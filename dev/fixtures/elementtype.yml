@@ -1,0 +1,22 @@
+ElementType:
+  ElementType_1:
+    name: Text Input
+    class: TextInputElement
+  ElementType_2:
+    name: Radio Buttons
+    class: RadioListElement
+  ElementType_3:
+    name: Dropdown List
+    class: SelectListElement
+  ElementType_4:
+    name: Checkboxes
+    class: CheckboxListElement
+  ElementType_5:
+    name: Text Area
+    class: TextareaElement
+  ElementType_6:
+    name: PDF Upload
+    class: PDFFileInputElement
+  ElementType_7:
+    name: Ranking List
+    class: RankingListElement

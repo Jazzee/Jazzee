@@ -1,0 +1,19 @@
+PageType:
+  PageType_1:
+    name: Text Only
+    class: TextPage
+  PageType_2:
+    name: Standard
+    class: StandardPage
+  PageType_3:
+    name: Recommenders
+    class: RecommendersPage
+  PageType_4:
+    name: Lock
+    class: LockPage
+  PageType_5:
+    name: ETS Match
+    class: ETSMatchPage
+  PageType_6:
+    name: Citizenship
+    class: CitizenshipPage

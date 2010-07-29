@@ -1,0 +1,37 @@
+Role:
+  Role_1:
+    name: Administrator
+    global: true
+RoleAction:
+  RoleAction_1:
+    controller: manage_users
+    action: index 
+    roleID: 1
+  RoleAction_2:
+    controller: manage_users
+    action: edit 
+    roleID: 1
+  RoleAction_3:
+    controller: manage_users
+    action: new 
+    roleID: 1
+  RoleAction_4:
+    controller: manage_users
+    action: reset 
+    roleID: 1
+  RoleAction_5:
+    controller: manage_configuration
+    action: index 
+    roleID: 1
+  RoleAction_6:
+    controller: manage_roles
+    action: index 
+    roleID: 1
+  RoleAction_7:
+    controller: manage_roles
+    action: edit 
+    roleID: 1
+  RoleAction_8:
+    controller: manage_roles
+    action: new 
+    roleID: 1

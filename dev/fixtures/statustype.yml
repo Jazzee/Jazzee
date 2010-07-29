@@ -1,0 +1,11 @@
+StatusType:
+  StatusType_1:
+    name: Received
+  StatusType_2:
+    name: Verified
+  StatusType_3:
+    name: Errors Present
+  StatusType_4:
+    name: Not Recieved
+  StatusType_5:
+    name: No Additional Information Required

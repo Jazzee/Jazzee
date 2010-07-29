@@ -1,0 +1,77 @@
+JazzeeConfig:
+  JazzeeConfig_1:
+    name: test
+    value: false
+
+Cycle:
+  Cycle_1:
+    name: Fall2010
+    start: '2009-01-01'
+    end: '2010-12-31'
+
+Program:
+  Program_1:
+    name: 'Test Program'
+    shortName: 'testprogram'
+    
+Application:
+  Application_1:
+    programID: 1
+    cycleID: 1
+    welcome: 'Sample Welcome text, editable for each program'
+    open: '2009-01-01'
+    close: '2010-12-31'
+    begin: '2010-09-01'
+
+
+Page:
+  Page_1:
+    title: 'Instructions'
+    class: 'Text'
+    min: 0
+    max: 1
+    leadingText: 'Sample instructions, editable for each program'
+  Page_2:
+    title: 'Standard Page'
+    class: 'Standard'
+    min: 3
+    max: 5
+    instructions: 'Instructions'
+    leadingText: 'Leading Text'
+    trailingText: 'Trailing Text'
+
+Element:
+  Element_1:
+    pageID: 2
+    class: 'TextInput'
+    title: 'Text Input'
+    format: 'format string'
+    instructions: 'some instructions'
+    defaultValue: 'default value'
+  Element_2:
+    pageID: 2
+    class: 'SelectList'
+    title: 'SelectList'
+    
+ElementListItem:
+  ElementListItem_1:
+	elementID: 2
+	weight: 1
+	value: 'First Item'
+  ElementListItem_2:
+	  elementID: 2
+	  weight: 2
+	  value: 'Second Item'	  
+
+      
+ApplicationPage:
+  ApplicationPage_1:
+    applicationID: 1
+    pageID: 1
+    weight: 1
+  ApplicationPage_2:
+    applicationID: 2
+    pageID: 2
+    weight: 2
+    
+      

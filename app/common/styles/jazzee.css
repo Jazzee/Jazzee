@@ -1,0 +1,280 @@
+/***** Default Jazzee Style *****/
+
+/***** Base colors and structure *****/
+html,body {
+	background-color: #ffffff;
+	color: #000000;
+	margin-top: 0;
+}
+
+#hd h1{
+  margin-top: 0;
+  text-align: right;
+  padding-right: 1em;
+}
+
+#topbar {
+  min-height: 2em;
+}
+
+#bar {
+  min-height: 400px;
+}
+
+#topbar p {
+  padding: 0.3em;
+}
+
+#content {
+  padding-left: .5em;
+  margin-top: 1em;
+  min-height: 400px;
+}
+
+#main {
+  border-left: 1px solid #000000;
+  border-top: 1px solid #000000;
+}
+
+#messages p {
+  text-align: center;
+  color: #000000;
+  font-weight: bold;
+  padding: .2em;
+  margin: .2em;
+}
+
+#ft {
+  margin-top: 1em;
+  border-top: 1px solid #990000;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+#ft p {
+  margin-bottom: .25em;
+  font-size: 85%;
+  text-align: center;
+}
+
+fieldset {
+  padding: .5em;
+  border: 1px solid #000000;
+}
+
+legend { 
+  color: #000000;  
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
+
+.success {
+  background-color: #ddeeee;
+  border: 1px groove #666699;
+}
+
+.notice {
+  background-color: #ffffee;
+  border: 1px groove #faf2e3;
+}
+
+.error {
+  background-color: #ffcc99;
+  border: 1px groove #990000;
+}
+
+ol li, ul li {
+  list-style-position: inside;
+}
+
+/***** NAVIGATION *****/
+
+/* Vertical navigation */
+div.v-navigation ol, div.v-navigation li{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+div.v-navigation a {
+  text-decoration: none;
+}
+
+/* Horizontal/Dropdown Navigation */
+div.h-navigation, div.h-navigation ol, div.h-navigation a {
+  list-style-type: none;
+  text-decoration: none;
+  display: block;
+}
+
+div.h-navigation li {
+  width: 146px;
+  height: 2em;
+  float: left;
+  position: relative;
+  z-index: 5;
+  background-color: #ffffff;
+  display: block;
+  cursor: pointer;
+}
+
+div.h-navigation li:hover {
+  z-index: 10000;
+  white-space: normal;/* Fix for IE7 hover bug */
+}
+
+div.h-navigation li ol {
+  visibility: hidden;
+  position: absolute;
+  z-index: 10;
+  left: 0; /*place the dropdown directly or IE7 throws it right*/
+}
+
+div.h-navigation li:hover>ol {
+  visibility: visible;
+  top: 100%;
+}
+
+div.h-navigation li ol li {
+  float: none;
+  clear: both;
+}
+
+div.h-navigation li:after, div.h-navigation li ol:after {
+  content: ".";
+  height: 0;
+  display: block;
+  visibility: hidden;
+  overflow: hidden;
+  clear: both;
+}
+div.h-navigation, div.h-navigation ol {
+  min-height: 0;
+}
+
+div.h-navigation li ol {
+  background-image: url('resource/media/blank.gif');
+  background-color: transparent;
+  padding: .5em 2em 2em 2em;
+  margin: -.5em -2em -2em -2em;
+}
+
+div.v-navigation li {
+  font-weight: bold;
+}
+
+div.v-navigation a, div.v-navigation a:visited, div.v-navigation li li {
+  display: block;
+}
+
+div.v-navigation li.current {
+  padding-left: 10px;
+}
+
+div.h-navigation ol, div.h-navigation ol li {
+  background-color: #ffffff;
+}
+
+div.h-navigation li:hover, div.h-navigation a:hover, div.h-navigation li:hover>a {
+  background-color: #ffffff;
+}
+
+/***** FORMS *****/
+
+div.form {
+  width: 100%;
+  margin: 1em 0 0 0;
+  padding-bottom: 1em;
+  border: 2px double #003366;
+  width: 95%;
+}
+
+div.form ol {  
+  list-style: none;
+}
+
+div.form ol li {   
+  width: 100%;
+  list-style: none;
+}
+
+div.form p.required{
+  float: right;
+  text-align: right;
+  background-image: url('resource/foundation/icons/asterisk_yellow.png');
+  background-repeat: no-repeat;
+  padding-left: 20px;
+}
+
+div.form fieldset {
+  border: none;
+  clear: both;
+  width: 90%;
+}
+
+div.form div.field {
+  clear: both;
+  margin-bottom: 0.5em;
+}
+
+div.form div.label{
+  text-align: right;
+}
+
+div.form fieldset.buttons {
+  width: auto;
+  padding-left: 4em;
+  border: none;
+}
+
+div.form fieldset.buttons input{
+  height: 2em;
+  padding: 0 1em;
+  margin-right: 1em;
+  float: left;
+}
+
+div.form div.field div.element label{
+  padding-right: 16px;
+  margin:0;
+}
+
+label.required{
+  background-image: url('resource/foundation/icons/asterisk_yellow.png');
+  background-repeat: no-repeat;
+  background-position:top right;
+}
+
+div.form p.instructions {
+  width: 90%;
+  margin: auto;
+  margin-bottom: 1em;
+  padding: .5em;
+  border: 1px groove #000000;
+  background-color: #ffffdd;
+}
+
+div.form div.field p.message {
+  color: #FF0000;
+}
+
+div.form div.field p.instructions {
+  background: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: 60%;
+}
+
+div.form div.field p.instructions, div.form div.field p.format, div.form div.field p.message {
+  font-style: italic;
+  font-size: 80%;
+}
+
+div.form textarea {
+  height: 15em;
+  width: 80%;
+}
