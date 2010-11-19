@@ -1,0 +1,126 @@
+@CHARSET "UTF-8";
+
+html {
+	background-color: #e6e6e6;
+}
+
+
+#hd {
+	background-color:#003366;
+}
+
+#hd h1{ 
+  color:#ffffff;
+}
+
+#bd {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+a, a:visited {color:#003366;}
+a:hover {color:#cc6600;}
+
+	
+#main {
+  border-left: 1px solid #003366;
+}
+
+#ft p {
+  border-top: 1px solid #003366;
+  font-size: 80%;
+  font-size: 85%;
+  text-align: center;
+}
+
+.success {
+  border: 1px dashed #003366;
+  background-color: #7799bb;
+}
+
+.notice {
+  background-color: #cc9933;
+  border: 1px groove #003366;
+}
+
+.error {
+  background-color: #990000;
+  border: 1px groove #003366;
+}
+
+/***** NAVIGATION Style *****/
+
+/* Horizontal/Dropdown Navigation */
+div.h-navigation, div.h-navigation li, div.h-navigation ol {
+	background-color: #7799bb;
+	color: #000000;
+}
+
+div.h-navigation li:hover, div.h-navigation a:hover, div.h-navigation li:hover>a {
+  color: #336699;
+}
+
+/***** SIDEBAR NAVIGATION *****/
+div.v-navigation li{
+  list-style: none;
+  font-weight: bold;
+}
+
+div.v-navigation a {
+  text-decoration: none;
+}
+
+/***** FORM STYLE *****/
+
+div.form {
+  border: 2px double #003366;
+  padding: 10px;
+}
+
+div.form ol{  
+  list-style: none;
+}
+
+div.form fieldset{
+	border: none;
+}
+
+div.form legend{
+	font-size: 121%;
+	font-weight: bold;
+}
+
+div.form p.required{
+  background-image: url('resource/foundation/icons/asterisk_yellow.png');
+  background-repeat: no-repeat;
+  padding-left: 20px;
+}
+
+div.form label.required{
+  background-image: url('resource/foundation/icons/asterisk_yellow.png');
+  background-repeat: no-repeat;
+  background-position:top right;
+}
+
+div.form p.instructions {
+  border: 1px groove #000000;
+  background-color: #ffffdd;
+}
+
+div.form div.field p.message {
+  color: #990000;
+}
+
+div.form div.field p.instructions {
+  width: 60%;
+}
+
+div.form div.field p.instructions, div.form div.field p.format, div.form div.field p.message {
+  font-style: italic;
+  font-size: 80%;
+}
+
+div.form textarea {
+  height: 15em;
+  width: 80%;
+}

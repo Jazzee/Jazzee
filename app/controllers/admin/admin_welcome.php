@@ -19,6 +19,11 @@ class AdminWelcomeController extends AdminController {
     $this->setVar('lastLogin_ip', $this->session->lastLogin_ip);
   }
   
+  protected function setUp(){
+    $this->setLayoutVar('pageTitle', 'Welcome');
+    $this->setLayoutVar('layoutTitle', 'Welcome');
+  }
+  
   public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
     //Check to be sure a valid user object has been set
     //Any user is allowed access
