@@ -1,0 +1,190 @@
+@CHARSET "UTF-8";
+/***** Default Jazzee layout *****/
+body {
+	margin-top: -20px;
+}
+
+#hd h1 {
+  padding: 2em 1em 0 0; 
+  text-align: right;
+}
+
+#topbar p {
+ padding: 0.3em;
+}
+
+#content {
+  padding-left: .5em;
+  margin-top: 1em;
+  min-height: 400px;
+}
+
+
+#messages p {
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+#ft p {
+	margin: 20px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+
+/***** NAVIGATION Layout*****/
+
+/* Horizontal/Dropdown Navigation */
+div.h-navigation {
+	display:block;
+	padding: .5em 0 0 1em;
+	margin-bottom:1em;
+	height:2em;
+}
+
+div.h-navigation ol, div.h-navigation a {
+  list-style-type: none;
+  text-decoration: none;
+  display: block;
+  padding:0;
+  margin:0;
+}
+
+div.h-navigation li {
+  height: 2em;
+  float: left;
+  position: relative;
+  z-index: 5;
+  display: block;
+  padding-right:5em;
+  font-weight:bold;
+  width: 180px;
+}
+
+div.h-navigation li:hover {
+  z-index: 10000;
+  white-space: normal;/* Fix for IE7 hover bug */
+}
+
+div.h-navigation li ol {
+  display: block;
+  visibility: hidden;
+  position: absolute;
+  z-index: 10;
+  left: 0; /*place the dropdown directly or IE7 throws it right*/
+
+}
+
+div.h-navigation li:hover ol {
+  visibility: visible;
+  top: 100%;
+}
+
+div.h-navigation li ol li {
+  float: none;
+  clear: both;
+  margin-left:.5em;
+}
+
+div.h-navigation li:after, div.h-navigation li ol:after {
+  content: ".";
+  height: 0;
+  display: block;
+  visibility: hidden;
+  overflow: hidden;
+  clear: both;
+}
+div.h-navigation, div.h-navigation ol {
+  min-height: 0;
+}
+
+div.h-navigation li ol {
+  padding: 1em .25em .25em .25em;
+  margin: -.5em -2em -2em -.5em;
+}
+
+/***** SIDEBAR NAVIGATION *****/
+
+div.v-navigation {
+margin:0 .1em 0 .8em;
+padding:0;
+}
+
+div.v-navigation ul, div.v-navigation ol{
+margin:0;
+padding:0;
+position:relative;
+overflow:hidden;
+}
+
+div.v-navigation li{
+  list-style: none;
+  margin:0;
+  padding: 0 0 .4em 1.5em;
+  display: block;
+}
+
+/***** FORMS LAYOUT *****/
+
+div.form {
+  width: 90%;
+  margin: 1em 0 0 0;
+  padding-bottom: 1em;
+}
+
+div.form p.required{
+  float: right;
+  text-align: right;
+}
+
+div.form fieldset {
+  clear: both;
+}
+
+div.form div.field {
+  clear: both;
+  margin-bottom: 0.5em;
+}
+
+div.form div.label{
+  text-align: right;
+}
+
+div.form fieldset.buttons {
+  width: auto;
+  padding-left: 4em;
+  border: none;
+}
+
+div.form fieldset.buttons input{
+  height: 2em;
+  padding: 0 1em;
+  margin-right: 1em;
+  float: left;
+}
+
+div.form div.field div.element label{
+  padding-right: 16px;
+  margin:0;
+}
+
+div.form p.instructions {
+  width: 90%;
+  margin: auto;
+  margin-bottom: 1em;
+  padding: .5em;
+}
+
+div.form div.field p.instructions {
+  width: 60%;
+}
+
+div.form textarea {
+  height: 15em;
+  width: 80%;
+}
+

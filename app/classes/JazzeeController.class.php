@@ -182,17 +182,29 @@ class JazzeeController extends Controller{
       }
     }
     
-    //define required layout fields with blanks
-    $this->loadRequiredLayout();
+    //required layout variables get default values
+    $this->setLayoutVar('requiredCss', array());
+    $this->setLayoutVar('requiredJs', array());
+    $this->setLayoutVar('pageTitle', '');
+    $this->setLayoutVar('layoutTitle', '');
+    $this->setLayoutVar('layoutContentTop', '');
+    $this->setLayoutVar('layoutContentFooter', '<p>This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.</p>');
+    $this->setLayoutVar('status', 'success'); //used in some json ajax requests
     
-    //loading base scripts found in foundation/scripts
-    $this->loadBaseScripts();
-
-    //loading base css found in foundation/styles
-    $this->loadBaseStyles();
-
-    //loading the theme
-    $this->loadTheme();
+    //add jquery
+    $this->addScript('foundation/scripts/jquery.js');
+    $this->addScript('foundation/scripts/jqueryui.js');
+    
+    //yui css library
+    $this->addCss('foundation/styles/reset-fonts-grids.css');
+    $this->addCss('foundation/styles/base.css');
+    
+    //our css
+    $this->addCss('common/styles/layout.css');
+    $this->addCss('common/styles/style.css');
+    
+    //jquery's style info
+    $this->addCss('foundation/styles/jquery/themes/smoothness/style.css');
   }
   
   /**
@@ -226,46 +238,6 @@ class JazzeeController extends Controller{
    */
   public function getNavigation(){
     return null;
-  }
-  
-  /**
-   * Load the theme
-   * For now this just loads the default Jazzee Theme
-   */
-  public function loadTheme(){
-    $this->addCss('common/styles/jazzee.css');
-    $this->addCss('foundation/styles/jquery/themes/smoothness/style.css');
-  }
-  
-  /**
-   * Load the required page layout
-   * Loads structs for storing the css & js files to load, 
-   * and various layout hooks 
-   */
-  public function loadRequiredLayout(){
-    $this->setLayoutVar('requiredCss', array());
-    $this->setLayoutVar('requiredJs', array());
-    $this->setLayoutVar('pageTitle', '');
-    $this->setLayoutVar('layoutTitle', '');
-    $this->setLayoutVar('layoutContentTop', '');
-    $this->setLayoutVar('layoutContentFooter', 'This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.');
-    $this->setLayoutVar('status', 'success'); //used in some json ajax requests
-  }
-  
-  /**
-   * Loads required scripts stored in foundation. 
-   */
-  public function loadBaseScripts() {
-    $this->addScript('foundation/scripts/jquery.js');
-    $this->addScript('foundation/scripts/jqueryui.js');
-  }
-  
-  /**
-   * Loads required css files stored in foundation.
-   */
-  public function loadBaseStyles() {
-    $this->addCss('foundation/styles/reset-fonts-grids.css');
-    $this->addCss('foundation/styles/base.css');
   }
   
 }
