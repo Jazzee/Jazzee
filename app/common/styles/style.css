@@ -33,19 +33,25 @@ a:hover {color:#cc6600;}
   text-align: center;
 }
 
+#messages p {
+  padding: 10px;
+  border-style: groove;
+  border-size: 1px;
+}
+
 .success {
-  border: 1px dashed #003366;
-  background-color: #7799bb;
+  color: #7799bb;
+  border-color:#7799bb;
 }
 
 .notice {
-  background-color: #cc9933;
-  border: 1px groove #003366;
+  color: #cc9933;
+  border-color:#cc9933;
 }
 
 .error {
-  background-color: #990000;
-  border: 1px groove #003366;
+  color: #990000;
+  border-color: #990000;
 }
 
 /***** NAVIGATION Style *****/
