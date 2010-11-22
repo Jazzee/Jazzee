@@ -66,6 +66,10 @@ abstract class AdminController extends JazzeeController{
       $this->afterAction();
       exit();
     }
+    if($this->cycle AND $this->program){
+      $this->setLayoutVar('pageTitle', $this->cycle->name . ' ' . $this->program->name);
+      $this->setLayoutVar('layoutTitle', $this->cycle->name . ' ' . $this->program->name);
+    }
     $this->setUp();
   }
   
