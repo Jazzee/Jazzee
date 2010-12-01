@@ -49,9 +49,10 @@ Lvc_Config::setViewClassName('JazzeeView');
 Lvc_Config::setDefaultControllerName('apply_welcome');
 Lvc_Config::setDefaultControllerActionName('index');
 
-//loading default scripts and theme scripts.
-Resource::getInstance()->addDirectory(APP_ROOT . '/common/scripts', 'common/scripts/', false);
-Resource::getInstance()->addDirectory(APP_ROOT . '/common/styles', 'common/styles/', false);
+//loading common scripts, themes, and styles
+Resource::getInstance()->addDirectory(APP_ROOT . '/common/scripts', 'common/scripts/', true);
+Resource::getInstance()->addDirectory(APP_ROOT . '/common/styles', 'common/styles/', true);
+Resource::getInstance()->addDirectory(APP_ROOT . '/common/media', 'common/media/', true);
 
 
 //Allow everything to be overridden
