@@ -25,6 +25,10 @@ body {
   margin: 10px;
 }
 
+#ft {
+	clear: both;
+}
+
 #ft p {
 	margin: 20px 0;
 }
