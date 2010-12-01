@@ -76,4 +76,18 @@ function ordinalValue($num){
   }
   return "{$num}<sup>{$suffix}</sup>";
 }
+
+/**
+ * Check and array of values for null values
+ * Javascript posts a string 'null' this function looks through an array
+ * with the purpose of converting that to php null type
+ * @param array $arr
+ * @return array
+ */
+function replaceNullString($arr){
+  foreach(array_keys($arr, 'null', true) as $key){
+    $arr[$key] = null;
+  }
+  return $arr;
+}
 ?>
