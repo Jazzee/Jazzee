@@ -49,7 +49,7 @@ abstract class AdminController extends JazzeeController{
     if(isset($this->session->cycleID))
       $this->cycle = Doctrine::getTable('Cycle')->find($this->session->cycleID);
     if($this->cycle AND $this->program){
-       $this->application = Doctrine::getTable('Application')->findOneByprogramIDAndcycleID($this->session->programID, $this->session->cycleID);
+       $this->application = Application::findOneApplication($this->program->shortName, $this->cycle->name);
     }
     if(!$this->checkIsAllowed($this->controllerName, $this->actionName)){
       if($this->controllerName == 'admin_welcome' and $this->actionName == 'index'){
