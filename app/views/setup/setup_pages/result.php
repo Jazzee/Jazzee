@@ -1,6 +1,7 @@
 <?php 
 /**
- * setup_pages newPageList view
+ * setup_pages result view
+ * a default jason view for outputting simple data
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
@@ -9,4 +10,4 @@
  */
 
 ?>
-"elements":<?php print json_encode($elements) ?>
+"result":<?php print json_encode($result) ?>

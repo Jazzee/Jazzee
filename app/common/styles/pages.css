@@ -1,6 +1,5 @@
 .container {
-    font-size: 1em;
-    border:3px solid #aaaa99;
+  border:3px solid #aaaa99;
 	padding: 1em;
 	margin: .5em;
 	cursor: default;
@@ -15,39 +14,48 @@
   list-style-type: none;
 }
 
-img.add, img.delete{
-  width: 1em;
-  height: 1em;
+.strike {
+  text-decoration: line-through;
 }
 
-#tabs ul {
-  list-style-type: none;
-  padding: 3px 5px;
-  width: 100%;
-  border-bottom: 1px solid #000000;
-  margin-bottom: 1em;
+
+#application-pages li{
+  list-style-image: url('resource/foundation/icons/page.png');
 }
 
-#tabs ul li {
-  display: inline;
-  padding: 3px 4px;
-  border: 1px solid #000000;
-  cursor: default;
-  margin-right: 3px;
-  text-decoration: none;
+#new-pages ol, #new-elements ol{
+	list-style-type: none;
+}
+#new-pages li, #new-elements li{
+	background-image: url('resource/foundation/icons/bullet_add.png');
+	background-repeat: no-repeat;
+	padding-left: 14px;
 }
 
-#tabs ul li.active {
-  border-bottom: 2px solid #ffffff;;
+#workspace p{
+  padding-left: 16px;
+  background-repeat: no-repeat;
+  background-image: url('resource/foundation/icons/pencil.png');
+  clear: left;
+}
+
+#workspace p.deletePage, #workspace p.deleteElement{
+	background-image: url('resource/foundation/icons/delete.png');
+}
+
+#workspace p.previewPage{
+  background-image: url('resource/foundation/icons/page_code.png');
+}
+
+#workspace p.title{
+  font-size: 120%;
   font-weight: bold;
 }
 
-#workspace li.element {
-  border-bottom: 2px solid #aaaa99;
-  padding: 1em;
-  margin: .5em;
+#canvas {
+  width: 100%;
 }
 
-.strike {
-  text-decoration: line-through;
+#status-bar img {
+  width: 120px;
 }
