@@ -9,17 +9,17 @@
  */
 ?>
 <noscript>This Page Requires javascript.  Please consult your department IT support for help enabling Javascript in your browser.</noscript>
-<div id='canvas' class='yui-gf'>
-  <div id='left' class='yui-u first'>
+<div id='canvas' class='yui-t2'>
+  <div id='yui-main'>
+    <div id='workspace' class='container yui-b'></div>
+  </div>
+  <div class='yui-b'>
     <div id='application-pages' class='container'>
     <h5>Application Pages</h5>
     </div>
     <div id='new-pages' class='container'>
     <h5>New Pages</h5>
     </div>
-  </div>
-  <div id='center' class='yui-u'>
-    <div id='tabs'></div>
-    <div id='workspace' class='container'></div>
+    <div id='status' class='container'></div>
   </div>
 </div>

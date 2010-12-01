@@ -7,7 +7,12 @@
  * @subpackage admin
  * @subpackage setup
  */
-class SetupPagesController extends SetupController {
+class SetupPagesController extends SetupController implements PagesInterface {
+  /**
+   * Set the default layout to json
+   * @var string
+   */
+  protected $layout = 'json';
   
   /**
    * Add the required JS
@@ -21,8 +26,12 @@ class SetupPagesController extends SetupController {
       exit();
     }
     $this->addScript('foundation/scripts/form.js');
-    $this->addScript('common/scripts/messages.js');
+    $this->addScript('common/scripts/status.js');
+    $this->addScript('common/scripts/pages/Page.js');
+    $this->addScript('common/scripts/pages/Element.js');
+    $this->addScript('common/scripts/pages/PageStore.js');
     $this->addScript('common/scripts/pages.js');
+   
     $this->addCss('common/styles/pages.css');
     
   }
@@ -31,30 +40,36 @@ class SetupPagesController extends SetupController {
    * Javascript does the display work unless there is no application
    */
   public function actionIndex(){
+    $this->layout = 'wide';
   }
   
   /**
    * List the application Pages
    */
-  public function actionPageList(){
+  public function actionListPages(){
     $pages = array();
     foreach($this->application->Pages AS $page){
-      $pages[] = array(
-        'id' => $page->id,
-        'title' => $page->title
-      );
+      $arr = $page->toArray(false);
+      $arr['type'] = $page->Page->PageType->class;
+      $arr['elements'] = array();
+      foreach($page->Page->Elements as $element){
+        $e = $element->toArray();
+        $e['type'] = $element->ElementType->class;
+        $arr['elements'][] = $e;
+      }
+      $pages[] = $arr;
     }
-    $this->layout = 'json';
-    $this->setVar('pages', $pages);
+    $this->setVar('result', $pages);
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
    * List the available page types
    */
-  public function actionNewPageList(){
+  public function actionListPageTypes(){
     $pageTypes = Doctrine::getTable('PageType')->findAll(Doctrine::HYDRATE_ARRAY);
-    foreach($pageTypes as $page){
-      $pages[$page['id']] = $page['name'];
+    foreach($pageTypes as $type){
+      $pages[$type['id']] = $type['name'];
     }
     asort($pages);
     $arr = array();
@@ -64,8 +79,8 @@ class SetupPagesController extends SetupController {
         'name' => $name
       );
     }
-    $this->layout = 'json';
-    $this->setVar('pages', $arr);
+    $this->setVar('result', $arr);
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
@@ -77,77 +92,101 @@ class SetupPagesController extends SetupController {
       $this->setLayoutVar('status', 'error');
       $this->messages->write('error', "Invalid page type");
     } else {
+      $lastPage = end($this->application->Pages->toArray());
+      $weight = $lastPage['weight'] + 1;
       $applicationPage = new ApplicationPage;
+      $applicationPage->weight = $weight;
       $page = new Page;
       $page->title = "New {$pageType->name} Page";
-      $page->min = 1;
-      $page->max = 1;
       $page->optional = false;
       $page->pageType = $pageType->id;
       $applicationPage['Page'] = $page;
       $this->application['Pages'][] = $applicationPage;
+      $this->messages->write('success', "Changes Saved");
       $this->application->save();
     }
-    $this->layout = 'json';
-  }
-  
-  /**
-   * Get all of the tabs for a page
-   * @param integer $pageID
-   */
-  public function actionGetTabs($pageID){
-    if(!$page = $this->application->getPageByID($pageID)){
-      $this->messages->write('error', "Invalid page: {$pageID}");
-    } else {
-      $this->setVar('page', $page);
-    }
-    $this->layout = 'json';
-  }
-  
-  /**
-   * Post the input from a page cretor form
-   * @param string $name the name of the form
-   * @param integer $pageID
-   */
-  public function actionPostForm($name, $pageID){
-    if(!$page = $this->application->getPageByID($pageID)){
-      $this->messages->write('error', "Invalid page: {$pageID}");
-    } else {
-      $class = new $page->Page->PageType->class($page);
-      $tabs = $class->getTabs();
-      $form = $tabs[$name]->getForm();
-      if($input = $form->processInput($this->post)){
-        $class->{$tabs[$name]->method}($input);
-        $tabs = $class->getTabs();
-        $form = $tabs[$name]->getForm();
-      }
-      $form->action = $this->path("setup/pages/postForm/{$name}/{$pageID}");
-      $this->setVar('form', $form);
-    }
-    $this->layout = 'json';
   }
   
   /**
    * Delete the page
    * @param integer $pageID
    */
-  public function actionDelete($pageID){
+  public function actionDeletePage($pageID){
     if(!$page = $this->application->getPageByID($pageID)){
       $this->messages->write('error', "Invalid page: {$pageID}");
-      $this->layout = 'json';
     } else {
       if(!$page->Page->GlobalPage->count()){
         $page->Page->delete();
       }
+      $this->messages->write('success', "Changes Saved");
       $page->delete();
     }
-    $this->layout = 'json';
+  }
+  
+  /**
+   * Save data from editing a page
+   * @param integer $pageID
+   */
+  public function actionSavePage($pageID){
+    $data = $this->post['data'];
+    if(!$page = $this->application->getPageByID($pageID)){
+      $this->messages->write('error', "Invalid page: {$pageID}");
+    } else {
+      if(!$page->Page->GlobalPage->count()){
+        $data = replaceNullString($data);
+        $page->Page->title = $data['title'];
+        $page->Page->min = $data['min'];
+        $page->Page->max = $data['max'];
+        $page->Page->optional = (bool)$data['optional'];
+        $page->Page->instructions = $data['instructions'];
+        $page->Page->leadingText = $data['leadingText'];
+        $page->Page->trailingText = $data['trailingText'];
+        $page->weight = $data['weight'];
+        $page->save();
+        $elementsByID = array();
+        foreach($data['elements'] as $arr){
+          if(
+            !$element = Doctrine::getTable('Element')->find($arr['id']) or
+            (
+              $element->Page->ApplicationPage->Application->id != $this->application->id and
+              $element->Page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
+            ){
+            $this->messages->write('error', "Invalid Element");
+          } else {
+            $arr = replaceNullString($arr);
+            $element->title = $arr['title'];
+            $element->format = $arr['format'];
+            $element->instructions = $arr['instructions'];
+            $element->defaultValue = $arr['defaultValue'];
+            $element->required = (bool)$arr['required'];
+            $element->min = $arr['min'];
+            $element->max = $arr['max'];
+            $element->save();
+          }
+        }
+      } else {
+        print 'write save method for global pages'; die;
+      } 
+      $this->messages->write('success', "Changes Saved");
+    }
+  }
+  
+  /**
+   * Preview a page
+   * @param integer $pageID
+   */
+  public function actionPreviewPage($pageID){
+    if($page = $this->application->getPageByID($pageID)){
+      $class = new $page->Page->PageType->class($page);
+      $this->layout = 'blank';
+      $this->setVar('page', $class);
+    }
   }
   
   /**
    * List the available element types
    */
-  public function actionNewElementsList(){
+  public function actionListElementTypes(){
     $elements = array();
     $elementTypes = Doctrine::getTable('ElementType')->findAll(Doctrine::HYDRATE_ARRAY);
     foreach($elementTypes as $element){
@@ -161,8 +200,8 @@ class SetupPagesController extends SetupController {
         'name' => $name
       );
     }
-    $this->layout = 'json';
-    $this->setVar('elements', $arr);
+    $this->setVar('result', $arr);
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
@@ -170,8 +209,7 @@ class SetupPagesController extends SetupController {
    * @param integer $pageID
    */  
   public function actionAddElement($pageID){
-    $this->layout = 'json';
-    $elementType = Doctrine::getTable('ElementType')->find($this->post['elementType']);
+    $elementType = Doctrine::getTable('ElementType')->find($this->post['type']);
     if(!$elementType or !class_exists($elementType->class)){
       $this->setLayoutVar('status', 'error');
       $this->messages->write('error', "Invalid element type");
@@ -179,10 +217,10 @@ class SetupPagesController extends SetupController {
       if(
         !$page = Doctrine::getTable('Page')->find($pageID) or
         ($page->ApplicationPage->Application->id != $this->application->id and
-        $page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
+        $page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)
       ){
         $this->setLayoutVar('status', 'error');
-        $this->messages->write('error', "Invalid page: {$pageID}");
+        $this->messages->write('error', "Invalid page");
       } else {
         $this->messages->write('success', "Element Added Successfully");
         $element = new Element;
@@ -193,95 +231,23 @@ class SetupPagesController extends SetupController {
       }
     }
   }
-
-  /**
-   * Edit an element
-   * @param integer $elementID
+  
+/**
+   * Delete the page
+   * @param integer $pageID
    */
-  public function actionEditElement($elementID){
-    $element = Doctrine::getTable('Element')->find($elementID);
+  public function actionDeleteElement($elementID){
     if(
-      !$element or
+      !$element = Doctrine::getTable('Element')->find($elementID) or
       (
-        !$page = Doctrine::getTable('Page')->find($element->Page->id) or
-        ($page->ApplicationPage->Application->id != $this->application->id and
-        $page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
-      )){
-      $this->messages->write('error', "Invalid Element: {$elementID}");
+        $element->Page->ApplicationPage->Application->id != $this->application->id and
+        $element->Page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
+      ){
+      $this->messages->write('error', "Invalid Element");
     } else {
-      $e = new $element->ElementType->class($element);
-      $form = $e->getPropertiesForm();
-      if($input = $form->processInput($this->post)){
-        $e->setProperties($input);
-        $this->messages->write('success', "Changes Saved Successfully");
-        $form = $e->getPropertiesForm();
-      }
-      $form->action = $this->path("setup/pages/editElement/{$elementID}");
-      $this->setVar('form', $form);
+      $this->messages->write('success', "Element Deleted");
+      $element->delete();
     }
-    $this->layout = 'json';
-  }
-  
-  /**
-   * Deactivate List Item
-   * @param integer $listItemID
-   */  
-  public function actionDeactivateListItem($listItemID){
-    $listItem = Doctrine::getTable('ElementListItem')->find($listItemID);
-    if(!$listItem or
-      (
-        !$page = Doctrine::getTable('Page')->find($listItem->Element->Page->id) or
-        ($page->ApplicationPage->Application->id != $this->application->id and
-        $page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
-      )){
-      $this->messages->write('error', "Invalid List Item: {$listItemID}");
-    } else {
-      $listItem->active = false;
-      $listItem->save();
-    }
-    $this->layout = 'json';
-  }
-  
-  /**
-   * Activate List Item
-   * @param integer $listItemID
-   */  
-  public function actionActivateListItem($listItemID){
-    $listItem = Doctrine::getTable('ElementListItem')->find($listItemID);
-    if(!$listItem or
-      (
-        !$page = Doctrine::getTable('Page')->find($listItem->Element->Page->id) or
-        ($page->ApplicationPage->Application->id != $this->application->id and
-        $page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
-      )){
-      $this->messages->write('error', "Invalid List Item: {$listItemID}");
-    } else {
-      $listItem->active = true;
-      $listItem->save();
-    }
-    $this->layout = 'json';
-  }
-  
-  /**
-   * Add a list item to an element
-   * @param integer $elementID
-   */  
-  public function actionAddListItem($elementID){
-    $element = Doctrine::getTable('Element')->find($elementID);
-    if(
-      !$element or
-      (
-        !$page = Doctrine::getTable('Page')->find($element->Page->id) or
-        ($page->ApplicationPage->Application->id != $this->application->id and
-        $page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
-      )){
-      $this->messages->write('error', "Invalid Element: {$elementID}");
-    } else {
-      $item = $element->ListItems->get(null);
-      $item->value = $this->post['value'];
-      $element->save();
-    }
-    $this->layout = 'json';
   }
   
   public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
