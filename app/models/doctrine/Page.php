@@ -14,4 +14,10 @@ class Page extends BasePage{
     }
     return self::$_null;
   }
+  public function findElementById($id){
+    foreach($this['Elements'] as $element){
+      if($element->id == $id){return $element;}
+    }
+    return self::$_null;
+  }
 }
