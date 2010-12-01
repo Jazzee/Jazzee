@@ -164,58 +164,6 @@ class CitizenshipPage extends StandardPage {
     return $answers;
   }
   
-  public function getTabs(){
-    $tabs = parent::getTabs();
-    unset($tabs['elements']);
-    return $tabs;
-  }
-  
-  /**
-   * Get the standard edit properties form
-   * @return Form
-   */
-  public function getEditPropertiesForm(){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Edit {$this->applicationPage->title} properties"));
-    $element = $field->newElement('TextInput','title');
-    $element->label = 'Title';
-    $element->addValidator('NotEmpty');
-    $element->value = $this->applicationPage->title;
-    
-    $element = $field->newElement('RadioList','optional');
-    $element->label = 'Is this page optional?';
-    $element->addValidator('NotEmpty');
-    $element->addItem(1,'Yes');
-    $element->addItem(0, 'No');
-    $element->value = (int)$this->applicationPage->optional;
-    
-    $element = $field->newElement('Textarea','instructions');
-    $element->label = 'Instructions';
-    $element->value = $this->applicationPage->instructions;
-    
-    $element = $field->newElement('Textarea','leadingText');
-    $element->label = 'Leading Text';
-    $element->value = $this->applicationPage->leadingText;
-    
-    $element = $field->newElement('Textarea','trailingText');
-    $element->label = 'Trailing Text';
-    $element->value = $this->applicationPage->trailingText;
-    
-    $form->newButton('submit', 'Save');
-    return $form;
-  }
-  
-  public function editProperties(FormInput $input){
-    $this->applicationPage->title = $input->title;
-    $this->applicationPage->min = 1;
-    $this->applicationPage->max = 1;
-    $this->applicationPage->optional = (bool)$input->optional;
-    $this->applicationPage->instructions = $input->instructions;
-    $this->applicationPage->leadingText = $input->leadingText;
-    $this->applicationPage->trailingText = $input->trailingText;
-    $this->applicationPage->save();
-  }
-  
 }
 
 /**

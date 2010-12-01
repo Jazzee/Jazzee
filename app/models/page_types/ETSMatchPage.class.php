@@ -72,15 +72,6 @@ class ETSMatchPage extends StandardPage {
     return $answers;
   }
   
-  /**
-   * Remove the elemnts tab
-   * @return array
-   */
-  public function getTabs(){
-    $tabs = parent::getTabs();
-    unset($tabs['elements']);
-    return $tabs;
-  }
 }
 
 /**

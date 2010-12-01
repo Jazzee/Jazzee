@@ -68,50 +68,5 @@ class LockPage extends StandardPage {
     return false;
   }
   
-  /**
-   * Remove the elemnts tab
-   * @return array
-   */
-  public function getTabs(){
-    $tabs = parent::getTabs();
-    unset($tabs['elements']);
-    return $tabs;
-  }
-  
-  /**
-   * Get the edit properties form
-   * @return Form
-   */
-  public function getEditPropertiesForm(){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Edit {$this->applicationPage->title} properties"));
-    $element = $field->newElement('TextInput','title');
-    $element->label = 'Title';
-    $element->addValidator('NotEmpty');
-    $element->value = $this->applicationPage->title;
-    
-    $element = $field->newElement('Textarea','instructions');
-    $element->label = 'Instructions';
-    $element->value = $this->applicationPage->instructions;
-    
-    $element = $field->newElement('Textarea','leadingText');
-    $element->label = 'Leading Text';
-    $element->value = $this->applicationPage->leadingText;
-    
-    $element = $field->newElement('Textarea','trailingText');
-    $element->label = 'Trailing Text';
-    $element->value = $this->applicationPage->trailingText;
-    
-    $form->newButton('submit', 'Save');
-    return $form;
-  }
-  
-  public function editProperties(FormInput $input){
-    $this->applicationPage->title = $input->title;
-    $this->applicationPage->instructions = $input->instructions;
-    $this->applicationPage->leadingText = $input->leadingText;
-    $this->applicationPage->trailingText = $input->trailingText;
-    $this->applicationPage->save();
-  }
 }
 ?>
