@@ -13,8 +13,8 @@
  * @property string $instructions
  * @property string $leadingText
  * @property string $trailingText
+ * @property boolean $globalPage
  * @property PageType $PageType
- * @property Doctrine_Collection $GlobalPage
  * @property Doctrine_Collection $PageVariable
  * @property Doctrine_Collection $Elements
  * @property ApplicationPage $ApplicationPage
@@ -57,6 +57,9 @@ abstract class BasePage extends Doctrine_Record
              'type' => 'string',
              'length' => '3000',
              ));
+        $this->hasColumn('globalPage', 'boolean', null, array(
+             'type' => 'boolean',
+             ));
     }
 
     public function setUp()
@@ -65,10 +68,6 @@ abstract class BasePage extends Doctrine_Record
         $this->hasOne('PageType', array(
              'local' => 'pageType',
              'foreign' => 'id'));
-
-        $this->hasMany('GlobalPage', array(
-             'local' => 'id',
-             'foreign' => 'pageID'));
 
         $this->hasMany('PageVariable', array(
              'local' => 'id',

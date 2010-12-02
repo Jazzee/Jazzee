@@ -84,30 +84,11 @@ Page:
     instructions: string(3000)
     leadingText: string(3000)
     trailingText: string(3000)
+    globalPage: boolean
   relations:
     PageType:
       local: pageType
       foreign: id
-
-GlobalPage:
-  columns:
-    pageID:
-      type: integer
-      primary: true
-    cycleID:
-      type: integer
-      primary: true
-  relations:
-    Page:
-      local: pageID
-      foreign: id
-      onDelete: CASCADE
-      onUpdate: CASCADE
-    Cycle:
-      local: cycleID
-      foreign: id
-      onDelete: CASCADE
-      onUpdate: CASCADE
 
 PageType:
   columns:

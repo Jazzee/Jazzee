@@ -9,7 +9,6 @@
  * @property timestamp $start
  * @property timestamp $end
  * @property Doctrine_Collection $Application
- * @property Doctrine_Collection $GlobalPage
  * @property Doctrine_Collection $DefaultUsers
  * 
  * @package    jazzee
@@ -41,10 +40,6 @@ abstract class BaseCycle extends Doctrine_Record
     {
         parent::setUp();
         $this->hasMany('Application', array(
-             'local' => 'id',
-             'foreign' => 'cycleID'));
-
-        $this->hasMany('GlobalPage', array(
              'local' => 'id',
              'foreign' => 'cycleID'));
 
