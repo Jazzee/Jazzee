@@ -41,8 +41,10 @@ function Pages(){
       self.pageStore.saveAll();
     });
     $('#application-pages').append(ol);
-    if(!this.pageStore.checkPageExists(this.currentPageID)) this.currentPageID = list[0].id;
-    $('#application-page-' + this.currentPageID).trigger('click');
+    if(list.length > 0){
+	  if(!this.pageStore.checkPageExists(this.currentPageID)) this.currentPageID = list[0].id;
+	  $('#application-page-' + this.currentPageID).trigger('click');
+    }
   }
   
   this.refreshPageTypesDisplay = function(){
