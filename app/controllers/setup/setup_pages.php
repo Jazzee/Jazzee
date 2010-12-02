@@ -106,6 +106,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
       $page = new Page;
       $page->title = "New {$pageType->name} Page";
       $page->optional = false;
+      $page->globalPage = false;
       $page->pageType = $pageType->id;
       $applicationPage['Page'] = $page;
       $this->application['Pages'][] = $applicationPage;
@@ -122,9 +123,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
     if(!$page = $this->application->getPageByID($pageID)){
       $this->messages->write('error', "Invalid page: {$pageID}");
     } else {
-      if(!$page->Page->GlobalPage->count()){
-        $page->Page->delete();
-      }
+      $page->Page->delete();
       $this->messages->write('success', "Changes Saved");
       $page->delete();
     }
@@ -139,50 +138,46 @@ class SetupPagesController extends SetupController implements PagesInterface {
     if(!$page = $this->application->getPageByID($pageID)){
       $this->messages->write('error', "Invalid page: {$pageID}");
     } else {
-      if(!$page->Page->GlobalPage->count()){
-        $data = replaceNullString($data);
-        $page->Page->title = $data['title'];
-        $page->Page->min = $data['min'];
-        $page->Page->max = $data['max'];
-        $page->Page->optional = (bool)$data['optional'];
-        $page->Page->instructions = $data['instructions'];
-        $page->Page->leadingText = $data['leadingText'];
-        $page->Page->trailingText = $data['trailingText'];
-        $page->weight = $data['weight'];
-        $page->save();
-        $elementsByID = array();
-        foreach($data['elements'] as $arr){
-          if(
-            !$element = Doctrine::getTable('Element')->find($arr['id']) or
-            (
-              $element->Page->ApplicationPage->Application->id != $this->application->id and
-              $element->Page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
-            ){
-            $this->messages->write('error', "Invalid Element");
-          } else {
-            $arr = replaceNullString($arr);
-            $element->title = $arr['title'];
-            $element->format = $arr['format'];
-            $element->instructions = $arr['instructions'];
-            $element->defaultValue = $arr['defaultValue'];
-            $element->required = (bool)$arr['required'];
-            $element->min = $arr['min'];
-            $element->max = $arr['max'];
-            $items = array();
-            foreach($arr['list'] as $item){
-              $items[$item['id']] = $item['value'];
-            }
-            foreach($element->ListItems as $item){
-              if(array_key_exists($item->id, $items)){
-                $item->value = $items[$item->id];
-              }
-            }
-            $element->save();
+      $data = replaceNullString($data);
+      $page->Page->title = $data['title'];
+      $page->Page->min = $data['min'];
+      $page->Page->max = $data['max'];
+      $page->Page->optional = (bool)$data['optional'];
+      $page->Page->instructions = $data['instructions'];
+      $page->Page->leadingText = $data['leadingText'];
+      $page->Page->trailingText = $data['trailingText'];
+      $page->weight = $data['weight'];
+      $page->save();
+      $elementsByID = array();
+      foreach($data['elements'] as $arr){
+        if(
+          !$element = Doctrine::getTable('Element')->find($arr['id']) or
+          (
+            $element->Page->ApplicationPage->Application->id != $this->application->id and
+            $element->Page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
+          ){
+          $this->messages->write('error', "Invalid Element");
+        } else {
+          $arr = replaceNullString($arr);
+          $element->title = $arr['title'];
+          $element->format = $arr['format'];
+          $element->instructions = $arr['instructions'];
+          $element->defaultValue = $arr['defaultValue'];
+          $element->required = (bool)$arr['required'];
+          $element->min = $arr['min'];
+          $element->max = $arr['max'];
+          $items = array();
+          foreach($arr['list'] as $item){
+            $items[$item['id']] = $item['value'];
           }
+          foreach($element->ListItems as $item){
+            if(array_key_exists($item->id, $items)){
+              $item->value = $items[$item->id];
+            }
+          }
+          $element->save();
         }
-      } else {
-        print 'write save method for global pages'; die;
-      } 
+      }
       $this->messages->write('success', "Changes Saved");
     }
   }
