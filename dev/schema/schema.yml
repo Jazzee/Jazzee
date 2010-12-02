@@ -308,23 +308,6 @@ Decision:
       foreignType: one
       onDelete: CASCADE
       onUpdate: CASCADE
-
-ApplicantVariable:
-  columns:
-    applicantID: integer
-    variableName: string(255)
-    value: blob
-  indexes:
-    applicant_variable: 
-      fields: [applicantID, variableName]
-      type: unique
-  relations:
-    Applicant:
-      local: applicantID
-      foreignAlias: Variables
-      foreign: id
-      onDelete: CASCADE
-      onUpdate: CASCADE
       
 Communication:
   columns:
@@ -594,15 +577,6 @@ AuditLog:
     Timestampable:
       updated: 
         disabled: true
-
-AdminVariable:
-  columns:
-    name: string(255)
-    value: blob
-  indexes:
-    variable_name: 
-      fields: [name]
-      type: unique
 
 User:
   columns:
