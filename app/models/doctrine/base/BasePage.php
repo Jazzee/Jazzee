@@ -18,7 +18,6 @@
  * @property Doctrine_Collection $PageVariable
  * @property Doctrine_Collection $Elements
  * @property ApplicationPage $ApplicationPage
- * @property RecommendationPage $RecommendationPage
  * @property Doctrine_Collection $Answer
  * 
  * @package    jazzee
@@ -80,10 +79,6 @@ abstract class BasePage extends Doctrine_Record
         $this->hasOne('ApplicationPage', array(
              'local' => 'id',
              'foreign' => 'pageID'));
-
-        $this->hasOne('RecommendationPage', array(
-             'local' => 'id',
-             'foreign' => 'lorPageID'));
 
         $this->hasMany('Answer', array(
              'local' => 'id',

@@ -26,7 +26,6 @@
  * @property Doctrine_Collection $Duplicates
  * @property Doctrine_Collection $Duplicate
  * @property Decision $Decision
- * @property Doctrine_Collection $Variables
  * @property Doctrine_Collection $Payment
  * @property Doctrine_Collection $Answers
  * 
@@ -137,10 +136,6 @@ abstract class BaseApplicant extends Doctrine_Record
              'foreign' => 'duplicateID'));
 
         $this->hasOne('Decision', array(
-             'local' => 'id',
-             'foreign' => 'applicantID'));
-
-        $this->hasMany('ApplicantVariable as Variables', array(
              'local' => 'id',
              'foreign' => 'applicantID'));
 

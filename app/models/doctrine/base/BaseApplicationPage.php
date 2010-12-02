@@ -17,7 +17,6 @@
  * @property string $trailingText
  * @property Application $Application
  * @property Page $Page
- * @property RecommendationPage $RecommendationPage
  * 
  * @package    jazzee
  * @subpackage orm
@@ -78,9 +77,5 @@ abstract class BaseApplicationPage extends Doctrine_Record
              'foreign' => 'id',
              'onDelete' => 'CASCADE',
              'onUpdate' => 'CASCADE'));
-
-        $this->hasOne('RecommendationPage', array(
-             'local' => 'id',
-             'foreign' => 'applicationPageID'));
     }
 }

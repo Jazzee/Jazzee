@@ -16,8 +16,6 @@
  * @property StatusType $PublicStatus
  * @property StatusType $PrivateStatus
  * @property Doctrine_Collection $Elements
- * @property Recommendation $Recommendation
- * @property Citizenship $Citizenship
  * @property Score $Score
  * 
  * @package    jazzee
@@ -72,14 +70,6 @@ abstract class BaseAnswer extends Doctrine_Record
              'foreign' => 'id'));
 
         $this->hasMany('ElementAnswer as Elements', array(
-             'local' => 'id',
-             'foreign' => 'answerID'));
-
-        $this->hasOne('Recommendation', array(
-             'local' => 'id',
-             'foreign' => 'answerID'));
-
-        $this->hasOne('Citizenship', array(
              'local' => 'id',
              'foreign' => 'answerID'));
 

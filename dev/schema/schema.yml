@@ -193,27 +193,6 @@ ApplicationPage:
       foreignType: one
       onDelete: CASCADE
       onUpdate: CASCADE
-
-RecommendationPage:
-  columns:
-    applicationPageID: integer
-    lorPageID: integer
-    deadline: timestamp
-    recommenderEmail: string(10000)
-  relations:
-    ApplicationPage:
-      local: applicationPageID
-      foreign: id
-      foreignType: one
-      onDelete: CASCADE
-      onUpdate: CASCADE
-    Page:
-      local: lorPageID
-      foreign: id
-      foreignType: one
-      alias: LORPage
-      onDelete: CASCADE
-      onUpdate: CASCADE
       
 Applicant:
   columns: 
@@ -413,63 +392,6 @@ ElementAnswer:
     Element:
       local: elementID
       foreign: id
-      onDelete: CASCADE
-      onUpdate: CASCADE
-
-Recommendation:
-  columns:
-    recommendationPageID: integer
-    answerID: 
-      type: integer
-      unique: true
-    LORAnswerID: 
-      type: integer
-      unique: true
-    urlKey:
-      type: string(255)
-      unique: true
-      notnull: true
-    email:
-      type: string(255)
-      notnull: true
-    waiveViewRight: boolean
-    invitationSent: timestamp
-  relations:
-    Answer:
-      local: answerID
-      foreign: id
-      foreignType: one
-      onDelete: CASCADE
-      onUpdate: CASCADE
-    LORAnswer:
-      class: Answer
-      local: LORAnswerID
-      foreign: id
-      foreignType: one
-      onDelete: CASCADE
-      onUpdate: CASCADE
-    RecommendationPage:
-      local: recommendationPageID
-      foreign: id
-      onDelete: CASCADE
-      onUpdate: CASCADE
-
-Citizenship:
-  columns:
-    answerID: integer
-    citizenship: string(32)
-    birthCity: string(255)
-    birthState: string(32)
-    birthCountry: string(32)
-    stateResident: boolean
-    citizenshipCountry: string(32)
-    permanentResidentDate: timestamp
-    visaType: string(32)
-  relations:
-    Answer:
-      local: answerID
-      foreign: id
-      foreignType: one
       onDelete: CASCADE
       onUpdate: CASCADE
   
