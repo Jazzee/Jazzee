@@ -10,14 +10,15 @@ interface PagesInterface{
   public function actionListPages();
   public function actionListPageTypes();
   public function actionAddPage();
-  public function actionDeletePage($id);
-  public function actionSavePage($id);
-  public function actionPreviewPage($id);
+  public function actionDeletePage($pageID);
+  public function actionSavePage($pageID);
+  public function actionPreviewPage($pageID);
   
   public function actionListElementTypes();
   public function actionAddElement($pageID);
   public function actionDeleteElement($pageID);
   
+  public function actionAddListItem($pageID, $elementID);
 }
 
 ?>
