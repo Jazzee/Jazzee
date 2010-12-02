@@ -1,5 +1,5 @@
 .container {
-  border:3px solid #aaaa99;
+  border:1px solid #7799bb;
 	padding: 1em;
 	margin: .5em;
 	cursor: default;
@@ -47,6 +47,14 @@
   background-image: url('resource/foundation/icons/page_code.png');
 }
 
+#workspace p.savePage{
+  background-image: url('resource/foundation/icons/page_save.png');
+}
+
+#workspace p.add-list-item{
+  background-image: url('resource/foundation/icons/add.png');
+}
+
 #workspace p.title{
   font-size: 120%;
   font-weight: bold;
@@ -58,4 +66,8 @@
 
 #status-bar img {
   width: 120px;
+}
+
+#workspace div.element{
+  clear: both;
 }

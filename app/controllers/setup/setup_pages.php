@@ -55,6 +55,13 @@ class SetupPagesController extends SetupController implements PagesInterface {
       foreach($page->Page->Elements as $element){
         $e = $element->toArray();
         $e['type'] = $element->ElementType->class;
+        $e['list'] = array();
+        foreach($element->ListItems as $item){
+          $e['list'][] = array(
+            'id' => $item->id,
+            'value' => $item->value
+          );
+        }
         $arr['elements'][] = $e;
       }
       $pages[] = $arr;
@@ -161,6 +168,15 @@ class SetupPagesController extends SetupController implements PagesInterface {
             $element->required = (bool)$arr['required'];
             $element->min = $arr['min'];
             $element->max = $arr['max'];
+            $items = array();
+            foreach($arr['list'] as $item){
+              $items[$item['id']] = $item['value'];
+            }
+            foreach($element->ListItems as $item){
+              if(array_key_exists($item->id, $items)){
+                $item->value = $items[$item->id];
+              }
+            }
             $element->save();
           }
         }
@@ -247,6 +263,27 @@ class SetupPagesController extends SetupController implements PagesInterface {
     } else {
       $this->messages->write('success', "Element Deleted");
       $element->delete();
+    }
+  }
+  
+  /**
+   * Add a list item
+   * @param $pageID
+   * @param $elementID
+   */
+  public function actionAddListItem($pageID, $elementID){
+    if(
+      !$element = Doctrine::getTable('Element')->find($elementID) or
+      (
+        $element->Page->ApplicationPage->Application->id != $this->application->id and
+        $element->Page->RecommendationPage->ApplicationPage->Application->id != $this->application->id)  
+      ){
+      $this->messages->write('error', "Invalid Element");
+    } else {
+      $this->messages->write('success', "List Item Added");
+      $item = $element->ListItems->get(null);
+      $item->value = $this->post['value'];
+      $item->save();
     }
   }
   
