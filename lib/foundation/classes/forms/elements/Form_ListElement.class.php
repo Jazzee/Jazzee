@@ -11,6 +11,16 @@ abstract class Form_ListElement extends Form_Element{
   private $_items = array();
   
   /**
+   * Constructor
+   * Add a list item validator
+   * @param Form_Field $field
+   */
+  public function __construct($field){
+    parent::__construct($field);
+    $this->addValidator('ChoiceInList'); 
+  }
+  
+  /**
    * Add a list item
    * @param string $label
    * @param mixed $value
