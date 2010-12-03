@@ -160,6 +160,24 @@ function TextInputElement(){
 TextInputElement.prototype = new ApplyElement();
 
 /**
+ * The HiddenInputElement class
+ */
+function HiddenInputElement(){
+  this.workspace = function(canvas){
+    this.canvas = canvas;
+    var workspace = this.standardWorkspace();
+    var left = $('div.element-left', workspace);
+    left.append(this.titleBlock());
+    
+    var right = $('div.element-right', workspace);
+    right.append(this.deleteElementBlock());
+    right.append(this.requiredBlock());
+    $(this.canvas).html(workspace);
+  }
+}
+HiddenInputElement.prototype = new ApplyElement();
+
+/**
  * The TextareaElement class
  */
 function TextareaElement(){}
