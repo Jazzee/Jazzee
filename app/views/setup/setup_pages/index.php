@@ -14,12 +14,12 @@
     <div id='workspace' class='container yui-b'></div>
   </div>
   <div class='yui-b'>
+    <div id='status' class='container'></div>
     <div id='application-pages' class='container'>
     <h5>Application Pages</h5>
     </div>
     <div id='new-pages' class='container'>
     <h5>New Pages</h5>
     </div>
-    <div id='status' class='container'></div>
   </div>
 </div>
