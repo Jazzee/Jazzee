@@ -70,53 +70,5 @@ class PDFFileInputElement extends ApplyElement {
   public function formValue(){
     return null;
   }
-  
-  public function hasListItems(){
-    return false;
-  }
-  
-  public function getPropertiesForm(){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Edit {$this->element->title} properties"));
-    $element = $field->newElement('TextInput','title');
-    $element->label = 'Title';
-    $element->addValidator('NotEmpty');
-    $element->value = $this->element->title;
-    
-    $element = $field->newElement('RadioList','required');
-    $element->label = 'Is Element Required?';
-    $element->addValidator('NotEmpty');
-    $element->addItem(1,'Yes');
-    $element->addItem(0, 'No');
-    $element->value = (int)$this->element->required;
-    
-    $element = $field->newElement('TextInput','instructions');
-    $element->label = 'Instructions';
-    $element->value = $this->element->instructions;
-    
-    $element = $field->newElement('TextInput','format');
-    $element->label = 'Format';
-    $element->value = $this->element->format;
-    
-    $element = $field->newElement('TextInput','max');
-    $element->addValidator('Integer');
-    $element->label = 'Maximum Size';
-    $element->format = 'in bytes ';
-    $element->value = $this->element->max;
-    $config = new ConfigManager;
-    $element->addValidator('NumberRange', array(0,$config->max_apply_file_size));
-    $form->newButton('submit', 'Save');
-    return $form;
-  }
-  
-  public function setProperties(FormInput $input){
-    $this->element->title = $input->title;
-    $this->element->instructions = $input->instructions;
-    $this->element->required = $input->required;
-    $this->element->format = $input->format;
-    $this->element->min = $input->min;
-    $this->element->max = $input->max;
-    $this->element->save();
-  }
 }
 ?>

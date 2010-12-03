@@ -73,24 +73,5 @@ abstract class ApplyElement {
    * @return mixed
    */
   abstract public function formValue();
-  
-  /**
-   * Does this element have list items
-   * @return bool
-   */
-  abstract public function hasListItems();
-  
-  /**
-   * Get the edit form for this element
-   * @return Form
-   */
-  abstract public function getPropertiesForm();
-  
-  /**
-   * Set the properties from the input
-   * @param FormInput $input
-   */
-  abstract public function setProperties(FormInput $input);
-  
 }
 ?>
