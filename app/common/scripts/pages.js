@@ -6,25 +6,28 @@ function Pages(){
   
   this.init = function(){
     this.canvas = $('#canvas');
+    $('#workspace').hide();
     this.pageStore = new PageStore;
     this.pageStore.init(document.location.href);
-    $(document).bind("updatedPageList", function(){
-      self.refreshPageDisplay();
-    });
+    $(document).bind("updatedPageList", self.refreshPageDisplay);
     this.refreshPageTypesDisplay();
   }
   
   this.refreshPageDisplay = function(){
-    $('#workspace').empty();
+    $('#workspace').hide();
     $('#application-pages ol').remove();
     var list = self.pageStore.getPageList();
-    var ol = $('<ol>');
+    var ol = $('<ol>').addClass('page-list');
     $(list).each(function(i){
       var li = $('<li>').html(this.title).attr('id', 'application-page-' + this.id);
       $(li).data('page', this);
       $(li).bind('click', function(e){
         self.currentPageID = $(this).data('page').id;
-        $(this).data('page').workspace('#workspace');
+        self.clearWorkspace();
+        $(this).parent().children('li').removeClass('active');
+        $(this).addClass('active');
+        $(this).data('page').workspace();
+        $('#workspace').show('slide');
       });
       ol.append(li);
     });
@@ -41,14 +44,11 @@ function Pages(){
       self.pageStore.saveAll();
     });
     $('#application-pages').append(ol);
-    if(list.length > 0){
-	  if(!this.pageStore.checkPageExists(this.currentPageID)) this.currentPageID = list[0].id;
-	  $('#application-page-' + this.currentPageID).trigger('click');
-    }
+    $('#application-pages li:first').trigger('click');
   }
   
   this.refreshPageTypesDisplay = function(){
-    var ol = $('<ol>');
+    var ol = $('<ol>').addClass('add-list');
     $(this.pageStore.pageTypes).each(function(id,name){
       var li = $('<li>').html(name);
       $(li).bind('click', function(e){
@@ -57,6 +57,21 @@ function Pages(){
       ol.append(li);
     });
     $('#new-pages').append(ol);
+  }
+  
+
+  
+  this.clearWorkspace = function(){
+    $('#workspace-left-top').empty();
+    $('#workspace-left-middle-left').empty();
+    $('#workspace-left-middle-right').empty();
+    $('#workspace-left-bottom-left').empty();
+    $('#workspace-left-bottom-left').empty();
+    
+
+    $('#workspace-right-top').empty();
+    $('#workspace-right-middle').empty();
+    $('#workspace-right-bottom').empty();
   }
 }
   

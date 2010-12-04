@@ -15,24 +15,23 @@ function ApplyElement(){
   this.min;
   this.max;
   this.weight;
+  this.list;
   
-  //the html element where we are displaying controls
-  this.canvas = null;
+  this.showFormat = true;
+  this.hasListItems = false;
   
   this.init = function(obj, page){
     this.page = page;
     this.id = obj.id;
     this.title = obj.title;
     this.instructions = obj.instructions;
+    this.format = obj.format;
     this.defaultValue = obj.defaultValue;
     this.required = obj.required;
     this.min = obj.min;
     this.max = obj.max;
+    this.list = [];
 //    this.weight = obj.weight;
-  }
-  
-  this.workspace = function(canvas){
-    $(canvas).html('No canvas for this element type has been defined');
   }
   
   this.setProperty = function(property, value){
@@ -40,51 +39,68 @@ function ApplyElement(){
     this.page.isModified = true;
   }
   
-  this.titleBlock = function(){
-    return this.editBlock('small', 'title', 'Title', 'titleBlock');
+  this.addListItem = function(id, value){
+    this.list.push({id: id, value: value});
+  }
+  
+  this.legendBlock = function(){
+    var pageClass = this;
+    var field = $('<input type="text">').attr('value',this.title)
+      .bind('change',function(){
+        pageClass.setProperty('title', $(this).val());
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('legend').eq(0).html(pageClass.title+':');
+        $(this).parent().children('legend').eq(0).show();
+    }).hide();
+    var legend = $('<legend>').addClass('edit').html((this.title)+':').bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('input').eq(0).show().focus();
+    });
+    return $('<div>').addClass('yui-u first').append(legend).append(field);
   }
   
   this.instructionsBlock = function(){
-    return this.editBlock('large', 'instructions', 'Instructions', 'instructionsBlock');
+    var elementClass = this;
+    var field = $('<textarea>').html(elementClass.page.valueOrBlank(elementClass.instructions))
+      .bind('change',function(){
+        elementClass.setProperty('instructions', $(this).val());
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('p').eq(0).html(elementClass.page.valueOrBlank(elementClass.instructions));
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    var p = $('<p>').addClass('edit instructions').html(this.page.valueOrBlank(this.instructions)).bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('textarea').eq(0).show().focus();
+    });
+    return $('<div>').append(p).append(field);
   }
   
   this.formatBlock = function(){
-    return this.editBlock('large', 'format', 'Format', 'formatBlock');
-  }
-  
-  this.deleteElementBlock = function(){
-    var div = $('<p>Delete this element</p>').addClass('deleteElement').bind('click', {elementClass: this}, this.deleteElement);
-    return div;
-  }
-  
-  this.editBlock = function(control, name, title, callback){
-    if(this[name]) var value = this[name];
-    else var value = 'click to edit...';
-    var p = $('<p>').addClass(name).html(title+': ' + value).bind('click', {elementClass: this, control: control, name: name, callback: callback}, function(e){
-      $(this).unbind('click');
-      switch(control){
-        case 'large':
-          var field = $('<textarea>').html(e.data.elementClass[name]);
-          break;
-        case 'small':
-          var field = $('<input type="text">').attr('value',e.data.elementClass[name]);
-          break;
-      }
-      field.bind('change', {elementClass: e.data.elementClass, name: name}, function(e){
-        e.data.elementClass.setProperty(e.data.name, $(this).val());
-      }).bind('blur', {elementClass: e.data.elementClass, callback: callback}, function(e){
-        $(this).parent().replaceWith(e.data.elementClass[e.data.callback]());
-      });
-      $(this).empty().append(field);
-      $(field).trigger('focus');
+    var elementClass = this;
+    var field = $('<textarea>').html(elementClass.page.valueOrBlank(elementClass.format))
+      .bind('change',function(){
+        elementClass.setProperty('format', $(this).val());
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('p').eq(0).html(elementClass.page.valueOrBlank(elementClass.format));
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    var p = $('<p>').addClass('edit').html(this.page.valueOrBlank(this.format)).bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('textarea').eq(0).show().focus();
     });
-    return p;
+    return $('<div>').addClass('format').append(p).append(field);
   }
   
   this.requiredBlock = function(){
     var value = 'optional';
     if(this.required == 1) value = 'required';
-    var p = $('<p>').addClass('required').html('This element is ').append($('<span>').html(value).bind('click', {elementClass: this}, function(e){
+    var p = $('<p>').addClass('edit').html('This element is ').append($('<span>').html(value).bind('click', {elementClass: this}, function(e){
       $(this).unbind('click');
       var field = $('<select>');
       var optional = $('<option>').attr('value', 0).html('Optional');
@@ -124,113 +140,39 @@ function ApplyElement(){
     return obj;
   }
   
-  this.deleteElement = function(e){
-    var element = e.data.elementClass;
-    element.page.pageStore.deleteElement(element.id);
-    $('div', element.canvas).effect('explode',500);
+  this.workspace = function(){
+    var field = $('<div>').attr('id','element-'+this.id).data('element', this).addClass('field');
+    field.append(this.instructionsBlock());
+    var element = $('<div>').addClass('element yui-gf');
+    element.append(this.legendBlock());
+    var control = $('<div>').addClass('yui-u control').append(this.avatar());
+    if(this.showFormat) control.append(this.formatBlock());
+    element.append(control);
+    field.append(element);
+    $('#workspace-left-middle-left').append(field);
+    $('#workspace-left-middle-right').append(this.optionsBlock());
+    
+    $('#workspace-left-middle-left div.field').bind('click', function(){
+      $('#workspace-left-middle-right div').hide();
+      $('#workspace-left-middle-left div.selected').removeClass('selected');
+      $('#element-'+$(this).data('element').id).addClass('selected');
+      $('#element-options-'+$(this).data('element').id).show().children().show();
+    });
   }
   
-  this.standardWorkspace = function(){
-    var div = $('<div>').addClass('element')
-      .append($('<div>').addClass('yui-u first element-left'))
-      .append($('<div>').addClass('yui-u element-right'));
+  this.optionsBlock = function(){
+    var div = $('<div>').attr('id', 'element-options-'+this.id);
+    var element = this;
+    var p = $('<p>Delete this element</p>').addClass('delete').bind('click', function(e){
+      element.page.pageStore.deleteElement(element.id);
+      $('#element-'+element.id).effect('explode',500);
+      $('#workspace-left-middle-left div.field:first').trigger('click');
+    });
+    div.append(p);
+    if(this.hasListItems) div.append(this.listItemsBlock());
+    div.append(this.requiredBlock());
+    div.hide();
     return div;
-  }
-  
-}
-
-/**
- * The TextInputElement class
- */
-function TextInputElement(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var workspace = this.standardWorkspace();
-    var left = $('div.element-left', workspace);
-    left.append(this.titleBlock());
-    left.append(this.instructionsBlock());
-    left.append(this.formatBlock());
-    
-    var right = $('div.element-right', workspace);
-    right.append(this.deleteElementBlock());
-    right.append(this.requiredBlock());
-    $(this.canvas).html(workspace);
-  }
-}
-TextInputElement.prototype = new ApplyElement();
-
-/**
- * The HiddenInputElement class
- */
-function HiddenInputElement(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var workspace = this.standardWorkspace();
-    var left = $('div.element-left', workspace);
-    left.append(this.titleBlock());
-    
-    var right = $('div.element-right', workspace);
-    right.append(this.deleteElementBlock());
-    right.append(this.requiredBlock());
-    $(this.canvas).html(workspace);
-  }
-}
-HiddenInputElement.prototype = new ApplyElement();
-
-/**
- * The TextareaElement class
- */
-function TextareaElement(){}
-TextareaElement.prototype = new TextInputElement();
-
-/**
- * The PDFUploadElement class
- */
-function PDFFileInputElement(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var workspace = this.standardWorkspace();
-    var left = $('div.element-left', workspace);
-    left.append(this.titleBlock());
-    left.append(this.instructionsBlock());
-    
-    var right = $('div.element-right', workspace);
-    right.append(this.deleteElementBlock());
-    right.append(this.requiredBlock());
-    right.append(this.maxFileSizeBlock());
-    
-    $(this.canvas).html(workspace);
-  }
-  
-  this.maxFileSizeBlock = function(){
-    return this.editBlock('small', 'max', 'Maximum File Size', 'maxFileSizeBlock');
-  }
-}
-PDFFileInputElement.prototype = new ApplyElement();
-
-/**
- * The ListElement class
- * Generic List functions that specific elements can inherit
- */
-function ListElement(){
-  this.list = [];
-  
-  this.addListItem = function(id, value){
-    this.list.push({id: id, value: value});
-  }
-  
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var workspace = this.standardWorkspace();
-    var left = $('div.element-left', workspace);
-    left.append(this.titleBlock());
-    left.append(this.instructionsBlock());
-    
-    var right = $('div.element-right', workspace);
-    right.append(this.deleteElementBlock());
-    right.append(this.requiredBlock());
-    right.append(this.listItemsBlock());
-    $(this.canvas).html(workspace);
   }
   
   this.editItemBlock = function(item){
@@ -267,7 +209,7 @@ function ListElement(){
     }
     div.append(ol);
     
-    var p = $('<p>').addClass('add-list-item').html('add item').bind('click', {elementClass: this, ol: ol}, function(e){
+    var p = $('<p>').addClass('add').html('add item').bind('click', {elementClass: this, ol: ol}, function(e){
       var field = $('<input type="text">');
       field.bind('change', {elementClass: e.data.elementClass}, function(e){
         e.data.elementClass.page.pageStore.addListItem(e.data.elementClass.page.id, e.data.elementClass.id, $(this).val());
@@ -280,24 +222,78 @@ function ListElement(){
     div.append(p);
     return div;
   }
+  
 }
-ListElement.prototype = new ApplyElement();
-ListElement.prototype.constructor = ListElement;
+
+/**
+ * The TextInputElement class
+ */
+function TextInputElement(){
+  this.avatar = function(){
+    return $('<input type="text" disabled="true">');
+  };
+}
+TextInputElement.prototype = new ApplyElement();
+TextInputElement.prototype.constructor = TextInputElement;
+
+/**
+ * The TextareaElement class
+ */
+function TextareaElement(){
+  this.avatar = function(){
+    return $('<textarea>');
+  };
+}
+TextareaElement.prototype = new ApplyElement();
+TextareaElement.prototype.constructor = TextareaElement;
+
+/**
+ * The PDFFileInputElement class
+ */
+function PDFFileInputElement(){
+  this.avatar = function(){
+    return $('<input type="file" disabled="true">');
+  };
+}
+PDFFileInputElement.prototype = new ApplyElement();
+PDFFileInputElement.prototype.constructor = PDFFileInputElement;
 
 /**
  * The RadioListElement class
  */
-function RadioListElement(){}
-RadioListElement.prototype = new ListElement();
-
+function RadioListElement(){
+  this.showFormat = false;
+  this.avatar = function(){
+    return $('<input type="radio" disabled="true">');
+  };
+}
+RadioListElement.prototype = new ApplyElement();
+RadioListElement.prototype.constructor = RadioListElement;
 /**
  * The SelectListElement class
  */
-function SelectListElement(){}
-SelectListElement.prototype = new ListElement();
+function SelectListElement(){
+  this.showFormat = false;
+  this.hasListItems = true;
+  this.avatar = function(){
+    var select = $('<select>');
+    for(var i = 0; i < this.list.length; i++){
+      select.append($('<option>').html(this.list[i].value));
+    }
+    return select;
+  };
+}
+SelectListElement.prototype = new ApplyElement();
+SelectListElement.prototype.constructor = SelectListElement;
 
 /**
  * The CheckboxListElement class
  */
-function CheckboxListElement(){}
-CheckboxListElement.prototype = new ListElement();
+function CheckboxListElement(){
+  this.showFormat = false;
+  this.avatar = function(){
+    return $('<input type="checkbox" disabled="true">');
+  };
+}
+CheckboxListElement.prototype = new ApplyElement();
+CheckboxListElement.prototype.constructor = CheckboxListElement;

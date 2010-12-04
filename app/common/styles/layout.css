@@ -154,6 +154,10 @@ div.form div.label{
   text-align: right;
 }
 
+div.form div.control input, div.form div.control p{
+  float: left;
+}
+
 div.form fieldset.buttons {
   width: auto;
   padding-left: 4em;

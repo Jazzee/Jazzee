@@ -17,11 +17,16 @@ function ApplyPage(){
   this.weight;
   this.variables;
   this.elements;
+  this.children;
   
-  this.isModified;
-  
-  //the html element where we are displaying controls
-  this.canvas;
+  this.isModified = false;
+  this.showLeadingText = true;
+  this.showTrailingText = true;
+  this.showInstructions = true;
+  this.showMin = true;
+  this.showMax = true;
+  this.showRequired = true;
+  this.hasElements = true;
   
   this.init = function(obj, pageStore){
     this.pageStore = pageStore;
@@ -36,15 +41,20 @@ function ApplyPage(){
     this.weight = obj.weight;
     
     this.elements = [];
-    this.isModified = false;
-  }
-  
-  this.workspace = function(canvas){
-    $(canvas).html('No canvas for this element type has been defined');
+    this.variables = [];
+    this.children = [];
   }
   
   this.addElement = function(obj){
     this.elements.push(obj);
+  }
+  
+  this.addChild = function(obj){
+    this.children.push(obj);
+  }
+  
+  this.setVariable = function(name, value){
+    this.variables[name] = value;
   }
   
   this.setProperty = function(property, value){
@@ -53,12 +63,12 @@ function ApplyPage(){
   }
   
   this.deletePageBlock = function(){
-    var p = $('<p>Delete this page</p>').addClass('deletePage').bind('click', {pageClass: this}, this.deletePage);
+    var p = $('<p>Delete this page</p>').addClass('delete').bind('click', {pageClass: this}, this.deletePage);
     return p;
   }
   
   this.previewPageBlock = function(){
-    var p = $('<p>Preview the page</p>').addClass('previewPage').bind('click', {pageClass: this}, function(e){
+    var p = $('<p>Preview the page</p>').addClass('preview').bind('click', {pageClass: this}, function(e){
       var preview = e.data.pageClass.pageStore.getPagePreview(e.data.pageClass.id);
       $('form', preview).bind('submit', function(){alert('bad idea'); return false;});
       $('fieldset.buttons ', preview).remove();
@@ -67,50 +77,87 @@ function ApplyPage(){
     return p;
   }
   
-  this.editBlock = function(control, name, title, callback){
-    if(this[name]) var value = this[name];
-    else var value = 'click to edit...';
-    var p = $('<p>').addClass(name).html((title+': ' + value)).bind('click', {pageClass: this, control: control, name: name, callback: callback}, function(e){
-      $(this).unbind('click');
-      switch(control){
-        case 'large':
-          var field = $('<textarea>').html(e.data.pageClass[name]);
-          break;
-        case 'small':
-          var field = $('<input type="text">').attr('value',e.data.pageClass[name]);
-          break;
-      }
-      field.bind('change', {pageClass: e.data.pageClass, name: name}, function(e){
-        e.data.pageClass.setProperty(e.data.name, $(this).val());
-      }).bind('blur', {pageClass: e.data.pageClass, callback: callback}, function(e){
-        $(this).parent().replaceWith(e.data.pageClass[e.data.callback]());
-      });
-      $(this).empty().append(field);
-      $(field).trigger('focus');
-    });
-    return p;
-  }
-  
   this.titleBlock = function(){
-    return this.editBlock('small', 'title', 'Title', 'titleBlock');
+    var pageClass = this;
+    var field = $('<input type="text">').attr('value',this.title)
+      .bind('change',function(){
+        pageClass.setProperty('title', $(this).val());
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('p').eq(0).html(pageClass.title);
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    var p = $('<p>').addClass('edit title').html((this.title)).bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('input').eq(0).show().focus();
+    });
+    return $('<div>').append(p).append(field);
   }
   
   this.leadingTextBlock = function(){
-    return this.editBlock('large', 'leadingText', 'Leading Text', 'leadingTextBlock');
+    var pageClass = this;
+    var field = $('<textarea>').html(this.leadingText)
+      .bind('change',function(){
+        pageClass.setProperty('leadingText', $(this).val());
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('p').eq(0).html(pageClass.valueOrBlank(pageClass.leadingText));
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    var p = $('<p>').addClass('edit').html(this.valueOrBlank(this.leadingText)).bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('textarea').eq(0).show().focus();
+    });
+    return $('<div>').append(p).append(field);
   }
   
   this.instructionsBlock = function(){
-    return this.editBlock('large', 'instructions', 'Instructions', 'instructionsBlock');
+    var pageClass = this;
+    var field = $('<textarea>').html(this.title)
+      .bind('change',function(){
+        pageClass.setProperty('instructions', $(this).val());
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('p').eq(0).html(pageClass.valueOrBlank(pageClass.instructions));
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    var p = $('<p>').addClass('edit instructions').html(this.valueOrBlank(this.instructions)).bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('textarea').eq(0).show().focus();
+    });
+    return $('<div>').append(p).append(field);
   }
   
   this.trailingTextBlock = function(){
-    return this.editBlock('large', 'trailingText', 'Trailing Text', 'trailingTextBlock');
+    var pageClass = this;
+    var field = $('<textarea>').html(this.trailingText)
+      .bind('change',function(){
+        pageClass.setProperty('trailingText', $(this).val());
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('p').eq(0).html(pageClass.valueOrBlank(pageClass.trailingText));
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    var p = $('<p>').addClass('edit').html(this.valueOrBlank(this.trailingText)).bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('textarea').eq(0).show();
+    });
+    return $('<div>').append(p).append(field);
+  }
+  
+  this.valueOrBlank = function(value){
+    if(value == '' || value == null) return 'click to edit';
+    return value;
   }
   
   this.optionalBlock = function(){
     var value = 'required';
     if(this.optional == 1) value = 'optional';
-    var p = $('<p>').addClass('optional').html('This page is ').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
+    var p = $('<p>').addClass('edit optional').html('This page is ').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
       $(this).unbind('click');
       var field = $('<select>');
       var optional = $('<option>').attr('value', 1).html('Optional');
@@ -133,7 +180,7 @@ function ApplyPage(){
   this.minBlock = function(){
     var value = 'No minimum';
     if(this.min > 0) value = this.min;
-    var p = $('<p>').addClass('min').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
+    var p = $('<p>').addClass('edit min').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
       $(this).unbind('click');
       var field = $('<select>');
       var option = $('<option>').attr('value', 0).html('No minimum');
@@ -158,7 +205,7 @@ function ApplyPage(){
   this.maxBlock = function(){
     var value = 'Unlimited';
     if(this.max > 0) value = this.max;
-    var p = $('<p>').addClass('max').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
+    var p = $('<p>').addClass('edit max').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
       $(this).unbind('click');
       var field = $('<select>');
       var option = $('<option>').attr('value', 0).html('Unlimited');
@@ -181,15 +228,10 @@ function ApplyPage(){
   }
   
   this.savePageBlock = function(){
-    var p = $('<p>Save this page</p>').addClass('savePage').bind('click', {pageClass: this}, function(e){
+    var p = $('<p>Save this page</p>').addClass('save').bind('click', {pageClass: this}, function(e){
       e.data.pageClass.save();
     });
     return p;
-  }
-  
-  this.checkControlStatus = function(){
-    if(this.isModified)  $('#workspace-controls').show();
-    if(!this.isModified)  $('#workspace-controls').hide();
   }
   
   this.getDataObject = function(){
@@ -214,96 +256,67 @@ function ApplyPage(){
   this.save = function(){
     this.pageStore.save(this.id);
     this.isModified = false;
-    $('div', this.canvas).effect('highlight',500);
+    $('#workspace').effect('highlight',500);
   }
   
   this.deletePage = function(e){
     var page = e.data.pageClass;
     page.pageStore.deletePage(page.id);
-    $('div', page.canvas).effect('explode',500);
+    $('#workspace').effect('explode',500);
   }
   
+  this.workspace = function(){
+    $('#workspace-left-top').parent().addClass('form');
+    $('#workspace-left-top').append(this.titleBlock());
+    if(this.showLeadingText) $('#workspace-left-top').append(this.leadingTextBlock());
+    if(this.showInstructions) $('#workspace-left-top').append(this.instructionsBlock());
+    if(this.showTrailingText) $('#workspace-left-bottom-left').append(this.trailingTextBlock());
+    
+    $('#workspace-right-top').append(this.savePageBlock());
+    $('#workspace-right-top').append(this.previewPageBlock());
+    if(this.showMin) $('#workspace-right-top').append(this.minBlock());
+    if(this.showMax) $('#workspace-right-top').append(this.maxBlock());
+    if(this.showOptional) $('#workspace-right-top').append(this.optionalBlock());
+    
+    $('#workspace-right-bottom').append(this.deletePageBlock());
+    if(this.hasElements){
+      $('#workspace-left-middle').show();
+      $(this.elements).each(function(){
+        this.workspace();
+      });
+      var pageClass = this;
+      $('#workspace-right-middle').append($('<h5>').html('New Elements'));
+      var ol = $('<ol>').addClass('add-list');
+      $(this.pageStore.elementTypes).each(function(id,name){
+        var li = $('<li>').html(name);
+        $(li).bind('click', {pageClass: this},function(e){
+          pageClass.pageStore.addElement(pageClass.id, id);
+        });
+        ol.append(li);
+      });
+      $('#workspace-right-middle').append(ol);
+    } else {$('#workspace-left-middle').hide();}
+    
+    $('#workspace-left-middle-left div.field:first').trigger('click');
+  }
 }
 
 /**
  * The StandardPage class
  */
-function StandardPage(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var div = $('<div>').addClass('yui-ge');
-    var left = $('<div>').addClass('yui-u first yui-ge');
-    left.append(this.titleBlock());
-    left.append(this.leadingTextBlock());
-    left.append(this.instructionsBlock());
-    left.append(this.trailingTextBlock());
-    left.append(this.elementsBlock());
-    
-    var right = $('<div>').addClass('yui-u');
-    right.append(this.savePageBlock());
-    right.append(this.previewPageBlock());
-    right.append(this.minBlock());
-    right.append(this.maxBlock());
-    right.append(this.optionalBlock());
-    right.append(this.newElementsBlock());
-    right.append(this.deletePageBlock());
-    div.append(left);
-    div.append(right);
-    $(this.canvas).html(div);
-  }
-  
-  this.newElementsBlock = function(){
-    var pageClass = this;
-    var div = $('<div>').attr('id', 'new-elements');
-    div.append($('<h5>').html('New Elements'));
-    var ol = $('<ol>');
-    $(this.pageStore.elementTypes).each(function(id,name){
-      var li = $('<li>').html(name);
-      $(li).bind('click', {pageClass: this},function(e){
-        pageClass.pageStore.addElement(pageClass.id, id);
-      });
-      ol.append(li);
-    });
-    $(div).append(ol);
-    return div;
-  }
-  
-  this.elementsBlock = function(){
-    var div = $('<div>').addClass('elements');
-    div.append($('<h5>').html('Elements'));
-    var ol = $('<ol>');
-    $(this.elements).each(function(){
-      var li = $('<li>');
-      this.workspace(li);
-      ol.append(li);
-    });
-    $(div).append(ol);
-    return div;
-  }
-}
+function StandardPage(){}
 StandardPage.prototype = new ApplyPage();
 StandardPage.prototype.constructor = StandardPage;
+
 /**
  * The TextPage class
  */
 function TextPage(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var div = $('<div>').addClass('yui-ge');
-    var left = $('<div>').addClass('yui-u first yui-ge');
-    left.append(this.titleBlock());
-    left.append(this.leadingTextBlock());
-    left.append(this.trailingTextBlock());
-    
-    var right = $('<div>').addClass('yui-u');
-    right.append(this.savePageBlock());
-    right.append(this.previewPageBlock());
-    right.append(this.deletePageBlock());
-    
-    div.append(left);
-    div.append(right);
-    $(this.canvas).html(div);
-  }
+  this.showInstructions = false;
+  this.showMin = false;
+  this.showMax = false;
+  this.showRequired = false;
+  this.hasElements = false;
 }
 TextPage.prototype = new ApplyPage();
 TextPage.prototype.constructor = TextPage;
@@ -312,76 +325,22 @@ TextPage.prototype.constructor = TextPage;
  * The LockPage class
  */
 function LockPage(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var div = $('<div>').addClass('yui-ge');
-    var left = $('<div>').addClass('yui-u first yui-ge');
-    left.append(this.titleBlock());
-    left.append(this.leadingTextBlock());
-    left.append(this.instructionsBlock());
-    left.append(this.trailingTextBlock());
-    
-    var right = $('<div>').addClass('yui-u');
-    right.append(this.savePageBlock());
-    right.append(this.previewPageBlock());
-    right.append(this.deletePageBlock());
-    
-    div.append(left);
-    div.append(right);
-    $(this.canvas).html(div);
-  }
+  this.showMin = false;
+  this.showMax = false;
+  this.showRequired = false;
+  this.hasElements = false;
 }
 LockPage.prototype = new ApplyPage();
 LockPage.prototype.constructor = LockPage;
 
 /**
- * The ETSMatch class
+ * The ETSMatchPage class
  */
 function ETSMatchPage(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var div = $('<div>').addClass('yui-ge');
-    var left = $('<div>').addClass('yui-u first yui-ge');
-    left.append(this.titleBlock());
-    left.append(this.leadingTextBlock());
-    left.append(this.instructionsBlock());
-    left.append(this.trailingTextBlock());
-    
-    var right = $('<div>').addClass('yui-u');
-    right.append(this.savePageBlock());
-    right.append(this.previewPageBlock());
-    right.append(this.deletePageBlock());
-    
-    div.append(left);
-    div.append(right);
-    $(this.canvas).html(div);
-  }
+  this.showMin = false;
+  this.showMax = false;
+  this.showRequired = false;
+  this.hasElements = false;
 }
 ETSMatchPage.prototype = new ApplyPage();
 ETSMatchPage.prototype.constructor = ETSMatchPage;
-
-/**
- * The CitizenshipPage class
- */
-function CitizenshipPage(){
-  this.workspace = function(canvas){
-    this.canvas = canvas;
-    var div = $('<div>').addClass('yui-ge');
-    var left = $('<div>').addClass('yui-u first yui-ge');
-    left.append(this.titleBlock());
-    left.append(this.leadingTextBlock());
-    left.append(this.instructionsBlock());
-    left.append(this.trailingTextBlock());
-    
-    var right = $('<div>').addClass('yui-u');
-    right.append(this.savePageBlock());
-    right.append(this.previewPageBlock());
-    right.append(this.deletePageBlock());
-    
-    div.append(left);
-    div.append(right);
-    $(this.canvas).html(div);
-  }
-}
-CitizenshipPage.prototype = new ApplyPage();
-CitizenshipPage.prototype.constructor = CitizenshipPage;

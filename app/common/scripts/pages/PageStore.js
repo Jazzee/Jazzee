@@ -24,29 +24,40 @@ function PageStore(){
     this.fillElementTypesList();
     this.fillPageTypesList();
     this.refreshPageList();
-  }
+  };
   
   this.refreshPageList = function(){
     $.get(self.baseUrl + 'listPages',function(json){  
         self.pages = [];
         self.pageOrder = [];
         $(json.data.result).each(function(i){
-          var Page = new window[this.type]();
-          Page.init(this, self);
-          $(this.elements).each(function(i,element){
-            var Element = new window[element.type]();
-            Element.init(element, Page);
-            $(element.list).each(function(i,item){
-              Element.addListItem(item.id,item.value);
-            });
-            Page.addElement(Element);
-          });
+          var Page = self.createPageObject(this);
           self.pages[this.id] = Page;
-          self.pageOrder.push(this.id);
+          self.pageOrder.push(Page.id);
         });
         $(document).trigger("updatedPageList");
     });
-  }
+  };
+  
+  this.createPageObject = function(obj){
+    var Page = new window[obj.type]();
+    Page.init(obj, self);
+    $(obj.elements).each(function(i,element){
+      var Element = new window[element.type]();
+      Element.init(element, Page);
+      $(element.list).each(function(i,item){
+        Element.addListItem(item.id,item.value);
+      });
+      Page.addElement(Element);
+    });
+    $(obj.variables).each(function(){
+      Page.setVariable(this.name, this.value);
+    });
+    $(obj.children).each(function(){
+      Page.addChild(self.createPageObject(this));
+    });
+    return Page;
+  };
   
   this.fillElementTypesList = function(){
     $.ajax({
@@ -58,7 +69,7 @@ function PageStore(){
         });
       }
     });
-  }
+  };
   
   this.fillPageTypesList = function(){
     $.ajax({
@@ -70,19 +81,19 @@ function PageStore(){
         });
       }
     });
-  }
+  };
   
   this.addPage = function(type){
     $.post(self.baseUrl + 'addPage',{pageType: type}, self.refreshPageList);
-  }
+  };
   
   this.deletePage = function(pageID){
     $.get(self.baseUrl + 'deletePage/' + pageID, self.refreshPageList);
-  }
+  };
   
   this.deleteElement = function(elementID){
     $.get(self.baseUrl + 'deleteElement/' + elementID, self.refreshPageList);
-  }
+  };
   
   this.getPageList = function(){
     var response = [];
@@ -90,7 +101,7 @@ function PageStore(){
       response.push(self.pages[self.pageOrder[i]]);
     }
     return response;
-  }
+  };
   
   this.getPagePreview = function(pageID){
     var div = $('<div>');
@@ -102,19 +113,23 @@ function PageStore(){
       }
     });
     return div;
-  }
+  };
   
   this.addElement = function(pageID, elementID){
     $.post(self.baseUrl + 'addElement/' + pageID,{type: elementID}, self.refreshPageList);
-  }
+  };
   
   this.addListItem = function(pageID, elementID, value){
     $.post(self.baseUrl + 'addListItem/' + pageID +'/' + elementID,{value: value}, self.refreshPageList);
-  }
+  };
+  
+  this.addBranchingPage = function(pageID, newPageType){
+    $.post(self.baseUrl + 'addBranchingPage/' + pageID,{type: newPageType}, self.refreshPageList);
+  };
   
   this.checkPageExists = function(pageID){
     return (jQuery.inArray(pageID, this.pageOrder) == -1)?false:true;
-  }
+  };
   
   this.save = function(pageID){
     if(this.pages[pageID].isModified){
@@ -122,7 +137,7 @@ function PageStore(){
       $.post(self.baseUrl + 'savePage/' + pageID,{data: obj});
       $(document).trigger("updatedPageList");
     }
-  }
+  };
   
   this.saveAll = function(){
     var update = false;
@@ -134,5 +149,5 @@ function PageStore(){
       }
     });
     if(update) this.refreshPageList();
-  }
+  };
 }
