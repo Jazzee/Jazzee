@@ -54,6 +54,10 @@ a:hover {color:#cc6600;}
   border-color: #990000;
 }
 
+.strong {
+	font-weight: bold;
+}
+
 /***** NAVIGATION Style *****/
 
 /* Horizontal/Dropdown Navigation */
