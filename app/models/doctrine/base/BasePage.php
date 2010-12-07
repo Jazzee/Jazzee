@@ -13,9 +13,12 @@
  * @property string $instructions
  * @property string $leadingText
  * @property string $trailingText
- * @property boolean $globalPage
+ * @property boolean $isGlobal
+ * @property integer $parentID
  * @property PageType $PageType
- * @property Doctrine_Collection $PageVariable
+ * @property Page $Parent
+ * @property Doctrine_Collection $Children
+ * @property Doctrine_Collection $Variables
  * @property Doctrine_Collection $Elements
  * @property ApplicationPage $ApplicationPage
  * @property Doctrine_Collection $Answer
@@ -56,8 +59,11 @@ abstract class BasePage extends Doctrine_Record
              'type' => 'string',
              'length' => '3000',
              ));
-        $this->hasColumn('globalPage', 'boolean', null, array(
+        $this->hasColumn('isGlobal', 'boolean', null, array(
              'type' => 'boolean',
+             ));
+        $this->hasColumn('parentID', 'integer', null, array(
+             'type' => 'integer',
              ));
     }
 
@@ -68,7 +74,17 @@ abstract class BasePage extends Doctrine_Record
              'local' => 'pageType',
              'foreign' => 'id'));
 
-        $this->hasMany('PageVariable', array(
+        $this->hasOne('Page as Parent', array(
+             'local' => 'parentID',
+             'foreign' => 'id',
+             'onDelete' => 'CASCADE',
+             'onUpdate' => 'CASCADE'));
+
+        $this->hasMany('Page as Children', array(
+             'local' => 'id',
+             'foreign' => 'parentID'));
+
+        $this->hasMany('PageVariable as Variables', array(
              'local' => 'id',
              'foreign' => 'pageID'));
 

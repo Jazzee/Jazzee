@@ -84,11 +84,19 @@ Page:
     instructions: string(3000)
     leadingText: string(3000)
     trailingText: string(3000)
-    globalPage: boolean
+    isGlobal: boolean
+    parentID: integer
   relations:
     PageType:
       local: pageType
       foreign: id
+    Parent:
+      class: Page
+      local: parentID
+      foreign: id
+      onDelete: CASCADE
+      onUpdate: CASCADE
+      foreignAlias: Children
 
 PageType:
   columns:
@@ -104,16 +112,17 @@ PageType:
 PageVariable:
   columns:
     pageID: integer
-    variableName: string(255)
-    value: blob
+    name: string(255)
+    value: string(1000)
   indexes:
     page_variable: 
-      fields: [pageID, variableName]
+      fields: [pageID, name]
       type: unique
   relations:
     Page:
       local: pageID
       foreign: id
+      foreignAlias: Variables
       onDelete: CASCADE
       onUpdate: CASCADE
       
