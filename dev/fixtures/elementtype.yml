@@ -20,6 +20,3 @@ ElementType:
   ElementType_7:
     name: Ranking List
     class: RankingListElement
-  ElementType_8:
-    name: Hidden Input
-    class: HiddenInputElement
