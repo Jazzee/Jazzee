@@ -7,6 +7,7 @@
 function ApplyElement(){
   this.page;
   this.id;
+  this.elementType,
   this.title;
   this.format;
   this.instructions;
@@ -16,13 +17,12 @@ function ApplyElement(){
   this.max;
   this.weight;
   this.list;
-  
-  this.showFormat = true;
-  this.hasListItems = false;
+  this.listOrder;
   
   this.init = function(obj, page){
     this.page = page;
     this.id = obj.id;
+    this.elementType = obj.elementType,
     this.title = obj.title;
     this.instructions = obj.instructions;
     this.format = obj.format;
@@ -30,7 +30,8 @@ function ApplyElement(){
     this.required = obj.required;
     this.min = obj.min;
     this.max = obj.max;
-    this.list = [];
+    this.list = {};
+    this.listOrder = [];
 //    this.weight = obj.weight;
   }
   
@@ -39,8 +40,25 @@ function ApplyElement(){
     this.page.isModified = true;
   }
   
-  this.addListItem = function(id, value){
-    this.list.push({id: id, value: value});
+  this.addListItem = function(obj){
+    this.list[obj.id] = obj;
+    this.listOrder.push(obj.id);
+  }
+  
+  this.editListItem = function(id, value){
+    this.list[id].value = value;
+    this.page.isModified = true;
+  }
+  
+  this.deleteListItem = function(itemId){
+    delete this.list[itemId];
+    for(var i =0; i < this.listOrder.length; i++){
+      if(this.listOrder[i] == itemId) {
+        this.listOrder.splice(i, 1);
+        break;
+      }
+    }
+    this.page.isModified = true;
   }
   
   this.legendBlock = function(){
@@ -124,6 +142,7 @@ function ApplyElement(){
   this.getDataObject = function(){
     var obj = {
         id: this.id,
+        elementType: this.elementType,
         title: this.title,
         format: this.format,
         instructions: this.instructions,
@@ -134,14 +153,19 @@ function ApplyElement(){
 //        weight: this.weight
         list: []
     };
-    $(this.list).each(function(){
-      obj.list.push(this);
-    });
+    for(var i=0; i < this.listOrder.length; i++){
+      if(this.listOrder[i] in this.list) obj.list.push(this.list[this.listOrder[i]]);
+    }
     return obj;
   }
   
   this.workspace = function(){
-    var field = $('<div>').attr('id','element-'+this.id).data('element', this).addClass('field');
+    var field = $('#element-'+this.id);
+    if(field.length == 0){
+      $('#workspace-left-middle-left').append($('<div>').attr('id','element-'+this.id).data('element', this).addClass('field'));
+      var field = $('#element-'+this.id);
+    }
+    field.empty();
     field.append(this.instructionsBlock());
     var element = $('<div>').addClass('element yui-gf');
     element.append(this.legendBlock());
@@ -149,8 +173,7 @@ function ApplyElement(){
     if(this.showFormat) control.append(this.formatBlock());
     element.append(control);
     field.append(element);
-    $('#workspace-left-middle-left').append(field);
-    $('#workspace-left-middle-right').append(this.optionsBlock());
+    this.optionsBlock();
     
     $('#workspace-left-middle-left div.field').bind('click', function(){
       $('#workspace-left-middle-right div').hide();
@@ -158,21 +181,25 @@ function ApplyElement(){
       $('#element-'+$(this).data('element').id).addClass('selected');
       $('#element-options-'+$(this).data('element').id).show().children().show();
     });
+    $('#element-'+this.id).trigger('click');
   }
   
   this.optionsBlock = function(){
-    var div = $('<div>').attr('id', 'element-options-'+this.id);
+    var div = $('#element-options-'+this.id);
+    if(div.length == 0){
+      $('#workspace-left-middle-right').append($('<div>').attr('id', 'element-options-'+this.id));
+      div = $('#element-options-'+this.id);
+    }
+    div.empty();
     var element = this;
     var p = $('<p>Delete this element</p>').addClass('delete').bind('click', function(e){
-      element.page.pageStore.deleteElement(element.id);
-      $('#element-'+element.id).effect('explode',500);
+      element.page.deleteElement(element.id);
       $('#workspace-left-middle-left div.field:first').trigger('click');
     });
     div.append(p);
     if(this.hasListItems) div.append(this.listItemsBlock());
     div.append(this.requiredBlock());
     div.hide();
-    return div;
   }
   
   this.editItemBlock = function(item){
@@ -180,7 +207,8 @@ function ApplyElement(){
       $(this).unbind('click');
       var field = $('<input type="text">').attr('value',e.data.item.value);
       field.bind('change', {elementClass: e.data.elementClass, item: e.data.item}, function(e){
-        e.data.elementClass.editListItem(e.data.item.id, $(this).val());
+        e.data.elementClass.editListItem(e.data.item.id,$(this).val());
+        e.data.elementClass.workspace();
       }).bind('blur', {elementClass: e.data.elementClass, item: e.data.item}, function(e){
         $(this).parent().replaceWith(e.data.elementClass.editItemBlock(e.data.item));
       });
@@ -190,35 +218,25 @@ function ApplyElement(){
     return li;
   }
   
-  this.editListItem = function(id, value){
-    for(var i = 0; i < this.list.length; i++){
-      var item = this.list[i];
-      if(item.id == id){
-        this.list[i].value = value;
-        this.page.isModified = true;
-        break;
-      }
-    }
-  }
-  
   this.listItemsBlock = function(){
     var div = $('<div>').addClass('listItem container').append($('<h5>').html('List Items'));
     var ol = $('<ol>');
-    for(var i = 0; i < this.list.length; i++){
-      ol.append(this.editItemBlock(this.list[i]));
+    for(var i =0; i < this.listOrder.length; i++){
+      if(this.listOrder[i] in this.list) ol.append(this.editItemBlock(this.list[this.listOrder[i]]));
     }
     div.append(ol);
-    
-    var p = $('<p>').addClass('add').html('add item').bind('click', {elementClass: this, ol: ol}, function(e){
-      var field = $('<input type="text">');
-      field.bind('change', {elementClass: e.data.elementClass}, function(e){
-        e.data.elementClass.page.pageStore.addListItem(e.data.elementClass.page.id, e.data.elementClass.id, $(this).val());
-      }).bind('blur', {field: field}, function(e){
-        $(field).remove();
-      });
-      $(e.data.ol).append($('<li>').append(field));
-      $(field).trigger('focus');
-    });
+    var form = $('<form>').bind('submit', {elementClass: this}, function(e){
+      var value = $(this).children('input').eq(0).val();
+      if(value != ''){
+        e.data.elementClass.page.pageStore.newListItem(e.data.elementClass.page, e.data.elementClass,value);
+        $(this).children('input').eq(0).val('');
+        e.data.elementClass.workspace();
+      }
+      return false;
+    }).append($('<input type="text">')).append($('<input type="button" name="submit" value="Add">'));
+    var p = $('<p>').addClass('add').bind('click', function(){
+      $(this).children('form').trigger('submit');
+    }).append(form);
     div.append(p);
     return div;
   }
@@ -277,8 +295,8 @@ function SelectListElement(){
   this.hasListItems = true;
   this.avatar = function(){
     var select = $('<select>');
-    for(var i = 0; i < this.list.length; i++){
-      select.append($('<option>').html(this.list[i].value));
+    for(var i =0; i < this.listOrder.length; i++){
+      if(this.listOrder[i] in this.list) select.append($('<option>').html(this.list[this.listOrder[i]].value));
     }
     return select;
   };

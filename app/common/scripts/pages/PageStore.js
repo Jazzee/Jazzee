@@ -11,16 +11,28 @@
 function PageStore(){
   var self = this;
   this.baseUrl = '';
-  this.pages = [];
+  this.index = '';
+  this.pages = {};
   //retain the page order from the server since we store by ID
   this.pageOrder = [];
   
-  this.pageTypes = [];
+  this.pageTypes = {};
+  this.pageTypesOrder = [];
   
-  this.elementTypes = [];
+  this.elementTypes = {};
+  this.elementTypesOrder = [];
   
-  this.init = function(baseUrl){
+  //make sure we don't have any collisions with new page and element Ids
+  this.IdCounter = 0;
+  
+  /**
+   * Initialize the pageStore
+   * @param string baseUrl the location to send requests to
+   * @param string index what to use as the object ID applicationPageId, or pageID
+   */
+  this.init = function(baseUrl, index){
     this.baseUrl = baseUrl;
+    this.index = index;
     this.fillElementTypesList();
     this.fillPageTypesList();
     this.refreshPageList();
@@ -32,8 +44,8 @@ function PageStore(){
         self.pageOrder = [];
         $(json.data.result).each(function(i){
           var Page = self.createPageObject(this);
-          self.pages[this.id] = Page;
-          self.pageOrder.push(Page.id);
+          self.pages[this[self.index]] = Page;
+          self.pageOrder.push(Page[self.index]);
         });
         $(document).trigger("updatedPageList");
     });
@@ -45,8 +57,8 @@ function PageStore(){
     $(obj.elements).each(function(i,element){
       var Element = new window[element.type]();
       Element.init(element, Page);
-      $(element.list).each(function(i,item){
-        Element.addListItem(item.id,item.value);
+      $(element.list).each(function(){
+        Element.addListItem(this);
       });
       Page.addElement(Element);
     });
@@ -65,7 +77,8 @@ function PageStore(){
       async: false,
       success: function(json){
         $(json.data.result).each(function(i){
-          self.elementTypes[this.id] = this.name;
+          self.elementTypesOrder.push(this.id);
+          self.elementTypes[this.id] = this;
         });
       }
     });
@@ -77,28 +90,78 @@ function PageStore(){
       async: false,
       success: function(json){
         $(json.data.result).each(function(i){
-          self.pageTypes[this.id] = this.name;
+          self.pageTypesOrder.push(this.id);
+          self.pageTypes[this.id] = this;
         });
       }
     });
   };
   
-  this.addPage = function(type){
-    $.post(self.baseUrl + 'addPage',{pageType: type}, self.refreshPageList);
+  this.newPage = function(typeID){
+    var uniqueID = 'newpage' + this.IdCounter++;
+    var newPage = {
+        applicationPageId: uniqueID,
+        pageId: uniqueID,
+        type: this.pageTypes[typeID].class,
+        pageType: typeID,
+        title: "New " + this.pageTypes[typeID].name + " Page",
+        min: 0,
+        max: 0,
+        optional: false,
+        instructions: '',
+        leadingText: '',
+        trailingText: '',
+        elements: [],
+        variables: [],
+        children: []
+    };
+    var Page = this.createPageObject(newPage);
+    Page.isModified = true;
+    this.pages[Page[self.index]] = Page;
+    this.pageOrder.push(Page[self.index]);
+    $(document).trigger("updatedPageList");
   };
   
-  this.deletePage = function(pageID){
-    $.get(self.baseUrl + 'deletePage/' + pageID, self.refreshPageList);
-  };
-  
-  this.deleteElement = function(elementID){
-    $.get(self.baseUrl + 'deleteElement/' + elementID, self.refreshPageList);
+  this.deletePage = function(page){
+    $.post(self.baseUrl + 'deletePage/' + page[self.index],function(){
+      delete self.pages[page[self.index]];
+      for(var i =0; i < self.pageOrder.length; i++){
+        if(self.pageOrder[i] == page[self.index]) {
+          self.pageOrder.splice(i, 1);
+          break;
+        }
+      }
+      $(document).trigger("updatedPageList");
+    });
   };
   
   this.getPageList = function(){
     var response = [];
     for(var i =0; i < self.pageOrder.length; i++){
-      response.push(self.pages[self.pageOrder[i]]);
+      if(self.pageOrder[i] in self.pages) response.push(self.pages[self.pageOrder[i]]);
+    }
+    return response;
+  };
+  
+  this.getPageTypesList = function(){
+    var response = [];
+    for(var i =0; i < self.pageTypesOrder.length; i++){
+      if(self.pageTypesOrder[i] in self.pageTypes) response.push(self.pageTypes[self.pageTypesOrder[i]]);
+    }
+    return response;
+  };
+  
+  this.getPageTypeByClassName = function(name){
+    for(var i =0; i < self.pageTypesOrder.length; i++){
+      if(self.pageTypesOrder[i] in self.pageTypes && self.pageTypes[self.pageTypesOrder[i]].class == name) return self.pageTypes[self.pageTypesOrder[i]];
+    }
+    return false;
+  };
+  
+  this.getElementTypesList = function(){
+    var response = [];
+    for(var i =0; i < self.elementTypesOrder.length; i++){
+      if(self.elementTypesOrder[i] in self.elementTypes) response.push(self.elementTypes[self.elementTypesOrder[i]]);
     }
     return response;
   };
@@ -115,39 +178,65 @@ function PageStore(){
     return div;
   };
   
-  this.addElement = function(pageID, elementID){
-    $.post(self.baseUrl + 'addElement/' + pageID,{type: elementID}, self.refreshPageList);
+  this.newElement = function(page, elementType){
+    var newElement = {
+        id: 'newElement'+this.IdCounter++,
+        title: 'New ' + elementType.name,
+        elementType: elementType.id,
+        format: '',
+        instructions: '',
+        defaultValue: '',
+        required: true,
+        min: null,
+        max: null,
+        weight: null
+    };
+    var Element = new window[elementType.class]();
+    Element.init(newElement, page);
+    page.addElement(Element);
   };
   
-  this.addListItem = function(pageID, elementID, value){
-    $.post(self.baseUrl + 'addListItem/' + pageID +'/' + elementID,{value: value}, self.refreshPageList);
+  this.newListItem = function(page, element, value){
+    element.addListItem({id:'newListItem'+this.IdCounter++,value: value, active: 1});
+    page.isModified = true;
   };
   
-  this.addBranchingPage = function(pageID, newPageType){
-    $.post(self.baseUrl + 'addBranchingPage/' + pageID,{type: newPageType}, self.refreshPageList);
+  this.newBranchingPage = function(pageTypeID, parentPage){
+    var uniqueID = 'newbranchingpage' + this.IdCounter++;
+    var newPage = {
+        applicationPageId: null,
+        pageId: uniqueID,
+        type: this.pageTypes[pageTypeID].class,
+        pageType: pageTypeID,
+        title: "New Branch",
+        min: 0,
+        max: 0,
+        optional: false,
+        instructions: '',
+        leadingText: '',
+        trailingText: '',
+        elements: [],
+        variables: [],
+        children: []
+    };
+    var Branch = this.createPageObject(newPage);
+    Branch.isModified = true;
+    parentPage.addChild(Branch);
   };
   
-  this.checkPageExists = function(pageID){
-    return (jQuery.inArray(pageID, this.pageOrder) == -1)?false:true;
+  this.checkPageExists = function(id){
+    return (id in this.pages);
   };
   
-  this.save = function(pageID){
-    if(this.pages[pageID].isModified){
-      var obj = this.pages[pageID].getDataObject();
-      $.post(self.baseUrl + 'savePage/' + pageID,{data: obj});
-      $(document).trigger("updatedPageList");
-    }
-  };
-  
-  this.saveAll = function(){
+  this.save = function(){
     var update = false;
-    $(this.pages).each(function(){
-      if(this.isModified){
+    for(var i =0; i < self.pageOrder.length; i++){
+      var page = self.pages[self.pageOrder[i]];
+      if(page.checkModified()){
         update = true;
-        var obj = this.getDataObject();
-        $.post(self.baseUrl + 'savePage/' + this.id,{data: obj});
+        var obj = page.getDataObject();
+        $.post(self.baseUrl + 'savePage/' + obj[self.index],{data: obj}, self.refreshPageList);
       }
-    });
-    if(update) this.refreshPageList();
+    };
   };
 }

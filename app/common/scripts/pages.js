@@ -8,9 +8,10 @@ function Pages(){
     this.canvas = $('#canvas');
     $('#workspace').hide();
     this.pageStore = new PageStore;
-    this.pageStore.init(document.location.href);
+    this.pageStore.init(document.location.href, 'applicationPageId');
     $(document).bind("updatedPageList", self.refreshPageDisplay);
     this.refreshPageTypesDisplay();
+    $('#save-pages').bind('click', self.pageStore.save);
   }
   
   this.refreshPageDisplay = function(){
@@ -19,11 +20,10 @@ function Pages(){
     var list = self.pageStore.getPageList();
     var ol = $('<ol>').addClass('page-list');
     $(list).each(function(i){
-      var li = $('<li>').html(this.title).attr('id', 'application-page-' + this.id);
+      var li = $('<li>').html(this.title).attr('id', 'application-page-' + this.applicationPageId);
       $(li).data('page', this);
       $(li).bind('click', function(e){
-        self.currentPageID = $(this).data('page').id;
-        self.clearWorkspace();
+        self.currentPageID = $(this).data('page').applicationPageId;
         $(this).parent().children('li').removeClass('active');
         $(this).addClass('active');
         $(this).data('page').workspace();
@@ -34,44 +34,32 @@ function Pages(){
     ol.sortable();
     ol.bind( "sortupdate", function(event, ui) {
       $(this).children('li').each(function(i){
-        var page = $(this).data('page');
-        //set the page weight to i+1 so we don't start at zero
-        var weight = i+1;
-        if(page.weight != weight){
-          page.setProperty('weight', weight);
-        }
+        console.log('use the pageStore to set the weight not here');
+//        var page = $(this).data('page');
+//        //set the page weight to i+1 so we don't start at zero
+//        var weight = i+1;
+//        if(page.weight != weight){
+//          page.setProperty('weight', weight);
+//        }
       });
-      self.pageStore.saveAll();
+//      self.pageStore.saveAll();
     });
     $('#application-pages').append(ol);
-    $('#application-pages li:first').trigger('click');
+    if(this.currentPageID) $('#application-page-' + this.currentPageID).trigger('click');
+    else $('#application-pages li:first').trigger('click');
   }
   
   this.refreshPageTypesDisplay = function(){
     var ol = $('<ol>').addClass('add-list');
-    $(this.pageStore.pageTypes).each(function(id,name){
-      var li = $('<li>').html(name);
+    $(this.pageStore.getPageTypesList()).each(function(i){
+      var type = this;
+      var li = $('<li>').html(type.name);
       $(li).bind('click', function(e){
-        self.pageStore.addPage(id);
+        self.pageStore.newPage(type.id);
       });
       ol.append(li);
     });
     $('#new-pages').append(ol);
-  }
-  
-
-  
-  this.clearWorkspace = function(){
-    $('#workspace-left-top').empty();
-    $('#workspace-left-middle-left').empty();
-    $('#workspace-left-middle-right').empty();
-    $('#workspace-left-bottom-left').empty();
-    $('#workspace-left-bottom-left').empty();
-    
-
-    $('#workspace-right-top').empty();
-    $('#workspace-right-middle').empty();
-    $('#workspace-right-bottom').empty();
   }
 }
   

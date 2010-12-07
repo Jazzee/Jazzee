@@ -38,5 +38,6 @@
     <div id='new-pages' class='container'>
     <h5>New Pages</h5>
     </div>
+    <div class='container'><p id='save-pages' class='save'>Save</p></div>
   </div>
 </div>

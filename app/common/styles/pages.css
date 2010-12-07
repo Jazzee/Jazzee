@@ -30,7 +30,7 @@ ol.add-list li{
 	list-style-image: url('resource/foundation/icons/bullet_add.png');
 }
 
-#workspace p{
+#workspace p, #save-pages{
   padding-left: 16px;
   background-repeat: no-repeat
 }
