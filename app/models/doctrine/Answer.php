@@ -20,4 +20,17 @@ class Answer extends BaseAnswer{
     }
   }
   
+  
+  /**
+   * Find child answer by pageID
+   * @param integer $id
+   * @return Answer || NULL
+   */
+  public function getChildByPageId($id){
+    foreach($this->Children as $child){
+      if($child->pageID == $id) return $child;
+    }
+    return false;
+  }
+  
 }

@@ -7,6 +7,7 @@
  * 
  * @property integer $applicantID
  * @property integer $pageID
+ * @property integer $parentID
  * @property integer $publicStatus
  * @property integer $privateStatus
  * @property blob $attachment
@@ -15,6 +16,8 @@
  * @property Page $Page
  * @property StatusType $PublicStatus
  * @property StatusType $PrivateStatus
+ * @property Answer $Parent
+ * @property Doctrine_Collection $Children
  * @property Doctrine_Collection $Elements
  * @property Score $Score
  * 
@@ -30,6 +33,9 @@ abstract class BaseAnswer extends Doctrine_Record
              'type' => 'integer',
              ));
         $this->hasColumn('pageID', 'integer', null, array(
+             'type' => 'integer',
+             ));
+        $this->hasColumn('parentID', 'integer', null, array(
              'type' => 'integer',
              ));
         $this->hasColumn('publicStatus', 'integer', null, array(
@@ -68,6 +74,16 @@ abstract class BaseAnswer extends Doctrine_Record
         $this->hasOne('StatusType as PrivateStatus', array(
              'local' => 'privateStatus',
              'foreign' => 'id'));
+
+        $this->hasOne('Answer as Parent', array(
+             'local' => 'parentID',
+             'foreign' => 'id',
+             'onDelete' => 'CASCADE',
+             'onUpdate' => 'CASCADE'));
+
+        $this->hasMany('Answer as Children', array(
+             'local' => 'id',
+             'foreign' => 'parentID'));
 
         $this->hasMany('ElementAnswer as Elements', array(
              'local' => 'id',

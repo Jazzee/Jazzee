@@ -344,6 +344,7 @@ Answer:
   columns:
     applicantID: integer
     pageID: integer
+    parentID: integer
     publicStatus: integer
     privateStatus: integer
     attachment: blob
@@ -368,6 +369,13 @@ Answer:
       class: StatusType
       local: privateStatus
       foreign: id
+    Parent:
+      class: Answer
+      local: parentID
+      foreign: id
+      onDelete: CASCADE
+      onUpdate: CASCADE
+      foreignAlias: Children
 
 StatusType:
   columns:
