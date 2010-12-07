@@ -45,7 +45,7 @@ class Applicant extends BaseApplicant{
   public function getAnswersForPage($pageID){
     $q = Doctrine_Query::create()
     ->select('a.*, r.*, rp.*, lora.*')
-    ->from('Answer a, a.Recommendation r, r.RecommendationPage rp, r.LORAnswer lora')
+    ->from('Answer a')
     ->where('a.PageID = ? AND a.applicantID = ?', array($pageID, $this->id));
     $answers =  $q->execute();
     //the indexby DQL specifier doesnt seem to work
@@ -64,7 +64,7 @@ class Applicant extends BaseApplicant{
   public function getAnswerByID($answerID){
     $q = Doctrine_Query::create()
     ->select('a.*, r.*, rp.*')
-    ->from('Answer a, a.Recommendation r, r.RecommendationPage rp, r.LORAnswer lora')
+    ->from('Answer a')
     ->where('a.ID = ? AND a.applicantID = ?', array($answerID, $this->id));
     return $q->fetchOne();
     
