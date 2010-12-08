@@ -71,8 +71,6 @@ p.add{
 #workspace-left-middle{
 	background-color: #eeffff;
 	overflow: hidden;
-	border-right: .5px solid #7799bb;
-	border-bottom: .5px solid #7799bb;
 }
 
 #workspace-left-middle-left div.field{
@@ -87,7 +85,6 @@ p.add{
 }
 
 #workspace-left-middle-right{
-  border-top: .5px solid #7799bb;
   float: left;
 }
 
