@@ -348,7 +348,13 @@ Answer:
     publicStatus: integer
     privateStatus: integer
     attachment: blob
+    uniqueID: string
+    locked: bool
     updatedAt: timestamp
+  indexes:
+    uniqueID: 
+      fields: [uniqueID]
+      type: unique
   relations:
     Applicant:
       local: applicantID

@@ -15,19 +15,13 @@ class LorController extends JazzeeController{
    * @param string $urlKey 
    */
   public function actionIndex($urlKey){
-    $q = Doctrine_Query::create()
-    ->select('r.*, rp.*')
-    ->from('Recommendation r')
-    ->leftJoin('r.RecommendationPage rp')
-    ->leftJoin('r.LORAnswer an')
-    ->where('r.urlKey = ?', array($urlKey));
-    $recommendation = $q->fetchOne();
-    if(!$recommendation) $this->send404();
-    $page = $recommendation->RecommendationPage->LORPage;
-    if($recommendation->LORAnswer->exists()){
+    $answer = Doctrine::getTable('Answer')->findOneByUniqueID($urlKey);
+    if(!$answer OR !$answer->locked) $this->send404();
+    if($answer->Children->getFirst()->Elements->count() > 0){
       $this->loadView($this->controllerName . '/complete');
       exit;
     }
+    $page = $answer->Page->Children->getFirst();
     $this->setVar('page', $page);
     $form = new Form;
     $form->action = $this->path("lor/{$urlKey}");
@@ -41,9 +35,7 @@ class LorController extends JazzeeController{
     $form->newButton('submit', 'Save');
     $form->newButton('reset', 'Clear Form');
     if($input = $form->processInput($this->post)){
-      $a = new Answer;
-      $a->pageID = $page->id;
-      $a->applicantID = $recommendation->Answer->Applicant->id;
+      $a = $answer->Children->getFirst();
       foreach($page->Elements as $e){
         $element = new $e->ElementType->class($e);
         $element->setValueFromInput($input->{'el'.$e->id});
@@ -52,8 +44,6 @@ class LorController extends JazzeeController{
         }
       }
       $a->save();
-      $recommendation->LORAnswerID = $a->id;
-      $recommendation->save();
       $this->messages->write('success', 'Recommendation Saved Successfully');
       
       $this->setVar('answer', $a);

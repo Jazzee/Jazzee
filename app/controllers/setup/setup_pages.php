@@ -95,7 +95,6 @@ class SetupPagesController extends SetupController implements PagesInterface {
     foreach($page->Variables as $variable){
       $arr['variables'][] = $variable->toArray();
     }
-    
     $arr['children'] = array();
     foreach($page->Children as $child){
       $arr['children'][] = $this->pageArray($child);
@@ -163,6 +162,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
       $page->pageType = $pageType->id;
       //let the class make modifications if it needs to 
       //no idea why this has to be done in two steps, but it was failing without the interim $className variable
+      $page->save();
       $className = $page->PageType->class;
       $className::setupNewPage($page);
     }
@@ -174,15 +174,20 @@ class SetupPagesController extends SetupController implements PagesInterface {
     $applicationPage->instructions = $data['instructions'];
     $applicationPage->leadingText = $data['leadingText'];
     $applicationPage->trailingText = $data['trailingText'];
+//    $applicationPage->Page->Variables->delete();
+    foreach($data['variables'] as $key => $value){
+      $applicationPage->Page->setVar($key, $value);
+      $applicationPage->Page->save();
+    }
     $applicationPage->save();
     $elementIds = array();
     foreach($data['elements'] as $arr){
       $elementIds[] = $arr['id'];
     }
     //get rid of any elements that are no longer present
-    foreach($applicationPage->Page->Elements as $element){
-      if(!in_array($element->id, $elementIds)) $element->delete();
-    }
+//    foreach($applicationPage->Page->Elements as $element){
+//      if(!in_array($element->id, $elementIds)) $element->delete();
+//    }
     foreach($data['elements'] as $arr){
       if(!$element = $applicationPage->Page->getElementByID($arr['id'])){
         $elementType = Doctrine::getTable('ElementType')->find($arr['elementType']);
@@ -211,7 +216,6 @@ class SetupPagesController extends SetupController implements PagesInterface {
         $item->save();
       }
     }
-    
     //for children pages
     foreach($data['children'] as $childArr){
       if(!$page = $applicationPage->Page->getChildById($childArr['pageId'])){
@@ -223,10 +227,6 @@ class SetupPagesController extends SetupController implements PagesInterface {
         $page = $applicationPage->Page->Children->get(null);
         $page->isGlobal = false;
         $page->pageType = $pageType->id;
-        //let the class make modifications if it needs to 
-        //no idea why this has to be done in two steps, but it was failing without the interim $className variable
-        $className = $page->PageType->class;
-        $className::setupNewPage($page);
       }
       $childArr = replaceNullString($childArr);
       $page->title = $childArr['title'];

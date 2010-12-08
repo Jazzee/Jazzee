@@ -8,4 +8,4 @@
  * @subpackage lor
  */
 ?>
-<p>Thank you, your recommendation has been recieved.</a>
+<p>This recommendation has alreadybeen completed.</p>

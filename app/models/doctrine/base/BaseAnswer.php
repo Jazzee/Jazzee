@@ -11,6 +11,8 @@
  * @property integer $publicStatus
  * @property integer $privateStatus
  * @property blob $attachment
+ * @property string $uniqueID
+ * @property bool $locked
  * @property timestamp $updatedAt
  * @property Applicant $Applicant
  * @property Page $Page
@@ -47,8 +49,23 @@ abstract class BaseAnswer extends Doctrine_Record
         $this->hasColumn('attachment', 'blob', null, array(
              'type' => 'blob',
              ));
+        $this->hasColumn('uniqueID', 'string', null, array(
+             'type' => 'string',
+             ));
+        $this->hasColumn('locked', 'bool', null, array(
+             'type' => 'bool',
+             ));
         $this->hasColumn('updatedAt', 'timestamp', null, array(
              'type' => 'timestamp',
+             ));
+
+
+        $this->index('uniqueID', array(
+             'fields' => 
+             array(
+              0 => 'uniqueID',
+             ),
+             'type' => 'unique',
              ));
     }
 

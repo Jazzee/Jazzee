@@ -54,7 +54,7 @@ function ApplyPage(){
     
     this.elements = {};
     this.elementsOrder = [];
-    this.variables = [];
+    this.variables = {};
     this.children = {};
     this.childrenOrder = [];
   }
@@ -103,6 +103,11 @@ function ApplyPage(){
     this.variables[name] = value;
   }
   
+  this.getVariable = function(name){
+    if(name in this.variables) return this.variables[name];
+    return false;
+  }
+  
   this.setProperty = function(property, value){
     this[property] = value;
     this.isModified = true;
@@ -125,7 +130,6 @@ function ApplyPage(){
 //      $(preview).dialog({ width: 800 });
 //    });
 //    return p;
-    console.log('preview this page');
   }
   
   this.titleBlock = function(){
@@ -292,6 +296,7 @@ function ApplyPage(){
         trailingText: this.trailingText,
         weight: this.weight,
         pageType: this.pageType,
+        variables: this.variables,
         elements: [],
         children: []
     };
@@ -419,6 +424,193 @@ function BranchingPage(){
 }
 BranchingPage.prototype = new ApplyPage();
 BranchingPage.prototype.constructor = BranchingPage;
+
+
+/**
+ * The RecommendationPage class
+ */
+function RecommendersPage(){
+  this.workspace = function(){
+    this.clearWorkspace();
+    $('#workspace-left-top').parent().addClass('form');
+    $('#workspace-left-top').append(this.titleBlock());
+    if(this.showLeadingText) $('#workspace-left-top').append(this.leadingTextBlock());
+    if(this.showInstructions) $('#workspace-left-top').append(this.instructionsBlock());
+    if(this.showTrailingText) $('#workspace-left-bottom-left').append(this.trailingTextBlock());
+    
+    $('#workspace-right-top').append(this.previewPageBlock());
+    $('#workspace-right-top').append(this.minBlock());
+    $('#workspace-right-top').append(this.maxBlock());
+    $('#workspace-right-top').append(this.optionalBlock());
+    $('#workspace-right-top').append(this.deadlineBlock());
+    $('#workspace-right-top').append(this.deadlineEnforcedBlock());
+    $('#workspace-right-top').append(this.recommendationPageBlock());
+    $('#workspace-right-top').append(this.recommenderEmailBlock());
+    
+    $('#workspace-right-bottom').append(this.deletePageBlock());
+  }
+  
+  this.deadlineBlock = function(){
+    var prefix = "The deadine for submitting recommendations is ";
+    var pageClass = this;
+    var deadline = 'the same as the application.';
+    if(this.getVariable('lorDeadline')){
+      deadline = pageClass.getVariable('lorDeadline');
+    }
+    var p = $('<p>').addClass('edit lorDeadline').html(prefix + deadline).bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('input').eq(0).show().focus();
+    });
+    var field = $('<input type="text">').bind('change',function(){
+        pageClass.setVariable('lorDeadline',$(this).val());
+        pageClass.isModified = true;
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        var deadline = 'the same as the application.';
+        if(pageClass.getVariable('lorDeadline')){
+          deadline = pageClass.getVariable('lorDeadline');
+        }
+        $(this).parent().children('p').eq(0).html(prefix + deadline);
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    if(this.getVariable('lorDeadline')){
+      field.attr('value',deadline);
+    }
+    return $('<div>').append(p).append(field);
+  }
+  
+  this.deadlineEnforcedBlock = function(){
+    var pageClass = this;
+    var value = 'not enforced.';
+    if(this.getVariable('lorDeadlineEnforced') == 1) value = 'enforced';
+    var p = $('<p>').addClass('edit deadlineEnforced').html('The deadine for recommender is ').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
+      $(this).unbind('click');
+      var field = $('<select>');
+      var enforced = $('<option>').attr('value', 1).html('Enforced');
+      if(e.data.pageClass.getVariable('lorDeadlineEnforced') == 1) enforced.attr('selected', true);
+      field.append(enforced);
+      var notEnforced = $('<option>').attr('value', 0).html(' Not Enforced');
+      if(e.data.pageClass.getVariable('lorDeadlineEnforced') == 0) notEnforced.attr('selected', true);
+      field.append(notEnforced);
+      field.bind('change', {pageClass: e.data.pageClass}, function(e){
+        e.data.pageClass.setVariable('lorDeadlineEnforced', $(this).val());
+        console.log(e.data.pageClass.variables); 
+        e.data.pageClass.isModified = true;
+      });
+      field.bind('blur', {pageClass: e.data.pageClass}, function(e){
+        $(this).parent().parent().html(e.data.pageClass.deadlineEnforcedBlock());
+      });
+      $(this).empty().append(field);
+    }));
+    return p;
+  }
+  
+  this.minBlock = function(){
+    var value = 'No minimum';
+    if(this.min > 0) value = this.min;
+    var p = $('<p>').addClass('edit min').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
+      $(this).unbind('click');
+      var field = $('<select>');
+      var option = $('<option>').attr('value', 0).html('No minimum');
+      if(e.data.pageClass.min == 0) option.attr('selected', true);
+      field.append(option);
+      for(var i=1; i < 50; i++){
+        var option = $('<option>').attr('value', i).html(i);
+        if(e.data.pageClass.min == i) option.attr('selected', true);
+        field.append(option);
+      }
+      field.bind('change', {pageClass: e.data.pageClass}, function(e){
+        e.data.pageClass.setProperty('min', $(this).val());
+      });
+      field.bind('blur', {pageClass: e.data.pageClass}, function(e){
+        $(this).parent().parent().html(e.data.pageClass.minBlock());
+      });
+      $(this).empty().append(field);
+    })).append(' recommendations required on this page.');
+    return p;
+  }
+  
+  this.maxBlock = function(){
+    var value = 'Unlimited';
+    if(this.max > 0) value = this.max;
+    var p = $('<p>').addClass('edit max').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
+      $(this).unbind('click');
+      var field = $('<select>');
+      var option = $('<option>').attr('value', 0).html('Unlimited');
+      if(e.data.pageClass.max == 0) option.attr('selected', true);
+      field.append(option);
+      for(var i=1; i < 50; i++){
+        var option = $('<option>').attr('value', i).html(i);
+        if(e.data.pageClass.max == i) option.attr('selected', true);
+        field.append(option);
+      }
+      field.bind('change', {pageClass: e.data.pageClass}, function(e){
+        e.data.pageClass.setProperty('max', $(this).val());
+      });
+      field.bind('blur', {pageClass: e.data.pageClass}, function(e){
+        $(this).parent().parent().html(e.data.pageClass.maxBlock());
+      });
+      $(this).empty().append(field);
+    })).append(' recommendations allowed on this page.');
+    return p;
+  }
+  
+  this.recommendationPageBlock = function(){
+    var pageClass = this;
+    if(this.childrenOrder.length == 0){
+      var standardPage = pageClass.pageStore.getPageTypeByClassName('StandardPage');
+      var uniqueID = 'newlorpage' + this.pageStore.IdCounter++;
+      var newPage = {
+          applicationPageId: null,
+          pageId: uniqueID,
+          type: standardPage.class,
+          pageType: standardPage.id,
+          title: 'Recommendation',
+          min: 0,
+          max: 0,
+          optional: false,
+          instructions: '',
+          leadingText: '',
+          trailingText: '',
+          elements: [],
+          variables: [],
+          children: []
+      };
+      var LOR = this.pageStore.createPageObject(newPage);
+      LOR.isModified = true;
+      this.addChild(LOR);
+    }
+    var p = $('<p>').addClass('edit lorPage').html('Edit Recommendation Page').bind('click',{lor: this.children[this.childrenOrder[0]]},function(e){
+      e.data.lor.workspace();
+      //get rid of the min/max/preview/delete controls
+      $('#workspace-right-top').empty();
+      $('#workspace-right-bottom').empty();
+    });
+    return p;
+  }
+  
+  this.recommenderEmailBlock = function(){
+    var pageClass = this;
+    var field = $('<textarea>').html(this.getVariable('recommenderEmail'))
+      .bind('change',function(){
+        pageClass.setVariable('recommenderEmail', $(this).val());
+        pageClass.isModified = true;
+      })
+      .bind('blur', function(){
+        $(this).hide();
+        $(this).parent().children('p').eq(0).show();
+    }).hide();
+    var p = $('<p>').addClass('edit').html('Recommender Email').bind('click', function(){
+      $(this).hide();
+      $(this).parent().children('textarea').eq(0).show();
+      $(this).parent().children('textarea').eq(0).focus();
+    });
+    return $('<div>').append(p).append(field);
+  }
+}
+RecommendersPage.prototype = new ApplyPage();
+RecommendersPage.prototype.constructor = RecommendersPage;
 
 /**
  * The TextPage class

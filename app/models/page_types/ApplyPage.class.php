@@ -130,6 +130,11 @@ abstract class ApplyPage {
    */
   abstract public function getStatus();
   
+  /**
+   * Perform some setup actions on a new page
+   * @param Page $page
+   */
+  public static function setupNewPage(Page $page){}
 }
 
 /**
