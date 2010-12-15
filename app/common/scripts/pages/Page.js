@@ -28,6 +28,7 @@ function ApplyPage(){
   this.elementsOrder;
   this.children;
   this.childrenOrder;
+  this.status = '';
   
   this.isModified = false;
   this.showLeadingText = true;
@@ -51,12 +52,13 @@ function ApplyPage(){
     this.trailingText = obj.trailingText;
     this.pageType = obj.pageType;
     this.weight = obj.weight;
-    
     this.elements = {};
     this.elementsOrder = [];
+    this.deletedElements = [];
     this.variables = {};
     this.children = {};
     this.childrenOrder = [];
+    this.deletedChildren = [];
   }
   
   this.checkModified = function(){
@@ -73,7 +75,8 @@ function ApplyPage(){
   }
   
   this.deleteElement = function(elementId){
-    delete this.elements[elementId];
+    this.deletedElements.push(elementId);
+    this.elements[elementId].status = 'delete';
     for(var i =0; i < this.elementsOrder.length; i++){
       if(this.elementsOrder[i] == elementId) {
         this.elementsOrder.splice(i, 1);
@@ -82,7 +85,7 @@ function ApplyPage(){
     }
     this.isModified = true;
     this.elementsWorkspace();
-  }
+  };
   
   this.addChild = function(obj){
     this.children[obj.pageId] = obj;
@@ -100,11 +103,11 @@ function ApplyPage(){
   }
   
   this.setVariable = function(name, value){
-    this.variables[name] = value;
+    this.variables[name] = {name : name, value: value};
   }
   
   this.getVariable = function(name){
-    if(name in this.variables) return this.variables[name];
+    if(name in this.variables) return this.variables[name].value;
     return false;
   }
   
@@ -287,6 +290,7 @@ function ApplyPage(){
     var obj = {
         pageId: this.pageId,
         applicationPageId: this.applicationPageId,
+        status: this.status,
         title: this.title,
         min: this.min,
         max: this.max,
@@ -302,6 +306,9 @@ function ApplyPage(){
     };
     for(var i =0; i < this.elementsOrder.length; i++){
       if(this.elementsOrder[i] in this.elements) obj.elements.push(this.elements[this.elementsOrder[i]].getDataObject());
+    }
+    for(var i =0; i < this.deletedElements.length; i++){
+      if(this.deletedElements[i] in this.elements) obj.elements.push(this.elements[this.deletedElements[i]].getDataObject());
     }
     for(var i =0; i < this.childrenOrder.length; i++){
       if(this.childrenOrder[i] in this.children) obj.children.push(this.children[this.childrenOrder[i]].getDataObject());
@@ -578,7 +585,7 @@ function RecommendersPage(){
           children: []
       };
       var LOR = this.pageStore.createPageObject(newPage);
-      LOR.isModified = true;
+      LOR.status = 'new';
       this.addChild(LOR);
     }
     var p = $('<p>').addClass('edit lorPage').html('Edit Recommendation Page').bind('click',{lor: this.children[this.childrenOrder[0]]},function(e){

@@ -7,6 +7,7 @@
 function ApplyElement(){
   this.page;
   this.id;
+  this.status;
   this.elementType,
   this.title;
   this.format;
@@ -143,6 +144,7 @@ function ApplyElement(){
     var obj = {
         id: this.id,
         elementType: this.elementType,
+        status: this.status,
         title: this.title,
         format: this.format,
         instructions: this.instructions,

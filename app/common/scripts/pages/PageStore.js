@@ -22,6 +22,9 @@ function PageStore(){
   this.elementTypes = {};
   this.elementTypesOrder = [];
   
+  //array of pages we are scheduled to delete
+  this.deletedPages = [];
+  
   //make sure we don't have any collisions with new page and element Ids
   this.IdCounter = 0;
   
@@ -117,22 +120,22 @@ function PageStore(){
     };
     var Page = this.createPageObject(newPage);
     Page.isModified = true;
+    Page.status = 'new';
     this.pages[Page[self.index]] = Page;
     this.pageOrder.push(Page[self.index]);
     $(document).trigger("updatedPageList");
   };
   
   this.deletePage = function(page){
-    $.post(self.baseUrl + 'deletePage/' + page[self.index],function(){
-      delete self.pages[page[self.index]];
-      for(var i =0; i < self.pageOrder.length; i++){
-        if(self.pageOrder[i] == page[self.index]) {
-          self.pageOrder.splice(i, 1);
-          break;
-        }
+    this.deletedPages.push(page[self.index]);
+    delete self.pages[page[self.index]];
+    for(var i =0; i < self.pageOrder.length; i++){
+      if(self.pageOrder[i] == page[self.index]) {
+        self.pageOrder.splice(i, 1);
+        break;
       }
-      $(document).trigger("updatedPageList");
-    });
+    }
+    $(document).trigger("updatedPageList");
   };
   
   this.getPageList = function(){
@@ -193,6 +196,7 @@ function PageStore(){
     };
     var Element = new window[elementType.class]();
     Element.init(newElement, page);
+    Element.status = 'new';
     page.addElement(Element);
   };
   
@@ -235,8 +239,11 @@ function PageStore(){
       if(page.checkModified()){
         update = true;
         var obj = page.getDataObject();
-        $.post(self.baseUrl + 'savePage/' + obj[self.index],{data: obj}, self.refreshPageList);
+        $.post(self.baseUrl + 'savePage/' + obj[self.index],{data: $.toJSON(obj)}, self.refreshPageList);
       }
-    };
+    }
+    for(var i =0; i < self.deletedPages.length; i++){
+      $.post(self.baseUrl + 'savePage/' + self.deletedPages[i],{data: $.toJSON({status: 'delete'})});
+    }
   };
 }
