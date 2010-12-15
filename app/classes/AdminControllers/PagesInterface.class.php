@@ -10,7 +10,6 @@ interface PagesInterface{
   public function actionListPages();
   public function actionListPageTypes();
   public function actionSavePage($pageId);
-  public function actionDeletePage($pageId);
   public function actionPreviewPage($pageId);
   public function actionListElementTypes();
 }
