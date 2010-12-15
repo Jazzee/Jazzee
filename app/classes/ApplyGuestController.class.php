@@ -28,7 +28,9 @@ class ApplyGuestController extends JazzeeController{
   protected function beforeAction(){
     parent::beforeAction();
     if(!empty($this->actionParams['programShortName']) AND !empty($this->actionParams['cycleName'])){
-      if(!$this->application = Application::findOneApplication($this->actionParams['programShortName'],$this->actionParams['cycleName'])){
+      $program = Doctrine::getTable('Program')->findOneByShortName($this->actionParams['programShortName']);
+      $cycle = Doctrine::getTable('Cycle')->findOneByName($this->actionParams['cycleName']);
+      if(!$this->application = Doctrine::getTable('Application')->findOneByProgramIDAndCycleID($program->id, $cycle->id)){
         throw new Exception("{$this->actionParams['programShortName']} is not a valid program");
       }
     } else if(!empty($this->actionParams['programShortName'])){
