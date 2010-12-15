@@ -194,6 +194,7 @@ class JazzeeController extends Controller{
     //add jquery
     $this->addScript('foundation/scripts/jquery.js');
     $this->addScript('foundation/scripts/jqueryui.js');
+    $this->addScript('foundation/scripts/jquery.json.js');
     
     //yui css library
     $this->addCss('foundation/styles/reset-fonts-grids.css');

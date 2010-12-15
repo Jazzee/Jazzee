@@ -72,6 +72,7 @@ $virtualResources->addDirectory(dirname(__FILE__) . '/javascript/', 'foundation/
 $virtualResources->addDirectory(dirname(__FILE__) . '/media/famfamfam_silk_icons_v013/icons', 'foundation/icons/');
 
 $virtualResources->add(dirname(__FILE__) . '/lib/jquery/jquery-1.4.2.min.js', 'foundation/scripts/jquery.js');
+$virtualResources->add(dirname(__FILE__) . '/lib/jquery/plugins/jquery.json-2.2.min.js', 'foundation/scripts/jquery.json.js');
 $virtualResources->add(dirname(__FILE__) . '/lib/jquery/jquery-ui-1.8.min.js', 'foundation/scripts/jqueryui.js');
 $virtualResources->addDirectory(dirname(__FILE__) . '/lib/jquery/themes/', 'foundation/styles/jquery/themes');
 $virtualResources->add(dirname(__FILE__) . '/lib/yui/base-min.css', 'foundation/styles/base.css');
