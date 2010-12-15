@@ -127,155 +127,107 @@ class SetupPagesController extends SetupController implements PagesInterface {
   }
   
   /**
-   * Delete the page
-   * @param integer $applicationPageId
-   */
-  public function actionDeletePage($applicationPageId){
-    if(!$page = $this->application->getPageByID($applicationPageId)){
-      $this->messages->write('error', "Invalid page");
-    } else {
-      $title = $page->title;
-      if($page->Page->isGlobal){
-        $page->delete();
-      } else {
-        $page->Page->delete();
-      }
-      $this->messages->write('success', "{$title} Deleted");
-    }
-  }
-  
-  /**
    * Save data from editing a page
    * @param integer $applicationPageId
    */
   public function actionSavePage($applicationPageId){
-    $data = $this->post['data'];
-    if(!$applicationPage = $this->application->getPageByID($applicationPageId)){
-      $pageType = Doctrine::getTable('PageType')->find($data['pageType']);
-      if(!$pageType or !class_exists($pageType->class)){
-        $this->messages->write('error', "Invalid Page Type");
-        return false;
-      }
-      $applicationPage = $this->application->Pages->get(null);
-      $page = $applicationPage->Page;
-      $page->isGlobal = false;
-      $page->pageType = $pageType->id;
-      //let the class make modifications if it needs to 
-      //no idea why this has to be done in two steps, but it was failing without the interim $className variable
-      $page->save();
-      $className = $page->PageType->class;
-      $className::setupNewPage($page);
-    }
-    $data = replaceNullString($data);
-    $applicationPage->title = $data['title'];
-    $applicationPage->min = $data['min'];
-    $applicationPage->max = $data['max'];
-    $applicationPage->optional = (bool)$data['optional'];
-    $applicationPage->instructions = $data['instructions'];
-    $applicationPage->leadingText = $data['leadingText'];
-    $applicationPage->trailingText = $data['trailingText'];
-//    $applicationPage->Page->Variables->delete();
-    foreach($data['variables'] as $key => $value){
-      $applicationPage->Page->setVar($key, $value);
-      $applicationPage->Page->save();
-    }
-    $applicationPage->save();
-    $elementIds = array();
-    foreach($data['elements'] as $arr){
-      $elementIds[] = $arr['id'];
-    }
-    //get rid of any elements that are no longer present
-//    foreach($applicationPage->Page->Elements as $element){
-//      if(!in_array($element->id, $elementIds)) $element->delete();
-//    }
-    foreach($data['elements'] as $arr){
-      if(!$element = $applicationPage->Page->getElementByID($arr['id'])){
-        $elementType = Doctrine::getTable('ElementType')->find($arr['elementType']);
-        if(!$elementType or !class_exists($elementType->class)){
-          $this->messages->write('error', "Invalid Element Type");
-          return false;
-        }
-        $element = $applicationPage->Page->Elements->get(null);
-        $element->elementType = $elementType->id;
-      }
-      $arr = replaceNullString($arr);
-      $element->title = $arr['title'];
-      $element->format = $arr['format'];
-      $element->instructions = $arr['instructions'];
-      $element->defaultValue = $arr['defaultValue'];
-      $element->required = (bool)$arr['required'];
-      $element->min = $arr['min'];
-      $element->max = $arr['max'];
-      $element->save();
-      foreach($arr['list'] as $itemArr){
-        if(!$item = $element->getItemById($itemArr['id'])){
-          $item = $element->ListItems->get(null);
-        }
-        $item->value = $itemArr['value'];
-        $item->active = $itemArr['active'];
-        $item->save();
-      }
-    }
-    //for children pages
-    foreach($data['children'] as $childArr){
-      if(!$page = $applicationPage->Page->getChildById($childArr['pageId'])){
-        $pageType = Doctrine::getTable('PageType')->find($childArr['pageType']);
-        if(!$pageType or !class_exists($pageType->class)){
-          $this->messages->write('error', "Invalid Page Type for Child page");
-          return false;
-        }
-        $page = $applicationPage->Page->Children->get(null);
-        $page->isGlobal = false;
-        $page->pageType = $pageType->id;
-      }
-      $childArr = replaceNullString($childArr);
-      $page->title = $childArr['title'];
-      $page->min = $childArr['min'];
-      $page->max = $childArr['max'];
-      $page->optional = (bool)$childArr['optional'];
-      $page->instructions = $childArr['instructions'];
-      $page->leadingText = $childArr['leadingText'];
-      $page->trailingText = $childArr['trailingText'];
-      $page->save();
-      $elementIds = array();
-      foreach($childArr['elements'] as $arr){
-        $elementIds[] = $arr['id'];
-      }
-      //get rid of any elements that are no longer present
-      foreach($page->Elements as $element){
-        if(!in_array($element->id, $elementIds)) $element->delete();
-      }
-      foreach($childArr['elements'] as $arr){
-        if(!$element = $page->getElementByID($arr['id'])){
-          $elementType = Doctrine::getTable('ElementType')->find($arr['elementType']);
-          if(!$elementType or !class_exists($elementType->class)){
-            $this->messages->write('error', "Invalid Element Type in Child Page");
-            return false;
+    $work = new UnitOfWork();
+    $data = json_decode($this->post['data']);
+    switch($data->status){
+      case 'delete':
+        if($page = $this->application->getPageByID($applicationPageId)){
+          if($page->Page->isGlobal){
+            $work->registerModelForDelete($page);
+          } else {
+            $work->registerModelForDelete($page->Page);
           }
-          $element = $page->Elements->get(null);
-          $element->elementType = $elementType->id;
         }
-        $arr = replaceNullString($arr);
-        $element->title = $arr['title'];
-        $element->format = $arr['format'];
-        $element->instructions = $arr['instructions'];
-        $element->defaultValue = $arr['defaultValue'];
-        $element->required = (bool)$arr['required'];
-        $element->min = $arr['min'];
-        $element->max = $arr['max'];
-        $element->save();
-        foreach($arr['list'] as $itemArr){
-          if(!$item = $element->getItemById($itemArr['id'])){
-            $item = $element->ListItems->get(null);
+      break;
+      case 'new':
+        $applicationPage = $this->application->Pages->get(null);
+        $applicationPage->Page->isGlobal = false;
+        $applicationPage->Page->pageType = $data->pageType;
+        //let the class make modifications if it needs to 
+        //no idea why this has to be done in two steps, but it was failing without the interim $className variable
+        $className = $applicationPage->Page->PageType->class;
+        $className::setupNewPage($applicationPage->Page);
+      default:
+        if(!isset($applicationPage)) $applicationPage = $this->application->getPageByID($applicationPageId);
+        $applicationPage->title = $data->title;
+        $applicationPage->min = $data->min;
+        $applicationPage->max = $data->max;
+        $applicationPage->optional = $data->optional;
+        $applicationPage->instructions = $data->instructions;
+        $applicationPage->leadingText = $data->leadingText;
+        $applicationPage->trailingText = $data->trailingText;
+        foreach($data->variables as $v){
+          $applicationPage->Page->setVar($v->name, $v->value);
+        }
+        $this->updatePageElements($applicationPage->Page, $data->elements, $work);
+        foreach($data->children as $child){
+          switch($child->status){
+            case 'delete':
+              $work->registerModelForDelete($applicationPage->Page->getChildById($child->pageId));
+            break;
+            case 'new':
+              $childPage = $applicationPage->Page->Children->get(null);
+              $childPage->isGlobal = false;
+              $childPage->pageType = $child->pageType;
+            case 'save':
+              if(!isset($childPage)) $childPage = $applicationPage->Page->getChildById($child->pageId);
+              $childPage->title = $child->title;
+              $childPage->min = $child->min;
+              $childPage->max = $child->max;
+              $childPage->optional = $child->optional;
+              $childPage->instructions = $child->instructions;
+              $childPage->leadingText = $child->leadingText;
+              $childPage->trailingText = $child->trailingText;
+              foreach($child->variables as $v){
+                $childPage->setVar($v->name, $v->value);
+              }
+              $this->updatePageElements($childPage, $child->elements, $work);
+            break;
           }
-          $item->value = $itemArr['value'];
-          $item->active = $itemArr['active'];
-          $item->save();
         }
+    } //end switch action
+    $work->registerModelForCreateOrUpdate($this->application);
+    $work->commitAll();
+  }
+  
+  /**
+   * Update all of the elements on a page with an array of elements passed in
+   * @param Element $element
+   * @param array $arr array of elements
+   * @param UnitOfOwrk $work
+   */
+  protected function updatePageElements(Page $page, $arr, UnitOfWork $work){
+    foreach($arr as $e){
+      switch($e->status){
+        case 'delete':
+          $work->registerModelForDelete($page->getElementByID($e->id));
+          break;
+        case 'new':
+            $element = $page->Elements->get(null);
+            $element->elementType = $e->elementType;
+        default:
+          if(!isset($element)) $element = $page->getElementByID($e->id);
+          $element->title = $e->title;
+          $element->format = $e->format;
+          $element->instructions = $e->instructions;
+          $element->defaultValue = $e->defaultValue;
+          $element->required = $e->required;
+          $element->min = $e->min;
+          $element->max = $e->max;
+          foreach($e->list as $i){
+            if(!$item = $element->getItemById($i->id)){
+              $item = $element->ListItems->get(null);
+            }
+            $item->value = $i->value;
+            $item->active = $i->active;
+          }
       }
+      unset($element);
     }
-    $this->application->save();
-    $this->messages->write('success', "{$applicationPage->title} Saved");
   }
   
   /**
