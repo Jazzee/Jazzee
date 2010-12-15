@@ -111,7 +111,19 @@ class RecommendersPage extends StandardPage {
  * Answer for Recommendations
  */
 class RecommendationAnswer extends StandardAnswer {
-
+  protected $fixedIds = array();
+  
+ /**
+  * Contructor
+  * Fill the fixedID index array
+  */
+  public function __construct(Answer $answer){
+    parent::__construct($answer);
+    foreach($this->elements as $e){
+      $this->fixedIds[$e->fixedID] = $e->id;
+    }
+  }
+  
   public function update(FormInput $input){
     //PHPs uniquid function is time based and therefor guessable
     //A stright random MD5 sum is too long for email and tends to line break causing usability problems for the recommender
@@ -125,6 +137,13 @@ class RecommendationAnswer extends StandardAnswer {
     $prefix = substr(md5($string),rand(0,24), rand(6,8));
     $this->answer->uniqueID = uniqid($prefix);
     parent::update($input);
+  }
+  
+  public function getDisplayValueForFixedElement($fixedElementID){
+    if(isset($this->fixedIds[$fixedElementID])){
+      return $this->elements[$this->fixedIds[$fixedElementID]]->displayValue();
+    }
+    return false;
   }
   
   public function applyTools($basePath){
@@ -182,16 +201,16 @@ class RecommendationAnswer extends StandardAnswer {
      $this->answer->Applicant->Application->contactEmail,
      $this->answer->Applicant->Application->contactPhone
     );
-    $replace[] = $this->getDisplayValueForElement($this->answer->Page->getVar('firstNameElement'));
-    $replace[] = $this->getDisplayValueForElement($this->answer->Page->getVar('lastNameElement'));
-    $replace[] = $this->getDisplayValueForElement($this->answer->Page->getVar('institutionElement'));
-    $replace[] = $this->getDisplayValueForElement($this->answer->Page->getVar('emailElement'));
-    $replace[] = $this->getDisplayValueForElement($this->answer->Page->getVar('phoneElement'));
-    $replace[] = $this->getDisplayValueForElement($this->answer->Page->getVar('waiveRightElement'));
+    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_FIRST_NAME);
+    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_LAST_NAME);
+    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_INSTITUTION);
+    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_EMAIL);
+    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_PHONE);
+    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_WAIVE_RIGHT);
     $text = str_ireplace($search, $replace, $this->answer->Page->getVar('recommenderEmail'));
 
     $message = new EmailMessage;
-    $message->to($this->getDisplayValueForElement($this->answer->Page->getVar('emailElement')), '');
+    $message->to($this->getDisplayValueForFixedElement(RecommendersPage::FID_EMAIL), '');
     $message->from($this->answer->Applicant->Application->contactEmail, $this->answer->Applicant->Application->contactName);
     $message->subject = 'Letter of Recommendation Request';
     $message->body = $text;
