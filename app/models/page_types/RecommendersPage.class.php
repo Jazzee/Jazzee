@@ -13,6 +13,17 @@ class RecommendersPage extends StandardPage {
    */
   const RECOMMENDATION_EMAIL_WAIT_TIME = 1209600;
   
+  /**
+   * These fixedIDs make it easy to find the element we are looking for
+   * @const integer
+   */
+  const FID_FIRST_NAME = 2;
+  const FID_LAST_NAME = 4;
+  const FID_INSTITUTION = 6;
+  const FID_EMAIL = 8;
+  const FID_PHONE = 10;
+  const FID_WAIVE_RIGHT = 12;
+  
   public function newAnswer($input){
     $a = $this->applicant->Answers->get(null);
     $a->pageID = $this->applicationPage->Page->id;
@@ -77,29 +88,22 @@ class RecommendersPage extends StandardPage {
     foreach($types as $type){
       $elementTypes[$type['class']] = $type['id'];
     };
-    foreach(array('firstName'=>'First Name','lastName'=>'Last Name','institution'=>'Institution','email'=>'Email Address','phone'=>'Phone Number') as $name => $title){
+    foreach(array(RecommendersPage::FID_FIRST_NAME=>'First Name',RecommendersPage::FID_LAST_NAME=>'Last Name',RecommendersPage::FID_INSTITUTION=>'Institution',RecommendersPage::FID_EMAIL=>'Email Address',RecommendersPage::FID_PHONE=>'Phone Number') as $fid => $title){
       $element = $page->Elements->get(null);
       $element->elementType = $elementTypes['TextInputElement'];
       $element->title = $title;
       $element->required = true;
-      $element->save();
-      $page->setVar("{$name}Element", $element->id);
+      $element->fixedID = $fid;
     }
     $element = $page->Elements->get(null);
     $element->elementType = $elementTypes['RadioListElement'];
     $element->title = 'Do you waive your right to view this letter at a later time?';
     $element->required = true;
-    $element->save();
-    $page->setVar("waiveRightElement", $element->id);
+    $element->fixedID = RecommendersPage::FID_WAIVE_RIGHT;
     $item = $element->ListItems->get(null);
     $item->value = 'No';
-    $item->save();
     $item = $element->ListItems->get(null);
     $item->value = 'Yes';
-    $item->save();
-    
-    
-    $page->save();
   }
 }
 
