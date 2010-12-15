@@ -108,4 +108,15 @@ class ApplicationPage extends BaseApplicationPage{
     }
     return $this->_set('trailingText',$value);
   }
+  
+  /**
+   * After we save the applicationPage make sure all of its pages are properly saved too
+   * At some point doctrine is unable to follow the relationships deep enough
+   * This method explicitly saves the members of collections with the correct id
+   */
+  public function postSave(){
+    if($this->Page->isModified(true)){
+      $this->Page->save();
+    }
+  }
 }

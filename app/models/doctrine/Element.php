@@ -20,4 +20,18 @@ class Element extends BaseElement{
     }
     return false;
   }
+  
+  /**
+   * After we save the Element make sure all of its Items
+   * At some point doctrine is unable to follow the relationships deep enough
+   * This method explicitly saves the members of collections with the correct id
+   */
+  public function postSave(){
+    foreach($this->ListItems as $item){
+      if($item->isModified(true)){
+        $item->elementID = $this->id;
+        $item->save();
+      }
+    }
+  }
 }

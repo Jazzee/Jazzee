@@ -6,27 +6,7 @@
  * @author     Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  */
-class Application extends BaseApplication{
-      
-  /**
-   * Get an application by shortname/cycle
-   * @params string $shortName
-   * @param string $cycleName
-   * @return Application|false on failure
-   */
-  static function findOneApplication($shortName, $cycleName){
-    $q = Doctrine_Query::create()
-      ->from('Application a')
-      ->leftJoin('a.Pages pages')
-      ->leftJoin('a.Program program')
-      ->leftJoin('a.Cycle cycle')
-      ->where('program.shortName = ?', $shortName)
-      ->andwhere('cycle.name = ?', $cycleName)
-      ->orderby('pages.weight')
-      ->limit(1);
-    return $q->execute()->getFirst();
-  }
-  
+class Application extends BaseApplication{  
   /**
   * Get page by ID
   * @param integer $pageID
@@ -40,7 +20,7 @@ class Application extends BaseApplication{
     return false;
   }
   
-    /**
+  /**
    * Get applicant by ID
    * @param integer $id
    * @return Applicant
@@ -51,5 +31,19 @@ class Application extends BaseApplication{
       return $this->Applicants->get($key);
     }
     return false;
+  }
+  
+  /**
+   * After we save the application make sure all of its pages are properly saved too
+   * At some point doctrine is unable to follow the relationships deep enough
+   * This method explicitly saves the members of collections with the correct id
+   */
+  public function postSave(){
+    foreach($this->Pages as $page){
+      if($page->isModified(true)){
+        $page->applicationID = $this->id;
+        $page->save();
+      }
+    }
   }
 }

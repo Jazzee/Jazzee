@@ -62,4 +62,30 @@ class Page extends BasePage{
     }
     return false;
   }
+  
+  /**
+   * After we save the Page make sure all of its elements and children are saved too
+   * At some point doctrine is unable to follow the relationships deep enough
+   * This method explicitly saves the members of collections with the correct id
+   */
+  public function postSave(){
+    foreach($this->Elements as $element){
+      if($element->isModified(true)){
+        $element->pageID = $this->id;
+        $element->save();
+      }
+    }
+    foreach($this->Children as $child){
+      if($child->isModified(true)){
+        $child->parentID = $this->id;
+        $child->save();
+      }
+    }
+  foreach($this->Variables as $variable){
+      if($variable->isModified(true)){
+        $variable->pageID = $this->id;
+        $variable->save();
+      }
+    }
+  }
 }
