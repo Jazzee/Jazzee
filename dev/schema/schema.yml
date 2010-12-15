@@ -129,6 +129,7 @@ PageVariable:
 Element:
   columns:
     pageID: integer
+    fixedID: integer
     elementType: integer
     title: string(255)
     format: string(255)
@@ -137,6 +138,10 @@ Element:
     required: boolean
     min: double
     max: double
+  indexes:
+    UniqueFixedID: 
+      fields: [fixedID, pageID]
+      type: unique
   relations:
     Page:
       local: pageID
@@ -348,12 +353,16 @@ Answer:
     publicStatus: integer
     privateStatus: integer
     attachment: blob
-    uniqueID: string
+    uniqueID:
+      type: string
+      length: 200
     locked: bool
     updatedAt: timestamp
   indexes:
     uniqueID: 
-      fields: [uniqueID]
+      fields: 
+        uniqueID:
+          length: 200
       type: unique
   relations:
     Applicant:

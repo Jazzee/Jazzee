@@ -49,8 +49,9 @@ abstract class BaseAnswer extends Doctrine_Record
         $this->hasColumn('attachment', 'blob', null, array(
              'type' => 'blob',
              ));
-        $this->hasColumn('uniqueID', 'string', null, array(
+        $this->hasColumn('uniqueID', 'string', 200, array(
              'type' => 'string',
+             'length' => 200,
              ));
         $this->hasColumn('locked', 'bool', null, array(
              'type' => 'bool',
@@ -63,7 +64,10 @@ abstract class BaseAnswer extends Doctrine_Record
         $this->index('uniqueID', array(
              'fields' => 
              array(
-              0 => 'uniqueID',
+              'uniqueID' => 
+              array(
+              'length' => 200,
+              ),
              ),
              'type' => 'unique',
              ));
