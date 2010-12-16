@@ -15,5 +15,5 @@ PageType:
     name: ETS Match
     class: ETSMatchPage
   PageType_6:
-    name: Citizenship
-    class: CitizenshipPage
+    name: Branching
+    class: BranchingPage
