@@ -17,7 +17,7 @@ abstract class Form_Filter{
    * Holds the rule set for processing
    * @var mixed
    */
-  protected $rulesSet;
+  protected $ruleSet;
   
   /**
    * Constructor
