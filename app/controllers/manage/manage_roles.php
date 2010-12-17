@@ -102,6 +102,7 @@ class ManageRolesController extends ManageController {
     $controllers = array(
       'manage_users',
       'manage_configuration',
+      'manage_globalpages',
       'manage_roles',
       'manage_scores',
       'manage_programs',

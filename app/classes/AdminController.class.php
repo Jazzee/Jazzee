@@ -125,6 +125,8 @@ abstract class AdminController extends JazzeeController{
       $menu->newLink(array('text'=>'Users', 'href'=>$this->path("manage/users/")));
     if($this->checkIsAllowed('manage_roles'))
       $menu->newLink(array('text'=>'Global Roles', 'href'=>$this->path("manage/roles/")));
+    if($this->checkIsAllowed('manage_globalpages'))
+      $menu->newLink(array('text'=>'Global Pages', 'href'=>$this->path("manage/globalpages/")));
     if($this->checkIsAllowed('manage_pagetypes'))
       $menu->newLink(array('text'=>'Page Types', 'href'=>$this->path("manage/pagetypes/")));
     if($this->checkIsAllowed('manage_elementtypes'))
