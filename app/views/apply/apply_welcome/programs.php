@@ -7,18 +7,17 @@
  * @subpackage apply
  */
 ?>
-<fieldset><legend>Select the program you are applying to:</legend><ul class='no-bullets'>
-<?php foreach($programList as $program){
-	if($program['visibleSum'] > 0) {
-    echo '<li>';
-    
-    if($program['liveSum'] > 0) {
-      print '<a href="' . $this->path("apply/{$program['shortName']}") . '/">' . $program['name'] . '</a>';
-    } else {
-      print $program['name'] . " Application <strong>(Closed)</strong>";
+<fieldset><legend>Select the program you are applying to:</legend><ul>
+<?php foreach($programs as $program){
+	if($program->Applications->count() > 0) {
+    foreach($program->Applications as $application){
+      if($application->published AND $application->visible){
+        print '<li>';
+        print '<a href="' . $this->path("apply/{$program['shortName']}") . '/">' . $program['name'] . '</a>';
+        print '</li>';
+        break;
+      }
     }
-
-    print '</li>';
 	}
 }
 ?>

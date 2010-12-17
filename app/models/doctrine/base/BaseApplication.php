@@ -16,7 +16,7 @@
  * @property timestamp $begin
  * @property decimal $feeForeign
  * @property decimal $feeDomestic
- * @property boolean $live
+ * @property boolean $published
  * @property boolean $visible
  * @property string $admitLetter
  * @property string $denyLetter
@@ -77,7 +77,7 @@ abstract class BaseApplication extends Doctrine_Record
         $this->hasColumn('feeDomestic', 'decimal', null, array(
              'type' => 'decimal',
              ));
-        $this->hasColumn('live', 'boolean', null, array(
+        $this->hasColumn('published', 'boolean', null, array(
              'type' => 'boolean',
              ));
         $this->hasColumn('visible', 'boolean', null, array(

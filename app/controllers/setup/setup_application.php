@@ -64,15 +64,8 @@ class SetupApplicationController extends SetupController {
     $element->label = 'Program Start Date';
     $element->addValidator('Date');
     $element->addFilter('DateFormat', 'Y-m-d H:i:s');
+    $element->addValidator('NotEmpty');
     $element->value = $this->application->begin;
-    
-    $element = $field->newElement('TextInput','feeDomestic');
-    $element->label = 'Applicant Fee';
-    $element->value = $this->application->feeDomestic;
-    
-    $element = $field->newElement('TextInput','feeForeign');
-    $element->label = 'International Applicant Fee';
-    $element->value = $this->application->feeForeign;
     
     $element = $field->newElement('RadioList','visible');
     $element->label = 'Visible';
@@ -81,12 +74,12 @@ class SetupApplicationController extends SetupController {
     $element->addValidator('NotEmpty');
     $element->value = $this->application->visible;
     
-    $element = $field->newElement('RadioList','live');
-    $element->label = 'Live';
+    $element = $field->newElement('RadioList','published');
+    $element->label = 'Published';
     $element->addItem(0, 'No');
     $element->addItem(1, 'Yes');
     $element->addValidator('NotEmpty');
-    $element->value = $this->application->live;
+    $element->value = $this->application->published;
 
     $form->newButton('submit', 'Save');
     
@@ -101,7 +94,7 @@ class SetupApplicationController extends SetupController {
       $this->application->feeDomestic = $input->feeDomestic;
       $this->application->feeForeign = $input->feeForeign;
       $this->application->visible = (bool)$input->visible;
-      $this->application->live = (bool)$input->live;
+      $this->application->published = (bool)$input->published;
       $this->application->save();
       $this->messages->write('success', 'Application saved.');
       $this->redirect($this->path("setup/application"));

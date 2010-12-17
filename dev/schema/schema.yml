@@ -49,7 +49,7 @@ Application:
     begin: timestamp
     feeForeign: decimal
     feeDomestic: decimal
-    live: boolean
+    published: boolean
     visible: boolean
     admitLetter: string(4000)
     denyLetter: string(4000)

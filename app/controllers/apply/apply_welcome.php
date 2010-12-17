@@ -9,15 +9,13 @@
 class ApplyWelcomeController extends ApplyGuestController {
   
   public function actionIndex($programShortName = '', $cycleName = '') {
-    if(empty($this->program) AND empty($this->application)){
+    if(empty($this->program) AND empty($this->application)){  
       $q = Doctrine_Query::create()
-        ->select('p.*, SUM(a.live) as liveSum, SUM(a.visible) as visibleSum')
-        ->from('Program p, Application a')
-        ->orderBy('p.name')
-        ->where('p.expires IS NULL OR p.expires > now()')
-        ->andWhere('p.id = a.programid')
-        ->groupBy('a.programid');     
-      $this->setVar('programList', $q->fetchArray());
+        ->select('*')
+        ->from('Program')
+        ->orderBy('name')
+        ->where('expires IS NULL OR expires > now()');
+      $this->setVar('programs', $q->execute());
       $this->loadView($this->controllerName . '/programs');
       return true;
     }
