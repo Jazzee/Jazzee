@@ -28,6 +28,34 @@ class ManageScoresController extends ManageController {
     
     $form->newButton('submit', 'Import');
     $this->setVar('form', $form);
+    $this->setVar('greCount', Doctrine::getTable('GREScore')->count());
+    $q = Doctrine_Query::create()
+        ->select('ID')
+        ->from('Score')
+        ->where('ScoreType = ?', 'gre')
+        ->andWhere('ScoreID IS NOT NULL');
+    $this->setVar('greMatchedCount', $q->execute()->count());
+    $q = Doctrine_Query::create()
+        ->select('ID')
+        ->from('Score')
+        ->where('ScoreType = ?', 'gre')
+        ->andWhere('ScoreID IS NULL');
+    $this->setVar('greUnmatchedCount', $q->execute()->count());
+    
+    
+    $this->setVar('toeflCount', Doctrine::getTable('TOEFLScore')->count());
+    $q = Doctrine_Query::create()
+        ->select('ID')
+        ->from('Score')
+        ->where('ScoreType = ?', 'toefl')
+        ->andWhere('ScoreID IS NOT NULL');
+    $this->setVar('toeflMatchedCount', $q->execute()->count());
+    $q = Doctrine_Query::create()
+        ->select('ID')
+        ->from('Score')
+        ->where('ScoreType = ?', 'toefl')
+        ->andWhere('ScoreID IS NULL');
+    $this->setVar('toeflUnmatchedCount', $q->execute()->count());
     
     if($input = $form->processInput($this->post)){
       $method = $input->type . 'Scores';
