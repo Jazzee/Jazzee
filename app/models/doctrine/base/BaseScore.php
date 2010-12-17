@@ -8,7 +8,9 @@
  * @property integer $answerID
  * @property enum $scoreType
  * @property integer $scoreID
- * @property integer $registrationNumber
+ * @property string $registrationNumber
+ * @property integer $testMonth
+ * @property integer $testYear
  * @property Answer $Answer
  * 
  * @package    jazzee
@@ -33,7 +35,14 @@ abstract class BaseScore extends Doctrine_Record
         $this->hasColumn('scoreID', 'integer', null, array(
              'type' => 'integer',
              ));
-        $this->hasColumn('registrationNumber', 'integer', null, array(
+        $this->hasColumn('registrationNumber', 'string', 255, array(
+             'type' => 'string',
+             'length' => '255',
+             ));
+        $this->hasColumn('testMonth', 'integer', null, array(
+             'type' => 'integer',
+             ));
+        $this->hasColumn('testYear', 'integer', null, array(
              'type' => 'integer',
              ));
 
@@ -50,9 +59,10 @@ abstract class BaseScore extends Doctrine_Record
         $this->index('regnumber', array(
              'fields' => 
              array(
-              0 => 'answerID',
-              1 => 'scoreType',
-              2 => 'registrationNumber',
+              0 => 'scoreType',
+              1 => 'registrationNumber',
+              2 => 'testMonth',
+              3 => 'testYear',
              ),
              'type' => 'unique',
              ));

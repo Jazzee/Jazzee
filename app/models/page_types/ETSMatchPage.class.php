@@ -31,6 +31,13 @@ class ETSMatchPage extends StandardPage {
     $e->addValidator('Integer');
     $e->addFilter('PHPSanitize', FILTER_SANITIZE_NUMBER_INT);
     
+    $e = $field->newElement('ShortDateInput', 'testDate');
+    $e->label = 'Test Date';
+    $e->format = date('F Y', strtotime('3 months ago'));
+    $e->addValidator('NotEmpty');
+    $e->addValidator('Date');
+    $e->addFilter('DateFormat', 'n/Y');
+    
     $form->newButton('submit', 'Save');
     $form->newButton('reset', 'Clear Form');
     return $form;
@@ -61,6 +68,7 @@ class ETSMatchPage extends StandardPage {
       $answer = new ETSAnswer($a);
       $this->form->elements['scoreType']->value = $answer->getFormValueForElement('scoreType');
       $this->form->elements['registrationNumber']->value = $answer->getFormValueForElement('registrationNumber');
+      $this->form->elements['testDate']->value = $answer->getFormValueForElement('testDate');
     }
   }
   
@@ -82,14 +90,18 @@ class ETSAnswer extends StandardAnswer {
   public function update(FormInput $input){
     $this->answer->Score->scoreType = $input->scoreType;
     $this->answer->Score->registrationNumber = $input->registrationNumber;
-    $this->answer->Score->scoreID = null;
+    $arr = explode('/', $input->testDate);
+    $this->answer->Score->testMonth = $arr[0];
+    $this->answer->Score->testYear = $arr[1];
+    $this->answer->Score->scoreID = null; //reset the score ID in case we already had a match
     $this->answer->Score->makeMatch();
   }
   
   public function getElements(){
     return array(
       'scoreType' => 'Test Type',
-      'registrationNumber' => 'ETS Registration Number'
+      'registrationNumber' => 'ETS Registration Number',
+      'testDate' => 'Test Date'
     );
   }
   
@@ -101,13 +113,19 @@ class ETSAnswer extends StandardAnswer {
         case 'toefl':
           return 'TOEFL';
       }
+    } else if($name == 'testDate'){
+      return date('F Y', strtotime($this->answer->Score->testMonth . '/1/' . $this->answer->Score->testYear));
     } else {
       return $this->answer->Score->$name;
     }
   }
   
   public function getFormValueForElement($name){
-    return $this->answer->Score->$name;
+    if($name == 'testDate'){
+      return date('F Y', strtotime($this->answer->Score->testMonth . '/1/' . $this->answer->Score->testYear));
+    } else {
+      return $this->answer->Score->$name;
+    }
   }
   
   public function applyStatus(){
@@ -121,7 +139,7 @@ class ETSAnswer extends StandardAnswer {
   }
   
   public function applicantStatus(){
-    $arr = parent::applyStatus();
+    $arr = parent::applicantStatus();
     if($this->answer->Score->Score){
       $arr['Score Status'] = 'ETS Score recieved for test taken on ' . date('m/d/Y', strtotime($this->answer->Score->Score->testDate));
     } else {

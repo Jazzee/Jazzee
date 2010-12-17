@@ -49,14 +49,25 @@ class Score extends BaseScore{
     if(empty($this->scoreID)){
       switch($this->scoreType){
         case 'gre':
-          $score = Doctrine::getTable('GREScore')->findOneByRegistrationNumber($this->registrationNumber);
+          $q = Doctrine_Query::create()
+            ->select('id')
+            ->from('GREScore')
+            ->where('RegistrationNumber = ?', $this->registrationNumber)
+            ->andWhere('TestMonth = ?', $this->testMonth)
+            ->andWhere('TestYear = ?', $this->testYear);
           break;
         case 'toefl':
-          $score = Doctrine::getTable('TOEFLScore')->findOneByRegistrationNumber($this->registrationNumber);
+          $q = Doctrine_Query::create()
+            ->select('id')
+            ->from('TOEFLScore')
+            ->where('RegistrationNumber = ?', $this->registrationNumber)
+            ->andWhere('TestMonth = ?', $this->testMonth)
+            ->andWhere('TestYear = ?', $this->testYear);
           break;
       }
-      if($score){
-        $this->scoreID = $score->id;
+      $scores = $q->execute(array(), Doctrine_Core::HYDRATE_ARRAY);
+      if(!empty($scores)){
+        $this->scoreID = $scores[0]['id'];
       }
     }
   }

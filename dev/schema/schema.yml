@@ -434,13 +434,15 @@ Score:
       type: enum
       values: [gre,toefl]
     scoreID: integer
-    registrationNumber: integer
+    registrationNumber: string(255)
+    testMonth: integer
+    testYear: integer
   indexes:
     applicant_score: 
       fields: [answerID, scoreType, scoreID]
       type: unique
     regnumber: 
-      fields: [answerID, scoreType, registrationNumber]
+      fields: [scoreType, registrationNumber, testMonth, testYear]
       type: unique
   relations:
     Answer:
@@ -453,9 +455,9 @@ Score:
 GREScore:
   tableName: gre_score
   columns:
-    registrationNumber: 
-      type: integer
-      unique: true
+    registrationNumber: string(255)
+    testMonth: integer
+    testYear: integer
     departmentCode: string(4)
     departmentName: string(30)
     firstName: string(255)
@@ -482,13 +484,17 @@ GREScore:
     recordSerialNumber: integer(2)
     cycleNumber: integer    
     processDate: date
+  indexes:
+    registration_number: 
+      fields: [registrationNumber, testMonth, testYear]
+      type: unique
       
 TOEFLScore:
   tableName: toefl_score
   columns:
-    registrationNumber: 
-      type: integer
-      unique: true
+    registrationNumber: string(255)
+    testMonth: integer
+    testYear: integer
     departmentCode: string(4)
     firstName: string(255)
     middleName: string(255)
@@ -516,6 +522,10 @@ TOEFLScore:
     total: int(3)
     timesTaken: int(1)
     offTopic: boolean
+  indexes:
+    registration_number: 
+      fields: [registrationNumber, testMonth, testYear]
+      type: unique
 
 AuditLog:
   columns:
