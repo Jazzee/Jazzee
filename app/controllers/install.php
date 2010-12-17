@@ -9,7 +9,7 @@
  * @package jazzee
  */
 ini_set('memory_limit', '32M');
-class InstallController extends Lvc_PageController {
+class InstallController extends Controller {
 
   /**
    * Specify layout to use.
@@ -42,14 +42,29 @@ class InstallController extends Lvc_PageController {
   protected $configFilePath;
   
   protected function beforeAction() {
+    //required layout variables get default values
     $this->setLayoutVar('requiredCss', array());
     $this->setLayoutVar('requiredJs', array());
     $this->setLayoutVar('pageTitle', '');
     $this->setLayoutVar('layoutTitle', '');
-    $this->setLayoutVar('layoutLeft', '');
     $this->setLayoutVar('layoutContentTop', '');
-    $this->setLayoutVar('layoutContentMain', '');
-    $this->setLayoutVar('layoutContentFooter', '');
+    $this->setLayoutVar('layoutContentFooter', '<p>This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.</p>');
+    
+    //add jquery
+    $this->addScript('foundation/scripts/jquery.js');
+    $this->addScript('foundation/scripts/jqueryui.js');
+    $this->addScript('foundation/scripts/jquery.json.js');
+    
+    //yui css library
+    $this->addCss('foundation/styles/reset-fonts-grids.css');
+    $this->addCss('foundation/styles/base.css');
+    
+    //our css
+    $this->addCss('common/styles/layout.css');
+    $this->addCss('common/styles/style.css');
+    
+    //jquery's style info
+    $this->addCss('foundation/styles/jquery/themes/smoothness/style.css');
   }
 	
   public function actionIndex() {
