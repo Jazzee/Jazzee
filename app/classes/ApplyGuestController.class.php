@@ -31,7 +31,7 @@ class ApplyGuestController extends JazzeeController{
       $program = Doctrine::getTable('Program')->findOneByShortName($this->actionParams['programShortName']);
       $cycle = Doctrine::getTable('Cycle')->findOneByName($this->actionParams['cycleName']);
       if(!$this->application = Doctrine::getTable('Application')->findOneByProgramIDAndCycleID($program->id, $cycle->id)){
-        throw new Exception("{$this->actionParams['programShortName']} is not a valid program");
+        throw new Exception("{$this->actionParams['cycleName']} {$this->actionParams['programShortName']} is not a valid program");
       }
     } else if(!empty($this->actionParams['programShortName'])){
       if(!$this->program = Doctrine::getTable('Program')->findOneByShortName($this->actionParams['programShortName'])){
