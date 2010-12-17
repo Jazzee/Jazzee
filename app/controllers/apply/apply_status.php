@@ -2,7 +2,6 @@
 /**
  * The status portal that is displayed to applicants once thier application is locked
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage apply
  */
@@ -29,13 +28,13 @@ class ApplyStatusController extends ApplyController {
     $status = 0;
     if($this->applicant->relatedExists('Decision')){
       if($this->applicant->Decision->finalDeny)
-        $status = $status | self::DENIED;
+        $status = $status | ApplyStatusController::DENIED;
       if($this->applicant->Decision->finalAdmit)
-        $status = $status | self::ADMITTED;
+        $status = $status | ApplyStatusController::ADMITTED;
       if($this->applicant->Decision->declineOffer)
-        $status = $status | self::DECLINED;
+        $status = $status | ApplyStatusController::DECLINED;
       if($this->applicant->Decision->acceptOffer)
-        $status = $status | self::ACCEPTED;
+        $status = $status | ApplyStatusController::ACCEPTED;
     }
     $this->setVar('status', $status);
     $this->setVar('applicant', $this->applicant);
