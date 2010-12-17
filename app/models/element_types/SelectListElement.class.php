@@ -17,7 +17,7 @@ class SelectListElement extends ApplyElement {
     }
     $element->addItem(false, '');
     foreach($this->element->ListItems as $item){
-      $element->addItem($item->id, $item->value);
+      if($item->active) $element->addItem($item->id, $item->value);
     }
     return $element;
   }

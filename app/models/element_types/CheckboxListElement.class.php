@@ -22,7 +22,7 @@ class CheckboxListElement extends ApplyElement {
       $element->addValidator('NotEmpty');
     }
     foreach($this->element->ListItems as $item){
-      $element->addItem($item->id, $item->value);
+      if($item->active) $element->addItem($item->id, $item->value);
     }
     return $element;
   }
