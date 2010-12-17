@@ -8,8 +8,8 @@
  */
 class Form_SameAsValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if($input->{$this->_e->name} != $input->{$this->_ruleSet}){
-      $this->addError('Does not match ' . $this->_e->field->form->elements[$this->_ruleSet]->label);
+    if(!is_null($input->{$this->e->name}) AND $input->{$this->e->name} != $input->{$this->ruleSet}){
+      $this->addError('Does not match ' . $this->e->field->form->elements[$this->ruleSet]->label);
       return false;
     }
     return true;

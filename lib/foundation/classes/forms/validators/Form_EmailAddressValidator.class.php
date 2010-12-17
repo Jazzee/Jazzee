@@ -15,8 +15,8 @@ class Form_EmailAddressValidator extends Form_Validator{
   const ERROR = 'Invlid Email address';
   
   public function validate(FormInput $input){
-    if(!is_null($input->{$this->_e->name})){
-      $value = $input->{$this->_e->name};
+    if(!is_null($input->{$this->e->name})){
+      $value = $input->{$this->e->name};
       //get the last @ sign
       $lastAtSign = strrpos($value, '@');
       if($lastAtSign === false){
@@ -51,7 +51,7 @@ class Form_EmailAddressValidator extends Form_Validator{
         !preg_match(
           //allowed localPart expressions when the local part is quoted
           '/^"(\\\\"|[^"])+"$/', 
-          //get ride of double backslashes to our regular expression is easier to understand
+          //get ride of double backslashes so our regular expression is easier to understand
           str_replace("\\\\","",$localPart)))
         {
           $this->addError(self::ERROR);

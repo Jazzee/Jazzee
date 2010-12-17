@@ -8,7 +8,7 @@
  */
 class Form_DateValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if(!empty($input->{$this->_e->name}) AND !strtotime($input->{$this->_e->name})){
+    if(!is_null($input->{$this->e->name}) AND !strtotime($input->{$this->e->name})){
       $this->addError('Not a valid date');
       return false;
     }

@@ -21,9 +21,9 @@ abstract class Form_InputElement extends Form_Element{
    */
   public function __construct($field){
     parent::__construct($field);
-    $this->_attributes['disabled'] = 'disabled';
-    $this->_attributes['type'] = 'type';
-    $this->_attributes['maxlength'] = 'maxlength';
+    $this->attributes['disabled'] = 'disabled';
+    $this->attributes['type'] = 'type';
+    $this->attributes['maxlength'] = 'maxlength';
   }
 }
 ?>

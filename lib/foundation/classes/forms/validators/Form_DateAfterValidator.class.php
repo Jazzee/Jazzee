@@ -8,8 +8,8 @@
  */
 class Form_DateAfterValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if(!empty($input->{$this->_e->name}) AND strtotime($input->{$this->_e->name}) <= strtotime($this->_ruleSet)){
-      $this->addError('Date must be after ' . $this->_ruleSet);
+    if(!is_null($input->{$this->e->name}) AND strtotime($input->{$this->e->name}) <= strtotime($this->ruleSet)){
+      $this->addError('Date must be after ' . $this->ruleSet);
       return false;
     }
     return true;

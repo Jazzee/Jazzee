@@ -23,7 +23,7 @@ class Form_Field extends HTML_Element{
    * Holds the field elements
    * @var array
    */
-  private $_elements = array();
+  protected $elements = array();
   
   /**
    * Holds a reference to the form
@@ -67,7 +67,7 @@ class Form_Field extends HTML_Element{
       $element->addFilter($filter, $ruleset);
     }
     $this->form->elements[$name] = $element;
-    $this->_elements[$name] = $element;
+    $this->elements[$name] = $element;
     return $element;
   }
   
@@ -76,7 +76,7 @@ class Form_Field extends HTML_Element{
    * @return array
    */
   public function getElements(){
-    return $this->_elements;
+    return $this->elements;
   }
 }
 ?>

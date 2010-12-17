@@ -12,7 +12,7 @@ class HTML_Element extends Foundation{
    * An array of all the possible attributes for this element and their member names
    * @var array
    */
-  protected $_attributes = array();
+  protected $attributes = array();
   
   /**
    * HTML element attributes
@@ -35,13 +35,13 @@ class HTML_Element extends Foundation{
    * Constructor
    */
   public function __construct(){
-    $this->_attributes['class'] = 'class';
-    $this->_attributes['dir'] = 'dir';
-    $this->_attributes['id'] = 'id';
-    $this->_attributes['lang'] = 'lang';
-    $this->_attributes['style'] = 'style';
-    $this->_attributes['title'] = 'title';
-    $this->_attributes['xml_lang'] = 'xml:lang';
+    $this->attributes['class'] = 'class';
+    $this->attributes['dir'] = 'dir';
+    $this->attributes['id'] = 'id';
+    $this->attributes['lang'] = 'lang';
+    $this->attributes['style'] = 'style';
+    $this->attributes['title'] = 'title';
+    $this->attributes['xml_lang'] = 'xml:lang';
   }
   
   /**
@@ -49,7 +49,7 @@ class HTML_Element extends Foundation{
    * @return array 
    */
   public function getAttributes(){
-    return $this->_attributes;
+    return $this->attributes;
   }
   
   /**

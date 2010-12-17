@@ -21,10 +21,10 @@ class Form_TextareaElement extends Form_Element{
    */
   public function __construct($field){
     parent::__construct($field);
-    $this->_attributes['cols'] = 'cols';
-    $this->_attributes['rows'] = 'rows';
-    $this->_attributes['disabled'] = 'disabled';
-    $this->_attributes['readonly'] = 'readonly';
+    $this->attributes['cols'] = 'cols';
+    $this->attributes['rows'] = 'rows';
+    $this->attributes['disabled'] = 'disabled';
+    $this->attributes['readonly'] = 'readonly';
   }
 }
 ?>

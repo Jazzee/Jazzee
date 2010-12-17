@@ -136,13 +136,13 @@ class Form_CaptchaValidator extends Form_Validator{
   public function validate(FormInput $input){
     //discard empty submissions
     if ($input->recaptcha_challenge_field == null || strlen($input->recaptcha_challenge_field) == 0 || $input->recaptcha_response_field == null || strlen($input->recaptcha_response_field) == 0) {
-      $this->_e->errorString = 'incorrect-captcha-sol';
+      $this->e->errorString = 'incorrect-captcha-sol';
       $this->addError('');
       return false;
     }
 
     $response = $this->http_post (self::VERIFY_SERVER, "/verify", array (
-      'privatekey' => $this->_ruleSet,
+      'privatekey' => $this->ruleSet,
       'remoteip' => $_SERVER['REMOTE_ADDR'],
       'challenge' => $input->recaptcha_challenge_field,
       'response' => $input->recaptcha_response_field
@@ -151,7 +151,7 @@ class Form_CaptchaValidator extends Form_Validator{
 
     $answers = explode ("\n", $response [1]);
     if (trim($answers[0]) == 'false') {
-      $this->_e->errorString = $answers[1];
+      $this->e->errorString = $answers[1];
       $this->addError('');
       return false;
     }

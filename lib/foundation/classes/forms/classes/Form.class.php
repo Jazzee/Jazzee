@@ -21,7 +21,7 @@ class Form extends HTML_Element{
    * The form fields
    * @var array 
    */
-  protected $_fields = array();
+  protected $fields = array();
   
   /**
    * Every Element
@@ -33,13 +33,13 @@ class Form extends HTML_Element{
    * The hidden field
    * @var Form_Field
    */
-  private $_hidden;
+  protected $hidden;
   
   /**
    * The button field
    * @var Form_Field
    */
-  private $_buttons;
+  protected $buttons;
   
   /**
    * Constructor
@@ -47,16 +47,16 @@ class Form extends HTML_Element{
    */
   public function __construct(){
     parent::__construct();
-    $this->_attributes['action'] = 'action';
-    $this->_attributes['enctype'] = 'enctype';
-    $this->_attributes['method'] = 'method';
-    $this->_attributes['accept_charset'] = 'accept-charset';
-    $this->_attributes['name'] = 'name';
+    $this->attributes['action'] = 'action';
+    $this->attributes['enctype'] = 'enctype';
+    $this->attributes['method'] = 'method';
+    $this->attributes['accept_charset'] = 'accept-charset';
+    $this->attributes['name'] = 'name';
     
-    $this->_hidden = new Form_Field($this);
-    $this->_hidden->class = 'hidden';
-    $this->_buttons = new Form_Field($this);
-    $this->_buttons->class = 'buttons';
+    $this->hidden = new Form_Field($this);
+    $this->hidden->class = 'hidden';
+    $this->buttons = new Form_Field($this);
+    $this->buttons->class = 'buttons';
   }
   
   /**
@@ -69,7 +69,7 @@ class Form extends HTML_Element{
     foreach($attributes as $key=>$value){
       $field->$key = $value;
     }
-    $this->_fields[] = $field;
+    $this->fields[] = $field;
     return $field;
   }
   
@@ -78,9 +78,9 @@ class Form extends HTML_Element{
    * @return array
    */
   public function getFields(){
-    $fields = $this->_fields;
-    $fields[] = $this->_buttons;
-    $fields[] = $this->_hidden;
+    $fields = $this->fields;
+    $fields[] = $this->buttons;
+    $fields[] = $this->hidden;
     return $fields;
   }
   
@@ -90,7 +90,7 @@ class Form extends HTML_Element{
    * @param string $value
    */
   public function newHiddenElement($name, $value){
-    $e = $this->_hidden->newElement('HiddenInput', $name);
+    $e = $this->hidden->newElement('HiddenInput', $name);
     $e->value = $value;
     $e->defaultValue = $value;
     return $e; 
@@ -102,7 +102,7 @@ class Form extends HTML_Element{
    * @param string $title
    */
   public function newButton($type, $value){
-    $e = $this->_buttons->newElement('ButtonInput',$type);
+    $e = $this->buttons->newElement('ButtonInput',$type);
     $e->type = $type;
     $e->value = $value;
     $e->defaultValue = $value;
@@ -175,11 +175,11 @@ class Form extends HTML_Element{
    * Usefull when the object needs to stick around, but the form is different
    */
   public function reset(){
-    $this->_hidden = new Form_Field($this);
-    $this->_hidden->class = 'hidden';
-    $this->_buttons = new Form_Field($this);
-    $this->_buttons->class = 'buttons';
-    $this->_fields = array();
+    $this->hidden = new Form_Field($this);
+    $this->hidden->class = 'hidden';
+    $this->buttons = new Form_Field($this);
+    $this->buttons->class = 'buttons';
+    $this->fields = array();
     $this->elements = array();
   }
 }

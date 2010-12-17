@@ -58,7 +58,7 @@ class Form_FileInputElement extends Form_InputElement{
             $text = 'There was an error uploading your file.  Please try again.';
         }
         //write any error messages to the validationSet
-        $this->_validatorSet->addError(new Form_ValidationError($text));
+        $this->validatorSet->addError(new Form_ValidationError($text));
       }
     }
     //pass the input back and let the rest of the validator set handle it

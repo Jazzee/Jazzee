@@ -74,8 +74,8 @@ class ListItem extends HTML_Element {
   
   public function __construct(){
     parent::__construct();
-    $this->_attributes['disabled'] = 'disabled';
-    $this->_attributes['value'] = 'value';
+    $this->attributes['disabled'] = 'disabled';
+    $this->attributes['value'] = 'value';
   }
 }
 ?>

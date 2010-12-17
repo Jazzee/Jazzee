@@ -8,7 +8,7 @@
  */
 class Form_IntegerValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if(!is_null($input->{$this->_e->name}) AND !filter_Var($input->{$this->_e->name}, FILTER_VALIDATE_INT)){
+    if(!is_null($input->{$this->e->name}) AND !filter_Var($input->{$this->e->name}, FILTER_VALIDATE_INT)){
       $this->addError('An integer is required for this field');
       return false;
     }

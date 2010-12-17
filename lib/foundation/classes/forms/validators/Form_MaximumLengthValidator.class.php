@@ -8,9 +8,9 @@
  */
 class Form_MaximumLengthValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if($this->_ruleSet AND !is_null($input->{$this->_e->name})){
-      if(strlen($input->{$this->_e->name}) > $this->_ruleSet){
-        $this->addError('Input is too large.  Your input is: ' . (strlen($input->{$this->_e->name}) - $this->_ruleSet) . ' characters bigger than the maximum size of ' . $this->_ruleSet);
+    if($this->ruleSet AND !is_null($input->{$this->e->name})){
+      if(strlen($input->{$this->e->name}) > $this->ruleSet){
+        $this->addError('Input is too large.  Your input is: ' . (strlen($input->{$this->e->name}) - $this->ruleSet) . ' characters bigger than the maximum size of ' . $this->ruleSet);
         return false;
       }
     }
@@ -18,7 +18,7 @@ class Form_MaximumLengthValidator extends Form_Validator{
   }
   
   public function preRender(){
-    $this->_e->format .=  "Maximum length: {$this->_ruleSet} characters.  ";
+    $this->e->format .=  "Maximum length: {$this->ruleSet} characters.  ";
   }
 }
 ?>

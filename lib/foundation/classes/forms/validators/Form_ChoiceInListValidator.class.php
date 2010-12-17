@@ -7,10 +7,10 @@
  */
 class Form_ChoiceInListValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if(!is_array($input->{$this->_e->name})) $arr = array($input->{$this->_e->name});
-    else $arr = $input->{$this->_e->name};
+    if(!is_array($input->{$this->e->name})) $arr = array($input->{$this->e->name});
+    else $arr = $input->{$this->e->name};
     foreach($arr as $value){
-      if(!array_key_exists($value, $this->_e->getItems())){
+      if(!array_key_exists($value, $this->e->getItems())){
         $this->addError('Your chose an invalid option');
         return false;
       }

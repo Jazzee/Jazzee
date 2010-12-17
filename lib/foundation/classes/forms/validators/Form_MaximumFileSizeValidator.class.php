@@ -17,14 +17,14 @@ class Form_MaximumFileSizeValidator extends Form_Validator{
    */
   public function  __construct(Form_Element $e, $ruleSet, Form_ValidatorSet $set){
     parent::__construct($e,$ruleSet,$set);
-    $this->_e->maxSize = $this->_ruleSet;
+    $this->e->maxSize = $this->ruleSet;
   }
   
   public function validate(FormInput $input){
-    if($this->_ruleSet AND !is_null($input->{$this->_e->name})){
-      $fileArr = $input->{$this->_e->name};
-      if($fileArr['size'] > $this->_ruleSet){
-        $this->addError('File is too large.  Your file is: ' . convertBytesToString($fileArr['size'] - $this->_ruleSet) . ' bigger than the maximum size of ' . convertBytesToString($this->_ruleSet, 0));
+    if($this->ruleSet AND !is_null($input->{$this->e->name})){
+      $fileArr = $input->{$this->e->name};
+      if($fileArr['size'] > $this->ruleSet){
+        $this->addError('File is too large.  Your file is: ' . convertBytesToString($fileArr['size'] - $this->ruleSet) . ' bigger than the maximum size of ' . convertBytesToString($this->ruleSet, 0));
         return false;
       }
     }
@@ -32,8 +32,8 @@ class Form_MaximumFileSizeValidator extends Form_Validator{
   }
   
   public function preRender(){
-    $this->_e->maxSize = $this->_ruleSet;
-    $this->_e->format .=  'Maximum file size: ' . convertBytesToString($this->_ruleSet, 0);
+    $this->e->maxSize = $this->ruleSet;
+    $this->e->format .=  'Maximum file size: ' . convertBytesToString($this->ruleSet, 0);
   }
 }
 ?>

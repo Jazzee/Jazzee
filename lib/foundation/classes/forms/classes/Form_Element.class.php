@@ -55,13 +55,13 @@ abstract class Form_Element extends HTML_Element{
    * Holds all of the validators which must be run
    * @var Form_ValidatorSet
    */
-  protected $_validatorSet;
+  protected $validatorSet;
   
   /**
    * Holds all of the filters which must be run
    * @var Form_FilterSet
    */
-  protected $_filterSet;
+  protected $filterSet;
   
   /**
    * Any user level messages to output
@@ -77,13 +77,13 @@ abstract class Form_Element extends HTML_Element{
     $this->field = $field;
     parent::__construct();
     
-    $this->_attributes['name'] = 'name';
-    $this->_attributes['value'] = 'value';
-    $this->_attributes['accesskey'] = 'accesskey';
-    $this->_attributes['tabindex'] = 'tabindex';
+    $this->attributes['name'] = 'name';
+    $this->attributes['value'] = 'value';
+    $this->attributes['accesskey'] = 'accesskey';
+    $this->attributes['tabindex'] = 'tabindex';
     
-    $this->_validatorSet = new Form_ValidatorSet;
-    $this->_filterSet = new Form_FilterSet;
+    $this->validatorSet = new Form_ValidatorSet;
+    $this->filterSet = new Form_FilterSet;
   }
   
   /**
@@ -120,8 +120,8 @@ abstract class Form_Element extends HTML_Element{
     if(!class_exists($class)){
       throw new Foundation_Exception("{$name} validator does not exist");
     }
-    $validator = new $class($this, $ruleSet, $this->_validatorSet);
-    $this->_validatorSet->addValidator($validator);
+    $validator = new $class($this, $ruleSet, $this->validatorSet);
+    $this->validatorSet->addValidator($validator);
     return $validator;
   }
   
@@ -135,7 +135,7 @@ abstract class Form_Element extends HTML_Element{
       throw new Foundation_Exception("{$name} filter does not exist");
     }
     $filter = new $class($this, $ruleSet);
-    $this->_filterSet->addFilter($filter);
+    $this->filterSet->addFilter($filter);
     return $filter;
   }
 
@@ -143,7 +143,7 @@ abstract class Form_Element extends HTML_Element{
    * Run any validator preRender methods
    */
   public function preRender(){
-    $this->_validatorSet->preRender();
+    $this->validatorSet->preRender();
   }
     
   /**
@@ -151,9 +151,9 @@ abstract class Form_Element extends HTML_Element{
    * @param FormInput $input
    */
   public function validate(FormInput $input){
-    $this->_validatorSet->validate($input);
-    if($this->_validatorSet->hasError()){
-      foreach($this->_validatorSet->getErrors() as $error){
+    $this->validatorSet->validate($input);
+    if($this->validatorSet->hasError()){
+      foreach($this->validatorSet->getErrors() as $error){
         $this->addMessage($error);
       }
       return false;
@@ -167,16 +167,7 @@ abstract class Form_Element extends HTML_Element{
    */
   public function filter(FormInput $input){
     if(is_null($input->{$this->name})) return null;
-    return $this->_filterSet->filter($input->{$this->name});
+    return $this->filterSet->filter($input->{$this->name});
   }
-  
-  /**
-   * Get the type name of the element
-   * @return string
-   */
-  public function elementType(){
-    return preg_replace(array('/^Form_/','/Element$/'), '',get_class($this));
-  }
-  
 }
 ?>

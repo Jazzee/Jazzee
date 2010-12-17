@@ -8,8 +8,8 @@
  */
 class Form_DateBeforeElementValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if(!empty($input->{$this->_e->name}) AND strtotime($input->{$this->_e->name}) >= strtotime($input->{$this->_ruleSet})){
-      $this->addError('Must be before date in ' . $this->_e->field->form->elements[$this->_ruleSet]->label);
+    if(!is_null($input->{$this->e->name}) AND strtotime($input->{$this->e->name}) >= strtotime($input->{$this->ruleSet})){
+      $this->addError('Must be before date in ' . $this->e->field->form->elements[$this->ruleSet]->label);
       return false;
     }
     return true;

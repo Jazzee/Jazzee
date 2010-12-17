@@ -8,7 +8,7 @@
  */
 class Form_NotEmptyValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if(is_null($input->{$this->_e->name})){
+    if(is_null($input->{$this->e->name})){
       $this->addError('This field is required and you left it blank');
       return false;
     }
@@ -16,7 +16,7 @@ class Form_NotEmptyValidator extends Form_Validator{
   }
   
   public function preRender(){
-    $this->_e->required = true;
+    $this->e->required = true;
   }
 }
 ?>

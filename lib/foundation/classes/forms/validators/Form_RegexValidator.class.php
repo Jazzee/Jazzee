@@ -8,7 +8,7 @@
  */
 class Form_RegexValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if(!preg_match($this->_ruleSet, $input->{$this->_e->name})){
+    if(!is_null($input->{$this->e->name}) AND !preg_match($this->ruleSet, $input->{$this->e->name})){
       $this->addError('Regex did not match');
       return false;
     }

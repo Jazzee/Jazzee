@@ -8,9 +8,9 @@
  */
 class Form_MinimumLengthValidator extends Form_Validator{
   public function validate(FormInput $input){
-    if($this->_ruleSet AND !is_null($input->{$this->_e->name})){
-      if(strlen($input->{$this->_e->name}) < $this->_ruleSet){
-        $this->addError('Input is too small.  Your input is: ' . ($this->_ruleSet - strlen($input->{$this->_e->name})) . ' characters smaller than the minimum size of ' . $this->_ruleSet);
+    if($this->ruleSet AND !is_null($input->{$this->e->name})){
+      if(strlen($input->{$this->e->name}) < $this->ruleSet){
+        $this->addError('Input is too small.  Your input is: ' . ($this->ruleSet - strlen($input->{$this->e->name})) . ' characters smaller than the minimum size of ' . $this->ruleSet);
         return false;
       }
     }
@@ -18,7 +18,7 @@ class Form_MinimumLengthValidator extends Form_Validator{
   }
   
   public function preRender(){
-    $this->_e->format .=  "Minimum length: {$this->_ruleSet} characters.  ";
+    $this->e->format .=  "Minimum length: {$this->ruleSet} characters.  ";
   }
 }
 ?>

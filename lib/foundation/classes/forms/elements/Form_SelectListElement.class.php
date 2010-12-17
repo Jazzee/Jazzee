@@ -18,7 +18,7 @@ class Form_SelectListElement extends Form_ListElement{
    */
   public function __construct($field){
     parent::__construct($field);
-    $this->_attributes['multiple'] = 'multiple';
+    $this->attributes['multiple'] = 'multiple';
   }
 }
 ?>

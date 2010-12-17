@@ -11,19 +11,19 @@ abstract class Form_Validator{
    * Holds the element we are validating
    * @var Form_Element
    */
-  protected $_e; 
+  protected $e; 
   
   /**
    * Holds the set we belong to
    * @var Form_ValidatorSet
    */
-  protected $_s;
+  protected $s;
   
   /**
    * Holds the rule set for processing
    * @var mixed
    */
-  protected $_rulesSet;
+  protected $rulesSet;
   
   /**
    * @param Form_Element $e the element we are validating
@@ -31,9 +31,9 @@ abstract class Form_Validator{
    * @param Form_ValidatorSet $set the set we belogn to
    */
   public function  __construct(Form_Element $e, $ruleSet, Form_ValidatorSet $set){
-    $this->_e = $e;
-    $this->_ruleSet = $ruleSet;
-    $this->_s = $set;
+    $this->e = $e;
+    $this->ruleSet = $ruleSet;
+    $this->s = $set;
   }
   
   /**
@@ -41,7 +41,7 @@ abstract class Form_Validator{
    * @param string $text error text
    */
   protected function addError($text){
-    $this->_s->addError(new Form_ValidationError($text));
+    $this->s->addError(new Form_ValidationError($text));
   }
   
   /**

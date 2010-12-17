@@ -35,14 +35,14 @@ class Navigation_Link extends HTML_Element{
    */
   public function __construct(){
     parent::__construct();
-    $this->_attributes['charset'] = 'charset';
-    $this->_attributes['coords'] = 'coords';
-    $this->_attributes['href'] = 'href';
-    $this->_attributes['hreflang'] = 'hreflang';
-    $this->_attributes['name'] = 'name';
-    $this->_attributes['rel'] = 'rel';
-    $this->_attributes['rev'] = 'rev';
-    $this->_attributes['shape'] = 'shape';
+    $this->attributes['charset'] = 'charset';
+    $this->attributes['coords'] = 'coords';
+    $this->attributes['href'] = 'href';
+    $this->attributes['hreflang'] = 'hreflang';
+    $this->attributes['name'] = 'name';
+    $this->attributes['rel'] = 'rel';
+    $this->attributes['rev'] = 'rev';
+    $this->attributes['shape'] = 'shape';
   }
 
 }
