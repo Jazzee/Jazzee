@@ -141,14 +141,7 @@ class ApplyPageController extends ApplyController {
 
     $applicant_menu = $navigation->newMenu();
     $applicant_menu->title = "User Menu";
-
-    
-    //Logout Function, if user session is alive (store has a non-empty $data).
-    $s_fetch = Session::getInstance();
-    $session_fetch = $s_fetch->getStore('apply');
-    if (!empty($session_fetch)) {
-       $applicant_menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/logout")));
-    }
+    $applicant_menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/logout")));
     
     return $navigation;
   }
