@@ -11,16 +11,17 @@ function Pages(){
     this.pageStore.init(document.location.href, 'applicationPageId');
     $(document).bind("updatedPageList", self.refreshPageDisplay);
     this.refreshPageTypesDisplay();
+    this.refreshGlobalPagesDisplay();
     $('#save-pages').bind('click', self.pageStore.save);
   }
   
   this.refreshPageDisplay = function(){
     $('#workspace').hide();
-    $('#application-pages ol').remove();
+    $('#pages ol').remove();
     var list = self.pageStore.getPageList();
     var ol = $('<ol>').addClass('page-list');
     $(list).each(function(i){
-      var li = $('<li>').html(this.title).attr('id', 'application-page-' + this.applicationPageId);
+      var li = $('<li>').html(this.title).attr('id', 'page-' + this.applicationPageId);
       $(li).data('page', this);
       $(li).bind('click', function(e){
         self.currentPageID = $(this).data('page').applicationPageId;
@@ -44,9 +45,9 @@ function Pages(){
       });
 //      self.pageStore.saveAll();
     });
-    $('#application-pages').append(ol);
-    if(this.currentPageID) $('#application-page-' + this.currentPageID).trigger('click');
-    else $('#application-pages li:first').trigger('click');
+    $('#pages').append(ol);
+    if(this.currentPageID) $('#page-' + this.currentPageID).trigger('click');
+    else $('#pages li:first').trigger('click');
   }
   
   this.refreshPageTypesDisplay = function(){
@@ -55,11 +56,36 @@ function Pages(){
       var type = this;
       var li = $('<li>').html(type.name);
       $(li).bind('click', function(e){
-        self.pageStore.newPage(type.id);
+        var obj = self.pageStore.newPageObject();
+        obj.pageType = type.id;
+        obj.type = type.class;
+        obj.title = 'New ' + type.name + ' Page';
+        self.pageStore.addPage(obj, 'new');
       });
       ol.append(li);
     });
     $('#new-pages').append(ol);
+  }
+  
+  this.refreshGlobalPagesDisplay = function(){
+    $.get(document.location.href + 'listGlobalPages',function(json){
+      var ol = $('<ol>').addClass('add-list');
+      $(json.data.result).each(function(i){
+        var globalPage = this;
+        var li = $('<li>').html(globalPage.title);
+        $(li).bind('click', function(e){
+          var obj = self.pageStore.newPageObject();
+          obj.pageId = globalPage.id;
+          obj.pageType = globalPage.pageType;
+          obj.type = globalPage.type;
+          obj.title = globalPage.title;
+          self.pageStore.addPage(obj, 'new-global');
+        });
+        ol.append(li);
+      });
+      $('#global-pages').append(ol);
+    });
+    
   }
 }
   

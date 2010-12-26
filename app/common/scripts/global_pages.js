@@ -48,7 +48,11 @@ function Pages(){
       var type = this;
       var li = $('<li>').html(type.name);
       $(li).bind('click', function(e){
-        self.pageStore.newPage(type.id);
+        var obj = self.pageStore.newPageObject();
+        obj.pageType = type.id;
+        obj.type = type.class;
+        obj.title = 'New ' + type.name + ' Page';
+        self.pageStore.addPage(obj, 'new');
       });
       ol.append(li);
     });

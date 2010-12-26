@@ -127,6 +127,18 @@ class SetupPagesController extends SetupController implements PagesInterface {
   }
   
   /**
+   * List the global Pages
+   */
+  public function actionListGlobalPages(){
+    $pages = array();
+    foreach(Doctrine::getTable('Page')->findByIsGlobal(true) AS $page){
+      $pages[] = $this->pageArray($page);
+    }
+    $this->setVar('result', $pages);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
    * Save data from editing a page
    * @param integer $applicationPageId
    */
@@ -143,6 +155,17 @@ class SetupPagesController extends SetupController implements PagesInterface {
           }
         }
       break;
+      case 'new-global':
+        $applicationPage = $this->application->Pages->get(null);
+        $applicationPage->pageID = $data->pageId;
+        $applicationPage->title = $data->title;
+        $applicationPage->min = $data->min;
+        $applicationPage->max = $data->max;
+        $applicationPage->optional = $data->optional;
+        $applicationPage->instructions = $data->instructions;
+        $applicationPage->leadingText = $data->leadingText;
+        $applicationPage->trailingText = $data->trailingText;
+        break;
       case 'new':
         $applicationPage = $this->application->Pages->get(null);
         $applicationPage->Page->isGlobal = false;
@@ -160,33 +183,35 @@ class SetupPagesController extends SetupController implements PagesInterface {
         $applicationPage->instructions = $data->instructions;
         $applicationPage->leadingText = $data->leadingText;
         $applicationPage->trailingText = $data->trailingText;
-        foreach($data->variables as $v){
-          $applicationPage->Page->setVar($v->name, $v->value);
-        }
-        $this->updatePageElements($applicationPage->Page, $data->elements, $work);
-        foreach($data->children as $child){
-          switch($child->status){
-            case 'delete':
-              $work->registerModelForDelete($applicationPage->Page->getChildById($child->pageId));
-            break;
-            case 'new':
-              $childPage = $applicationPage->Page->Children->get(null);
-              $childPage->isGlobal = false;
-              $childPage->pageType = $child->pageType;
-            case 'save':
-              if(!isset($childPage)) $childPage = $applicationPage->Page->getChildById($child->pageId);
-              $childPage->title = $child->title;
-              $childPage->min = $child->min;
-              $childPage->max = $child->max;
-              $childPage->optional = $child->optional;
-              $childPage->instructions = $child->instructions;
-              $childPage->leadingText = $child->leadingText;
-              $childPage->trailingText = $child->trailingText;
-              foreach($child->variables as $v){
-                $childPage->setVar($v->name, $v->value);
-              }
-              $this->updatePageElements($childPage, $child->elements, $work);
-            break;
+        if(!$applicationPage->Page->isGlobal){
+          foreach($data->variables as $v){
+            $applicationPage->Page->setVar($v->name, $v->value);
+          }
+          $this->updatePageElements($applicationPage->Page, $data->elements, $work);
+          foreach($data->children as $child){
+            switch($child->status){
+              case 'delete':
+                $work->registerModelForDelete($applicationPage->Page->getChildById($child->pageId));
+              break;
+              case 'new':
+                $childPage = $applicationPage->Page->Children->get(null);
+                $childPage->isGlobal = false;
+                $childPage->pageType = $child->pageType;
+              case 'save':
+                if(!isset($childPage)) $childPage = $applicationPage->Page->getChildById($child->pageId);
+                $childPage->title = $child->title;
+                $childPage->min = $child->min;
+                $childPage->max = $child->max;
+                $childPage->optional = $child->optional;
+                $childPage->instructions = $child->instructions;
+                $childPage->leadingText = $child->leadingText;
+                $childPage->trailingText = $child->trailingText;
+                foreach($child->variables as $v){
+                  $childPage->setVar($v->name, $v->value);
+                }
+                $this->updatePageElements($childPage, $child->elements, $work);
+              break;
+            }
           }
         }
     } //end switch action

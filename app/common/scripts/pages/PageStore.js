@@ -19,6 +19,9 @@ function PageStore(){
   this.pageTypes = {};
   this.pageTypesOrder = [];
   
+  this.globalPages = {};
+  this.globalPagesOrder = [];
+  
   this.elementTypes = {};
   this.elementTypesOrder = [];
   
@@ -100,14 +103,23 @@ function PageStore(){
     });
   };
   
-  this.newPage = function(typeID){
-    var uniqueID = 'newpage' + this.IdCounter++;
+  this.addPage = function(obj, status){ 
+    var Page = this.createPageObject(obj);
+    Page.isModified = true;
+    Page.status = status;
+    this.pages[Page[self.index]] = Page;
+    this.pageOrder.push(Page[self.index]);
+    $(document).trigger("updatedPageList");
+  };
+  
+  this.newPageObject = function(){
+    var uniqueID = 'new' + this.IdCounter++;
     var newPage = {
         applicationPageId: uniqueID,
         pageId: uniqueID,
-        type: this.pageTypes[typeID].class,
-        pageType: typeID,
-        title: "New " + this.pageTypes[typeID].name + " Page",
+        type: null,
+        pageType: null,
+        title: null,
         min: 0,
         max: 0,
         optional: false,
@@ -118,13 +130,8 @@ function PageStore(){
         variables: [],
         children: []
     };
-    var Page = this.createPageObject(newPage);
-    Page.isModified = true;
-    Page.status = 'new';
-    this.pages[Page[self.index]] = Page;
-    this.pageOrder.push(Page[self.index]);
-    $(document).trigger("updatedPageList");
-  };
+    return newPage;
+  }
   
   this.deletePage = function(page){
     this.deletedPages.push(page[self.index]);
@@ -203,29 +210,6 @@ function PageStore(){
   this.newListItem = function(page, element, value){
     element.addListItem({id:'newListItem'+this.IdCounter++,value: value, active: 1});
     page.isModified = true;
-  };
-  
-  this.newBranchingPage = function(pageTypeID, parentPage){
-    var uniqueID = 'newbranchingpage' + this.IdCounter++;
-    var newPage = {
-        applicationPageId: null,
-        pageId: uniqueID,
-        type: this.pageTypes[pageTypeID].class,
-        pageType: pageTypeID,
-        title: "New Branch",
-        min: 0,
-        max: 0,
-        optional: false,
-        instructions: '',
-        leadingText: '',
-        trailingText: '',
-        elements: [],
-        variables: [],
-        children: []
-    };
-    var Branch = this.createPageObject(newPage);
-    Branch.isModified = true;
-    parentPage.addChild(Branch);
   };
   
   this.checkPageExists = function(id){

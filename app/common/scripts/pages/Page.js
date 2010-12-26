@@ -14,6 +14,7 @@ function ApplyPage(){
   this.pageId;
   this.applicationPageId;
   this.pageType,
+  this.isGlobal;
   this.title;
   this.min;
   this.max;
@@ -43,6 +44,7 @@ function ApplyPage(){
     this.pageStore = pageStore;
     this.pageId = obj.pageId;
     this.applicationPageId = obj.applicationPageId;
+    this.isGlobal = obj.isGlobal;
     this.title = obj.title;
     this.min = obj.min;
     this.max = obj.max;
@@ -424,7 +426,14 @@ function BranchingPage(){
     }
     var p = $('<p>').addClass('add').html('New Branch').bind('click',function(){
       var standardPage = pageClass.pageStore.getPageTypeByClassName('StandardPage');
-      pageClass.pageStore.newBranchingPage(standardPage.id, pageClass);
+      var obj = pageClass.pageStore.newPageObject();
+      obj.pageType = standardPage.id;
+      obj.type = standardPage.class;
+      obj.title = 'New Branch';
+      var Branch = pageClass.pageStore.createPageObject(obj);
+      Branch.status = 'new';
+      Branch.isModified = true;
+      pageClass.addChild(Branch);
     });
     return $('<div>').append($('<h5>').html('Branched Pages')).append(ol).append(p);
   }
@@ -567,26 +576,14 @@ function RecommendersPage(){
     var pageClass = this;
     if(this.childrenOrder.length == 0){
       var standardPage = pageClass.pageStore.getPageTypeByClassName('StandardPage');
-      var uniqueID = 'newlorpage' + this.pageStore.IdCounter++;
-      var newPage = {
-          applicationPageId: null,
-          pageId: uniqueID,
-          type: standardPage.class,
-          pageType: standardPage.id,
-          title: 'Recommendation',
-          min: 0,
-          max: 0,
-          optional: false,
-          instructions: '',
-          leadingText: '',
-          trailingText: '',
-          elements: [],
-          variables: [],
-          children: []
-      };
-      var LOR = this.pageStore.createPageObject(newPage);
+      
+      var obj = pageClass.pageStore.newPageObject();
+      obj.pageType = standardPage.id;
+      obj.type = standardPage.class;
+      obj.title = 'Recommendation';
+      var LOR = pageClass.pageStore.createPageObject(obj);
       LOR.status = 'new';
-      this.addChild(LOR);
+      pageClass.addChild(LOR);
     }
     var p = $('<p>').addClass('edit lorPage').html('Edit Recommendation Page').bind('click',{lor: this.children[this.childrenOrder[0]]},function(e){
       e.data.lor.workspace();
