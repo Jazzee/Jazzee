@@ -61,6 +61,16 @@ abstract class BaseApplicationPage extends Doctrine_Record
              'type' => 'string',
              'length' => '3000',
              ));
+
+
+        $this->index('global_page', array(
+             'fields' => 
+             array(
+              0 => 'applicationID',
+              1 => 'pageID',
+             ),
+             'type' => 'unique',
+             ));
     }
 
     public function setUp()

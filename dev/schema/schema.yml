@@ -194,6 +194,10 @@ ApplicationPage:
     instructions: string(3000)
     leadingText: string(3000)
     trailingText: string(3000)
+  indexes:
+    global_page: 
+      fields: [applicationID, pageID]
+      type: unique
   relations:
     Application:
       local: applicationID
