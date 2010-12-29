@@ -15,7 +15,7 @@ class ApplicantsViewController extends ApplicantsController {
   public function setUp(){
     parent::setUp();
     $this->addScript('foundation/scripts/form.js');
-    $this->addScript('common/scripts/messages.js');
+    $this->addScript('common/scripts/status.js');
     $this->addScript('common/scripts/applicants_view.js');
   }
   /**
@@ -34,14 +34,14 @@ class ApplicantsViewController extends ApplicantsController {
     $form->newButton('submit', 'Search');
     if($input = $form->processInput($this->post)){
       $q = Doctrine_Query::create()
-          ->select('a.*')
-          ->from('Applicant a');
+          ->select('*')
+          ->from('Applicant');
       if($input->firstName)
-          $q->andWhere('a.firstName like ?', $input->firstName . '%');
+          $q->andWhere('firstName like ?', $input->firstName . '%');
       if($input->lastName)
-          $q->andWhere('a.lastName like ?', $input->lastName . '%');   
+          $q->andWhere('lastName like ?', $input->lastName . '%');   
       if($input->applicantID)
-          $q->andWhere('a.id = ?', $input->applicantID);
+          $q->andWhere('id = ?', $input->applicantID);
       $this->setVar('applicants', $q->execute());
       
     }

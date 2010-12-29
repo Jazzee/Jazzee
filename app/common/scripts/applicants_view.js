@@ -125,22 +125,27 @@ function ApplicantsView(){
   }
 }
 
-
 $(document).ready(function(){
-  var messages = new Messages;
+  var status = new Status($('#status'));
   $(document).ajaxError(function(e, xhr, settings, exception) {
-    messages.create('error','There was an error with your request, please try again.');
+    status.addMessage('error','There was an error with your request, please try again.');
   });
   
   $(document).ajaxComplete(function(e, xhr, settings) {
     if(xhr.getResponseHeader('Content-Type') == 'application/json'){
       eval("var json="+xhr.responseText);
       $(json.messages).each(function(i){
-        messages.create(this.type, this.text);
+        status.addMessage(this.type, this.text);
       });
     }
   });
-
+  //Ajax activity indicator bound to ajax start/stop document events
+  $(document).ajaxStart(function(){
+    status.start();
+  }).ajaxStop(function(){
+    status.end();
+  });
+  
   var view = new ApplicantsView;
   view.init();
 });
