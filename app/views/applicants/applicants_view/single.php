@@ -92,7 +92,7 @@
     </tbody>
   </table>
   <?php foreach($pages as $page): ?>
-  <?php if($page->showPageData()): ?>
+  <?php if($page::SHOW_PAGE): ?>
     <fieldset>
       <legend><?php print $page->title ?></legend>
         <?php if($answers = $page->getAnswers()):?>

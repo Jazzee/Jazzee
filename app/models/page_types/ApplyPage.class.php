@@ -20,6 +20,12 @@ abstract class ApplyPage {
   const COMPLETE = 1;
   const SKIPPED = 2;
   
+  /**
+   * Does this page contain any answers or is it a Text or Lock page which doesn't
+   * show anything usefull to reviewers
+   */
+  const SHOW_PAGE = true;
+  
  /**
   * The ApplicationPage model
   * @var ApplicationPage $_page

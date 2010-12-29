@@ -7,6 +7,8 @@
  * @subpackage apply
  */
 class LockPage extends StandardPage {
+  const SHOW_PAGE = false;
+  
   protected function makeForm(){
     $form = new Form;
     $field = $form->newField();

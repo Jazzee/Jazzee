@@ -7,6 +7,7 @@
  * @subpackage apply
  */
 class TextPage extends StandardPage {
+  const SHOW_PAGE = false;
   /**
    * Text pages dont have forms
    */
