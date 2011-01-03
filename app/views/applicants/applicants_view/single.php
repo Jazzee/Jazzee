@@ -151,5 +151,26 @@
     </fieldset>
   <?php endif; //showPageData?> 
   <?php endforeach; //pages?>
+  <?php if($applicant->Attachments->count()):?>
+  <div>
+    <fieldset>
+      <caption>Applicant PDFs</caption>
+      <?php 
+      foreach($applicant->Attachments as $attachment){
+        //a uniqueish name which is permanent (for caching)
+        $name = substr(sha1("applicant-attachment_" . $attachment->id . "_for_applicant_{$applicant->id}"),0,10);
+        $file = new FileContainer($attachment->attachment, 'pdf', $name);
+        $file->setLastModified(time());
+        $fileStore->$name = $file;
+        print "<a href='" . $this->path("file/{$name}.pdf") . "'>View Attached PDF</a> <br />";
+      }?>
+    </fieldset>
+  </div>
+  <?php endif;//end if applicant has attachments ?>
+  <?php
+  if($this->controller->checkIsAllowed('applicants_view', 'attachApplicantPDF')){
+    print "<a class='attachApplicantPDF' href='" . $this->path("applicants/view/attachApplicantPDF/{$applicant->id}/") . "'>Attach PDF to Application</a>";
+  }
+  ?>
 </div>
 <?php endif;

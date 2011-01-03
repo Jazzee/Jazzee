@@ -393,6 +393,35 @@ class ApplicantsViewController extends ApplicantsController {
     $this->setVar('form', $form);
   }
   
+  /**
+   * Attach a PDF to an Applicant
+   * @param integer $id applicantID
+   */
+  public function actionAttachApplicantPDF($id){
+    if(!$applicant = $this->application->getApplicantByID($id)){
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to add a pdf to applicant {$id} which is not an applicant in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
+    }
+    $this->layout = 'json';
+    $form = new Form;
+    $form->action = $this->path("applicants/view/attachApplicantPDF/{$id}");
+    $field = $form->newField(array('legend'=>"Attach PDF to Applicant"));
+    $element = $field->newElement('FileInput', 'pdf');
+    $element->label = 'PDF';
+
+    $form->newButton('submit', 'Attach');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $attachment = $applicant->Attachments->get(null);
+        $attachment->attachment = file_get_contents($input->pdf['tmp_name']);
+        $applicant->save();
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $this->setVar('form', $form);
+  }
+  
   public static function getControllerAuth(){
     $auth = new ControllerAuth;
     $auth->name = 'View Applicants';
@@ -401,6 +430,7 @@ class ApplicantsViewController extends ApplicantsController {
     $auth->addAction('single', new ActionAuth('View a Single Applicant'));
     $auth->addAction('edit', new ActionAuth('Edit Applicant Data'));
     $auth->addAction('attachAnswerPDF', new ActionAuth('Attach PDF to answers'));
+    $auth->addAction('attachApplicantPDF', new ActionAuth('Attach PDF to an applicant'));
     $auth->addAction('verifyAnswer', new ActionAuth('Verify Applicant Answer'));
     $auth->addAction('unlock', new ActionAuth('Unlock an application'));
     $auth->addAction('extendDeadline', new ActionAuth('Extend the deadline for an applicant'));

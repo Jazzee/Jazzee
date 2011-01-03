@@ -72,6 +72,13 @@ function ApplicantsView(){
         self.createForm(form.create(json.data.form));
       });
     });
+    $('a.attachApplicantPDF').unbind().bind('click', function(e){
+      e.preventDefault();
+      $.get($(this).attr('href'), function(json){
+        var form = new Form();
+        self.createForm(form.create(json.data.form));
+      });
+    });
     $('a.deleteAnswer').unbind().bind('click', function(e){
       e.preventDefault();
       $.get($(this).attr('href'), function(json){
