@@ -264,7 +264,7 @@ class ApplicantsViewController extends ApplicantsController {
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
     }
     $this->layout = 'json';
-    $page = new $answer->ApplicationPage->Page->PageType->class($answer->ApplicationPage, $applicant);
+    $page = new $answer->Page->PageType->class($this->application->getApplicationPageByGlobalID($answer->Page->id), $applicant);
     $form = $page->getForm();
     $form->action = $this->path("applicants/view/editAnswer/{$id}");
     $page->fill($id);

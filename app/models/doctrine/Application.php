@@ -20,6 +20,18 @@ class Application extends BaseApplication{
     return false;
   }
   
+ /**
+  * Get page by its global ID
+  * @param integer $globalPageID
+  * @return ApplicationPage
+  */
+  public function getApplicationPageByGlobalID($globalPageID){
+    foreach($this->Pages as $applicationPage){
+      if($globalPageID == $applicationPage->pageID) return $applicationPage;
+    }
+    return false;
+  }
+  
   /**
    * Get applicant by ID
    * @param integer $id

@@ -88,14 +88,15 @@ function ApplicantsView(){
    * @param string formHTML
    */
   this.createForm = function(formHTML){
-    var div = $('<div>').insertAfter('#container');
+    
+    var div = $('<div>');
     div.css("overflow-y", "auto");
     div.html(formHTML);
     div.dialog({
       modal: true,
       autoOpen: true,
       position: 'center',
-      width: 700,
+      width: 800,
       overlay: {
         backgroundColor: '#fff',
         opacity: 0.8
@@ -107,7 +108,7 @@ function ApplicantsView(){
     $('form', div).unbind().bind('submit',function(e){
       //give our iframe a unique name from the timestamp
       var iFrameName = "iFrame" + (new Date().getTime());
-      var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('#container');
+      var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
       iFrame.css("display", "none");
       e.target.target = iFrameName;
       iFrame.load(function(e){
