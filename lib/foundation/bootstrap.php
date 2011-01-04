@@ -31,6 +31,9 @@ if(!class_exists('Mail')){
 if(!class_exists('Config')){
   trigger_error('Pear Config is required and it is not availalble', E_USER_ERROR);
 }
+if(!class_exists('imagick')){
+  trigger_error('PECL/Imagick is required and it is not availalble', E_USER_ERROR);
+}
 
 //load the helper functions
 require_once('functions.php');

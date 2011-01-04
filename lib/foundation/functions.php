@@ -90,4 +90,16 @@ function replaceNullString($arr){
   }
   return $arr;
 }
+
+/**
+ * Get a preview thumbnail for a pdf
+ * @param blobl $blob
+ */
+function thumbnailPDF($blob, $width, $height){
+  $im = new imagick;
+  $im->readimageblob($blob);
+  $im->setImageFormat("png");
+  $im->scaleimage($width, $height);
+  return $im->getimageblob();
+}
 ?>
