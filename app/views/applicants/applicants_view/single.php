@@ -118,12 +118,16 @@
               print '</td>';
               print "<td class='attachment'>";
                 if($answer->attachment){
-                  //a uniqueish name which is permanent (for caching)
-                  $name = substr(sha1("answer-attachment_" . $answer->getID() . "_for_applicant_{$applicant->id}" . $answer->updatedAt),0,10);
-                  $file = new FileContainer($answer->attachment, 'pdf', $name);
-                  $file->setLastModified($answer->updatedAt);
-                  $fileStore->$name = $file;
-                  print "<a href='" . $this->path("file/{$name}.pdf") . "'>View PDF</a>";
+                  $pdfName = "applicant-{$applicant->id}-answer_" . $answer->id;
+                  $file = new FileContainer($answer->attachment, 'pdf', $pdfName);
+                  $file->setLastModified(time());
+                  $fileStore->$pdfName = $file;
+                  $png = thumbnailPDF($answer->attachment, 100, 0);
+                  $pngName = "applicant-{$applicant->id}-answer_" . $answer->id . "_preview";
+                  $file = new FileContainer($png, 'png', $pngName);
+                  $file->setLastModified(time());
+                  $fileStore->$pngName = $file;
+                  print "<a href='" . $this->path("file/{$pdfName}.pdf") . "'><img src='" . $this->path("file/{$pngName}.png") . "' /></a>";
                 } else {
                   if($this->controller->checkIsAllowed('applicants_view', 'attachAnswerPDF')){
                     print "<a class='attachAnswerPDF' href='" . $this->path("applicants/view/attachAnswerPDF/{$answer->id}") . "'>Attach PDF</a>";
@@ -154,15 +158,19 @@
   <?php if($applicant->Attachments->count()):?>
   <div>
     <fieldset>
-      <caption>Applicant PDFs</caption>
+      <legend>Applicant PDFs</legend>
       <?php 
       foreach($applicant->Attachments as $attachment){
-        //a uniqueish name which is permanent (for caching)
-        $name = substr(sha1("applicant-attachment_" . $attachment->id . "_for_applicant_{$applicant->id}"),0,10);
-        $file = new FileContainer($attachment->attachment, 'pdf', $name);
+        $pdfName = "applicant-{$applicant->id}-attachment_" . $attachment->id;
+        $file = new FileContainer($attachment->attachment, 'pdf', $pdfName);
         $file->setLastModified(time());
-        $fileStore->$name = $file;
-        print "<a href='" . $this->path("file/{$name}.pdf") . "'>View Attached PDF</a> <br />";
+        $fileStore->$pdfName = $file;
+        $png = thumbnailPDF($attachment->attachment, 100, 0);
+        $pngName = "applicant-{$applicant->id}-attachment_preview_" . $attachment->id;
+        $file = new FileContainer($png, 'png', $pngName);
+        $file->setLastModified(time());
+        $fileStore->$pngName = $file;
+        print "<a href='" . $this->path("file/{$pdfName}.pdf") . "'><img src='" . $this->path("file/{$pngName}.png") . "' /></a>";
       }?>
     </fieldset>
   </div>
