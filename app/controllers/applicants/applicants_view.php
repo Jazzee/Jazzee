@@ -313,10 +313,10 @@ class ApplicantsViewController extends ApplicantsController {
    */
   public function actionDeleteAnswer($id){
     if(!$answer = Doctrine::getTable('Answer')->find($id) OR !$applicant = $this->application->getApplicantByID($answer->applicantID)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to delete answer {$id}", E_USER_ERROR, 'You do not have access to this applicant');
     }
     $this->layout = 'json';
-    $page = new $answer->ApplicationPage->Page->PageType->class($answer->ApplicationPage, $applicant);
+    $page = new $answer->Page->PageType->class($this->application->getApplicationPageByGlobalID($answer->Page->id), $applicant);
     if($page->deleteAnswer($id)){
       $this->messages->write('success', 'Answer Deleted Successfully');
     }
