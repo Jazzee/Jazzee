@@ -59,12 +59,17 @@ class PDFFileInputElement extends ApplyElement {
     if(is_null($this->value)){
       return null;
     }
-    //a unique name which is repeatable
-    $name = 'file' . $this->elementAnswer->answerID . $this->elementAnswer->elementID . strtotime($this->elementAnswer->Answer->updatedAt);
-    $file = new FileContainer($this->value, 'pdf', $name);
+    $fileStore = Session::getInstance()->getStore('files');
+    $pdfName = 'file' . $this->elementAnswer->answerID . $this->elementAnswer->elementID . strtotime($this->elementAnswer->Answer->updatedAt);
+    $file = new FileContainer($this->value, 'pdf', $pdfName);
     $file->setLastModified(strtotime($this->elementAnswer->Answer->updatedAt));
-    Session::getInstance()->getStore('files')->$name = $file;
-    return "<a href='file/{$name}.pdf'>View PDF</a>";
+    $fileStore->$pdfName = $file;
+    $png = thumbnailPDF($this->value, 100, 0);
+    $pngName = 'file' . $this->elementAnswer->answerID . $this->elementAnswer->elementID . strtotime($this->elementAnswer->Answer->updatedAt) . '_preview';
+    $file = new FileContainer($png, 'png', $pngName);
+    $file->setLastModified(strtotime($this->elementAnswer->Answer->updatedAt));
+    $fileStore->$pngName = $file;
+    return "<a href='file/{$pdfName}.pdf'><img src='file/{$pngName}.png' /></a>";
   }
   
   public function formValue(){
