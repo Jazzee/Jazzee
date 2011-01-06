@@ -13,7 +13,7 @@ if(isset($applicants)):?>
   <p>Your search returned <?php print count($applicants); ?> results</p>
   <ol>
     <?foreach($applicants as $applicant):?>
-      <?php if($this->controller->checkIsAllowed('applicants_vieww', 'single')): ?>
+      <?php if($this->controller->checkIsAllowed('applicants_view', 'single')): ?>
         <li><a href='<?php print $this->path("applicants/view/single/{$applicant->id}")?>'><?php print "{$applicant->firstName} {$applicant->lastName}"?></li>
       <?php endif;?>
       

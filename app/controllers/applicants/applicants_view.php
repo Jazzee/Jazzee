@@ -32,20 +32,16 @@ class ApplicantsViewController extends ApplicantsController {
     $element = $field->newElement('TextInput','applicantID');
     $element->label = 'Applicant ID';
     $form->newButton('submit', 'Search');
-    if($input = $form->processInput($this->post)){
-      $q = Doctrine_Query::create()
-          ->select('*')
-          ->from('Applicant');
-      if($input->firstName)
-          $q->andWhere('firstName like ?', $input->firstName . '%');
-      if($input->lastName)
-          $q->andWhere('lastName like ?', $input->lastName . '%');   
-      if($input->applicantID)
-          $q->andWhere('id = ?', $input->applicantID);
-      $this->setVar('applicants', $q->execute());
-      
+    if($input = $form->processInput($this->post)){   
+      $applicants = array();
+      if($input->applicantID){
+        $applicant = $this->application->getApplicantByID($input->applicantID);
+        if($applicant)  $applicants[] = $applicant;
+      } else {
+        $applicants = $this->application->findApplicantsByName($input->lastName, $input->firstName);        
+      }
+      $this->setVar('applicants', $applicants);
     }
-    
     $this->setVar('form', $form);
   }
  

@@ -46,6 +46,25 @@ class Application extends BaseApplication{
   }
   
   /**
+   * Find an applicant by name
+   * @param string $lastName
+   * @param string $firstName
+   * @param string $middleName
+   */
+  public function findApplicantsByName($lastName = false, $firstName = false, $middleName = false){
+    $q = Doctrine_Query::create()
+          ->select('*')
+          ->from('Applicant');
+      if($lastName)
+          $q->andWhere('lastName like ?', $lastName . '%');
+      if($firstName)
+          $q->andWhere('firstName like ?', $firstName . '%');   
+      if($middleName)
+          $q->andWhere('middleName = ?', $middleName);
+    return $q->execute();
+  }
+  
+  /**
    * After we save the application make sure all of its pages are properly saved too
    * At some point doctrine is unable to follow the relationships deep enough
    * This method explicitly saves the members of collections with the correct id
