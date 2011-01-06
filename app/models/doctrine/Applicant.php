@@ -111,4 +111,18 @@ class Applicant extends BaseApplicant{
         $event->getInvoker()->updatedAt = date('Y-m-d H:i:s', time());
       }
   }
+  
+  /**
+   * Lock an application
+   */
+  public function lock(){
+    $this->locked = date('Y-m-d H:i:s');
+  }
+  
+  /**
+   * UnLock an application
+   */
+  public function unlock(){
+    $this->locked = null;
+  }
 }

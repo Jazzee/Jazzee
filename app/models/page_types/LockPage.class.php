@@ -52,7 +52,7 @@ class LockPage extends StandardPage {
   }
   
   public function newAnswer($input){
-    $this->applicant->locked = date('Y-m-d H:i:s');
+    $this->applicant->lock();
     $this->applicant->save();
   }
   

@@ -211,7 +211,20 @@ class ApplicantsViewController extends ApplicantsController {
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
     }
     $this->layout = 'json';
-    $applicant->locked = null;
+    $applicant->unlock();
+    $applicant->save();
+  }
+  
+  /**
+   * Lock an application
+   * @param integer $id
+   */
+  public function actionLock($id){
+    if(!$applicant = $this->application->getApplicantByID($id)){
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
+    }
+    $this->layout = 'json';
+    $applicant->lock();
     $applicant->save();
   }
   
@@ -429,6 +442,7 @@ class ApplicantsViewController extends ApplicantsController {
     $auth->addAction('attachApplicantPDF', new ActionAuth('Attach PDF to an applicant'));
     $auth->addAction('verifyAnswer', new ActionAuth('Verify Applicant Answer'));
     $auth->addAction('unlock', new ActionAuth('Unlock an application'));
+    $auth->addAction('lock', new ActionAuth('Lock an application'));
     $auth->addAction('extendDeadline', new ActionAuth('Extend the deadline for an applicant'));
     $auth->addAction('pdf', new ActionAuth('Generate PDF from applicant data'));
     $auth->addAction('nominateDecision', new ActionAuth('Nominate Applicant for Admission Decision'));

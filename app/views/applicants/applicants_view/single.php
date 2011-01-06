@@ -82,6 +82,9 @@
           <?php  if($this->controller->checkIsAllowed('applicants_view', 'unlock') and $applicant->locked): ?>
             &nbsp(<a class='unlock' href='<?php print $this->path("applicants/view/unlock/{$applicant->id}")?>' title='unlock applicant'>Unlock Application</a>)
           <?php endif;?>
+          <?php  if($this->controller->checkIsAllowed('applicants_view', 'lock') and !$applicant->locked): ?>
+            &nbsp(<a class='lock' href='<?php print $this->path("applicants/view/lock/{$applicant->id}")?>' title='lock applicant'>Lock Application</a>)
+          <?php endif;?>
           <?php  if($this->controller->checkIsAllowed('applicants_view', 'extendDeadline')): ?>
             &nbsp(<a class='extendDeadline' href='<?php print $this->path("applicants/view/extendDeadline/{$applicant->id}")?>' title='extend deadline for applicant'>Extend Deadline</a>)
           <?php endif;?>
