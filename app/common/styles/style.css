@@ -106,6 +106,10 @@ div.form p.required{
   padding-left: 20px;
 }
 
+div.form label{
+	padding-right: 16px;
+}
+
 div.form label.required{
   background-image: url('resource/foundation/icons/asterisk_yellow.png');
   background-repeat: no-repeat;

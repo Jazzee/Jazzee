@@ -171,11 +171,6 @@ div.form fieldset.buttons input{
   float: left;
 }
 
-div.form div.field div.element label{
-  padding-right: 16px;
-  margin:0;
-}
-
 div.form p.instructions {
   width: 90%;
   margin: auto;
