@@ -110,6 +110,7 @@ class ManageRolesController extends ManageController {
       'manage_pagetypes',
       'manage_elementtypes',
       'applicants_view',
+      'applicants_decisions',
       'setup_application',
       'setup_pages',
       'setup_roles',
