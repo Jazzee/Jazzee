@@ -54,13 +54,27 @@ class Application extends BaseApplication{
   public function findApplicantsByName($lastName = false, $firstName = false, $middleName = false){
     $q = Doctrine_Query::create()
           ->select('*')
-          ->from('Applicant');
+          ->from('Applicant')
+          ->where('applicationID = ?', $this->id);
       if($lastName)
           $q->andWhere('lastName like ?', $lastName . '%');
       if($firstName)
           $q->andWhere('firstName like ?', $firstName . '%');   
       if($middleName)
           $q->andWhere('middleName = ?', $middleName);
+    return $q->execute();
+  }
+  
+  
+  /**
+   * Find locked applicants
+   */
+  public function findLockedApplicants(){
+    $q = Doctrine_Query::create()
+          ->select('*')
+          ->from('Applicant')
+          ->where('applicationID = ?', $this->id)
+          ->andWhere('locked IS NOT NULL');
     return $q->execute();
   }
   
