@@ -10,7 +10,7 @@ class Controller extends Lvc_PageController{
    * Specifies the layout to be used in displaying the view
    * @var string
    */
-	protected $layout = THM_NAME;
+	protected $layout = 'default';
   
   /**
    * Any actions parameters which were passed in by the Lvc_Router from the URL
