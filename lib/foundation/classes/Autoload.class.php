@@ -6,6 +6,10 @@
  * @package foundation
  */
 require_once('Foundation.class.php');
+/**
+ * Require Cache.class.php so we don't get stuck in an autoload loop tying to find it
+ */
+require_once('Cache.class.php');
 
 class Autoload extends Foundation {
   /**
@@ -15,6 +19,17 @@ class Autoload extends Foundation {
    */
   static private $_autoLoadPaths = array();
   
+  /**
+   *  Our cache
+   *  @var Cache 
+   */
+  static private $_cache;
+  
+  /**
+   * What we prefix our cached paths with
+   * @const string
+   */
+  const CACHE_PREFIX = 'FoundationAutoloadPath';
   
   /**
    * Adds a path to the autoload array
@@ -49,11 +64,17 @@ class Autoload extends Foundation {
    * @return bool TRUE on success FALSE on failure
    */
   static public function load($className){
+    if(!isset(self::$_cache)) self::$_cache = Cache::getInstance();
+    if($cachePath = self::$_cache->fetch(self::CACHE_PREFIX . $className)){
+      include_once($cachePath);
+      return true;
+    }
     $suffixes = array('.class.php', '.inerface.php');
     foreach(self::$_autoLoadPaths as $path){
       foreach($suffixes as $suffix){
         $fileName = $path . $className . $suffix;
         if(file_exists($fileName) AND include_once($fileName)) {
+          self::$_cache->store(self::CACHE_PREFIX.$className,$fileName);
           return TRUE;
         }
       }
