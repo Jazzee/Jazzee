@@ -27,6 +27,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
     }
     $this->addScript('foundation/scripts/form.js');
     $this->addScript('common/scripts/status.js');
+    $this->addScript('common/scripts/authenticationTimeout.js');
     $this->addScript('common/scripts/pages/Page.js');
     $this->addScript('common/scripts/pages/Element.js');
     $this->addScript('common/scripts/pages/PageStore.js');

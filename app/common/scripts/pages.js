@@ -90,6 +90,9 @@ function Pages(){
 }
   
 $(document).ready(function(){
+  var timeout = new AuthenticationTimeout('JazzeeAdminLoginTimeout');
+  timeout.start();
+  
   var status = new Status($('#status'));
   $(document).ajaxError(function(e, xhr, settings, exception) {
     status.addMessage('error','There was an error with your request, please try again.');
