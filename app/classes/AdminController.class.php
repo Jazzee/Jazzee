@@ -42,6 +42,7 @@ abstract class AdminController extends JazzeeController{
   public final function beforeAction(){
     parent::beforeAction();
     $this->session = Session::getInstance()->getStore('admin', $this->config->session_lifetime);
+    setcookie('JazzeeAdminLoginTimeout', time()+$this->config->session_lifetime);
     if(isset($this->session->userID))
       $this->user = Doctrine::getTable('User')->find($this->session->userID);
     if(isset($this->session->programID))

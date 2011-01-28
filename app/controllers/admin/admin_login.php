@@ -45,8 +45,6 @@ class AdminLoginController extends AdminController {
           $user->lastFailedLogin_ip = null;
           $user->failedLoginAttempts = 0;
           $user->save();
-
-          setcookie('JazzeeLogin', '1', 0, '/');
           
           $this->redirect($this->path("admin/welcome"));
           $this->afterAction();
