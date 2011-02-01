@@ -8,12 +8,10 @@
  * @property integer $applicantID
  * @property integer $paymentTypeID
  * @property double $amount
- * @property string $approvalCode
- * @property integer $transactionId
- * @property integer $checkNumber
- * @property string $rechargeAccount
+ * @property enum $status
  * @property Applicant $Applicant
  * @property PaymentType $PaymentType
+ * @property Doctrine_Collection $Variables
  * 
  * @package    jazzee
  * @subpackage orm
@@ -32,19 +30,15 @@ abstract class BasePayment extends Doctrine_Record
         $this->hasColumn('amount', 'double', null, array(
              'type' => 'double',
              ));
-        $this->hasColumn('approvalCode', 'string', 255, array(
-             'type' => 'string',
-             'length' => '255',
-             ));
-        $this->hasColumn('transactionId', 'integer', null, array(
-             'type' => 'integer',
-             ));
-        $this->hasColumn('checkNumber', 'integer', null, array(
-             'type' => 'integer',
-             ));
-        $this->hasColumn('rechargeAccount', 'string', 255, array(
-             'type' => 'string',
-             'length' => '255',
+        $this->hasColumn('status', 'enum', null, array(
+             'type' => 'enum',
+             'values' => 
+             array(
+              0 => 'pending',
+              1 => 'settled',
+              2 => 'rejected',
+              3 => 'refunded',
+             ),
              ));
     }
 
@@ -59,5 +53,9 @@ abstract class BasePayment extends Doctrine_Record
         $this->hasOne('PaymentType', array(
              'local' => 'paymentTypeID',
              'foreign' => 'id'));
+
+        $this->hasMany('PaymentVariable as Variables', array(
+             'local' => 'id',
+             'foreign' => 'paymentID'));
     }
 }

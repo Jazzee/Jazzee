@@ -327,27 +327,65 @@ Communication:
       foreign: id
       foreignAlias: Reply
       
+PaymentType:
+  columns:
+    name:
+      type: string(255)
+      notnull: true
+      unique: true
+    class:
+      type: string(255)
+      notnull: true
+      unique: true
+    
+PaymentTypeVariable:
+  columns:
+    paymentTypeId: integer
+    name: string(255)
+    value: string(3000)
+  indexes:
+    payemntType_variable: 
+      fields: [paymentTypeId, name]
+      type: unique
+  relations:
+    PaymentType:
+      local: paymentTypeID
+      foreign: id
+      foreignAlias: Variables
+      
 Payment:
   columns:
     applicantID: integer
     paymentTypeID: integer
     amount: double
-    approvalCode: string(255)
-    transactionId: integer
-    checkNumber: integer
-    rechargeAccount: string(255)
+    status: 
+      type: enum
+      values: [pending, settled, rejected, refunded]
   relations:
     Applicant:
       local: applicantID
       foreign: id
+      foreignAlias: Payments
       onUpdate: CASCADE
     PaymentType:
       local: paymentTypeID
       foreign: id
-
-PaymentType:
+      
+PaymentVariable:
   columns:
+    paymentID: integer
     name: string(255)
+    value: string(3000)
+  indexes:
+    payemnt_variable: 
+      fields: [paymentId, name]
+      type: unique
+  relations:
+    Payment:
+      local: paymentID
+      foreign: id
+      onUpdate: CASCADE
+      foreignAlias: Variables
 
 Answer:
   columns:

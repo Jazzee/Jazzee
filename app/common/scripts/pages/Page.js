@@ -617,6 +617,68 @@ RecommendersPage.prototype = new ApplyPage();
 RecommendersPage.prototype.constructor = RecommendersPage;
 
 /**
+ * The PaymentPage class
+ */
+function PaymentPage(){
+  
+  this.workspace = function(){
+    this.clearWorkspace();
+    $('#workspace-left-top').parent().addClass('form');
+    $('#workspace-left-top').append(this.titleBlock());
+    
+    $('#workspace-right-top').append(this.previewPageBlock());
+    $('#workspace-right-bottom').append(this.deletePageBlock());
+    $('#workspace-left-middle-left').append(this.paymentAmountsBlock());
+  }
+  
+  this.paymentAmountsBlock = function(){
+    var pageClass = this;
+    var div = $('<div>').append($('<h5>').html('Payment Amounts and Descriptions'));
+    var amounts = pageClass.getVariable('amounts');
+    var table = $('<table>').attr('id','paymentPageAmounts').append('<tr><th>Amount</th><th>Description</th></tr>');
+    div.append(table);
+    if(amounts && amounts > 0){
+      for(var i=1;i<=amounts;i++){
+        var amount = pageClass.getVariable('amount'+i);
+        var description = pageClass.getVariable('description'+i);
+        table.append(pageClass.amountRow(amount, description));
+      }
+      pageClass.trackPaymentUpdates(table);
+    }
+    var p = $('<p>').addClass('add').html('New payment amount').bind('click', function(e){
+      table.append(pageClass.amountRow('0', 'blank'));
+      pageClass.trackPaymentUpdates(table);
+    });
+    
+    div.append(p);
+    return div;
+  }
+  
+  this.amountRow = function(amount, description){
+    var tr = $('<tr class="amount">');
+    tr.append($('<td>').append($('<input type="text" class="paymentAmount">').val(amount)));
+    tr.append($('<td>').append($('<input type="text" class="paymentDescription">').val(description)));
+    return tr;
+  }
+  
+  this.trackPaymentUpdates = function(table){
+    var pageClass = this;
+    $('input', table).unbind('change');
+    $('input', table).bind('change', function(e){
+      var count;
+      $('tr.amount', table).each(function(i){
+        pageClass.setVariable('amount'+(i+1), $('.paymentAmount', this).eq(0).val());
+        pageClass.setVariable('description'+(i+1), $('.paymentDescription', this).eq(0).val());
+        count = i+1;
+      });
+      pageClass.setVariable('amounts', count);
+    });
+  }
+}
+PaymentPage.prototype = new ApplyPage();
+PaymentPage.prototype.constructor = PaymentPage;
+
+/**
  * The TextPage class
  */
 function TextPage(){

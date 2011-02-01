@@ -108,6 +108,7 @@ class ManageRolesController extends ManageController {
       'manage_programs',
       'manage_cycles',
       'manage_pagetypes',
+      'manage_paymenttypes',
       'manage_elementtypes',
       'applicants_view',
       'applicants_decisions',

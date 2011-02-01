@@ -130,6 +130,8 @@ abstract class AdminController extends JazzeeController{
       $menu->newLink(array('text'=>'Global Pages', 'href'=>$this->path("manage/globalpages/")));
     if($this->checkIsAllowed('manage_pagetypes'))
       $menu->newLink(array('text'=>'Page Types', 'href'=>$this->path("manage/pagetypes/")));
+    if($this->checkIsAllowed('manage_paymenttypes'))
+      $menu->newLink(array('text'=>'Payment Types', 'href'=>$this->path("manage/paymenttypes/")));
     if($this->checkIsAllowed('manage_elementtypes'))
       $menu->newLink(array('text'=>'Element Types', 'href'=>$this->path("manage/elementtypes/")));
     if($this->checkIsAllowed('manage_scores'))
