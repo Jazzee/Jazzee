@@ -151,9 +151,11 @@ abstract class AdminController extends JazzeeController{
     $menu = $navigation->newMenu();
     $menu->title = 'Applicants';
     if($this->checkIsAllowed('applicants_view'))
-      $menu->newLink(array('text'=>'View Applicants', 'href'=>$this->path("applicants/view/")));
+      $menu->newLink(array('text'=>'Search', 'href'=>$this->path("applicants/view/")));
+    if($this->checkIsAllowed('applicants_communication'))
+      $menu->newLink(array('text'=>'Communication', 'href'=>$this->path("applicants/communication/")));
     if($this->checkIsAllowed('applicants_decisions'))
-      $menu->newLink(array('text'=>'Admission Decisions', 'href'=>$this->path("applicants/decisions/")));
+      $menu->newLink(array('text'=>'Decisions', 'href'=>$this->path("applicants/decisions/")));
     
     
     $menu = $navigation->newMenu();

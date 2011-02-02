@@ -111,6 +111,7 @@ class ManageRolesController extends ManageController {
       'manage_paymenttypes',
       'manage_elementtypes',
       'applicants_view',
+      'applicants_communication',
       'applicants_decisions',
       'setup_application',
       'setup_pages',
