@@ -309,23 +309,27 @@ Decision:
 Communication:
   columns:
     parentID: integer
-    senderID: integer
-    recipientID: integer
-    senderType: 
-      type: enum
-      values: [applicant, user]
-    recipientType: 
+    applicantID: integer
+    userID: integer
+    sentBy: 
       type: enum
       values: [applicant, user]
     text: string(4000)
-  actAs:
-    Timestampable:
+    createdAt: timestamp
+    status: integer
   relations:
     Parent:
       class: Communication
       local: parentID
       foreign: id
       foreignAlias: Reply
+      foreignType: one
+    Applicant:
+      local: applicantID
+      foreign: id
+    User:
+      local: userID
+      foreign: id
       
 PaymentType:
   columns:

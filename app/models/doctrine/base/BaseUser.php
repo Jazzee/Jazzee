@@ -24,6 +24,7 @@
  * @property integer $defaultCycle
  * @property Program $Program
  * @property Cycle $Cycle
+ * @property Doctrine_Collection $Communication
  * @property Doctrine_Collection $Roles
  * 
  * @package    jazzee
@@ -119,6 +120,10 @@ abstract class BaseUser extends Doctrine_Record
              'foreign' => 'id',
              'onDelete' => 'SET NULL',
              'onUpdate' => 'CASCADE'));
+
+        $this->hasMany('Communication', array(
+             'local' => 'id',
+             'foreign' => 'userID'));
 
         $this->hasMany('UserRole as Roles', array(
              'local' => 'id',

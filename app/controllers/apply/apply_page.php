@@ -141,6 +141,7 @@ class ApplyPageController extends ApplyController {
 
     $applicant_menu = $navigation->newMenu();
     $applicant_menu->title = "User Menu";
+    $applicant_menu->newLink(array('text'=>'Support', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/support")));
     $applicant_menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/logout")));
     
     return $navigation;

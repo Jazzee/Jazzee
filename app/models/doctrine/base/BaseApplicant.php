@@ -26,7 +26,8 @@
  * @property Doctrine_Collection $Duplicates
  * @property Doctrine_Collection $Duplicate
  * @property Decision $Decision
- * @property Doctrine_Collection $Payment
+ * @property Doctrine_Collection $Communication
+ * @property Doctrine_Collection $Payments
  * @property Doctrine_Collection $Answers
  * 
  * @package    jazzee
@@ -139,7 +140,11 @@ abstract class BaseApplicant extends Doctrine_Record
              'local' => 'id',
              'foreign' => 'applicantID'));
 
-        $this->hasMany('Payment', array(
+        $this->hasMany('Communication', array(
+             'local' => 'id',
+             'foreign' => 'applicantID'));
+
+        $this->hasMany('Payment as Payments', array(
              'local' => 'id',
              'foreign' => 'applicantID'));
 

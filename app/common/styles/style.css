@@ -58,6 +58,9 @@ a:hover {color:#cc6600;}
 	font-weight: bold;
 }
 
+div.threaded div{
+  margin-left: 2em;	
+}
 /***** NAVIGATION Style *****/
 
 /* Horizontal/Dropdown Navigation */

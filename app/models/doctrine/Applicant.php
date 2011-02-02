@@ -125,4 +125,18 @@ class Applicant extends BaseApplicant{
   public function unlock(){
     $this->locked = null;
   }
+  
+  /**
+   * Get all of the communication threads involving the applicant
+   * @return Array of Communication
+   */
+  public function findCommunicationThreads(){
+    $q = Doctrine_Query::create()
+    ->select('*')
+    ->from('Communication')
+    ->where('parentID IS NULL')
+    ->AndWhere('applicantID=?', array($this->id))
+    ->orderBy('createdAt ASC');
+    return $q->execute();
+  }
 }
