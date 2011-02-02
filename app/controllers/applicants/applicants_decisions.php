@@ -8,7 +8,17 @@
  */
 class ApplicantsDecisionsController extends ApplicantsController {
   protected $layout = 'json';
-
+  
+    
+  /**
+   * Add the required JS
+   */
+  public function setUp(){
+    parent::setUp();
+    $this->addScript('common/scripts/status.js');
+    $this->addScript('common/scripts/decisions.js');
+  }
+  
   /**
    * Build the blank page
    */
