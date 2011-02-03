@@ -8,13 +8,10 @@
  
 class ApplyStatusController extends ApplyController {  
   /**
-   * Status level constants 
-   * Bitmask values so status levels can be compared
+   * Status array
+   * @var array
    */
-  const DENIED = 1;
-  const ADMITTED = 2;
-  const DECLINED = 4;
-  const ACCEPTED = 8;
+  protected $status;
   
   public function beforeAction(){
     parent::beforeAction();
@@ -25,18 +22,18 @@ class ApplyStatusController extends ApplyController {
       $this->afterAction();
       die();
     }
-    $status = 0;
+    $this->status = array('deny'=>false,'admit'=>false,'accept'=>false,'decline'=>false);
     if($this->applicant->relatedExists('Decision')){
       if($this->applicant->Decision->finalDeny)
-        $status = $status | ApplyStatusController::DENIED;
+        $this->status['deny'] = true;
       if($this->applicant->Decision->finalAdmit)
-        $status = $status | ApplyStatusController::ADMITTED;
+        $this->status['admit'] = true;
       if($this->applicant->Decision->declineOffer)
-        $status = $status | ApplyStatusController::DECLINED;
+        $this->status['decline'] = true;
       if($this->applicant->Decision->acceptOffer)
-        $status = $status | ApplyStatusController::ACCEPTED;
+        $this->status['accept'] = true;
     }
-    $this->setVar('status', $status);
+    $this->setVar('status', $this->status);
     $this->setVar('applicant', $this->applicant);
   }
   
@@ -45,6 +42,49 @@ class ApplyStatusController extends ApplyController {
    */
   public function actionIndex() {
     
+  }
+  
+  /**
+   * SIR Form
+   */
+  public function actionSir(){
+    $form = new Form;
+    $form->action = $this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status/sir");
+    $field = $form->newField();
+    $field->legend = 'Confirm Enrolment';
+    $field->instructions = 'You must confirm your enrollment by <strong><em>' . $this->applicant->Decision->offerResponseDeadline . '</em></strong>. If you do not confirm your enrollment your space may be released to another applicant.';
+    $element = $field->newElement('RadioList', 'confirm');
+    $element->label = 'Do you intend to register for the quarter in which you applied?';
+    $element->addItem(0,'No');
+    $element->addItem(1,'Yes');
+    $element->addValidator('NotEmpty');
+    $form->newButton('submit', 'Save');
+    $this->setVar('form', $form);
+    if($input = $form->processInput($this->post)){
+      if($input->confirm){
+        $this->applicant->Decision->acceptOffer();
+      } else {
+        $this->applicant->Decision->declineOffer();
+      }
+      $this->applicant->save();
+      $this->redirect($this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status"));
+    }
+  }
+  
+  /**
+   * Navigation
+   * @return Navigation
+   */
+  public function getNavigation(){
+    $navigation = new Navigation;
+    $menu = $navigation->newMenu();
+    $menu->title = 'Navigation';
+    $menu->newLink(array('text'=>'Your Status', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status")));
+    if($this->status['admit'] and (!$this->status['accept'] and !$this->status['decline']))
+      $menu->newLink(array('text'=>'Confirm Enrolment', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status/sir")));
+    $menu->newLink(array('text'=>'Get Help', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/support/")));
+    $menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/logout")));
+    return $navigation;
   }
   
 }
