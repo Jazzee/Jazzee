@@ -1,9 +1,6 @@
 Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine on
-  #prevent access to .svn directories
-  RewriteRule ^(.*/)?\.svn/ - [F,L]
-  ErrorDocument 403 "Access Forbidden"
 
   # Rewrite URLs of the form 'index.php?q=x':
   RewriteCond %{REQUEST_FILENAME} !-f
