@@ -1,7 +1,7 @@
 <?php
 require_once('../app/bootstrap.php');
 try {
-  $fc = new Lvc_FrontController();
+  $fc = new FoundationVC_FrontController();
   //do the easy stuff here becuase it is faster
   $basicRouter = new Lvc_RegexRewriteRouter;
   $basicRouter->addRoute('#^(?:.*)/?resource/(.*)$#i', array(
@@ -87,7 +87,7 @@ try {
   
   
   //Advanced routing needs preg_replace
-  $advancedRouter = new Lvc_FullRegexRewriteRouter;
+  $advancedRouter = new FoundationVC_FullRegexRewriteRouter();
   $advancedRouter->addRoute('#^admin/([^/]+)/?([^/]*)/?(.*)$#i', array(
     'controller' => 'admin_$1',
     'action' => '$2',

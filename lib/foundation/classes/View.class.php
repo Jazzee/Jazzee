@@ -21,7 +21,22 @@ class View extends Lvc_View{
    * @return bool
    */
   public function elementExists($name){
-    return Lvc_FoundationConfig::elementExists($name);
+    return FoundationVC_Config::elementExists($name);
   }
+  
+  /**
+	 * Overridden to user FoundationVC_Config
+	 * @see Lvc_View::renderElement()
+	 */
+	protected function renderElement($elementName, $data = array()) {
+		$view = FoundationVC_Config::getElementView($elementName, $data);
+		if (!is_null($view)) {
+			$view->setController($this->controller);
+			$view->output();
+		} else {
+			error_log('Unable to render element "' . $elementName . '"');
+			// throw new Lvc_Exception('Unable to render element "' . $elementName . '"');
+		}
+	}
 }
 ?>

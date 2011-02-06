@@ -16,38 +16,38 @@ Autoload::addAutoLoadPath(APP_ROOT . '/classes/');
 Autoload::addAutoLoadPath(APP_ROOT . '/models/');
 
 //Setup the Lvc options
-Lvc_Config::addControllerPath(APP_ROOT . '/controllers/');
-Lvc_Config::addControllerViewPath(APP_ROOT . '/views/');
-Lvc_Config::addLayoutViewPath(APP_ROOT . '/views/layouts/');
-Lvc_Config::addElementViewPath(APP_ROOT . '/views/elements/');
+FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/');
+FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/');
+FoundationVC_Config::addLayoutViewPath(APP_ROOT . '/views/layouts/');
+FoundationVC_Config::addElementViewPath(APP_ROOT . '/views/elements/');
 
-Lvc_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/forms/lvc_elements/');
-Lvc_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/navigation/lvc_elements/');
-Lvc_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/lvc_elements/');
+FoundationVC_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/forms/lvc_elements/');
+FoundationVC_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/navigation/lvc_elements/');
+FoundationVC_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/lvc_elements/');
 
 //Load apply controllers and views
-Lvc_Config::addControllerPath(APP_ROOT . '/controllers/apply/');
-Lvc_Config::addControllerViewPath(APP_ROOT . '/views/apply/');
+FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/apply/');
+FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/apply/');
 
 //Load admin controllers and views
-Lvc_Config::addControllerPath(APP_ROOT . '/controllers/admin/');
-Lvc_Config::addControllerViewPath(APP_ROOT . '/views/admin/');
+FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/admin/');
+FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/admin/');
 
 //Load manage controllers and views
-Lvc_Config::addControllerPath(APP_ROOT . '/controllers/manage/');
-Lvc_Config::addControllerViewPath(APP_ROOT . '/views/manage/');
+FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/manage/');
+FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/manage/');
 
 //Load setup controllers and views
-Lvc_Config::addControllerPath(APP_ROOT . '/controllers/setup/');
-Lvc_Config::addControllerViewPath(APP_ROOT . '/views/setup/');
+FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/setup/');
+FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/setup/');
 
 //Load applicants controllers and views
-Lvc_Config::addControllerPath(APP_ROOT . '/controllers/applicants/');
-Lvc_Config::addControllerViewPath(APP_ROOT . '/views/applicants/');
+FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/applicants/');
+FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/applicants/');
 
-Lvc_Config::setViewClassName('JazzeeView');
-Lvc_Config::setDefaultControllerName('apply_welcome');
-Lvc_Config::setDefaultControllerActionName('index');
+FoundationVC_Config::setViewClassName('JazzeeView');
+FoundationVC_Config::setDefaultControllerName('apply_welcome');
+FoundationVC_Config::setDefaultControllerActionName('index');
 
 //loading common scripts, themes, and styles
 Resource::getInstance()->addDirectory(APP_ROOT . '/common/scripts', 'common/scripts/', true);

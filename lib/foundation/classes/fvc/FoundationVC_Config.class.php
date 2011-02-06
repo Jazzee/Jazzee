@@ -1,11 +1,28 @@
 <?php
 /**
- * Override Lvc_Config to add some functionality
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package foundation
+ * FoundationVC
+ * 
+ * Mostly copied from LightVC - A lightweight view-controller framework.
+ * http://lightvc.org/
+ * 
+ * The original framework Copyright (c) 2007, Anthony Bush has been modified to meet the caching and 
+ * detection needs of our Foundation framework.
+ * 
+ * @author Anthony Bush
+ * @author Jonathan Johnson
+ * @version 1.0.4-foundation (2011-02-01)
+ * @package lightvc
+ * @see http://lightvc.org/
  **/
-class Lvc_FoundationConfig extends Lvc_Config {
+
+/**
+ * Configuration class for the LVC suite of classes.
+ *
+ * @package lightvc
+ * @author Anthony Bush
+ * @since 2007-04-20
+ **/
+class FoundationVC_Config extends Lvc_Config {
   /**
    *  Our cache
    *  @var Cache 
@@ -16,8 +33,23 @@ class Lvc_FoundationConfig extends Lvc_Config {
    * What we prefix our cached paths with
    * @const string
    */
-  const CACHE_PREFIX = 'FoundationLVCPath';
+  const CACHE_PREFIX = 'FoundationVCPath';
   
+  public static function prefixControllerPath($path) {
+    array_unshift(self::$controllerPaths, $path);
+  }
+  public static function prefixControllerViewPath($path) {
+    array_unshift(self::$controllerViewPaths, $path);
+  }
+  public static function prefixLayoutViewPath($path) {
+    array_unshift(self::$layoutViewPaths, $path);
+  }
+  public static function prefixElementViewPath($path) {
+    array_unshift(self::$elementViewPaths, $path);
+  }
+	
+	// Retrieval Methods
+ 
   /**
    * Get the path to a controller include
    * @param string $controllerName
@@ -85,12 +117,12 @@ class Lvc_FoundationConfig extends Lvc_Config {
 	}
 	
 	public static function getElementView($elementName, &$data = array()) {
-	  $file = self::getViewPath($viewName, 'element', self::$elementViewPaths, self::$elementViewSuffix);
+	  $file = self::getViewPath($elementName, 'element', self::$elementViewPaths, self::$elementViewSuffix);
     return new self::$viewClassName($file, $data);
 	}
 	
 	public static function getLayoutView($layoutName, &$data = array()) {
-	  $file = self::getViewPath($viewName, 'layout', self::$layoutViewPaths, self::$layoutViewSuffix);
+	  $file = self::getViewPath($layoutName, 'layout', self::$layoutViewPaths, self::$layoutViewSuffix);
     return new self::$viewClassName($file, $data);
 	}
   
@@ -112,18 +144,4 @@ class Lvc_FoundationConfig extends Lvc_Config {
     }  
     return false;
   }
-  
-  public static function prefixControllerPath($path) {
-    array_unshift(self::$controllerPaths, $path);
-  }
-  public static function prefixControllerViewPath($path) {
-    array_unshift(self::$controllerViewPaths, $path);
-  }
-  public static function prefixLayoutViewPath($path) {
-    array_unshift(self::$layoutViewPaths, $path);
-  }
-  public static function prefixElementViewPath($path) {
-    array_unshift(self::$elementViewPaths, $path);
-  }
 }
-?>

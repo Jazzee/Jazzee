@@ -6,7 +6,7 @@
  * @license http://jazzee.org/license.txt
  * @package foundation
  **/
-class Lvc_FullRegexRewriteRouter extends Lvc_RegexRewriteRouter {
+class FoundationVC_FullRegexRewriteRouter extends Lvc_RegexRewriteRouter {
   
   public function route($request) {
     $params = $request->getParams();

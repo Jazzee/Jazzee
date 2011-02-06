@@ -97,7 +97,7 @@ abstract class AdminController extends JazzeeController{
    * @return bool
    */
   public function checkIsAllowed($controller, $action = 'index'){
-    Lvc_FoundationConfig::includeController($controller);
+    FoundationVC_Config::includeController($controller);
     $programID = $this->program?$this->program->id:null;
     $cycleID = $this->cycle?$this->cycle->id:null;
     return call_user_func(array(Lvc_Config::getControllerClassName($controller), 'isAllowed'),$controller, $action, $this->user, $programID, $cycleID, $this->actionParams);
