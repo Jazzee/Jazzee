@@ -53,5 +53,5 @@ varPath=
 adminEmail=
 ;The timezone this machine is located in.  A list of supported options can be found at http://php.net/manual/en/timezones.php
 timezone=America/Los_Angeles
-;The default theme to load.
-theme=default
+;Call this bootstrap file to load local customizations
+localBootstrap=

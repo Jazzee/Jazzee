@@ -68,35 +68,8 @@ if (!PEAR::isError($root)) {
     if(is_dir($overridePath . '/views')) Lvc_FoundationConfig::prefixControllerViewPath($overridePath . '/views/');
     if(is_dir($overridePath . '/elements')) Lvc_FoundationConfig::prefixElementViewPath($overridePath . '/elements/');
   }
-  
-  $theme = $arr['root']['system']['theme'];
-  $theme_name = $theme;
-  //attempting to load theme specific resources. CAN potentially overwrite default resources.
-  if(strcasecmp($theme, "default") != 0) {
-     //expected path root for storing theme specific files. Can be changed if necessary
-     $styles_path = APP_ROOT . '/common/styles/';
-     $images_path = APP_ROOT . '/common/images/';
-     $scripts_path = APP_ROOT . '/common/scripts/';
-     
-     //theme styles, if exists.
-     if (is_dir($styles_path . $theme)) {
-        Resource::getInstance()->addDirectory($styles_path . $theme, 'common/styles/');
-     }
-     
-     //theme images, if exists.
-     if (is_dir($images_path . $theme)) {
-        Resource::getInstance()->addDirectory($images_path . $theme, 'common/images/');
-     }
-     
-     //theme scripts, if exists.
-     if (is_dir($scripts_path . $theme)) {
-        //Resource::getInstance()->addDirectory($scripts_path . $theme, 'common/scripts/');
-     }
-     
-     if (!file_exists(APP_ROOT . '/views/layouts/' . $theme_name . ".php")) {
-     	$theme_name = 'default'; 
-     }
+  if(!is_null($arr['root']['system']['localBootstrap'])){
+    require_once($arr['root']['system']['localBootstrap']);
   }
-  define('THM_NAME', $theme_name);
 }
 ?>

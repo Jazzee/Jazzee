@@ -196,9 +196,8 @@ class InstallController extends Controller {
     $system->createComment('The timezone this machine is located in.  A list of supported options can be found at http://php.net/manual/en/timezones.php');
     $system->createDirective('timezone', date_default_timezone_get());
 
-    //hook to set the theme from the config form
-    $system->createComment('The default theme to load.');
-    $system->createDirective('theme', null);
+    $system->createComment(';Call this bootstrap file to load local customizations.');
+    $system->createDirective('localBootstrap', null);
 
     $c->setRoot($config);
     
@@ -247,14 +246,6 @@ class InstallController extends Controller {
     $type = $field->newElement('RadioList', 'forceSSL', array('label'=>'Require SSL', 'value'=>1));
     $type->addItem(1, 'SSL is required');
     $type->addItem(0, 'SSL is not required');
-
-    $field = $form->newField(array('legend'=>'Theme Settings'));
-    $_element = $field->newElement('TextInput', 'theme');
-    $_element->label = 'Theme Name/Directory';
-    $_element->setValue('default');
-    $_element->addValidator('NotEmpty');
-    
-    //$_element = $field->newElement('TextInput', 'theme', array('label'=>'Theme Name/Directory', 'value'=>'default'), array('NotEmpty'=>true));
     
     //Table prefixing is not yet supported in Doctrine
     //$field->newElement('TextInput', 'dbPrefix', array('label'=>'Table Prefix', 'instructions'=>'If you are using a shared database a prefix allows Jazee to keep your tables seperate'));
@@ -275,7 +266,6 @@ class InstallController extends Controller {
     $dsn = $input->dbBackend . '://' . $input->dbUser . ':' . $input->dbPass . '@' . $input->dnHost . '/' . $input->dbName;
     $config->getItem('section', 'system')->getItem('directive', 'dsn')->setContent($dsn);
     $config->getItem('section', 'system')->getItem('directive', 'forceSSL')->setContent($input->forceSSL);
-    $config->getItem('section', 'system')->getItem('directive', 'theme')->setContent($input->theme);
     /*
     //Table prefixing is not yet supported in doctrine
     if (!empty($input['dbPrefix'])) {
@@ -375,7 +365,6 @@ class InstallController extends Controller {
       $c->session_lifetime = 3600;
       $c->session_name = 'JazzeeOnlineApplication';
       $c->pretty_urls = false;
-      $c->theme_path = SRC_ROOT . '/themes/dusk/dusk.theme.php';
       return true;
     } catch (Exception $e) {
       $this->messages[] = $e->getMessage();
