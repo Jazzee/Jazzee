@@ -81,6 +81,7 @@ Page:
     min: integer
     max: integer
     optional: boolean
+    showAnswerStatus: boolean
     instructions: string(3000)
     leadingText: string(3000)
     trailingText: string(3000)

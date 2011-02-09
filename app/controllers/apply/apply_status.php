@@ -41,7 +41,13 @@ class ApplyStatusController extends ApplyController {
    * Display the page
    */
   public function actionIndex() {
-    
+    $pages = array();
+    foreach($this->application->Pages as $page){
+      if($page->Page->showAnswerStatus == true){
+        $pages[] = $this->pages[$page->id];
+      }
+    }
+    $this->setVar('answerStatusPages', $pages);
   }
   
   /**

@@ -20,6 +20,7 @@ FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/');
 FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/');
 FoundationVC_Config::addLayoutViewPath(APP_ROOT . '/views/layouts/');
 FoundationVC_Config::addElementViewPath(APP_ROOT . '/views/elements/');
+FoundationVC_Config::addElementViewPath(APP_ROOT . '/views/page_type_elements/');
 
 FoundationVC_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/forms/lvc_elements/');
 FoundationVC_Config::addElementViewPath(SRC_ROOT . '/lib/foundation/classes/navigation/lvc_elements/');

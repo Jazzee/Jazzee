@@ -10,6 +10,7 @@
  * @property integer $min
  * @property integer $max
  * @property boolean $optional
+ * @property boolean $showAnswerStatus
  * @property string $instructions
  * @property string $leadingText
  * @property string $trailingText
@@ -45,6 +46,9 @@ abstract class BasePage extends Doctrine_Record
              'type' => 'integer',
              ));
         $this->hasColumn('optional', 'boolean', null, array(
+             'type' => 'boolean',
+             ));
+        $this->hasColumn('showAnswerStatus', 'boolean', null, array(
              'type' => 'boolean',
              ));
         $this->hasColumn('instructions', 'string', 3000, array(

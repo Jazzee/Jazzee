@@ -22,6 +22,7 @@ function ApplyPage(){
   this.instructions;
   this.leadingText;
   this.trailingText;
+  this.showAnswerStatus;
   this.weight;
   this.type;
   this.variables;
@@ -52,6 +53,7 @@ function ApplyPage(){
     this.instructions = obj.instructions;
     this.leadingText = obj.leadingText;
     this.trailingText = obj.trailingText;
+    this.showAnswerStatus = obj.showAnswerStatus;
     this.pageType = obj.pageType;
     this.weight = obj.weight;
     this.elements = {};
@@ -105,7 +107,15 @@ function ApplyPage(){
   }
   
   this.setVariable = function(name, value){
-    this.variables[name] = {name : name, value: value};
+    if(name in this.variables){
+      if(this.variables[name].value != value){
+        this.variables[name] = {name : name, value: value};
+        this.isModified = true;
+      }
+    } else {
+      this.variables[name] = {name : name, value: value};
+      this.isModified = true;
+    }
   }
   
   this.getVariable = function(name){
@@ -114,8 +124,10 @@ function ApplyPage(){
   }
   
   this.setProperty = function(property, value){
-    this[property] = value;
-    this.isModified = true;
+    if(this[property] !== value){
+      this[property] = value;
+      this.isModified = true;
+    }
   }
   
   this.deletePageBlock = function(){
@@ -238,6 +250,29 @@ function ApplyPage(){
     return p;
   }
   
+  this.showAnswerStatusBlock = function(){
+    var value = 'not shown';
+    if(this.showAnswerStatus == 1) value = 'shown';
+    var p = $('<p>').addClass('edit showAnswerStatus').html('Answer status ').append($('<span>').html(value).bind('click', {pageClass: this}, function(e){
+      $(this).unbind('click');
+      var field = $('<select>');
+      var shown = $('<option>').attr('value', 1).html('Shown');
+      if(e.data.pageClass.showAnswerStatus == 1) shown.attr('selected', true);
+      field.append(shown);
+      var notshown = $('<option>').attr('value', 0).html('Not Shown');
+      if(e.data.pageClass.showAnswerStatus == 0) notshown.attr('selected', true);
+      field.append(notshown);
+      field.bind('change', {pageClass: e.data.pageClass}, function(e){
+        e.data.pageClass.setProperty('showAnswerStatus', $(this).val());
+      });
+      field.bind('blur', {pageClass: e.data.pageClass}, function(e){
+        $(this).parent().parent().html(e.data.pageClass.showAnswerStatusBlock());
+      });
+      $(this).empty().append(field);
+    }));
+    return p;
+  }
+  
   this.minBlock = function(){
     var value = 'No minimum';
     if(this.min > 0) value = this.min;
@@ -297,6 +332,7 @@ function ApplyPage(){
         min: this.min,
         max: this.max,
         optional: this.optional,
+        showAnswerStatus: this.showAnswerStatus,        
         instructions: this.instructions,
         leadingText: this.leadingText,
         trailingText: this.trailingText,
@@ -343,6 +379,7 @@ function ApplyPage(){
     if(this.showMin) $('#workspace-right-top').append(this.minBlock());
     if(this.showMax) $('#workspace-right-top').append(this.maxBlock());
     if(this.showOptional) $('#workspace-right-top').append(this.optionalBlock());
+    $('#workspace-right-top').append(this.showAnswerStatusBlock());
     
     $('#workspace-right-bottom').append(this.deletePageBlock());
     if(this.hasElements){
@@ -373,12 +410,86 @@ function ApplyPage(){
     }
     $('#workspace-left-middle-left div.field:first').trigger('click');
   }
+  
+  this.makeReplacementText = function(text){
+    text = text.replace(/\s+/, '_');
+    replacementText = '%' + text.toUpperCase() + '%';
+    return replacementText;
+  }
 }
 
 /**
  * The StandardPage class
  */
-function StandardPage(){}
+function StandardPage(){
+	this.showAnswerStatusBlock = function(){
+	  var pageClass = this;
+		var value = 'not shown';
+		if(this.showAnswerStatus == 1) value = 'shown';
+		var p = $('<p>').addClass('edit showAnswerStatus').html('Answer status ').append($('<span>').html(value)).bind('click', function(e){
+		  $(this).unbind('click');
+
+		  var obj = new FormObject();
+		  var field = obj.newField({name: 'legend', value: 'Answer Status'});
+		  var element = field.newElement('RadioList', 'showAnswerStatus');
+		  element.label = 'Show status on this page?';
+		  element.required = true;
+		  element.addItem('Yes', 1);
+		  element.addItem('No', 0);
+		  element.value = pageClass.showAnswerStatus;
+		  var element = field.newElement('TextInput', 'title');
+		  element.label = 'Title';
+      element.required = true;
+      element.value = pageClass.getVariable('answerStatusTitle');
+      var element = field.newElement('TextInput', 'text');
+      element.label = 'Text';
+      element.value = pageClass.getVariable('answerStatusText');
+      element.instructions = 'The following will be replaced with the applicants input on this answer:';
+      for(var i =0; i < pageClass.elementsOrder.length; i++){
+        if(pageClass.elementsOrder[i] in pageClass.elements){
+          var el = pageClass.elements[pageClass.elementsOrder[i]];
+          element.instructions += '<br />' + pageClass.makeReplacementText(el.title) + ': ' + el.title;
+        }
+      }
+      element.required = true;
+      
+		  var form = new Form();
+		  var formObject = form.create(obj);
+		  $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
+		  
+		  var div = $('<div>');
+	    div.css("overflow-y", "auto");
+	    div.html(formObject);
+	    div.dialog({
+	      modal: true,
+	      autoOpen: true,
+	      position: 'center',
+	      width: 800,
+	      close: function() {
+	        div.dialog("destroy").remove();
+	      }
+	    });
+	    $('form', div).unbind().bind('submit',function(e){
+	      var show = $('input[name=showAnswerStatus]', this).val();
+	      if(show != pageClass.showAnswerStatus){
+	        pageClass.setProperty('showAnswerStatus',show);
+	      }
+	      if(show == 1){
+	        var title = $('input[name=title]', this).val();
+	        var text = $('input[name=text]', this).val();
+	      } else {
+	        var title = null;
+	        var text = null;
+	      }
+	      pageClass.setVariable('answerStatusTitle', title);
+        pageClass.setVariable('answerStatusText', text);
+        div.dialog("destroy").remove();
+	      return false;
+	    });//end submit
+		});
+		return p;
+  }
+}
 StandardPage.prototype = new ApplyPage();
 StandardPage.prototype.constructor = StandardPage;
 

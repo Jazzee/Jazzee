@@ -163,6 +163,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
         $applicationPage->min = $data->min;
         $applicationPage->max = $data->max;
         $applicationPage->optional = $data->optional;
+        $applicationPage->Page->showAnswerStatus = $data->showAnswerStatus;
         $applicationPage->instructions = $data->instructions;
         $applicationPage->leadingText = $data->leadingText;
         $applicationPage->trailingText = $data->trailingText;
@@ -181,6 +182,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
         $applicationPage->min = $data->min;
         $applicationPage->max = $data->max;
         $applicationPage->optional = $data->optional;
+        $applicationPage->Page->showAnswerStatus = $data->showAnswerStatus;
         $applicationPage->instructions = $data->instructions;
         $applicationPage->leadingText = $data->leadingText;
         $applicationPage->trailingText = $data->trailingText;

@@ -19,3 +19,4 @@ if(!$applicant->locked):?>
 <?php else:?>
   <h2>Application Status: <em>Under Review</em></h2>
 <?php endif;?>
+<?php foreach($answerStatusPages as $page) $this->renderElement(get_class($page) . '-answer_status', array('page'=> $page)); ?>
