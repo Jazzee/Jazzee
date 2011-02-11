@@ -69,7 +69,7 @@ if (!PEAR::isError($root)) {
     if(is_dir($overridePath . '/views')) Lvc_FoundationConfig::prefixControllerViewPath($overridePath . '/views/');
     if(is_dir($overridePath . '/elements')) Lvc_FoundationConfig::prefixElementViewPath($overridePath . '/elements/');
   }
-  if(!is_null($arr['root']['system']['localBootstrap'])){
+  if(!empty($arr['root']['system']['localBootstrap'])){
     require_once($arr['root']['system']['localBootstrap']);
   }
 }
