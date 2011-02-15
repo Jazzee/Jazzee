@@ -28,10 +28,20 @@ class SetupPagesController extends SetupController implements PagesInterface {
     $this->addScript('foundation/scripts/form.js');
     $this->addScript('common/scripts/status.js');
     $this->addScript('common/scripts/authenticationTimeout.js');
-    $this->addScript('common/scripts/pages/Page.js');
-    $this->addScript('common/scripts/pages/Element.js');
-    $this->addScript('common/scripts/pages/PageStore.js');
-    $this->addScript('common/scripts/pages.js');
+    
+    $this->addScript('common/scripts/page_types/ApplyPage.class.js');
+    $types = Doctrine::getTable('PageType')->findAll(Doctrine::HYDRATE_ARRAY);
+    foreach($types as $type){
+      $this->addScript("common/scripts/page_types/{$type['class']}.class.js");
+    }
+    $this->addScript('common/scripts/element_types/ApplyElement.class.js');
+    $this->addScript('common/scripts/element_types/ListElement.class.js');
+    $types = Doctrine::getTable('ElementType')->findAll(Doctrine::HYDRATE_ARRAY);
+    foreach($types as $type){
+      $this->addScript("common/scripts/element_types/{$type['class']}.class.js");
+    }
+    $this->addScript('common/scripts/classes/PageStore.class.js');
+    $this->addScript('common/scripts/controllers/setup_pages.controller.js');
    
     $this->addCss('common/styles/pages.css');
     
@@ -186,6 +196,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
         $applicationPage->instructions = $data->instructions;
         $applicationPage->leadingText = $data->leadingText;
         $applicationPage->trailingText = $data->trailingText;
+        $applicationPage->weight = $data->weight;
         if(!$applicationPage->Page->isGlobal){
           foreach($data->variables as $v){
             $applicationPage->Page->setVar($v->name, $v->value);
