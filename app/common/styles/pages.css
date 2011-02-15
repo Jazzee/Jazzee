@@ -32,7 +32,7 @@ ol.add-list li{
 
 #workspace p, #save-pages{
   padding-left: 16px;
-  background-repeat: no-repeat
+  background-repeat: no-repeat;
 }
 
 p.edit{
@@ -53,6 +53,16 @@ p.save{
 
 p.add{
   background-image: url('resource/foundation/icons/add.png');
+}
+
+span.deactivate{
+  background-image: url('resource/foundation/icons/bullet_delete.png');
+  padding-left: 16px;
+  background-repeat: no-repeat;
+}
+
+div.listItems li.inactive{
+	text-decoration: line-through;
 }
 
 #status-bar img {
