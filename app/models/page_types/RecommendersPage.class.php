@@ -207,7 +207,7 @@ class RecommendationAnswer extends StandardAnswer {
     $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_EMAIL);
     $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_PHONE);
     $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_WAIVE_RIGHT);
-    $text = str_ireplace($search, $replace, $this->answer->Page->getVar('recommenderEmail'));
+    $text = str_ireplace($search, $replace, $this->answer->Page->getVar('recommenderEmailText'));
 
     $message = new EmailMessage;
     $message->to($this->getDisplayValueForFixedElement(RecommendersPage::FID_EMAIL), '');
