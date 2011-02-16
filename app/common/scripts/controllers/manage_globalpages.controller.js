@@ -35,7 +35,7 @@ $(document).ready(function(){
       var pageType = this;
       var li = $('<li>').html(pageType.name);
       li.bind('click', function(){
-        var page = new window[pageType.class].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.id,pageType.class,'new',pageStore);
+        var page = new window[pageType.class].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.class,'new',pageStore);
         pageStore.addPage(page);
       });
       ol.append(li);

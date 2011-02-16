@@ -26,7 +26,7 @@ StandardPage.prototype.workspace = function(){
       var elementType = this;
       var li = $('<li>').html(elementType.name);
       $(li).bind('click',function(e){
-        var element = new window[elementType.class].prototype.newElement('new' + pageClass.pageStore.getUniqueId(),'New ' + elementType.name + ' Element',elementType.id,elementType.class,'new',pageClass);
+        var element = new window[elementType.class].prototype.newElement('new' + pageClass.pageStore.getUniqueId(),'New ' + elementType.name + ' Element',elementType.class,'new',pageClass);
         pageClass.addElement(element);
         element.workspace();
         pageClass.synchronizeElementList();

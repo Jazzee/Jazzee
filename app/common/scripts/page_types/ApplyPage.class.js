@@ -8,7 +8,7 @@ function ApplyPage(){
   this.pageStore;
   this.pageId;
   this.applicationPageId;
-  this.pageType;
+  this.className;
   this.isGlobal;
   this.title;
   this.min;
@@ -39,7 +39,7 @@ ApplyPage.prototype.init = function(pageObject, pageStore){
   this.pageStore = pageStore;
   this.pageId = pageObject.pageId;
   this.applicationPageId = pageObject.applicationPageId;
-  this.pageType = pageObject.pageType;
+  this.className = pageObject.className;
   this.title = pageObject.title;
   this.isGlobal = pageObject.isGlobal;
   this.min = pageObject.min;
@@ -66,13 +66,13 @@ ApplyPage.prototype.init = function(pageObject, pageStore){
  * @param {String} id the id to use
  * @returns {ApplyPage}
  */
-ApplyPage.prototype.newPage = function(id,title,pageType,pageClass,status,pageStore){
+ApplyPage.prototype.newPage = function(id,title,className,status,pageStore){
   var obj = {
     pageId: id,
     applicationPageId: id,
-    pageType: pageType,
+    className: className,
     title: title,
-    isGlobal = false,
+    isGlobal: false,
     min: 0,
     max: 0,
     optional: false,
@@ -82,7 +82,7 @@ ApplyPage.prototype.newPage = function(id,title,pageType,pageClass,status,pageSt
     trailingText: '',
     weight: 0
   };
-  var page = new window[pageClass]();
+  var page = new window[className]();
   page.init(obj, pageStore);
   page.status = status;
   page.isModified = true;
@@ -361,6 +361,7 @@ ApplyPage.prototype.selectListVariableBlock = function(variableName, description
  */
 ApplyPage.prototype.getDataObject = function(){
   var obj = {
+    className: this.className,
     pageId: this.pageId,
     applicationPageId: this.applicationPageId,
     status: this.status,
@@ -373,7 +374,6 @@ ApplyPage.prototype.getDataObject = function(){
     leadingText: this.leadingText,
     trailingText: this.trailingText,
     weight: this.weight,
-    pageType: this.pageType,
     variables: this.variables,
     elements: [],
     children: []
@@ -421,7 +421,7 @@ ApplyPage.prototype.workspace = function(){
   $('#workspace-left-top').append(this.textInputBlock('leadingText', 'click to edit'));
   $('#workspace-left-top').append(this.textAreaBlock('instructions', 'click to edit'));
   $('#workspace-left-bottom-left').append(this.textAreaBlock('trailingText', 'click to edit'));
-  
+
   $('#workspace-right-top').append(this.previewPageBlock());
   var min = {0: 'No Minimum'};
   for(var i = 1; i<=50;i++){

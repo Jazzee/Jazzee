@@ -11,8 +11,8 @@ RecommendersPage.prototype.constructor = RecommendersPage;
  * @param {String} id the id to use
  * @returns {RecommendersPage}
  */
-RecommendersPage.prototype.newPage = function(id,title,pageType,pageClass,status,pageStore){
-  var page = ApplyPage.prototype.newPage.call(this, id,title,pageType,pageClass,status,pageStore);
+RecommendersPage.prototype.newPage = function(id,title,pageClass,status,pageStore){
+  var page = ApplyPage.prototype.newPage.call(this, id,title,pageClass,status,pageStore);
   page.setVariable('lorDeadline', null);
   page.setVariable('lorDeadlineEnforced', 0);
   page.setVariable('recommenderEmailText', "Dear %RECOMMENDER_FIRST_NAME% %RECOMMENDER_LAST_NAME%,\n"
@@ -21,7 +21,7 @@ RecommendersPage.prototype.newPage = function(id,title,pageType,pageClass,status
       + "Click the following link to access the online system; or, you may need to copy and paste this link into your browser. \n"
       + "%LINK% \n"
       + "Questions or comments about submitting your recommendation may be addressed to %PROGRAM_CONTACT_NAME% %PROGRAM_CONTACT_EMAIL%");
-  var recommendation = new StandardPage.prototype.newPage('newpage' + pageStore.getUniqueId(),'Recommendation',2,'StandardPage','new',pageStore);
+  var recommendation = new StandardPage.prototype.newPage('newpage' + pageStore.getUniqueId(),'Recommendation','StandardPage','new',pageStore);
   page.addChild(recommendation);
   return page;
 };

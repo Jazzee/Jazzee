@@ -37,7 +37,7 @@ BranchingPage.prototype.listBranchingPagesBlock = function(){
     ol.append(li);
   }
   var p = $('<p>').addClass('add').html('New Branch').bind('click',function(){
-    var branch = new StandardPage.prototype.newPage('newpage' + pageClass.pageStore.getUniqueId(),'New Branch',2,'StandardPage','new',pageClass.pageStore);
+    var branch = new StandardPage.prototype.newPage('newpage' + pageClass.pageStore.getUniqueId(),'New Branch','StandardPage','new',pageClass.pageStore);
     pageClass.addChild(branch);
     div.replaceWith(pageClass.listBranchingPagesBlock());
   });

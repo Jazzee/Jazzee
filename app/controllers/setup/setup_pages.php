@@ -87,11 +87,11 @@ class SetupPagesController extends SetupController implements PagesInterface {
   protected function pageArray(Page $page){
     $arr = $page->toArray(false);
     $arr['pageId'] = $arr['id'];
-    $arr['type'] = $page->PageType->class;
+    $arr['className'] = $page->PageType->class;
     $arr['elements'] = array();
     foreach($page->Elements as $element){
       $e = $element->toArray();
-      $e['type'] = $element->ElementType->class;
+      $e['className'] = $element->ElementType->class;
       $e['list'] = array();
       foreach($element->ListItems as $item){
         $e['list'][] = array(
@@ -181,7 +181,8 @@ class SetupPagesController extends SetupController implements PagesInterface {
       case 'new':
         $applicationPage = $this->application->Pages->get(null);
         $applicationPage->Page->isGlobal = false;
-        $applicationPage->Page->pageType = $data->pageType;
+        $pageType = Doctrine::getTable('PageType')->findOneByClass($data->className);
+        $applicationPage->Page->pageType = $pageType->id;
         //let the class make modifications if it needs to 
         //no idea why this has to be done in two steps, but it was failing without the interim $className variable
         $className = $applicationPage->Page->PageType->class;
@@ -210,7 +211,8 @@ class SetupPagesController extends SetupController implements PagesInterface {
               case 'new':
                 $childPage = $applicationPage->Page->Children->get(null);
                 $childPage->isGlobal = false;
-                $childPage->pageType = $child->pageType;
+                $pageType = Doctrine::getTable('PageType')->findOneByClass($child->className);
+                $childPage->pageType = $pageType->id;
               case 'save':
                 if(!isset($childPage)) $childPage = $applicationPage->Page->getChildById($child->pageId);
                 $childPage->title = $child->title;
@@ -247,7 +249,8 @@ class SetupPagesController extends SetupController implements PagesInterface {
           break;
         case 'new':
             $element = $page->Elements->get(null);
-            $element->elementType = $e->elementType;
+            $elementType = Doctrine::getTable('ElementType')->findOneByClass($e->className);
+            $element->elementType = $elementType->id;
         default:
           if(!isset($element)) $element = $page->getElementByID($e->id);
           $element->title = $e->title;

@@ -35,7 +35,7 @@ $(document).ready(function(){
       var pageType = this;
       var li = $('<li>').html(pageType.name);
       li.bind('click', function(){
-        var page = new window[pageType.class].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.id,pageType.class,'new',pageStore);
+        var page = new window[pageType.class].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.class,'new',pageStore);
         pageStore.addPage(page);
       });
       ol.append(li);
@@ -48,7 +48,7 @@ $(document).ready(function(){
       var globalPage = this;
       var li = $('<li>').html(globalPage.title);
       li.bind('click', function(){
-        var page = new window[globalPage.type].prototype.newPage(globalPage.id,globalPage.title,globalPage.pageType,globalPage.type,'new-global',pageStore);
+        var page = new window[globalPage.className].prototype.newPage(globalPage.id,globalPage.title,globalPage.className,'new-global',pageStore);
         page.isGlobal = true;
         pageStore.addPage(page);
       });

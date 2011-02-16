@@ -42,10 +42,10 @@ PageStore.prototype.refreshPageList = function(){
  */
 PageStore.prototype.createPageObject = function(obj){
   var pageStore = this;
-  var page = new window[obj.type]();
+  var page = new window[obj.className]();
   page.init(obj, pageStore);
   $(obj.elements).each(function(i,element){
-    var Element = new window[element.type]();
+    var Element = new window[element.className]();
     Element.init(element, page);
     $(element.list).each(function(){
       Element.addListItem(this);

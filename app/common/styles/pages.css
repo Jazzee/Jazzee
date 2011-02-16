@@ -55,6 +55,10 @@ p.add{
   background-image: url('resource/foundation/icons/add.png');
 }
 
+p.copy{
+  background-image: url('resource/foundation/icons/page_copy.png');
+}
+
 span.deactivate{
   background-image: url('resource/foundation/icons/bullet_delete.png');
   padding-left: 16px;

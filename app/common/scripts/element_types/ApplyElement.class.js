@@ -7,7 +7,7 @@
 function ApplyElement(){
   this.page;
   this.id;
-  this.elementType,
+  this.className,
   this.title;
   this.format;
   this.instructions;
@@ -30,7 +30,7 @@ function ApplyElement(){
 ApplyElement.prototype.init = function(obj, page){
   this.page = page;
   this.id = obj.id;
-  this.elementType = obj.elementType,
+  this.className = obj.className,
   this.title = obj.title;
   this.instructions = obj.instructions;
   this.format = obj.format;
@@ -51,11 +51,11 @@ ApplyElement.prototype.init = function(obj, page){
  * @param {String} id the id to use
  * @returns {ApplyElement}
  */
-ApplyElement.prototype.newElement = function(id,title,elementType,elementClass,status,page){
+ApplyElement.prototype.newElement = function(id,title,className,status,page){
   var obj = {
     id: id,
     title: title,
-    elementType: elementType,
+    className: className,
     format: '',
     instructions: '',
     defaultValue: '',
@@ -64,7 +64,7 @@ ApplyElement.prototype.newElement = function(id,title,elementType,elementClass,s
     max: null,
     weight: null
   };
-  var element = new window[elementClass]();
+  var element = new window[className]();
   element.init(obj, page);
   element.status = status;
   element.isModified = true;
@@ -173,7 +173,7 @@ ApplyElement.prototype.editTitleBlock = function(){
 ApplyElement.prototype.getDataObject = function(){
   var obj = {
     id: this.id,
-    elementType: this.elementType,
+    className: this.className,
     status: this.status,
     title: this.title,
     format: this.format,
