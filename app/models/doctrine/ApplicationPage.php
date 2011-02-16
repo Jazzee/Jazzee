@@ -1,6 +1,7 @@
 <?php
 /**
  * ApplicationPage
+ * Override all several getters and setters so Page data gets used when it isn't overridden
  * @package    jazzee
  * @subpackage orm
  * @author     Jon Johnson <jon.johnson@ucsf.edu>
@@ -8,22 +9,16 @@
  */
 class ApplicationPage extends BaseApplicationPage{
   
-  /**
-   * Override the get method to check the Page when nothing is set in ApplicationPage
-   *
-   * @param mixed $fieldName
-   * @param boolean $load whether or not to invoke the loading procedure
-   * @return mixed
+ /**
+   * Get the title
+   * If the title is not overridde then use the one from Page
    */
-  public function get($fieldName, $load = true){
-    $fields = array('title', 'min', 'max', 'optional', 'instructions', 'leadingText', 'trailingText');
-    if(in_array($fieldName, $fields)){
-      if(is_null($this->_data[$fieldName]) or is_a($this->_data[$fieldName], 'Doctrine_Null')){
-        return $this->Page->$fieldName;
-      }
+  public function getTitle(){
+    if(is_null($this->_data['title']) OR ($this->_data['title'] instanceof Doctrine_Null)){
+      return $this->Page->title;
     }
-    return parent::get($fieldName, $load);
-  }  
+    return $this->_get('title');
+  }
   
   /**
    * Set the title
@@ -37,6 +32,16 @@ class ApplicationPage extends BaseApplicationPage{
     return $this->_set('title',$value);
   }
   
+ /**
+   * Get the min
+   */
+  public function getMin(){
+    if(is_null($this->_data['min']) OR ($this->_data['min'] instanceof Doctrine_Null)){
+      return $this->Page->min;
+    }
+    return $this->_get('min');
+  }
+  
 /**
    * Set the min
    * If this isn't a global page then store the min in Page and not here
@@ -47,6 +52,16 @@ class ApplicationPage extends BaseApplicationPage{
       return $this->Page->min = $value;
     }
     return $this->_set('min',$value);
+  }
+
+ /**
+   * Get the max
+   */
+  public function getMax(){
+    if(is_null($this->_data['max']) OR ($this->_data['max'] instanceof Doctrine_Null)){
+      return $this->Page->max;
+    }
+    return $this->_get('max');
   }
   
 /**
@@ -61,7 +76,17 @@ class ApplicationPage extends BaseApplicationPage{
     return $this->_set('max',$value);
   }
   
-/**
+  /**
+   * Get the optional
+   */
+  public function getOptional(){
+    if(is_null($this->_data['optional']) OR ($this->_data['optional'] instanceof Doctrine_Null)){
+      return $this->Page->optional;
+    }
+    return $this->_get('optional');
+  }
+  
+  /**
    * Set the optional
    * If this isn't a global page then store the optional in Page and not here
    * @param string $value
@@ -73,7 +98,17 @@ class ApplicationPage extends BaseApplicationPage{
     return $this->_set('optional',$value);
   }
   
-/**
+  /**
+   * Get the instructions
+   */
+  public function getInstructions(){
+    if(is_null($this->_data['instructions']) OR ($this->_data['instructions'] instanceof Doctrine_Null)){
+      return $this->Page->instructions;
+    }
+    return $this->_get('instructions');
+  }
+  
+  /**
    * Set the instructions
    * If this isn't a global page then store the instructions in Page and not here
    * @param string $value
@@ -85,7 +120,17 @@ class ApplicationPage extends BaseApplicationPage{
     return $this->_set('instructions',$value);
   }
   
-/**
+  /**
+   * Get the leadingText
+   */
+  public function getLeadingText(){
+    if(is_null($this->_data['leadingText']) OR ($this->_data['leadingText'] instanceof Doctrine_Null)){
+      return $this->Page->leadingText;
+    }
+    return $this->_get('leadingText');
+  }
+  
+  /**
    * Set the leadingText
    * If this isn't a global page then store the title in Page and not here
    * @param string $value
@@ -97,7 +142,17 @@ class ApplicationPage extends BaseApplicationPage{
     return $this->_set('leadingText',$value);
   }
   
-/**
+  /**
+   * Get the trailingText
+   */
+  public function getTrailingText(){
+    if(is_null($this->_data['trailingText']) OR ($this->_data['trailingText'] instanceof Doctrine_Null)){
+      return $this->Page->trailingText;
+    }
+    return $this->_get('trailingText');
+  }
+  
+  /**
    * Set the trailingText
    * If this isn't a global page then store the title in Page and not here
    * @param string $value
