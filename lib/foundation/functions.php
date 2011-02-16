@@ -35,7 +35,7 @@ function convertIniShorthandValue($value){
  * @return string
  */
 function convertBytesToString($bytes, $precision = 2) {
-    $units = array('b', 'kb', 'mb', 'g', 'tb');
+    $units = array('b', 'k', 'm', 'g', 't');
   
     $bytes = max($bytes, 0);
     $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
