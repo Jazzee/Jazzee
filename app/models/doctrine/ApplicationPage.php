@@ -18,7 +18,7 @@ class ApplicationPage extends BaseApplicationPage{
   public function get($fieldName, $load = true){
     $fields = array('title', 'min', 'max', 'optional', 'instructions', 'leadingText', 'trailingText');
     if(in_array($fieldName, $fields)){
-      if(is_null($this->_data[$fieldName])){
+      if(is_null($this->_data[$fieldName]) or is_a($this->_data[$fieldName], 'Doctrine_Null')){
         return $this->Page->$fieldName;
       }
     }
