@@ -36,6 +36,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
     }
     $this->addScript('common/scripts/element_types/ApplyElement.class.js');
     $this->addScript('common/scripts/element_types/ListElement.class.js');
+    $this->addScript('common/scripts/element_types/FileInputElement.class.js');
     $types = Doctrine::getTable('ElementType')->findAll(Doctrine::HYDRATE_ARRAY);
     foreach($types as $type){
       $this->addScript("common/scripts/element_types/{$type['class']}.class.js");

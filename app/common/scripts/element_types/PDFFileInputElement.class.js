@@ -3,9 +3,5 @@
   @extends ApplyElement
  */
 function PDFFileInputElement(){}
-PDFFileInputElement.prototype = new ApplyElement();
+PDFFileInputElement.prototype = new FileInputElement();
 PDFFileInputElement.prototype.constructor = PDFFileInputElement;
-
-PDFFileInputElement.prototype.avatar = function(){
-  return $('<input>').attr('type', 'file').attr('disabled', true);
-};
