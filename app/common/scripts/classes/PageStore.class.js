@@ -83,6 +83,50 @@ PageStore.prototype.deletePage = function(page){
   $('#page-' + page[this.index]).remove();
 };
 
+/**
+ * Copy a page
+ * @param {ApplyPage} page
+ */
+PageStore.prototype.copyPage = function(page){
+  this.addPage(this.createPageCopy(page.getDataObject()));
+};
+
+/**
+ * Make a copy of a page
+ * Need to seperate this function so it can be used recursivly on child pages
+ * @param {Object} obj
+ * @returns {ApplyPage}
+ */
+PageStore.prototype.createPageCopy = function(obj){
+  var id = 'newpage' + this.getUniqueId();
+  obj.pageId = id;
+  obj.applicationPageId = id;
+  obj.title = 'Copy of ' + obj.title;
+  var copy = new window[obj.className]();
+  copy.init(obj, this);
+  copy.status = 'new';
+  copy.isModified = true;
+  for(var i=0; i<obj.elements.length; i++){
+    var e = obj.elements[i];
+    e.id = 'newelement' + this.getUniqueId();
+    var Element = new window[e.className]();
+    Element.init(e, copy);
+    Element.status = 'new';
+    Element.isModified = true;
+    for(var j = 0; j < e.list.length; j++){
+      Element.newListItem(e.list[j].value);
+    }
+    copy.addElement(Element);
+  }
+  for(var property in obj.variables){
+    copy.setVariable(property, obj.variables[property].value);
+  }
+  for(var i=0; i<obj.children.length; i++){
+    copy.addChild(this.createPageCopy(obj.children[i]));
+  }
+  return copy;
+};
+
 ///**
 // * Get a preview of the page
 // * @param {ApplyPage} page

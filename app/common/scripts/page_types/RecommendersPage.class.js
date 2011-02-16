@@ -33,7 +33,8 @@ RecommendersPage.prototype.workspace = function(){
   $('#workspace-left-top').append(this.textInputBlock('leadingText', 'click to edit'));
   $('#workspace-left-top').append(this.textAreaBlock('instructions', 'click to edit'));
   $('#workspace-left-bottom-left').append(this.textAreaBlock('trailingText', 'click to edit'));
-  
+
+  $('#workspace-right-top').append(this.copyPageBlock());
   $('#workspace-right-top').append(this.previewPageBlock());
   var min = {0: 'No Minimum'};
   for(var i = 1; i<=20;i++){

@@ -201,6 +201,18 @@ ApplyPage.prototype.deletePageBlock = function(){
   return p;
 };
 
+/**
+ * Block for copying the page
+ * @returns {jQuery}
+ */
+ApplyPage.prototype.copyPageBlock = function(){
+  var pageClass = this;
+  var p = $('<p>Copy this page</p>').addClass('copy').bind('click', function(e){
+    pageClass.pageStore.copyPage(pageClass);
+  });
+  return p;
+};
+
 ApplyPage.prototype.previewPageBlock = function(){
 //var p = $('<p>Preview the page</p>').addClass('preview').bind('click', {pageClass: this}, function(e){
 //  var preview = e.data.pageClass.pageStore.getPagePreview(e.data.pageClass);
@@ -421,7 +433,7 @@ ApplyPage.prototype.workspace = function(){
   $('#workspace-left-top').append(this.textInputBlock('leadingText', 'click to edit'));
   $('#workspace-left-top').append(this.textAreaBlock('instructions', 'click to edit'));
   $('#workspace-left-bottom-left').append(this.textAreaBlock('trailingText', 'click to edit'));
-
+  $('#workspace-right-top').append(this.copyPageBlock());
   $('#workspace-right-top').append(this.previewPageBlock());
   var min = {0: 'No Minimum'};
   for(var i = 1; i<=50;i++){

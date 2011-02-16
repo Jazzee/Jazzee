@@ -60,7 +60,7 @@ ListElement.prototype.itemBlock = function(item){
 //  });
 //  li.prepend(span);
   return li;
-}
+};
 
 /**
  * Add a new New item for the list

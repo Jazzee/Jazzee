@@ -17,6 +17,7 @@ TextPage.prototype.workspace = function(){
   $('#workspace-left-top').append(this.textAreaBlock('Leading Text','leadingText'));
   $('#workspace-left-bottom-left').append(this.textAreaBlock('Trailing Text','trailingText'));
   
+  $('#workspace-right-top').append(this.copyPageBlock());
   $('#workspace-right-top').append(this.previewPageBlock());
   $('#workspace-right-bottom').append(this.deletePageBlock());
   
