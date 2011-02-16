@@ -10,18 +10,18 @@ ETSMatchPage.prototype.constructor = ETSMatchPage;
  * Create the ETSMatchPage workspace
  */
 ETSMatchPage.prototype.workspace = function(){
-  this.clearWorkspace();
-  $('#workspace-left-top').parent().addClass('form');
-  $('#workspace-left-top').append(this.titleBlock());
-  $('#workspace-left-top').append(this.textAreaBlock('Leading Text','leadingText'));
-  $('#workspace-left-top').append(this.textAreaBlock('Instructions','instructions'));
-  $('#workspace-left-bottom-left').append(this.textAreaBlock('Trailing Text','trailingText'));
-  
-  $('#workspace-right-top').append(this.copyPageBlock());
-  $('#workspace-right-top').append(this.previewPageBlock());
-  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
+  ApplyPage.prototype.workspace.call(this);
   $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
   
-  $('#workspace-right-bottom').append(this.deletePageBlock());
-  
+  var min = {0: 'No Minimum'};
+  for(var i = 1; i<=50;i++){
+    min[i] = i;
+  }
+  $('#workspace-right-top').append(this.selectListBlock('min','Minimum Scores Required:', min));
+  var max = {0: 'No Maximum'};
+  for(var i = 1; i<=50;i++){
+    max[i] = i;
+  }
+  $('#workspace-right-top').append(this.selectListBlock('max','Maximum Scores Allowed:', max));
 };

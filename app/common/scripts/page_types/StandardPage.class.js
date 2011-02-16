@@ -5,13 +5,26 @@
 function StandardPage(){}
 StandardPage.prototype = new ApplyPage();
 StandardPage.prototype.constructor = StandardPage;
-StandardPage.prototype.parent = ApplyPage.prototype;
-
 
 StandardPage.prototype.workspace = function(){
-  //call the parent workspace method
-  this.parent.workspace.call(this);
+  ApplyPage.prototype.workspace.call(this);
   var pageClass = this;
+  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
+  $('#workspace-right-top').append(this.showAnswerStatusBlock());
+  
+  var min = {0: 'No Minimum'};
+  for(var i = 1; i<=50;i++){
+    min[i] = i;
+  }
+  $('#workspace-right-top').append(this.selectListBlock('min','Minimum Answers Required:', min));
+  var max = {0: 'No Maximum'};
+  for(var i = 1; i<=50;i++){
+    max[i] = i;
+  }
+  $('#workspace-right-top').append(this.selectListBlock('max','Maximum Answers Allowed:', max));
+  
+  
+  
   $('#workspace-left-middle').show();
   for(var i in this.elements){
     this.elements[i].workspace();
@@ -44,8 +57,6 @@ StandardPage.prototype.workspace = function(){
  */
 StandardPage.prototype.synchronizeElementList = function(){
   $('#workspace-left-middle-left div.field').unbind('click');
-  
-  $('#workspace-right-top').append(this.showAnswerStatusBlock());
   $('#workspace-left-middle-left div.field').each(function(i){
     $(this).bind('click', function(){
       $('#workspace-left-middle-right div').hide();

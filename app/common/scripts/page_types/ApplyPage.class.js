@@ -435,19 +435,7 @@ ApplyPage.prototype.workspace = function(){
   $('#workspace-left-bottom-left').append(this.textAreaBlock('trailingText', 'click to edit'));
   $('#workspace-right-top').append(this.copyPageBlock());
   $('#workspace-right-top').append(this.previewPageBlock());
-  var min = {0: 'No Minimum'};
-  for(var i = 1; i<=50;i++){
-    min[i] = i;
-  }
-  $('#workspace-right-top').append(this.selectListBlock('min','Minimum Answers Required:', min));
-  var max = {0: 'No Maximum'};
-  for(var i = 1; i<=50;i++){
-    max[i] = i;
-  }
-  $('#workspace-right-top').append(this.selectListBlock('max','Maximum Answers Allowed:', max));
-  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
   
   $('#workspace-right-bottom').append(this.deletePageBlock());
   $('#workspace').show('slide');
-  
 };

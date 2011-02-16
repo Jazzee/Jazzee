@@ -21,18 +21,8 @@ PaymentPage.prototype.newPage = function(id,title,pageType,pageClass,status,page
  * Create the PaymentPage workspace
  */
 PaymentPage.prototype.workspace = function(){
-  this.clearWorkspace();
-  $('#workspace-left-top').parent().addClass('form');
-  $('#workspace-left-top').append(this.titleBlock());
-  
-  $('#workspace-left-middle-left').append(this.paymentAmountsBlock());
-  
-  $('#workspace-right-top').append(this.copyPageBlock());
-  $('#workspace-right-top').append(this.previewPageBlock());
+  ApplyPage.prototype.workspace.call(this);
   $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
-  
-  $('#workspace-right-bottom').append(this.deletePageBlock());
-  $('#workspace').show('slide');
 };
 
 PaymentPage.prototype.paymentAmountsBlock = function(){

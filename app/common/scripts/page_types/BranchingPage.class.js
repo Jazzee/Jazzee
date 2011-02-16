@@ -9,7 +9,9 @@ BranchingPage.prototype.constructor = BranchingPage;
 BranchingPage.prototype.workspace = function(){
   //call the parent workspace method
   ApplyPage.prototype.workspace.call(this);
-  var pageClass = this;
+  $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
+  
   $('#workspace-left-middle-left').show();
   $('#workspace-left-middle-left').html(this.listBranchingPagesBlock());
 };

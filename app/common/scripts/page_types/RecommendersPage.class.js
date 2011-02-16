@@ -27,15 +27,11 @@ RecommendersPage.prototype.newPage = function(id,title,pageClass,status,pageStor
 };
 
 RecommendersPage.prototype.workspace = function(){
-  this.clearWorkspace();
-  $('#workspace-left-top').parent().addClass('form');
-  $('#workspace-left-top').append(this.titleBlock());
-  $('#workspace-left-top').append(this.textInputBlock('leadingText', 'click to edit'));
-  $('#workspace-left-top').append(this.textAreaBlock('instructions', 'click to edit'));
-  $('#workspace-left-bottom-left').append(this.textAreaBlock('trailingText', 'click to edit'));
-
-  $('#workspace-right-top').append(this.copyPageBlock());
-  $('#workspace-right-top').append(this.previewPageBlock());
+  ApplyPage.prototype.workspace.call(this);
+  var pageClass = this;
+  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
+  $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  
   var min = {0: 'No Minimum'};
   for(var i = 1; i<=20;i++){
     min[i] = i;
@@ -46,17 +42,11 @@ RecommendersPage.prototype.workspace = function(){
     max[i] = i;
   }
   $('#workspace-right-top').append(this.selectListBlock('max','Maximum Recommenders Allows:', max));
-  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
-  $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
   
   $('#workspace-right-top').append(this.textInputVariableBlock('lorDeadline', 'The deadine for submitting recommendations is ', 'the same as the application'));
   $('#workspace-right-top').append(this.selectListVariableBlock('lorDeadlineEnforced', 'The deadine for recommender is', {0:'Not Enforced',1:'Enforced'}));
   $('#workspace-right-top').append(this.recommendationPageBlock());
   $('#workspace-right-top').append(this.recommenderEmailBlock());
-  
-  $('#workspace-right-bottom').append(this.deletePageBlock());
-  
-  $('#workspace').show('slide');
 };
 
 /**
