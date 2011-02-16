@@ -275,16 +275,78 @@ class SetupPagesController extends SetupController implements PagesInterface {
   
   /**
    * Preview a page
-   * @param integer $applicationPageId
    */
-  public function actionPreviewPage($applicationPageId){
-    if($page = $this->application->getPageByID($applicationPageId)){
-      $class = new $page->Page->PageType->class($page);
-      $this->layout = 'blank';
-      $this->setVar('page', $class);
+  public function actionPreviewPage(){
+    $data = json_decode($this->post['data']);
+    $applicationPage = new ApplicationPage();
+    $applicationPage->id = uniqid();
+    $this->genericPage($applicationPage->Page, $data);
+    $class = new $applicationPage->Page->PageType->class($applicationPage);
+    $this->layout = 'blank';
+    $this->setVar('page', $class);
+  }
+  
+  /**
+   * Create a generic page to use in a preview
+   * @param Page $page
+   * @param Object $data
+   */
+  protected function genericPage(Page $page,$data){
+    $page->id = uniqid();
+    $page->isGlobal = false;
+    $pageType = Doctrine::getTable('PageType')->findOneByClass($data->className);
+    $page->pageType = $pageType->id;
+    $className = $page->PageType->class;
+    $className::setupNewPage($page);
+    //give any created elements a temporary id so they will display in the form
+    foreach($page->Elements as $element){
+      $element->id = uniqid();
+    }
+    $page->title = $data->title;
+    $page->min = $data->min;
+    $page->max = $data->max;
+    $page->optional = $data->optional;
+    $page->showAnswerStatus = $data->showAnswerStatus;
+    $page->instructions = $data->instructions;
+    $page->leadingText = $data->leadingText;
+    $page->trailingText = $data->trailingText;
+    foreach($data->variables as $v){
+      $page->setVar($v->name, $v->value);
+    }
+    foreach($data->elements as $obj){
+      $element = $page->Elements->get(null);
+      $this->genericElement($element, $obj);
+    }
+    foreach($data->children as $obj){
+      $childPage = $page->Children->get(null);
+      $this->genericPage($childPage, $obj);
     }
   }
-
+  
+  /**
+   * Crate a generic element to use in previewing a page
+   * @param Element $element that we are workign with
+   * @param Object $data
+   */
+  protected function genericElement(Element $element, $data){
+    $element->id = uniqid();
+    $elementType = Doctrine::getTable('ElementType')->findOneByClass($data->className);
+    $element->elementType = $elementType->id;
+    $element->title = $data->title;
+    $element->format = $data->format;
+    $element->instructions = $data->instructions;
+    $element->defaultValue = $data->defaultValue;
+    $element->required = $data->required;
+    $element->min = $data->min;
+    $element->max = $data->max;
+    foreach($data->list as $i){
+      $item = $element->ListItems->get(null);
+      $item->id = uniqid();
+      $item->value = $i->value;
+      $item->active = $i->active;
+    }
+  }
+  
   /**
    * List the available element types
    */

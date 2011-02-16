@@ -214,13 +214,14 @@ ApplyPage.prototype.copyPageBlock = function(){
 };
 
 ApplyPage.prototype.previewPageBlock = function(){
-//var p = $('<p>Preview the page</p>').addClass('preview').bind('click', {pageClass: this}, function(e){
-//  var preview = e.data.pageClass.pageStore.getPagePreview(e.data.pageClass);
-//  $('form', preview).bind('submit', function(){return false;});
-//  $('fieldset.buttons ', preview).remove();
-//  $(preview).dialog({ width: 800 });
-//});
-//return p;
+  var pageClass = this;
+  var p = $('<p>Preview the page</p>').addClass('preview').bind('click',function(e){
+    var preview = pageClass.pageStore.getPagePreview(pageClass);
+    $('form', preview).bind('submit', function(){return false;});
+    $('fieldset.buttons ', preview).remove();
+    $(preview).dialog({ width: 800 });
+  });
+  return p;
 };
 
 /**

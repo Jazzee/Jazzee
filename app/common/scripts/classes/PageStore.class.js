@@ -127,22 +127,24 @@ PageStore.prototype.createPageCopy = function(obj){
   return copy;
 };
 
-///**
-// * Get a preview of the page
-// * @param {ApplyPage} page
-// * @returns {jQuery}
-// */
-//PageStore.prototype.getPagePreview = function(pageID){
-//  var div = $('<div>');
-//  $.ajax({
-//    url: this.baseUrl + 'previewPage/' +pageID,
-//    async: false,
-//    success: function(html){
-//      div.html(html);
-//    }
-//  });
-//  return div;
-//};
+/**
+ * Get a preview of the page
+ * @param {ApplyPage} page
+ * @returns {jQuery}
+ */
+PageStore.prototype.getPagePreview = function(page){
+  var div = $('<div>');
+  $.ajax({
+    type: 'POST',
+    url: this.baseUrl + 'previewPage/',
+    data: {data: $.toJSON(page.getDataObject())},
+    async: false,
+    success: function(html){
+      div.html(html);
+    }
+  });
+  return div;
+};
 
 /**
  * Get the unique ID and incirement the counter
