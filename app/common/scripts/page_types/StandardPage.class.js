@@ -52,6 +52,26 @@ StandardPage.prototype.workspace = function(){
 };
 
 /**
+ * Add a copy of an element to the page
+ * @param {ApplyElement} element
+ */
+StandardPage.prototype.copyElement = function(e){
+  var obj = e.getDataObject();
+  obj.id = 'newelement' + this.pageStore.getUniqueId();
+  obj.title = 'Copy of ' + obj.title;
+  var element = new window[obj.className]();
+  element.init(obj, this);
+  element.status = 'new';
+  element.isModified = true;
+  for(var i = 0; i < obj.list.length; i++){
+    element.newListItem(obj.list[i].value);
+  }
+  this.addElement(element);
+  element.workspace();
+  this.synchronizeElementList();
+};
+
+/**
  * Synchronize the element list after it has been created
  * Walk through the elements and make sure they are all have the right weight and click functionality
  */

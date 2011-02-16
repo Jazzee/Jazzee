@@ -224,7 +224,10 @@ ApplyElement.prototype.optionsBlock = function(){
     div = $('#element-options-'+this.id);
   }
   div.empty();
-  
+  var p = $('<p>Copy this element</p>').addClass('copy').bind('click', function(e){
+    elementClass.page.copyElement(elementClass);
+  });
+  div.append(p);
   var p = $('<p>Delete this element</p>').addClass('delete').bind('click', function(e){
     elementClass.isModified = true;
     elementClass.status = 'delete';
