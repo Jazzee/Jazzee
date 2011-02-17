@@ -154,7 +154,7 @@ div.form div.label{
   text-align: right;
 }
 
-div.form div.control input, div.form div.control p{
+div.form div.control *{
   float: left;
 }
 
@@ -187,3 +187,6 @@ div.form textarea {
   width: 80%;
 }
 
+.monthpicker#ui-datepicker-div .ui-datepicker-calendar {
+	display: none;
+}
