@@ -44,7 +44,7 @@ class Applicant extends BaseApplicant{
    */
   public function getAnswersForPage($pageID){
     $q = Doctrine_Query::create()
-    ->select('a.*, r.*, rp.*, lora.*')
+    ->select('*')
     ->from('Answer a')
     ->where('a.PageID = ? AND a.applicantID = ?', array($pageID, $this->id));
     $answers =  $q->execute();
@@ -62,19 +62,11 @@ class Applicant extends BaseApplicant{
    * @return Answer
    */
   public function getAnswerByID($answerID){
-    $q = Doctrine_Query::create()
-    ->select('a.*, r.*, rp.*')
-    ->from('Answer a')
-    ->where('a.ID = ? AND a.applicantID = ?', array($answerID, $this->id));
-    return $q->fetchOne();
-    
-//    Didn't have time to track it down, but there is a bug somewhere that prevents the RecommendationPage 
-//    relationship from loading correctly.  Using DQL fixes the problem  however this code is a bit nicer so I'm leaving it commented out
-//    $key = array_search($answerID, $this->Answers->getPrimaryKeys());
-//    if($key !== false){ //use === becuase 0 is returned often
-//      return $this->Answers->get($key);
-//    }
-//    return false;
+    $key = array_search($answerID, $this->Answers->getPrimaryKeys());
+    if($key !== false){ //use === becuase 0 is returned often
+      return $this->Answers->get($key);
+    }
+    return false;
   }
   
   /**
