@@ -20,13 +20,6 @@ class ApplyPageController extends ApplyController {
    */
   protected $page;
   
-  
-  /**
-   * The path to this page
-   * @var string
-   */
-  protected $path;
-  
   public function beforeAction(){
     parent::beforeAction();
     $this->pageID = $this->actionParams['pageID'];
@@ -43,11 +36,10 @@ class ApplyPageController extends ApplyController {
     }
     $this->addScript('common/scripts/controllers/apply_page.controller.js');
     $this->page = $this->pages[$this->pageID];
-    $this->path = WWW_ROOT . '/apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $this->pageID;
     $this->setVar('page', $this->page);
     $this->setVar('currentAnswerID', false);
     $this->setVar('form', $this->page->getForm());
-    if($form = $this->page->getForm()) $form->action = $this->path;
+    if($form = $this->page->getForm()) $form->action = $this->path('apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $this->pageID);
   }
   
   /**
@@ -88,7 +80,7 @@ class ApplyPageController extends ApplyController {
    */
   public function actionEdit() {
     if(empty($this->post)){
-      $this->page->getForm()->action = $this->path . '/edit/' . $this->actionParams['answerID'];
+      $this->page->getForm()->action = $this->path('apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $this->pageID . '/edit/' . $this->actionParams['answerID']);
       $this->page->fill($this->actionParams['answerID']);
       $this->setVar('currentAnswerID', $this->actionParams['answerID']);
     } else {
