@@ -33,10 +33,9 @@ class ETSMatchPage extends StandardPage {
     
     $e = $field->newElement('ShortDateInput', 'testDate');
     $e->label = 'Test Date';
-    $e->format = date('F Y', strtotime('3 months ago'));
     $e->addValidator('NotEmpty');
     $e->addValidator('Date');
-    $e->addFilter('DateFormat', 'n/Y');
+    $e->addFilter('DateFormat', 'm/d/Y');
     
     $form->newButton('submit', 'Save');
     $form->newButton('reset', 'Clear Form');
@@ -90,9 +89,8 @@ class ETSAnswer extends StandardAnswer {
   public function update(FormInput $input){
     $this->answer->Score->scoreType = $input->scoreType;
     $this->answer->Score->registrationNumber = $input->registrationNumber;
-    $arr = explode('/', $input->testDate);
-    $this->answer->Score->testMonth = $arr[0];
-    $this->answer->Score->testYear = $arr[1];
+    $this->answer->Score->testMonth = date('n', strtotime($input->testDate));
+    $this->answer->Score->testYear = date('Y', strtotime($input->testDate));
     $this->answer->Score->scoreID = null; //reset the score ID in case we already had a match
     $this->answer->Score->makeMatch();
   }
@@ -122,7 +120,7 @@ class ETSAnswer extends StandardAnswer {
   
   public function getFormValueForElement($name){
     if($name == 'testDate'){
-      return date('F Y', strtotime($this->answer->Score->testMonth . '/1/' . $this->answer->Score->testYear));
+      return "{$this->answer->Score->testYear}-{$this->answer->Score->testMonth}";
     } else {
       return $this->answer->Score->$name;
     }
