@@ -41,6 +41,7 @@ class ApplyPageController extends ApplyController {
       $this->afterAction();
       exit();
     }
+    $this->addScript('common/scripts/controllers/apply_page.controller.js');
     $this->page = $this->pages[$this->pageID];
     $this->path = WWW_ROOT . '/apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $this->pageID;
     $this->setVar('page', $this->page);
