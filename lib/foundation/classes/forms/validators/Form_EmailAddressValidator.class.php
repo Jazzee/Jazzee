@@ -2,8 +2,8 @@
 /**
  * Check to see if the email address is valid
  * Inspiration from http://www.linuxjournal.com/article/9585
+ * If the ruleSet is set to true we will do a domain lookup to check if the email address domain is valid
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package foundation
  * @subpackage forms
  */
@@ -76,15 +76,17 @@ class Form_EmailAddressValidator extends Form_Validator{
         $this->addError(self::ERROR);
         return false;
       }
-      if(
-        //check that the domain is valid
-        !(
-          checkdnsrr($domainPart,"MX") OR
-          checkdnsrr($domainPart, "A") //only check the A if MX is invalid
-        )
-      ){
-        $this->addError(self::ERROR);
-        return false;
+      if($this->ruleSet){
+        if(
+          //check that the domain is valid
+          !(
+            checkdnsrr($domainPart,"MX") OR
+            checkdnsrr($domainPart, "A") //only check the A if MX is invalid
+          )
+        ){
+          $this->addError(self::ERROR);
+          return false;
+        }
       }
     }
     return true;
