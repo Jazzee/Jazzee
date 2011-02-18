@@ -49,16 +49,12 @@ class JazzeeController extends Controller{
     }
     $arr = $root->toArray();
     $this->configFile = $arr['root']['system'];
-    
-    //URL path for absolute links and email detect https and add it
-    if($this->configFile['forceSSL']){
-      $protocol = 'https';
-    } else {
+    if((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off') AND $this->configFile['forceSSL'] == false){
       $protocol = 'http';
-      $url = (!empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] != 'off')?'https':'http';
+    } else {
+      $protocol = 'https';
     }
     define('SERVER_URL', $protocol . '://' .  $_SERVER['SERVER_NAME']);
-    
     //set the default timezone
     date_default_timezone_set($this->configFile['timezone']);
     
@@ -100,7 +96,7 @@ class JazzeeController extends Controller{
     $session->set('use_only_cookies', true);
     $session->set('hash_function', 1);
     $session->set('save_path', VAR_ROOT . '/session/');
-    if($this->configFile['forceSSL']){
+    if($this->configFile['forceSSL'] OR (!empty($_SERVER['HTTPS']) and $_SERVER['HTTPS'] == 'on')){
       $session->set('cookie_secure', true);
     }
     $session->set('cookie_path', WWW_ROOT . '/');
@@ -227,9 +223,9 @@ class JazzeeController extends Controller{
    */
   public function path($path){
     if($this->config->pretty_urls){
-      return WWW_ROOT . '/' . $path;
+      return SERVER_URL . WWW_ROOT . '/' . $path;
     } else {
-      return WWW_ROOT . '/index.php?url=' . $path;
+      return SERVER_URL . WWW_ROOT . '/index.php?url=' . $path;
     }
     
   }
