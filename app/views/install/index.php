@@ -1,19 +1,19 @@
 <?php
 /**
- * Initial Install
+ * InstallController build view
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  */
 ?>
-<h2>Install Jazzee</h2>
-<?php
-if(!empty($messages)){
-  foreach($messages as $message){
-    print "<p>{$message}</p>";
-  }
-}
-if(!empty($form)){
-  $this->renderElement('form', array('form'=>$form));
-}
-?>
+<h2>Configure Jazzee</h2>
+<?php if(isset($fileContents)):?>
+  <h5>Problem saving configuration</h5>
+  <p>There was a problem saving your configuration file.  
+  Please copy these contents into <?php print SRC_ROOT . InstallController::CONFIG_PATH ?> 
+  and then visit the <a href='<?php print $setupPath; ?>'>Setup Page</a> to continue installation</p>
+  <code>
+    <?php print nl2br($fileContents); ?>
+	</code>
+<?php else:?>
+  <?php $this->renderElement('form', array('form'=>$form)); ?>
+<?php endif;?>
