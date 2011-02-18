@@ -10,7 +10,15 @@
 define('SRC_ROOT', realpath(dirname(__FILE__) . '/..'));
 define('APP_ROOT', SRC_ROOT . '/app');
 define('WWW_ROOT',rtrim(dirname($_SERVER['SCRIPT_NAME']),'/\\.')); //strip any slashes and if this is the root directory a period (.) is possible
+
 require_once(SRC_ROOT . '/lib/foundation/bootstrap.php');
+
+//Allow everything to be overridden
+//load configuration file
+$c = new Config;
+$root = $c->parseConfig(SRC_ROOT . '/etc/config.ini.php', 'INICommented'); 
+$arr = $root->toArray();
+if(!empty($arr['root']['system']['localBootstrap'])) require_once($arr['root']['system']['localBootstrap']);
 
 Autoload::addAutoLoadPath(APP_ROOT . '/classes/');
 Autoload::addAutoLoadPath(APP_ROOT . '/models/');
@@ -55,22 +63,4 @@ Resource::getInstance()->addDirectory(APP_ROOT . '/common/scripts', 'common/scri
 Resource::getInstance()->addDirectory(APP_ROOT . '/common/styles', 'common/styles/', true);
 Resource::getInstance()->addDirectory(APP_ROOT . '/common/media', 'common/media/', true);
 
-
-//Allow everything to be overridden
-//load configuration file
-$c = new Config;
-$root = $c->parseConfig(SRC_ROOT . '/etc/config.ini.php', 'INICommented'); 
-if (!PEAR::isError($root)) {
-  $arr = $root->toArray();
-  if(isset($arr['root']['system']['overridePath'])){
-    $overridePath = $arr['root']['system']['overridePath'];
-    if(is_dir($overridePath . '/classes')) Autoload::addAutoLoadPath($overridePath . '/classes/', true);
-    if(is_dir($overridePath . '/controllers')) Lvc_FoundationConfig::prefixControllerPath($overridePath . '/controllers/');
-    if(is_dir($overridePath . '/views')) Lvc_FoundationConfig::prefixControllerViewPath($overridePath . '/views/');
-    if(is_dir($overridePath . '/elements')) Lvc_FoundationConfig::prefixElementViewPath($overridePath . '/elements/');
-  }
-  if(!empty($arr['root']['system']['localBootstrap'])){
-    require_once($arr['root']['system']['localBootstrap']);
-  }
-}
 ?>
