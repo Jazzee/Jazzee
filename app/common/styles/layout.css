@@ -156,6 +156,13 @@ div.form div.label{
 
 div.form div.control *{
   float: left;
+  margin: 0;
+  padding: 0;
+}
+
+div.form div.control ol li{
+  clear: left;
+  list-style-type: none;
 }
 
 div.form fieldset.buttons {
