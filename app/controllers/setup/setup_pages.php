@@ -214,7 +214,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
                 $childPage->isGlobal = false;
                 $pageType = Doctrine::getTable('PageType')->findOneByClass($child->className);
                 $childPage->pageType = $pageType->id;
-              case 'save':
+              default:
                 if(!isset($childPage)) $childPage = $applicationPage->Page->getChildById($child->pageId);
                 $childPage->title = $child->title;
                 $childPage->min = $child->min;

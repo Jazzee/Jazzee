@@ -395,7 +395,7 @@ ApplyPage.prototype.getDataObject = function(){
     obj.elements.push(this.elements[i].getDataObject());
   }
   for(var i=0;i<this.deletedElements.length; i++){
-        obj.elements.push(this.deletedElements[i].getDataObject());
+    obj.elements.push(this.deletedElements[i].getDataObject());
   }
   for(var i in this.children){
     obj.children.push(this.children[i].getDataObject());
