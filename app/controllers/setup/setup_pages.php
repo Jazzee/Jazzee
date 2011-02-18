@@ -60,7 +60,7 @@ class SetupPagesController extends SetupController implements PagesInterface {
    */
   public function actionListPages(){
     $pages = array();
-    foreach($this->application->Pages AS $applicationPage){
+    foreach($this->application->findPagesByWeight() AS $applicationPage){
       $arr = $this->pageArray($applicationPage->Page);
       $arr['weight'] = $applicationPage->weight;
       $arr['applicationPageId'] = $applicationPage->id;

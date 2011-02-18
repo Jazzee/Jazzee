@@ -4,9 +4,21 @@
  * @package    jazzee
  * @subpackage orm
  * @author     Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  */
 class Application extends BaseApplication{  
+  /**
+   * Find Pages by weight
+   * @returns Doctrine_Collection
+   */
+  public function findPagesByWeight(){
+    $q = Doctrine_Query::create()
+      ->select('*')
+      ->from('ApplicationPage')
+      ->where('applicationID = ?', $this->id)
+      ->orderBy('weight asc');
+    return $q->execute();
+  }
+  
   /**
   * Get page by ID
   * @param integer $pageID

@@ -40,7 +40,7 @@ class ApplyController extends JazzeeController{
     }
     $this->applicant = Doctrine::getTable('Applicant')->find($this->session->applicantID);
     $this->application = $this->applicant->Application;
-    foreach($this->application->Pages as $page){
+    foreach($this->application->findPagesByWeight() as $page){
       if(class_exists($page->Page->PageType->class) AND is_subclass_of($page->Page->PageType->class, 'ApplyPage')){
         $this->pages[$page->id] = new $page->Page->PageType->class($page, $this->applicant);
       } else {
