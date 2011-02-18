@@ -122,7 +122,7 @@ class ManageRolesController extends ManageController {
       'admin_changeprogram'
     );
     foreach($controllers as $controller){
-      Lvc_FoundationConfig::includeController($controller);
+      FoundationVC_Config::includeController($controller);
       $auths[$controller] = call_user_func(array(Lvc_Config::getControllerClassName($controller), 'getControllerAuth')); 
     }
     return $auths;
