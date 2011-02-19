@@ -10,8 +10,8 @@
  */
  
 //check dependencies
-if (version_compare(PHP_VERSION, '5.2.0', '<')) {
-    trigger_error('You are using PHP version ' . PHP_VERSION . '.  We require PHP version 5.2.0 or higher.',E_USER_ERROR);
+if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+    trigger_error('You are using PHP version ' . PHP_VERSION . '.  We require PHP version 5.3.0 or higher.',E_USER_ERROR);
 }
 $requiredIncludes = array('Log.php','Mail.php', 'Config.php');
 
