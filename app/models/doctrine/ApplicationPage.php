@@ -252,8 +252,9 @@ class ApplicationPage extends Doctrine_Record{
    * After we save the applicationPage make sure all of its pages are properly saved too
    * At some point doctrine is unable to follow the relationships deep enough
    * This method explicitly saves the members of collections with the correct id
+   * @param mixed $event
    */
-  public function postSave(){
+  public function postSave($event){
     if($this->Page->isModified(true)){
       $this->Page->save();
     }

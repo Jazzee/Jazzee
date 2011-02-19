@@ -187,8 +187,9 @@ class Page extends Doctrine_Record{
    * After we save the Page make sure all of its elements and children are saved too
    * At some point doctrine is unable to follow the relationships deep enough
    * This method explicitly saves the members of collections with the correct id
+   * @param mixed $event
    */
-  public function postSave(){
+  public function postSave($event){
     foreach($this->Elements as $element){
       if($element->isModified(true)){
         $element->pageID = $this->id;

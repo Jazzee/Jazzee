@@ -234,8 +234,9 @@ class Application extends Doctrine_Record{
    * After we save the application make sure all of its pages are properly saved too
    * At some point doctrine is unable to follow the relationships deep enough
    * This method explicitly saves the members of collections with the correct id
+   * @param mixed $event
    */
-  public function postSave(){
+  public function postSave($event){
     foreach($this->Pages as $page){
       if($page->isModified(true)){
         $page->applicationID = $this->id;
