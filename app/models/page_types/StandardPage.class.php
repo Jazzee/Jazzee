@@ -17,7 +17,7 @@ class StandardPage extends ApplyPage {
     $field = $form->newField();
     $field->legend = $this->applicationPage->title;
     $field->instructions = $this->applicationPage->instructions;
-    foreach($this->applicationPage->Page->Elements as $e){
+    foreach($this->applicationPage->Page->findElementsByWeight() as $e){
       $element = new $e->ElementType->class($e);
       $element->addToField($field);
     }
@@ -123,7 +123,7 @@ class StandardAnswer extends ApplyAnswer {
     foreach($this->answer->Elements as $answerElement){
       $allAnswersByElementId[$answerElement->elementID][] = $answerElement;
     }
-    foreach($this->answer->Page->Elements as $e){
+    foreach($this->answer->Page->findElementsByWeight() as $e){
       $this->elements[$e->id] = new $e->ElementType->class($e);
       if(!empty($allAnswersByElementId[$e->id])) $this->elements[$e->id]->setValueFromAnswer($allAnswersByElementId[$e->id]);
     }

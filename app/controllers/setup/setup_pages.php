@@ -90,14 +90,15 @@ class SetupPagesController extends SetupController implements PagesInterface {
     $arr['pageId'] = $arr['id'];
     $arr['className'] = $page->PageType->class;
     $arr['elements'] = array();
-    foreach($page->Elements as $element){
+    foreach($page->findElementsByWeight() as $element){
       $e = $element->toArray();
       $e['className'] = $element->ElementType->class;
       $e['list'] = array();
-      foreach($element->ListItems as $item){
+      foreach($element->findListItemsByWeight() as $item){
         $e['list'][] = array(
           'id' => $item->id,
           'value' => $item->value,
+          'weight' => $item->weight,
           'active' => (int)$item->active
         );
       }
@@ -261,12 +262,14 @@ class SetupPagesController extends SetupController implements PagesInterface {
           $element->required = $e->required;
           $element->min = $e->min;
           $element->max = $e->max;
+          $element->weight = $e->weight;
           foreach($e->list as $i){
             if(!$item = $element->getItemById($i->id)){
               $item = $element->ListItems->get(null);
             }
             $item->value = $i->value;
             $item->active = $i->active;
+            $item->weight = $i->weight;
           }
       }
       unset($element);

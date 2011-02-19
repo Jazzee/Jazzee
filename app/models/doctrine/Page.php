@@ -7,6 +7,19 @@
  * @license http://jazzee.org/license.txt
  */
 class Page extends BasePage{
+  /**
+   * Find Elements by weight
+   * @returns Doctrine_Collection
+   */
+  public function findElementsByWeight(){
+    $q = Doctrine_Query::create()
+      ->select('*')
+      ->from('Element')
+      ->where('pageID = ?', $this->id)
+      ->orderBy('weight asc');
+    return $q->execute();
+  }
+  
   public function getElementByTitle($title){
     foreach($this['Elements'] as $element){
       if($element->title == $title){return $element;}

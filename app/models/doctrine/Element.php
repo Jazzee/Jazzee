@@ -9,6 +9,19 @@
  */
 class Element extends BaseElement{
   /**
+   * Find ListItems by weight
+   * @returns Doctrine_Collection
+   */
+  public function findListItemsByWeight(){
+    $q = Doctrine_Query::create()
+      ->select('*')
+      ->from('ElementListItem')
+      ->where('elementID = ?', $this->id)
+      ->orderBy('weight asc');
+    return $q->execute();
+  }
+  
+  /**
   * Get ListItem
   * @param integer $itemId
   * @return ListItem

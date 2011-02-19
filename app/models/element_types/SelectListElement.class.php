@@ -16,7 +16,7 @@ class SelectListElement extends ApplyElement {
       $element->addValidator('NotEmpty');
     }
     $element->addItem(false, '');
-    foreach($this->element->ListItems as $item){
+    foreach($this->element->findListItemsByWeight() as $item){
       if($item->active) $element->addItem($item->id, $item->value);
     }
     return $element;

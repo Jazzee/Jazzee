@@ -26,7 +26,7 @@ StandardPage.prototype.workspace = function(){
   
   
   $('#workspace-left-middle').show();
-  for(var i in this.elements){
+  for(var i = 0; i < this.elements.length; i++){
     this.elements[i].workspace();
   }
   this.synchronizeElementList();
@@ -76,6 +76,7 @@ StandardPage.prototype.copyElement = function(e){
  * Walk through the elements and make sure they are all have the right weight and click functionality
  */
 StandardPage.prototype.synchronizeElementList = function(){
+  var pageClass = this;
   $('#workspace-left-middle-left div.field').unbind('click');
   $('#workspace-left-middle-left div.field').each(function(i){
     $(this).bind('click', function(){
@@ -85,6 +86,11 @@ StandardPage.prototype.synchronizeElementList = function(){
       $('#element-options-'+$(this).data('element').id).show().children().show();
     });
     $(this).data('element').setProperty('weight',i+1);
+  });
+  var list = $('#workspace-left-middle-left');
+  list.sortable();
+  list.bind("sortupdate", function(event, ui) {
+    pageClass.synchronizeElementList();
   });
 };
 

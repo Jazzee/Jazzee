@@ -118,7 +118,7 @@ class BranchingAnswer extends StandardAnswer {
       }
     }
     foreach($this->answer->Page->Children as $branch){
-      foreach($branch->Elements as $e){
+      foreach($branch->findElementsByWeight() as $e){
         $this->elements[$e->id] = new $e->ElementType->class($e);
         if(!empty($allAnswersByElementId[$e->id])) $this->elements[$e->id]->setValueFromAnswer($allAnswersByElementId[$e->id]);
       }

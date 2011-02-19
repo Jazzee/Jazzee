@@ -130,6 +130,9 @@ PageVariable:
 Element:
   columns:
     pageID: integer
+    weight: 
+      type: integer
+      default: 0
     fixedID: integer
     elementType: integer
     title: string(255)
@@ -168,7 +171,9 @@ ElementType:
 ElementListItem:
   columns:
     elementID: integer
-    weight: integer
+    weight: 
+      type: integer
+      default: 0
     active: 
       type: boolean
       default: true

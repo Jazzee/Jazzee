@@ -52,7 +52,7 @@ ApplyPage.prototype.init = function(pageObject, pageStore){
   this.weight = pageObject.weight;
 
   this.variables = {};
-  this.elements = {};
+  this.elements = [];
   this.deletedElements = [];
   this.children = {};
   this.deletedChildren = [];
@@ -98,7 +98,7 @@ ApplyPage.prototype.checkModified = function(){
   for(var i in this.children) {
     if(this.children[i].checkModified()) return true;
   }
-  for(var i in this.elements) {
+  for(var i = 0; i < this.elements.length; i++){
     if(this.elements[i].checkModified()) return true;
   }
   return false;
@@ -110,7 +110,7 @@ ApplyPage.prototype.checkModified = function(){
  * @returns {ApplyElement}
  */
 ApplyPage.prototype.addElement = function(element){
-  this.elements[element.id] = element;
+  this.elements.push(element);
   return element;
 };
 
@@ -120,7 +120,13 @@ ApplyPage.prototype.addElement = function(element){
  * @returns {boolean}
  */
 ApplyPage.prototype.deleteElement = function(element){
-  delete this.elements[element.id];
+  for(var i = 0; i < this.elements.length; i++){
+    if(this.elements[i] == element){ 
+      this.elements.splice(i,1);
+      break;
+    }
+  }
+  this.isModified = true;
   this.deletedElements.push(element);
 };
   
@@ -140,6 +146,7 @@ ApplyPage.prototype.addChild = function(page){
  */
 ApplyPage.prototype.deleteChild = function(page){
   delete this.children[page.pageId];
+  this.isModified = true;
   page.status = 'delete';
   this.deletedChildren.push(page);
 };

@@ -15,9 +15,15 @@ ListElement.prototype.optionsBlock = function(){
   
   var div = $('<div>').addClass('listItems container').append($('<h5>').html('List Items'));
   var ol = $('<ol>');
-  for(var i in this.listItems){
+  for(var i = 0; i<this.listItems.length; i++){
     ol.append(this.itemBlock(this.listItems[i]));
   }
+  ol.sortable();
+  ol.bind("sortupdate", function(event, ui) {
+    $('li', this).each(function(i){
+      $(this).data('item').weight = i;
+    });
+  });
   div.append(ol);
   var form = $('<form>').bind('submit', function(){
     var value = $(this).children('input').eq(0).val();
@@ -25,6 +31,7 @@ ListElement.prototype.optionsBlock = function(){
       var item = element.newListItem(value);
       $(this).children('input').eq(0).val('');
       ol.append(element.itemBlock(item));
+      ol.trigger('sortupdate');
     }
     return false;
   }).append($('<input>').attr('type','text')).append($('<input>').attr('type', 'button').attr('name', 'submit').attr('value', 'Add'));
@@ -43,11 +50,11 @@ ListElement.prototype.optionsBlock = function(){
  */
 ListElement.prototype.itemBlock = function(item){
   var element = this;
-  var li = $('<li>').addClass((item.active)?'active':'inactive').html(item.value).bind('click', function(){
+  var li = $('<li>').addClass((item.active)?'active':'inactive').data('item',item).html(item.value).bind('click', function(){
   $(this).unbind('click');
     var field = $('<input>').attr('type', 'text').attr('value',item.value)
     .bind('change', function(){
-      element.editListItem(item,$(this).val());
+      item.value = $(this).val();
     }).bind('blur', function(){
       $(this).parent().replaceWith(element.itemBlock(item));
     });
@@ -68,9 +75,10 @@ ListElement.prototype.itemBlock = function(item){
  */
 ListElement.prototype.newListItem = function(value){
   var itemId = 'new-list-item' + this.page.pageStore.getUniqueId();
-  this.listItems[itemId] = {id: itemId, value: value, active: true};
+  var item = {id: itemId, value: value, active: true};
+  this.listItems.push(item);
   this.isModified = true;
-  return this.listItems[itemId];
+  return item;
 };
 
 
@@ -79,27 +87,6 @@ ListElement.prototype.newListItem = function(value){
  * @param {String} value the items text
  */
 ListElement.prototype.addListItem = function(item){
-  this.listItems[item.id] = item;
-  return this.listItems[item.id];
-};
-
-/**
- * Edit an existing item
- * @param {Object} item
- * @param {String} value
- * @returns {Object}
- */
-ListElement.prototype.editListItem = function(item, value){
-  this.listItems[item.id].value = value;
-  this.isModified = true;
-  return this.listItems[item.id];
-};
-
-/**
- * Delete an existing item
- * @param {Object} item
- */
-ListElement.prototype.deactivateListItem = function(item){
-  this.listItems[item.id].active = false;
-  this.isModified = true;
+  this.listItems.push(item);
+  return item;
 };

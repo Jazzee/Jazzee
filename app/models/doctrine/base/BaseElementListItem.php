@@ -24,6 +24,7 @@ abstract class BaseElementListItem extends Doctrine_Record
              ));
         $this->hasColumn('weight', 'integer', null, array(
              'type' => 'integer',
+             'default' => 0,
              ));
         $this->hasColumn('active', 'boolean', null, array(
              'type' => 'boolean',

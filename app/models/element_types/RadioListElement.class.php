@@ -15,7 +15,7 @@ class RadioListElement extends ApplyElement {
     if($this->element->required){
       $element->addValidator('NotEmpty');
     }
-    foreach($this->element->ListItems as $item){
+    foreach($this->element->findListItemsByWeight() as $item){
       if($item->active) $element->addItem($item->id, $item->value);
     }
     return $element;

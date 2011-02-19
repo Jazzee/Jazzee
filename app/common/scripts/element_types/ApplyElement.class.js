@@ -38,7 +38,7 @@ ApplyElement.prototype.init = function(obj, page){
   this.required = (obj.required)?1:0;
   this.min = obj.min;
   this.max = obj.max;
-  this.listItems = {};
+  this.listItems = [];
   
   this.status = '';
   this.isModified = false;
@@ -185,7 +185,7 @@ ApplyElement.prototype.getDataObject = function(){
     weight: this.weight,
     list: []
   };
-  for(var i in this.listItems){
+  for(var i = 0; i < this.listItems.length; i++){
     obj.list.push(this.listItems[i]);
   }
   return obj;
