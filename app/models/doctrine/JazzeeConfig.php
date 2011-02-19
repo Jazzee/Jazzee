@@ -1,11 +1,31 @@
 <?php
 /**
  * JazzeeConfig
+ * 
+ * @property string $name
+ * @property blob $value
  * @package    jazzee
  * @subpackage orm
  * @author     Jon Johnson <jon.johnson@ucsf.edu>
  */
-class JazzeeConfig extends BaseJazzeeConfig{
+class JazzeeConfig extends Doctrine_Record{
+  
+  /**
+   * @see BaseJazzeeConfig::setTableDefinition()
+   */
+  public function setTableDefinition(){
+    $this->setTableName('jazzee_config');
+    $this->hasColumn('name', 'string', 255, array(
+      'type' => 'string',
+      'notnull' => true,
+      'unique' => true,
+      'length' => '255',
+     ));
+    $this->hasColumn('value', 'blob', null, array(
+      'type' => 'blob',
+     ));
+  }
+
   /**
    * Get the base64 decoded value
    * @return blob
