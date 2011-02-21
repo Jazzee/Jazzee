@@ -69,7 +69,7 @@ class Autoload extends Foundation {
       include_once($cachePath);
       return true;
     }
-    $suffixes = array('.class.php', '.inerface.php');
+    $suffixes = array('.class.php', '.interface.php');
     foreach(self::$_autoLoadPaths as $path){
       foreach($suffixes as $suffix){
         $fileName = $path . $className . $suffix;
