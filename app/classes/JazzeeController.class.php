@@ -163,7 +163,7 @@ class JazzeeController extends Controller{
     
     /*
       When the php post_max_size attribute is exceed the POST array is blanked.
-      So a check has to be done using the CONTENT_LENGTH superglobal against the post_max_size value oon every request
+      So a check has to be done using the CONTENT_LENGTH superglobal against the post_max_size value on every request
 	*/
     if(!empty($_SERVER['CONTENT_LENGTH'])){
       $max = convertIniShorthandValue(ini_get('post_max_size'));
