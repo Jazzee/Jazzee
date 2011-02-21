@@ -40,26 +40,20 @@ class JazzeeController extends Controller{
    * Setup error processing and email
    */
   public function __construct(){
-    //load configuration file
-    $c = new Config;
-    $root = $c->parseConfig(SRC_ROOT . '/etc/config.ini.php', 'INICommented'); 
-    if (PEAR::isError($root)) {
-      $this->redirect(WWW_ROOT . '/index.php?url=install');
-      exit();
-    }
-    $arr = $root->toArray();
-    $this->configFile = $arr['root']['system'];
-    if((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off') AND $this->configFile['forceSSL'] == false){
+    $this->config = new ConfigManager;
+    $this->config->addContainer(new IniConfigType(SRC_ROOT . '/etc/config.ini.php'));
+
+    if((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off') AND !$this->config->forceSSL){
       $protocol = 'http';
     } else {
       $protocol = 'https';
     }
     define('SERVER_URL', $protocol . '://' .  $_SERVER['SERVER_NAME']);
     //set the default timezone
-    date_default_timezone_set($this->configFile['timezone']);
+    date_default_timezone_set($this->config->timezone);
     
     //The var root is the base for storing logs, sessions, cache files, tmp and uploaded files
-    define('VAR_ROOT',$this->configFile['varPath']?$this->configFile['varPath']:SRC_ROOT . '/var');
+    define('VAR_ROOT',$this->config->varPath?$this->config->varPath:SRC_ROOT . '/var');
     
     if(!is_dir(VAR_ROOT)){
       throw new Jazzee_Exception(VAR_ROOT . ' is not readable by the webserver');
@@ -79,12 +73,12 @@ class JazzeeController extends Controller{
       }
     }
     //setup database connection
-    Doctrine_Manager::connection($this->configFile['dsn']);
+    Doctrine_Manager::connection($this->config->dsn);
     Doctrine::loadModels(APP_ROOT . '/models/doctrine');
     
-    //Get database configuration options
-    $this->config = new ConfigManager;
-    
+    //Add the JazzeeConfig table to the ConfigManager
+    $this->config->addContainer(new DoctrineTableConfigType(Doctrine::getTable('JazzeeConfig')));
+   
     //setup secure sessions
     $session = Session::getInstance();
     $session->set('name', $this->config->session_name);
@@ -96,7 +90,7 @@ class JazzeeController extends Controller{
     $session->set('use_only_cookies', true);
     $session->set('hash_function', 1);
     $session->set('save_path', VAR_ROOT . '/session/');
-    if($this->configFile['forceSSL'] OR (!empty($_SERVER['HTTPS']) and $_SERVER['HTTPS'] == 'on')){
+    if($this->config->forceSSL OR (!empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] == 'on')){
       $session->set('cookie_secure', true);
     }
     $session->set('cookie_path', WWW_ROOT . '/');
@@ -132,7 +126,7 @@ class JazzeeController extends Controller{
     );
     
     //In developemnt log errors to screen
-    if($this->configFile['status'] == 'DEVELOPMENT'){
+    if($this->config->status == 'DEVELOPMENT'){
       Error::getInstance()->attach(
         new PearLogObserver(
           Log::factory('display','','', array(),PEAR_LOG_DEBUG)

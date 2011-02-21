@@ -15,10 +15,10 @@ require_once(SRC_ROOT . '/lib/foundation/bootstrap.php');
 
 //Allow everything to be overridden
 //load configuration file
-$c = new Config;
-$root = $c->parseConfig(SRC_ROOT . '/etc/config.ini.php', 'INICommented'); 
-$arr = $root->toArray();
-if(!empty($arr['root']['system']['localBootstrap'])) require_once($arr['root']['system']['localBootstrap']);
+if(file_exists(SRC_ROOT . '/etc/config.ini.php')){
+  $config = new IniConfigType(SRC_ROOT . '/etc/config.ini.php');
+  if($config->readVar('localBootstrap') != '') require_once($config->readVar('localBootstrap'));
+}
 
 Autoload::addAutoLoadPath(APP_ROOT . '/classes/');
 Autoload::addAutoLoadPath(APP_ROOT . '/models/');

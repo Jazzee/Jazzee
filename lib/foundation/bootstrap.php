@@ -13,7 +13,7 @@
 if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     trigger_error('You are using PHP version ' . PHP_VERSION . '.  We require PHP version 5.3.0 or higher.',E_USER_ERROR);
 }
-$requiredIncludes = array('Log.php','Mail.php', 'Config.php');
+$requiredIncludes = array('Log.php','Mail.php');
 
 foreach(explode(PATH_SEPARATOR, get_include_path()) as $dir){
   foreach($requiredIncludes as $file){
@@ -27,9 +27,6 @@ if(!class_exists('Log')){
 }
 if(!class_exists('Mail')){
   trigger_error('Pear Mail is required and it is not availalble', E_USER_ERROR);
-}
-if(!class_exists('Config')){
-  trigger_error('Pear Config is required and it is not availalble', E_USER_ERROR);
 }
 if(!class_exists('imagick')){
   trigger_error('PECL/Imagick is required and it is not availalble', E_USER_ERROR);

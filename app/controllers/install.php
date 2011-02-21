@@ -60,37 +60,38 @@ class InstallController extends Controller {
     if(file_exists(SRC_ROOT . self::CONFIG_PATH)){
       $this->redirect($this->path . '/setup'); die;
     }
-    $form = new Form;
-    $form->action = $this->path;
-    $field = $form->newField(array('legend'=>'Database Connection'));
-    $type = $field->newElement('RadioList', 'dbBackend', array('label'=>'Backend', 'value'=>'mysql'));
-    $type->addItem('mysql', 'MySQL');
-    $type->addItem('pgsql', 'PostgreSQL');
-    $type->addItem('mssql', 'Microsoft SQL Server (NOT for Sybase. Compile PHP --with-mssql)');
-    $type->addItem('oci', 'Oracle 7/8/9/10');
-    $type->addItem('sqlite', 'SQLite 2');
-    $type->addItem('fbsql', 'FrontBase');
-    $type->addItem('ibase', 'InterBase / Firebird');
-    $type->addItem('querysim', 'QuerySim');
     
-    $field->newElement('TextInput', 'dnHost', array('label'=>'Host', 'value'=>'localhost'), array('NotEmpty'=>true));
-    $field->newElement('TextInput', 'dbUser', array('label'=>'Username', 'value'=>'root'), array('NotEmpty'=>true));
-    $field->newElement('PasswordInput', 'dbPass', array('label'=>'Password'), array('NotEmpty'=>true));
-    $field->newElement('TextInput', 'dbName', array('label'=>'Database Name'), array('NotEmpty'=>true));
-
-    $form->newButton('submit', 'Save Configuration');
-    if($input = $form->processInput($this->post)){
-      $config = $this->newDefaultConfig(); 
-      $root = $config->getRoot();
-      $dsn = $input->dbBackend . '://' . $input->dbUser . ':' . $input->dbPass . '@' . $input->dnHost . '/' . $input->dbName;
-      $root->getItem('section', 'system')->getItem('directive', 'dsn')->setContent($dsn);
-      if($config->writeConfig(SRC_ROOT . self::CONFIG_PATH, 'INICommented') === true){
-        $this->redirect($this->path . '/setup'); die;
-      }
-      $this->setVar('fileContents',$root->toString('INIFile'));
-      $this->setVar('setupPath',$this->path . '/setup');
-    }
-    $this->setVar('form', $form);
+//    $form = new Form;
+//    $form->action = $this->path;
+//    $field = $form->newField(array('legend'=>'Database Connection'));
+//    $type = $field->newElement('RadioList', 'dbBackend', array('label'=>'Backend', 'value'=>'mysql'));
+//    $type->addItem('mysql', 'MySQL');
+//    $type->addItem('pgsql', 'PostgreSQL');
+//    $type->addItem('mssql', 'Microsoft SQL Server (NOT for Sybase. Compile PHP --with-mssql)');
+//    $type->addItem('oci', 'Oracle 7/8/9/10');
+//    $type->addItem('sqlite', 'SQLite 2');
+//    $type->addItem('fbsql', 'FrontBase');
+//    $type->addItem('ibase', 'InterBase / Firebird');
+//    $type->addItem('querysim', 'QuerySim');
+//    
+//    $field->newElement('TextInput', 'dnHost', array('label'=>'Host', 'value'=>'localhost'), array('NotEmpty'=>true));
+//    $field->newElement('TextInput', 'dbUser', array('label'=>'Username', 'value'=>'root'), array('NotEmpty'=>true));
+//    $field->newElement('PasswordInput', 'dbPass', array('label'=>'Password'), array('NotEmpty'=>true));
+//    $field->newElement('TextInput', 'dbName', array('label'=>'Database Name'), array('NotEmpty'=>true));
+//
+//    $form->newButton('submit', 'Save Configuration');
+//    if($input = $form->processInput($this->post)){
+//      $config = $this->newDefaultConfig(); 
+//      $root = $config->getRoot();
+//      $dsn = $input->dbBackend . '://' . $input->dbUser . ':' . $input->dbPass . '@' . $input->dnHost . '/' . $input->dbName;
+//      $root->getItem('section', 'system')->getItem('directive', 'dsn')->setContent($dsn);
+//      if($config->writeConfig(SRC_ROOT . self::CONFIG_PATH, 'INICommented') === true){
+//        $this->redirect($this->path . '/setup'); die;
+//      }
+//      $this->setVar('fileContents',$root->toString('INIFile'));
+//      $this->setVar('setupPath',$this->path . '/setup');
+//    }
+//    $this->setVar('form', $form);
   }
   
   /**
@@ -100,10 +101,9 @@ class InstallController extends Controller {
     if(!file_exists(SRC_ROOT . self::CONFIG_PATH)){
       $this->redirect($this->path); die;
     }
-    $c = new Config;
-    $config = $c->parseConfig(SRC_ROOT . self::CONFIG_PATH, 'INICommented'); 
+    $config = new IniConfigType(SRC_ROOT . self::CONFIG_PATH);
     try {
-      $connection = Doctrine_Manager::connection($config->getItem('section', 'system')->getItem('directive', 'dsn')->getContent());
+      $connection = Doctrine_Manager::connection($config->readVar('dsn'));
       $tables = $connection->execute('SHOW TABLES')->fetchAll();
     }catch (Doctrine_Exception $e) {
       $this->setVar('message',$e->getMessage());
@@ -161,6 +161,7 @@ class InstallController extends Controller {
    * Build the default config file
    * @return Config
    */
+  /* need to find a way to build configuration without the PearConfig class.
   protected function newDefaultConfig() {
     $c = new Config;
     $config = $c->getRoot();
@@ -245,6 +246,7 @@ class InstallController extends Controller {
     
     return $c;
   }
+  */
 }
 
 ?>
