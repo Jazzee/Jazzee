@@ -122,7 +122,7 @@ class Answer extends Doctrine_Record{
    * Whenever we are saved update the timestamp
    * @param $event Doctrine_Event
    */
-  public function preSave(Doctrine_Event $event){
+  public function preSave($event){
     if(!$this->isModified() AND !$this->Elements->isModified()) return;
     $modifiedFields = $this->getModified();
     if ( ! array_key_exists('updatedAt',$modifiedFields)) {

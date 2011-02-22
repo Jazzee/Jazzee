@@ -240,7 +240,7 @@ class Applicant extends Doctrine_Record{
    * Whenever we new applicant is inserted set the createdAt timestamp
    * @param $event Doctrine_Event
    */
-  public function preInsert(Doctrine_Event $event){
+  public function preInsert($event){
       $modified = $event->getInvoker()->getModified();
       if ( ! array_key_exists('createdAt',$modified)) {
         $event->getInvoker()->createdAt = date('Y-m-d H:i:s', time());
@@ -251,7 +251,7 @@ class Applicant extends Doctrine_Record{
    * Whenever we are saved update the timestamp
    * @param $event Doctrine_Event
    */
-  public function preSave(Doctrine_Event $event){
+  public function preSave($event){
       $modified = $event->getInvoker()->getModified();
       if ( ! array_key_exists('updatedAt',$modified)) {
         $event->getInvoker()->updatedAt = date('Y-m-d H:i:s', time());
