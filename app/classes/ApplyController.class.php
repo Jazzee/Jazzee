@@ -34,20 +34,17 @@ class ApplyController extends JazzeeController{
     ){
       //Not authenticated 
       $this->messages->write('error', "You are not logged in or your session has expired.  Please log in again");
-      $this->redirect($this->path("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/"));
-      $this->afterAction();
-      exit();
+      $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/");
     }
     $this->applicant = Doctrine::getTable('Applicant')->find($this->session->applicantID);
     $this->application = $this->applicant->Application;
-    foreach($this->application->findPagesByWeight() as $page){
-      if(class_exists($page->Page->PageType->class) AND is_subclass_of($page->Page->PageType->class, 'ApplyPage')){
-        $this->pages[$page->id] = new $page->Page->PageType->class($page, $this->applicant);
-      } else {
-        throw new Jazzee_Exception("There is no {$page->Page->PageType->class} class available.  This page will not be displayed");
-      }
+    if(!$this->application->published){
+      $this->redirectPath("apply/{$this->application->Program->shortName}/");
     }
-    $this->setLayoutVar('layoutTitle', $this->application->Cycle->name . ' ' . $this->application->Program->name);
+    foreach($this->application->findPagesByWeight() as $page){
+      $this->pages[$page->id] = new $page->Page->PageType->class($page, $this->applicant);
+    }
+    $this->setLayoutVar('layoutTitle', $this->application->Cycle->name . ' ' . $this->application->Program->name . ' Application');
     $this->addCss('common/styles/apply.css');
   }
 }

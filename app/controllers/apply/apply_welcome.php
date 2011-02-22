@@ -6,16 +6,54 @@
  * @package jazzee
  * @subpackage apply
  */
-class ApplyWelcomeController extends ApplyGuestController {
+class ApplyWelcomeController extends JazzeeController {
+  /**
+   * The program if it is available
+   * @var Program
+   */
+  protected $program;
   
-  public function actionIndex($programShortName = '', $cycleName = '') {
-    if(empty($this->program) AND empty($this->application)){  
-      $q = Doctrine_Query::create()
-        ->select('*')
-        ->from('Program')
-        ->orderBy('name')
-        ->where('expires IS NULL OR expires > now()');
-      $this->setVar('programs', $q->execute());
+  /**
+   * The Cycle if it is available
+   * @var Cycle
+   */
+  protected $cycle;
+  
+  /**
+   * The application if it is available
+   * @var Application
+   */
+  protected $application;
+  
+  /**
+   * Before any action do some setup
+   * If we know the program and cycle load the applicant var
+   * If we only know the program fill that in
+   * @return null
+   */
+  protected function beforeAction(){
+    parent::beforeAction();
+    if(!empty($this->actionParams['programShortName'])) $this->program = Doctrine::getTable('Program')->findOneByShortName($this->actionParams['programShortName']);
+    if(!empty($this->actionParams['cycleName'])) $this->cycle = Doctrine::getTable('Cycle')->findOneByName($this->actionParams['cycleName']);
+    
+    if(!is_null($this->program) AND !is_null($this->cycle)) $this->application = Doctrine::getTable('Application')->findOneByProgramIDAndCycleID($this->program->id, $this->cycle->id);
+    
+  }
+  
+  /**
+   * Display welcome information
+   * Might display list of program, cycles in a program, or an application welcome page dependign on the url
+   * Enter description here ...
+   */
+  public function actionIndex() {
+    if(is_null($this->program)){  
+      $arr = Doctrine::getTable('Program')->findAll(Doctrine_Core::HYDRATE_ARRAY);
+      $programs = array();
+      foreach($arr as $p){
+        if(is_null($p['expires']) or strtotime($p['expires']) > time()) $programs[$p['shortName']] = $p['name'];
+      }
+      $this->setVar('programs', $programs);
+      $this->setLayoutVar('layoutTitle', 'Select a Program');
       $this->loadView($this->controllerName . '/programs');
       return true;
     }
@@ -25,7 +63,10 @@ class ApplyWelcomeController extends ApplyGuestController {
       $this->loadView($this->controllerName . '/cycles');
       return true;
     }
-    $this->setLayoutVar('layoutTitle', $this->application['Cycle']->name . ' ' . $this->application['Program']->name . ' Application');
+    if(!$this->application->published){
+      $this->redirectPath("apply/{$this->application->Program->shortName}/");
+    }
+    $this->setLayoutVar('layoutTitle', $this->application->Cycle->name . ' ' . $this->application->Program->name . ' Application');
     $this->setVar('application', $this->application);
   }
   

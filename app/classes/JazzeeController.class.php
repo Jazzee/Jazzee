@@ -225,6 +225,15 @@ class JazzeeController extends Controller{
   }
   
   /**
+   * Call any after action properties, redirect, and exit
+   * @param string $path
+   */
+  public function redirectPath($path){
+    $this->redirect($this->path($path));
+    $this->afterAction();
+    exit(0);
+  }
+  /**
    * If there is no navigation
    * @return null
    */

@@ -9,21 +9,25 @@
  
 class ApplyPageController extends ApplyController {
   /**
-   * The id of the current page
-   * @var int
-   */
-  protected $pageID;
-  
-  /**
-   * The current page an alias for $this->pages[$pageID]
+   * The current page an alias for $this->pages[$this->actionParams['pageID']]
    * @var ApplyPage
    */
   protected $page;
   
+  /**
+   * Convienece string holding the path to this page
+   * @var  string    
+   */
+  protected $pathPath;
+  
+  /**
+   * Lookup applicant and make sure we are authorized to view the page
+   * @see ApplyController::beforeAction()
+   */
   public function beforeAction(){
     parent::beforeAction();
-    $this->pageID = $this->actionParams['pageID'];
-    if(!array_key_exists($this->pageID,$this->pages)){
+    $pageID = $this->actionParams['pageID'];
+    if(!array_key_exists($pageID,$this->pages)){
       $this->messages->write('error', "You are not authorized to view that page.");
       $this->redirect($this->path("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/"));
       $this->afterAction();
@@ -35,11 +39,11 @@ class ApplyPageController extends ApplyController {
       exit();
     }
     $this->addScript('common/scripts/controllers/apply_page.controller.js');
-    $this->page = $this->pages[$this->pageID];
+    $this->page = $this->pages[$pageID];
+    $this->pagePath = 'apply/' . $this->application->Program->shortName . '/' . $this->application->Cycle->name . '/page/' . $this->page->id;
     $this->setVar('page', $this->page);
     $this->setVar('currentAnswerID', false);
-    $this->setVar('form', $this->page->getForm());
-    if($form = $this->page->getForm()) $form->action = $this->path('apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $this->pageID);
+    $this->setVar('action', $this->path($this->pagePath));
   }
   
   /**
@@ -49,13 +53,8 @@ class ApplyPageController extends ApplyController {
     if(!empty($this->post)){
       if($input = $this->page->validateInput($this->post)){
         $this->page->newAnswer($input);
-        //look for locked applications and redirect them
-        //this is cheaper than redirecting for every page load
-        if($this->applicant->locked){
-          $this->redirect($this->path("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/status/"));
-          exit();
-        }
         $this->messages->write('success', 'Answer Saved Successfully');
+        $this->redirectPath($this->pagePath);
       }
     }
   }
@@ -68,9 +67,7 @@ class ApplyPageController extends ApplyController {
     if(method_exists($this->page, $this->actionParams['doWhat'])){
       if($this->page->{$this->actionParams['doWhat']}($this->actionParams['answerID']))
         $this->messages->write('success', 'Action Completed Successfully');
-      
-      //stick this inside the exists block so a 404 will be returned otherwise
-      $this->loadView($this->controllerName . '/index');
+        $this->redirectPath($this->pagePath);
     }
   }
   
@@ -80,13 +77,14 @@ class ApplyPageController extends ApplyController {
    */
   public function actionEdit() {
     if(empty($this->post)){
-      $this->page->getForm()->action = $this->path('apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $this->pageID . '/edit/' . $this->actionParams['answerID']);
+      $this->setVar('action', $this->path('apply/' . $this->application->Program->shortName . '/' . $this->application->Cycle->name . '/page/' . $this->page->id . '/edit/' . $this->actionParams['answerID']));
       $this->page->fill($this->actionParams['answerID']);
       $this->setVar('currentAnswerID', $this->actionParams['answerID']);
     } else {
       if($input = $this->page->validateInput($this->post)){
         if($this->page->updateAnswer($input,$this->actionParams['answerID'])){
           $this->messages->write('success', 'Answer Updated Successfully');
+          $this->redirectPath($this->pagePath);
         }
       }
     }
@@ -99,6 +97,7 @@ class ApplyPageController extends ApplyController {
   public function actionDelete() {
     if($this->page->deleteAnswer($this->actionParams['answerID'])){
       $this->messages->write('success', 'Answer Deleted Successfully');
+      $this->redirectPath($this->pagePath);
     }
     $this->loadView($this->controllerName . '/index');
   }
@@ -115,7 +114,7 @@ class ApplyPageController extends ApplyController {
     $menu->title = 'Application Pages';
     foreach($this->pages as $id => $page){
       $link = $menu->newLink(array('text'=>$page->title, 'href'=> $this->path('apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $page->id)));
-      if($this->pageID == $id){
+      if($this->page->id == $id){
         $link->current = true;
       }
       switch($page->getStatus()){
@@ -130,12 +129,10 @@ class ApplyPageController extends ApplyController {
           break;
       }
     }
-    
-
     $applicant_menu = $navigation->newMenu();
     $applicant_menu->title = "User Menu";
-    $applicant_menu->newLink(array('text'=>'Support', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/support")));
-    $applicant_menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/logout")));
+    $applicant_menu->newLink(array('text'=>'Support', 'href'=>$this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/support")));
+    $applicant_menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/applicant/logout")));
     
     return $navigation;
   }

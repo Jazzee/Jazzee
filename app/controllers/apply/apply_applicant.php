@@ -6,17 +6,28 @@
  * @package jazzee
  * @subpackage apply
  */
-class ApplyApplicantController extends ApplyGuestController {
+class ApplyApplicantController extends JazzeeController {
+  /**
+   * The application
+   * @var Application
+   */
+  protected $application;
   
-   /**
-   * Before any action check to be sure an application is setup
+  /**
+   * Before any action do some setup
+   * If we know the program and cycle load the applicant var
+   * If we only know the program fill that in
    * @return null
    */
   protected function beforeAction(){
     parent::beforeAction();
-    if(empty($this->application)){
-      die('No application available');
+    $program = Doctrine::getTable('Program')->findOneByShortName($this->actionParams['programShortName']);
+    $cycle = Doctrine::getTable('Cycle')->findOneByName($this->actionParams['cycleName']);
+    $this->application = Doctrine::getTable('Application')->findOneByProgramIDAndCycleID($program->id, $cycle->id);
+    if(!$this->application->published){
+      $this->redirectPath("apply/{$this->application->Program->shortName}/");
     }
+    $this->setLayoutVar('layoutTitle', $this->application->Cycle->name . ' ' . $this->application->Program->name . ' Application');
   }
   
   /**
@@ -25,9 +36,9 @@ class ApplyApplicantController extends ApplyGuestController {
    * @param string $cycleName
    * @return null
    */
-  public function actionLogin($programShortName, $cycleName) {
+  public function actionLogin() {
     $form = new Form;
-    $form->action = $this->path("apply/{$programShortName}/{$cycleName}/applicant/login");
+    $form->action = $this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/applicant/login");
     $field = $form->newField(array('legend'=>'Login'));
     $element = $field->newElement('TextInput','email');
     $element->label = 'Email Address';
@@ -49,10 +60,10 @@ class ApplyApplicantController extends ApplyGuestController {
           $applicant->failedLoginAttempts = 0;
           $applicant->save();
           $s = Session::getInstance();
-          $session = $s->getStore('apply');
+          $session = $s->getStore('apply', $this->config->session_lifetime);
           $session->applicantID = $applicant->id;
-          $this->messages->write('success', "Welcome to the {$this->application['Program']->name} application.");
-          $this->redirect($this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/page/{$this->application['Pages']->getFirst()->id}"));
+          $this->messages->write('success', "Welcome to the {$this->application->Program->name} application.");
+          $this->redirect($this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/page/{$this->application->findPagesByWeight()->getFirst()->id}"));
           return;
         }
         $applicant->failedLoginAttempts++;
@@ -63,7 +74,6 @@ class ApplyApplicantController extends ApplyGuestController {
       sleep(5); //wait 5 seconds before announcing failure to slow down guessing.
     }
     $this->setVar('form', $form);
-    $this->setLayoutVar('layoutTitle', $this->application['Cycle']->name . ' ' . $this->application['Program']->name . ' Application');
     
   }
   
@@ -163,24 +173,21 @@ class ApplyApplicantController extends ApplyGuestController {
       }
     }
     $this->setVar('form', $form);
-    $this->setLayoutVar('layoutTitle', $this->application['Cycle']->name . ' ' . $this->application['Program']->name . ' Application');
   }
   
   public function actionLogout($programShortName,$cycleName){
     $s = Session::getInstance()->getStore('apply')->expire();
-    $this->setLayoutVar('layoutTitle', $this->application['Cycle']->name . ' ' . $this->application['Program']->name . ' Application');
   }
   
   public function getNavigation(){
+    $path = "apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}";
     $navigation = new Navigation();
     $menu = $navigation->newMenu();
     $menu->title = 'Navigation';
-    $menu->newLink(array('text'=>'Welcome', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/")));
-    $menu->newLink(array('text'=>'Other Cycles', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/")));
-    $menu->newLink(array('text'=>'Returning Applicants', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/login/")));
-    $menu->newLink(array('text'=>'Start a New Application', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/new/")));
+    $menu->newLink(array('text'=>'Welcome', 'href'=>$this->path("{$path}/")));
+    $menu->newLink(array('text'=>'Other Cycles', 'href'=>$this->path("apply/{$this->application->Program->shortName}/")));
+    $menu->newLink(array('text'=>'Returning Applicants', 'href'=>$this->path("{$path}/applicant/login/")));
+    $menu->newLink(array('text'=>'Start a New Application', 'href'=>$this->path("{$path}/applicant/new/")));
     return $navigation;
-  }
-  
+  } 
 }
-?>

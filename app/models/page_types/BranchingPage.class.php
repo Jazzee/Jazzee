@@ -68,6 +68,7 @@ class BranchingPage extends StandardPage {
       $a->save();
       $this->form = $this->makeForm();
       $this->form->applyDefaultValues();
+      return true;
     }
   }
 

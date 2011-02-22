@@ -41,7 +41,8 @@ if($answers = $page->getAnswers()){
   print '</div>';
 }
 print "<div id='leadingText'>{$page->leadingText}</div>";
-if($form){
+if($form = $page->getForm()){
+  $form->action = $action;
   $this->renderElement('form', array('form'=> $form));
 }
 print "<div id='trailingText'>{$page->trailingText}</div>";

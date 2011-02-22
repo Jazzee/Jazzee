@@ -66,7 +66,7 @@ try {
   ));
   $basicRouter->addRoute('#^apply/?([^/]*)/?([^/]*)/?(.*)$#i', array(
     'controller' => 'apply_welcome',
-    'action' => '', //do the default
+    'action' => 'index',
     'action_params' => array(
       'programShortName' => 1,
       'cycleName' => 2

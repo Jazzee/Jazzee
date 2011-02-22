@@ -59,6 +59,7 @@ class ETSMatchPage extends StandardPage {
       $answer->update($input);
       $a->save();
       $this->form->applyDefaultValues();
+      return true;
     }
   }
   
