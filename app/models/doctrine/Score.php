@@ -88,7 +88,7 @@ class Score extends Doctrine_Record{
   /**
    * Load the matched score after every save
    */
-  public function postSave(){
+  public function postSave($event){
     $this->loadMatchedScore();
   }
   
