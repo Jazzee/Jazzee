@@ -75,7 +75,7 @@ class UnitOfWork{
         $model->save();
       }
       foreach ($this->deleteCollection as $model) {
-        $model->delete($conn);
+        $model->delete();
       }
       $this->connection->commit();
     } catch(Doctrine_Exception $e) {
