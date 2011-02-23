@@ -19,11 +19,7 @@ class AdminCronController extends AdminController {
     }
     $this->setVariable('cron_semaphore', 'true');
     $this->setVariable('cron_lastRun', $startTime);
-    //use a static list for now, future update should dynamically search all paths for AdminController
-    $cronClasses = array( 
-//      'admin_cron'
-    );
-    foreach($cronClasses as $className){
+    foreach($this->listControllers() as $className){
       Lvc_FoundationConfig::includeController($className);
       $class = Lvc_Config::getControllerClassName($className);
       if(call_user_func(array($class, 'runCron'),$this->getVariable("{$className}_cron_lastRun"))){
