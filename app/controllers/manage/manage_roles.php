@@ -45,7 +45,7 @@ class ManageRolesController extends ManageController {
         $element->value = $values;
       }
       $form->newButton('submit', 'Edit Role');
-      $this->setVar('form', $form); 
+      $this->setVar('form', $form);
       if($input = $form->processInput($this->post)){
         $role->name = $input->name;
         $role->Actions->clear();
@@ -101,32 +101,10 @@ class ManageRolesController extends ManageController {
    */
   protected function getAuths(){
     $auths = array();
-    //all of the admin controllers, shoudl probably autodetect
-    $controllers = array(
-      'manage_users',
-      'manage_configuration',
-      'manage_globalpages',
-      'manage_roles',
-      'manage_scores',
-      'manage_programs',
-      'manage_cycles',
-      'manage_pagetypes',
-      'manage_paymenttypes',
-      'manage_elementtypes',
-      'applicants_view',
-      'applicants_communication',
-      'applicants_decisions',
-      'setup_application',
-      'setup_pages',
-      'setup_roles',
-      'setup_users',
-      'admin_profile',
-      'admin_changecycle',
-      'admin_changeprogram'
-    );
-    foreach($controllers as $controller){
+    foreach($this->listControllers() as $controller){
       FoundationVC_Config::includeController($controller);
-      $auths[$controller] = call_user_func(array(Lvc_Config::getControllerClassName($controller), 'getControllerAuth')); 
+      $auth = call_user_func(array(Lvc_Config::getControllerClassName($controller), 'getControllerAuth'));
+      if($auth instanceof ControllerAuth) $auths[$controller] = $auth;
     }
     return $auths;
   }
