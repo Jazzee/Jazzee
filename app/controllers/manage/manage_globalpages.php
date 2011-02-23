@@ -127,9 +127,14 @@ class ManageGlobalpagesController extends ManageController implements PagesInter
     $data = json_decode($this->post['data']);
     switch($data->status){
       case 'delete':
-        if($page = Doctrine::getTable('Page')->findByIdAndIsGlobal($pageId,true)){
-          var_dump($page); die;
-          $work->registerModelForDelete($page);
+        if($page = Doctrine::getTable('Page')->findOneByIdAndIsGlobal($pageId,true)){
+          if(Doctrine::getTable('ApplicationPage')->findByPageId($page->id)->count()){
+            $this->setLayoutVar('status', 'error');
+            $this->messages->write('error',"{$page->title} could not be deleted becuase it is part of at least on application");
+          } else {
+            $page->delete();
+            return true;
+          }
         }
       break;
       case 'new':
