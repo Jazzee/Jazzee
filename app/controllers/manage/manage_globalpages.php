@@ -19,8 +19,8 @@ class ManageGlobalpagesController extends ManageController implements PagesInter
   public function setUp(){
     parent::setUp();
     $this->addScript('foundation/scripts/form.js');
-    $this->addScript('common/scripts/status.js');
-    $this->addScript('common/scripts/authenticationTimeout.js');
+    $this->addScript('common/scripts/classes/Status.class.js');
+    $this->addScript('common/scripts/classes/AuthenticationTimeout.class.js');
     
     $this->addScript('common/scripts/page_types/ApplyPage.class.js');
     $types = Doctrine::getTable('PageType')->findAll(Doctrine::HYDRATE_ARRAY);
