@@ -84,7 +84,7 @@ class Communication extends Doctrine_Record{
    * Pre Insert set the createdAt timestamp
    * @see Doctrine_Record::preInsert()
    */
-  public function preInsert(Doctrine_Event $event){
+  public function preInsert($event){
     $modifiedFields = $this->getModified();
     if(!array_key_exists('createdAt',$modifiedFields)){
       $this->createdAt = date('Y-m-d H:i:s', time());
