@@ -38,6 +38,7 @@ ApplyElement.prototype.init = function(obj, page){
   this.required = (obj.required)?1:0;
   this.min = obj.min;
   this.max = obj.max;
+  this.weight = obj.weight;
   this.listItems = [];
   
   this.status = '';
