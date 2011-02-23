@@ -3,10 +3,13 @@
  * Manage Global Pages
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
- * @subpackage admin
- * @subpackage setup
+ * @subpackage manage
  */
 class ManageGlobalpagesController extends ManageController implements PagesInterface {
+  const MENU = 'Manage';
+  const TITLE = 'Global Pages';
+  const PATH = 'manage/globalpages';
+  
   /**
    * Set the default layout to json
    * @var string

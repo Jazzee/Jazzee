@@ -2,11 +2,14 @@
 /**
  * Manage Element types
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage manage
  */
 class ManageElementtypesController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Element Types';
+  const PATH = 'manage/elementtypes';
+  
   /**
    * List all the active ElementTypes and find any new classes on the file system
    */

@@ -63,4 +63,9 @@ Resource::getInstance()->addDirectory(APP_ROOT . '/common/scripts', 'common/scri
 Resource::getInstance()->addDirectory(APP_ROOT . '/common/styles', 'common/styles/', true);
 Resource::getInstance()->addDirectory(APP_ROOT . '/common/media', 'common/media/', true);
 
+//add the builtin admin controller directories
+AdminController::addControllerPath(APP_ROOT . '/controllers/manage');
+AdminController::addControllerPath(APP_ROOT . '/controllers/setup');
+AdminController::addControllerPath(APP_ROOT . '/controllers/applicants');
+AdminController::addControllerPath(APP_ROOT . '/controllers/admin');
 ?>

@@ -7,6 +7,14 @@
  */
 abstract class AdminController extends JazzeeController{
   /**
+   * The navigation constants for this controller
+   * @constant string
+   */
+  const MENU = null;
+  const TITLE = null;
+  const PATH = null;
+  
+  /**
    * The user
    * @var User
    */
@@ -35,6 +43,12 @@ abstract class AdminController extends JazzeeController{
    * @var string
    */
   protected $layout = 'wide';
+  
+  /**
+   * Array of direcotires where admin controllers can be found
+   * @var array
+   */
+  protected static $controllerPaths = array();
   
   /**
    * Check credentials and intialize members
@@ -114,88 +128,46 @@ abstract class AdminController extends JazzeeController{
    */
   public function getNavigation(){
     $navigation = new Navigation();
-    $menu = $navigation->newMenu();
-    $menu->title = 'Manage System';
-    if($this->checkIsAllowed('manage_configuration'))
-      $menu->newLink(array('text'=>'Configuration', 'href'=>$this->path("manage/configuration/")));
-    if($this->checkIsAllowed('manage_cycles'))
-      $menu->newLink(array('text'=>'Application Cycles', 'href'=>$this->path("manage/cycles/")));
-    if($this->checkIsAllowed('manage_programs'))
-      $menu->newLink(array('text'=>'Programs', 'href'=>$this->path("manage/programs/")));
-    if($this->checkIsAllowed('manage_users'))
-      $menu->newLink(array('text'=>'Users', 'href'=>$this->path("manage/users/")));
-    if($this->checkIsAllowed('manage_roles'))
-      $menu->newLink(array('text'=>'Global Roles', 'href'=>$this->path("manage/roles/")));
-    if($this->checkIsAllowed('manage_globalpages'))
-      $menu->newLink(array('text'=>'Global Pages', 'href'=>$this->path("manage/globalpages/")));
-    if($this->checkIsAllowed('manage_pagetypes'))
-      $menu->newLink(array('text'=>'Page Types', 'href'=>$this->path("manage/pagetypes/")));
-    if($this->checkIsAllowed('manage_paymenttypes'))
-      $menu->newLink(array('text'=>'Payment Types', 'href'=>$this->path("manage/paymenttypes/")));
-    if($this->checkIsAllowed('manage_elementtypes'))
-      $menu->newLink(array('text'=>'Element Types', 'href'=>$this->path("manage/elementtypes/")));
-    if($this->checkIsAllowed('manage_scores'))
-      $menu->newLink(array('text'=>'Test Scores', 'href'=>$this->path("manage/scores/")));
-      
-    $menu = $navigation->newMenu();
-    $menu->title = 'Setup';
-    if($this->checkIsAllowed('setup_application'))
-      $menu->newLink(array('text'=>'Application', 'href'=>$this->path("setup/application/")));
-    if($this->checkIsAllowed('setup_pages'))
-      $menu->newLink(array('text'=>'Pages', 'href'=>$this->path("setup/pages/")));
-    if($this->checkIsAllowed('setup_roles'))
-      $menu->newLink(array('text'=>'Program Roles', 'href'=>$this->path("setup/roles/")));
-    if($this->checkIsAllowed('setup_users'))
-      $menu->newLink(array('text'=>'Program Users', 'href'=>$this->path("setup/users/")));
-    
-    $menu = $navigation->newMenu();
-    $menu->title = 'Applicants';
-    if($this->checkIsAllowed('applicants_view'))
-      $menu->newLink(array('text'=>'Search', 'href'=>$this->path("applicants/view/")));
-    if($this->checkIsAllowed('applicants_communication'))
-      $menu->newLink(array('text'=>'Communication', 'href'=>$this->path("applicants/communication/")));
-    if($this->checkIsAllowed('applicants_decisions'))
-      $menu->newLink(array('text'=>'Decisions', 'href'=>$this->path("applicants/decisions/")));
-    
-    
-    $menu = $navigation->newMenu();
-    $menu->title = 'My Account';
-    if($this->checkIsAllowed('admin_changecycle'))
-      $menu->newLink(array('text'=>'Change Cycle', 'href'=>$this->path("admin/changecycle/")));
-    if($this->checkIsAllowed('admin_changeprogram'))
-      $menu->newLink(array('text'=>'Change Program', 'href'=>$this->path("admin/changeprogram/")));
-    if($this->checkIsAllowed('admin_profile'))
-      $menu->newLink(array('text'=>'Profile', 'href'=>$this->path("admin/profile/")));
-    $menu->newLink(array('text'=>'Logout', 'href'=>$this->path("admin/logout")));
+    $menus = array();
+    foreach($this->listControllers() as $controller){
+      if($this->checkIsAllowed($controller)){
+        FoundationVC_Config::includeController($controller);
+        $class = Lvc_Config::getControllerClassName($controller);
+        if(!is_null($class::MENU)){
+          if(!isset($menus[$class::MENU])){
+            $menus[$class::MENU] = $navigation->newMenu();
+            $menus[$class::MENU]->title = $class::MENU;
+          }
+          $menus[$class::MENU]->newLink(array('text'=>$class::TITLE, 'href'=>$this->path($class::PATH).'/'));
+        }
+      }
+    }
+    foreach($menus as $menu) $menu->sortLinks();
     return $navigation;
   }
   
   /**
-   * Get a variable
-   * @param string $name
-   * @return blob the value
+   * Add a path to the AdminController::controllersPaths
+   * @param string $path
+   * @throws Jazzee_Exception
    */
-  protected function getVariable($name){
-    $var = Doctrine::getTable('AdminVariable')->findOneByName($name);
-    if($var){
-      return $var->value;
-    }
-    return false;
+  public static function addControllerPath($path){
+    if(!is_readable($path)) throw new Jazzee_Exception("Unable to read controller path {$path}");
+    self::$controllerPaths[] = $path;
   }
   
   /**
-   * Set a variable
-   * @param string $name
-   * @param mixed $value
+   * List all the controllers
+   * @return array
    */
-  protected function setVariable($name, $value){
-    $var = Doctrine::getTable('AdminVariable')->findOneByName($name);
-    if($var === false){
-      $var = new AdminVariable;
-      $var->name = $name; 
+  protected function listControllers(){
+    $arr = array();
+    foreach(self::$controllerPaths as $path){
+      //scan the directory but drop the relative paths
+      foreach(array_diff(scandir($path), array('.','..')) as $fileName) 
+        $arr[] = basename($fileName, '.php');
     }
-    $var->value = (string)$value;
-    $var->save();
+    return $arr;
   }
   
   /**

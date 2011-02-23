@@ -7,6 +7,10 @@
  * @subpackage manage
  */
 class ManageUsersController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Users';
+  const PATH = 'manage/users';
+  
   /**
    * Search for a user to modify
    */

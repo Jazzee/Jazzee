@@ -1,13 +1,16 @@
 <?php
 /**
  * Manage Configuration
- * Settings for the JazzeeConfig and /etc/config.ini.php
+ * Settings stored in JazzeeConfig table
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage manage
  */
 class ManageConfigurationController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Configuration';
+  const PATH = 'manage/configuration';
+  
   /**
    * Form for editing variables
    */

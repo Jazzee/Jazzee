@@ -7,6 +7,9 @@
  * @subpackage admin
  */
 class AdminWelcomeController extends AdminController {
+  const TITLE = 'Home';
+  const PATH = 'admin/welcome';
+  
   /**
    * Display index
    */

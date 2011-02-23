@@ -2,11 +2,14 @@
 /**
  * Manage Cycles
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage manage
  */
 class ManageCyclesController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Cycles';
+  const PATH = 'manage/cycles';
+  
   /**
    * List cycles
    */

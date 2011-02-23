@@ -6,6 +6,10 @@
  * @subpackage manage
  */
 class ManagePaymenttypesController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Payment Types';
+  const PATH = 'manage/paymenttypes';
+  
   /**
    * List all the active PaymentTypes and find any new classes on the file system
    */

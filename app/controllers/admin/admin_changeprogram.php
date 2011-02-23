@@ -2,12 +2,14 @@
 /**
  * Change the a users current program and defautl program
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
- * @todo When authentication is working only allow a user to change to a program in which they have priviliges
  */
 class AdminChangeprogramController extends AdminController {
+  const MENU = 'My Account';
+  const TITLE = 'Change Program';
+  const PATH = 'admin/changeprogram';
+  
   /**
    * Display index
    */

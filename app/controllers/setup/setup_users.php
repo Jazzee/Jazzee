@@ -1,12 +1,15 @@
 <?php
 /**
- * Manage Users
+ * Setup Program Users
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
- * @subpackage manage
+ * @subpackage setup
  */
 class SetupUsersController extends SetupController {
+  const MENU = 'Setup';
+  const TITLE = 'Program Users';
+  const PATH = 'setup/users';
+  
   /**
    * Search for a user to modify
    */

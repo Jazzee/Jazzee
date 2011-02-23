@@ -4,10 +4,13 @@
  * View messages sent by applicants and send messages to individuals or groups
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
- * @subpackage admin
  * @subpackage applicants
  */
 class ApplicantsCommunicationController extends ApplicantsController {
+  const MENU = 'Applicants';
+  const TITLE = 'Communication';
+  const PATH = 'applicants/communication';
+  
 //  
 //  /**
 //   * Add the required JS

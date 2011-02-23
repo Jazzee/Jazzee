@@ -2,7 +2,6 @@
 /**
  * Activate new account or finish password reset for an old account
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  */

@@ -2,11 +2,14 @@
 /**
  * Manage Page types
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage manage
  */
 class ManagePagetypesController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Page Types';
+  const PATH = 'manage/pagetypes';
+  
   /**
    * List all the active PageTypes and find any new classes on the file system
    */

@@ -2,11 +2,14 @@
 /**
  * Manage Global Roles
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage manage
  */
 class ManageRolesController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Roles';
+  const PATH = 'manage/roles';
+  
   /**
    * List all the Roles
    */

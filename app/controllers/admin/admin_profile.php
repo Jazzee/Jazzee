@@ -2,11 +2,14 @@
 /**
  * Current user can edit their profile
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  */
 class AdminProfileController extends AdminController {
+  const MENU = 'My Account';
+  const TITLE = 'My Profile';
+  const PATH = 'admin/profile';
+  
   /**
    * Display index
    */

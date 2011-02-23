@@ -3,11 +3,14 @@
  * Manage Test Scores
  * Import test scores from a variatey of sources
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage manage
  */
 class ManageScoresController extends ManageController {
+  const MENU = 'Manage';
+  const TITLE = 'Scores';
+  const PATH = 'manage/scores';
+  
   /**
    * Allow the user to pick a score type and upload the file
    */

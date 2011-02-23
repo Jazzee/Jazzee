@@ -2,11 +2,14 @@
 /**
  * Setup Program Roles
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage setup
  */
 class SetupRolesController extends SetupController {
+  const MENU = 'Setup';
+  const TITLE = 'Program Roles';
+  const PATH = 'setup/roles';
+  
   /**
    * List all the Roles
    */

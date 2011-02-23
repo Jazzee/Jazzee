@@ -2,12 +2,13 @@
 /**
  * View the applicants
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
- * @subpackage admin
  * @subpackage applicants
  */
 class ApplicantsViewController extends ApplicantsController {
+  const MENU = 'Applicants';
+  const TITLE = 'Search';
+  const PATH = 'applicants/view';
   
   /**
    * Add the required JS

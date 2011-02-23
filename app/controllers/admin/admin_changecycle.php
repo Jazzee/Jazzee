@@ -2,11 +2,14 @@
 /**
  * Change the a users current cycle
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  */
 class AdminChangecycleController extends AdminController {
+  const MENU = 'My Account';
+  const TITLE = 'Change Cycle';
+  const PATH = 'admin/changecycle';
+  
   /**
    * Display index
    */

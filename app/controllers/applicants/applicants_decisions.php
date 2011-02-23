@@ -3,10 +3,13 @@
  * Decide on applicants
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
- * @subpackage admin
  * @subpackage applicants
  */
 class ApplicantsDecisionsController extends ApplicantsController {
+  const MENU = 'Applicants';
+  const TITLE = 'Decisions';
+  const PATH = 'applicants/decisions';
+  
   protected $layout = 'json';
   
     

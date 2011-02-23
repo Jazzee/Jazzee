@@ -2,12 +2,15 @@
 /**
  * Setup the pages
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  * @subpackage setup
  */
 class SetupPagesController extends SetupController implements PagesInterface {
+  const MENU = 'Setup';
+  const TITLE = 'Pages';
+  const PATH = 'setup/pages';
+  
   /**
    * Set the default layout to json
    * @var string

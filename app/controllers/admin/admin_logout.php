@@ -2,11 +2,14 @@
 /**
  * Logout Administrators
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  */
 class AdminLogoutController extends AdminController {
+  const MENU = 'My Account';
+  const TITLE = 'Logout';
+  const PATH = 'admin/logout';
+  
   protected $sessionName = 'guest';
   protected $layout = 'default';
   /**
@@ -14,12 +17,8 @@ class AdminLogoutController extends AdminController {
    */
   public function actionIndex(){
     Session::getInstance()->getStore('manage')->expire();
-    setcookie('JazzeeLogin', '', time() - 3600);
-    $this->setLayoutVar('layoutTitle', 'Application Management Logout');
     $this->messages->write('success', "You have been loggout out successfully.");
-    $this->redirect($this->path("admin/login"));
-    $this->afterAction();
-    exit(0);
+    $this->redirectPath('admin/login');
   }
   
   public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){

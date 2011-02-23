@@ -2,12 +2,15 @@
 /**
  * Setup the application
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  * @subpackage setup
  */
 class SetupApplicationController extends SetupController {
+  const MENU = 'Setup';
+  const TITLE = 'Application';
+  const PATH = 'setup/application';
+  
   /**
    * If there is no application then create a new one to work with
    */
