@@ -43,6 +43,15 @@ class Navigation_Menu {
   }
   
   /**
+   * Sort the links by title
+   */
+  public function sortLinks(){
+    usort($this->_links, function($a, $b){
+      return strcmp($a->text, $b->text);
+    });
+  }
+  
+  /**
    * Does the menu have links
    * @return bool true if there are any links false if not
    */
