@@ -6,6 +6,17 @@ function BranchingPage(){}
 BranchingPage.prototype = new ApplyPage();
 BranchingPage.prototype.constructor = BranchingPage;
 
+/**
+ * Override AplyPage::newPage to set varialbe defaults
+ * @param {String} id the id to use
+ * @returns {BranchingPage}
+ */
+BranchingPage.prototype.newPage = function(id,title,pageType,pageClass,status,pageStore){
+  var page = ApplyPage.prototype.newPage.call(this, id,title,pageType,pageClass,status,pageStore);
+  page.setVariable('branchingElementLabel', title);
+  return page;
+};
+
 BranchingPage.prototype.workspace = function(){
   //call the parent workspace method
   ApplyPage.prototype.workspace.call(this);
@@ -13,7 +24,8 @@ BranchingPage.prototype.workspace = function(){
   $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
   
   $('#workspace-left-middle-left').show();
-  $('#workspace-left-middle-left').html(this.listBranchingPagesBlock());
+  $('#workspace-left-middle-left').append(this.textInputVariableBlock('branchingElementLabel', 'Branching Element Label: ', 'click to edit'));
+  $('#workspace-left-middle-left').append(this.listBranchingPagesBlock());
 };
 
 BranchingPage.prototype.listBranchingPagesBlock = function(){

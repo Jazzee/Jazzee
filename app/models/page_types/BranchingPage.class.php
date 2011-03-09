@@ -13,7 +13,7 @@ class BranchingPage extends StandardPage {
     $field->legend = $this->applicationPage->title;
     $field->instructions = $this->applicationPage->instructions;
     $element = $field->newElement('SelectList', 'branching');
-    $element->label = $this->applicationPage->title;
+    $element->label = $this->applicationPage->Page->getVar('branchingElementLabel');
     $element->addValidator('NotEmpty');
     foreach($this->applicationPage->Page->Children as $branch){
       $element->addItem($branch->id, $branch->title);
@@ -141,7 +141,7 @@ class BranchingAnswer extends StandardAnswer {
   }
   
   public function getElements(){
-    $arr = array('branching' => $this->answer->Page->title);
+    $arr = array('branching' => $this->answer->Page->getVar('branchingElementLabel'));
     foreach($this->elements as $id => $element){
       $arr[$id] = $element->title;
     }
