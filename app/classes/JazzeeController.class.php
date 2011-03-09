@@ -79,9 +79,10 @@ class JazzeeController extends Controller{
     //Add the JazzeeConfig table to the ConfigManager
     $this->config->addContainer(new DoctrineTableConfigType(Doctrine::getTable('JazzeeConfig')));
    
-    //setup secure sessions
+    //setup the session based on the configuration
     $session = Session::getInstance();
-    $session->set('name', $this->config->session_name);
+    //if the session name variable is empty then there is no way to login and fix it so look for an empty session name and default to the ini value if it is blank
+    $session->set('name', (empty($this->config->session_name)?ini_get('session.name'):$this->config->session_name));
     //cookies last forever (until browser is closed) which takes the users local clock out of the picture
     //Timeouts are handled By Session internally by expiring the Session_Store
     $session->set('cookie_lifetime', 0);
