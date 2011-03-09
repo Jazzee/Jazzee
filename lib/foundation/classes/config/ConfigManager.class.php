@@ -34,6 +34,15 @@ class ConfigManager {
   }
   
   /**
+   * Check if a value is set
+   * @param string $name
+   * @return boolean
+   */
+  public function __isset($name){
+    return isset($this->variables[$name]);
+  }
+  
+  /**
    * Add a config container
    * @param ConfigType $container
    */
