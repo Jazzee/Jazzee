@@ -1,0 +1,22 @@
+JazzeeConfig:
+  JazzeeConfig_1:
+    name: session_lifetime
+    value: null
+  JazzeeConfig_2:
+    name: session_name
+    value: null
+  JazzeeConfig_3:
+    name: pretty_urls
+    value: null
+  JazzeeConfig_4:
+    name: captcha_public_key
+    value: null
+  JazzeeConfig_5:
+    name: captcha_private_key
+    value: null
+  JazzeeConfig_6:
+    name: pdflib_key
+    value: null
+  JazzeeConfig_7:
+    name: max_apply_file_size
+    value: null
