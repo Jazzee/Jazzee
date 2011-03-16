@@ -17,3 +17,6 @@ PageType:
   PageType_6:
     name: Branching
     class: BranchingPage
+  PageType_7:
+    name: Payment
+    class: PaymentPage
