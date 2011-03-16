@@ -20,3 +20,9 @@ ElementType:
   ElementType_7:
     name: Ranking List
     class: RankingListElement
+  ElementType_8:
+    name: Date
+    class: DateElement
+  ElementType_9:
+    name: Short Date
+    class: ShortDateElement
