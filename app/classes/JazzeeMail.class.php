@@ -19,19 +19,17 @@ class JazzeeMail {
    * Constructor is protected to preserve singleton
    */
   protected function __construct() {
-    //load configuration file
-    $c = new Config;
-    $root = $c->parseConfig(SRC_ROOT . '/etc/config.ini.php', 'INICommented'); 
-    $file = $root->toArray();
+    $config = new ConfigManager;
+    $config->addContainer(new IniConfigType(SRC_ROOT . '/etc/config.ini.php'));
     //setup the connection to the mail server
-    $this->server = new EmailServer($file['root']['system']['mailServer']);
-    $this->server->defaultFrom($file['root']['system']['mailDefaultFrom'], $file['root']['system']['mailDefaultName']);
+    $this->server = new EmailServer($config->mailServer);
+    $this->server->defaultFrom($config->mailDefaultFrom, $config->mailDefaultName);
     
     //In development mode require the mailOverrideTo configruation item, but allow it in other status levels
-    if($file['root']['system']['status'] == 'DEVELOPMENT' OR $file['root']['system']['mailOverrideTo']) {
-      if(!$file['root']['system']['mailOverrideTo'])
+    if($config->status == 'DEVELOPMENT' OR $config->mailOverrideTo) {
+      if(!$config->mailOverrideTo)
         throw new Jazzee_Exception('In development mode mailOverrideTo must be set.');
-      $this->server->overrideTo($file['root']['system']['mailOverrideTo']);
+      $this->server->overrideTo($config->mailOverrideTo);
     }
   }
   
