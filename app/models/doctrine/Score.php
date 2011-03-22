@@ -45,25 +45,6 @@ class Score extends Doctrine_Record{
     $this->hasColumn('testYear', 'integer', null, array(
       'type' => 'integer',
      ));
-
-
-    $this->index('applicant_score', array(
-      'fields' => array(
-        0 => 'answerID',
-        1 => 'scoreType',
-        2 => 'scoreID',
-      ),
-      'type' => 'unique',
-    ));
-    $this->index('regnumber', array(
-      'fields' =>  array(
-        0 => 'scoreType',
-        1 => 'registrationNumber',
-        2 => 'testMonth',
-        3 => 'testYear',
-      ),
-      'type' => 'unique',
-    ));
   }
   
   /**
