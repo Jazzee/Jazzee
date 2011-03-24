@@ -19,9 +19,6 @@ class RankingListElement extends ApplyElement {
     $element->format = $this->element->format;
     $element->rankItems = $this->element->max;
     $element->minimumItems = $this->element->min;
-    if($this->element->required){
-      $element->addValidator('NotEmpty');
-    }
     foreach($this->element->ListItems as $item){
       $element->addItem($item->id, $item->value);
     }
