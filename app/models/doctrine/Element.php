@@ -119,7 +119,7 @@ class Element extends Doctrine_Record{
     return $q->execute();
   }
   
-  /**
+ /**
   * Get ListItem
   * @param integer $itemId
   * @return ListItem
@@ -130,6 +130,20 @@ class Element extends Doctrine_Record{
       return $this->ListItems->get($key);
     }
     return false;
+  }
+  
+ /**
+  * Get Item by value
+  * @param string $value
+  * @return ListItem
+  */
+  public function getItemByValue($value){
+    $q = Doctrine_Query::create()
+      ->select('*')
+      ->from('ElementListItem')
+      ->where('elementID = ?', $this->id)
+      ->andWhere('value=?', $value);
+    return $q->execute();
   }
   
   /**
