@@ -143,7 +143,9 @@ class Element extends Doctrine_Record{
       ->from('ElementListItem')
       ->where('elementID = ?', $this->id)
       ->andWhere('value=?', $value);
-    return $q->execute();
+    $result = $q->execute();
+    if($result->count()) return $result->getFirst();
+    return false;
   }
   
   /**
