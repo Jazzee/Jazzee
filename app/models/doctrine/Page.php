@@ -132,7 +132,7 @@ class Page extends Doctrine_Record{
       ->select('*')
       ->from('Element')
       ->where('pageID = ?', $this->id)
-      ->ansWhere('title = ?', $title);
+      ->andWhere('title = ?', $title);
     return $q->execute()->getFirst();
   }
   
