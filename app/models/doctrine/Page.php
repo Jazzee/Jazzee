@@ -128,10 +128,12 @@ class Page extends Doctrine_Record{
   }
   
   public function getElementByTitle($title){
-    foreach($this['Elements'] as $element){
-      if($element->title == $title){return $element;}
-    }
-    return self::$_null;
+    $q = Doctrine_Query::create()
+      ->select('*')
+      ->from('Element')
+      ->where('pageID = ?', $this->id)
+      ->ansWhere('title = ?', $title);
+    return $q->execute()->getFirst();
   }
   
   /**
