@@ -41,9 +41,9 @@ class ElementAnswer extends Doctrine_Record{
       'type' => 'string',
       'length' => '255',
      ));
-    $this->hasColumn('eLongString', 'string', 10000, array(
+    $this->hasColumn('eLongString', 'string', 100000, array(
       'type' => 'string',
-      'length' => '10000',
+      'length' => '100000',
      ));
     $this->hasColumn('eDate', 'timestamp', null, array(
       'type' => 'timestamp',
