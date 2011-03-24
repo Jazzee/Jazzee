@@ -147,8 +147,9 @@ class TOEFLScore extends Doctrine_Record{
       'type' => 'int',
       'length' => '1',
     ));
-    $this->hasColumn('offTopic', 'boolean', null, array(
-      'type' => 'boolean',
+    $this->hasColumn('offTopic', 'string', 1, array(
+      'type' => 'string',
+      'length' => '1',
     ));
   
     $this->index('registration_number', array(
