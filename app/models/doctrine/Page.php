@@ -149,6 +149,19 @@ class Page extends Doctrine_Record{
   }
   
   /**
+   * Find an element by FixedID
+   * @param integer $fixedID
+   */
+  public function getElementByFixedId($fixedID){
+    $q = Doctrine_Query::create()
+      ->select('*')
+      ->from('Element')
+      ->where('pageID = ?', $this->id)
+      ->andWhere('fixedID = ?', $fixedID);
+    return $q->execute()->getFirst();
+  }
+  
+  /**
    * Get Variable by name
    * @param string $name
    * @return blob || NULL
