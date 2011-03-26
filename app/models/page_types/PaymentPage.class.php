@@ -12,7 +12,7 @@ class PaymentPage extends StandardPage {
 
   protected function makeForm(){
     //dont display the form if we have a settled or pending payment
-    foreach($this->applicant->Payment as $payment){
+    foreach($this->applicant->Payments as $payment){
       if($payment->status == 'settled' OR $payment->status == 'pending'){
         return null;
       }
@@ -61,7 +61,7 @@ class PaymentPage extends StandardPage {
   public function newAnswer($input){
     $paymentType = Doctrine::getTable('PaymentType')->find($input->paymentTypeID);
     $paymentClass = new $paymentType->class($paymentType);
-    $payment = $this->applicant->Payment->get(null);
+    $payment = $this->applicant->Payments->get(null);
     $payment->amount = $input->amount;
     $payment->paymentTypeID = $paymentType->id;
     $paymentClass->pendingPayment($payment);
@@ -76,7 +76,7 @@ class PaymentPage extends StandardPage {
   
   public function getAnswers(){
     $answers = array();
-    foreach($this->applicant->Payment as $p){
+    foreach($this->applicant->Payments as $p){
       $answers[] = new PaymentAnswer($p);
     }
     return $answers;
