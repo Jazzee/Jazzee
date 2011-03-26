@@ -6,6 +6,6 @@ StatusType:
   StatusType_3:
     name: Errors Present
   StatusType_4:
-    name: Not Recieved
+    name: Not Received
   StatusType_5:
     name: No Additional Information Required
