@@ -214,6 +214,7 @@ class Application extends Doctrine_Record{
           $q->andWhere('firstName like ?', $firstName . '%');   
       if($middleName)
           $q->andWhere('middleName = ?', $middleName);
+      $q->orderBy('lastName, firstName, middleName');
     return $q->execute();
   }
   
