@@ -1,7 +1,6 @@
 <?php 
 /**
- * applicants_view attachAapplicantPDF view
- * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * applicants_view generic form
  * @package jazzee
  * @subpackage admin
  * @subpackage applicants

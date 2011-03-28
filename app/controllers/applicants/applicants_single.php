@@ -1,78 +1,44 @@
 <?php
 /**
- * View the applicants
+ * View an applicant
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
  * @subpackage applicants
  */
-class ApplicantsViewController extends ApplicantsController {
-  const MENU = 'Applicants';
-  const TITLE = 'Search';
-  const PATH = 'applicants/view';
+class ApplicantsSingleController extends ApplicantsController {
+  const TITLE = 'Single Applicant';
+  const PATH = 'applicants/single';
   
-  /**
-   * Add the required JS
-   */
+//  /**
+//   * Add the required JS
+//   */
   public function setUp(){
     parent::setUp();
     $this->addScript('foundation/scripts/form.js');
-    $this->addScript('common/scripts/status.js');
+    $this->addScript('common/scripts/classes/Status.class.js');
     $this->addScript('common/scripts/applicants_view.js');
-  }
-  /**
-   * Display a search form and links to views
-   */
-  public function actionIndex(){
-    $form = new Form;
-    $form->action = $this->path("applicants/view");
-    $field = $form->newField(array('legend'=>'Search Applicants'));
-    $element = $field->newElement('TextInput','firstName');
-    $element->label = 'First Name';
-    $element = $field->newElement('TextInput','lastName');
-    $element->label = 'Last Name';
-    $element = $field->newElement('TextInput','applicantID');
-    $element->label = 'Applicant ID';
-    $form->newButton('submit', 'Search');
-    if($input = $form->processInput($this->post)){   
-      $applicants = array();
-      if($input->applicantID){
-        $applicant = $this->application->getApplicantByID($input->applicantID);
-        if($applicant)  $applicants[] = $applicant;
-      } else {
-        $applicants = $this->application->findApplicantsByName($input->lastName, $input->firstName);        
-      }
-      $this->setVar('applicants', $applicants);
-    }
-    $this->setVar('form', $form);
-  }
- 
-  /**
-   * List the applicants in the current program
-   */
-  public function actionList(){
-    if($this->application)
-      $this->setVar('applicants', $this->application->Applicants);
   }
   
   /**
-   * View a single applicants
+   * Index doesn't do anything right now
+   */
+  public function actionIndex(){}
+  
+  /**
+   * View a single applicants by ID
    * @param integer $id the applicant id
    */
-  public function actionSingle($id){
+  public function actionById($id){
     if(!$applicant = $this->application->getApplicantByID($id)){
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
     }
     $pages = array();
     foreach($this->application->Pages as $page){
-      if(class_exists($page->Page->PageType->class) AND is_subclass_of($page->Page->PageType->class, 'ApplyPage')){
-        $pages[$page->id] = new $page->Page->PageType->class($page, $applicant);
-      } else {
-        throw new Jazzee_Exception("There is no {$page->Page->PageType->class} class available.  This page will not be displayed");
-      }
+      $pages[$page->id] = new $page->Page->PageType->class($page, $applicant);
     }
     $this->setVar('pages', $pages);
     $this->setVar('applicant', $applicant);
-    $this->setVAR('fileStore', Session::getInstance()->getStore('files'));
+    $this->loadView('applicants_single/single');
   }
   
   /**
@@ -148,11 +114,13 @@ class ApplicantsViewController extends ApplicantsController {
         $applicant->suffix = $input->suffix;
         $applicant->email = $input->email;
         $applicant->save();
+        $this->redirectPath('applicants/single/byId/'.$applicant->id);
       } else {
         $this->setLayoutVar('status', 'error');
       }
     }
     $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   
@@ -169,6 +137,7 @@ class ApplicantsViewController extends ApplicantsController {
     $this->layout = 'json';
     $applicant->Decision->nominateAdmit = date('Y-m-d H:i:s');
     $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
   
   /**
@@ -184,6 +153,7 @@ class ApplicantsViewController extends ApplicantsController {
     $this->layout = 'json';
     $applicant->Decision->nominateDeny = date('Y-m-d H:i:s');
     $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
   
   /**
@@ -201,6 +171,7 @@ class ApplicantsViewController extends ApplicantsController {
     $applicant->Decision->nominateAdmit = null;
     $applicant->Decision->nominateDeny = null;
     $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
   
   /**
@@ -214,6 +185,7 @@ class ApplicantsViewController extends ApplicantsController {
     $this->layout = 'json';
     $applicant->unlock();
     $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
   
   /**
@@ -227,6 +199,7 @@ class ApplicantsViewController extends ApplicantsController {
     $this->layout = 'json';
     $applicant->lock();
     $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
   
   /**
@@ -262,6 +235,7 @@ class ApplicantsViewController extends ApplicantsController {
       }
     }
     $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   
@@ -289,6 +263,7 @@ class ApplicantsViewController extends ApplicantsController {
       }
     }
     $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**
@@ -315,6 +290,7 @@ class ApplicantsViewController extends ApplicantsController {
       }
     }
     $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**
@@ -330,6 +306,7 @@ class ApplicantsViewController extends ApplicantsController {
     if($page->deleteAnswer($id)){
       $this->messages->write('success', 'Answer Deleted Successfully');
     }
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
   
   /**
@@ -372,6 +349,7 @@ class ApplicantsViewController extends ApplicantsController {
       }
     }
     $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   
@@ -401,6 +379,7 @@ class ApplicantsViewController extends ApplicantsController {
       }
     }
     $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**
@@ -430,14 +409,14 @@ class ApplicantsViewController extends ApplicantsController {
       }
     }
     $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   public static function getControllerAuth(){
     $auth = new ControllerAuth;
-    $auth->name = 'View Applicants';
-    $auth->addAction('index', new ActionAuth('Search Applicants'));
-    $auth->addAction('list', new ActionAuth('List All Applicants'));
-    $auth->addAction('single', new ActionAuth('View a Single Applicant'));
+    $auth->name = 'Single Applicant';
+    $auth->addAction('index', new ActionAuth('Access single applicant'));
+    $auth->addAction('byId', new ActionAuth('Applicant By ID'));
     $auth->addAction('edit', new ActionAuth('Edit Applicant Data'));
     $auth->addAction('attachAnswerPDF', new ActionAuth('Attach PDF to answers'));
     $auth->addAction('attachApplicantPDF', new ActionAuth('Attach PDF to an applicant'));

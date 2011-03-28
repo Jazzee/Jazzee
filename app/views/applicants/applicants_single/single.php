@@ -1,8 +1,6 @@
 <?php 
 /**
- * applicants_view single view
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
+ * applicants_single single view
  * @package jazzee
  * @subpackage admin
  * @subpackage applicants
@@ -14,14 +12,14 @@
       "{$applicant->middleName} " .
       "{$applicant->lastName} " .
       "{$applicant->suffix}"; ?>
-  <?php if($this->controller->checkIsAllowed('applicants_view', 'edit')): ?>
-  (<a class='editApplicant' href='<?php print $this->path("applicants/view/editApplicant/{$applicant->id}")?>' title='edit applicant'>Edit</a>)
+  <?php if($this->controller->checkIsAllowed('applicants_single', 'edit')): ?>
+  (<a class='editApplicant' href='<?php print $this->path("applicants/single/editApplicant/{$applicant->id}")?>' title='edit applicant'>Edit</a>)
   <?php endif; ?>
   </h3>
-  <?php if($this->controller->checkIsAllowed('applicants_view', 'pdf')): ?>
+  <?php if($this->controller->checkIsAllowed('applicants_single', 'pdf')): ?>
   <p>Print PDF 
-  (<a href='<?php print $this->path("applicants/view/pdf/{$applicant->id}/portrait")?>' title='portrait pdf'>Portrait</a>)
-  (<a href='<?php print $this->path("applicants/view/pdf/{$applicant->id}/landscape")?>' title='landscape pdf'>Landscape</a>)
+  (<a href='<?php print $this->path("applicants/single/pdf/{$applicant->id}/portrait")?>' title='portrait pdf'>Portrait</a>)
+  (<a href='<?php print $this->path("applicants/single/pdf/{$applicant->id}/landscape")?>' title='landscape pdf'>Landscape</a>)
   </p>
   <?php endif; ?>
   <table>
@@ -67,26 +65,26 @@
         }
         $status = implode('<br />', $arr);
         if(empty($status)) $status = 'Under Review'; //no decision has been made
-        if(!$decision AND $this->controller->checkIsAllowed('applicants_view', 'nominateDecision')){
-          $status .= "&nbsp(<a class='nominateAdmit decision' href='" . $this->path("applicants/view/nominateAdmit/{$applicant->id}") . "' title='nominate applicant for admission'>Nominate for Admission</a>)";
-          $status .= "&nbsp(<a class='nominateDeny decision' href='" . $this->path("applicants/view/nominateDeny/{$applicant->id}") . "' title='nominate applicant for deny'>Nominate for Deny</a>)";
+        if(!$decision AND $this->controller->checkIsAllowed('applicants_single', 'nominateDecision')){
+          $status .= "&nbsp(<a class='nominateAdmit decision' href='" . $this->path("applicants/single/nominateAdmit/{$applicant->id}") . "' title='nominate applicant for admission'>Nominate for Admission</a>)";
+          $status .= "&nbsp(<a class='nominateDeny decision' href='" . $this->path("applicants/single/nominateDeny/{$applicant->id}") . "' title='nominate applicant for deny'>Nominate for Deny</a>)";
         }
-        if($decision and !$final and $this->controller->checkIsAllowed('applicants_view', 'nominateDecision'))
-          $status .= "&nbsp(<a class='undoNomination decision' href='" . $this->path("applicants/view/undoNomination/{$applicant->id}") . "' title='undo nomination'>Undo Nomination</a>)";
+        if($decision and !$final and $this->controller->checkIsAllowed('applicants_single', 'nominateDecision'))
+          $status .= "&nbsp(<a class='undoNomination decision' href='" . $this->path("applicants/single/undoNomination/{$applicant->id}") . "' title='undo nomination'>Undo Nomination</a>)";
       } else {
         $status = 'In Progress';
       }
       ?>
         <td>
           <?php print $status ?>
-          <?php  if($this->controller->checkIsAllowed('applicants_view', 'unlock') and $applicant->locked): ?>
-            &nbsp(<a class='unlock' href='<?php print $this->path("applicants/view/unlock/{$applicant->id}")?>' title='unlock applicant'>Unlock Application</a>)
+          <?php  if($this->controller->checkIsAllowed('applicants_single', 'unlock') and $applicant->locked): ?>
+            &nbsp(<a class='unlock' href='<?php print $this->path("applicants/single/unlock/{$applicant->id}")?>' title='unlock applicant'>Unlock Application</a>)
           <?php endif;?>
-          <?php  if($this->controller->checkIsAllowed('applicants_view', 'lock') and !$applicant->locked): ?>
-            &nbsp(<a class='lock' href='<?php print $this->path("applicants/view/lock/{$applicant->id}")?>' title='lock applicant'>Lock Application</a>)
+          <?php  if($this->controller->checkIsAllowed('applicants_single', 'lock') and !$applicant->locked): ?>
+            &nbsp(<a class='lock' href='<?php print $this->path("applicants/single/lock/{$applicant->id}")?>' title='lock applicant'>Lock Application</a>)
           <?php endif;?>
-          <?php  if($this->controller->checkIsAllowed('applicants_view', 'extendDeadline')): ?>
-            &nbsp(<a class='extendDeadline' href='<?php print $this->path("applicants/view/extendDeadline/{$applicant->id}")?>' title='extend deadline for applicant'>Extend Deadline</a>)
+          <?php  if($this->controller->checkIsAllowed('applicants_single', 'extendDeadline')): ?>
+            &nbsp(<a class='extendDeadline' href='<?php print $this->path("applicants/single/extendDeadline/{$applicant->id}")?>' title='extend deadline for applicant'>Extend Deadline</a>)
           <?php endif;?>
           <?php if($applicant->deadlineExtension and strtotime($applicant->deadlineExtension) > time())
             print '<br />Deadline Extension: ' . date('Y-m-d H:i:s', strtotime($applicant->deadlineExtension));?>
@@ -132,15 +130,15 @@
                   $fileStore->$pngName = $file;
                   print "<a href='" . $this->path("file/{$pdfName}.pdf") . "'><img src='" . $this->path("file/{$pngName}.png") . "' /></a>";
                 } else {
-                  if($this->controller->checkIsAllowed('applicants_view', 'attachAnswerPDF')){
-                    print "<a class='attachAnswerPDF' href='" . $this->path("applicants/view/attachAnswerPDF/{$answer->id}") . "'>Attach PDF</a>";
+                  if($this->controller->checkIsAllowed('applicants_single', 'attachAnswerPDF')){
+                    print "<a class='attachAnswerPDF' href='" . $this->path("applicants/single/attachAnswerPDF/{$answer->id}") . "'>Attach PDF</a>";
                   }
                 }
               print '</td>';
               print "<td class='tools'>";
-              if($this->controller->checkIsAllowed('applicants_view', 'edit')){
+              if($this->controller->checkIsAllowed('applicants_single', 'edit')){
                 foreach($answer->applicantTools() as $arr){
-                  print "<a class='{$arr['class']}' href='" . $this->path("applicants/view/{$arr['path']}") . "'>{$arr['title']}</a>";
+                  print "<a class='{$arr['class']}' href='" . $this->path("applicants/single/{$arr['path']}") . "'>{$arr['title']}</a>";
                 }
               }
               print '</td>';
@@ -151,8 +149,8 @@
         else:?>
           <p>Applicant has not answered this section</p>
         <?php endif; //answers
-        if($this->controller->checkIsAllowed('applicants_view', 'edit')){
-          print "<a class='addAnswer' href='" . $this->path("applicants/view/addAnswer/{$applicant->id}/{$page->id}") . "'>Add Answer</a>";
+        if($this->controller->checkIsAllowed('applicants_single', 'edit')){
+          print "<a class='addAnswer' href='" . $this->path("applicants/single/addAnswer/{$applicant->id}/{$page->id}") . "'>Add Answer</a>";
         }
         ?>
     </fieldset>
@@ -179,8 +177,8 @@
   </div>
   <?php endif;//end if applicant has attachments ?>
   <?php
-  if($this->controller->checkIsAllowed('applicants_view', 'attachApplicantPDF')){
-    print "<a class='attachApplicantPDF' href='" . $this->path("applicants/view/attachApplicantPDF/{$applicant->id}/") . "'>Attach PDF to Application</a>";
+  if($this->controller->checkIsAllowed('applicants_single', 'attachApplicantPDF')){
+    print "<a class='attachApplicantPDF' href='" . $this->path("applicants/single/attachApplicantPDF/{$applicant->id}/") . "'>Attach PDF to Application</a>";
   }
   ?>
 </div>

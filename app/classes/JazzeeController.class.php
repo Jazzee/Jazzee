@@ -181,6 +181,7 @@ class JazzeeController extends Controller{
     $this->setLayoutVar('layoutContentTop', '');
     $this->setLayoutVar('layoutContentFooter', '<p>This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.</p>');
     $this->setLayoutVar('status', 'success'); //used in some json ajax requests
+    $this->setLayoutVar('fileStore', $this->fileStore);
     
     //add jquery
     $this->addScript('foundation/scripts/jquery.js');
