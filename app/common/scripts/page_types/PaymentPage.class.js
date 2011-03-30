@@ -23,6 +23,7 @@ PaymentPage.prototype.newPage = function(id,title,pageType,pageClass,status,page
 PaymentPage.prototype.workspace = function(){
   ApplyPage.prototype.workspace.call(this);
   $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  $('#workspace-left-middle-left').append(this.paymentAmountsBlock());
 };
 
 PaymentPage.prototype.paymentAmountsBlock = function(){
