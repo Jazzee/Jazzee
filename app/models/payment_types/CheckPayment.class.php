@@ -40,6 +40,8 @@ class CheckPayment extends ApplyPayment{
     return str_ireplace($search, $replace, $leadingText);
   }
   
+  public function trailingText(Applicant $applicant){return '';}
+  
   /**
    * Setup the instructions for mailing the check including the address and any special markings (like appicant ID)
    * @see ApplyPayment::setupForm()
@@ -67,13 +69,13 @@ class CheckPayment extends ApplyPayment{
     $element->format = $format;
     $element->addValidator('NotEmpty');
     
-    $element = $field->newElement('TextArea','address');
+    $element = $field->newElement('Textarea','address');
     $element->label = 'Address to send the check to';
     if($paymentType) $element->value = $paymentType->getVar('address');
     $element->format = $format;
     $element->addValidator('NotEmpty');
     
-    $element = $field->newElement('TextArea','coupon');
+    $element = $field->newElement('Textarea','coupon');
     $element->label = 'Text for Payment Coupon';
     if($paymentType) $element->value = $paymentType->getVar('coupon');
     $element->format = $format;
