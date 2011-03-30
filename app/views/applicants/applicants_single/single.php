@@ -25,7 +25,7 @@
   <table>
     <caption>Applicant Information</caption>
     <thead>
-      <tr><th>Email</th><th>Actions</th><th>Admission Status</th></tr>
+      <tr><th>Email</th><th>Actions</th><th>Admission Status</th><th>Tags</th></tr>
     </thead>
     <tbody>
       <tr>
@@ -78,16 +78,25 @@
         <td>
           <?php print $status ?>
           <?php  if($this->controller->checkIsAllowed('applicants_single', 'unlock') and $applicant->locked): ?>
-            &nbsp(<a class='unlock' href='<?php print $this->path("applicants/single/unlock/{$applicant->id}")?>' title='unlock applicant'>Unlock Application</a>)
+            &nbsp;(<a class='unlock' href='<?php print $this->path("applicants/single/unlock/{$applicant->id}")?>' title='unlock applicant'>Unlock Application</a>)
           <?php endif;?>
           <?php  if($this->controller->checkIsAllowed('applicants_single', 'lock') and !$applicant->locked): ?>
-            &nbsp(<a class='lock' href='<?php print $this->path("applicants/single/lock/{$applicant->id}")?>' title='lock applicant'>Lock Application</a>)
+            &nbsp;(<a class='lock' href='<?php print $this->path("applicants/single/lock/{$applicant->id}")?>' title='lock applicant'>Lock Application</a>)
           <?php endif;?>
           <?php  if($this->controller->checkIsAllowed('applicants_single', 'extendDeadline')): ?>
-            &nbsp(<a class='extendDeadline' href='<?php print $this->path("applicants/single/extendDeadline/{$applicant->id}")?>' title='extend deadline for applicant'>Extend Deadline</a>)
+            &nbsp;(<a class='extendDeadline' href='<?php print $this->path("applicants/single/extendDeadline/{$applicant->id}")?>' title='extend deadline for applicant'>Extend Deadline</a>)
           <?php endif;?>
           <?php if($applicant->deadlineExtension and strtotime($applicant->deadlineExtension) > time())
             print '<br />Deadline Extension: ' . date('Y-m-d H:i:s', strtotime($applicant->deadlineExtension));?>
+        </td>
+        <td class='tags'>
+          <?php foreach($applicant->Tags as $tag){
+            print $tag->title . '<br />';
+          }?>
+          <form method='post' action='<?php print $this->path('applicants/single/addTag/'.$applicant->id)?>'>
+            <input type='text' size='5' name='tag' />
+            <input type='submit' value='Add' />
+          </form>
         </td>
       </tr>
     </tbody>

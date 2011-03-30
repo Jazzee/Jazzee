@@ -26,6 +26,7 @@
  * @property Doctrine_Collection $Communication
  * @property Doctrine_Collection $Payments
  * @property Doctrine_Collection $Answers
+ * @property Doctrine_Collection $Tags
  * 
  * @package    jazzee
  * @subpackage orm
@@ -119,7 +120,6 @@ class Applicant extends Doctrine_Record{
    * @see Doctrine_Record::setUp()
    */
   public function setUp(){
-    parent::setUp();
     $this->hasOne('Application', array(
       'local' => 'applicationID',
       'foreign' => 'id',
@@ -160,6 +160,12 @@ class Applicant extends Doctrine_Record{
     $this->hasMany('Answer as Answers', array(
       'local' => 'id',
       'foreign' => 'applicantID')
+    );
+    
+    $this->hasMany('Tag as Tags', array(
+      'local' => 'applicantID',
+      'foreign' => 'tagID',
+			'refClass' => 'ApplicantTag')
     );
   }
   
@@ -284,5 +290,26 @@ class Applicant extends Doctrine_Record{
     ->AndWhere('applicantID=?', array($this->id))
     ->orderBy('createdAt ASC');
     return $q->execute();
+  }
+  
+  /**
+   * Tag an applicant
+   * @param string $title
+   */
+  public function addTag($title){
+    foreach($this->Tags as $tag){
+      if($tag->title == $title) return true;
+    }
+    $this->Tags[]->title = $title;
+  }
+  
+/**
+   * Remove a tag from an applicant
+   * @param string $title
+   */
+  public function removeTag($title){
+    foreach($this->Tags as $index => $tag){
+      if($tag->title == $title) $this->Tags->remove($index);
+    }
   }
 }

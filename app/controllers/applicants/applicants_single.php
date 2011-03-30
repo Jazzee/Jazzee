@@ -141,6 +141,19 @@ class ApplicantsSingleController extends ApplicantsController {
   }
   
   /**
+   * Tag an applicant
+   * @param integer $id applicantID
+   */
+  public function actionAddTag($id){
+    if(!$applicant = $this->application->getApplicantByID($id)){
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
+    }
+    $applicant->addTag($this->post['tag']);
+    $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  }
+  
+  /**
    * Nominate and applicant for deny
    * @param integer $id applicantID
    */
@@ -431,7 +444,7 @@ class ApplicantsSingleController extends ApplicantsController {
   
   public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
     //All of these actions are controlled by the 'edit' role
-    $editActions = array('editApplicant', 'editAnswer', 'deleteAnswer', 'addAnswer');
+    $editActions = array('editApplicant', 'editAnswer', 'deleteAnswer', 'addAnswer', 'addTag');
     if(in_array($action, $editActions))
       $action = 'edit';
     $nominateDecisionActions = array('nominateAdmit', 'nominateDeny', 'undoNomination');
