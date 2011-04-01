@@ -300,7 +300,15 @@ class Applicant extends Doctrine_Record{
     foreach($this->Tags as $tag){
       if($tag->title == $title) return true;
     }
-    $this->Tags[]->title = $title;
+    $q = Doctrine_Query::create()
+      ->select('*')
+      ->from('Tag')
+      ->where('title=?', array($title));
+    $tags = $q->execute();
+    if($tags->count())
+      $this->Tags[] = $tags->getFirst();
+    else
+      $this->Tags[]->title = $title;
   }
   
 /**
