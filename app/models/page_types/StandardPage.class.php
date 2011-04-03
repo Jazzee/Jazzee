@@ -101,7 +101,7 @@ class StandardPage extends ApplyPage {
 /**
  * A single StandardPage Applicant Answer
  */
-class StandardAnswer extends ApplyAnswer {
+class StandardAnswer implements ApplyAnswer {
  /**
   * The Answer model
   * @var Answer $answer
