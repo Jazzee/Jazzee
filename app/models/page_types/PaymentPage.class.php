@@ -1,70 +1,44 @@
 <?php
 /**
- * Abstract Payment Page
- * Provides a guide for vendor specific payment types
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
+ * Payment Page
+ * Displays branching form to select payment type 
+ * Then displays payment form from that model and passes input
  * @package jazzee
  * @subpackage apply
  */
 class PaymentPage extends StandardPage {
   const SHOW_PAGE = false;
 
-  protected function makeForm(){
-    //dont display the form if we have a settled or pending payment
-    foreach($this->applicant->Payments as $payment){
-      if($payment->status == 'settled' OR $payment->status == 'pending'){
-        return null;
-      }
-    }
-    //display a form for selecting payment type
-    $form = new Form;
-    $field = $form->newField();
-    $field->legend = $this->applicationPage->title;
-    $element = $field->newElement('RadioList', 'paymentTypeID');
-    $element->label = 'Payment Method';
-    $element->addValidator('NotEmpty');
+  /**
+   * Get all the PaymentType forms
+   * return Array of Form
+   */
+  public function makeForm(){
+    $forms = array();   
     $paymentTypes = Doctrine::getTable('PaymentType')->findAll();
-    foreach($paymentTypes as $type){
-      $element->addItem($type->id, $type->name);
+    foreach($paymentTypes as $paymentType){
+      $paymentClass = new $paymentType->class($paymentType);
+      for($i = 1; $i<=$this->applicationPage->Page->getVar('amounts'); $i++){
+        $amounts[] = array(
+          'Amount' => $this->applicationPage->Page->getVar('amount'.$i),
+          'Description' => $this->applicationPage->Page->getVar('description'.$i)
+        );
+      }
+      $form = $paymentClass->paymentForm($this->applicant, $amounts);
+      $form->newHiddenElement('paymentType', $paymentType->id);
+      $forms[$paymentType->id] = $form;
     }
-    $form->newHiddenElement('level', 1);
-    $form->newButton('submit', 'Select');
-    return $form;
-  }
-  
-  protected function paymentForm($paymentTypeID){
-    $this->applicationPage->leadingText .= "<a href='{$this->applicationPage->id}'>Select a different payment option</a>";
-    $paymentType = Doctrine::getTable('PaymentType')->find($paymentTypeID);
-    $paymentClass = new $paymentType->class($paymentType);
-    $this->form->reset();
-    $amounts = array();
-    for($i = 1; $i<=$this->applicationPage->Page->getVar('amounts'); $i++){
-      $amounts[] = array(
-        'Amount' => $this->applicationPage->Page->getVar('amount'.$i),
-        'Description' => $this->applicationPage->Page->getVar('description'.$i)
-      );
-    }
-    $paymentClass->paymentForm($this->applicant, $amounts, $this->form);
-    $this->applicationPage->leadingText = $paymentClass->leadingText($this->applicant);
-    $this->applicationPage->trailingText = $paymentClass->trailingText($this->applicant);
-    $this->form->newHiddenElement('level', 2);
-    $this->form->newHiddenElement('paymentTypeID', $paymentTypeID);
+    return $forms;
   }
   
   public function validateInput($input){
-    $this->paymentForm($input['paymentTypeID']);
-    if($input['level'] == 1) return false;
-    return $this->form->processInput($input);
+    return $this->form[$input['paymentType']]->processInput($input);
   }
   
   public function newAnswer($input){
-    $paymentType = Doctrine::getTable('PaymentType')->find($input->paymentTypeID);
-    $paymentClass = new $paymentType->class($paymentType);
     $payment = $this->applicant->Payments->get(null);
-    $payment->amount = $input->amount;
-    $payment->paymentTypeID = $paymentType->id;
-    $paymentClass->pendingPayment($payment);
+    $answer = new PaymentAnswer($payment);
+    $answer->update($input);
     $this->applicant->save();
     $this->form = null;
     return true;
@@ -87,7 +61,7 @@ class PaymentPage extends StandardPage {
 /**
  * A single PaymentAnswer Applicant Answer
  */
-class PaymentAnswer extends ApplyAnswer {
+class PaymentAnswer implements ApplyAnswer {
  /**
   * The Payment model
   * @var Payment
@@ -107,7 +81,11 @@ class PaymentAnswer extends ApplyAnswer {
   }
   
   public function update(FormInput $input){
-    
+    $paymentType = Doctrine::getTable('PaymentType')->find($input->paymentType);
+    $this->payment->amount = $input->amount;
+    $this->payment->paymentTypeID = $paymentType->id;
+    $paymentClass = new $paymentType->class($paymentType);
+    $paymentClass->pendingPayment($this->payment, $input);
   }
   
   public function getElements(){
