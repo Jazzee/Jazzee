@@ -9,7 +9,7 @@ class CheckPayment extends ApplyPayment{
    */
   public function paymentForm(Applicant $applicant, $amounts){
     $form = new Form;
-    $field = $form->newField(array('legend'=>"Pay by check")); 
+    $field = $form->newField(array('legend'=>$this->paymentType->name)); 
     $instructions = '<p><strong>Make Checks Payable to:</strong> ' . $this->paymentType->getVar('payable') . '</p>';
     if($this->paymentType->getVar('address')) $instructions .= '<p><h4>Mail Check to:</h4>' . nl2br($this->paymentType->getVar('address')) . '</p>';
     if($this->paymentType->getVar('coupon')) $instructions .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($this->paymentType->getVar('coupon')) . '</p>';
