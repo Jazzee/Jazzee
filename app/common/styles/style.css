@@ -119,7 +119,7 @@ div.form label.required{
   background-position:top right;
 }
 
-div.form p.instructions {
+div.form p.instructions, div.form div.instructions {
   border: 1px groove #000000;
   background-color: #ffffdd;
 }
