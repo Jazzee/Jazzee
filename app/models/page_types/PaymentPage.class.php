@@ -16,6 +16,7 @@ class PaymentPage extends StandardPage {
    */
   protected function makeForm(){
     $form = new Form;
+    $form->action = $this->actionPath;
     $field = $form->newField();
     $field->legend = $this->applicationPage->title;
     $element = $field->newElement('SelectList', 'paymentType');

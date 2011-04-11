@@ -11,6 +11,7 @@ class LockPage extends StandardPage {
   
   protected function makeForm(){
     $form = new Form;
+    $form->action = $this->actionPath;
     $field = $form->newField();
     $field->legend = $this->applicationPage->title;
     $field->instructions = $this->applicationPage->instructions;

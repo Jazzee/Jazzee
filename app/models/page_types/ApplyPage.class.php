@@ -28,12 +28,19 @@ abstract class ApplyPage {
   
  /**
   * The ApplicationPage model
-  * @var ApplicationPage $_page
+  * @var ApplicationPage $applicationPage
   */
   protected $applicationPage;
+    
+  /**
+   * The path where form actions are directed to
+   * @var string
+   */
+  protected $actionPath = null;
   
   /**
    * The Applicant
+   * @var Applicant
    */
   protected $applicant;
   
@@ -42,6 +49,8 @@ abstract class ApplyPage {
    * @var Form
    */
   protected $form;
+  
+  
   
  /**
   * Contructor
@@ -52,6 +61,14 @@ abstract class ApplyPage {
     $this->applicationPage = $applicationPage;
     $this->applicant = $applicant;
     $this->form = $this->makeForm();
+  }
+  
+  /**
+   * Set the action path
+   * @param string $actionPath
+   */
+  public function setActionPath($actionPath){
+    $this->actionPath = $actionPath;
   }
   
   /**

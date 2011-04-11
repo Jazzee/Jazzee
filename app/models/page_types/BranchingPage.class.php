@@ -9,6 +9,7 @@ class BranchingPage extends StandardPage {
   
   protected function makeForm(){
     $form = new Form;
+    $form->action = $this->actionPath;
     $field = $form->newField();
     $field->legend = $this->applicationPage->title;
     $field->instructions = $this->applicationPage->instructions;
@@ -26,6 +27,8 @@ class BranchingPage extends StandardPage {
   protected function branchingForm($branchingPageID){
     $this->applicationPage->leadingText .= "<a href='{$this->applicationPage->id}'>Undo</a>";
     $this->form->reset();
+    $this->form->action = $this->actionPath;
+    
     $page = $this->applicationPage->Page->getChildById($branchingPageID);
     $field = $this->form->newField();
     $field->legend = $page->title;

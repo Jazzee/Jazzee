@@ -6,9 +6,5 @@
  */
 ?>
 <div id='leadingText'><?php print $page->leadingText?></div>
-<?php 
-  $form = $page->getForm();
-  $form->action = $action;
-  $this->renderElement('form', array('form'=> $form));
-?>
+<?php $this->renderElement('form', array('form'=> $form = $page->getForm())); ?>
 <div id='trailingText'><?php print $page->trailingText?></div>

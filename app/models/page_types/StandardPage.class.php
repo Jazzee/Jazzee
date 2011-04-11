@@ -8,12 +8,22 @@
  * @subpackage apply
  */
 class StandardPage extends ApplyPage {
+  
+  /**
+   * When we update the action path also update the path for the form
+   * @see ApplyPage::setActionPath()
+   */
+  public function setActionPath($actionPath){
+    $this->form->action = $actionPath;
+  }
+  
   /**
    * Create the form from the $page
    * @return Form
    */
   protected function makeForm(){
     $form = new Form;
+    $form->action = $this->actionPath;
     $field = $form->newField();
     $field->legend = $this->applicationPage->title;
     $field->instructions = $this->applicationPage->instructions;

@@ -15,4 +15,4 @@ if($answers = $page->getAnswers()){
   print '</div>';
 }
 $elementName = FoundationVC_Config::findElementCacading(get_class($page), '', '-form');
-$this->renderElement($elementName, array('page'=>$page, 'action'=>$action));
+$this->renderElement($elementName, array('page'=>$page));

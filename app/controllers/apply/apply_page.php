@@ -18,7 +18,7 @@ class ApplyPageController extends ApplyController {
    * Convienece string holding the path to this page
    * @var  string    
    */
-  protected $pathPath;
+  protected $pagePath;
   
   /**
    * Lookup applicant and make sure we are authorized to view the page
@@ -41,9 +41,9 @@ class ApplyPageController extends ApplyController {
     $this->addScript('common/scripts/controllers/apply_page.controller.js');
     $this->page = $this->pages[$pageID];
     $this->pagePath = 'apply/' . $this->application->Program->shortName . '/' . $this->application->Cycle->name . '/page/' . $this->page->id;
+    $this->page->setActionPath($this->path($this->pagePath));
     $this->setVar('page', $this->page);
     $this->setVar('currentAnswerID', false);
-    $this->setVar('action', $this->path($this->pagePath));
   }
   
   /**
@@ -77,7 +77,7 @@ class ApplyPageController extends ApplyController {
    */
   public function actionEdit() {
     if(empty($this->post)){
-      $this->setVar('action', $this->path('apply/' . $this->application->Program->shortName . '/' . $this->application->Cycle->name . '/page/' . $this->page->id . '/edit/' . $this->actionParams['answerID']));
+      $this->page->setActionPath($this->path($this->pagePath . '/edit/' . $this->actionParams['answerID']));
       $this->page->fill($this->actionParams['answerID']);
       $this->setVar('currentAnswerID', $this->actionParams['answerID']);
     } else {
