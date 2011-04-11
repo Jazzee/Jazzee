@@ -7,10 +7,12 @@ class CheckPayment extends ApplyPayment{
    * Display information about mailing a check and allow the applicant to record a preliminary check payment
    * @see ApplyPayment::paymentForm()
    */
-  public function paymentForm(Applicant $applicant, $amounts){
+  public function paymentForm(Applicant $applicant, $amount){
     $form = new Form;
+    $form->newHiddenElement('amount', $amount);
     $field = $form->newField(array('legend'=>$this->paymentType->name)); 
-    $instructions = '<p><strong>Make Checks Payable to:</strong> ' . $this->paymentType->getVar('payable') . '</p>';
+    $instructions = "<p><strong>Application Fee:</strong> &#36;{$amount}</p>";
+    $instructions .= '<p><strong>Make Checks Payable to:</strong> ' . $this->paymentType->getVar('payable') . '</p>';
     if($this->paymentType->getVar('address')) $instructions .= '<p><h4>Mail Check to:</h4>' . nl2br($this->paymentType->getVar('address')) . '</p>';
     if($this->paymentType->getVar('coupon')) $instructions .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($this->paymentType->getVar('coupon')) . '</p>';
     $search = array(
@@ -27,12 +29,6 @@ class CheckPayment extends ApplyPayment{
     $instructions = str_ireplace($search, $replace, $instructions);
     $field->instructions = $instructions . '<p>Click the Pay By Check button to pay your fee by check.  Your account will be temporarily credited and you can complete your application.  Your application will not be reviewed until your check is recieved.</p>';       
     
-    $element = $field->newElement('RadioList', 'amount');
-    $element->label = 'Type of payment';
-    $element->addValidator('NotEmpty');
-    foreach($amounts as $amount){
-      $element->addItem($amount['Amount'], $amount['Description'] . ' $' . $amount['Amount']);
-    }
     $form->newButton('submit', 'Pay By Check');
     return $form;
   }

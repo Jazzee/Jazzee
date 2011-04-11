@@ -12,12 +12,21 @@ abstract class ApplyPayment implements ApplyPaymentInterface{
   protected $paymentType;
   
   /**
+   * The config file
+   * @var ConfigManager
+   */
+  protected $config;
+  
+  /**
    * Constructor
    * @param Payment $payment
    * @param PaymentType $paymentType
    */
   public function __construct(PaymentType $paymentType){
     $this->paymentType = $paymentType;
+    $this->config = new ConfigManager;
+    $this->config->addContainer(new IniConfigType(SRC_ROOT . '/etc/config.ini.php'));
+    
   }
 }
 
@@ -36,10 +45,10 @@ interface ApplyPaymentInterface{
   /**
    * Get the form for new payments
    * @param Applicant $applicant
-   * @param Array $amounts
+   * @param float $amount
    * @return Form
    */
-  function paymentForm(Applicant $applicant, $amounts);
+  function paymentForm(Applicant $applicant, $amount);
 
   /**
    * Get the setup form

@@ -8,31 +8,59 @@
  */
 class PaymentPage extends StandardPage {
   const SHOW_PAGE = false;
-
+  
   /**
-   * Get all the PaymentType forms
-   * return Array of Form
+   * The payment type and the amount are selected first
+   * then we display the form for the payment type
+   * @see StandardPage::makeForm()
    */
-  public function makeForm(){
-    $forms = array();   
+  protected function makeForm(){
+    $form = new Form;
+    $field = $form->newField();
+    $field->legend = $this->applicationPage->title;
+    $element = $field->newElement('SelectList', 'paymentType');
+    $element->label = 'Payment Method';
+    $element->addValidator('NotEmpty');
     $paymentTypes = Doctrine::getTable('PaymentType')->findAll();
-    foreach($paymentTypes as $paymentType){
-      $paymentClass = new $paymentType->class($paymentType);
-      for($i = 1; $i<=$this->applicationPage->Page->getVar('amounts'); $i++){
-        $amounts[] = array(
-          'Amount' => $this->applicationPage->Page->getVar('amount'.$i),
-          'Description' => $this->applicationPage->Page->getVar('description'.$i)
-        );
-      }
-      $form = $paymentClass->paymentForm($this->applicant, $amounts);
-      $form->newHiddenElement('paymentType', $paymentType->id);
-      $forms[$paymentType->id] = $form;
+    foreach($paymentTypes as $type){
+      $element->addItem($type->id, $type->name);
     }
-    return $forms;
+    $element = $field->newElement('RadioList', 'amount');
+    $element->label = 'Type of payment';
+    $element->addValidator('NotEmpty');
+    for($i = 1; $i<=$this->applicationPage->Page->getVar('amounts'); $i++){
+      $element->addItem($this->applicationPage->Page->getVar('amount'.$i), $this->applicationPage->Page->getVar('description'.$i));
+    }
+      
+    $form->newHiddenElement('level', 1);
+    $form->newButton('submit', 'Select');
+    return $form;
   }
   
+  /**
+   * Validate form input from either the intial payment selection form
+   * or the ApplyPayment form
+   * @see StandardPage::validateInput()
+   */
   public function validateInput($input){
-    return $this->form[$input['paymentType']]->processInput($input);
+    if($input['level'] == 1){
+      $result = $this->form->processInput($input);
+      //if there is an problem with the input then do what we would normally do
+      if(!$result) return false;
+    }
+    //we are eithier processing a good choice of payment and amount or the input from an ApplyPayment form
+    //eithier way we need to create the apply payment form
+    $this->applicationPage->leadingText .= "<a href='{$this->applicationPage->id}'>Select a different payment option</a>";
+    $paymentType = Doctrine::getTable('PaymentType')->find($input['paymentType']);
+    $paymentClass = new $paymentType->class($paymentType);
+    $this->form = $paymentClass->paymentForm($this->applicant, $input['amount']);
+    $this->form->newHiddenElement('level', 2);
+    $this->form->newHiddenElement('paymentType', $input['paymentType']);
+    
+    //if we were processing a good choice of payment and amount we now return false so the newly created form can be displayed to the applicant
+    if($input['level'] == 1) return false;
+    //otherwise we process the input from the ApplyPayment form
+    return $this->form->processInput($input);
   }
   
   public function newAnswer($input){
