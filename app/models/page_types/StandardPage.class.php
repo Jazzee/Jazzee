@@ -14,6 +14,7 @@ class StandardPage extends ApplyPage {
    * @see ApplyPage::setActionPath()
    */
   public function setActionPath($actionPath){
+    parent::setActionPath($actionPath);
     $this->form->action = $actionPath;
   }
   
