@@ -46,9 +46,10 @@ interface ApplyPaymentInterface{
    * Get the form for new payments
    * @param Applicant $applicant
    * @param float $amount
+   * @param string $actionPath where we are posting the form to
    * @return Form
    */
-  function paymentForm(Applicant $applicant, $amount);
+  function paymentForm(Applicant $applicant, $amount, $actionPath);
 
   /**
    * Get the setup form

@@ -51,10 +51,10 @@ class PaymentPage extends StandardPage {
     }
     //we are eithier processing a good choice of payment and amount or the input from an ApplyPayment form
     //eithier way we need to create the apply payment form
-    $this->applicationPage->leadingText .= "<a href='{$this->applicationPage->id}'>Select a different payment option</a>";
+    $this->applicationPage->leadingText .= "<a href='{$this->actionPath}'>Select a different payment option</a>";
     $paymentType = Doctrine::getTable('PaymentType')->find($input['paymentType']);
     $paymentClass = new $paymentType->class($paymentType);
-    $this->form = $paymentClass->paymentForm($this->applicant, $input['amount']);
+    $this->form = $paymentClass->paymentForm($this->applicant, $input['amount'], $this->actionPath);
     $this->form->newHiddenElement('level', 2);
     $this->form->newHiddenElement('paymentType', $input['paymentType']);
     

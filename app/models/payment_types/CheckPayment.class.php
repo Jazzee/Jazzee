@@ -7,8 +7,9 @@ class CheckPayment extends ApplyPayment{
    * Display information about mailing a check and allow the applicant to record a preliminary check payment
    * @see ApplyPayment::paymentForm()
    */
-  public function paymentForm(Applicant $applicant, $amount){
+  public function paymentForm(Applicant $applicant, $amount, $actionPath){
     $form = new Form;
+    $form->action = $actionPath;
     $form->newHiddenElement('amount', $amount);
     $field = $form->newField(array('legend'=>$this->paymentType->name)); 
     $instructions = "<p><strong>Application Fee:</strong> &#36;{$amount}</p>";
