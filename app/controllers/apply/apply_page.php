@@ -52,9 +52,10 @@ class ApplyPageController extends ApplyController {
   public function actionIndex() {
     if(!empty($this->post)){
       if($input = $this->page->validateInput($this->post)){
-        $this->page->newAnswer($input);
-        $this->messages->write('success', 'Answer Saved Successfully');
-        $this->redirectPath($this->pagePath);
+        if($this->page->newAnswer($input)){
+          $this->messages->write('success', 'Answer Saved Successfully');
+          $this->redirectPath($this->pagePath);
+        }
       }
     }
   }

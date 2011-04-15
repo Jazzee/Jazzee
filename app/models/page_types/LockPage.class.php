@@ -55,6 +55,7 @@ class LockPage extends StandardPage {
   public function newAnswer($input){
     $this->applicant->lock();
     $this->applicant->save();
+    return true;
   }
   
   /**
