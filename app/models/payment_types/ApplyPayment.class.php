@@ -6,6 +6,14 @@
  */
 abstract class ApplyPayment implements ApplyPaymentInterface{
   /**
+   * Status text constants
+   */
+  const PENDING_TEXT = 'pending';
+  const SETTLED_TEXT = 'seettled';
+  const REJECTED_TEXT = 'rejected';
+  const REFUNDED_TEXT = 'refunded';
+  
+  /**
    * The PaymentType Model
    * @var PaymentType
    */
@@ -33,6 +41,7 @@ abstract class ApplyPayment implements ApplyPaymentInterface{
     $this->config->addContainer(new IniConfigType(SRC_ROOT . '/etc/config.ini.php'));
     $this->messages = Message::getInstance();
   }
+  
 }
 
 /**

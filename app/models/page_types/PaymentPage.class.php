@@ -83,7 +83,7 @@ class PaymentPage extends StandardPage {
   public function getAnswers(){
     $answers = array();
     foreach($this->applicant->Payments as $p){
-      if($p->status == 'settled' or $p->status == 'pending') $answers[] = new PaymentAnswer($p);
+      if($p->status != 'rejected') $answers[] = new PaymentAnswer($p);
     }
     return $answers;
   }
@@ -160,8 +160,24 @@ class PaymentAnswer implements ApplyAnswer {
   }
 
   public function applyStatus(){
+    $class = $this->payment->PaymentType->class;
+    $text = '';
+    switch($this->payment->status){
+      case 'pending':
+        $status = $class::PENDING_TEXT;
+        break;
+      case 'settled':
+        $status = $class::SETTLED_TEXT;
+        break;
+      case 'rejected':
+        $status = $class::REJECTED_TEXT;
+        break;
+      case 'refunded':
+        $status = $class::REFUNDED_TEXT;
+        break;
+    }  
     $arr = array(
-      'Status' => $this->payment->status
+      'Status' => $status
     );
     //add the reson to rejected payments
     if($this->payment->status == 'rejected') $arr['Reason'] = $this->payment->getVar('reasonText');

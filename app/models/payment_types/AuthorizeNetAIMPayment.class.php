@@ -4,6 +4,11 @@ require_once SRC_ROOT . '/lib/anet_sdk/AuthorizeNet.php';
  * Pay via Authorize.net Advanced Integration Method
  */
 class AuthorizeNetAIMPayment extends ApplyPayment{
+  const PENDING_TEXT = 'Approved';
+  const SETTLED_TEXT = 'Approved';
+  const REJECTED_TEXT = 'Card was rejected';
+  const REFUNDED_TEXT = 'This transaction was refunded';
+  
   /**
    * Display the button to pass applicant to Authorize.net's hosted payment page
    * @see ApplyPayment::paymentForm()

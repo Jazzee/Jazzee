@@ -3,6 +3,11 @@
  * Pay by check
  */
 class CheckPayment extends ApplyPayment{  
+  const PENDING_TEXT = 'We have not recieved your check';
+  const SETTLED_TEXT = 'Your check has been received';
+  const REJECTED_TEXT = 'Your check did not clear or was rejected';
+  const REFUNDED_TEXT = 'We have sent you a refund for this payment';
+  
   /**
    * Display information about mailing a check and allow the applicant to record a preliminary check payment
    * @see ApplyPayment::paymentForm()
