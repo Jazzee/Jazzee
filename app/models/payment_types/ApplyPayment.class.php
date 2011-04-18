@@ -18,6 +18,11 @@ abstract class ApplyPayment implements ApplyPaymentInterface{
   protected $config;
   
   /**
+   * @var Message
+   */
+  protected $messages;
+  
+  /**
    * Constructor
    * @param Payment $payment
    * @param PaymentType $paymentType
@@ -26,7 +31,7 @@ abstract class ApplyPayment implements ApplyPaymentInterface{
     $this->paymentType = $paymentType;
     $this->config = new ConfigManager;
     $this->config->addContainer(new IniConfigType(SRC_ROOT . '/etc/config.ini.php'));
-    
+    $this->messages = Message::getInstance();
   }
 }
 

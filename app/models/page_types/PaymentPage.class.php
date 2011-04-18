@@ -67,10 +67,13 @@ class PaymentPage extends StandardPage {
   public function newAnswer($input){
     $payment = $this->applicant->Payments->get(null);
     $answer = new PaymentAnswer($payment);
-    $answer->update($input);
-    $this->applicant->save();
-    $this->form = null;
-    return true;
+    if($answer->update($input)){
+      $this->applicant->save();
+      $this->form = null;
+      return true;
+    }
+    $this->applicant->save(); //save the applicant either way so we can record rejected payments
+    return false;
   }
   
   public function updateAnswer($input, $answerID){
@@ -80,7 +83,7 @@ class PaymentPage extends StandardPage {
   public function getAnswers(){
     $answers = array();
     foreach($this->applicant->Payments as $p){
-      $answers[] = new PaymentAnswer($p);
+      if($p->status == 'settled' or $p->status == 'pending') $answers[] = new PaymentAnswer($p);
     }
     return $answers;
   }
@@ -114,7 +117,7 @@ class PaymentAnswer implements ApplyAnswer {
     $this->payment->amount = $input->amount;
     $this->payment->paymentTypeID = $paymentType->id;
     $paymentClass = new $paymentType->class($paymentType);
-    $paymentClass->pendingPayment($this->payment, $input);
+    return $paymentClass->pendingPayment($this->payment, $input);
   }
   
   public function getElements(){
@@ -160,6 +163,8 @@ class PaymentAnswer implements ApplyAnswer {
     $arr = array(
       'Status' => $this->payment->status
     );
+    //add the reson to rejected payments
+    if($this->payment->status == 'rejected') $arr['Reason'] = $this->payment->getVar('reasonText');
     return $arr;
   }
   
@@ -167,6 +172,8 @@ class PaymentAnswer implements ApplyAnswer {
     $arr = array(
       'Status' => $this->payment->status
     );
+    //add the reson to rejected payments
+    if($this->payment->status == 'rejected') $arr['Reason'] = $this->payment->getVar('responseText');
     return $arr;
   }
   
