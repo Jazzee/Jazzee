@@ -85,7 +85,17 @@ class Payment extends Doctrine_Record{
     $var->value = $value;
   }
   
+  /**
+   * Set a payment as pending
+   */
   public function pending(){
     $this->status = 'pending';
+  }
+  
+  /**
+   * Set a payment as rejected
+   */
+  public function rejected(){
+    $this->status = 'rejected';
   }
 }
