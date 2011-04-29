@@ -77,7 +77,7 @@ interface ApplyPaymentInterface{
    * @param PaymentType $paymentType
    * @param Input $input the input from the form
    */
-  static function setup(PaymentType $paymentType, Input $input);
+  static function setup(PaymentType $paymentType, FormInput $input);
   
   /**
    * Record a payment as pending

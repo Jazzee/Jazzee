@@ -100,7 +100,7 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
     return $form;
   }
   
-  public static function setup(PaymentType $paymentType, Input $input){
+  public static function setup(PaymentType $paymentType, FormInput $input){
     $paymentType->name = $input->name;
     $paymentType->class = 'AuthorizeNetAIMPayment';
     $paymentType->setVar('description', $input->description);

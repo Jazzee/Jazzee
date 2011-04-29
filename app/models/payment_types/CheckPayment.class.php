@@ -80,7 +80,7 @@ class CheckPayment extends ApplyPayment{
     return $form;
   }
   
-  public static function setup(PaymentType $paymentType, Input $input){
+  public static function setup(PaymentType $paymentType, FormInput $input){
     $paymentType->name = $input->name;
     $paymentType->class = 'CheckPayment';
     $paymentType->setVar('payable', $input->payable);
