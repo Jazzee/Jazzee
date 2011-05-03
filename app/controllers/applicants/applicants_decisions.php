@@ -16,7 +16,7 @@ class ApplicantsDecisionsController extends ApplicantsController {
   /**
    * Add the required JS
    */
-  public function setUp(){
+  protected function setUp(){
     parent::setUp();
     $this->addScript('common/scripts/status.js');
     $this->addScript('common/scripts/decisions.js');

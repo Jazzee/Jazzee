@@ -13,7 +13,7 @@ class ApplicantsSearchController extends ApplicantsController {
   /**
    * Add the required JS
    */
-  public function setUp(){
+  protected function setUp(){
     parent::setUp();
     $this->addScript('common/scripts/controllers/applicants_search.controller.js');
   }

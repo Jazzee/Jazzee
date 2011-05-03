@@ -9,10 +9,10 @@ class ApplicantsSingleController extends ApplicantsController {
   const TITLE = 'Single Applicant';
   const PATH = 'applicants/single';
   
-//  /**
-//   * Add the required JS
-//   */
-  public function setUp(){
+  /**
+   * Add the required JS
+   */
+  protected function setUp(){
     parent::setUp();
     $this->addScript('foundation/scripts/form.js');
     $this->addScript('common/scripts/classes/Status.class.js');
