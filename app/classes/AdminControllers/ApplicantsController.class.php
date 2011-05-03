@@ -27,6 +27,20 @@ abstract class ApplicantsController extends AdminController{
     $message->body = "We have updated your application status.  In order to protect your privacy you must login to see these changes.  " . $mail->path("apply/{$applicant->Application->Program->shortName}/{$applicant->Application->Cycle->name}/applicant/login");
     $mail->send($message);
   }
+  
+  /**
+   * Get an applicant by ID
+   * Ensures we are fetching an applicant from our current program and cycle
+   * @param integer $applicantId
+   * @return Applicant
+   * 
+   */
+  protected function getApplicantById($applicantId){
+    if(!$applicant = $this->application->getApplicantByID($id)){
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
+    }
+    return $applicant;
+  }
 }
 
 ?>

@@ -29,9 +29,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id the applicant id
    */
   public function actionById($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $pages = array();
     foreach($this->application->Pages as $page){
       $pages[$page->id] = new $page->Page->PageType->class($page, $applicant);
@@ -47,9 +45,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param string $type the page orientation
    */
   public function actionPdf($id, $type = 'portrait'){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     switch($type){
       case 'landscape':
         $orientation = ApplicantPDF::USLETTER_LANDSCAPE;
@@ -71,9 +67,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id
    */
   public function actionEditApplicant($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $form = new Form;
     $form->action = $this->path("applicants/view/editApplicant/{$id}");
@@ -129,9 +123,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id applicantID
    */
   public function actionNominateAdmit($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     if($applicant->Decision->nominateDeny OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to admit applicant {$id} who already has a deny or final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
     $this->layout = 'json';
@@ -145,9 +137,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id applicantID
    */
   public function actionAddTag($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $applicant->addTag($this->post['tag']);
     $applicant->save();
     $this->redirectPath('applicants/single/byId/'.$applicant->id);
@@ -158,9 +148,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id applicantID
    */
   public function actionNominateDeny($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     if($applicant->Decision->nominateAdmit OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to deny applicant {$id} who already has a admit or final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
     $this->layout = 'json';
@@ -175,9 +163,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id applicantID
    */
   public function actionUndoNomination($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     if($applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to undo nomination for applicant {$id} who already has a final status", E_USER_ERROR, 'A final decision has already been recorded for that applicant');
     $this->layout = 'json';
@@ -192,9 +178,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id
    */
   public function actionUnlock($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $applicant->unlock();
     $applicant->save();
@@ -206,9 +190,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id
    */
   public function actionLock($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $applicant->lock();
     $applicant->save();
@@ -220,9 +202,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id
    */
   public function actionExtendDeadline($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $form = new Form;
     $form->action = $this->path("applicants/view/extendDeadline/{$id}");
@@ -257,9 +237,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id answerID
    */
   public function actionEditAnswer($id){
-    if(!$answer = Doctrine::getTable('Answer')->find($id) OR !$applicant = $this->application->getApplicantByID($answer->applicantID)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $page = new $answer->Page->PageType->class($this->application->getApplicationPageByGlobalID($answer->Page->id), $applicant);
     $form = $page->getForm();
@@ -285,9 +263,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $pageID
    */
   public function actionAddAnswer($applicantID, $pageID){
-    if(!$page = $this->application->getPageByID($pageID) OR !$applicant = $this->application->getApplicantByID($applicantID)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$applicantID} or page {$pageID} which is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $page = new $page->Page->PageType->class($page, $applicant);
     $form = $page->getForm();
@@ -311,9 +287,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id answerID
    */
   public function actionDeleteAnswer($id){
-    if(!$answer = Doctrine::getTable('Answer')->find($id) OR !$applicant = $this->application->getApplicantByID($answer->applicantID)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to delete answer {$id}", E_USER_ERROR, 'You do not have access to this applicant');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $page = new $answer->Page->PageType->class($this->application->getApplicationPageByGlobalID($answer->Page->id), $applicant);
     if($page->deleteAnswer($id)){
@@ -327,9 +301,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id answerID
    */
   public function actionVerifyAnswer($id){
-    if(!$answer = Doctrine::getTable('Answer')->find($id) OR !$applicant = $this->application->getApplicantByID($answer->applicantID)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access answer {$id} which does not belong to an applicantt in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $statusTypes = Doctrine::getTable('StatusType')->findAll();
     $form = new Form;
@@ -371,9 +343,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id answerID
    */
   public function actionAttachAnswerPDF($id){
-    if(!$answer = Doctrine::getTable('Answer')->find($id) OR !$applicant = $this->application->getApplicantByID($answer->applicantID)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access answer {$id} which does not belong to an applicantt in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $form = new Form;
     $form->action = $this->path("applicants/view/attachAnswerPDF/{$id}");
@@ -400,9 +370,7 @@ class ApplicantsSingleController extends ApplicantsController {
    * @param integer $id applicantID
    */
   public function actionAttachApplicantPDF($id){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to add a pdf to applicant {$id} which is not an applicant in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-    }
+    $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $form = new Form;
     $form->action = $this->path("applicants/view/attachApplicantPDF/{$id}");

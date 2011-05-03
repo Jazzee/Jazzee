@@ -57,17 +57,13 @@ class ApplicantsDecisionsController extends ApplicantsController {
   public function actionPreliminaryDecision(){
     $count = array('admit'=>0, 'deny'=>0);
     foreach($this->post['deny'] as $id){
-      if(!$applicant = $this->application->getApplicantByID($id)){
-        throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-      }
+      $applicant = $this->getApplicantById($id);
       $count['deny']++;
       $applicant->Decision->nominateDeny();
       $applicant->save();
     }
     foreach($this->post['admit'] as $id){
-      if(!$applicant = $this->application->getApplicantByID($id)){
-        throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-      }
+      $applicant = $this->getApplicantById($id);
       $count['admit']++;
       $applicant->Decision->nominateAdmit();
       $applicant->save();
@@ -86,17 +82,13 @@ class ApplicantsDecisionsController extends ApplicantsController {
   public function actionFinalDeny(){
     $count = array('undo'=>0, 'deny'=>0);
     foreach($this->post['undo'] as $id){
-      if(!$applicant = $this->application->getApplicantByID($id)){
-        throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-      }
+      $applicant = $this->getApplicantById($id);
       $count['undo']++;
       $applicant->Decision->undoNominateDeny();
       $applicant->save();
     }
     foreach($this->post['deny'] as $id){
-      if(!$applicant = $this->application->getApplicantByID($id)){
-        throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-      }
+      $applicant = $this->getApplicantById($id);
       $count['deny']++;
       $applicant->Decision->finalDeny();
       $this->notifyApplicantStatusUpdate($applicant);
@@ -117,9 +109,7 @@ class ApplicantsDecisionsController extends ApplicantsController {
   public function actionFinalAdmit(){
     $count = array('undo'=>0, 'admit'=>0);
     foreach($this->post['undo'] as $id){
-      if(!$applicant = $this->application->getApplicantByID($id)){
-        throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-      }
+      $applicant = $this->getApplicantById($id);
       $count['undo']++;
       $applicant->Decision->undoNominateAdmit();
       $applicant->save();
@@ -137,9 +127,7 @@ class ApplicantsDecisionsController extends ApplicantsController {
       }
       $sirDeadline = date('Y-m-d H:i:s', $timestamp);
       foreach($this->post['admit'] as $id){
-        if(!$applicant = $this->application->getApplicantByID($id)){
-          throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
-        }
+        $applicant = $this->getApplicantById($id);
         $count['admit']++;
         $applicant->Decision->finalAdmit();
         $applicant->Decision->offerResponseDeadline = $sirDeadline;
