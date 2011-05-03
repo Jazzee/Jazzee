@@ -7,6 +7,17 @@
  * @subpackage applicants
  */
 abstract class ApplicantsController extends AdminController{
+  
+  /**
+   * Check controller access
+   * Only allow access if we have a valid programID and cycleID
+   * @param string $controller
+   * @param string $action
+   * @param User $user
+   * @param integer $programID
+   * @param integer $cycleID
+   * @param array $actionParams
+   */
   public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
     if($programID AND $cycleID AND $user)  return $user->isAllowed($controller, $action, $programID);
     return false;
