@@ -429,8 +429,20 @@ class ApplicantsSingleController extends ApplicantsController {
     $auth = new ControllerAuth;
     $auth->name = 'Single Applicant';
     $auth->addAction('index', new ActionAuth('Access single applicant'));
-    $auth->addAction('byId', new ActionAuth('Applicant By ID'));
-    $auth->addAction('edit', new ActionAuth('Edit Applicant Data'));
+    $auth->addAction('byId', new ActionAuth('View a single applicant by id'));
+    $auth->addAction('editApplicant', new ActionAuth('Edit Applicant Data'));
+    $auth->addAction('editAnswer', new ActionAuth('Edit Answers'));
+    $auth->addAction('deleteAnswer', new ActionAuth('Delete Answers'));
+    $auth->addAction('addAnswer', new ActionAuth('Add an Answer'));
+    $auth->addAction('addTag', new ActionAuth('Add a tag to an applicant'));
+    
+    
+    $auth->addAction('nominateAdmit', new ActionAuth('Nominate Applicant for admission'));
+    $auth->addAction('nominateDeny', new ActionAuth('Nominate Applicant for denial'));
+    $auth->addAction('undoNomination', new ActionAuth('Undo nomination'));
+    $auth->addAction('finalAdmit', new ActionAuth('Admit Applicant'));
+    $auth->addAction('finalDeny', new ActionAuth('Deny Applicant'));
+    
     $auth->addAction('attachAnswerPDF', new ActionAuth('Attach PDF to answers'));
     $auth->addAction('attachApplicantPDF', new ActionAuth('Attach PDF to an applicant'));
     $auth->addAction('verifyAnswer', new ActionAuth('Verify Applicant Answer'));
@@ -440,20 +452,5 @@ class ApplicantsSingleController extends ApplicantsController {
     $auth->addAction('pdf', new ActionAuth('Generate PDF from applicant data'));
     $auth->addAction('nominateDecision', new ActionAuth('Nominate Applicant for Admission Decision'));
     return $auth;
-  }
-  
-  public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
-    //All of these actions are controlled by the 'edit' role
-    $editActions = array('editApplicant', 'editAnswer', 'deleteAnswer', 'addAnswer', 'addTag');
-    if(in_array($action, $editActions))
-      $action = 'edit';
-    $nominateDecisionActions = array('nominateAdmit', 'nominateDeny', 'undoNomination');
-    if(in_array($action, $nominateDecisionActions))
-      $action = 'nominateDecision';
-    $finalDecisionActions = array('finalAdmit', 'finalDeny');
-    if(in_array($action, $finalDecisionActions))
-      $action = 'finalDecision';
-    if($programID AND $cycleID AND $user)  return $user->isAllowed($controller, $action, $programID);
-    return false;
   }
 }
