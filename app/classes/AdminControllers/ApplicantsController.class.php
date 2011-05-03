@@ -47,8 +47,8 @@ abstract class ApplicantsController extends AdminController{
    * 
    */
   protected function getApplicantById($applicantId){
-    if(!$applicant = $this->application->getApplicantByID($id)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$id} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
+    if(!$applicant = $this->application->getApplicantByID($applicantId)){
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$applicantId} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
     }
     return $applicant;
   }
