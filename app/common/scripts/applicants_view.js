@@ -19,24 +19,6 @@ function ApplicantsView(){
         self.createForm(form.create(json.data.form));
       });
     });
-    $('a.unlock').unbind().bind('click', function(e){
-      e.preventDefault();
-      $.get($(this).attr('href'), function(json){
-        console.log(json);
-        if(json.status == 'success'){
-          window.location.reload();
-        }
-      });
-    });
-    $('a.decision').unbind().bind('click', function(e){
-      e.preventDefault();
-      $.get($(this).attr('href'), function(json){
-        console.log(json);
-        if(json.status == 'success'){
-          window.location.reload();
-        }
-      });
-    });
     $('a.extendDeadline').unbind().bind('click', function(e){
       e.preventDefault();
       $.get($(this).attr('href'), function(json){
