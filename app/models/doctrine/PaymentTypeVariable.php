@@ -45,7 +45,9 @@ class PaymentTypeVariable extends Doctrine_Record{
     parent::setUp();
     $this->hasOne('PaymentType', array(
       'local' => 'paymentTypeID',
-      'foreign' => 'id')
+      'foreign' => 'id',
+      'onDelete' => 'CASCADE',
+      'onUpdate' => 'CASCADE')
     );
   }
 }
