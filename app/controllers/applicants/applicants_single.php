@@ -126,8 +126,20 @@ class ApplicantsSingleController extends ApplicantsController {
     $applicant = $this->getApplicantById($id);
     if($applicant->Decision->nominateDeny OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to admit applicant {$id} who already has a deny or final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
-    $this->layout = 'json';
     $applicant->Decision->nominateAdmit = date('Y-m-d H:i:s');
+    $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  }
+  
+/**
+   * Final Deny an applicant
+   * @param integer $id applicantID
+   */
+  public function actionFinalAdmit($id){
+    $applicant = $this->getApplicantById($id);
+    if(!$applicant->Decision->nominateAdmit OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to admit applicant {$id} who doesnt has a preliminary status or already final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
+    $applicant->Decision->finalAdmit = date('Y-m-d H:i:s');
     $applicant->save();
     $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
@@ -151,8 +163,20 @@ class ApplicantsSingleController extends ApplicantsController {
     $applicant = $this->getApplicantById($id);
     if($applicant->Decision->nominateAdmit OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
       throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to deny applicant {$id} who already has a admit or final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
-    $this->layout = 'json';
     $applicant->Decision->nominateDeny = date('Y-m-d H:i:s');
+    $applicant->save();
+    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  }
+  
+  /**
+   * Final Deny an applicant
+   * @param integer $id applicantID
+   */
+  public function actionFinalDeny($id){
+    $applicant = $this->getApplicantById($id);
+    if(!$applicant->Decision->nominateDeny OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to deny applicant {$id} who already has a final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
+    $applicant->Decision->finalDeny = date('Y-m-d H:i:s');
     $applicant->save();
     $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }

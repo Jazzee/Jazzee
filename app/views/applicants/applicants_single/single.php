@@ -65,12 +65,16 @@
         }
         $status = implode('<br />', $arr);
         if(empty($status)) $status = 'Under Review'; //no decision has been made
-        if(!$decision AND $this->controller->checkIsAllowed('applicants_single', 'nominateDecision')){
+        if(!$decision AND $this->controller->checkIsAllowed('applicants_single', 'nominateAdmit'))
           $status .= "&nbsp(<a class='nominateAdmit decision' href='" . $this->path("applicants/single/nominateAdmit/{$applicant->id}") . "' title='nominate applicant for admission'>Nominate for Admission</a>)";
+        if(!$decision AND $this->controller->checkIsAllowed('applicants_single', 'nominateDeny'))
           $status .= "&nbsp(<a class='nominateDeny decision' href='" . $this->path("applicants/single/nominateDeny/{$applicant->id}") . "' title='nominate applicant for deny'>Nominate for Deny</a>)";
-        }
-        if($decision and !$final and $this->controller->checkIsAllowed('applicants_single', 'nominateDecision'))
+        if($decision and !$final and $this->controller->checkIsAllowed('applicants_single', 'undoNomination'))
           $status .= "&nbsp(<a class='undoNomination decision' href='" . $this->path("applicants/single/undoNomination/{$applicant->id}") . "' title='undo nomination'>Undo Nomination</a>)";
+        if($decision and !$final and $applicant->Decision->nominateAdmit and $this->controller->checkIsAllowed('applicants_single', 'finalAdmit'))
+          $status .= "&nbsp(<a class='finalAdmit decision' href='" . $this->path("applicants/single/finalAdmit/{$applicant->id}") . "' title='finalize admit'>Admit Applicant</a>)";
+        if($decision and !$final and $applicant->Decision->nominateDeny and $this->controller->checkIsAllowed('applicants_single', 'finalDeny'))
+          $status .= "&nbsp(<a class='finalDeny decision' href='" . $this->path("applicants/single/finalDeny/{$applicant->id}") . "' title='finalize deny'>Deny Applicant</a>)";  
       } else {
         $status = 'In Progress';
       }
