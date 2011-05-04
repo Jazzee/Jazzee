@@ -61,12 +61,16 @@ class Communication extends Doctrine_Record{
     parent::setUp();
     $this->hasOne('Communication as Parent', array(
       'local' => 'parentID',
-      'foreign' => 'id')
+      'foreign' => 'id',
+      'onDelete' => 'CASCADE',
+      'onUpdate' => 'CASCADE')
     );
 
     $this->hasOne('Applicant', array(
       'local' => 'applicantID',
-      'foreign' => 'id')
+      'foreign' => 'id',
+      'onDelete' => 'CASCADE',
+      'onUpdate' => 'CASCADE')
     );
 
     $this->hasOne('User', array(
