@@ -51,7 +51,8 @@ class Payment extends Doctrine_Record{
 
     $this->hasOne('PaymentType', array(
       'local' => 'paymentTypeID',
-      'foreign' => 'id')
+      'foreign' => 'id',
+      'onUpdate' => 'CASCADE')
     );
 
     $this->hasMany('PaymentVariable as Variables', array(
