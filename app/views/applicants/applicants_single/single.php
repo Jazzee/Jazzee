@@ -63,7 +63,7 @@
             $arr[] = $value . ' ' . date('m/d/y', strtotime($applicant->Decision->$key));
           }
         }
-        $status = implode('<br />', $arr);
+        $status = implode('<br />', $arr) . '<br />';
         if(empty($status)) $status = 'Under Review'; //no decision has been made
         if(!$decision AND $this->controller->checkIsAllowed('applicants_single', 'nominateAdmit'))
           $status .= "&nbsp(<a class='nominateAdmit decision' href='" . $this->path("applicants/single/nominateAdmit/{$applicant->id}") . "' title='nominate applicant for admission'>Nominate for Admission</a>)";
@@ -82,13 +82,13 @@
         <td>
           <?php print $status ?>
           <?php  if($this->controller->checkIsAllowed('applicants_single', 'unlock') and $applicant->locked): ?>
-            &nbsp;(<a class='unlock' href='<?php print $this->path("applicants/single/unlock/{$applicant->id}")?>' title='unlock applicant'>Unlock Application</a>)
+            (<a class='unlock' href='<?php print $this->path("applicants/single/unlock/{$applicant->id}")?>' title='unlock applicant'>Unlock Application</a>)&nbsp;
           <?php endif;?>
           <?php  if($this->controller->checkIsAllowed('applicants_single', 'lock') and !$applicant->locked): ?>
-            &nbsp;(<a class='lock' href='<?php print $this->path("applicants/single/lock/{$applicant->id}")?>' title='lock applicant'>Lock Application</a>)
+            (<a class='lock' href='<?php print $this->path("applicants/single/lock/{$applicant->id}")?>' title='lock applicant'>Lock Application</a>)&nbsp;
           <?php endif;?>
           <?php  if($this->controller->checkIsAllowed('applicants_single', 'extendDeadline')): ?>
-            &nbsp;(<a class='extendDeadline' href='<?php print $this->path("applicants/single/extendDeadline/{$applicant->id}")?>' title='extend deadline for applicant'>Extend Deadline</a>)
+            (<a class='extendDeadline' href='<?php print $this->path("applicants/single/extendDeadline/{$applicant->id}")?>' title='extend deadline for applicant'>Extend Deadline</a>)&nbsp;
           <?php endif;?>
           <?php if($applicant->deadlineExtension and strtotime($applicant->deadlineExtension) > time())
             print '<br />Deadline Extension: ' . date('Y-m-d H:i:s', strtotime($applicant->deadlineExtension));?>
