@@ -87,12 +87,14 @@ class Answer extends Doctrine_Record{
 
     $this->hasOne('StatusType as PublicStatus', array(
       'local' => 'publicStatus',
-      'foreign' => 'id')
+      'foreign' => 'id',
+      'onUpdate' => 'CASCADE')
     );
 
     $this->hasOne('StatusType as PrivateStatus', array(
       'local' => 'privateStatus',
-      'foreign' => 'id')
+      'foreign' => 'id',
+      'onUpdate' => 'CASCADE')
     );
 
     $this->hasOne('Answer as Parent', array(
