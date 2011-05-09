@@ -197,3 +197,7 @@ div.form textarea {
 .monthpicker#ui-datepicker-div .ui-datepicker-calendar {
 	display: none;
 }
+
+#recaptcha_widget_div *{
+	float: none;
+}
