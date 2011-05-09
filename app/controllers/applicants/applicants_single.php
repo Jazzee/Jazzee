@@ -442,7 +442,6 @@ class ApplicantsSingleController extends ApplicantsController {
     $auth->addAction('lock', new ActionAuth('Lock an application'));
     $auth->addAction('extendDeadline', new ActionAuth('Extend the deadline for an applicant'));
     $auth->addAction('pdf', new ActionAuth('Generate PDF from applicant data'));
-    $auth->addAction('nominateDecision', new ActionAuth('Nominate Applicant for Admission Decision'));
     return $auth;
   }
 }
