@@ -73,65 +73,65 @@ class AuthorizeNetAIM_Sandbox_Test extends PHPUnit_Framework_TestCase
         $this->assertTrue($response->approved);
     }
     
-    public function testVisaVerify()
-    {
-        return;  // Remove to enable test
-        $verify = new AuthorizeNetAIM;
-        $verify->amount = "0.00";
-        $verify->card_num = '4012888818888';
-        $verify->exp_date = "0517";
-        $verify->address = "123 Main Street";
-        $verify->zip = "94110";
-        $verify->authentication_indicator = "5";
-        $verify->cardholder_authentication_value = "512";
-        $response = $verify->authorizeOnly();
-        $this->assertTrue($response->approved);
-    }
-    
-    public function testVisaVerifyFail()
-    {
-        return;  // Remove to enable test
-        $verify = new AuthorizeNetAIM;
-        $verify->amount = "0.00";
-        $verify->card_num = '4012888818888';
-        $verify->exp_date = "0517";
-        $verify->address = "123 Main Street";
-        $verify->zip = "94110";
-        $verify->authentication_indicator = "5";
-        $verify->cardholder_authentication_value = "";
-        $response = $verify->authorizeOnly();
-        $this->assertTrue($response->declined);
-    }
-    
-    public function testMastercardVerify()
-    {
-        return;  // Remove to enable test
-        $verify = new AuthorizeNetAIM;
-        $verify->amount = "0.00";
-        $verify->card_num = '5424000000000015';
-        $verify->exp_date = "0517";
-        $verify->address = "123 Main Street";
-        $verify->zip = "94110";
-        $verify->authentication_indicator = "2";
-        $verify->cardholder_authentication_value = "512";
-        $response = $verify->authorizeOnly();
-        $this->assertTrue($response->approved);
-    }
-    
-    public function testMastercardVerifyFail()
-    {
-        return;  // Remove to enable test
-        $verify = new AuthorizeNetAIM;
-        $verify->amount = "0.00";
-        $verify->card_num = '5424000000000015';
-        $verify->exp_date = "0517";
-        $verify->address = "123 Main Street";
-        $verify->zip = "94110";
-        $verify->authentication_indicator = "2";
-        $verify->cardholder_authentication_value = "";
-        $response = $verify->authorizeOnly();
-        $this->assertTrue($response->declined);
-    }
+    // public function testVisaVerify()
+    // {
+    //     return;  // Remove to enable test
+    //     $verify = new AuthorizeNetAIM;
+    //     $verify->amount = "0.00";
+    //     $verify->card_num = '4012888818888';
+    //     $verify->exp_date = "0517";
+    //     $verify->address = "123 Main Street";
+    //     $verify->zip = "94110";
+    //     $verify->authentication_indicator = "5";
+    //     $verify->cardholder_authentication_value = "512";
+    //     $response = $verify->authorizeOnly();
+    //     $this->assertTrue($response->approved);
+    // }
+    // 
+    // public function testVisaVerifyFail()
+    // {
+    //     return;  // Remove to enable test
+    //     $verify = new AuthorizeNetAIM;
+    //     $verify->amount = "0.00";
+    //     $verify->card_num = '4012888818888';
+    //     $verify->exp_date = "0517";
+    //     $verify->address = "123 Main Street";
+    //     $verify->zip = "94110";
+    //     $verify->authentication_indicator = "5";
+    //     $verify->cardholder_authentication_value = "";
+    //     $response = $verify->authorizeOnly();
+    //     $this->assertTrue($response->declined);
+    // }
+    // 
+    // public function testMastercardVerify()
+    // {
+    //     return;  // Remove to enable test
+    //     $verify = new AuthorizeNetAIM;
+    //     $verify->amount = "0.00";
+    //     $verify->card_num = '5424000000000015';
+    //     $verify->exp_date = "0517";
+    //     $verify->address = "123 Main Street";
+    //     $verify->zip = "94110";
+    //     $verify->authentication_indicator = "2";
+    //     $verify->cardholder_authentication_value = "512";
+    //     $response = $verify->authorizeOnly();
+    //     $this->assertTrue($response->approved);
+    // }
+    // 
+    // public function testMastercardVerifyFail()
+    // {
+    //     return;  // Remove to enable test
+    //     $verify = new AuthorizeNetAIM;
+    //     $verify->amount = "0.00";
+    //     $verify->card_num = '5424000000000015';
+    //     $verify->exp_date = "0517";
+    //     $verify->address = "123 Main Street";
+    //     $verify->zip = "94110";
+    //     $verify->authentication_indicator = "2";
+    //     $verify->cardholder_authentication_value = "";
+    //     $response = $verify->authorizeOnly();
+    //     $this->assertTrue($response->declined);
+    // }
     
     public function testAimResponseFields()
     {
@@ -307,21 +307,21 @@ class AuthorizeNetAIM_Sandbox_Test extends PHPUnit_Framework_TestCase
         $this->assertTrue($response->approved);
     }
     
-    public function testJCB()
-    {
-        return; // Remove to enable test
-        $sale = new AuthorizeNetAIM;
-        $response = $sale->authorizeAndCapture(rand(1, 100), '3088000000000017', '0905');
-        $this->assertTrue($response->approved);
-    }
-    
-    public function testDinersClub()
-    {
-        return; // Remove to enable test
-        $sale = new AuthorizeNetAIM;
-        $response = $sale->authorizeAndCapture(rand(1, 100), '38000000000006', '0905');
-        $this->assertTrue($response->approved);
-    }
+    // public function testJCB()
+    // {
+    //     return; // Remove to enable test
+    //     $sale = new AuthorizeNetAIM;
+    //     $response = $sale->authorizeAndCapture(rand(1, 100), '3088000000000017', '0905');
+    //     $this->assertTrue($response->approved);
+    // }
+    // 
+    // public function testDinersClub()
+    // {
+    //     return; // Remove to enable test
+    //     $sale = new AuthorizeNetAIM;
+    //     $response = $sale->authorizeAndCapture(rand(1, 100), '38000000000006', '0905');
+    //     $this->assertTrue($response->approved);
+    // }
     
     public function testAuthOnly()
     {
@@ -377,20 +377,20 @@ class AuthorizeNetAIM_Sandbox_Test extends PHPUnit_Framework_TestCase
         $this->assertTrue($void_response->approved);
     }
     
-    public function testCredit()
-    {
-        
-    }
-    
-    public function testPriorAuthCapture()
-    {
-        
-    }
-    
-    public function testCaptureOnly()
-    {
-        
-    }
+    // public function testCredit()
+    // {
+    //     
+    // }
+    // 
+    // public function testPriorAuthCapture()
+    // {
+    //     
+    // }
+    // 
+    // public function testCaptureOnly()
+    // {
+    //     
+    // }
     
     public function testAdvancedAIM()
     {

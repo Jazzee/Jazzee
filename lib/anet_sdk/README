@@ -26,9 +26,10 @@ Files:
     - lib/ssl/cert.pem                       -> The AuthorizeNet Certificate bundle.
     - tests/                                 -> Tests & examples for each of the API methods.
     - README                                 -> This file.
+    - README.html                            -> HTML version of this file.
 
 Requirements:
-    - CURL PHP Extension
+    - cURL PHP Extension
     - PHP 5.2+
     - An Authorize.Net Merchant Account or Test Account. You can get a 
       free test account at http://developer.authorize.net/testaccount/
@@ -202,6 +203,10 @@ PHPDoc:
   phpdoc -t phpdocs/ -f AuthorizeNet.php -d lib
 
 Release Notes
+    Version 1.1.5
+    - Added HTML version of README.
+    Version 1.1.4
+    - Updated the cert.pem bundle to include the new secure.authorize.net SSL certificate.
     Version 1.1.3
     - Added more documentation
     - Improved support for all Transaction Details API methods.
