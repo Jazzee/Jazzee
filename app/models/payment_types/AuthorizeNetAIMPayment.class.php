@@ -6,8 +6,8 @@ require_once SRC_ROOT . '/lib/anet_sdk/AuthorizeNet.php';
 class AuthorizeNetAIMPayment extends ApplyPayment{
   const PENDING_TEXT = 'Approved';
   const SETTLED_TEXT = 'Approved';
-  const REJECTED_TEXT = 'Card was rejected';
-  const REFUNDED_TEXT = 'This transaction was refunded';
+  const REJECTED_TEXT = 'Rejected or Voided';
+  const REFUNDED_TEXT = 'Refunded';
   
   /**
    * Display the button to pass applicant to Authorize.net's hosted payment page
@@ -53,7 +53,7 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    */
   public static function setupForm(PaymentType $paymentType = null){
     $form = new Form;
-    $field = $form->newField(array('legend'=>"Setup Authorize.net SIM Payments"));        
+    $field = $form->newField(array('legend'=>"Setup Authorize.net AIM Payments"));        
     $element = $field->newElement('TextInput','name');
     $element->label = 'Payment Name';
     if($paymentType) $element->value = $paymentType->name;
@@ -115,7 +115,7 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    * Record transaction information pending until it is settled with the bank
    * @see ApplyPaymentInterface::pendingPayment()
    */
-  function pendingPayment(Payment $payment, FormInput $input){
+  public function pendingPayment(Payment $payment, FormInput $input){
     $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
     $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     $aim->amount = $input->amount;
@@ -148,28 +148,149 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
   }
   
   /**
-   * Once funds have cleared the payment is settled
+   * Attempt to settle payment with anet's API
+   * @see ApplyPaymentInterface::settlePaymentForm()
+   */
+  public function getSettlePaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Settle {$this->paymentType->name} Payment"));
+    $element = $field->newElement('Plaintext','info');
+    $element->value = "{$this->paymentType->name} transactions have to be settled by Authorize.net.  To check the status of this payment click 'Attempt Settlement'";
+    $form->newButton('submit', 'Attempt Settlement');
+    return $form;
+  }
+  
+  /**
+   * Once checks have been cashed we settle the payment
    * @see ApplyPaymentInterface::settlePayment()
    */
-  function settlePayment(Payment $payment, FormInput $input){
-    
+  public function settlePayment(Payment $payment, FormInput $input){
+    $td = new AuthorizeNetTD($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
+    $td->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    // Get Transaction Details
+    $transactionId = $payment->getVar('transactionId');
+    $response = $td->getTransactionDetails($transactionId);
+    if($response->isError())
+      throw new Jazzee_Exception("Unable to get transaction details for {$payment->id} transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
+    //has this transaction has been settled already
+    if($response->xml->transaction->transactionStatus == 'settledSuccessfully'){
+      $payment->settled();
+      $payment->setVar('settlementTimeUTC', (string)$response->xml->transaction->batch->settlementTimeUTC);
+      $payment->save();
+      return true;
+    } else if($response->xml->transaction->transactionStatus == 'voided'){
+      $payment->rejected();
+      if(isset($input->reason))
+        $payment->setVar('rejectedReason', $input->reason);
+      else
+        $payment->setVar('rejectedReason', 'This payment was voided.');
+      $payment->save();
+      return true;
+    }
+    return false;
   }
   
   /**
-   * Credit card transactions which were rejected
-   * Record the reason for the rejection and details for troubleshooting
+   * Record the reason the payment was rejected
+   * @see ApplyPaymentInterface::rejectPaymentForm()
+   */
+  public function getRejectPaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Reject {$this->paymentType->name} Payment"));        
+    $element = $field->newElement('Textarea','reason');
+    $element->label = 'Reason displayed to Applicant';
+    $element->addValidator('NotEmpty');
+    
+    $form->newButton('submit', 'Save');
+    return $form;
+  }
+  
+  /**
+   * Void a transaction before it is settled
    * @see ApplyPaymentInterface::rejectPayment()
    */
-  function rejectPayment(Payment $payment, FormInput $input){
-    
+  public function rejectPayment(Payment $payment, FormInput $input){
+    $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
+    $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $aim->test_request = $this->config->status == 'PRODUCTION'?0:1;
+    $response = $aim->void($payment->getVar('transactionId'));
+    if($response->approved) {
+      $payment->rejected();
+      $payment->setVar('rejectedReason', $input->reason);
+      $payment->save();
+      return true;
+    }
+    //if we cant void we are probably already settled so try and settle the payment in our system
+    return $this->settlePayment($payment, $input);
   }
   
   /**
-   * Authorize.net doens't have a refund api for SIM transactions 
-   * User the AIM method to attempt to process a refund since no CC details are exposed
+   * Record the reason the payment was refunded
+   * @see ApplyPaymentInterface::rejectPaymentForm()
+   */
+  public function getRefundPaymentForm(Payment $payment){
+    $td = new AuthorizeNetTD($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
+    $td->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    // Get Transaction Details
+    $transactionId = $payment->getVar('transactionId');
+    $response = $td->getTransactionDetails($transactionId);
+    if($response->isError())
+      throw new Jazzee_Exception("Unable to get transaction details for {$payment->id} transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
+      
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Refund {$this->paymentType->name} Payment"));      
+    $element = $field->newElement('Plaintext', 'details');
+    $element->label = 'Details';
+    $element->value = "Refund \${$payment->amount} to card " . $response->xml->transaction->payment->creditCard->cardNumber;  
+    $element = $field->newElement('Textarea','reason');
+    $element->label = 'Reason displayed to Applicant';
+    $element->addValidator('NotEmpty');
+    
+    $form->newHiddenElement('cardNumber', substr($response->xml->transaction->payment->creditCard->cardNumber, strlen($response->xml->transaction->payment->creditCard->cardNumber)-4, 4));
+    $form->newButton('submit', 'Save');
+    return $form;
+  }
+  
+  /**
+   * Check payments are refunded outside Jazzee and then marked as refunded
    * @see ApplyPaymentInterface::refundPayment()
    */
-  function refundPayment(Payment $payment, FormInput $input){
-    
+  public function refundPayment(Payment $payment, FormInput $input){
+    $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
+    $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $aim->test_request = $this->config->status == 'PRODUCTION'?0:1;
+    $response = $aim->credit($payment->getVar('transactionId'), $payment->amount, $input->cardNumber);
+    if($response->approved) {
+      $payment->refunded();
+      $payment->setVar('refundedReason', $input->reason);
+      $payment->save();
+      return true;
+    }
+    return false;
+  }
+  
+  public function applicantTools(Payment $payment){
+    $arr = array();
+    switch($payment->status){
+      case Payment::PENDING:
+        $arr[] = array(
+          'title' => 'Settle Payment',
+          'class' => 'settlePayment',
+          'path' => "settlePayment/{$payment->id}"
+        );
+        $arr[] = array(
+          'title' => 'Reject Payment',
+          'class' => 'rejectPayment',
+          'path' => "rejectPayment/{$payment->id}"
+        );
+        break;
+      case Payment::SETTLED:
+        $arr[] = array(
+          'title' => 'Refund Payment',
+          'class' => 'refundPayment',
+          'path' => "refundPayment/{$payment->id}"
+        );
+    }
+    return $arr;
   }
 }

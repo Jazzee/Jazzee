@@ -26,6 +26,27 @@ function ApplicantsView(){
         self.createForm(form.create(json.data.form));
       });
     });
+    $('a.settlePayment').unbind().bind('click', function(e){
+      e.preventDefault();
+      $.get($(this).attr('href'), function(json){
+        var form = new Form();
+        self.createForm(form.create(json.data.form));
+      });
+    });
+    $('a.refundPayment').unbind().bind('click', function(e){
+      e.preventDefault();
+      $.get($(this).attr('href'), function(json){
+        var form = new Form();
+        self.createForm(form.create(json.data.form));
+      });
+    });
+    $('a.rejectPayment').unbind().bind('click', function(e){
+      e.preventDefault();
+      $.get($(this).attr('href'), function(json){
+        var form = new Form();
+        self.createForm(form.create(json.data.form));
+      });
+    });
     $('a.editAnswer').unbind().bind('click', function(e){
       e.preventDefault();
       $.get($(this).attr('href'), function(json){

@@ -50,11 +50,40 @@ class FeeWaiverPayment extends ApplyPayment{
   }
   
   /**
+   * Approve the fee waiver application
+   * @see ApplyPaymentInterface::settlePaymentForm()
+   */
+  function getSettlePaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Approve {$this->paymentType->name}"));        
+    
+    $form->newButton('submit', 'Approve Application');
+    return $form;
+  }
+  
+  /**
    * We settled fee waivers when the application has been approved
    * @see ApplyPaymentInterface::settlePayment()
    */
   function settlePayment(Payment $payment, FormInput $input){
+    $payment->settled();
+    $payment->save();
+    return true;
+  }
+  
+  /**
+   * Record the reason the application was denied
+   * @see ApplyPaymentInterface::rejectPaymentForm()
+   */
+  function getRejectPaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Deny {$this->paymentType->name} Application"));        
+    $element = $field->newElement('Textarea','reason');
+    $element->label = 'Reason displayed to Applicant';
+    $element->addValidator('NotEmpty');
     
+    $form->newButton('submit', 'Save');
+    return $form;
   }
   
   /**
@@ -62,7 +91,25 @@ class FeeWaiverPayment extends ApplyPayment{
    * @see ApplyPaymentInterface::rejectPayment()
    */
   function rejectPayment(Payment $payment, FormInput $input){
+    $payment->rejected();
+    $payment->setVar('rejectedReason', $input->reason);
+    $payment->save();
+    return true;
+  }
+  
+  /**
+   * Withdraw an approved application
+   * @see ApplyPaymentInterface::rejectPaymentForm()
+   */
+  function getRefundPaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Withdraw {$this->paymentType->name} Application"));        
+    $element = $field->newElement('Textarea','reason');
+    $element->label = 'Reason displayed to Applicant';
+    $element->addValidator('NotEmpty');
     
+    $form->newButton('submit', 'Save');
+    return $form;
   }
   
   /**
@@ -70,6 +117,38 @@ class FeeWaiverPayment extends ApplyPayment{
    * @see ApplyPaymentInterface::refundPayment()
    */
   function refundPayment(Payment $payment, FormInput $input){
-    
+    $payment->refunded();
+    $payment->setVar('refundedReason', $input->reason);
+    $payment->save();
+    return true;
+  }
+  
+/**
+   * Fee Waiver Tools
+   * @see ApplyPaymentInterface::applicantTools()
+   */
+  public function applicantTools(Payment $payment){
+    $arr = array();
+    switch($payment->status){
+      case Payment::PENDING:
+        $arr[] = array(
+          'title' => 'Approve Application',
+          'class' => 'settlePayment',
+          'path' => "settlePayment/{$payment->id}"
+        );
+        $arr[] = array(
+          'title' => 'Deny Application',
+          'class' => 'rejectPayment',
+          'path' => "rejectPayment/{$payment->id}"
+        );
+        break;
+      case Payment::SETTLED:
+        $arr[] = array(
+          'title' => 'Withdraw Application',
+          'class' => 'refundPayment',
+          'path' => "refundPayment/{$payment->id}"
+        );
+    }
+    return $arr;
   }
 }

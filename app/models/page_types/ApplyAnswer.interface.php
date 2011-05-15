@@ -11,6 +11,12 @@ interface ApplyAnswer {
   function getID();
   
   /**
+   * Get an attachment if it exists
+   * @return Attachment|false
+   */
+  function getAttachment();
+  
+  /**
    * Update the values in an answer 
    * @param FormInput $input
    */

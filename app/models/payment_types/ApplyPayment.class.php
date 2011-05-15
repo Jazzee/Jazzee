@@ -9,7 +9,7 @@ abstract class ApplyPayment implements ApplyPaymentInterface{
    * Status text constants
    */
   const PENDING_TEXT = 'pending';
-  const SETTLED_TEXT = 'seettled';
+  const SETTLED_TEXT = 'settled';
   const REJECTED_TEXT = 'rejected';
   const REFUNDED_TEXT = 'refunded';
   
@@ -89,11 +89,25 @@ interface ApplyPaymentInterface{
   function pendingPayment(Payment $payment, FormInput $input);
   
   /**
+   * The form to display to adminstrators so they can settle the payment
+   * @param Payment $payment
+   * @return Form
+   */
+  function getSettlePaymentForm(Payment $payment);
+  
+  /**
    * Once funds have been recieved or transactions verified a payment is settled
    * @param Payment $payment
    * @param FormInput $input
    */
   function settlePayment(Payment $payment, FormInput $input);
+  
+  /**
+   * The form to display to adminstrators so they can reject the payment
+   * @param Payment $payment
+   * @return Form
+   */
+  function getRejectPaymentForm(Payment $payment);
   
   /**
    * Payments which are denied or never recieved get set to rejected
@@ -103,9 +117,22 @@ interface ApplyPaymentInterface{
   function rejectPayment(Payment $payment, FormInput $input);
   
   /**
+   * The form to display to adminstrators so they can refund the payment
+   * @param Payment $payment
+   * @return Form
+   */
+  function getRefundPaymentForm(Payment $payment);
+  
+  /**
    * Refund a payment
    * @param Payment $payment
    * @param FormInput $input
    */
   function refundPayment(Payment $payment, FormInput $input);
+  
+  /**
+   * Get the applicant admin tools
+   * @param Payment $payment
+   */
+  function applicantTools(Payment $payment);
 }

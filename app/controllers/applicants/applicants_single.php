@@ -131,7 +131,7 @@ class ApplicantsSingleController extends ApplicantsController {
     $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
   
-/**
+  /**
    * Final Deny an applicant
    * @param integer $id applicantID
    */
@@ -179,6 +179,93 @@ class ApplicantsSingleController extends ApplicantsController {
     $applicant->Decision->finalDeny = date('Y-m-d H:i:s');
     $applicant->save();
     $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  }
+  
+  /**
+   * Settle a payment
+   * @param integer $paymentId 
+   */
+  public function actionSettlePayment($paymentId){
+    $payment = Doctrine::getTable('Payment')->find($paymentId);
+    if(!$payment)
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to settle payment {$paymentID} that doesn't exist", E_USER_ERROR, 'That payment is not valid');
+    $applicant = $this->getApplicantById($payment->Applicant->id);
+    $this->layout = 'json';
+    $paymentType = new $payment->PaymentType->class($payment->PaymentType);
+    
+    $form = $paymentType->getSettlePaymentForm($payment);
+    $form->action = $this->path("applicants/single/settlePayment/{$payment->id}");
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        if($paymentType->settlePayment($payment, $input)){
+          $this->messages->write('success', 'Payment Settled Successfully');
+          $this->redirectPath('applicants/single/byId/'.$applicant->id);
+        }
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
+  }
+  
+  /**
+   * Refund a payment
+   * @param integer $paymentId 
+   */
+  public function actionRefundPayment($paymentId){
+    $payment = Doctrine::getTable('Payment')->find($paymentId);
+    if(!$payment)
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to settle payment {$paymentID} that doesn't exist", E_USER_ERROR, 'That payment is not valid');
+    $applicant = $this->getApplicantById($payment->Applicant->id);
+    $this->layout = 'json';
+    $paymentType = new $payment->PaymentType->class($payment->PaymentType);
+    
+    $form = $paymentType->getRefundPaymentForm($payment);
+    $form->action = $this->path("applicants/single/refundPayment/{$payment->id}");
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        if($paymentType->refundPayment($payment, $input)){
+          $this->messages->write('success', 'Payment Refunded Successfully');
+          $this->redirectPath('applicants/single/byId/'.$applicant->id);
+        }
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
+  }
+  
+  /**
+   * Reject a payment
+   * @param integer $paymentId 
+   */
+  public function actionRejectPayment($paymentId){
+    $payment = Doctrine::getTable('Payment')->find($paymentId);
+    if(!$payment)
+      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to reject payment {$paymentID} that doesn't exist", E_USER_ERROR, 'That payment is not valid');
+    $applicant = $this->getApplicantById($payment->Applicant->id);
+    $this->layout = 'json';
+    $paymentType = new $payment->PaymentType->class($payment->PaymentType);
+    
+    $form = $paymentType->getRejectPaymentForm($payment);
+    $form->action = $this->path("applicants/single/rejectPayment/{$payment->id}");
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        if($paymentType->rejectPayment($payment, $input)){
+          $this->messages->write('success', 'Payment Rejected Successfully');
+          $this->redirectPath('applicants/single/byId/'.$applicant->id);
+        }
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**
@@ -442,6 +529,12 @@ class ApplicantsSingleController extends ApplicantsController {
     $auth->addAction('lock', new ActionAuth('Lock an application'));
     $auth->addAction('extendDeadline', new ActionAuth('Extend the deadline for an applicant'));
     $auth->addAction('pdf', new ActionAuth('Generate PDF from applicant data'));
+    
+    $auth->addAction('newPayment', new ActionAuth('Add New Payment'));
+    $auth->addAction('settlePayment', new ActionAuth('Settle Applicant payment'));
+    $auth->addAction('refundPayment', new ActionAuth('Settle Applicant payment'));
+    $auth->addAction('rejectPayment', new ActionAuth('Settle Applicant payment'));
+    
     return $auth;
   }
 }

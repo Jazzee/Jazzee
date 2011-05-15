@@ -14,6 +14,14 @@
  */
 class Payment extends Doctrine_Record{
   /**
+   * Define some string constants for the payment status
+   */
+  const PENDING = 'pending';
+  const SETTLED = 'settled';
+  const REJECTED = 'rejected';
+  const REFUNDED = 'refunded';
+  
+  /**
    * @see Doctrine_Record_Abstract::setTableDefinition()
    */
   public function setTableDefinition(){
@@ -30,10 +38,10 @@ class Payment extends Doctrine_Record{
     $this->hasColumn('status', 'enum', null, array(
       'type' => 'enum',
       'values' => array(
-        0 => 'pending',
-        1 => 'settled',
-        2 => 'rejected',
-        3 => 'refunded',
+        0 => self::PENDING,
+        1 => self::SETTLED,
+        2 => self::REJECTED,
+        3 => self::REFUNDED,
       ),
      ));
   }
@@ -90,13 +98,27 @@ class Payment extends Doctrine_Record{
    * Set a payment as pending
    */
   public function pending(){
-    $this->status = 'pending';
+    $this->status = self::PENDING;
+  }
+  
+  /**
+   * Set a payment as settled
+   */
+  public function settled(){
+    $this->status = self::SETTLED;
   }
   
   /**
    * Set a payment as rejected
    */
   public function rejected(){
-    $this->status = 'rejected';
+    $this->status = self::REJECTED;
+  }
+  
+/**
+   * Set a payment as refunded
+   */
+  public function refunded(){
+    $this->status = self::REFUNDED;
   }
 }

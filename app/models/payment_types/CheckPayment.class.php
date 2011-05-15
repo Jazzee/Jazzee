@@ -98,11 +98,53 @@ class CheckPayment extends ApplyPayment{
   }
   
   /**
+   * Record the check number and the deposit date for a payment
+   * @see ApplyPaymentInterface::settlePaymentForm()
+   */
+  function getSettlePaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Settle {$this->paymentType->name} Payment"));        
+    $element = $field->newElement('TextInput','checkNumber');
+    $element->label = 'Check Number';
+    $element->addValidator('NotEmpty');
+    
+    $element = $field->newElement('DateInput','checkSettlementDate');
+    $element->label = 'The Date the check was settled';
+    $element->value = 'today';
+      
+    $element->addValidator('DateBefore', 'tomorrow');
+    $element->addFilter('DateFormat', 'Y-m-d H:i:s');
+    $element->addValidator('NotEmpty');
+    
+    $form->newButton('submit', 'Save');
+    return $form;
+  }
+  
+  /**
    * Once checks have been cashed we settle the payment
    * @see ApplyPaymentInterface::settlePayment()
    */
   function settlePayment(Payment $payment, FormInput $input){
+    $payment->settled();
+    $payment->setVar('checkNumber', $input->checkNumber);
+    $payment->setVar('checkSettlementDate', $input->checkSettlementDate);
+    $payment->save();
+    return true;
+  }
+  
+  /**
+   * Record the reason the payment was rejected
+   * @see ApplyPaymentInterface::rejectPaymentForm()
+   */
+  function getRejectPaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Reject {$this->paymentType->name} Payment"));        
+    $element = $field->newElement('Textarea','reason');
+    $element->label = 'Reason displayed to Applicant';
+    $element->addValidator('NotEmpty');
     
+    $form->newButton('submit', 'Save');
+    return $form;
   }
   
   /**
@@ -110,7 +152,25 @@ class CheckPayment extends ApplyPayment{
    * @see ApplyPaymentInterface::rejectPayment()
    */
   function rejectPayment(Payment $payment, FormInput $input){
+    $payment->rejected();
+    $payment->setVar('rejectedReason', $input->reason);
+    $payment->save();
+    return true;
+  }
+  
+  /**
+   * Record the reason the payment was refunded
+   * @see ApplyPaymentInterface::rejectPaymentForm()
+   */
+  function getRefundPaymentForm(Payment $payment){
+    $form = new Form;
+    $field = $form->newField(array('legend'=>"Refund {$this->paymentType->name} Payment"));        
+    $element = $field->newElement('Textarea','reason');
+    $element->label = 'Reason displayed to Applicant';
+    $element->addValidator('NotEmpty');
     
+    $form->newButton('submit', 'Save');
+    return $form;
   }
   
   /**
@@ -118,6 +178,38 @@ class CheckPayment extends ApplyPayment{
    * @see ApplyPaymentInterface::refundPayment()
    */
   function refundPayment(Payment $payment, FormInput $input){
-    
+    $payment->refunded();
+    $payment->setVar('refundedReason', $input->reason);
+    $payment->save();
+    return true;
+  }
+  
+  /**
+   * Check tools
+   * @see ApplyPaymentInterface::applicantTools()
+   */
+  public function applicantTools(Payment $payment){
+    $arr = array();
+    switch($payment->status){
+      case Payment::PENDING:
+        $arr[] = array(
+          'title' => 'Clear Check',
+          'class' => 'settlePayment',
+          'path' => "settlePayment/{$payment->id}"
+        );
+        $arr[] = array(
+          'title' => 'Reject Check',
+          'class' => 'rejectPayment',
+          'path' => "rejectPayment/{$payment->id}"
+        );
+        break;
+      case Payment::SETTLED:
+        $arr[] = array(
+          'title' => 'Apply Refund',
+          'class' => 'refundPayment',
+          'path' => "refundPayment/{$payment->id}"
+        );
+    }
+    return $arr;
   }
 }

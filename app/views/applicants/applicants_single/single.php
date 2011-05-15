@@ -97,7 +97,7 @@
           <?php foreach($applicant->Tags as $tag){
             print $tag->title . '<br />';
           }?>
-          <form method='post' action='<?php print $this->path('applicants/single/addTag/'.$applicant->id)?>'>
+          <form method='post' action='<?php print $this->path("applicants/single/addTag/{$applicant->id}")?>'>
             <input type='text' size='5' name='tag' />
             <input type='submit' value='Add' />
           </form>
@@ -131,12 +131,12 @@
                 foreach($answer->applicantStatus() as $title => $value) print "{$title}: {$value} <br />";
               print '</td>';
               print "<td class='attachment'>";
-                if($answer->attachment){
+                if($attachment = $answer->getAttachment()){
                   $pdfName = "applicant-{$applicant->id}-answer_" . $answer->id;
-                  $file = new FileContainer($answer->attachment, 'pdf', $pdfName);
+                  $file = new FileContainer($attachment, 'pdf', $pdfName);
                   $file->setLastModified(time());
                   $fileStore->$pdfName = $file;
-                  $png = thumbnailPDF($answer->attachment, 100, 0);
+                  $png = thumbnailPDF($attachment, 100, 0);
                   $pngName = "applicant-{$applicant->id}-answer_" . $answer->id . "_preview";
                   $file = new FileContainer($png, 'png', $pngName);
                   $file->setLastModified(time());
@@ -144,15 +144,14 @@
                   print "<a href='" . $this->path("file/{$pdfName}.pdf") . "'><img src='" . $this->path("file/{$pngName}.png") . "' /></a>";
                 } else {
                   if($this->controller->checkIsAllowed('applicants_single', 'attachAnswerPDF')){
-                    print "<a class='attachAnswerPDF' href='" . $this->path("applicants/single/attachAnswerPDF/{$answer->id}") . "'>Attach PDF</a>";
+                    print "<a class='attachAnswerPDF' href='" . $this->path("applicants/single/attachAnswerPDF/" . $answer->getId()) . "'>Attach PDF</a>";
                   }
                 }
               print '</td>';
               print "<td class='tools'>";
-              if($this->controller->checkIsAllowed('applicants_single', 'edit')){
-                foreach($answer->applicantTools() as $arr){
-                  print "<a class='{$arr['class']}' href='" . $this->path("applicants/single/{$arr['path']}") . "'>{$arr['title']}</a>";
-                }
+              foreach($answer->applicantTools() as $arr){
+                if($this->controller->checkIsAllowed('applicants_single', $arr['class']))
+                  print "<a class='{$arr['class']}' href='" . $this->path("applicants/single/{$arr['path']}") . "'>{$arr['title']}</a><br />";
               }
               print '</td>';
 
@@ -162,7 +161,7 @@
         else:?>
           <p>Applicant has not answered this section</p>
         <?php endif; //answers
-        if($this->controller->checkIsAllowed('applicants_single', 'edit')){
+        if($this->controller->checkIsAllowed('applicants_single', 'addAnswer')){
           print "<a class='addAnswer' href='" . $this->path("applicants/single/addAnswer/{$applicant->id}/{$page->id}") . "'>Add Answer</a>";
         }
         ?>

@@ -7,7 +7,6 @@
  * @subpackage apply
  */
 class PaymentPage extends StandardPage {
-  const SHOW_PAGE = false;
   
   /**
    * The payment type and the amount are selected first
@@ -83,7 +82,7 @@ class PaymentPage extends StandardPage {
   public function getAnswers(){
     $answers = array();
     foreach($this->applicant->Payments as $p){
-      if($p->status != 'rejected') $answers[] = new PaymentAnswer($p);
+      $answers[] = new PaymentAnswer($p);
     }
     return $answers;
   }
@@ -144,53 +143,55 @@ class PaymentAnswer implements ApplyAnswer {
   }
   
   public function applicantTools(){
-    $arr = array();
-    $arr[] = array(
-        'title' => 'Details',
-         'class' => 'paymentDetails',
-         'path' => "paymentDetails/{$this->payment->id}"
-       );
-//    
-//    $arr[] = array(
-//        'title' => 'Settle',
-//         'class' => 'settlePayment',
-//         'path' => "settlePayment/{$this->payment->id}"
-//       );
-    return $arr;
+    $paymentType = new $this->payment->PaymentType->class($this->payment->PaymentType);
+    return $paymentType->applicantTools($this->payment);
   }
 
   public function applyStatus(){
-    $class = $this->payment->PaymentType->class;
-    $text = '';
-    switch($this->payment->status){
-      case 'pending':
-        $status = $class::PENDING_TEXT;
-        break;
-      case 'settled':
-        $status = $class::SETTLED_TEXT;
-        break;
-      case 'rejected':
-        $status = $class::REJECTED_TEXT;
-        break;
-      case 'refunded':
-        $status = $class::REFUNDED_TEXT;
-        break;
-    }  
+     
     $arr = array(
-      'Status' => $status
+      'Status' => $this->getStatusText()
     );
+    //add the reson to refunded payments
+    if($this->payment->status == Payment::REFUNDED) $arr['Reason'] = $this->payment->getVar('refundedReason');
+    
     //add the reson to rejected payments
-    if($this->payment->status == 'rejected') $arr['Reason'] = $this->payment->getVar('reasonText');
+    if($this->payment->status == Payment::REJECTED) $arr['Reason'] = $this->payment->getVar('rejectedReason');
     return $arr;
   }
   
   public function applicantStatus(){
     $arr = array(
-      'Status' => $this->payment->status
+      'Status' => $this->payment->status,
+      'Applicant Status Message' => $this->getStatusText()
     );
     //add the reson to rejected payments
-    if($this->payment->status == 'rejected') $arr['Reason'] = $this->payment->getVar('responseText');
+    if($this->payment->status == Payment::REJECTED) $arr['Reason'] = $this->payment->getVar('rejectedReason');
     return $arr;
+  }
+  
+  /**
+   * Get Status Text
+   * Get the ApplyPayment status text for the specific payment type
+   * @return string
+   */
+  protected function getStatusText(){
+    $class = $this->payment->PaymentType->class;
+    switch($this->payment->status){
+      case Payment::PENDING:
+        $status = $class::PENDING_TEXT;
+        break;
+      case Payment::SETTLED:
+        $status = $class::SETTLED_TEXT;
+        break;
+      case Payment::REJECTED:
+        $status = $class::REJECTED_TEXT;
+        break;
+      case Payment::REFUNDED:
+        $status = $class::REFUNDED_TEXT;
+        break;
+    } 
+    return $status;
   }
   
   public function getAttachment(){
