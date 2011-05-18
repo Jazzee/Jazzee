@@ -23,6 +23,11 @@ if(file_exists(SRC_ROOT . '/etc/config.ini.php')){
 Autoload::addAutoLoadPath(APP_ROOT . '/classes/');
 Autoload::addAutoLoadPath(APP_ROOT . '/models/');
 
+$classLoader = new Doctrine\Common\ClassLoader('Entity', APP_ROOT . '/models/');
+$classLoader->register();
+
+
+
 //Setup the Lvc options
 FoundationVC_Config::addControllerPath(APP_ROOT . '/controllers/');
 FoundationVC_Config::addControllerViewPath(APP_ROOT . '/views/');

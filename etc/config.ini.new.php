@@ -30,10 +30,14 @@ status=PRODUCTION
 ;On productions systems it is also a good idea to reidrect non-secure traffic at the webserver level to ensure no data is transmitted in the clear.
 forceSSL=on
 
-;Doctrine DSN
-;eg mysql://user:pass@localhost/databasename
-;Info at http://www.doctrine-project.org/documentation/manual/1_2/en/introduction-to-connections
-dsn=
+;Database connection details
+;Details at http://www.doctrine-project.org/docs/dbal/2.0/en/reference/configuration.html
+dbHost=
+dbPort=
+dbName=
+dbUser=
+dbPassword=
+dbDriver=
 
 ;Server/account to send email from
 ;Format: type://[username:password@]host:port

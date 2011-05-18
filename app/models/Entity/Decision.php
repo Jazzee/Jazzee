@@ -1,80 +1,60 @@
 <?php
-/**
- * Decision
- * 
- * @property integer $applicantID
- * @property timestamp $nominateAdmit
- * @property timestamp $nominateDeny
- * @property timestamp $finalAdmit
- * @property timestamp $finalDeny
- * @property timestamp $offerResponseDeadline
- * @property timestamp $decisionLetterSent
- * @property timestamp $decisionLetterViewed
- * @property timestamp $acceptOffer
- * @property timestamp $declineOffer
- * @property Applicant $Applicant
- * 
+namespace Entity;
+
+/** 
+ * Applicant
+ * Individual applicants are tied to an Application - but a single person can be multiple Applicants
+ * @Entity @Table(name="decisions") 
  * @package    jazzee
  * @subpackage orm
- * @author     Jon Johnson <jon.johnson@ucsf.edu>
- */
-class Decision extends Doctrine_Record{
+ **/
+class Decision{
+  /**
+    * @Id 
+    * @Column(type="bigint")
+    * @GeneratedValue(strategy="AUTO")
+  */
+  private $id;
   
-  /**
-   * @see Doctrine_Record::setTableDefinition()
+  /** 
+   * @OneToOne(targetEntity="Applicant",inversedBy="decision",cascade={"all"})
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
-  public function setTableDefinition(){
-    $this->setTableName('decision');
-    $this->hasColumn('applicantID', 'integer', null, array(
-      'type' => 'integer',
-     ));
-    $this->hasColumn('nominateAdmit', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('nominateDeny', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('finalAdmit', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('finalDeny', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('offerResponseDeadline', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('decisionLetterSent', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('decisionLetterViewed', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('acceptOffer', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-    $this->hasColumn('declineOffer', 'timestamp', null, array(
-      'type' => 'timestamp',
-     ));
-  }
+  private $applicant;
+  
+  /** @Column(type="datetime") */
+  private $nominateAdmit;
+  
+  /** @Column(type="datetime") */
+  private $nominateDeny;
+  
+  /** @Column(type="datetime") */
+  private $finalAdmit;
+  
+  /** @Column(type="datetime") */
+  private $finalDeny;
+  
+  /** @Column(type="datetime") */
+  private $offerResponseDeadline;
+  
+  /** @Column(type="datetime") */
+  private $decisionLetterSent;
+  
+  /** @Column(type="datetime") */
+  private $decisionLetterViewed;
+  
+  /** @Column(type="datetime") */
+  private $acceptOffer;
+  
+  /** @Column(type="datetime") */
+  private $declineOffer;
 
-  /**
-   * @see Doctrine_Record::setUp()
-   */
-  public function setUp(){
-    parent::setUp();
-    $this->hasOne('Applicant', array(
-      'local' => 'applicantID',
-      'foreign' => 'id',
-      'onDelete' => 'CASCADE',
-      'onUpdate' => 'CASCADE')
-    );
-  }
   
   /**
    * Format a decision time stamp
    */
   protected function decisionStamp(){
-    return date('Y-m-d H:i:s');
+    return DateTime('now');
   }
   
   /**

@@ -6,6 +6,7 @@
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
  */
+
 class JazzeeController extends Controller{
   
   /**
@@ -32,6 +33,12 @@ class JazzeeController extends Controller{
    * @var EmailServer
    */
   protected $mail;
+  
+  /**
+   * Holds the Doctrine EntityManager
+   * @var EntityManager
+   */
+  protected $em;
   
   /**
    * Constructor
@@ -72,12 +79,39 @@ class JazzeeController extends Controller{
         throw new Jazzee_Exception("Invalid path to var/{$dir} {$path} is not writable by the webserver");
       }
     }
-    //setup database connection
-    Doctrine_Manager::connection($this->config->dsn);
-    Doctrine::loadModels(APP_ROOT . '/models/doctrine');
     
-    //Add the JazzeeConfig table to the ConfigManager
-    $this->config->addContainer(new DoctrineTableConfigType(Doctrine::getTable('JazzeeConfig')));
+    //setup doctrine
+    $doctrineConfig = new Doctrine\ORM\Configuration();
+
+    //We use different caching and proxy settings in Development status
+    if($this->config->status == 'DEVELOPMENT'){
+      $doctrineConfig->setAutoGenerateProxyClasses(true);
+      $doctrineConfig->setProxyDir(VAR_ROOT . '/tmp');
+      $cache = new \Doctrine\Common\Cache\ArrayCache;
+    } else {
+      $doctrineConfig->setAutoGenerateProxyClasses(false);
+      $doctrineConfig->setProxyDir(APP_ROOT . '/models/Entity/Proxy');
+      if(!extension_loaded('apc')) throw new Jazzee_Exception('APC cache is required, but was not available.');
+      $cache = new \Doctrine\Common\Cache\ApcCache;
+    }
+    $driver = $doctrineConfig->newDefaultAnnotationDriver(array(APP_ROOT."/models/Entity"));
+    $doctrineConfig->setMetadataDriverImpl($driver);
+    
+    
+    $doctrineConfig->setProxyNamespace('Entity\Proxy');
+    $doctrineConfig->setMetadataCacheImpl($cache);
+    $doctrineConfig->setQueryCacheImpl($cache);
+    
+    $connectionParams = array(
+      'dbname' => $this->config->dbName,
+      'user' => $this->config->dbUser,
+      'password' => $this->config->dbPassword,
+      'host' => $this->config->dbHost,
+      'port' => $this->config->dnPort,
+      'driver' => $this->config->dbDriver,
+    );
+    $this->em = Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
+    
    
     //setup the session based on the configuration
     $session = Session::getInstance();
