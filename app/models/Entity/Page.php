@@ -46,7 +46,7 @@ class Page{
   private $variables;
 
   /** 
-   * @OneToMany(targetEntity="Element", mappedBy="page")
+   * @OneToMany(targetEntity="Element", mappedBy="page",cascade={"all"})
    */
   private $elements;
   
@@ -57,10 +57,10 @@ class Page{
   private $max;
   
   /** @Column(type="boolean") */
-  private $isRequired;
+  private $isRequired = true;
   
   /** @Column(type="boolean") */
-  private $answerStatusDisplay;
+  private $answerStatusDisplay = false;
   
   /** @Column(type="text", nullable=true) */
   private $instructions;
@@ -334,6 +334,7 @@ class Page{
    * @param Entity\Element $element
    */
   public function addElement(Element $element){
+    if(is_null($element->getWeight())) $element->setWeight(count($this->elements)+1);
     $this->elements[] = $element;
   }
 }
