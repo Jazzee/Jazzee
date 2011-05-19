@@ -24,7 +24,7 @@ class Program{
   private $shortName;
   
   /** @Column(type="boolean") */
-  private $isExpired;
+  private $isExpired = false;
   
   
 /**
