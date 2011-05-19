@@ -84,27 +84,43 @@ class RecommendersPage extends StandardPage {
    * @param Page $page
    */
   public static function setupNewPage(Entity\Page $page){
-    $types = Doctrine::getTable('ElementType')->findAll(Doctrine::HYDRATE_ARRAY);
+    $em = JazzeeController::getEntityManager();
+    $types = $em->getRepository('Entity\ElementType')->findAll();
     $elementTypes = array();
     foreach($types as $type){
-      $elementTypes[$type['class']] = $type['id'];
+      $elementTypes[$type->getClass()] = $type;
     };
+    $count = 1;
     foreach(array(RecommendersPage::FID_FIRST_NAME=>'First Name',RecommendersPage::FID_LAST_NAME=>'Last Name',RecommendersPage::FID_INSTITUTION=>'Institution',RecommendersPage::FID_EMAIL=>'Email Address',RecommendersPage::FID_PHONE=>'Phone Number') as $fid => $title){
-      $element = $page->Elements->get(null);
-      $element->elementType = $elementTypes['TextInputElement'];
-      $element->title = $title;
-      $element->required = true;
-      $element->fixedID = $fid;
+      $element = new Entity\Element;
+      $element->setPage($page);
+      $element->setType($elementTypes['TextInputElement']);
+      $element->setTitle($title);
+      $element->required();
+      $element->setWeight($count);
+      $element->setFixedId($fid);
+      $em->persist($element);
+      $count++;
     }
-    $element = $page->Elements->get(null);
-    $element->elementType = $elementTypes['RadioListElement'];
-    $element->title = 'Do you waive your right to view this letter at a later time?';
-    $element->required = true;
-    $element->fixedID = RecommendersPage::FID_WAIVE_RIGHT;
-    $item = $element->ListItems->get(null);
-    $item->value = 'No';
-    $item = $element->ListItems->get(null);
-    $item->value = 'Yes';
+    $element = new Entity\Element;
+    $element->setPage($page);
+    $element->setType($elementTypes['RadioListElement']);
+    $element->setTitle('Do you waive your right to view this letter at a later time?');
+    $element->required();
+    $element->setWeight(7);
+    $element->setFixedId(RecommendersPage::FID_WAIVE_RIGHT);
+    
+    $item = new Entity\ElementListItem;
+    $item->setElement($element);
+    $item->setValue('Yes');
+    $item->setWeight(1);
+    $em->persist($item);
+    
+    $item = new Entity\ElementListItem;
+    $item->setElement($element);
+    $item->setValue('No');
+    $item->setWeight(2);
+    $em->persist($item);
   }
 }
 
