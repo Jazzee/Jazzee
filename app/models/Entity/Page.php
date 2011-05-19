@@ -306,21 +306,17 @@ class Page{
   }
 
   /**
-   * Add variable
-   *
-   * @param Entity\PageVariable $variable
+   * Set page variable
+   * @param string $name
+   * @param string $value
    */
-  public function addVariable(PageVariable $variable){
-    $this->variables[] = $variable;
-  }
-
-  /**
-   * Get variables
-   *
-   * @return Doctrine\Common\Collections\Collection $variables
-   */
-  public function getVariables(){
-    return $this->variables;
+  public function setVar($name, $value){
+    foreach($this->variables as $variable)
+      if($variable->getName() == $name)return $variable->setValue($value);
+    //create a new empty variable with that name
+    $var = new PageVariable;
+    $var->setName($name);
+    $var->setValue($value);
   }
 
   /**
@@ -330,5 +326,14 @@ class Page{
    */
   public function getElements(){
     return $this->elements;
+  }
+  
+/**
+   * Add element
+   *
+   * @param Entity\Element $element
+   */
+  public function addElement(Element $element){
+    $this->elements[] = $element;
   }
 }
