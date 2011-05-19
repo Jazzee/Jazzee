@@ -17,21 +17,19 @@ class ApplicationPage{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Application", inversedBy="pages")
-   * @JoinColumn(onDelete="CASCADE",onUpdate="CASCADE") 
+   * @ManyToOne(targetEntity="Application", inversedBy="pages", cascade={"all"})
    */
   private $application;
   
   /** 
    * @ManyToOne(targetEntity="Page")
-   * @JoinColumn(onDelete="CASCADE",onUpdate="CASCADE") 
    */
   private $page;
   
   /** @Column(type="integer") */
   private $weight;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $title;
   
   /** @Column(type="integer", nullable=true) */
@@ -41,10 +39,10 @@ class ApplicationPage{
   private $max;
   
   /** @Column(type="boolean") */
-  private $isRequired;
+  private $isRequired = true;
   
   /** @Column(type="boolean") */
-  private $showAnswerStatus;
+  private $answerStatusDisplay = false;
   
   /** @Column(type="text", nullable=true) */
   private $instructions;
@@ -54,6 +52,39 @@ class ApplicationPage{
   
   /** @Column(type="text", nullable=true) */
   private $trailingText;
+  
+/**
+   * Set application
+   *
+   * @param Entity\Application $application
+   */
+  public function setApplication(Application $application){
+    $this->application = $application;
+  }
+  
+  /**
+   * Set page
+   *
+   * @param Entity\Page $page
+   */
+  public function setPage(Page $page){
+    $this->page = $page;
+  }
+  
+  /**
+   * Get the weight
+   */
+  public function getWeight(){
+    return $this->weight;
+  }
+  
+  /**
+   * Set the weight
+   * @param integer $value
+   */
+  public function setWeight($weight){
+    $this->weight = $weight;
+  }
   
   /**
    * Get the title
@@ -134,6 +165,30 @@ class ApplicationPage{
   public function optional(){
     if(!$this->page->isGlobal()) $this->page->optioal();
     else $this->isRequired = false;
+  }
+  
+  /**
+   * Show the answer status
+   */
+  public function showAnswerStatus(){
+    if(!$this->page->isGlobal()) $this->page->showAnswerStatus();
+    else $this->answerStatusDisplay = true;
+  }
+  
+/**
+   * Hide the answer status
+   */
+  public function hideAnswerStatus(){
+    if(!$this->page->isGlobal()) $this->page->hideAnswerStatus();
+    else $this->answerStatusDisplay = false;
+  }
+  
+  /**
+   * Display answer status value
+   */
+  public function answerStatusDisplay(){
+    if(is_null($this->answerStatusDisplay)) return $this->page->answerStatusDisplay();
+    return $this->answerStatusDisplay;
   }
   
   /**
