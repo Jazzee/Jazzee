@@ -325,6 +325,6 @@ class Page{
    * @return Doctrine\Common\Collections\Collection $elements
    */
   public function getElements(){
-    return $this->elements->toArray();
+    return $this->elements;
   }
 }
