@@ -24,7 +24,6 @@ class Element{
 
   /** 
    * @ManyToOne(targetEntity="Page",inversedBy="elements",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $page;
   
@@ -47,7 +46,7 @@ class Element{
   private $max;
   
   /** @Column(type="boolean") */
-  private $required;
+  private $required = false;
   
   /** @Column(type="text", nullable=true) */
   private $instructions;
@@ -56,7 +55,7 @@ class Element{
   private $defaultValue;
   
   /** 
-   * @OneToMany(targetEntity="ElementListItem",mappedBy="element",cascade={"all"})
+   * @OneToMany(targetEntity="ElementListItem",mappedBy="element")
    */
   private $listItems;
 
@@ -273,16 +272,6 @@ class Element{
    */
   public function getPage(){
     return $this->page;
-  }
-
-  /**
-   * Add ListItem
-   *
-   * @param Entity\ElementListItem $listItem
-   */
-  public function addListItem(ElementListItem $listItem){
-    if(is_null($listItem->getWeight())) $listItem->setWeight(count($this->listItems)+1);
-    $this->listItems[] = $listItem;
   }
 
   /**
