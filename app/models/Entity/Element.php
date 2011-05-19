@@ -37,7 +37,7 @@ class Element{
   /** @Column(type="string") */
   private $title;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $format;
   
   /** @Column(type="decimal", nullable=true) */
@@ -56,7 +56,7 @@ class Element{
   private $defaultValue;
   
   /** 
-   * @OneToMany(targetEntity="ElementListItem",mappedBy="element")
+   * @OneToMany(targetEntity="ElementListItem",mappedBy="element",cascade={"all"})
    */
   private $listItems;
 
@@ -281,6 +281,7 @@ class Element{
    * @param Entity\ElementListItem $listItem
    */
   public function addListItem(ElementListItem $listItem){
+    if(is_null($listItem->getWeight())) $listItem->setWeight(count($this->listItems)+1);
     $this->listItems[] = $listItem;
   }
 
