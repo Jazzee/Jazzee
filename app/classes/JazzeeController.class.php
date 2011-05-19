@@ -38,7 +38,7 @@ class JazzeeController extends Controller{
    * Holds the Doctrine EntityManager
    * @var EntityManager
    */
-  protected $em;
+  protected static $em = null;
   
   /**
    * Constructor
@@ -110,8 +110,8 @@ class JazzeeController extends Controller{
       'port' => $this->config->dnPort,
       'driver' => $this->config->dbDriver,
     );
-    $this->em = Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
     
+    self::createEntityManager($connectionParams, $doctrineConfig);
    
     //setup the session based on the configuration
     $session = Session::getInstance();
@@ -260,6 +260,34 @@ class JazzeeController extends Controller{
     
   }
   
+  /**
+   * Get the entity manager instance
+   * Alias for class children to get the entity manager
+   * @return \Doctrine\ORM\EntityManager $em;
+   */
+  protected function em(){
+    return self::getEntityManager();
+  }
+  
+  /**
+   * Get the entity manager instance
+   * @return \Doctrine\ORM\EntityManager $em;
+   */
+  public static function getEntityManager(){
+    return self::$em;
+  }
+  
+  /**
+   * Create Entity Manager
+   * Registers our static entity manager
+   * will not overwrite the existing manager if it is called twice
+   * @param array $connectionParams
+   * @param Doctrine\ORM\Configuration $doctrineConfig
+   */
+  public static function createEntityManager(array $connectionParams, Doctrine\ORM\Configuration $doctrineConfig){
+    if(!is_null(self::$em)) throw new Jazzee_Exception('Attempting to create a new EntityManager, but one already exists');
+    self::$em = Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
+  }
   /**
    * Call any after action properties, redirect, and exit
    * @param string $path
