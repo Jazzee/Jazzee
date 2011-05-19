@@ -26,7 +26,7 @@ class Page{
   private $type;
   
   /** @Column(type="boolean") */
-  private $isGlobal;
+  private $isGlobal = false;
   
   /** 
    * @ManyToOne(targetEntity="Page",inversedBy="children")
@@ -46,7 +46,7 @@ class Page{
   private $variables;
 
   /** 
-   * @OneToMany(targetEntity="Element", mappedBy="page",cascade={"all"})
+   * @OneToMany(targetEntity="Element", mappedBy="page")
    */
   private $elements;
   
@@ -286,14 +286,14 @@ class Page{
   public function getParent(){
     return $this->parent;
   }
-
+  
   /**
-   * Add child
+   * Set parent
    *
-   * @param Entity\Page $child
+   * @param Entity\Page $parent
    */
-  public function addChild(Page $child){
-    $this->child[] = $child;
+  public function setParent($parent){
+    $this->parent = $parent;
   }
 
   /**
@@ -325,16 +325,6 @@ class Page{
    * @return Doctrine\Common\Collections\Collection $elements
    */
   public function getElements(){
-    return $this->elements;
-  }
-  
-/**
-   * Add element
-   *
-   * @param Entity\Element $element
-   */
-  public function addElement(Element $element){
-    if(is_null($element->getWeight())) $element->setWeight(count($this->elements)+1);
-    $this->elements[] = $element;
+    return $this->elements->toArray();
   }
 }
