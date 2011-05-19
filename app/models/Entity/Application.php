@@ -55,11 +55,11 @@ class Application{
   /** @Column(type="datetime", nullable=true) */
   private $begin;
   
-  /** @Column(type="boolean", nullable=true) */
-  private $published;
+  /** @Column(type="boolean") */
+  private $published = false;
   
-  /** @Column(type="boolean", nullable=true) */
-  private $visible;
+  /** @Column(type="boolean") */
+  private $visible = false;
   
   /** @Column(type="text", nullable=true) */
   private $admitLetter;
