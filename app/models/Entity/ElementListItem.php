@@ -26,7 +26,7 @@ class ElementListItem{
   private $weight;
   
   /** @Column(type="boolean") */
-  private $active;
+  private $active = true;
   
   /** @Column(type="string") */
   private $value;
