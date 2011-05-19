@@ -18,7 +18,6 @@ class ElementListItem{
   
   /** 
    * @ManyToOne(targetEntity="Element",inversedBy="listItems",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $element;
   
@@ -38,6 +37,15 @@ class ElementListItem{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Set element
+   *
+   * @param Entity\Element $element
+   */
+  public function setElement(Element $element){
+    $this->element = $element;
   }
 
   /**
