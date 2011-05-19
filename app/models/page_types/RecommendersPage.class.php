@@ -83,7 +83,7 @@ class RecommendersPage extends StandardPage {
    * Create the recommenders form
    * @param Page $page
    */
-  public static function setupNewPage(Page $page){
+  public static function setupNewPage(Entity\Page $page){
     $types = Doctrine::getTable('ElementType')->findAll(Doctrine::HYDRATE_ARRAY);
     $elementTypes = array();
     foreach($types as $type){

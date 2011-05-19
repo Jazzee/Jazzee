@@ -157,7 +157,7 @@ abstract class ApplyPage {
    * Perform some setup actions on a new page
    * @param Page $page
    */
-  public static function setupNewPage(Page $page){}
+  public static function setupNewPage(Entity\Page $page){}
 }
 
 ?>
