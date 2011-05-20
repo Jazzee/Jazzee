@@ -72,6 +72,15 @@ class ApplicationPage{
   }
   
   /**
+   * Get page
+   *
+   * @return Entity\Page
+   */
+  public function getPage(){
+    return $this->page;
+  }
+  
+  /**
    * Get the weight
    */
   public function getWeight(){
