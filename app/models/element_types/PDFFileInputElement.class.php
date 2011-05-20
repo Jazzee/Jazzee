@@ -48,10 +48,10 @@ class PDFFileInputElement extends ApplyElement {
   
   public function getAnswers(){
     if(is_null($this->value)) return array();
-    $elementAnswer = new ElementAnswer;
-    $elementAnswer->elementID = $this->element->id;
-    $elementAnswer->position = 0;
-    $elementAnswer->eBlob = $this->value;
+    $elementAnswer = new Entity\ElementAnswer;
+    $elementAnswer->setElement($this->element);
+    $elementAnswer->setPosition(0);
+    $elementAnswer->setEBlob($this->value);
     return array($elementAnswer);
   }
   

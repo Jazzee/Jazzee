@@ -40,10 +40,10 @@ class RankingListElement extends ApplyElement {
     $return = array();
     foreach($this->value as $position => $value){
       if($value){
-        $elementAnswer = new ElementAnswer;
-        $elementAnswer->elementID = $this->element->id;
-        $elementAnswer->position = $position;
-        $elementAnswer->eInteger = $value;
+        $elementAnswer = new Entity\ElementAnswer;
+        $elementAnswer->setElement($this->element);
+        $elementAnswer->setPosition($position);
+        $elementAnswer->setEInteger($this->value);
         $return[] = $elementAnswer;
       }
     }

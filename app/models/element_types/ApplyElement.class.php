@@ -21,20 +21,8 @@ abstract class ApplyElement {
  /**
   * Contructor
   */
-  public function __construct(Element $element){
+  public function __construct(Entity\Element $element){
     $this->element = $element;
-  }
-  
-  /**
-   * Passthrough unset get request to the $element object
-   * @param $name
-   */
-  public function __get($name){
-    $method = "get{$name}";
-    if(method_exists($this, $method)){
-      return $this->$method();
-    }
-    return $this->element->$name;
   }
   
   /**

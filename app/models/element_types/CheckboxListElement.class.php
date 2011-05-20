@@ -41,10 +41,10 @@ class CheckboxListElement extends ApplyElement {
   public function getAnswers(){
     $return = array();
     foreach($this->value as $position => $value){
-      $elementAnswer = new ElementAnswer;
-      $elementAnswer->elementID = $this->element->id;
-      $elementAnswer->position = $position;
-      $elementAnswer->eInteger = $value;
+      $elementAnswer = new Entity\ElementAnswer;
+      $elementAnswer->setElement($this->element);
+      $elementAnswer->setPosition($position);
+      $elementAnswer->setEInteger($value);
       $return[] = $elementAnswer;
     }
     return $return;

@@ -29,10 +29,10 @@ class TextInputElement extends ApplyElement {
   
   public function getAnswers(){
     if(is_null($this->value)) return array();
-    $elementAnswer = new ElementAnswer;
-    $elementAnswer->elementID = $this->element->id;
-    $elementAnswer->position = 0;
-    $elementAnswer->eShortString = $this->value;
+    $elementAnswer = new Entity\ElementAnswer;
+    $elementAnswer->setElement($this->element);
+    $elementAnswer->setPosition(0);
+    $elementAnswer->setEShortString($this->value);
     return array($elementAnswer);
   }
   

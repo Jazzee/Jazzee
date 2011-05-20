@@ -36,10 +36,10 @@ class TextareaElement extends ApplyElement {
   
   public function getAnswers(){
     if(is_null($this->value)) return array();
-    $elementAnswer = new ElementAnswer;
-    $elementAnswer->elementID = $this->element->id;
-    $elementAnswer->position = 0;
-    $elementAnswer->eLongString = $this->value;
+    $elementAnswer = new Entity\ElementAnswer;
+    $elementAnswer->setElement($this->element);
+    $elementAnswer->setPosition(0);
+    $elementAnswer->setEText($this->value);
     return array($elementAnswer);
   }
   
