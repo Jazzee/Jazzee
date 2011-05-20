@@ -109,7 +109,7 @@ class RecommendersPage extends StandardPage {
     $element->required();
     $element->setWeight(7);
     $element->setFixedId(RecommendersPage::FID_WAIVE_RIGHT);
-    
+    $em->persist($element);
     $item = new Entity\ElementListItem;
     $item->setElement($element);
     $item->setValue('Yes');
@@ -139,21 +139,6 @@ class RecommendationAnswer extends StandardAnswer {
     foreach($this->elements as $e){
       $this->fixedIds[$e->fixedID] = $e->id;
     }
-  }
-  
-  public function update(FormInput $input){
-    //PHPs uniquid function is time based and therefor guessable
-    //A stright random MD5 sum is too long for email and tends to line break causing usability problems for the recommender
-    //So we get unique through uniquid and we get random by prefixing it with a part of an MD5
-    //hopefully this results in a URL friendly short, but unguessable string
-    $string = '';
-    foreach($this->elements as $id => $element){
-      $string .= $input->{'el'.$id};
-    }
-    $string = mt_rand() . $string . mt_rand();
-    $prefix = substr(md5($string),rand(0,24), rand(6,8));
-    $this->answer->uniqueID = uniqid($prefix);
-    parent::update($input);
   }
   
   public function getDisplayValueForFixedElement($fixedElementID){
