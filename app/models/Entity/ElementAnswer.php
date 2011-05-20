@@ -19,7 +19,6 @@ class ElementAnswer{
   
   /** 
    * @ManyToOne(targetEntity="Answer",inversedBy="elements",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $answer;
   
@@ -116,16 +115,16 @@ class ElementAnswer{
   /**
    * Set eDate
    *
-   * @param datetime $eDate
+   * @param string $eDate
    */
   public function setEDate($eDate){
-    $this->eDate = $eDate;
+    $this->eDate = new \DateTime($eDate);
   }
 
   /**
    * Get eDate
    *
-   * @return datetime $eDate
+   * @return \DateTime $eDate
    */
   public function getEDate(){
     return $this->eDate;
@@ -192,5 +191,14 @@ class ElementAnswer{
    */
   public function setElement(Element $element){
     $this->element = $element;
+  }
+  
+/**
+   * Set answer
+   *
+   * @param Entity\Answer $answer
+   */
+  public function setAnswer(Answer $answer){
+    $this->answer = $answer;
   }
 }

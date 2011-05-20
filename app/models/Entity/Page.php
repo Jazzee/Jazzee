@@ -41,7 +41,7 @@ class Page{
   private $children;
   
   /** 
-   * @OneToMany(targetEntity="PageVariable", mappedBy="page")
+   * @OneToMany(targetEntity="PageVariable", mappedBy="page", cascade={"all"})
    */
   private $variables;
 
@@ -315,7 +315,9 @@ class Page{
       if($variable->getName() == $name)return $variable->setValue($value);
     //create a new empty variable with that name
     $var = new PageVariable;
+    $var->setPage($this);
     $var->setName($name);
+    $this->variables[] = $var;
     $var->setValue($value);
   }
 
@@ -326,5 +328,25 @@ class Page{
    */
   public function getElements(){
     return $this->elements;
+  }
+  
+	/**
+   * Get element by ID
+   * @param integer $id
+   * @return Entity\Element $element
+   */
+  public function getElementById($id){
+    foreach($this->elements as $element) if($element->getId() == $id) return $element;
+    return false;
+  }
+  
+  /**
+   * Get element by fixed ID
+   * @param integer $id
+   * @return Entity\Element $element
+   */
+  public function getElementByFixedId($id){
+    foreach($this->elements as $element) if($element->getFixedId() == $id) return $element;
+    return false;
   }
 }

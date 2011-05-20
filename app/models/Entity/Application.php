@@ -149,7 +149,7 @@ class Application{
   /**
    * Get open
    *
-   * @return datetime $open
+   * @return \DateTime $open
    */
   public function getOpen(){
     return $this->open;
@@ -185,7 +185,7 @@ class Application{
   /**
    * Get begin
    *
-   * @return DateTime $begin
+   * @return \DateTime $begin
    */
   public function getBegin(){
     return $this->begin;

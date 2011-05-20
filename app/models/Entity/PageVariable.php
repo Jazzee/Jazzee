@@ -17,7 +17,6 @@ class PageVariable{
   
   /** 
    * @ManyToOne(targetEntity="Page", inversedBy="variables")
-   * @JoinColumn(onDelete="CASCADE",onUpdate="CASCADE") 
    */
   private $page;
   
@@ -26,7 +25,7 @@ class PageVariable{
   
   /** @Column(type="string") */
   private $value;
-
+  
   /**
    * Get id
    *
@@ -34,6 +33,15 @@ class PageVariable{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Set page
+   *
+   * @param Entity\Page $page
+   */
+  public function setPage($page){
+    $this->page = $page;
   }
 
   /**

@@ -26,13 +26,13 @@ class TOEFLScore{
   /** @Column(type="integer") */
   private $testYear;
   
-  /** @Column(type="string", length=4) */
+  /** @Column(type="string", length=4, nullable=true) */
   private $departmentCode;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $firstName;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $middleName;
   
   /** @Column(type="string") */
@@ -56,49 +56,49 @@ class TOEFLScore{
   /** @Column(type="string") */
   private $testType;
   
-  /** @Column(type="integer", length=1) */
+  /** @Column(type="integer", length=1, nullable=true) */
   private $listeningIndicator;
   
-  /** @Column(type="integer", length=1) */
+  /** @Column(type="integer", length=1, nullable=true) */
   private $speakingIndicator;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $IBTListening;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $IBTWriting;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $IBTSpeaking;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $IBTReading;
   
-  /** @Column(type="integer", length=3) */
+  /** @Column(type="integer", length=3, nullable=true) */
   private $IBTTotal;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $TSEScore;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $listening;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $writing;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $reading;
   
-  /** @Column(type="integer", length=2) */
+  /** @Column(type="integer", length=2, nullable=true) */
   private $essay;
   
-  /** @Column(type="integer", length=3) */
+  /** @Column(type="integer", length=3, nullable=true) */
   private $total;
   
-  /** @Column(type="integer", length=3) */
+  /** @Column(type="integer", length=3, nullable=true) */
   private $timesTaken;
   
-  /** @Column(type="string", length=1) */
+  /** @Column(type="string", length=1, nullable=true) */
   private $offTopic;
   
 
@@ -119,8 +119,8 @@ class TOEFLScore{
    * @param integer $testYear
    */
   public function setRegistrationNumber($registrationNumber, $testMonth, $testYear){
-    if($testMont < 1 OR $testMonth > 12) throw new Jazzee_Exception("{$testMonth} is not a valid month");
-    if($testYear < 1900 OR $testMonth > 2100) throw new Jazzee_Exception("{$testYear} is not a valid year");
+    if($testMonth < 1 OR $testMonth > 12) throw new \Jazzee_Exception("{$testMonth} is not a valid month");
+    if($testYear < 1900 OR $testMonth > 2100) throw new \Jazzee_Exception("{$testYear} is not a valid year");
     $this->registrationNumber = $registrationNumber;
     $this->testMonth = $testMonth;
     $this->testYear = $testYear;
@@ -231,7 +231,7 @@ class TOEFLScore{
    * @param string $gender
    */
   public function setGender($gender){
-    if(!in_array(strtolower($gender), array('m', 'f'))) throw new Jazzee_Exception("{$gender} is not a valid gender");
+    if(!in_array(strtolower($gender), array('m', 'f'))) throw new \Jazzee_Exception("{$gender} is not a valid gender");
     $this->gender = $gender;
   }
 

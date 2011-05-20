@@ -25,7 +25,6 @@ class Answer{
   
   /** 
    * @ManyToOne(targetEntity="Page",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE")
    */
   protected $page;
   
@@ -69,9 +68,16 @@ class Answer{
   /** @Column(type="datetime") */
   protected $updatedAt;
   
+  /** 
+   * @OneToMany(targetEntity="GREScore",mappedBy="answer")
+   */
+  private $greScores;
+  
   public function __construct(){
     $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->generateUniqueId();
+    $this->locked = false;
   }
   
   /**
@@ -100,16 +106,46 @@ class Answer{
   public function getAttachment(){
     return $this->attachment;
   }
+  
+  /**
+   * Set page
+   *
+   * @param Entity\Page $page
+   */
+  public function setPage($page){
+    $this->page = $page;
+  }
 
   /**
-   * Set uniqueId
+   * Get page
    *
-   * @param string $uniqueId
+   * @return Entity\Page $page
+   */
+  public function getPage(){
+    return $this->page;
+  }
+
+  /**
+   * Generate a unique id
+   */
+  public function generateUniqueId(){
+    //PHPs uniquid function is time based and therefor guessable
+    //A stright random MD5 sum is too long for email and tends to line break causing usability problems
+    //So we get unique through uniquid and we get random by prefixing it with a part of an MD5
+    //hopefully this results in a URL friendly short, but unguessable string
+    $prefix = substr(md5(mt_rand()*mt_rand()),rand(0,24), rand(6,8));
+    $this->uniqueId = \uniqid($prefix);
+  }
+  
+  /**
+   * Set a uniqueid
+   * Prefferably call generateUniqueId - but it can also be set manually
+   * @param string $uniqueId;
    */
   public function setUniqueId($uniqueId){
     $this->uniqueId = $uniqueId;
   }
-
+  
   /**
    * Get uniqueId
    *
@@ -120,36 +156,41 @@ class Answer{
   }
 
   /**
-   * Set locked
-   *
-   * @param boolean $locked
+   * Lock the Answer
    */
-  public function setLocked($locked){
-    $this->locked = $locked;
+  public function lock(){
+    $this->locked = true;
+  }
+  
+  /**
+   * UnLock the Answer
+   */
+  public function unlock(){
+    $this->locked = false;
   }
 
   /**
-   * Get locked
+   * Get locked status
    *
    * @return boolean $locked
    */
-  public function getLocked(){
+  public function isLocked(){
     return $this->locked;
   }
 
   /**
    * Set updatedAt
    *
-   * @param datetime $updatedAt
+   * @param string $updatedAt
    */
   public function setUpdatedAt($updatedAt){
-    $this->updatedAt = $updatedAt;
+    $this->updatedAt = new \DateTime($updatedAt);
   }
 
   /**
    * Get updatedAt
    *
-   * @return datetime $updatedAt
+   * @return DateTime $updatedAt
    */
   public function getUpdatedAt(){
     return $this->updatedAt;

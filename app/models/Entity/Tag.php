@@ -33,6 +33,11 @@ class Tag{
   public function getId(){
     return $this->id;
   }
+  
+  /**
+   * Set the Applicant
+   * @par
+   */
 
   /**
    * Set title

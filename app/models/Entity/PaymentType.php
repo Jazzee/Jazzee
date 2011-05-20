@@ -22,9 +22,13 @@ class PaymentType{
   private $class;
   
   /** 
-   * @OneToMany(targetEntity="PaymentTypeVariable", mappedBy="type")
+   * @OneToMany(targetEntity="PaymentTypeVariable", mappedBy="type", cascade={"all"})
    */
   private $variables;
+
+  public function __construct(){
+    $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
+  }
   
 /**
    * Get id
@@ -72,11 +76,18 @@ class PaymentType{
   }
 
   /**
-   * Add variable
-   *
-   * @param Entity\PaymentTypeVariable $variable
+   * Set variable
+   * @param string $name
+   * @param string $value
    */
-  public function addVariable(PaymentTypeVariable $variable){
-    $this->variables[] = $variable;
+  public function setVar($name, $value){
+    foreach($this->variables as $variable) if($variable->getName() == $name) return$variable->setValue($value);
+    //create a new empty variable with that name
+    $var = new PaymentTypeVariable();
+    $var->setType($this);
+    $var->setName($name);
+    $var->setValue($value);
+    $this->variables[] = $var;
+    return $var;
   }
 }

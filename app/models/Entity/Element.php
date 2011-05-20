@@ -282,4 +282,14 @@ class Element{
   public function getListItems(){
     return $this->listItems;
   }
+  
+  /**
+   * Get list item by value
+   *
+   * @return Entity\ElementListItem $item
+   */
+  public function getItemByValue($value){
+    foreach($this->listItems as $item) if($item->getValue() == $value) return $item;
+    return false;
+  }
 }

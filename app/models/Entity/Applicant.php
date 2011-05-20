@@ -18,7 +18,6 @@ class Applicant{
   
   /** 
    * @ManyToOne(targetEntity="Application",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $application;
   
@@ -49,13 +48,13 @@ class Applicant{
   /** @Column(type="datetime", nullable=true) */
   private $lastLogin;
   
-  /** @Column(type="string", length="15") */
+  /** @Column(type="string", length="15", nullable=true) */
   private $lastLoginIp;
   
-  /** @Column(type="string", length="15") */
+  /** @Column(type="string", length="15", nullable=true) */
   private $lastFailedLoginIp;
   
-  /** @Column(type="integer") */
+  /** @Column(type="integer", nullable=true) */
   private $failedLoginAttempts;
   
   /** @Column(type="datetime", nullable=true) */
@@ -65,22 +64,22 @@ class Applicant{
   private $updatedAt;
   
   /** 
-   * @OneToMany(targetEntity="Answer",mappedBy="applicant")
+   * @OneToMany(targetEntity="Answer",mappedBy="applicant", cascade={"all"})
    */
   private $answers;
   
   /** 
-   * @OneToMany(targetEntity="Attachment",mappedBy="applicant")
+   * @OneToMany(targetEntity="Attachment",mappedBy="applicant", cascade={"all"})
    */
   private $attachments;
   
   /** 
-   * @OneToOne(targetEntity="Decision",mappedBy="applicant")
+   * @OneToOne(targetEntity="Decision",mappedBy="applicant", cascade={"all"})
    */
   private $decision;
   
   /** 
-   * @OneToMany(targetEntity="Payment",mappedBy="applicant")
+   * @OneToMany(targetEntity="Payment",mappedBy="applicant", cascade={"all"})
    */
   private $payments;
   
@@ -266,16 +265,16 @@ class Applicant{
   /**
    * Set deadlineExtension
    *
-   * @param datetime $deadlineExtension
+   * @param string $deadlineExtension
    */
   public function setDeadlineExtension($deadlineExtension){
-    $this->deadlineExtension = $deadlineExtension;
+    $this->deadlineExtension = new \DateTime($deadlineExtension);
   }
 
   /**
    * Get deadlineExtension
    *
-   * @return datetime $deadlineExtension
+   * @return DateTime $deadlineExtension
    */
   public function getDeadlineExtension(){
     return $this->deadlineExtension;
@@ -284,16 +283,16 @@ class Applicant{
   /**
    * Set lastLogin
    *
-   * @param datetime $lastLogin
+   * @param string $lastLogin
    */
   public function setLastLogin($lastLogin){
-    $this->lastLogin = $lastLogin;
+    $this->lastLogin = new \DateTime($lastLogin);
   }
 
   /**
    * Get lastLogin
    *
-   * @return datetime $lastLogin
+   * @return \DateTime $lastLogin
    */
   public function getLastLogin(){
     return $this->lastLogin;
@@ -356,16 +355,16 @@ class Applicant{
   /**
    * Set createdAt
    *
-   * @param datetime $createdAt
+   * @param string $createdAt
    */
   public function setCreatedAt($createdAt){
-    $this->createdAt = $createdAt;
+    $this->createdAt = new \DateTime($createdAt);
   }
 
   /**
    * Get createdAt
    *
-   * @return datetime $createdAt
+   * @return \DateTime $createdAt
    */
   public function getCreatedAt(){
     return $this->createdAt;
@@ -374,16 +373,16 @@ class Applicant{
   /**
    * Set updatedAt
    *
-   * @param datetime $updatedAt
+   * @param string $updatedAt
    */
   public function setUpdatedAt($updatedAt){
-    $this->updatedAt = $updatedAt;
+    $this->updatedAt = new \DateTime($updatedAt);
   }
 
   /**
    * Get updatedAt
    *
-   * @return datetime $updatedAt
+   * @return \DateTime $updatedAt
    */
   public function getUpdatedAt(){
     return $this->updatedAt;
@@ -405,33 +404,6 @@ class Applicant{
    */
   public function getApplication(){
     return $this->application;
-  }
-
-  /**
-   * Add answers
-   *
-   * @param Entity\Answer $answers
-   */
-  public function addAnswers(Answer $answers){
-    $this->answers[] = $answers;
-  }
-
-  /**
-   * Get answers
-   *
-   * @return Doctrine\Common\Collections\Collection $answers
-   */
-  public function getAnswers(){
-    return $this->answers;
-  }
-
-  /**
-   * Add attachments
-   *
-   * @param Entity\Attachment $attachment
-   */
-  public function addAttachment(Attachment $attachment){
-    $this->attachments[] = $attachment;
   }
 
   /**

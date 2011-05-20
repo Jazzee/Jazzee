@@ -26,16 +26,21 @@ class GREScore{
   /** @Column(type="integer") */
   private $testYear;
   
-  /** @Column(type="string", length=4) */
+  /** 
+   * @ManyToOne(targetEntity="Answer",inversedBy="greScores",cascade={"all"})
+   */
+  protected $answer;
+  
+  /** @Column(type="string", length=4, nullable=true) */
   private $departmentCode;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $departmentName;
   
   /** @Column(type="string") */
   private $firstName;
   
-  /** @Column(type="string", length=1) */
+  /** @Column(type="string", length=1, nullable=true) */
   private $middleInitial;
   
   /** @Column(type="string") */
@@ -44,7 +49,7 @@ class GREScore{
   /** @Column(type="datetime") */
   private $birthDate;
   
-  /** @Column(type="string", length=1) */
+  /** @Column(type="string", length=1, nullable=true) */
   private $gender;
   
   /** @Column(type="datetime") */
@@ -65,31 +70,31 @@ class GREScore{
   /** @Column(type="decimal", length=3) */
   private $score1Percentile;
   
-  /** @Column(type="string", length=1) */
+  /** @Column(type="string", length=1, nullable=true) */
   private $score2Type;
   
-  /** @Column(type="integer", length=3) */
+  /** @Column(type="integer", length=3, nullable=true) */
   private $score2Converted;
   
-  /** @Column(type="decimal", length=3) */
+  /** @Column(type="decimal", length=3, nullable=true) */
   private $score2Percentile;
   
-  /** @Column(type="string", length=1) */
+  /** @Column(type="string", length=1, nullable=true) */
   private $score3Type;
   
-  /** @Column(type="integer", length=3) */
+  /** @Column(type="integer", length=3, nullable=true) */
   private $score3Converted;
   
-  /** @Column(type="decimal", length=3) */
+  /** @Column(type="decimal", length=3, nullable=true) */
   private $score3Percentile;
   
-  /** @Column(type="string", length=1) */
+  /** @Column(type="string", length=1, nullable=true) */
   private $score4Type;
   
-  /** @Column(type="integer", length=3) */
+  /** @Column(type="integer", length=3, nullable=true) */
   private $score4Converted;
   
-  /** @Column(type="decimal", length=3) */
+  /** @Column(type="decimal", length=3, nullable=true) */
   private $score4Percentile;
   
   /** @Column(type="integer", length=4) */
@@ -121,7 +126,7 @@ class GREScore{
    * @param integer $testYear
    */
   public function setRegistrationNumber($registrationNumber, $testMonth, $testYear){
-    if($testMont < 1 OR $testMonth > 12) throw new Jazzee_Exception("{$testMonth} is not a valid month");
+    if($testMonth < 1 OR $testMonth > 12) throw new Jazzee_Exception("{$testMonth} is not a valid month");
     if($testYear < 1900 OR $testMonth > 2100) throw new Jazzee_Exception("{$testYear} is not a valid year");
     $this->registrationNumber = $registrationNumber;
     $this->testMonth = $testMonth;
@@ -251,7 +256,8 @@ class GREScore{
    * @param string $gender
    */
   public function setGender($gender){
-    if(!in_array(strtolower($gender), array('m', 'f'))) throw new Jazzee_Exception("{$gender} is not a valid gender");
+    if(is_null($gender)) return;
+    if(!in_array(strtolower($gender), array('m', 'f'))) throw new \Jazzee_Exception("'{$gender}' is not a valid gender");
     $this->gender = $gender;
   }
 

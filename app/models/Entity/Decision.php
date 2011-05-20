@@ -18,53 +18,63 @@ class Decision{
   
   /** 
    * @OneToOne(targetEntity="Applicant",inversedBy="decision",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $applicant;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $nominateAdmit;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $nominateDeny;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $finalAdmit;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $finalDeny;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $offerResponseDeadline;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $decisionLetterSent;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $decisionLetterViewed;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $acceptOffer;
   
-  /** @Column(type="datetime") */
+  /** @Column(type="datetime", nullable=true) */
   private $declineOffer;
 
-  
   /**
-   * Format a decision time stamp
+   * Set applicant
+   *
+   * @param Entity\Applicant $applicant
    */
-  protected function decisionStamp(){
-    return DateTime('now');
+  public function setApplicant(Applicant $applicant){
+    $this->applicant = $applicant;
   }
   
   /**
-   * Nominate for admit decision
+   * Format a decision time stamp
+   * @param string $dateString
    */
-  public function nominateAdmit(){
+  protected function decisionStamp($dateString){
+    $dateString = empty($dateString)?'now':$dateString;
+    return new \DateTime($dateString);
+  }
+
+  /**
+   * Nominate for admit decision
+   * @param string $dateString
+   */
+  public function nominateAdmit($dateString = null){
     if(!is_null($this->nominateDeny)){
       throw new Jazzee_Exception('Cannot record two preliminary decisions');
     }
-    if(is_null($this->nominateAdmit)) $this->nominateAdmit = $this->decisionStamp();
+    if(is_null($this->nominateAdmit)) $this->nominateAdmit = $this->decisionStamp($dateString);
   }
   
   /**
@@ -79,16 +89,18 @@ class Decision{
   
   /**
    * Nominate for deny decision
+   * @param string $dateString
    */
-  public function nominateDeny(){
+  public function nominateDeny($dateString = null){
     if(!is_null($this->nominateAdmit)){
       throw new Jazzee_Exception('Cannot record two preliminary decisions');
     }
-    if(is_null($this->nominateDeny)) $this->nominateDeny = $this->decisionStamp();
+    if(is_null($this->nominateDeny)) $this->nominateDeny = $this->decisionStamp($dateString);
   }
   
   /**
    * Undo nominate deny
+   * @param string $dateString
    */
   public function undoNominateDeny(){
     if(!is_null($this->finalDeny)){
@@ -99,14 +111,15 @@ class Decision{
   
   /**
    * Final Deny Decision
+   * @param string $dateString
    */
-  public function finalDeny(){
+  public function finalDeny($dateString = null){
     if(!is_null($this->finalAdmit)){
       throw new Jazzee_Exception('Cannot record two final decisions');
     }
     //if we don't have a preliminary decision record it now
-    if(is_null($this->nominateDeny)) $this->nominateDeny = $this->decisionStamp();
-    if(is_null($this->finalDeny)) $this->finalDeny = $this->decisionStamp();
+    if(is_null($this->nominateDeny)) $this->nominateDeny = $this->decisionStamp($dateString);
+    if(is_null($this->finalDeny)) $this->finalDeny = $this->decisionStamp($dateString);
   }
   
   /**
@@ -116,17 +129,33 @@ class Decision{
     $this->finalDeny = null;
   }
   
+  /**
+   * Set offerResponseDeadline
+   * @param string $dateString
+   */
+  public function setOfferResponseDeadline($dateString){
+    $this->offerResponseDeadline = new \DateTime($dateString);
+  }
+  
+ /**
+   * Get offerResponseDeadline
+   * @return DateTime|null
+   */
+  public function getOfferResponseDeadline(){
+    return $this->offerResponseDeadline;
+  }
 
   /**
    * Final Admit Decision
+   * @param string $dateString
    */
-  public function finalAdmit(){
+  public function finalAdmit($dateString = null){
     if(!is_null($this->finalDeny)){
       throw new Jazzee_Exception('Cannot record two final decisions');
     }
     //if we don't have a preliminary decision record it now
-    if(is_null($this->nominateAdmit)) $this->nominateAdmit = $this->decisionStamp();
-    if(is_null($this->finalAdmit)) $this->finalAdmit = $this->decisionStamp();
+    if(is_null($this->nominateAdmit)) $this->nominateAdmit = $this->decisionStamp($dateString);
+    if(is_null($this->finalAdmit)) $this->finalAdmit = $this->decisionStamp($dateString);
   }
   
   /**
@@ -138,28 +167,39 @@ class Decision{
   
   /**
    * Accept Offer
+   * @param string $dateString
    */
-  public function acceptOffer(){
+  public function acceptOffer($dateString = null){
     if(is_null($this->finalAdmit)){
       throw new Jazzee_Exception('Cannot accept offer for an applicant who has not been admitted');
     }
-    if(is_null($this->acceptOffer)) $this->acceptOffer = $this->decisionStamp();
+    if(is_null($this->acceptOffer)) $this->acceptOffer = $this->decisionStamp($dateString);
   }
   
   /**
    * Decline Offer
+   * @param string $dateString
    */
-  public function declineOffer(){
+  public function declineOffer($dateString = null){
     if(is_null($this->finalAdmit)){
       throw new Jazzee_Exception('Cannot decline offer for an applicant who has not been admitted');
     }
-    if(is_null($this->declineOffer)) $this->declineOffer = $this->decisionStamp();
+    if(is_null($this->declineOffer)) $this->declineOffer = $this->decisionStamp($dateString);
   }
   
   /**
    * Register a decision letter has been sent
+   * @param string $dateString
    */
-  public function decisionLetterSent(){
-    $this->decisionLetterSent = $this->decisionStamp();
+  public function decisionLetterSent($dateString = null){
+    $this->decisionLetterSent = $this->decisionStamp($dateString);
+  }
+  
+  /**
+   * Register a decision letter has been viewed
+   * @param string $dateString
+   */
+  public function decisionLetterViewed($dateString = null){
+    $this->decisionLetterViewed = $this->decisionStamp($dateString);
   }
 }

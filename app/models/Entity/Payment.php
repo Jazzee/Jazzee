@@ -16,14 +16,12 @@ class Payment{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Applicant",inversedBy="payments",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @ManyToOne(targetEntity="Applicant",inversedBy="payments")
    */
   private $applicant;
   
   /** 
    * @ManyToOne(targetEntity="PaymentType")
-   * @JoinColumn(onUpdate="CASCADE") 
    */
   private $type;
   
@@ -34,7 +32,7 @@ class Payment{
   private $status;
   
   /** 
-   * @OneToMany(targetEntity="PaymentVariable", mappedBy="payment")
+   * @OneToMany(targetEntity="PaymentVariable", mappedBy="payment", cascade={"all"})
    */
   private $variables;
   
@@ -58,6 +56,15 @@ class Payment{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Set applicant
+   *
+   * @param Entity\Applicant $applicant
+   */
+  public function setApplicant(Applicant $applicant){
+    $this->applicant = $applicant;
   }
 
   /**
@@ -140,5 +147,21 @@ class Payment{
    */
   public function refunded(){
     $this->status = self::REFUNDED;
+  }
+  
+  /**
+   * Set payment variable
+   * @param string $name
+   * @param string $value
+   */
+  public function setVar($name, $value){
+    foreach($this->variables as $variable)
+      if($variable->getName() == $name)return $variable->setValue($value);
+    //create a new empty variable with that name
+    $var = new PaymentVariable();
+    $var->setPayment($this);
+    $var->setName($name);
+    $var->setValue($value);
+    $this->variables->add($var);
   }
 }

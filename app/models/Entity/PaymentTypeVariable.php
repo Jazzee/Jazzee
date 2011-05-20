@@ -3,7 +3,7 @@ namespace Entity;
 /** 
  * PaymentTypeVariable
  * Allow developers to store arbitrary data as a PaymentTypeVariable so we don't need new tables for every new ApplyPaymentType type
- * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variables", columns={"type_id", "value"})}) 
+ * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variables", columns={"type_id", "name"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -17,7 +17,6 @@ class PaymentTypeVariable{
   
   /** 
    * @ManyToOne(targetEntity="PaymentType", inversedBy="variables")
-   * @JoinColumn(onDelete="CASCADE",onUpdate="CASCADE") 
    */
   private $type;
   
@@ -26,8 +25,6 @@ class PaymentTypeVariable{
   
   /** @Column(type="string") */
   private $value;
-  
-
 
   /**
    * Get id
@@ -38,6 +35,15 @@ class PaymentTypeVariable{
     return $this->id;
   }
 
+  /**
+   * Set type
+   *
+   * @param Entity\PaymentType $type
+   */
+  public function setType($type){
+    $this->type = $type;
+  }
+  
   /**
    * Set name
    *

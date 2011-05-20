@@ -17,7 +17,6 @@ class PaymentVariable{
   
   /** 
    * @ManyToOne(targetEntity="Payment", inversedBy="variables")
-   * @JoinColumn(onDelete="CASCADE",onUpdate="CASCADE") 
    */
   private $payment;
   
@@ -36,6 +35,15 @@ class PaymentVariable{
     return $this->id;
   }
 
+  /**
+   * Set payment
+   *
+   * @param Entity\Payment $payment
+   */
+  public function setPayment(Payment $payment){
+    $this->payment = $payment;
+  }
+  
   /**
    * Set name
    *

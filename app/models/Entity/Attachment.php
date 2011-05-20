@@ -17,7 +17,6 @@ class Attachment{
   
   /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="attachments",cascade={"all"})
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $applicant;
   
@@ -31,6 +30,14 @@ class Attachment{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Set the Applicant
+   * @param Entity\Applicant $applicant
+   */
+  public function setApplicant(Applicant $applicant){
+    $this->applicant = $applicant;
   }
 
   /**
