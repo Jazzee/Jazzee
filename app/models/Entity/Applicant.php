@@ -17,11 +17,11 @@ class Applicant{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Application",cascade={"all"})
+   * @ManyToOne(targetEntity="Application", inversedBy="applicants")
    */
   private $application;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="string") */
   private $email;
   
   /** @Column(type="string") */

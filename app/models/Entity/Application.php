@@ -37,6 +37,11 @@ class Application{
    */
   private $pages;
   
+  /** 
+   * @OneToMany(targetEntity="Applicant", mappedBy="application",cascade={"all"})
+   */
+  private $applicants;
+  
   /** @Column(type="string", nullable=true) */
   private $contactName;
   
@@ -72,6 +77,7 @@ class Application{
   
   public function __construct(){
     $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
   }
   
   /**
