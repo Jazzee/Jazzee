@@ -86,8 +86,7 @@ class Controller extends \Foundation\VC\Controller
     //set the default timezone
     date_default_timezone_set($this->_config->getTimezone());
     
-    //The var root is the base for storing logs, sessions, cache files, tmp and uploaded files
-    $var = \realpath($this->_config->getVarPath()?$this->_config->getVarPath():__DIR__ . '/../../var');
+    $var = $this->getVarPath();
     
     if(!\is_dir($var) or !\is_writable($var)){
       throw new Exception("{$var} is not readable by the webserver so we cannot use it as the 'var' directory");
@@ -309,6 +308,16 @@ class Controller extends \Foundation\VC\Controller
     } 
     return $messages;
   }
+  
+  /**
+   * Get the path to the var directory
+   * @return string
+   */
+  protected function getVarPath(){
+    //The var root is the base for storing logs, sessions, cache files, tmp and uploaded files
+    return \realpath($this->_config->getVarPath()?$this->_config->getVarPath():__DIR__ . '/../../var');
+  }
+  
   /**
    * Build our virtual file system
    */
