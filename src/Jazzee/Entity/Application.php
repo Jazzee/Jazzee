@@ -28,6 +28,7 @@ class Application{
   /** 
    * @ManyToOne(targetEntity="Cycle",cascade={"all"})
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE")
+   * @OrderBy({"name" = "ASC"})
    */
   private $cycle;
   
@@ -373,14 +374,14 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository{
     return false;
   }
   
-/**
+  /**
    * findByProgram
    * Search for all the Applications belonging to a program
    * @param Program $program
    * @return Doctrine\Common\Collections\Collection $applications
    */
   public function findByProgram(Program $program){
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a WHERE a.program = :programId');
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a JOIN a.cycle c WHERE a.program = :programId ORDER BY c.start DESC');
     $query->setParameter('programId', $program->getId());
     return $query->getResult();
   }
