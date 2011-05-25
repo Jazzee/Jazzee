@@ -6,9 +6,5 @@
  * @package jazzee
  * @subpackage apply
  */
- 
-$messages = Message::getInstance();
-while($m = $messages->read()){
-  print "<p class='{$m['type']}'>{$m['message']}</p>";
-}
+print "<p class='error'>No messages</p>";
 ?>

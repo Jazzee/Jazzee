@@ -6,7 +6,7 @@
  * @package jazzee
  * @subpackage apply
  */
-class ApplyWelcomeController extends JazzeeController {
+class ApplyWelcomeController extends \Jazzee\Controller {
   /**
    * The program if it is available
    * @var Program
@@ -33,11 +33,10 @@ class ApplyWelcomeController extends JazzeeController {
    */
   protected function beforeAction(){
     parent::beforeAction();
-    if(!empty($this->actionParams['programShortName'])) $this->program = Doctrine::getTable('Program')->findOneByShortName($this->actionParams['programShortName']);
-    if(!empty($this->actionParams['cycleName'])) $this->cycle = Doctrine::getTable('Cycle')->findOneByName($this->actionParams['cycleName']);
-    
-    if(!is_null($this->program) AND !is_null($this->cycle)) $this->application = Doctrine::getTable('Application')->findOneByProgramIDAndCycleID($this->program->id, $this->cycle->id);
-    
+    if(!empty($this->actionParams['programShortName'])) $this->program = $this->_em->getRepository('Entity\Program')->findOneByShortName($this->actionParams['programShortName']);
+    if(!empty($this->actionParams['cycleName'])) $this->cycle = $this->_em->getRepository('Entity\Cycle')->findOneByName($this->actionParams['cycleName']);
+    if(!is_null($this->program) AND !is_null($this->cycle)) $this->application = $this->_em->getRepository('Entity\Application')->findOneByProgramAndCycle($this->program,$this->cycle);
+
   }
   
   /**
@@ -47,10 +46,10 @@ class ApplyWelcomeController extends JazzeeController {
    */
   public function actionIndex() {
     if(is_null($this->program)){  
-      $arr = Doctrine::getTable('Program')->findAll(Doctrine_Core::HYDRATE_ARRAY);
+      $arr = $this->_em->getRepository('Entity\Program')->findAll();
       $programs = array();
       foreach($arr as $p){
-        if(is_null($p['expires']) or strtotime($p['expires']) > time()) $programs[$p['shortName']] = $p['name'];
+        if(is_null($p->getExpires()) or strtotime($p->getExpires()) > time()) $programs[$p->getShortName()] = $p->getName();
       }
       $this->setVar('programs', $programs);
       $this->setLayoutVar('layoutTitle', 'Select a Program');
@@ -58,8 +57,8 @@ class ApplyWelcomeController extends JazzeeController {
       return true;
     }
     if(empty($this->application)){
-      $this->setLayoutVar('layoutTitle', $this->program->name . ' Application');
-      $this->setVar('program', $this->program);
+      $this->setLayoutVar('layoutTitle', $this->program->getName() . ' Application');
+      $this->setVar('applications',$this->em->getRepository('Entity\Application')->findByProgram($this->program));
       $this->loadView($this->controllerName . '/cycles');
       return true;
     }

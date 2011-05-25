@@ -1,7 +1,7 @@
 <?php
-require_once('../app/bootstrap.php');
+require_once('../src/jazzee-bootstrap.php');
 try {
-  $fc = new FoundationVC_FrontController();
+  $fc = new \Foundation\VC\FrontController();
   //do the easy stuff here becuase it is faster
   $basicRouter = new Lvc_RegexRewriteRouter;
   $basicRouter->addRoute('#^(?:.*)/?resource/(.*)$#i', array(
@@ -87,7 +87,7 @@ try {
   
   
   //Advanced routing needs preg_replace
-  $advancedRouter = new FoundationVC_FullRegexRewriteRouter();
+  $advancedRouter = new \Foundation\VC\FullRegexRewriteRouter();
   $advancedRouter->addRoute('#^admin/([^/]+)/?([^/]*)/?(.*)$#i', array(
     'controller' => 'admin_$1',
     'action' => '$2',
@@ -126,7 +126,7 @@ try {
   $fc = new Lvc_FrontController();
   $fc->processRequest($request);
   
-} catch (Foundation_Exception $e) {
+} catch (\Foundation\Exception $e) {
   //Foundation exceptions have a getUserMessage method to display to the user so they get caught first
   trigger_error('Foundation Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(), E_USER_ERROR);
   // Get a request for the error page
