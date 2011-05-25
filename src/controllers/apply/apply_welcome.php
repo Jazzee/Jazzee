@@ -33,9 +33,9 @@ class ApplyWelcomeController extends \Jazzee\Controller {
    */
   protected function beforeAction(){
     parent::beforeAction();
-    if(!empty($this->actionParams['programShortName'])) $this->program = $this->_em->getRepository('Entity\Program')->findOneByShortName($this->actionParams['programShortName']);
-    if(!empty($this->actionParams['cycleName'])) $this->cycle = $this->_em->getRepository('Entity\Cycle')->findOneByName($this->actionParams['cycleName']);
-    if(!is_null($this->program) AND !is_null($this->cycle)) $this->application = $this->_em->getRepository('Entity\Application')->findOneByProgramAndCycle($this->program,$this->cycle);
+    if(!empty($this->actionParams['programShortName'])) $this->program = $this->_em->getRepository('Jazzee\Entity\Program')->findOneByShortName($this->actionParams['programShortName']);
+    if(!empty($this->actionParams['cycleName'])) $this->cycle = $this->_em->getRepository('Jazzee\Entity\Cycle')->findOneByName($this->actionParams['cycleName']);
+    if(!is_null($this->program) AND !is_null($this->cycle)) $this->application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->program,$this->cycle);
 
   }
   
@@ -46,7 +46,7 @@ class ApplyWelcomeController extends \Jazzee\Controller {
    */
   public function actionIndex() {
     if(is_null($this->program)){  
-      $arr = $this->_em->getRepository('Entity\Program')->findAll();
+      $arr = $this->_em->getRepository('Jazzee\Entity\Program')->findAll();
       $programs = array();
       foreach($arr as $p){
         if(!$p->isExpired()) $programs[$p->getShortName()] = $p->getName();

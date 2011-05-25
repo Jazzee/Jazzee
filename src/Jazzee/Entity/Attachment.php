@@ -1,5 +1,5 @@
 <?php
-namespace Entity;
+namespace Jazzee\Entity;
 /** 
  * Attachment
  * Attach a file to an applicant

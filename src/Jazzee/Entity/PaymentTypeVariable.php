@@ -1,13 +1,13 @@
 <?php
-namespace Entity;
+namespace Jazzee\Entity;
 /** 
- * PageVariable
- * Allow developers to store arbitrary data as a PageVariable so we don't need new tables for every new ApplyPage type
- * @Entity @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="page_variable", columns={"page_id", "value"})}) 
+ * PaymentTypeVariable
+ * Allow developers to store arbitrary data as a PaymentTypeVariable so we don't need new tables for every new ApplyPaymentType type
+ * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variables", columns={"type_id", "name"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
-class PageVariable{
+class PaymentTypeVariable{
   /**
    * @Id 
    * @Column(type="bigint")
@@ -16,16 +16,16 @@ class PageVariable{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Page", inversedBy="variables")
+   * @ManyToOne(targetEntity="PaymentType", inversedBy="variables")
    */
-  private $page;
+  private $type;
   
   /** @Column(type="string") */
   private $name;
   
   /** @Column(type="string") */
   private $value;
-  
+
   /**
    * Get id
    *
@@ -34,16 +34,16 @@ class PageVariable{
   public function getId(){
     return $this->id;
   }
-  
-  /**
-   * Set page
-   *
-   * @param Entity\Page $page
-   */
-  public function setPage($page){
-    $this->page = $page;
-  }
 
+  /**
+   * Set type
+   *
+   * @param Entity\PaymentType $type
+   */
+  public function setType($type){
+    $this->type = $type;
+  }
+  
   /**
    * Set name
    *
@@ -61,22 +61,23 @@ class PageVariable{
   public function getName(){
     return $this->name;
   }
-
+  
   /**
-   * Set value
-   *
-   * @param string $value
+   * Base64 encode the value
+   * @param mixed $value
+   * @return mixed
    */
   public function setValue($value){
-    $this->value = base64_encode($value);
+    return $this->value = base64_encode($value);
   }
-
+  
   /**
-   * Get value
-   *
-   * @return string $value
+   * Get the base64 decoded value
+   * @return blob
    */
   public function getValue(){
     return base64_decode($this->value);
   }
+  
+  
 }

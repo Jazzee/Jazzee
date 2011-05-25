@@ -1,5 +1,5 @@
 <?php
-namespace Entity;
+namespace Jazzee\Entity;
 /** 
  * Payment
  * Records all applicant payment attempts

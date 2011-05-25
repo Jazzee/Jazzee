@@ -59,7 +59,7 @@ class Controller extends \Foundation\VC\Controller
    * Setup error processing and email
    */
   public function __construct(){
-    $this->setupConfig();
+    $this->setupConfiguration();
     $this->setupVarPath();
     $this->setupDoctrine(); 
     $this->setupSession();
@@ -229,14 +229,14 @@ class Controller extends \Foundation\VC\Controller
       $cache = new \Doctrine\Common\Cache\ArrayCache;
     } else {
       $doctrineConfig->setAutoGenerateProxyClasses(false);
-      $doctrineConfig->setProxyDir(__DIR__ . '/Entity/Proxy');
+      $doctrineConfig->setProxyDir(__DIR__ . '/Jazzee/Entity/Proxy');
       if(!extension_loaded('apc')) throw new Exception('APC cache is required, but was not available.');
       $cache = new \Doctrine\Common\Cache\ApcCache;
     }
-    $driver = $doctrineConfig->newDefaultAnnotationDriver(array(__DIR__."/Entity"));
+    $driver = $doctrineConfig->newDefaultAnnotationDriver(array(__DIR__."/Jazzee/Entity"));
     $doctrineConfig->setMetadataDriverImpl($driver);
     
-    $doctrineConfig->setProxyNamespace('Entity\Proxy');
+    $doctrineConfig->setProxyNamespace('Jazzee\Entity\Proxy');
     $doctrineConfig->setMetadataCacheImpl($cache);
     $doctrineConfig->setQueryCacheImpl($cache);
     

@@ -1,13 +1,13 @@
 <?php
-namespace Entity;
+namespace Jazzee\Entity;
 /** 
- * PaymentType
- * The ApplyPayment class we are going to use
- * @Entity @Table(name="payment_types") 
+ * PageType
+ * The ApplyPage class we are going to use
+ * @Entity @Table(name="page_types") 
  * @package    jazzee
  * @subpackage orm
  **/
-class PaymentType{
+class PageType{
   /**
    * @Id 
    * @Column(type="bigint")
@@ -20,15 +20,6 @@ class PaymentType{
   
   /** @Column(type="string", unique=true) */
   private $class;
-  
-  /** 
-   * @OneToMany(targetEntity="PaymentTypeVariable", mappedBy="type", cascade={"all"})
-   */
-  private $variables;
-
-  public function __construct(){
-    $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
-  }
   
 /**
    * Get id
@@ -73,21 +64,5 @@ class PaymentType{
    */
   public function getClass(){
     return $this->class;
-  }
-
-  /**
-   * Set variable
-   * @param string $name
-   * @param string $value
-   */
-  public function setVar($name, $value){
-    foreach($this->variables as $variable) if($variable->getName() == $name) return$variable->setValue($value);
-    //create a new empty variable with that name
-    $var = new PaymentTypeVariable();
-    $var->setType($this);
-    $var->setName($name);
-    $var->setValue($value);
-    $this->variables[] = $var;
-    return $var;
   }
 }

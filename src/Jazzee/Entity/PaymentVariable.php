@@ -1,5 +1,5 @@
 <?php
-namespace Entity;
+namespace Jazzee\Entity;
 /** 
  * PaymentVariable
  * Allow developers to store arbitrary data as a PaymentVariable so we don't need new tables for every new ApplyPayment type

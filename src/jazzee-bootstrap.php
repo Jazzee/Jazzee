@@ -15,9 +15,6 @@ require_once($src . '/lib/foundation/src/foundation.php');
 $classLoader = new Doctrine\Common\ClassLoader('Jazzee', $src . '/src');
 $classLoader->register();
 
-$classLoader = new Doctrine\Common\ClassLoader('Entity', $src . '/src');
-$classLoader->register();
-
 //load the configuration and cache it
 $jazzeeConfig = new \Jazzee\Configuration();
 
