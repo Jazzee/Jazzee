@@ -36,7 +36,7 @@ class ApplyWelcomeController extends \Jazzee\Controller {
     if(!empty($this->actionParams['programShortName'])) $this->program = $this->_em->getRepository('Jazzee\Entity\Program')->findOneByShortName($this->actionParams['programShortName']);
     if(!empty($this->actionParams['cycleName'])) $this->cycle = $this->_em->getRepository('Jazzee\Entity\Cycle')->findOneByName($this->actionParams['cycleName']);
     if(!is_null($this->program) AND !is_null($this->cycle)) $this->application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->program,$this->cycle);
-
+    $this->setLayoutVar('navigation', $this->getNavigation());
   }
   
   /**
@@ -45,27 +45,22 @@ class ApplyWelcomeController extends \Jazzee\Controller {
    * Enter description here ...
    */
   public function actionIndex() {
-    if(is_null($this->program)){  
-      $arr = $this->_em->getRepository('Jazzee\Entity\Program')->findAll();
-      $programs = array();
-      foreach($arr as $p){
-        if(!$p->isExpired()) $programs[$p->getShortName()] = $p->getName();
-      }
-      $this->setVar('programs', $programs);
+    if(is_null($this->program)){
+      $this->setVar('programs', $this->_em->getRepository('Jazzee\Entity\Program')->findAllActive());
       $this->setLayoutVar('layoutTitle', 'Select a Program');
       $this->loadView($this->controllerName . '/programs');
       return true;
     }
     if(empty($this->application)){
       $this->setLayoutVar('layoutTitle', $this->program->getName() . ' Application');
-      $this->setVar('applications',$this->em->getRepository('Entity\Application')->findByProgram($this->program));
+      $this->setVar('applications',$this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($this->program));
       $this->loadView($this->controllerName . '/cycles');
       return true;
     }
-    if(!$this->application->published){
-      $this->redirectPath("apply/{$this->application->Program->shortName}/");
+    if(!$this->application->isPublished()){
+      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/');
     }
-    $this->setLayoutVar('layoutTitle', $this->application->Cycle->name . ' ' . $this->application->Program->name . ' Application');
+    $this->setLayoutVar('layoutTitle', $this->cycle->getName() . ' ' . $this->program->getName() . ' Application');
     $this->setVar('application', $this->application);
   }
   
@@ -77,17 +72,34 @@ class ApplyWelcomeController extends \Jazzee\Controller {
     if(empty($this->program) AND empty($this->application)){
       return null;
     }
-    $navigation = new Navigation();
-    $menu = $navigation->newMenu();
-    $menu->title = 'Navigation';
+    $navigation = new \Foundation\Navigation\Container();
+    $menu = new \Foundation\Navigation\Menu();
+    
+    $menu->setTitle('Navigation');
     if(empty($this->application)){
-      $menu->newLink(array('text'=>'List of Programs', 'href'=>$this->path('/apply')));
+      $link = new \Foundation\Navigation\Link('Welcome');
+      $link->setHref($this->path('apply'));
+      $menu->addLink($link);
     } else {
-      $menu->newLink(array('text'=>'Welcome', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/"), 'current'=>true));
-      $menu->newLink(array('text'=>'Other Cycles', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/")));
-      $menu->newLink(array('text'=>'Returning Applicants', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/login/")));
-      $menu->newLink(array('text'=>'Start a New Application', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/new/")));
+      $path = 'apply/' . $this->program->getShortName() . '/' . $this->cycle->getName();
+      $link = new \Foundation\Navigation\Link('Welcome');
+      $link->setHref($this->path($path));
+      $link->setCurrent(true);
+      
+      $menu->addLink($link); 
+      $link = new \Foundation\Navigation\Link('Other Cycles');
+      $link->setHref($this->path('apply/' . $this->program->getShortName() . '/'));
+      $menu->addLink($link);
+      
+      $link = new \Foundation\Navigation\Link('Returning Applicants');
+      $link->setHref($this->path($path . '/applicant/login/'));
+      $menu->addLink($link);
+      
+      $link = new \Foundation\Navigation\Link('Start a New Application');
+      $link->setHref($this->path($path . '/applicant/new/'));
+      $menu->addLink($link);
     }
+    $navigation->addMenu($menu);
     return $navigation;
   }
 }

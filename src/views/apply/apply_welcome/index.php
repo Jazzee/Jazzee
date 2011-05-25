@@ -7,4 +7,4 @@
  * @subpackage apply
  */
 ?>
-<p><?php echo $application->welcome ?></p>
+<p><?php echo $application->getWelcome() ?></p>

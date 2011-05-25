@@ -26,9 +26,9 @@ print '<?xml version="1.0" encoding="iso-8859-1"?>' ?>
       <div id='bd'>
       <div id='bar' class='yui-b tall'>
       <?php
-        if($navigation = $this->controller->getNavigation()){
-          $navigation->class = 'v-navigation';
-          $this->renderElement('navigation', array('navigation'=>$navigation));
+        if($navigation){
+          $navigation->addClass('v-navigation');
+          $this->renderElement('navigation', array('container'=>$navigation));
         }
       ?>
       </div>
