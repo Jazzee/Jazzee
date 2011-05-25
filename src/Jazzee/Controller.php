@@ -93,7 +93,7 @@ class Controller extends \Foundation\VC\Controller
     $this->setLayoutVar('layoutTitle', '');
     $this->setLayoutVar('layoutContentTop', '');
     $this->setLayoutVar('layoutContentFooter', '<p>This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.</p>');
-    $this->setLayoutVar('navigation', null);
+    $this->setLayoutVar('navigation', false);
     $this->setLayoutVar('status', 'success'); //used in some json ajax requests
     
     //add jquery
@@ -327,8 +327,8 @@ class Controller extends \Foundation\VC\Controller
     $styles = new \Foundation\Virtual\VirtualDirectory();
     $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/src/lib/jquery/themes'));
     
-    $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css,', __DIR__ . '/../../lib/foundation/src/lib/yui/base-min.css'));
-    $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css,', __DIR__ . '/../../lib/foundation/src/lib/yui/reset-fonts-grids-min.css'));
+    $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', __DIR__ . '/../../lib/foundation/src/lib/yui/base-min.css'));
+    $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../lib/foundation/src/lib/yui/reset-fonts-grids-min.css'));
     //var_dump($styles); die;
     $virtualFoundation->addDirectory('media',$media);
     $virtualFoundation->addDirectory('scripts',$scripts);
