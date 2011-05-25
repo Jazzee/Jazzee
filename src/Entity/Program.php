@@ -50,14 +50,6 @@ class Program{
   public function getShortName(){
     return $this->shortName;
   }
-
-  /**
-   * Get the start date
-   * @return DateTime
-   */
-  public function getExpires(){
-    return $this->expires;
-  }
   
   /**
    * Set the name
@@ -92,7 +84,7 @@ class Program{
   /**
    * Get expires status
    */
-  public function isExpires(){
-    return $this->isEpired;
+  public function isExpired(){
+    return $this->isExpired;
   }
 }
