@@ -5,7 +5,7 @@ namespace Jazzee\Entity;
  * Application
  * Cycle+Program=Application
  * Sets the unique preferences for a givien Cycle/Program and contains all of its Applicants
- * @Entity(repositoryClass="Entity\ApplicationRepository")
+ * @Entity(repositoryClass="\Jazzee\Entity\ApplicationRepository")
  * @Table(name="applications",uniqueConstraints={@UniqueConstraint(name="program_cycle", columns={"program_id", "cycle_id"})}) 
  * 
  * @package    jazzee
@@ -365,7 +365,7 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository{
    * @return Application
    */
   public function findOneByProgramAndCycle(Program $program, Cycle $cycle){
-    $query = $this->_em->createQuery('SELECT a FROM Entity\Application a WHERE a.program = :programId AND  a.cycle = :cycleId');
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a WHERE a.program = :programId AND  a.cycle = :cycleId');
     $query->setParameter('programId', $program->getId());
     $query->setParameter('cycleId', $cycle->getId());
     $result = $query->getResult();
@@ -380,7 +380,7 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository{
    * @return Doctrine\Common\Collections\Collection $applications
    */
   public function findByProgram(Program $program){
-    $query = $this->_em->createQuery('SELECT a FROM Entity\Application a WHERE a.program = :programId');
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a WHERE a.program = :programId');
     $query->setParameter('programId', $program->getId());
     return $query->getResult();
   }
