@@ -12,12 +12,12 @@ print '<?xml version="1.0" encoding="iso-8859-1"?>' ?>
   <head>
   <title><?php echo $pageTitle ?></title>
   <?php
-  /*foreach($requiredCss as $file => $use){
-    if($use) print '<link rel="stylesheet" href="' . WWW_ROOT . '/resource/' . $file .'" type="text/css" media="all" charset="utf-8" />' . "\n";
+  foreach($requiredCss as $link => $use){
+    if($use) print '<link rel="stylesheet" href="'. $link .'" type="text/css" media="all" charset="utf-8" />' . "\n";
   }
-  foreach($requiredJs as $script => $use){
-    if($use) print '<script type="text/javascript" src="' . WWW_ROOT . '/resource/' . $script . '"></script>' . "\n";
-  }*/
+  foreach($requiredJs as $link => $use){
+    if($use) print '<script type="text/javascript" src="' . $link . '"></script>' . "\n";
+  }
   ?>
   </head>
   <body>

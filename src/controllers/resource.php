@@ -1,23 +1,11 @@
 <?php
 /**
- * Loads theme files and includes
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package jazzee
+ * Any call to /resource gets passed to the virtual file system
  */
-class ResourceController extends Lvc_PageController{
-  /**
-   * The singleton resource
-   * @var Resource
-   */
-  protected $resource;
-  
-  protected function beforeAction(){
-    $this->resource = Resource::getInstance();
-  }
-  
+class ResourceController extends \Jazzee\Controller 
+{ 
   public function actionGet($path){
-    $this->resource->output($path);
+    $this->_vfs->find($path)->output();
   }
 }
 ?>

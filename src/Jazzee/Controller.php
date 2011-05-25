@@ -29,6 +29,12 @@ class Controller extends \Foundation\VC\Controller
   protected $_cache;
   
   /**
+   * Virtual File system root directory
+   * @var \Foundation\Virtual\Directory
+   */
+  protected $_vfs;
+  
+  /**
    * Holds the EmailServer class for sending messages
    * @var \Foundation\Mail\Server
    */
@@ -67,7 +73,7 @@ class Controller extends \Foundation\VC\Controller
     
     $this->_cache = new \Foundation\Cache('Jazzee',$this->_foundationConfig);
     
-    \Foundation\VC\Config::setCache($this->cache);
+    \Foundation\VC\Config::setCache($this->_cache);
     
     if((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off') AND !$this->_config->getForceSSL()){
       $protocol = 'http';
@@ -153,6 +159,8 @@ class Controller extends \Foundation\VC\Controller
     //browsers give inconsisten results when the domain is used to set the cookie, instead use an empty string to restrict the cookie to this domain
     $this->_session->setConfigVariable('cookie_domain', '');
     $this->_session->start();
+    
+    $this->buildVirtualFilesystem();
     /*
     //create an access log with browser information
     $accessLog = Log::singleton('file', VAR_ROOT . '/log/access_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
@@ -229,28 +237,25 @@ class Controller extends \Foundation\VC\Controller
     $this->setLayoutVar('status', 'success'); //used in some json ajax requests
     
     //add jquery
-    $this->addScript('foundation/scripts/jquery.js');
-    $this->addScript('foundation/scripts/jqueryui.js');
-    $this->addScript('foundation/scripts/jquery.json.js');
-    $this->addScript('foundation/scripts/jquery.cookie.js');
+    $this->addScript($this->path('resource/foundation/scripts/jquery.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jqueryui.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jquery.json.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jquery.cookie.js'));
     
     //yui css library
-    $this->addCss('foundation/styles/reset-fonts-grids.css');
-    $this->addCss('foundation/styles/base.css');
+    $this->addCss($this->path('resource/foundation/styles/reset-fonts-grids.css'));
+    $this->addCss($this->path('resource/foundation/styles/base.css'));
     
     //our css
-    $this->addCss('common/styles/layout.css');
-    $this->addCss('common/styles/style.css');
+    $this->addCss($this->path('resource/styles/layout.css'));
+    $this->addCss($this->path('resource/styles/style.css'));
     
     //jquery's style info
-    $this->addCss('foundation/styles/jquery/themes/smoothness/style.css');
+    $this->addCss($this->path('resource/foundation/styles/jquerythemes/smoothness/style.css'));
   }
   
   /**
-   * Clean up post-action
-   * After the action was run and the views are rendered store any remaining messages
-   * in the session so they can be displayed on the next page load
-   * @return null
+   * Flush the EntityManager to persist all changes
    */
   protected function afterAction(){
     $this->_em->flush();
@@ -288,5 +293,40 @@ class Controller extends \Foundation\VC\Controller
   public function addMessage($type, $text){
     $store = $this->_session->getStore('messages');
     $store[] = array('type'=>$type, 'text'=>$text);
+  }
+  
+  /**
+   * Build our virtual file system
+   */
+  protected function buildVirtualFileSystem(){
+    $this->_vfs = new \Foundation\Virtual\VirtualDirectory();
+    $this->_vfs->addDirectory('scripts', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../scripts'));
+    $this->_vfs->addDirectory('styles', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../styles'));
+    
+    
+    $virtualFoundation = new \Foundation\Virtual\VirtualDirectory();
+    $virtualFoundation->addDirectory('javascript', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/src/javascript'));
+    $media = new \Foundation\Virtual\VirtualDirectory();
+    $media->addFile('blank.gif', new \Foundation\Virtual\RealFile('blank.gif,', __DIR__ . '/../../lib/foundation/src/media/blank.gif'));
+    $media->addFile('ajax-bar.gif', new \Foundation\Virtual\RealFile('ajax-bar.gif,', __DIR__ . '/../../lib/foundation/src/media/ajax-bar.gif'));
+    $media->addDirectory('icons', new \Foundation\Virtual\ProxyDirectory( __DIR__ . '/../../lib/foundation/src/media/famfamfam_silk_icons_v013/icons'));
+    
+    $scripts = new \Foundation\Virtual\VirtualDirectory();
+    $scripts->addFile('jquery.js', new \Foundation\Virtual\RealFile('jquery.js,', __DIR__ . '/../../lib/foundation/src/lib/jquery/jquery-1.4.4.min.js'));
+    $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js,', __DIR__ . '/../../lib/foundation/src/lib/jquery/plugins/jquery.json-2.2.min.js'));
+    $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js,', __DIR__ . '/../../lib/foundation/src/lib/jquery/plugins/jquery.cookie-1.min.js'));
+    $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js,', __DIR__ . '/../../lib/foundation/src/lib/jquery/jquery-ui-1.8.11.min.js'));
+    
+    $styles = new \Foundation\Virtual\VirtualDirectory();
+    $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/src/lib/jquery/themes'));
+    
+    $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css,', __DIR__ . '/../../lib/foundation/src/lib/yui/base-min.css'));
+    $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css,', __DIR__ . '/../../lib/foundation/src/lib/yui/reset-fonts-grids-min.css'));
+    //var_dump($styles); die;
+    $virtualFoundation->addDirectory('media',$media);
+    $virtualFoundation->addDirectory('scripts',$scripts);
+    $virtualFoundation->addDirectory('styles',$styles);
+    $this->_vfs->addDirectory('foundation', $virtualFoundation);
+
   }
 }

@@ -126,6 +126,18 @@ try {
   $fc = new Lvc_FrontController();
   $fc->processRequest($request);
   
+} catch (\Foundation\Virtual\Exception $e) {
+  //Virtual Exceptions set a html header error code
+  // Get a request for the error page
+  $request = new Lvc_Request();
+  $request->setControllerName('error');
+  $request->setActionName('index');
+  $request->setActionParams(array('error' => $e->getHttpErrorCode(), 'message'=>$e->getUserMessage()));
+
+  // Get a new front controller without any routers, and have it process our handmade request.
+  $fc = new Lvc_FrontController();
+  $fc->processRequest($request);
+  
 } catch (\Foundation\Exception $e) {
   //Foundation exceptions have a getUserMessage method to display to the user so they get caught first
   trigger_error('Foundation Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(), E_USER_ERROR);

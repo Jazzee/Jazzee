@@ -49,7 +49,7 @@ class ApplyWelcomeController extends \Jazzee\Controller {
       $arr = $this->_em->getRepository('Entity\Program')->findAll();
       $programs = array();
       foreach($arr as $p){
-        if(is_null($p->getExpires()) or strtotime($p->getExpires()) > time()) $programs[$p->getShortName()] = $p->getName();
+        if(!$p->isExpired()) $programs[$p->getShortName()] = $p->getName();
       }
       $this->setVar('programs', $programs);
       $this->setLayoutVar('layoutTitle', 'Select a Program');
