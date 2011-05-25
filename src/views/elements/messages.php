@@ -6,5 +6,8 @@
  * @package jazzee
  * @subpackage apply
  */
-print "<p class='error'>No messages</p>";
+$messages = $this->controller->getMessages();
+foreach($messages as $message){
+  print "<p class='{$message['type']}'>{$message['text']}</p>";
+}
 ?>

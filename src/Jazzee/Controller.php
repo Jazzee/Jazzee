@@ -291,10 +291,24 @@ class Controller extends \Foundation\VC\Controller
    * @param string $text
    */
   public function addMessage($type, $text){
-    $store = $this->_session->getStore('messages');
-    $store[] = array('type'=>$type, 'text'=>$text);
+    if(isset($this->_session->getStore('messages')->messages)) $messages = $this->_session->getStore('messages')->messages;
+    else $messages = array();
+    $messages[] = array('type'=>$type, 'text'=>$text);
+    $this->_session->getStore('messages')->messages = $messages;
   }
   
+  /**
+   * Get messages
+   * @return arrau
+   */
+  public function getMessages(){
+    $messages = array();
+    if(isset($this->_session->getStore('messages')->messages)){
+      $messages = $this->_session->getStore('messages')->messages;
+      $this->_session->getStore('messages')->messages = array();
+    } 
+    return $messages;
+  }
   /**
    * Build our virtual file system
    */
