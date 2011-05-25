@@ -5,9 +5,8 @@ namespace Jazzee\Entity;
  * Program
  * Represents a single program which contains Applications for Cycles 
  * and Users with roles in the program
- * @Entity @Table(name="programs") 
- * @package    jazzee
- * @subpackage orm
+ * @Entity(repositoryClass="Jazzee\Entity\ProgramRepository")
+ * @Table(name="programs")
  **/
 class Program{
   /**
@@ -86,5 +85,22 @@ class Program{
    */
   public function isExpired(){
     return $this->isExpired;
+  }
+}
+
+/**
+ * Program Repository
+ */
+class ProgramRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * find all non expired programs ordered by name
+   * 
+   * @return Doctrine\Common\Collections\Collection $programs
+   */
+  public function findAllActive(){
+    $query = $this->_em->createQuery('SELECT p FROM Jazzee\Entity\Program p WHERE p.isExpired=false order by p.name');
+    return $query->getResult();
+
   }
 }
