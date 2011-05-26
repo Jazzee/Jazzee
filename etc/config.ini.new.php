@@ -66,3 +66,7 @@ timezone=
 
 ;Call this bootstrap file to load local customizations.
 localBootstrap=
+
+;Recaptch keys are free - go to http://www.google.com/recaptcha
+recaptchaPrivateKey=
+recaptchaPublicKey=

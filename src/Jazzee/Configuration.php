@@ -61,6 +61,16 @@ protected $_sessionName;
 /**
  * @var string
  */
+protected $_applicantSessionLifetime;
+
+/**
+ * @var string
+ */
+protected $_adminSessionLifetime;
+
+/**
+ * @var string
+ */
 protected $_mailServer;
 
 /**
@@ -450,6 +460,38 @@ protected $_localBootstrap;
    */
   public function setLocalBootstrap($localBootstrap) {
     $this->_localBootstrap = $localBootstrap;
+  }
+  
+  /**
+   * get recaptchaPrivateKey
+   * @return string
+   */
+  public function getRecaptchaPrivateKey() {
+    return $this->_recaptchaPrivateKey;
+  }
+  
+  /**
+   * set recaptchaPrivateKey
+   * @var string $recaptchaPrivateKey
+   */
+  public function setRecaptchaPrivateKey($recaptchaPrivateKey) {
+    $this->_recaptchaPrivateKey = $recaptchaPrivateKey;
+  }
+  
+  /**
+   * get recaptchaPublicKey
+   * @return string
+   */
+  public function getRecaptchaPublicKey() {
+    return $this->_recaptchaPublicKey;
+  }
+  
+  /**
+   * set recaptchaPublicKey
+   * @var string $recaptchaPublicKey
+   */
+  public function setRecaptchaPublicKey($recaptchaPublicKey) {
+    $this->_recaptchaPublicKey = $recaptchaPublicKey;
   }
 
 }
