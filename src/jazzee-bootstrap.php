@@ -23,7 +23,6 @@ $jazzeeConfig = new \Jazzee\Configuration();
 if($jazzeeConfig->getLocalBootstrap()) require_once $jazzeeConfig->getLocalBootstrap();
 
 //Setup the Lvc options
-
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/');
 \Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/');
 \Foundation\VC\Config::addLayoutViewPath(__DIR__ . '/views/layouts/');
@@ -55,11 +54,6 @@ if($jazzeeConfig->getLocalBootstrap()) require_once $jazzeeConfig->getLocalBoots
 \Foundation\VC\Config::setViewClassName('\Jazzee\View');
 \Foundation\VC\Config::setDefaultControllerName('apply_welcome');
 \Foundation\VC\Config::setDefaultControllerActionName('index');
-
-//loading common scripts, themes, and styles
-//Resource::getInstance()->addDirectory(APP_ROOT . '/common/scripts', 'common/scripts/', true);
-//Resource::getInstance()->addDirectory(APP_ROOT . '/common/styles', 'common/styles/', true);
-//Resource::getInstance()->addDirectory(APP_ROOT . '/common/media', 'common/media/', true);
 
 /*
 //add the builtin admin controller directories
