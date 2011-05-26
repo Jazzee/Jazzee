@@ -385,4 +385,20 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository{
     $query->setParameter('programId', $program->getId());
     return $query->getResult();
   }
+  
+/**
+   * Find an application be the program short name and cycle name
+   * 
+   * @param string $programShortName
+   * @param string $cycleNamme
+   * @return Application
+   */
+  public function findEasy($programShortName, $cycleName){
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a WHERE a.program = (SELECT p FROM Jazzee\Entity\Program p WHERE p.shortName = :programShortName) AND  a.cycle = (SELECT c FROM \Jazzee\Entity\Cycle c WHERE c.name= :cycleName)');
+    $query->setParameter('programShortName', $programShortName);
+    $query->setParameter('cycleName', $cycleName);
+    $result = $query->getResult();
+    if(count($result)) return $result[0];
+    return false;
+  }
 }

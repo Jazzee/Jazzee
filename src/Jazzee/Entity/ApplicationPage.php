@@ -53,7 +53,16 @@ class ApplicationPage{
   /** @Column(type="text", nullable=true) */
   private $trailingText;
   
-/**
+  /**
+   * Get id
+   *
+   * @return bigint $id
+   */
+  public function getId(){
+    return $this->id;
+  }
+  
+  /**
    * Set application
    *
    * @param Entity\Application $application

@@ -329,7 +329,7 @@ class Controller extends \Foundation\VC\Controller
     
     $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', __DIR__ . '/../../lib/foundation/src/lib/yui/base-min.css'));
     $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../lib/foundation/src/lib/yui/reset-fonts-grids-min.css'));
-    //var_dump($styles); die;
+
     $virtualFoundation->addDirectory('media',$media);
     $virtualFoundation->addDirectory('scripts',$scripts);
     $virtualFoundation->addDirectory('styles',$styles);

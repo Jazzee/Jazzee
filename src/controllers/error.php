@@ -5,16 +5,9 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class ErrorController extends Lvc_PageController{
+class ErrorController extends \Jazzee\Controller{
   protected $layout = 'default';
-  protected function beforeAction(){
-    $this->setLayoutVar('requiredCss', array());
-    $this->setLayoutVar('requiredJs', array());
-    $this->setLayoutVar('pageTitle', '');
-    $this->setLayoutVar('layoutTitle', '');
-    $this->setLayoutVar('layoutContentTop', '');
-    $this->setLayoutVar('layoutContentFooter', '');    
-  }
+
 	/**
 	 * Error code -> error message mappings.
 	 * @var array
@@ -63,6 +56,10 @@ class ErrorController extends Lvc_PageController{
 		505 => 'HTTP Version Not Supported',
 	);
 	
+	public function afterAction(){
+	  return;
+	}
+	
 	public function actionIndex($errorNum, $message){
 		if (!isset(self::$errorString[$errorNum])){
       $errorNum = '404';
@@ -72,9 +69,22 @@ class ErrorController extends Lvc_PageController{
 		$this->setLayoutVar('layoutTitle', $errorNum . ' ' . $errorMsg);
     $this->setVar('message', $message);
 	}
+	
+  //Dont setup sessions on the error page - they are already setup
+	protected function setupSession(){
+	  return;
+	}
+	
+	//No messages on errors
+  public function getMessages(){
+    return array();
+  }
   
-  public function getNavigation(){
-    return false;
+  /**
+   * Dont setup ORM on errors
+   */
+  protected function setupDoctrine(){
+    return;
   }
 }
 ?>

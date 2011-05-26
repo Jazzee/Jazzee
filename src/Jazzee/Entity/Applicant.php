@@ -4,7 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * Applicant
  * Individual applicants are tied to an Application - but a single person can be multiple Applicants
- * @Entity @Table(name="applicants",uniqueConstraints={@UniqueConstraint(name="application_email", columns={"application_id", "email"})}) 
+ * @Entity(repositoryClass="\Jazzee\Entity\ApplicantRepository") 
+ * @Table(name="applicants",uniqueConstraints={@UniqueConstraint(name="application_email", columns={"application_id", "email"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -33,13 +34,13 @@ class Applicant{
   /** @Column(type="string") */
   private $firstName;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $middleName;
   
   /** @Column(type="string") */
   private $lastName;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $suffix;
   
   /** @Column(type="datetime", nullable=true) */
@@ -135,7 +136,7 @@ class Applicant{
    * @param string $password
    */
   public function setPassword($password){
-    $p = new PasswordHash(8, FALSE);
+    $p = new \PasswordHash(8, FALSE);
     $this->password = $p->HashPassword($password);
   }
   
@@ -163,7 +164,8 @@ class Applicant{
    * @param string $hashedPassword
    */
   public function checkPassword($password){
-    $p = new PasswordHash(8, FALSE);
+    $this->setPassword($password);
+    $p = new \PasswordHash(8, FALSE);
     return $p->CheckPassword($password, $this->password);
   }
   
@@ -281,12 +283,13 @@ class Applicant{
   }
 
   /**
-   * Set lastLogin
+   * Register a sucessfull login
    *
-   * @param string $lastLogin
    */
-  public function setLastLogin($lastLogin){
-    $this->lastLogin = new \DateTime($lastLogin);
+  public function login(){
+    $this->lastLogin = new \DateTime();
+    $this->lastLoginIp = $_SERVER['REMOTE_ADDR'];
+    $this->failedLoginAttempts = 0;
   }
 
   /**
@@ -299,30 +302,12 @@ class Applicant{
   }
 
   /**
-   * Set lastLoginIp
-   *
-   * @param string $lastLoginIp
-   */
-  public function setLastLoginIp($lastLoginIp){
-    $this->lastLoginIp = $lastLoginIp;
-  }
-
-  /**
    * Get lastLoginIp
    *
    * @return string $lastLoginIp
    */
   public function getLastLoginIp(){
     return $this->lastLoginIp;
-  }
-
-  /**
-   * Set lastFailedLoginIp
-   *
-   * @param string $lastFailedLoginIp
-   */
-  public function setLastFailedLoginIp($lastFailedLoginIp){
-    $this->lastFailedLoginIp = $lastFailedLoginIp;
   }
 
   /**
@@ -333,16 +318,16 @@ class Applicant{
   public function getLastFailedLoginIp(){
     return $this->lastFailedLoginIp;
   }
-
+  
   /**
-   * Set failedLoginAttempts
-   *
-   * @param integer $failedLoginAttempts
+   * Fail an applicant login
    */
-  public function setFailedLoginAttempts($failedLoginAttempts){
-    $this->failedLoginAttempts = $failedLoginAttempts;
+  public function loginFail(){
+    $this->lastFailedLoginIp = $_SERVER['REMOTE_ADDR'];
+    $this->failedLoginAttempts++;
+    
   }
-
+  
   /**
    * Get failedLoginAttempts
    *
@@ -485,5 +470,29 @@ class Applicant{
    */
   public function getMessages(){
     return $this->messages;
+  }
+}
+
+/**
+ * ApplicantRepository
+ * Special Repository methods for Applicants
+ */
+class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * find on by email address and application
+   * 
+   * Search for an Applicant by email in an application
+   * @param string $email
+   * @param Application $application
+   * @return Application
+   */
+  public function findOneByEmailAndApplication($email, Application $application){
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a.application = :applicationId AND  a.email = :email');
+    $query->setParameter('applicationId', $application->getId());
+    $query->setParameter('email', $email);
+    $result = $query->getResult();
+    if(count($result)) return $result[0];
+    return false;
   }
 }

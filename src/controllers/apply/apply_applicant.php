@@ -1,15 +1,11 @@
 <?php
 /**
  * Authentication and Creation of applicants
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package jazzee
- * @subpackage apply
  */
-class ApplyApplicantController extends JazzeeController {
+class ApplyApplicantController extends \Jazzee\Controller {
   /**
    * The application
-   * @var Application
+   * @var \Jazzee\Entity\Application
    */
   protected $application;
   
@@ -21,13 +17,13 @@ class ApplyApplicantController extends JazzeeController {
    */
   protected function beforeAction(){
     parent::beforeAction();
-    $program = Doctrine::getTable('Program')->findOneByShortName($this->actionParams['programShortName']);
-    $cycle = Doctrine::getTable('Cycle')->findOneByName($this->actionParams['cycleName']);
-    $this->application = Doctrine::getTable('Application')->findOneByProgramIDAndCycleID($program->id, $cycle->id);
-    if(!$this->application->published){
-      $this->redirectPath("apply/{$this->application->Program->shortName}/");
+    $this->application = $this->_em->getRepository('Jazzee\Entity\Application')->findEasy($this->actionParams['programShortName'],$this->actionParams['cycleName']);
+    if(!$this->application) throw new \Jazzee\Exception("Unable to load {$this->actionParams['programShortName']} {$this->actionParams['cycleName']} application", E_USER_NOTICE, 'That is not a valid application');
+    if(!$this->application->isPublished()){
+      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/');
     }
-    $this->setLayoutVar('layoutTitle', $this->application->Cycle->name . ' ' . $this->application->Program->name . ' Application');
+    $this->setLayoutVar('layoutTitle', $this->application->getCycle()->getName() . ' ' . $this->application->getProgram()->getName() . ' Application');
+    $this->setLayoutVar('navigation', $this->getNavigation());
   }
   
   /**
@@ -37,41 +33,40 @@ class ApplyApplicantController extends JazzeeController {
    * @return null
    */
   public function actionLogin() {
-    $form = new Form;
-    $form->action = $this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/applicant/login");
-    $field = $form->newField(array('legend'=>'Login'));
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login'));
+    $field = new \Foundation\Form\Field($form);
+    $field->setLegend('Login');
+    $form->addField($field);
+    
     $element = $field->newElement('TextInput','email');
-    $element->label = 'Email Address';
-    $element->addValidator('NotEmpty');
-    $element->addFilter('Lowercase');
+    $element->setLabel('Email Address');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Lowercase($element));
      
     $element = $field->newElement('PasswordInput','password');
-    $element->label = 'Password';
-
+    $element->setLabel('Password');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
     $form->newButton('submit', 'Login');
     
     if($input = $form->processInput($this->post)){
-      $applicant = Doctrine::getTable('Applicant')->findOneByEmailAndApplicationID($input->email,$this->application->id);
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
       if($applicant){
-        if($applicant->checkPassword($input->password)){
-          $applicant->lastLogin = date('Y-m-d H:i:s', time());
-          $applicant->lastLogin_ip = $_SERVER['REMOTE_ADDR'];
-          $applicant->lastFailedLogin_ip = null;
-          $applicant->failedLoginAttempts = 0;
-          $applicant->save();
-          $s = Session::getInstance();
-          $session = $s->getStore('apply', $this->config->session_lifetime);
-          $session->applicantID = $applicant->id;
-          $this->messages->write('success', "Welcome to the {$this->application->Program->name} application.");
-          $this->redirect($this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/page/{$this->application->findPagesByWeight()->getFirst()->id}"));
-          return;
+        if($applicant->checkPassword($input->get('password'))){
+          $applicant->login();
+          
+          $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
+          $store->applicantID = $applicant->getId();
+          $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
+          $this->redirect($this->path(
+          'apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' .
+          $this->application->getPages()->first()->getId()));
         }
-        $applicant->failedLoginAttempts++;
-        $applicant->lastFailedLogin_ip = $_SERVER['REMOTE_ADDR'];
-        $applicant->save();
+        $applicant->loginFail();
       }
-      $this->messages->write('error', 'Incorrect username or password.');
-      sleep(5); //wait 5 seconds before announcing failure to slow down guessing.
+      $this->addMessage('error', 'Incorrect username or password.');
+      sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
     }
     $this->setVar('form', $form);
     
@@ -106,88 +101,106 @@ class ApplyApplicantController extends JazzeeController {
    * @return null
    */
   public function actionNew($programShortName, $cycleName) {
-    $form = new Form;
-    $form->action = $this->path("apply/{$programShortName}/{$cycleName}/applicant/new");
-    $field = $form->newField(array('legend'=>'Create New Application'));
-    $el = $field->newElement('TextInput', 'first');
-    $el->label = 'First Name';
-    $el->addValidator('NotEmpty');
+    $form = new \Foundation\Form;
+    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/new'));
     
-    $el = $field->newElement('TextInput', 'middle');
-    $el->label = 'Middle Name';
+    $field = new \Foundation\Form\Field($form);
+    $field->setLegend('Create New Application');
+    $form->addField($field);
     
-    $el = $field->newElement('TextInput','last');
-    $el->label = 'Last Name';
-    $el->addValidator('NotEmpty');
-        
-    $el = $field->newElement('TextInput', 'suffix');
-    $el->label = 'Suffix';
-    $el->format = 'Example: Jr., III';
-
-    $el = $field->newElement('TextInput', 'email');
-    $el->label = 'Email Address';
-    $el->addValidator('NotEmpty');
-    $el->addValidator('EmailAddress');
-    $el->addFilter('Lowercase');
+    $element = $field->newElement('TextInput','first');
+    $element->setLabel('First Name');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
-    $el = $field->newElement('PasswordInput', 'password');
-    $el->label = 'Password';
-    $el->addValidator('NotEmpty');
+    $element = $field->newElement('TextInput','middle');
+    $element->setLabel('Middle Name');
     
-    $el = $field->newElement('PasswordInput','confirm-password');
-    $el->label = 'Confirm Password';
-    $el->addValidator('NotEmpty');
-    $el->addValidator('SameAs', 'password');
+    $element = $field->newElement('TextInput','last');
+    $element->setLabel('Last Name');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $element = $field->newElement('TextInput','suffix');
+    $element->setLabel('Suffix');
+    $element->setFormat('Example: Jr., III');
+    
+    $element = $field->newElement('TextInput','email');
+    $element->setLabel('Email Address');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\EmailAddress($element));
+    $element->addFilter(new \Foundation\Form\Filter\Lowercase($element));
+    
+    $element = $field->newElement('PasswordInput','password');
+    $element->setLabel('Password');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $element = $field->newElement('PasswordInput','confirm-password');
+    $element->setLabel('Confirm Password');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\SameAs($element, 'password'));
     
     //setup recaptcha element keys
-    Form_CaptchaElement::setKeys($this->config->captcha_private_key, $this->config->captcha_public_key);
-    $el = $field->newElement('Captcha','captcha');
+    \Foundation\Form\Element\Captcha::setKeys($this->_config->getRecaptchaPrivateKey(), $this->_config->getRecaptchaPublicKey());
+    $element = $field->newElement('Captcha','captcha');
     
     $form->newButton('submit', 'Create Account');
     if($input = $form->processInput($this->post)){
-      $applicant = new Applicant;
-      $applicant->applicationID = $this->application->id;
-      $applicant->email = $input->email;
-      $applicant->password = $input->password;
-      $applicant->firstName = $input->first;
-      $applicant->middleName = $input->middle;
-      $applicant->lastName = $input->last;
-      $applicant->suffix = $input->suffix;
-      
-      try {
-        $applicant->save();
-        $this->messages->write('success', "Welcome to the {$this->application['Program']->name} application.");
-        $s = Session::getInstance();
-        $session = $s->getStore('apply');
-        $session->applicantID = $applicant->id;
-        $this->redirect($this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/page/{$this->application['Pages']->getFirst()->id}"));
+      $duplicate = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
+      if($duplicate){
+        $this->addMessage('error', 'You have already started a ' . $this->application->getProgram()->getName() . ' application.  Please login to retrieve it.');
+        $this->redirect($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login'));
         exit();
       }
-      catch (Doctrine_Connection_Exception $e){
-        if($e->getPortableCode() == Doctrine::ERR_ALREADY_EXISTS){
-          $this->messages->write('error', "You have already started a {$this->application['Program']->name} application.  Please login to retrieve it.");
-          $this->redirect($this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/login"));
-          exit();
-        }
-        throw new Jazzee_Exception($e->getPortableMessage(),E_USER_ERROR,'There was a problem saving your application.');
-      }
+      $applicant = new \Jazzee\Entity\Applicant;
+      $applicant->setApplication($this->application);
+      $applicant->setEmail($input->get('email'));
+      $applicant->setPassword($input->get('password'));
+      $applicant->setFirstName($input->get('first'));
+      $applicant->setMiddleName($input->get('middle'));
+      $applicant->setLastName($input->get('last'));
+      $applicant->setSuffix($input->get('suffix'));
+      
+      $applicant->login();
+      $this->_em->persist($applicant);
+      $this->_em->flush();
+      $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
+      $store->applicantID = $applicant->getId();
+      $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
+      $this->redirect($this->path(
+        'apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' .
+        $this->application->getPages()->first()->getId()));
+      exit();
     }
     $this->setVar('form', $form);
   }
   
   public function actionLogout($programShortName,$cycleName){
-    $s = Session::getInstance()->getStore('apply')->expire();
+    $this->_session->getStore('apply')->expire();
   }
   
   public function getNavigation(){
-    $path = "apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}";
-    $navigation = new Navigation();
-    $menu = $navigation->newMenu();
-    $menu->title = 'Navigation';
-    $menu->newLink(array('text'=>'Welcome', 'href'=>$this->path("{$path}/")));
-    $menu->newLink(array('text'=>'Other Cycles', 'href'=>$this->path("apply/{$this->application->Program->shortName}/")));
-    $menu->newLink(array('text'=>'Returning Applicants', 'href'=>$this->path("{$path}/applicant/login/")));
-    $menu->newLink(array('text'=>'Start a New Application', 'href'=>$this->path("{$path}/applicant/new/")));
+    $navigation = new \Foundation\Navigation\Container();
+    $menu = new \Foundation\Navigation\Menu();
+    
+    $menu->setTitle('Navigation');
+
+    $path = 'apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName();
+    $link = new \Foundation\Navigation\Link('Welcome');
+    $link->setHref($this->path($path));
+    $menu->addLink($link); 
+    
+    $link = new \Foundation\Navigation\Link('Other Cycles');
+    $link->setHref($this->path('apply/' . $this->application->getProgram()->getShortName() . '/'));
+    $menu->addLink($link);
+    
+    $link = new \Foundation\Navigation\Link('Returning Applicants');
+    $link->setHref($this->path($path . '/applicant/login/'));
+    $menu->addLink($link);
+    
+    $link = new \Foundation\Navigation\Link('Start a New Application');
+    $link->setHref($this->path($path . '/applicant/new/'));
+    $menu->addLink($link);
+    
+    $navigation->addMenu($menu);
     return $navigation;
   } 
 }
