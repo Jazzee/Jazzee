@@ -33,11 +33,11 @@ class ApplyPageController extends \Jazzee\ApplyController {
       $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/");
     }
     if($this->_applicant->isLocked()){
-      $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/status/");
+      $this->redirectPath('apply/' . $this->_application->getProgram() . '/' . $this->_application->getCycle()->getTitle() . '/status/');
     }
     $this->addScript($this->path('scripts/controllers/apply_page.controller.js'));
     $this->_page = $this->_pages[$pageID];
-    $this->_path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_page->getApplicationPage()->getId();
+    $this->_path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_page->getId();
     $this->setVar('page', $this->_page);
     $this->setVar('currentAnswerID', false);
     $n = $this->getNavigation();
@@ -123,13 +123,13 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $navigation->addMenu($menu);
     
     $menu->setTitle('Application Pages');
-    foreach($this->_pages as $id => $page){
-      $link = new \Foundation\Navigation\Link($page->getApplicationPage()->getTitle());
-      $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $page->getApplicationPage()->getId()));
-      if($this->_page->getApplicationPage()->getId() == $id){
+    foreach($this->_pages as $page){
+      $link = new \Foundation\Navigation\Link($page->getTitle());
+      $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $page->getId()));
+      if($this->_page->getId() == $page->getId()){
         $link->setCurrent(true);
       }
-      switch($page->getStatus()){
+      switch($page->getJazzeePage()->getStatus()){
         case \Jazzee\Page::INCOMPLETE:
           $link->addClass('incomplete');
           break;

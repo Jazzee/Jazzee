@@ -1,19 +1,21 @@
 <?php
+namespace Jazzee\Entity\Element;
 /**
  * TextInput Element
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class TextInputElement extends ApplyElement {
-  public function addToField(Form_Field $field){
-    $element = $field->newElement('TextInput', 'el' . $this->element->id);
-    $element->label = $this->element->title;
-    $element->instructions = $this->element->instructions;
-    $element->format = $this->element->format;
-    $element->value = $this->element->defaultValue;
-    if($this->element->required){
-      $element->addValidator('NotEmpty');
+class TextInput extends AbstractElement {
+  public function addToField(\Foundation\Form\Field $field){
+    $element = $field->newElement('TextInput', 'el' . $this->_element->getId());
+    $element->setLabel($this->_element->getTitle());
+    $element->setInstructions($this->_element->getInstructions());
+    $element->setFormat($this->_element->getFormat());
+    $element->setDefaultValue($this->_element->getDefaultValue());
+    if($this->_element->isRequired()){
+      $validator = new \Foundation\Form\Validator\NotEmpty($element);
+      $element->addValidator($validator);
     }
     return $element;
   }
@@ -22,7 +24,7 @@ class TextInputElement extends ApplyElement {
     $this->value = $input;
   }
   
-  public function setValueFromAnswer($answers){
+  public function setValueFromAnswer(\Jazzee\Entity\Answer $answer){
     if(isset($answers[0]))
       $this->value = $answers[0]->eShortString;
   }

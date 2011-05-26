@@ -14,12 +14,6 @@ interface Page
   const SKIPPED = 2;
   
   /**
-   * Get the application page
-   * @return \Jazzee\Entity\ApplicationPage
-   */
-  function getApplicationPage();
-  
-  /**
    * Set the controller
    * 
    * @param \Jazzee\Controller $controller

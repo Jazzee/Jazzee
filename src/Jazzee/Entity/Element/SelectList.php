@@ -1,23 +1,28 @@
 <?php
+namespace Jazzee\Entity\Element;
 /**
  * Select List Element
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class SelectListElement extends ApplyElement {
-  public function addToField(Form_Field $field){
-    $element = $field->newElement('SelectList', 'el' . $this->element->id);
-    $element->label = $this->element->title;
-    $element->instructions = $this->element->instructions;
-    $element->format = $this->element->format;
-    $element->value = $this->element->defaultValue;
-    if($this->element->required){
-      $element->addValidator('NotEmpty');
+class SelectList extends AbstractElement {
+  
+  public function addToField(\Foundation\Form\Field $field){
+    $element = $field->newElement('SelectList', 'el' . $this->_element->getId());
+    $element->setLabel($this->_element->getTitle());
+    $element->setInstructions($this->_element->getInstructions());
+    $element->setFormat($this->_element->getFormat());
+    $element->setDefaultValue($this->_element->getDefaultValue());
+    if($this->_element->isRequired()){
+      $validator = new \Foundation\Form\Validator\NotEmpty($element);
+      $element->addValidator($validator);
+    } else {
+      //only put a blank if it isn't required
+      $element->newItem('', '');
     }
-    $element->addItem(false, '');
-    foreach($this->element->findListItemsByWeight() as $item){
-      if($item->active) $element->addItem($item->id, $item->value);
+    foreach($this->_element->getListItems() as $item){
+      if($item->isActive()) $element->newItem($item->getId(), $item->getValue());
     }
     return $element;
   }
@@ -26,7 +31,7 @@ class SelectListElement extends ApplyElement {
     $this->value = $input;
   }
   
-  public function setValueFromAnswer($answers){
+  public function setValueFromAnswer(\Jazzee\Entity\Answer $answer){
     if(isset($answers[0]))
       $this->value = $answers[0]->eInteger;
   }

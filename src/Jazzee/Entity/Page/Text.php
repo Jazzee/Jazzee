@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee\Page;
+namespace Jazzee\Entity\Page;
 /**
  * A page with no form just text
  */

@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee\Page;
+namespace Jazzee\Entity\Page;
 /**
  * AbstractPage
  */
@@ -35,14 +35,6 @@ abstract class AbstractPage implements \Jazzee\Page {
   */
   public function __construct(\Jazzee\Entity\ApplicationPage $applicationPage){
     $this->_applicationPage = $applicationPage;
-  }
-  
-  /**
-   * 
-   * @see Jazzee.Page::getApplicationPage()
-   */
-  public function getApplicationPage(){
-    return $this->_applicationPage;
   }
   
   /**

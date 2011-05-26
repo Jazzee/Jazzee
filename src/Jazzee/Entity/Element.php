@@ -58,6 +58,12 @@ class Element{
    * @OneToMany(targetEntity="ElementListItem",mappedBy="element")
    */
   private $listItems;
+  
+  /**
+   * @var \Jazzee\Element
+   */
+  private $jazzeeElement;
+  
 
   public function __construct(){
     $this->listItems = new \Doctrine\Common\Collections\ArrayCollection();
@@ -291,5 +297,19 @@ class Element{
   public function getItemByValue($value){
     foreach($this->listItems as $item) if($item->getValue() == $value) return $item;
     return false;
+  }
+  
+  /**
+   * Get the jazzeeElement
+   * 
+   * @return \Jazzee\Element
+   */
+  public function getJazzeeElement(){
+    if(is_null($this->jazzeeElement)){
+      $class = $this->type->getClass();
+      if(!class_exists($class)) $class = 'Jazzee\Element\TextInput';
+      $this->jazzeeElement = new $class($this);
+    }
+    return $this->jazzeeElement;
   }
 }

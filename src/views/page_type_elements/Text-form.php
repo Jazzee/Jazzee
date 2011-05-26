@@ -5,5 +5,5 @@
  * @subpackage apply
  */
 ?>
-<div id='leadingText'><?php print $page->getApplicationPage()->getLeadingText()?></div>
-<div id='trailingText'><?php print $page->getApplicationPage()->getTrailingText()?></div>
+<div id='leadingText'><?php print $page->getLeadingText()?></div>
+<div id='trailingText'><?php print $page->getTrailingText()?></div>

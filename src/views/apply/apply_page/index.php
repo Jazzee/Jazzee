@@ -6,7 +6,7 @@
  * @package jazzee
  * @subpackage apply
  */
-if($answers = $page->getAnswers()){
+if($answers = $page->getJazzeePage()->getAnswers()){
   print "<div id='answers'>";
   $elementName = FoundationVC_Config::findElementCacading(get_class($page), '', '-answer');
   foreach($answers as $answer){
@@ -14,5 +14,5 @@ if($answers = $page->getAnswers()){
   }
   print '</div>';
 }
-$elementName = \Foundation\VC\Config::findElementCacading(get_class($page), '', '-form');
+$elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-form');
 $this->renderElement($elementName, array('page'=>$page));

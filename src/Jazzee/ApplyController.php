@@ -13,7 +13,7 @@ class ApplyController extends Controller
   
   /**
    * Application pages
-   * @var array \Jazzee\Page
+   * @var array \Jazzee\Entity\ApplicationPage
    */
   protected $_pages;
   
@@ -43,12 +43,9 @@ class ApplyController extends Controller
       $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() .'/');
     }
     foreach($this->_application->getPages() as $pageEntity){
-      $class = $pageEntity->getPage()->getType()->getClass();
-      if(!class_exists($class)) $class = 'Jazzee\Page\Text';
-      $page = new $class($pageEntity);
-      $page->setApplicant($this->_applicant);
-      $page->setController($this);
-      $this->_pages[$pageEntity->getId()] = $page;
+      $pageEntity->getJazzeePage()->setApplicant($this->_applicant);
+      $pageEntity->getJazzeePage()->setController($this);
+      $this->_pages[$pageEntity->getId()] = $pageEntity;
     }
     $this->setLayoutVar('layoutTitle', $this->_application->getCycle()->getName() . ' ' . $this->_application->getProgram()->getName() . ' Application');
     $this->addCss($this->path('styles/apply.css'));

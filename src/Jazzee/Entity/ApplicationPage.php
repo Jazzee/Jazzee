@@ -8,7 +8,8 @@ namespace Jazzee\Entity;
  * @package    jazzee
  * @subpackage orm
  **/
-class ApplicationPage{
+class ApplicationPage
+{
   /**
     * @Id 
     * @Column(type="bigint")
@@ -52,6 +53,12 @@ class ApplicationPage{
   
   /** @Column(type="text", nullable=true) */
   private $trailingText;
+  
+  /**
+   * The Jazzee Page instance
+   * @var \Jazzee\Page
+   */
+  private $jazzeePage;
   
   /**
    * Get id
@@ -261,5 +268,19 @@ class ApplicationPage{
   public function setTrailingText($value){
     if(!$this->page->isGlobal()) $this->page->setTrailingText($value);
     else $this->trailingText = $value;
+  }
+  
+  /**
+   * Get the jazzeePage
+   * 
+   * @return \Jazzee\Page
+   */
+  public function getJazzeePage(){
+    if(is_null($this->jazzeePage)){
+      $class = $this->page->getType()->getClass();
+      if(!class_exists($class)) $class = 'Jazzee\Entity\Page\Text';
+      $this->jazzeePage = new $class($this);
+    }
+    return $this->jazzeePage;
   }
 }

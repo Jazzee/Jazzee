@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee\Page;
+namespace Jazzee\Entity\Page;
 /**
  * The Standard Application Page
  * 
@@ -17,9 +17,8 @@ class Standard extends AbstractPage {
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
-    foreach($this->applicationPage->getPage()->getElements() as $e){
-      //$element = new $e->ElementType->class($e);
-      //$element->addToField($field);
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->addToField($field);
     }
     $form->newButton('submit', 'Save');
     $form->newButton('reset', 'Clear Form');
