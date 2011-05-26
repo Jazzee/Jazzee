@@ -188,7 +188,7 @@ class Applicant{
    *
    * @return boolean $locked
    */
-  public function getLocked(){
+  public function isLocked(){
     return $this->locked;
   }
 

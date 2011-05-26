@@ -7,18 +7,18 @@
  * @subpackage apply
  */
  
-class ApplyPageController extends ApplyController {
-  /**
-   * The current page an alias for $this->pages[$this->actionParams['pageID']]
-   * @var ApplyPage
-   */
-  protected $page;
-  
+class ApplyPageController extends \Jazzee\ApplyController {  
   /**
    * Convienece string holding the path to this page
    * @var  string    
    */
-  protected $pagePath;
+  protected $_path;
+  
+  /**
+   * Convience access to $this->pages[$pageId]
+   * @var \Jazzee\Page
+   */
+  protected $_page;
   
   /**
    * Lookup applicant and make sure we are authorized to view the page
@@ -27,23 +27,31 @@ class ApplyPageController extends ApplyController {
   public function beforeAction(){
     parent::beforeAction();
     $pageID = $this->actionParams['pageID'];
-    if(!array_key_exists($pageID,$this->pages)){
-      $this->messages->write('error', "You are not authorized to view that page.");
-      $this->redirect($this->path("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/"));
-      $this->afterAction();
-      exit();
+    
+    if(!array_key_exists($pageID,$this->_pages)){
+      $this->addMessage('error', "You are not authorized to view that page.");
+      $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/");
     }
-    if($this->applicant->locked){
-      $this->redirect($this->path("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/status/"));
-      $this->afterAction();
-      exit();
+    if($this->_applicant->isLocked()){
+      $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/status/");
     }
-    $this->addScript('common/scripts/controllers/apply_page.controller.js');
-    $this->page = $this->pages[$pageID];
-    $this->pagePath = 'apply/' . $this->application->Program->shortName . '/' . $this->application->Cycle->name . '/page/' . $this->page->id;
-    $this->page->setActionPath($this->path($this->pagePath));
-    $this->setVar('page', $this->page);
+    $this->addScript($this->path('scripts/controllers/apply_page.controller.js'));
+    $this->_page = $this->_pages[$pageID];
+    $this->_path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_page->getApplicationPage()->getId();
+    $this->setVar('page', $this->_page);
     $this->setVar('currentAnswerID', false);
+    $n = $this->getNavigation();
+    $this->setLayoutVar('navigation', $this->getNavigation());
+  }
+  
+  /**
+   * Get action page
+   * 
+   * Where to submit forms for Pages
+   * @return string
+   */
+  public function getActionPath(){
+    return $this->_path;
   }
   
   /**
@@ -109,31 +117,42 @@ class ApplyPageController extends ApplyController {
    * @return Navigation
    */
   public function getNavigation(){
-    $navigation = new Navigation;
+    $navigation = new \Foundation\Navigation\Container();
     
-    $menu = $navigation->newMenu();
-    $menu->title = 'Application Pages';
-    foreach($this->pages as $id => $page){
-      $link = $menu->newLink(array('text'=>$page->title, 'href'=> $this->path('apply/' . $this->application['Program']->shortName . '/' . $this->application['Cycle']->name . '/page/' . $page->id)));
-      if($this->page->id == $id){
-        $link->current = true;
+    $menu = new \Foundation\Navigation\Menu();
+    $navigation->addMenu($menu);
+    
+    $menu->setTitle('Application Pages');
+    foreach($this->_pages as $id => $page){
+      $link = new \Foundation\Navigation\Link($page->getApplicationPage()->getTitle());
+      $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $page->getApplicationPage()->getId()));
+      if($this->_page->getApplicationPage()->getId() == $id){
+        $link->setCurrent(true);
       }
       switch($page->getStatus()){
-        case ApplyPage::INCOMPLETE:
-          $link->class = 'incomplete';
+        case \Jazzee\Page::INCOMPLETE:
+          $link->addClass('incomplete');
           break;
-        case ApplyPage::COMPLETE:
-          $link->class = 'complete';
+        case \Jazzee\Page::COMPLETE:
+          $link->addClass('complete');
           break;
-        case ApplyPage::SKIPPED:
-          $link->class = 'skipped';
+        case \Jazzee\Page::SKIPPED:
+          $link->addClass('skipped');
           break;
       }
+      $menu->addLink($link);
     }
-    $applicant_menu = $navigation->newMenu();
-    $applicant_menu->title = "User Menu";
-    $applicant_menu->newLink(array('text'=>'Support', 'href'=>$this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/support")));
-    $applicant_menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application->Program->shortName}/{$this->application->Cycle->name}/applicant/logout")));
+    $applicant_menu = new \Foundation\Navigation\Menu();
+    $navigation->addMenu($applicant_menu);
+    $applicant_menu->setTitle("User Menu");
+    
+    $link = new \Foundation\Navigation\Link('Support');
+    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/'));
+    $applicant_menu->addLink($link);
+
+    $link = new \Foundation\Navigation\Link('Logout');
+    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/applicant/logout/'));
+    $applicant_menu->addLink($link);
     
     return $navigation;
   }

@@ -231,7 +231,7 @@ class ApplicationPage{
    * Get the leadingText
    */
   public function getLeadingText(){
-    if(is_null($this->leadingText)) return $this->page->getLeadignText();
+    if(is_null($this->leadingText)) return $this->page->getLeadingText();
     return $this->leadingText;
   }
   
@@ -249,7 +249,7 @@ class ApplicationPage{
    * Get the trailingText
    */
   public function getTrailingText(){
-    if(is_null($this->trailingText)) return $this->page->getTrailingText();
+    if(is_null($this->trailingText)) return $this->getPage()->getTrailingText();
     return $this->trailingText;
   }
   

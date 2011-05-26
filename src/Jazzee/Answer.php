@@ -1,9 +1,12 @@
 <?php
+namespace Jazzee;
 /**
  * ApplyAnswer interface 
+ * 
  * Most page types provide thier own answer types that must implement this interface
  */
-interface ApplyAnswer {
+interface ApplyAnswer 
+{
   /**
    * Get the ID of the answer 
    * @return integer
@@ -20,7 +23,7 @@ interface ApplyAnswer {
    * Update the values in an answer 
    * @param FormInput $input
    */
-  function update(FormInput $input);
+  function update(\Foundation\Form\Input $input);
   
   /**
    * Get a list of the elements
@@ -47,7 +50,7 @@ interface ApplyAnswer {
    * @param string $basePath
    * @return array of links 
    */
-  function applyTools($basePath);
+  function applyTools();
   
   /**
    * Tools for applicant_view view

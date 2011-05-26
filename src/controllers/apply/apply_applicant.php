@@ -59,9 +59,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
           $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
           $store->applicantID = $applicant->getId();
           $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-          $this->redirect($this->path(
-          'apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' .
-          $this->application->getPages()->first()->getId()));
+          $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $this->application->getPages()->first()->getId());
         }
         $applicant->loginFail();
       }
@@ -147,8 +145,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
       $duplicate = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
       if($duplicate){
         $this->addMessage('error', 'You have already started a ' . $this->application->getProgram()->getName() . ' application.  Please login to retrieve it.');
-        $this->redirect($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login'));
-        exit();
+        $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login');
       }
       $applicant = new \Jazzee\Entity\Applicant;
       $applicant->setApplication($this->application);
@@ -165,10 +162,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
       $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
       $store->applicantID = $applicant->getId();
       $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-      $this->redirect($this->path(
-        'apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' .
-        $this->application->getPages()->first()->getId()));
-      exit();
+      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $this->application->getPages()->first()->getId());
     }
     $this->setVar('form', $form);
   }
