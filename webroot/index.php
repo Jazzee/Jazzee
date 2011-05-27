@@ -136,6 +136,9 @@ try {
   // Get a new front controller without any routers, and have it process our handmade request.
   $fc = new Lvc_FrontController();
   $fc->processRequest($request);
+
+} catch (PDOException $e){
+  throw new \Jazzee\Exception("Problem with database connection. PDO says: " . $e->getMessage(), E_ERROR, 'We are experiencing a problem connecting to our database.  Please try your request again.');
   
 } catch (\Foundation\Exception $e) {
   //Foundation exceptions have a getUserMessage method to display to the user so they get caught first
@@ -149,9 +152,9 @@ try {
   // Get a new front controller without any routers, and have it process our handmade request.
   $fc = new Lvc_FrontController();
   $fc->processRequest($request);
-  
 } catch (Exception $e) {
   trigger_error('Uncaught Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(), E_USER_ERROR);
+  
   // Get a request for the error page
   $request = new Lvc_Request();
   $request->setControllerName('error');

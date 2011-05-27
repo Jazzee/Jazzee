@@ -250,6 +250,7 @@ class Controller extends \Foundation\VC\Controller
     );
     
     $this->_em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
+    
   }
   
   /**

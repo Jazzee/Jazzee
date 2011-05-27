@@ -123,7 +123,9 @@ protected $_maximumApplicantFileUpload;
    * Load data from the ini file
    */
   public function __construct(){
-    $arr = parse_ini_file(__DIR__ . '/../../etc/config.ini.php');
+    $configurationFile = realpath(__DIR__ . '/../../etc') . '/config.ini.php';
+    if(!is_readable($configurationFile)) throw new Exception("Unable to load {$configurationFile}.", E_ERROR, 'We were unable to load the configuration file for this site.');
+    $arr = parse_ini_file($configurationFile);
     foreach($arr as $name => $value){
       $setter = 'set' . \ucfirst($name);
       if(!method_exists($this, $setter)) throw new Exception("Configuration variable ({$name}) found in file, but it is not a recognized option.");

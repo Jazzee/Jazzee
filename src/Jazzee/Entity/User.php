@@ -18,7 +18,7 @@ class User{
   
   /**
    * Unique campus ID for use with campus AuthN/AuthZ 
-   * @Column(type="string", unique=true) 
+   * @Column(type="string", unique=true, nullable=true) 
    * */
   private $campusId;
   
@@ -28,10 +28,13 @@ class User{
   /** @Column(type="string") */
   private $password;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable=true) */
   private $activateToken;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="datetime", nullable=true) */
+  private $activateTokenExpires;
+  
+  /** @Column(type="string", unique=true, nullable=true) */
   private $apiKey;
   
   /** @Column(type="string") */
@@ -82,6 +85,8 @@ class User{
   public function __construct(){
     $this->roles = new \Doctrine\Common\Collections\ArrayCollection();
     $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->failedLoginAttempts = 0;
+    $this->expired = false;
   }
   
   /**
@@ -136,7 +141,7 @@ class User{
    * @param string $password
    */
   public function setPassword($password){
-    $p = new PasswordHash(8, FALSE);
+    $p = new \PasswordHash(8, FALSE);
     $this->password = $p->HashPassword($password);
   }
   
@@ -155,7 +160,7 @@ class User{
    * @param string $hashedPassword
    */
   public function checkPassword($password){
-    $p = new PasswordHash(8, FALSE);
+    $p = new \PasswordHash(8, FALSE);
     return $p->CheckPassword($password, $this->password);
   }
 
