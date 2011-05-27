@@ -22,7 +22,7 @@ class PaymentType{
   private $class;
   
   /** 
-   * @OneToMany(targetEntity="PaymentTypeVariable", mappedBy="type", cascade={"all"})
+   * @OneToMany(targetEntity="PaymentTypeVariable", mappedBy="type")
    */
   private $variables;
 

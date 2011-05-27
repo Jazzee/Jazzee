@@ -113,6 +113,11 @@ protected $_timezone;
  */
 protected $_localBootstrap;
 
+/**
+ * @var string
+ */
+protected $_maximumApplicantFileUpload;
+
   /**
    * Construct
    * Load data from the ini file
@@ -492,6 +497,22 @@ protected $_localBootstrap;
    */
   public function setRecaptchaPublicKey($recaptchaPublicKey) {
     $this->_recaptchaPublicKey = $recaptchaPublicKey;
+  }
+  
+  /**
+   * get maximumApplicantFileUpload
+   * @return string
+   */
+  public function getMaximumApplicantFileUpload() {
+    return $this->_maximumApplicantFileUpload;
+  }
+  
+  /**
+   * set maximumApplicantFileUpload
+   * @var string $maximumApplicantFileUpload
+   */
+  public function setMaximumApplicantFileUpload($maximumApplicantFileUpload) {
+    $this->_maximumApplicantFileUpload = $maximumApplicantFileUpload;
   }
 
 }

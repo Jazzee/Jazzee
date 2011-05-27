@@ -20,15 +20,14 @@ class Application{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Program",cascade={"all"})
+   * @ManyToOne(targetEntity="Program")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $program;
   
   /** 
-   * @ManyToOne(targetEntity="Cycle",cascade={"all"})
+   * @ManyToOne(targetEntity="Cycle")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE")
-   * @OrderBy({"name" = "ASC"})
    */
   private $cycle;
   
@@ -39,7 +38,7 @@ class Application{
   private $pages;
   
   /** 
-   * @OneToMany(targetEntity="Applicant", mappedBy="application",cascade={"all"})
+   * @OneToMany(targetEntity="Applicant", mappedBy="application")
    */
   private $applicants;
   

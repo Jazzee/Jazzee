@@ -5,8 +5,15 @@ namespace Jazzee;
  * 
  * Most page types provide thier own answer types that must implement this interface
  */
-interface ApplyAnswer 
+interface Answer 
 {
+  /**
+   * Set the EntityManager
+   * 
+   * @param \Doctrine\ORM\EntityManager
+   */
+  function setEntityManager(\Doctrine\ORM\EntityManager $em);
+  
   /**
    * Get the ID of the answer 
    * @return integer
@@ -20,30 +27,10 @@ interface ApplyAnswer
   function getAttachment();
   
   /**
-   * Update the values in an answer 
+   * Update the values in an answer
    * @param FormInput $input
    */
   function update(\Foundation\Form\Input $input);
-  
-  /**
-   * Get a list of the elements
-   * @return array
-   */
-  function getElements();
-  
-  /**
-   * Get the display value for an element by ID
-   * @param mixed $id
-   * @return string
-   */
-  function getDisplayValueForElement($elementID);
-  
-  /**
-   * Get the form value for an element by ID
-   * @param mixed $id
-   * @return string
-   */
-  function getFormValueForElement($elementID);
   
   /**
    * The tools for apply_page view

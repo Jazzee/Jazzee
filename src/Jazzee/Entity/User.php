@@ -57,13 +57,13 @@ class User{
   
   /** 
    * @ManyToOne(targetEntity="Program",cascade={"all"})
-   * @JoinColumn(onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   private $defaultProgram;
   
   /** 
    * @ManyToOne(targetEntity="Cycle",cascade={"all"})
-   * @JoinColumn(onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   private $defaultCycle;
   

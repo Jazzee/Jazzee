@@ -8,7 +8,7 @@
  */
 if($answers = $page->getJazzeePage()->getAnswers()){
   print "<div id='answers'>";
-  $elementName = FoundationVC_Config::findElementCacading(get_class($page), '', '-answer');
+  $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-answer');
   foreach($answers as $answer){
     $this->renderElement($elementName, array('answer'=>$answer, 'page'=>$page,'currentAnswerID'=>$currentAnswerID));
   }

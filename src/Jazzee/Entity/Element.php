@@ -23,7 +23,8 @@ class Element{
   private $type;
 
   /** 
-   * @ManyToOne(targetEntity="Page",inversedBy="elements",cascade={"all"})
+   * @ManyToOne(targetEntity="Page",inversedBy="elements")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $page;
   
@@ -292,10 +293,22 @@ class Element{
   /**
    * Get list item by value
    *
+   * @param string $value
    * @return Entity\ElementListItem $item
    */
   public function getItemByValue($value){
     foreach($this->listItems as $item) if($item->getValue() == $value) return $item;
+    return false;
+  }
+  
+  /**
+   * Get list item by id
+   *
+   * @param integer $id
+   * @return Entity\ElementListItem $item
+   */
+  public function getItemById($id){
+    foreach($this->listItems as $item) if($item->getId() == $id) return $item;
     return false;
   }
   

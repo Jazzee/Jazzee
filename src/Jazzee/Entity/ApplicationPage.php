@@ -18,12 +18,14 @@ class ApplicationPage
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Application", inversedBy="pages", cascade={"all"})
+   * @ManyToOne(targetEntity="Application", inversedBy="pages")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $application;
   
   /** 
    * @ManyToOne(targetEntity="Page")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $page;
   

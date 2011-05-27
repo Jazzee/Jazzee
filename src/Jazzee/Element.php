@@ -13,33 +13,27 @@ interface Element
   function addToField(\Foundation\Form\Field $field);
   
   /**
-   * Store input as an ElementAnswer
+   * Create element answers and attach them to the answer
+   * 
    * @param mixed $input
+   * @return array \Jazzee\Entity\AnswerElement
    */
-  function setValueFromInput($input);
-  
-  /**
-   * Set the value from an ApplyAnswer Object
-   * @param \Jazzee\Entity\Answer $answer
-   */
-  function setValueFromAnswer(\Jazzee\Entity\Answer $answer);
-  
-  /**
-   * Get an array of ElementAnswers from the store value
-   * @return array \Jazzee\Entity\ElementAnswer
-   */
-  function getAnswers();
+  function getElementAnswers($input);
   
   /**
    * Get the value of the element formated for display
+   * 
+   * @param \Jazzee\Entity\Answer $answer
    * @return string
    */
-  function displayValue();
+  function displayValue(\Jazzee\Entity\Answer $answer);
   
   /**
    * Get the value of the element that \Foundation\Form\Element will accept
+   * 
+   * @param \Jazzee\Entity\Answer $answer
    * @return mixed
    */
-  function formValue();
+  function formValue(\Jazzee\Entity\Answer $answer);
 }
 ?>

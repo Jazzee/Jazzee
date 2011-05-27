@@ -5,7 +5,7 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class RankingListElement extends ApplyElement {
+class RankingListElement{
  /**
   * RankingLists take multiple inputs as an array
   * @param array $value

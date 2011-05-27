@@ -18,17 +18,19 @@ class Message{
   
   /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="messages") 
+   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   private $applicant;
   
   /** 
-   * @ManyToOne(targetEntity="User",inversedBy="messages") 
+   * @ManyToOne(targetEntity="User",inversedBy="messages")
+   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   private $user;
   
   /** 
    * @ManyToOne(targetEntity="Message",inversedBy="replies")
-   * @JoinColumn(name="parent_id", referencedColumnName="id")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $parent;
   

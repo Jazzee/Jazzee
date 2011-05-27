@@ -27,7 +27,8 @@ class GREScore{
   private $testYear;
   
   /** 
-   * @ManyToOne(targetEntity="Answer",inversedBy="greScores",cascade={"all"})
+   * @ManyToOne(targetEntity="Answer",inversedBy="greScores")
+   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   protected $answer;
   

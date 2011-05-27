@@ -17,6 +17,7 @@ class PageVariable{
   
   /** 
    * @ManyToOne(targetEntity="Page", inversedBy="variables")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $page;
   

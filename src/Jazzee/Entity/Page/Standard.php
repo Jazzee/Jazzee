@@ -6,6 +6,11 @@ namespace Jazzee\Entity\Page;
  * Unless special functionaility is required all pages are of this type
  */
 class Standard extends AbstractPage {
+  /**
+   * The answer class for this page type
+   * @const string
+   */
+  const ANSWER_CLASS = '\Jazzee\Entity\Answer\Standard';
   
   /**
    * 
@@ -27,53 +32,49 @@ class Standard extends AbstractPage {
   
   
   public function newAnswer($input){
-    $a = new Answer;
-    $a->pageID = $this->applicationPage->Page->id;
-    $this->applicant['Answers'][] = $a;
-    $answer = new StandardAnswer($a);
-    $answer->update($input);
-    $this->applicant->save();
-    $this->form->applyDefaultValues();
-    return true;
+    $answer = new \Jazzee\Entity\Answer();
+    $answer->setPage($this->_applicationPage->getPage());
+    $answer->setApplicant($this->_applicant);
+    $answer->getJazzeeAnswer()->setEntityManager($this->_controller->getEntityManager());
+    $answer->getJazzeeAnswer()->update($input);
+    $this->_form->applyDefaultValues();
+    $this->_controller->getEntityManager()->persist($answer);
+    $this->_controller->addMessage('success', 'Answered Saved Successfully');
+    //flush here so the answerId will be correct when we view
+    $this->_controller->getEntityManager()->flush();
   }
   
-  public function updateAnswer($input, $answerID){
-    if($a = $this->applicant->getAnswerByID($answerID)){
-      $answer = new StandardAnswer($a);
-      $answer->update($input);
-      $a->save();
-      $this->form->applyDefaultValues();
-      return true;
+  public function updateAnswer($input, $answerId){
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      $answer->getJazzeeAnswer()->setEntityManager($this->_controller->getEntityManager());
+      $answer->getJazzeeAnswer()->update($input);
+      $this->getForm()->applyDefaultValues();
+      $this->_controller->getEntityManager()->persist($answer);
+      $this->_controller->addMessage('success', 'Answer Updated Successfully');
     }
   }
 
-  public function deleteAnswer($answerID){
-    if(($key = array_search($answerID, $this->applicant->Answers->getPrimaryKeys())) !== false){
-      $this->applicant->Answers->remove($key);
-      $this->applicant->save();
-      return true;
+  public function deleteAnswer($answerId){
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      $this->_controller->getEntityManager()->remove($answer);
+      $this->_applicant->getAnswers()->removeElement($answer);
+      $this->_controller->addMessage('success', 'Answered Deleted Successfully');
     }
-    return false;
   }
   
   
-  public function fill($answerID){
-    if($a = $this->applicant->getAnswerByID($answerID)){
-      $answer = new StandardAnswer($a);
-      foreach($answer->getElements() as $id => $element){
-        $value = $answer->getFormValueForElement($id);
-        if($value) $this->form->elements['el' . $id]->value = $value;
+  public function fill($answerId){
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $value = $element->getJazzeeElement()->formValue($answer);
+        if($value) $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
       }
+      $this->getForm()->setAction($this->_controller->getActionPath() . "/edit/{$answerId}");
     }
   }
   
   public function getAnswers(){
-    return array();
-    $answers = array();
-    foreach($this->applicant->getAnswersForPage($this->applicationPage->Page->id) as $a){
-      $answers[] = new StandardAnswer($a);
-    }
-    return $answers;
+    return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
   
   public function getStatus(){

@@ -18,12 +18,13 @@ class ElementAnswer{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Answer",inversedBy="elements",cascade={"all"})
+   * @ManyToOne(targetEntity="Answer",inversedBy="elements")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $answer;
   
   /** 
-   * @ManyToOne(targetEntity="Element",cascade={"all"})
+   * @ManyToOne(targetEntity="Element")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $element;
@@ -193,6 +194,15 @@ class ElementAnswer{
     $this->element = $element;
   }
   
+  /**
+   * Get element
+   *
+   * @return Entity\Element
+   */
+  public function getElement(){
+    return $this->element;
+  }
+  
 /**
    * Set answer
    *
@@ -200,5 +210,6 @@ class ElementAnswer{
    */
   public function setAnswer(Answer $answer){
     $this->answer = $answer;
+    $answer->addElementAnswer($this);
   }
 }

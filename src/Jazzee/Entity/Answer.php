@@ -4,7 +4,9 @@ namespace Jazzee\Entity;
 /** 
  * Answer
  * Applicant answer to a page
- * @Entity @Table(name="answers") 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="answers") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -18,19 +20,20 @@ class Answer{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Applicant",inversedBy="answers",cascade={"all"})
+   * @ManyToOne(targetEntity="Applicant",inversedBy="answers")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   protected $applicant;
   
   /** 
-   * @ManyToOne(targetEntity="Page",cascade={"all"})
+   * @ManyToOne(targetEntity="Page")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   protected $page;
   
   /** 
    * @ManyToOne(targetEntity="Answer",inversedBy="children")
-   * @JoinColumn(name="parent_id", referencedColumnName="id")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   protected $parent;
   
@@ -72,6 +75,12 @@ class Answer{
    * @OneToMany(targetEntity="GREScore",mappedBy="answer")
    */
   private $greScores;
+  
+  /**
+   * The Jazzee Answer instance
+   * @var \Jazzee\Answer
+   */
+  private $jazzeeAnswer;
   
   public function __construct(){
     $this->children = new \Doctrine\Common\Collections\ArrayCollection();
@@ -203,6 +212,7 @@ class Answer{
    */
   public function setApplicant(Applicant $applicant){
     $this->applicant = $applicant;
+    $applicant->addAnswer($this);
   }
 
   /**
@@ -256,7 +266,7 @@ class Answer{
    * @param Entity\ElementAnswer $element
    */
   public function addElementAnswer(ElementAnswer $element){
-    $this->elements[] = $elements;
+    $this->elements[] = $element;
   }
 
   /**
@@ -266,6 +276,18 @@ class Answer{
    */
   public function getElementAnswers(){
     return $this->elements;
+  }
+  
+  /**
+   * Get ElementAnswers for Element
+   * 
+   * @param \Jazzee\Entity\Element $element
+   * @return array
+   */
+  public function getElementAnswersForElement(Element $element){
+    $arr = array();
+    foreach($this->elements as $elementAnswer)if($elementAnswer->getElement() == $element) $arr[] = $elementAnswer;
+    return $arr;
   }
 
   /**
@@ -302,5 +324,28 @@ class Answer{
    */
   public function getPrivateStatus(){
     return $this->privateStatus;
+  }
+  
+  /**
+   * Get the jazzeeAnswer
+   * 
+   * @return \Jazzee\Answer
+   */
+  public function getJazzeeAnswer(){
+    if(is_null($this->jazzeeAnswer)){
+      $pageClass = $this->page->getType()->getClass();
+      $class = $pageClass::ANSWER_CLASS;
+      if(!class_exists($class)) $class = 'Jazzee\Entity\Answer\Text';
+      $this->jazzeeAnswer = new $class($this);
+    }
+    return $this->jazzeeAnswer;
+  }
+  
+  /**
+   * Mark the lastUpdate automatically 
+   * @PrePersist
+   */
+  public function markLastUpdate(){
+      $this->updatedAt = new \DateTime();
   }
 }

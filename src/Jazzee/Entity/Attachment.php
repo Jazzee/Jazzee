@@ -16,7 +16,8 @@ class Attachment{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Applicant",inversedBy="attachments",cascade={"all"})
+   * @ManyToOne(targetEntity="Applicant",inversedBy="attachments")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $applicant;
   

@@ -1,14 +1,14 @@
 <?php
 namespace Jazzee\Entity\Element;
 /**
- * TextInput Element
+ * Textarea Element
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class TextInput extends AbstractElement {
+class Textarea extends AbstractElement {
   public function addToField(\Foundation\Form\Field $field){
-    $element = $field->newElement('TextInput', 'el' . $this->_element->getId());
+    $element = $field->newElement('Textarea', 'el' . $this->_element->getId());
     $element->setLabel($this->_element->getTitle());
     $element->setInstructions($this->_element->getInstructions());
     $element->setFormat($this->_element->getFormat());
@@ -26,7 +26,7 @@ class TextInput extends AbstractElement {
       $elementAnswer = new \Jazzee\Entity\ElementAnswer;
       $elementAnswer->setElement($this->_element);
       $elementAnswer->setPosition(0);
-      $elementAnswer->setEShortString($input);
+      $elementAnswer->setEText($input);
       $elementAnswers[] = $elementAnswer;
     }
     return $elementAnswers;
@@ -35,7 +35,7 @@ class TextInput extends AbstractElement {
   public function displayValue(\Jazzee\Entity\Answer $answer){
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEShortString();
+      return $elementsAnswers[0]->getEText();
     }
     return null;
   }
@@ -43,7 +43,7 @@ class TextInput extends AbstractElement {
   public function formValue(\Jazzee\Entity\Answer $answer){
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEShortString();
+      return $elementsAnswers[0]->getEText();
     }
     return null;
   }

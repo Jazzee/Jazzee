@@ -17,6 +17,7 @@ class Payment{
   
   /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="payments")
+   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   private $applicant;
   
@@ -32,7 +33,7 @@ class Payment{
   private $status;
   
   /** 
-   * @OneToMany(targetEntity="PaymentVariable", mappedBy="payment", cascade={"all"})
+   * @OneToMany(targetEntity="PaymentVariable", mappedBy="payment")
    */
   private $variables;
   

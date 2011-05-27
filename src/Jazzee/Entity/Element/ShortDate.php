@@ -1,14 +1,14 @@
 <?php
 namespace Jazzee\Entity\Element;
 /**
- * TextInput Element
+ * ShortDate Element
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class TextInput extends AbstractElement {
+class ShortDate extends AbstractElement {
   public function addToField(\Foundation\Form\Field $field){
-    $element = $field->newElement('TextInput', 'el' . $this->_element->getId());
+    $element = $field->newElement('ShortDateInput', 'el' . $this->_element->getId());
     $element->setLabel($this->_element->getTitle());
     $element->setInstructions($this->_element->getInstructions());
     $element->setFormat($this->_element->getFormat());
@@ -17,6 +17,8 @@ class TextInput extends AbstractElement {
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
     }
+    $filter = new \Foundation\Form\Filter\DateFormat($element, 'c');
+    $element->addFilter($filter);
     return $element;
   }
   
@@ -26,7 +28,7 @@ class TextInput extends AbstractElement {
       $elementAnswer = new \Jazzee\Entity\ElementAnswer;
       $elementAnswer->setElement($this->_element);
       $elementAnswer->setPosition(0);
-      $elementAnswer->setEShortString($input);
+      $elementAnswer->setEDate($input);
       $elementAnswers[] = $elementAnswer;
     }
     return $elementAnswers;
@@ -35,7 +37,7 @@ class TextInput extends AbstractElement {
   public function displayValue(\Jazzee\Entity\Answer $answer){
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEShortString();
+      return $elementsAnswers[0]->getEDate()->format('F Y');
     }
     return null;
   }
@@ -43,7 +45,7 @@ class TextInput extends AbstractElement {
   public function formValue(\Jazzee\Entity\Answer $answer){
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEShortString();
+      return $elementsAnswers[0]->getEDate()->format('Y-n-j');
     }
     return null;
   }

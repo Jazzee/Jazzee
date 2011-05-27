@@ -48,6 +48,6 @@ class ApplyController extends Controller
       $this->_pages[$pageEntity->getId()] = $pageEntity;
     }
     $this->setLayoutVar('layoutTitle', $this->_application->getCycle()->getName() . ' ' . $this->_application->getProgram()->getName() . ' Application');
-    $this->addCss($this->path('styles/apply.css'));
+    $this->addCss($this->path('resource/styles/apply.css'));
   }
 }

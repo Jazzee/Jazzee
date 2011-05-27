@@ -17,7 +17,8 @@ class Decision{
   private $id;
   
   /** 
-   * @OneToOne(targetEntity="Applicant",inversedBy="decision",cascade={"all"})
+   * @OneToOne(targetEntity="Applicant",inversedBy="decision")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $applicant;
   

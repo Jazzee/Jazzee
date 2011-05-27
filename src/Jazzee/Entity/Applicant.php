@@ -19,6 +19,7 @@ class Applicant{
   
   /** 
    * @ManyToOne(targetEntity="Application", inversedBy="applicants")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $application;
   
@@ -65,22 +66,22 @@ class Applicant{
   private $updatedAt;
   
   /** 
-   * @OneToMany(targetEntity="Answer",mappedBy="applicant", cascade={"all"})
+   * @OneToMany(targetEntity="Answer",mappedBy="applicant")
    */
   private $answers;
   
   /** 
-   * @OneToMany(targetEntity="Attachment",mappedBy="applicant", cascade={"all"})
+   * @OneToMany(targetEntity="Attachment",mappedBy="applicant")
    */
   private $attachments;
   
   /** 
-   * @OneToOne(targetEntity="Decision",mappedBy="applicant", cascade={"all"})
+   * @OneToOne(targetEntity="Decision",mappedBy="applicant")
    */
   private $decision;
   
   /** 
-   * @OneToMany(targetEntity="Payment",mappedBy="applicant", cascade={"all"})
+   * @OneToMany(targetEntity="Payment",mappedBy="applicant")
    */
   private $payments;
   
@@ -390,7 +391,49 @@ class Applicant{
   public function getApplication(){
     return $this->application;
   }
-
+  
+  /**
+   * Add answer
+   *
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  public function addAnswer(\Jazzee\Entity\Answer $answer){
+    $this->answers[] = $answer;
+    if($answer->getApplicant() != $this) $answer->getApplicant($applicant);
+  }
+  
+  /**
+   * get all answers
+   *
+   * @param Doctrine\Common\Collections\Collection \Jazzee\Entity\Answer
+   */
+  public function getAnswers(){
+    return $this->answers;
+  }
+  
+  /**
+   * Find answers for a page
+   * 
+   * @param \Jazzee\Entity\Page
+   * @return array \Jazzee\Entity\Answer
+   */
+  public function findAnswersByPage(Page $page){
+    $return = array();
+    foreach($this->answers as $answer) if($answer->getPage() == $page) $return[] = $answer;
+    return $return;
+  }
+  
+  /**
+   * Find answer by id
+   * 
+   * @param integer $id
+   * @return \Jazzee\Entity\Answer or false
+   */
+  public function findAnswerById($id){
+    foreach($this->answers as $answer) if($answer->getId() == $id) return $answer;
+    return false;
+  }
+  
   /**
    * Get attachments
    *
@@ -459,7 +502,7 @@ class Applicant{
    *
    * @param Entity\Message $messages
    */
-  public function addMessage(\Entity\Message $message){
+  public function addMessage(Message $message){
     $this->messages[] = $message;
   }
 

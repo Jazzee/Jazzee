@@ -11,12 +11,11 @@ try {
       'path' => 1
     )
   ));
-  $basicRouter->addRoute('#^(?:.*)/?file/(.*).(pdf|png)$#i', array(
+  $basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array(
     'controller' => 'file',
     'action' => 'get',
     'action_params' => array(
-      'name' => 1,
-      'extension' => 2
+      'name' => 1
     )
   ));
   $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(edit|delete|do)/([0-9]+)/?)?$#i', array(

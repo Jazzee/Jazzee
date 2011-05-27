@@ -17,6 +17,7 @@ class PaymentVariable{
   
   /** 
    * @ManyToOne(targetEntity="Payment", inversedBy="variables")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $payment;
   

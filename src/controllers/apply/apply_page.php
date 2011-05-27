@@ -8,6 +8,7 @@
  */
  
 class ApplyPageController extends \Jazzee\ApplyController {  
+  const ERROR_MESSAGE = 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.';
   /**
    * Convienece string holding the path to this page
    * @var  string    
@@ -35,7 +36,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
     if($this->_applicant->isLocked()){
       $this->redirectPath('apply/' . $this->_application->getProgram() . '/' . $this->_application->getCycle()->getTitle() . '/status/');
     }
-    $this->addScript($this->path('scripts/controllers/apply_page.controller.js'));
+    $this->addScript($this->path('resource/scripts/controllers/apply_page.controller.js'));
     $this->_page = $this->_pages[$pageID];
     $this->_path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_page->getId();
     $this->setVar('page', $this->_page);
@@ -51,7 +52,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
    * @return string
    */
   public function getActionPath(){
-    return $this->_path;
+    return $this->path($this->_path);
   }
   
   /**
@@ -59,12 +60,11 @@ class ApplyPageController extends \Jazzee\ApplyController {
    */
   public function actionIndex() {
     if(!empty($this->post)){
-      if($input = $this->page->validateInput($this->post)){
-        if($this->page->newAnswer($input)){
-          $this->messages->write('success', 'Answer Saved Successfully');
-          $this->redirectPath($this->pagePath);
-        }
+      if(!$input = $this->_page->getJazzeePage()->validateInput($this->post)){
+        $this->addMessage('error', self::ERROR_MESSAGE);
+        return false;
       }
+      $this->_page->getJazzeePage()->newAnswer($input);
     }
   }
   
@@ -85,16 +85,14 @@ class ApplyPageController extends \Jazzee\ApplyController {
    * Highlight the answer being edited and fill the form with data from that answer
    */
   public function actionEdit() {
-    if(empty($this->post)){
-      $this->page->setActionPath($this->path($this->pagePath . '/edit/' . $this->actionParams['answerID']));
-      $this->page->fill($this->actionParams['answerID']);
-      $this->setVar('currentAnswerID', $this->actionParams['answerID']);
-    } else {
-      if($input = $this->page->validateInput($this->post)){
-        if($this->page->updateAnswer($input,$this->actionParams['answerID'])){
-          $this->messages->write('success', 'Answer Updated Successfully');
-          $this->redirectPath($this->pagePath);
-        }
+    $this->_page->getJazzeePage()->fill($this->actionParams['answerID']);
+    $this->setVar('currentAnswerID', $this->actionParams['answerID']);
+    if(!empty($this->post)){
+      if(!$input = $this->_page->getJazzeePage()->validateInput($this->post)){
+        $this->addMessage('error', self::ERROR_MESSAGE);
+      } else {
+        $this->_page->getJazzeePage()->updateAnswer($input, $this->actionParams['answerID']);
+        $this->setVar('currentAnswerID', null);
       }
     }
     $this->loadView($this->controllerName . '/index');
@@ -104,10 +102,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
    * Delete an answer
    */
   public function actionDelete() {
-    if($this->page->deleteAnswer($this->actionParams['answerID'])){
-      $this->messages->write('success', 'Answer Deleted Successfully');
-      $this->redirectPath($this->pagePath);
-    }
+    $this->_page->getJazzeePage()->deleteAnswer($this->actionParams['answerID']);
     $this->loadView($this->controllerName . '/index');
   }
   

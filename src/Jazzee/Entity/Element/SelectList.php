@@ -27,33 +27,32 @@ class SelectList extends AbstractElement {
     return $element;
   }
   
-  public function setValueFromInput($input){
-    $this->value = $input;
+  public function getElementAnswers($input){
+    $elementAnswers = array();
+    if(!is_null($input)){
+      $elementAnswer = new \Jazzee\Entity\ElementAnswer;
+      $elementAnswer->setElement($this->_element);
+      $elementAnswer->setPosition(0);
+      $elementAnswer->setEInteger($input);
+      $elementAnswers[] = $elementAnswer;
+    }
+    return $elementAnswers;
   }
   
-  public function setValueFromAnswer(\Jazzee\Entity\Answer $answer){
-    if(isset($answers[0]))
-      $this->value = $answers[0]->eInteger;
-  }
-  
-  public function getAnswers(){
-    if(is_null($this->value)) return array();
-    $elementAnswer = new Entity\ElementAnswer;
-    $elementAnswer->setElement($this->element);
-    $elementAnswer->setPosition(0);
-    $elementAnswer->setEInteger($this->value);
-    return array($elementAnswer);
-  }
-  
-  public function displayValue(){
-    $keys = $this->element->ListItems->getPrimaryKeys();
-    if(($key = array_search($this->value, $keys)) !== false)
-      return (string)$this->element->ListItems->get($key)->value;
+  public function displayValue(\Jazzee\Entity\Answer $answer){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(isset($elementsAnswers[0])){
+      return $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getValue();
+    }
     return null;
   }
   
-  public function formValue(){
-    return (integer)$this->value;
+  public function formValue(\Jazzee\Entity\Answer $answer){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(isset($elementsAnswers[0])){
+      return $elementsAnswers[0]->getEInteger();
+    }
+    return null;
   }
 }
 ?>

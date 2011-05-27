@@ -1,14 +1,15 @@
 <?php
 namespace Jazzee\Entity\Element;
 /**
- * TextInput Element
+ * Radio List Element
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class TextInput extends AbstractElement {
+class CheckboxList extends AbstractElement {
+  
   public function addToField(\Foundation\Form\Field $field){
-    $element = $field->newElement('TextInput', 'el' . $this->_element->getId());
+    $element = $field->newElement('CheckboxList', 'el' . $this->_element->getId());
     $element->setLabel($this->_element->getTitle());
     $element->setInstructions($this->_element->getInstructions());
     $element->setFormat($this->_element->getFormat());
@@ -17,35 +18,42 @@ class TextInput extends AbstractElement {
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
     }
+    foreach($this->_element->getListItems() as $item){
+      if($item->isActive()) $element->newItem($item->getId(), $item->getValue());
+    }
     return $element;
   }
   
   public function getElementAnswers($input){
     $elementAnswers = array();
-    if(!is_null($input)){
-      $elementAnswer = new \Jazzee\Entity\ElementAnswer;
-      $elementAnswer->setElement($this->_element);
-      $elementAnswer->setPosition(0);
-      $elementAnswer->setEShortString($input);
-      $elementAnswers[] = $elementAnswer;
+    if(!empty($input)){
+      foreach($input as $position => $value){
+        $elementAnswer = new \Jazzee\Entity\ElementAnswer;
+        $elementAnswer->setElement($this->_element);
+        $elementAnswer->setPosition($position);
+        $elementAnswer->setEInteger($value);
+        $elementAnswers[] = $elementAnswer;
+      }
     }
     return $elementAnswers;
   }
   
   public function displayValue(\Jazzee\Entity\Answer $answer){
+    $arr = array();
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
-    if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEShortString();
+    foreach($elementsAnswers as $elementAnswer){
+      $arr[] = $this->_element->getItemById($elementAnswer->getEInteger())->getValue();
     }
-    return null;
+    return empty($arr)?null:implode(', ', $arr);
   }
   
   public function formValue(\Jazzee\Entity\Answer $answer){
+    $arr = array();
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
-    if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEShortString();
+    foreach($elementsAnswers as $elementsAnswer){
+      $arr[] = $this->_element->getItemById($elementsAnswer->getEInteger())->getId();
     }
-    return null;
+    return $arr;
   }
 }
 ?>

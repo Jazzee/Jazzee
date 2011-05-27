@@ -72,7 +72,7 @@ abstract class AbstractPage implements \Jazzee\Page {
    * @see Jazzee.Page::validateInput()
    */
   public function validateInput($arr){
-    return $this->form->processInput($arr);
+    return $this->getForm()->processInput($arr);
   }
   
   /**

@@ -5,15 +5,16 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class FileController extends JazzeeController{
+class FileController extends \Jazzee\Controller{
   /**
    * Output a single file
    * @param string $name 
    */
-  public function actionGet($name, $extension){
-    if(isset($this->fileStore->$name)) {
-      $this->fileStore->$name->output(); 
-      exit();//output exists, but this is clearer
+  public function actionGet($name){
+    $store = $this->_session->getStore('files', 900);
+    $storeName = md5($name);
+    if(isset($store->$storeName)){
+      $store->$storeName->output();
     }
     
     //send a 404

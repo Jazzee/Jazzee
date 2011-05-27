@@ -17,7 +17,8 @@ class ElementListItem{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Element",inversedBy="listItems",cascade={"all"})
+   * @ManyToOne(targetEntity="Element",inversedBy="listItems")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $element;
   

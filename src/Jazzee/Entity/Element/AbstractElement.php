@@ -12,12 +12,6 @@ abstract class AbstractElement implements \Jazzee\Element {
  protected $_element;
  
  /**
-  * The input
-  * @param mixed $value
-  */
- protected $_value;
- 
- /**
   * Contructor
   * 
   * @param \Jazzee\Entity\Element

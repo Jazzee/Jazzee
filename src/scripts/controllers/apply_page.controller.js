@@ -4,8 +4,9 @@
  */
 $(document).ready(function(){
   //Add the datepicker to the DateInput element
-  $('div.form input.DateInput').datepicker();
+  //$('div.form input.DateInput').datepicker();
   
+  /*
   //Replace the dropdowns in ShortDateElement with a datepicker
   var div = $('div.ShortDateInput div.control');
   var hiddenInput = $('input', div);
@@ -38,4 +39,5 @@ $(document).ready(function(){
     input.attr('value', input.datepicker('option', 'monthNames')[month] + ' ' + year);
   }
   div.html(input);
+  */
 });

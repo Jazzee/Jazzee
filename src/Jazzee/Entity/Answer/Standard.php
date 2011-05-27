@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee\Answer;
+namespace Jazzee\Entity\Answer;
 /**
  * A single StandardPage Applicant Answer
  */
@@ -12,44 +12,52 @@ class Standard implements \Jazzee\Answer
   protected $_answer;
   
   /**
-   * The Elements for an answer
-   * @var array of \Jazzee\Element
+   * @var \Doctrine\ORM\EntityManager
    */
-  protected $_elements = array();
+  protected $_em;
   
  /**
   * Contructor
   * 
   * Store the answer and create the elements array
+  * @param \Doctrine\ORM\EntityManager $em
+  * @param \Jazzee\Entity\Answer $answer
   */
   public function __construct(\Jazzee\Entity\Answer $answer){
     $this->_answer = $answer;
-    
-    /*$allAnswersByElementId = array();
-    foreach($this->answer->Elements as $answerElement){
-      $allAnswersByElementId[$answerElement->elementID][] = $answerElement;
-    }
-    foreach($this->answer->Page->findElementsByWeight() as $e){
-      $this->elements[$e->id] = new $e->ElementType->class($e);
-      if(!empty($allAnswersByElementId[$e->id])) $this->elements[$e->id]->setValueFromAnswer($allAnswersByElementId[$e->id]);
-    }
-    */
+  }
+  
+  /**
+   * 
+   * @see Jazzee.Answer::setEntityManager()
+   */
+  public function setEntityManager(\Doctrine\ORM\EntityManager $em){
+    $this->_em = $em;
   }
 
+  /**
+   * 
+   * @see Jazzee.Answer::getID()
+   */
   public function getID(){
     return $this->_answer->getId();
   }
 
-  public function update(FormInput $input){
-    /*
-    $this->answer->Elements->delete();
-    foreach($this->elements as $id => $element){
-      $element->setValueFromInput($input->{'el'.$id});
-      foreach($element->getAnswers() as $elementAnswer){
-        $this->answer->Elements[] = $elementAnswer;
+  /**
+   * 
+   * @see Jazzee.Answer::update()
+   */
+  public function update(\Foundation\Form\Input $input){
+    foreach($this->_answer->getElementAnswers() as $ea){
+      $this->_em->remove($ea);
+      $this->_answer->getElementAnswers()->removeElement($ea);
+    }
+    foreach($this->_answer->getPage()->getElements() as $element){
+      foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+        $elementAnswer->setAnswer($this->_answer);
+        $this->_em->persist($elementAnswer); 
       }
     }
-    */
   }
   
   public function getElements(){
@@ -61,14 +69,6 @@ class Standard implements \Jazzee\Answer
     return $arr;
   }
 
-  public function getDisplayValueForElement($elementID){
-    return '';
-    if(isset($this->elements[$elementID])){
-      return $this->elements[$elementID]->displayValue();
-    }
-    return false;
-  }
-
   public function getFormValueForElement($elementID){
     return '';
     if(isset($this->elements[$elementID])){
@@ -77,11 +77,10 @@ class Standard implements \Jazzee\Answer
     return false;
   }
   
-  public function applyTools($basePath){
-    return array();
+  public function applyTools(){
     return array(
-      'Edit' => "{$basePath}/edit/{$this->answer->id}",
-      'Delete' => "{$basePath}/delete/{$this->answer->id}",
+      'Edit' => '/edit/' . $this->_answer->getId(),
+      'Delete' => '/delete/' . $this->_answer->getId(),
     );
   }
   
