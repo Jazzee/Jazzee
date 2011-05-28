@@ -1,8 +1,10 @@
-Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine on
-
-  # Rewrite URLs of the form 'index.php?q=x':
+  
+  # remove any trailing slash components
+  RewriteRule ^(.+)/$  /$1 [R=301,L]
+  
+  # Rewrite URLs of the form 'index.php?url=x':
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d 
   RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
