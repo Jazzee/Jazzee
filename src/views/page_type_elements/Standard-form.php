@@ -6,5 +6,5 @@
  */
 ?>
 <div id='leadingText'><?php print $page->getLeadingText()?></div>
-<?php $this->renderElement('form', array('form'=> $form = $page->getJazzeePage()->getForm())); ?>
+<?php $this->renderElement('form', array('form'=> $page->getJazzeePage()->getForm())); ?>
 <div id='trailingText'><?php print $page->getTrailingText()?></div>

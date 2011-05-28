@@ -131,7 +131,7 @@ try {
   $fc = new Lvc_FrontController();
   $fc->processRequest($request);
 } catch (Exception $e) {
-  trigger_error('Uncaught Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(), E_USER_ERROR);
+  //trigger_error('Uncaught Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(), E_USER_ERROR);
   
   // Get a request for the error page
   $request = new Lvc_Request();

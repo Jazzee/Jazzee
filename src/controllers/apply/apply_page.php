@@ -28,7 +28,6 @@ class ApplyPageController extends \Jazzee\ApplyController {
   public function beforeAction(){
     parent::beforeAction();
     $pageID = $this->actionParams['pageID'];
-    
     if(!array_key_exists($pageID,$this->_pages)){
       $this->addMessage('error', "You are not authorized to view that page.");
       $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/");
