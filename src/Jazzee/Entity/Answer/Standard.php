@@ -10,12 +10,7 @@ class Standard implements \Jazzee\Answer
   * @var \Jazzee\Entity\Answer
   */
   protected $_answer;
-  
-  /**
-   * @var \Doctrine\ORM\EntityManager
-   */
-  protected $_em;
-  
+
  /**
   * Contructor
   * 
@@ -25,14 +20,6 @@ class Standard implements \Jazzee\Answer
   */
   public function __construct(\Jazzee\Entity\Answer $answer){
     $this->_answer = $answer;
-  }
-  
-  /**
-   * 
-   * @see Jazzee.Answer::setEntityManager()
-   */
-  public function setEntityManager(\Doctrine\ORM\EntityManager $em){
-    $this->_em = $em;
   }
 
   /**
@@ -48,33 +35,11 @@ class Standard implements \Jazzee\Answer
    * @see Jazzee.Answer::update()
    */
   public function update(\Foundation\Form\Input $input){
-    foreach($this->_answer->getElementAnswers() as $ea){
-      $this->_em->remove($ea);
-      $this->_answer->getElementAnswers()->removeElement($ea);
-    }
     foreach($this->_answer->getPage()->getElements() as $element){
       foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
-        $elementAnswer->setAnswer($this->_answer);
-        $this->_em->persist($elementAnswer); 
+        $this->_answer->addElementAnswer($elementAnswer);
       }
     }
-  }
-  
-  public function getElements(){
-    return array();
-    $arr = array();
-    foreach($this->elements as $id => $element){
-      $arr[$id] = $element->title;
-    }
-    return $arr;
-  }
-
-  public function getFormValueForElement($elementID){
-    return '';
-    if(isset($this->elements[$elementID])){
-      return $this->elements[$elementID]->formValue();
-    }
-    return false;
   }
   
   public function applyTools(){
@@ -129,14 +94,6 @@ class Standard implements \Jazzee\Answer
       $arr['Private Status'] = $this->answer->PrivateStatus->name;
     }
     return $arr;
-  }
-  
-  public function getAttachment(){
-    return $this->_answer->getAttachment();
-  }
-  
-  public function getUpdatedAt(){
-    return $this->_answer->getUpdatedAt();
   }
 }
 ?>

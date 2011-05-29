@@ -33,7 +33,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
       $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/");
     }
     if($this->_applicant->isLocked()){
-      $this->redirectPath('apply/' . $this->_application->getProgram() . '/' . $this->_application->getCycle()->getTitle() . '/status/');
+      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status/');
     }
     $this->addScript($this->path('resource/scripts/controllers/apply_page.controller.js'));
     $this->_page = $this->_pages[$pageID];
@@ -55,15 +55,24 @@ class ApplyPageController extends \Jazzee\ApplyController {
   }
   
   /**
+   * Get path
+   * 
+   * Page path
+   * @return string
+   */
+  public function getPath(){
+    return $this->_path;
+  }
+  
+  /**
    * Display the page
    */
   public function actionIndex() {
     if(!empty($this->post)){
-      if(!$input = $this->_page->getJazzeePage()->validateInput($this->post)){
-        $this->addMessage('error', self::ERROR_MESSAGE);
-        return false;
+      if($input = $this->_page->getJazzeePage()->validateInput($this->post)){
+        $this->_page->getJazzeePage()->newAnswer($input);
       }
-      $this->_page->getJazzeePage()->newAnswer($input);
+      
     }
   }
   
@@ -72,11 +81,12 @@ class ApplyPageController extends \Jazzee\ApplyController {
    * Pass the input through to the apply page
    */
   public function actionDo() {
-    if(method_exists($this->page, $this->actionParams['doWhat'])){
-      if($this->page->{$this->actionParams['doWhat']}($this->actionParams['answerID']))
-        $this->messages->write('success', 'Action Completed Successfully');
-        $this->redirectPath($this->pagePath);
+    $what = $this->actionParams['what'];
+    if(method_exists($this->_page->getJazzeePage(), $what)){
+      $this->_page->getJazzeePage()->$what($this->actionParams['answerID'], $this->post);
+      $this->setVar('currentAnswerID', $this->actionParams['answerID']);
     }
+    $this->loadView($this->controllerName . '/index');
   }
   
   /**
@@ -149,6 +159,15 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $applicant_menu->addLink($link);
     
     return $navigation;
+  }
+  
+  /**
+   * Get all pages
+   * 
+   * @return array of \Jazzee\Entity\ApplicationPage
+   */
+  public function getPages(){
+    return $this->_pages;
   }
 }
 ?>

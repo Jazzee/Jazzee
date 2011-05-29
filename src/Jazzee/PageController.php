@@ -53,6 +53,13 @@ class PageController extends \Foundation\VC\Controller
   }
   
   /**
+   * No messages
+   */
+  public function getMessages(){
+    return array();
+  }
+  
+  /**
    * Build our virtual file system
    */
   protected function buildVirtualFileSystem(){

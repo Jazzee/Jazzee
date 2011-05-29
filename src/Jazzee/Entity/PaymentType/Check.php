@@ -1,26 +1,26 @@
 <?php
+namespace Jazzee\Entity\PaymentType;
 /**
  * Pay by check
  */
-class CheckPayment extends ApplyPayment{  
+class Check extends AbstractPaymentType{  
   const PENDING_TEXT = 'We have not recieved your check';
   const SETTLED_TEXT = 'Your check has been received';
   const REJECTED_TEXT = 'Your check did not clear or was rejected';
   const REFUNDED_TEXT = 'We have sent you a refund for this payment';
   
-  /**
-   * Display information about mailing a check and allow the applicant to record a preliminary check payment
-   * @see ApplyPayment::paymentForm()
-   */
-  public function paymentForm(Applicant $applicant, $amount, $actionPath){
-    $form = new Form;
-    $form->action = $actionPath;
+  public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath){
+    $form = new \Foundation\Form;
+    $form->setAction($actionPath);
     $form->newHiddenElement('amount', $amount);
-    $field = $form->newField(array('legend'=>$this->paymentType->name)); 
+    $field = $form->newField();
+    $field->setLegend($this->_paymentType->getName());
+    $field = $form->newField();
+     
     $instructions = "<p><strong>Application Fee:</strong> &#36;{$amount}</p>";
-    $instructions .= '<p><strong>Make Checks Payable to:</strong> ' . $this->paymentType->getVar('payable') . '</p>';
-    if($this->paymentType->getVar('address')) $instructions .= '<p><h4>Mail Check to:</h4>' . nl2br($this->paymentType->getVar('address')) . '</p>';
-    if($this->paymentType->getVar('coupon')) $instructions .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($this->paymentType->getVar('coupon')) . '</p>';
+    $instructions .= '<p><strong>Make Checks Payable to:</strong> ' . $this->_paymentType->getVar('payable') . '</p>';
+    if($this->_paymentType->getVar('address')) $instructions .= '<p><h4>Mail Check to:</h4>' . nl2br($this->_paymentType->getVar('address')) . '</p>';
+    if($this->_paymentType->getVar('coupon')) $instructions .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($this->_paymentType->getVar('coupon')) . '</p>';
     $search = array(
      '%Applicant_Name%',
      '%Applicant_ID%',
@@ -28,22 +28,19 @@ class CheckPayment extends ApplyPayment{
      '%Program_ID%'
     );
     $replace = array();
-    $replace[] = "{$applicant->firstName} {$applicant->lastName}";
-    $replace[] = $applicant->id;
-    $replace[] = $applicant->Application->Program->name;
-    $replace[] = $applicant->Application->Program->id;
+    $replace[] = $applicant->getFirstName() . ' ' . $applicant->getLastName();
+    $replace[] = $applicant->getId();
+    $replace[] = $applicant->getApplication()->getProgram()->getName();
+    $replace[] = $applicant->getApplication()->getProgram()->getId();
     $instructions = str_ireplace($search, $replace, $instructions);
-    $field->instructions = $instructions . '<p>Click the Pay By Check button to pay your fee by check.  Your account will be temporarily credited and you can complete your application.  Your application will not be reviewed until your check is recieved.</p>';       
+    $instructions .= '<p>Click the Pay By Check button to pay your fee by check.  Your account will be temporarily credited and you can complete your application.  Your application will not be reviewed until your check is recieved.</p>';   
+    $field->setInstructions($instructions);    
     
     $form->newButton('submit', 'Pay By Check');
     return $form;
   }
   
-  /**
-   * Setup the instructions for mailing the check including the address and any special markings (like appicant ID)
-   * @see ApplyPayment::setupForm()
-   */
-  public static function setupForm(PaymentType $paymentType = null){
+  public function getSetupForm(){
     $filters = array(
       'Applicant Name' => '%Applicant_Name%',
       'Applicant ID' => '%Applicant_ID%',
@@ -80,7 +77,7 @@ class CheckPayment extends ApplyPayment{
     return $form;
   }
   
-  public static function setup(PaymentType $paymentType, FormInput $input){
+  public function setup(\Foundation\Form\Input $input){
     $paymentType->name = $input->name;
     $paymentType->class = 'CheckPayment';
     $paymentType->setVar('payable', $input->payable);
@@ -92,8 +89,8 @@ class CheckPayment extends ApplyPayment{
    * Check Payments are pending with no verification
    * @see ApplyPaymentInterface::pendingPayment()
    */
-  function pendingPayment(Payment $payment, FormInput $input){
-    $payment->amount = $input->amount;
+  function pendingPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
+    $payment->setAmount($input->get('amount'));
     $payment->pending();
   }
   
@@ -101,7 +98,7 @@ class CheckPayment extends ApplyPayment{
    * Record the check number and the deposit date for a payment
    * @see ApplyPaymentInterface::settlePaymentForm()
    */
-  function getSettlePaymentForm(Payment $payment){
+  function getSettlePaymentForm(\Jazzee\Entity\Payment $payment){
     $form = new Form;
     $field = $form->newField(array('legend'=>"Settle {$this->paymentType->name} Payment"));        
     $element = $field->newElement('TextInput','checkNumber');
@@ -124,7 +121,7 @@ class CheckPayment extends ApplyPayment{
    * Once checks have been cashed we settle the payment
    * @see ApplyPaymentInterface::settlePayment()
    */
-  function settlePayment(Payment $payment, FormInput $input){
+  function settlePayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $payment->settled();
     $payment->setVar('checkNumber', $input->checkNumber);
     $payment->setVar('checkSettlementDate', $input->checkSettlementDate);
@@ -136,7 +133,7 @@ class CheckPayment extends ApplyPayment{
    * Record the reason the payment was rejected
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
-  function getRejectPaymentForm(Payment $payment){
+  function getRejectPaymentForm(\Jazzee\Entity\Payment $payment){
     $form = new Form;
     $field = $form->newField(array('legend'=>"Reject {$this->paymentType->name} Payment"));        
     $element = $field->newElement('Textarea','reason');
@@ -151,7 +148,7 @@ class CheckPayment extends ApplyPayment{
    * Bounced checks get rejected
    * @see ApplyPaymentInterface::rejectPayment()
    */
-  function rejectPayment(Payment $payment, FormInput $input){
+  function rejectPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $payment->rejected();
     $payment->setVar('rejectedReason', $input->reason);
     $payment->save();
@@ -162,7 +159,7 @@ class CheckPayment extends ApplyPayment{
    * Record the reason the payment was refunded
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
-  function getRefundPaymentForm(Payment $payment){
+  function getRefundPaymentForm(\Jazzee\Entity\Payment $payment){
     $form = new Form;
     $field = $form->newField(array('legend'=>"Refund {$this->paymentType->name} Payment"));        
     $element = $field->newElement('Textarea','reason');
@@ -177,7 +174,7 @@ class CheckPayment extends ApplyPayment{
    * Check payments are refunded outside Jazzee and then marked as refunded
    * @see ApplyPaymentInterface::refundPayment()
    */
-  function refundPayment(Payment $payment, FormInput $input){
+  function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $payment->refunded();
     $payment->setVar('refundedReason', $input->reason);
     $payment->save();
@@ -188,7 +185,7 @@ class CheckPayment extends ApplyPayment{
    * Check tools
    * @see ApplyPaymentInterface::applicantTools()
    */
-  public function applicantTools(Payment $payment){
+  public function applicantTools(\Jazzee\Entity\Payment $payment){
     $arr = array();
     switch($payment->status){
       case Payment::PENDING:

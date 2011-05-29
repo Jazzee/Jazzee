@@ -203,7 +203,7 @@ class ElementAnswer{
     return $this->element;
   }
   
-/**
+  /**
    * Set answer
    *
    * @param Entity\Answer $answer
@@ -211,5 +211,14 @@ class ElementAnswer{
   public function setAnswer(Answer $answer){
     $this->answer = $answer;
     $answer->addElementAnswer($this);
+  }
+  
+  /**
+   * Get answer
+   *
+   * @return Entity\Answer $answer
+   */
+  public function getAnswer(){
+    return $this->answer;
   }
 }

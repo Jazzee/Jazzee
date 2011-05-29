@@ -17,7 +17,7 @@ class TOEFLScore{
   */
   private $id;
   
-  /** @Column(type="string") */
+  /** @Column(type="bigint") */
   private $registrationNumber;
   
   /** @Column(type="integer") */

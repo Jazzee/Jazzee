@@ -17,7 +17,7 @@ class GREScore{
   */
   private $id;
   
-  /** @Column(type="string") */
+  /** @Column(type="bigint") */
   private $registrationNumber;
   
   /** @Column(type="integer") */
@@ -25,12 +25,6 @@ class GREScore{
   
   /** @Column(type="integer") */
   private $testYear;
-  
-  /** 
-   * @ManyToOne(targetEntity="Answer",inversedBy="greScores")
-   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
-   */
-  protected $answer;
   
   /** @Column(type="string", length=4, nullable=true) */
   private $departmentCode;

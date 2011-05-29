@@ -43,7 +43,7 @@ class Answer{
   protected $children;
   
   /** 
-   * @OneToMany(targetEntity="ElementAnswer", mappedBy="answer")
+   * @OneToMany(targetEntity="ElementAnswer", mappedBy="answer", cascade={"persist"})
    */
   protected $elements;
   
@@ -72,9 +72,14 @@ class Answer{
   protected $updatedAt;
   
   /** 
-   * @OneToMany(targetEntity="GREScore",mappedBy="answer")
+   * @ManyToOne(targetEntity="GREScore")
    */
-  private $greScores;
+  private $greScore;
+  
+  /** 
+   * @ManyToOne(targetEntity="TOEFLScore")
+   */
+  private $toeflScore;
   
   /**
    * The Jazzee Answer instance
@@ -245,10 +250,11 @@ class Answer{
   /**
    * Add children
    *
-   * @param Entity\Answer $children
+   * @param Entity\Answer $child
    */
-  public function addChildren(Answer $children){
-    $this->children[] = $children;
+  public function addChild(Answer $child){
+    $this->children[] = $child;
+    if($child->getParent() != $this) $child->setParent($this);
   }
 
   /**
@@ -259,6 +265,17 @@ class Answer{
   public function getChildren(){
     return $this->children;
   }
+  
+  /**
+   * Get Child for Page
+   * 
+   * @param \Jazzee\Entity\Page $page
+   * @return \Jazzee\Entity\Answer
+   */
+  public function getChildByPage(Page $page){
+    foreach($this->children as $child)if($child->getPage() == $page) return $child;
+    return false;
+  }
 
   /**
    * Add elements
@@ -267,7 +284,9 @@ class Answer{
    */
   public function addElementAnswer(ElementAnswer $element){
     $this->elements[] = $element;
+    if($element->getAnswer() != $this) $element->setAnswer($this);
   }
+
 
   /**
    * Get elements
@@ -287,7 +306,7 @@ class Answer{
   public function getElementAnswersForElement(Element $element){
     $arr = array();
     foreach($this->elements as $elementAnswer)if($elementAnswer->getElement() == $element) $arr[] = $elementAnswer;
-    return $arr;
+    return new \Doctrine\Common\Collections\ArrayCollection($arr);
   }
 
   /**
@@ -347,5 +366,41 @@ class Answer{
    */
   public function markLastUpdate(){
       $this->updatedAt = new \DateTime();
+  }
+  
+  /**
+   * get gre score
+   *
+   * @return \Jazzee\Entity\GREScore $score
+   */
+  public function getGREScore(){
+    return $this->greScore;
+  }
+  
+  /**
+   * Set gre score
+   *
+   * @param \Jazzee\Entity\GREScore $score
+   */
+  public function setGREScore($score){
+    $this->greScore = $score;
+  }
+  
+  /**
+   * get toefl score
+   *
+   * @return \Jazzee\Entity\TOEFL $score
+   */
+  public function getTOEFLScore(){
+    return $this->toeflScore;
+  }
+  
+  /**
+   * Set toefl score
+   *
+   * @param \Jazzee\Entity\TOEFLScore $score
+   */
+  public function setTOEFLScore($score){
+    $this->toeflScore = $score;
   }
 }

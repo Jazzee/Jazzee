@@ -279,9 +279,10 @@ class ApplicationPage
    */
   public function getJazzeePage(){
     if(is_null($this->jazzeePage)){
-      $class = $this->page->getType()->getClass();
-      if(!class_exists($class)) $class = 'Jazzee\Entity\Page\Text';
-      $this->jazzeePage = new $class($this);
+      $className = $this->page->getType()->getClass();
+      $class = new $className($this);
+      if(!($class instanceof \Jazzee\Page)) throw new \Jazzee\Exception($this->page->getType()->getName() . ' has class ' . $class . ' that does not implement \Jazzee\Page interface');
+      $this->jazzeePage = $class;
     }
     return $this->jazzeePage;
   }

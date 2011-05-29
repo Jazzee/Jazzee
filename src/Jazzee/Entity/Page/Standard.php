@@ -35,7 +35,6 @@ class Standard extends AbstractPage {
     $answer = new \Jazzee\Entity\Answer();
     $answer->setPage($this->_applicationPage->getPage());
     $answer->setApplicant($this->_applicant);
-    $answer->getJazzeeAnswer()->setEntityManager($this->_controller->getEntityManager());
     $answer->getJazzeeAnswer()->update($input);
     $this->_form->applyDefaultValues();
     $this->_controller->getEntityManager()->persist($answer);
@@ -46,7 +45,10 @@ class Standard extends AbstractPage {
   
   public function updateAnswer($input, $answerId){
     if($answer = $this->_applicant->findAnswerById($answerId)){
-      $answer->getJazzeeAnswer()->setEntityManager($this->_controller->getEntityManager());
+      foreach($answer->getElementAnswers() as $ea){
+        $this->_controller->getEntityManager()->remove($ea);
+        $answer->getElementAnswers()->removeElement($ea);
+      }
       $answer->getJazzeeAnswer()->update($input);
       $this->getForm()->applyDefaultValues();
       $this->_controller->getEntityManager()->persist($answer);
@@ -61,7 +63,6 @@ class Standard extends AbstractPage {
       $this->_controller->addMessage('success', 'Answered Deleted Successfully');
     }
   }
-  
   
   public function fill($answerId){
     if($answer = $this->_applicant->findAnswerById($answerId)){
@@ -78,8 +79,7 @@ class Standard extends AbstractPage {
   }
   
   public function getStatus(){
-    return self::INCOMPLETE;
-    if(count($this->getAnswers()) < $this->applicationPage->min){
+    if(count($this->getAnswers()) < $this->_applicationPage->getMin()){
       return self::INCOMPLETE;
     } else {
       return self::COMPLETE;

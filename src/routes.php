@@ -36,13 +36,26 @@ try {
   ));
   
   //the apply page is the actual application
-  $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(index|edit|delete|do)/([0-9]+)(/[0-9]+)?)?$#i', array(
+  $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(index|edit|delete)/([0-9]+)(/[0-9]+)?)?$#i', array(
     'controller' => 'apply_page',
     'action' => 4,
     'action_params' => array(
       'programShortName' => 1,
       'cycleName' => 2,
       'pageID' => 3,
+      'answerID' => 5
+    )
+  ));
+  
+  //special do type sends a second string to identify the method and an answerid
+  $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/do/(.*)/([0-9]+)$#i', array(
+    'controller' => 'apply_page',
+    'action' => 'do',
+    'action_params' => array(
+      'programShortName' => 1,
+      'cycleName' => 2,
+      'pageID' => 3,
+      'what' => 4,
       'answerID' => 5
     )
   ));
@@ -131,7 +144,7 @@ try {
   $fc = new Lvc_FrontController();
   $fc->processRequest($request);
 } catch (Exception $e) {
-  //trigger_error('Uncaught Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(), E_USER_ERROR);
+  trigger_error('Uncaught Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(), E_USER_ERROR);
   
   // Get a request for the error page
   $request = new Lvc_Request();

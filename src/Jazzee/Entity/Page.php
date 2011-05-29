@@ -303,7 +303,18 @@ class Page{
   public function getChildren(){
     return $this->children;
   }
-
+  
+  /**
+   * Get a child by id
+   *
+   * @param integer $id
+   * @return \Jazzee\Entity\Page
+   */
+  public function getChildById($id){
+    foreach($this->children as $child) if($child->getId() == $id) return $child;
+    return false;
+  }
+  
   /**
    * Set page variable
    * @param string $name
@@ -318,6 +329,16 @@ class Page{
     $var->setName($name);
     $this->variables[] = $var;
     $var->setValue($value);
+  }
+
+  /**
+   * get page variable
+   * @param string $name
+   * @return string $value
+   */
+  public function getVar($name){
+    foreach($this->variables as $variable)
+      if($variable->getName() == $name)return $variable->getValue();
   }
 
   /**
