@@ -36,7 +36,6 @@ class CreateAdminRole extends \Symfony\Component\Console\Command\Command
       $role->setName($input->getOption('name'));
       $arr = array(
         'manage_users' => array('index', 'edit', 'new', 'reset'),
-        'manage_configuration' => array('index'),
         'manage_roles' => array('index', 'edit', 'new')     
       );
       foreach($arr as $controller => $actions){
