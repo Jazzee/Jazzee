@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage admin
  */
-class AdminProfileController extends AdminController {
+class AdminProfileController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'My Profile';
   const PATH = 'admin/profile';

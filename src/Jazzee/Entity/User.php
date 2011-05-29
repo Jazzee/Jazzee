@@ -17,46 +17,19 @@ class User{
   private $id;
   
   /**
-   * Unique campus ID for use with campus AuthN/AuthZ 
-   * @Column(type="string", unique=true, nullable=true) 
+   * Unique eduPersonPrincipalName for use with SAML authentication
+   * @Column(type="string", unique=true) 
    * */
-  private $campusId;
+  private $eduPersonPrincipalName;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="string", nullable="true") */
   private $email;
   
-  /** @Column(type="string") */
-  private $password;
-  
-  /** @Column(type="string", nullable=true) */
-  private $activateToken;
-  
-  /** @Column(type="datetime", nullable=true) */
-  private $activateTokenExpires;
-  
-  /** @Column(type="string", unique=true, nullable=true) */
-  private $apiKey;
-  
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable="true") */
   private $firstName;
   
-  /** @Column(type="string") */
+  /** @Column(type="string", nullable="true") */
   private $lastName;
-  
-  /** @Column(type="datetime", nullable=true) */
-  private $lastLogin;
-  
-  /** @Column(type="string", length="15", nullable=true) */
-  private $lastLoginIp;
-  
-  /** @Column(type="string", length="15", nullable=true) */
-  private $lastFailedLoginIp;
-  
-  /** @Column(type="integer") */
-  private $failedLoginAttempts;
-  
-  /** @Column(type="boolean") */
-  private $expired;
   
   /** 
    * @ManyToOne(targetEntity="Program",cascade={"all"})
@@ -76,17 +49,9 @@ class User{
   **/
   private $roles;
   
-  /** 
-   * @OneToMany(targetEntity="Message",mappedBy="user") 
-   */
-  private $messages;
-  
 
   public function __construct(){
     $this->roles = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->failedLoginAttempts = 0;
-    $this->expired = false;
   }
   
   /**
@@ -99,21 +64,21 @@ class User{
   }
 
   /**
-   * Set campusId
+   * Set eduPersonPrincipalName
    *
-   * @param string $campusId
+   * @param string $eduPersonPrincipalName
    */
-  public function setCampusId($campusId){
-    $this->campusId = $campusId;
+  public function setEduPersonPrincipalName($eduPersonPrincipalName){
+    $this->eduPersonPrincipalName = $eduPersonPrincipalName;
   }
 
   /**
-   * Get campusId
+   * Get eduPersonPrincipalName
    *
-   * @return string $campusId
+   * @return string $eduPersonPrincipalName
    */
-  public function getCampusId(){
-    return $this->campusId;
+  public function getEduPersonPrincipalName(){
+    return $this->eduPersonPrincipalName;
   }
 
   /**
@@ -132,81 +97,6 @@ class User{
    */
   public function getEmail(){
     return $this->email;
-  }
-
-  
-  /**
-   * Set password
-   *
-   * @param string $password
-   */
-  public function setPassword($password){
-    $p = new \PasswordHash(8, FALSE);
-    $this->password = $p->HashPassword($password);
-  }
-  
-  /**
-   * Set Hashed password
-   * Store the previously hashed version of the password
-   * @param string $password
-   */
-  public function setHashedPassword($password){
-    $this->password = $password;
-  }
-    
-  /**
-   * Check a password against its hash
-   * @param string $password
-   * @param string $hashedPassword
-   */
-  public function checkPassword($password){
-    $p = new \PasswordHash(8, FALSE);
-    return $p->CheckPassword($password, $this->password);
-  }
-
-  /**
-   * Get password
-   *
-   * @return string $password
-   */
-  public function getPassword(){
-    return $this->password;
-  }
-
-  /**
-   * Set activeToken
-   *
-   * @param string $activeToken
-   */
-  public function setActivateToken($activeToken){
-    $this->activateToken = $activeToken;
-  }
-
-  /**
-   * Get activeToken
-   *
-   * @return string $activeToken
-   */
-  public function getActivateTokenToken(){
-    return $this->activateToken;
-  }
-
-  /**
-   * Set apiKey
-   *
-   * @param string $apiKey
-   */
-  public function setApiKey($apiKey){
-    $this->apiKey = $apiKey;
-  }
-
-  /**
-   * Get apiKey
-   *
-   * @return string $apiKey
-   */
-  public function getApiKey(){
-    return $this->apiKey;
   }
 
   /**
@@ -243,101 +133,6 @@ class User{
    */
   public function getLastName(){
     return $this->lastName;
-  }
-
-  /**
-   * Set lastLogin
-   *
-   * @param strint $lastLogin
-   */
-  public function setLastLogin($lastLogin){
-    $this->lastLogin = new \DateTime($lastLogin);
-  }
-
-  /**
-   * Get lastLogin
-   *
-   * @return DateTime $lastLogin
-   */
-  public function getLastLogin(){
-    return $this->lastLogin;
-  }
-
-  /**
-   * Set lastLoginIp
-   *
-   * @param string $lastLoginIp
-   */
-  public function setLastLoginIp($lastLoginIp){
-    $this->lastLoginIp = $lastLoginIp;
-  }
-
-  /**
-   * Get lastLoginIp
-   *
-   * @return string $lastLoginIp
-   */
-  public function getLastLoginIp(){
-    return $this->lastLoginIp;
-  }
-
-  /**
-   * Set lastFailedLoginIp
-   *
-   * @param string $lastFailedLoginIp
-   */
-  public function setLastFailedLoginIp($lastFailedLoginIp){
-    $this->lastFailedLoginIp = $lastFailedLoginIp;
-  }
-
-  /**
-   * Get lastFailedLoginIp
-   *
-   * @return string $lastFailedLoginIp
-   */
-  public function getLastFailedLoginIp(){
-    return $this->lastFailedLoginIp;
-  }
-
-  /**
-   * Set failedLoginAttempts
-   *
-   * @param integer $failedLoginAttempts
-   */
-  public function setFailedLoginAttempts($failedLoginAttempts){
-    $this->failedLoginAttempts = $failedLoginAttempts;
-  }
-
-  /**
-   * Get failedLoginAttempts
-   *
-   * @return integer $failedLoginAttempts
-   */
-  public function getFailedLoginAttempts(){
-    return $this->failedLoginAttempts;
-  }
-
-  /**
-   * Expire User
-   */
-  public function expire(){
-    $this->expired = true;
-  }
-  
-  /**
-   * UnExpire User
-   */
-  public function unExpire(){
-    $this->expired = false;
-  }
-
-  /**
-   * Get expired status
-   *
-   * @return datetime $expires
-   */
-  public function isExpired(){
-    return $this->expired;
   }
 
   /**
@@ -393,13 +188,20 @@ class User{
   public function getRoles(){
     return $this->roles;
   }
-
+  
   /**
-   * Get messages
-   *
-   * @return Doctrine\Common\Collections\Collection $messages
+   * Check if a user is allowed to access a resource
+   * 
+   * @param string $controller
+   * @param string $action
+   * @param \Jazzee\Entity\Program $program
    */
-  public function getMessages(){
-    return $this->messages;
+  public function isAllowed($controller, $action, \Jazzee\Entity\Program $program = null){
+    foreach($this->roles as $role) {
+      if(($role->isGlobal() or $role->getProgram() == $program) and $role->isAllowed($controller, $action)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

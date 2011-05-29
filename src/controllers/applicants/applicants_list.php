@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage applicants
  */
-class ApplicantsListController extends ApplicantsController {
+class ApplicantsListController extends \Jazzee\AdminController {
   const MENU = 'Applicants';
   const TITLE = 'By Tag';
   const PATH = 'applicants/list';

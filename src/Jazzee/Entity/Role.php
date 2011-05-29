@@ -23,6 +23,11 @@ class Role{
   private $isGlobal;
   
   /** 
+   * @ManyToOne(targetEntity="Program")
+   */
+  private $program;
+  
+  /** 
    * @OneToMany(targetEntity="RoleAction", mappedBy="role")
    */
   private $actions;
@@ -68,6 +73,7 @@ class Role{
    * Make global
    */
   public function makeGlobal(){
+    if($this->program) throw new \Jazzee\Exception("{this->name} is set for program " . $program->getName() . ' but you are trying to make it global.');
     $this->isGlobal = true;
   }
   
@@ -84,6 +90,25 @@ class Role{
    */
   public function isGlobal(){
     return $this->isGlobal;
+  }
+  
+  /**
+   * Set program
+   *
+   * @param \Jazzee\Entity\Program $program
+   */
+  public function setProgram(Program $program){
+    if($this->isGlobal) throw new \Jazzee\Exception("{this->name} is global but you are trying to set its program to " . $program->getName());
+    $this->program = $program;
+  }
+
+  /**
+   * Get program
+   *
+   * @return \Jazzee\Entity\Program $program
+   */
+  public function getProgram(){
+    return $this->program;
   }
 
   /**
@@ -120,6 +145,21 @@ class Role{
    */
   public function getUsers(){
     return $this->users;
+  }
+  
+  /**
+   * Check if an action is allowed by this role
+   * 
+   * @param string $controller
+   * @param string $action
+   * @param \Jazzee\Entity\Program $program
+   * @return bool
+   */
+  public function isAllowed($controllerName, $actionName){
+    foreach($this->actions as $action){
+      if($action->getController() == $controllerName and $action->getAction() == $actionName) return true;
+    }
+    return false;
   }
   
 }

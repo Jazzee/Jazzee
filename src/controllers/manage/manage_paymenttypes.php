@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManagePaymenttypesController extends ManageController {
+class ManagePaymenttypesController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Payment Types';
   const PATH = 'manage/paymenttypes';

@@ -23,12 +23,6 @@ class Message{
   private $applicant;
   
   /** 
-   * @ManyToOne(targetEntity="User",inversedBy="messages")
-   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
-   */
-  private $user;
-  
-  /** 
    * @ManyToOne(targetEntity="Message",inversedBy="replies")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
@@ -172,24 +166,6 @@ class Message{
    */
   public function getApplicant(){
     return $this->applicant;
-  }
-
-  /**
-   * Set user
-   *
-   * @param Entity\User $user
-   */
-  public function setUser(User $user){
-    $this->user = $user;
-  }
-
-  /**
-   * Get user
-   *
-   * @return Entity\User $user
-   */
-  public function getUser(){
-    return $this->user;
   }
 
   /**

@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage setup
  */
-class SetupUsersController extends SetupController {
+class SetupUsersController extends \Jazzee\AdminController {
   const MENU = 'Setup';
   const TITLE = 'Program Users';
   const PATH = 'setup/users';

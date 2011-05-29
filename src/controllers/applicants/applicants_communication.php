@@ -6,7 +6,7 @@
  * @package jazzee
  * @subpackage applicants
  */
-class ApplicantsCommunicationController extends ApplicantsController {
+class ApplicantsCommunicationController extends \Jazzee\AdminController {
   const MENU = 'Applicants';
   const TITLE = 'Communication';
   const PATH = 'applicants/communication';

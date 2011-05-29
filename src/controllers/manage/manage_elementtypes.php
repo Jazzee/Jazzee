@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManageElementtypesController extends ManageController {
+class ManageElementtypesController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Element Types';
   const PATH = 'manage/elementtypes';

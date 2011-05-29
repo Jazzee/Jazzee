@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage admin
  */
-class AdminChangecycleController extends AdminController {
+class AdminChangecycleController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'Change Cycle';
   const PATH = 'admin/changecycle';

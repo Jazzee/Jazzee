@@ -6,7 +6,7 @@
  * @subpackage admin
  * @subpackage setup
  */
-class SetupApplicationController extends SetupController {
+class SetupApplicationController extends \Jazzee\AdminController {
   const MENU = 'Setup';
   const TITLE = 'Application';
   const PATH = 'setup/application';

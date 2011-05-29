@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManageGlobalpagesController extends ManageController implements PagesInterface {
+class ManageGlobalpagesController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Global Pages';
   const PATH = 'manage/globalpages';

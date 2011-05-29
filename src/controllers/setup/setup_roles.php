@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage setup
  */
-class SetupRolesController extends SetupController {
+class SetupRolesController extends \Jazzee\AdminController {
   const MENU = 'Setup';
   const TITLE = 'Program Roles';
   const PATH = 'setup/roles';

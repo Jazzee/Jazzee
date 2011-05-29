@@ -6,7 +6,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManageConfigurationController extends ManageController {
+class ManageConfigurationController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Configuration';
   const PATH = 'manage/configuration';

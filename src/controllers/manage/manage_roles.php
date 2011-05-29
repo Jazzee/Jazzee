@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManageRolesController extends ManageController {
+class ManageRolesController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Roles';
   const PATH = 'manage/roles';

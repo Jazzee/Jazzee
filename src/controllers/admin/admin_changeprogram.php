@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage admin
  */
-class AdminChangeprogramController extends AdminController {
+class AdminChangeprogramController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'Change Program';
   const PATH = 'admin/changeprogram';

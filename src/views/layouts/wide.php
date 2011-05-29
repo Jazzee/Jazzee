@@ -28,9 +28,9 @@ print '<?xml version="1.0" encoding="iso-8859-1"?>' ?>
           <div id='main'>
             <div id='topbar'>
             <?php
-              if($navigation = $this->controller->getNavigation()){
-                $navigation->class = 'h-navigation';
-                $this->renderElement('navigation', array('navigation'=>$navigation));
+              if($navigation){
+                $navigation->addClass('h-navigation');
+                $this->renderElement('navigation', array('container'=>$navigation));
               }
             ?>
             <?php echo $layoutContentTop ?></div>

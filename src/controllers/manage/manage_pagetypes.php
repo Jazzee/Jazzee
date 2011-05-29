@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManagePagetypesController extends ManageController {
+class ManagePagetypesController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Page Types';
   const PATH = 'manage/pagetypes';

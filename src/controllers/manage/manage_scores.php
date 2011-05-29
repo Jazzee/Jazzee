@@ -6,7 +6,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManageScoresController extends ManageController {
+class ManageScoresController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Scores';
   const PATH = 'manage/scores';

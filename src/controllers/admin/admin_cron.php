@@ -6,7 +6,7 @@
  * @package jazzee
  * @subpackage admin
  */
-class AdminCronController extends AdminController {
+class AdminCronController extends \Jazzee\AdminController {
   /**
    * The maximum time a cron semephor can stick around before throwing an exception and deleting itself
    */
@@ -30,7 +30,7 @@ class AdminCronController extends AdminController {
     exit(0);
 	}
   
-  public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
     return true; //anyone is allowed to use cron
   }
   

@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage applicants
  */
-class ApplicantsDecisionsController extends ApplicantsController {
+class ApplicantsDecisionsController extends \Jazzee\AdminController {
   const MENU = 'Applicants';
   const TITLE = 'Decisions';
   const PATH = 'applicants/decisions';

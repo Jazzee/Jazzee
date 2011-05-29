@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage manage
  */
-class ManageCyclesController extends ManageController {
+class ManageCyclesController extends \Jazzee\AdminController {
   const MENU = 'Manage';
   const TITLE = 'Cycles';
   const PATH = 'manage/cycles';

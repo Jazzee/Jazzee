@@ -11,7 +11,7 @@
 $src = realpath(__DIR__ . '/..');
 
 require_once($src . '/lib/foundation/src/foundation.php');
-
+require_once('/usr/share/simplesamlphp/lib/_autoload.php');
 $classLoader = new Doctrine\Common\ClassLoader('Jazzee', $src . '/src');
 $classLoader->register();
 
@@ -55,11 +55,11 @@ if($jazzeeConfig->getLocalBootstrap()) require_once $jazzeeConfig->getLocalBoots
 \Foundation\VC\Config::setDefaultControllerName('apply_welcome');
 \Foundation\VC\Config::setDefaultControllerActionName('index');
 
-/*
+
 //add the builtin admin controller directories
-AdminController::addControllerPath(APP_ROOT . '/controllers/manage');
-AdminController::addControllerPath(APP_ROOT . '/controllers/setup');
-AdminController::addControllerPath(APP_ROOT . '/controllers/applicants');
-AdminController::addControllerPath(APP_ROOT . '/controllers/admin');
-*/
+\Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/manage');
+\Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/setup');
+\Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/applicants');
+\Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/admin');
+
 ?>

@@ -6,7 +6,7 @@
  * @package jazzee
  * @subpackage admin
  */
-class AdminWelcomeController extends AdminController {
+class AdminWelcomeController extends \Jazzee\AdminController {
   const TITLE = 'Home';
   const PATH = 'admin/welcome';
   
@@ -14,15 +14,11 @@ class AdminWelcomeController extends AdminController {
    * Display index
    */
   public function actionIndex(){
-    $this->setVar('firstName', $this->user->firstName);
-    $this->setVar('lastName', $this->user->lastName);
-    $this->setVar('failedLoginAttempts', $this->session->failedLoginAttempts);
-    $this->setVar('lastFailedLogin_ip', $this->session->lastFailedLogin_ip);
-    $this->setVar('lastLogin', $this->session->lastLogin);
-    $this->setVar('lastLogin_ip', $this->session->lastLogin_ip);
+    $this->setVar('firstName', $this->_user->getFirstName());
+    $this->setVar('lastName', $this->_user->getLastName());
   }
   
-  public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
     //Check to be sure a valid user object has been set
     //Any user is allowed access
     if($user){

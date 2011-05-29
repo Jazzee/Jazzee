@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage applicants
  */
-class ApplicantsSingleController extends ApplicantsController {
+class ApplicantsSingleController extends \Jazzee\AdminController {
   const TITLE = 'Single Applicant';
   const PATH = 'applicants/single';
   

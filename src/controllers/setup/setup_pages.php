@@ -6,7 +6,7 @@
  * @subpackage admin
  * @subpackage setup
  */
-class SetupPagesController extends SetupController implements PagesInterface {
+class SetupPagesController extends \Jazzee\AdminController {
   const MENU = 'Setup';
   const TITLE = 'Pages';
   const PATH = 'setup/pages';
@@ -377,10 +377,9 @@ class SetupPagesController extends SetupController implements PagesInterface {
     $this->loadView($this->controllerName . '/result');
   }
   
-  public static function isAllowed($controller, $action, $user, $programID, $cycleID, $actionParams){
-    $action = 'index'; //all action authorizations are controlled by the index action
-    if($programID AND $cycleID AND $user)  return $user->isAllowed($controller, $action, $programID);
-    return false;
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
+    //all action authorizations are controlled by the index action
+    return parent::isAllowed($controller, 'index', $user, $program);
   }
   
   public static function getControllerAuth(){
