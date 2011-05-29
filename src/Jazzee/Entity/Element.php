@@ -319,9 +319,9 @@ class Element{
    */
   public function getJazzeeElement(){
     if(is_null($this->jazzeeElement)){
-      $class = $this->type->getClass();
-      if(!class_exists($class)) $class = 'Jazzee\Element\TextInput';
-      $this->jazzeeElement = new $class($this);
+      $className = $this->type->getClass();
+      $this->jazzeeElement = new $className($this);
+      if(!($this->jazzeeElement instanceof \Jazzee\Element)) throw new \Jazzee\Exception($this->type>getName() . ' has class ' . $className . ' that does not implement \Jazzee\Element interface');
     }
     return $this->jazzeeElement;
   }

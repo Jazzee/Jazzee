@@ -1,7 +1,7 @@
 <?php
 namespace Jazzee\Entity\Element;
 /**
- * Radio List Element
+ * Checkbox List Element
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee

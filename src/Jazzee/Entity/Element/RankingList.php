@@ -1,67 +1,62 @@
 <?php
+namespace Jazzee\Entity\Element;
 /**
  * Ranking List Element
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class RankingListElement{
- /**
-  * RankingLists take multiple inputs as an array
-  * @param array $value
-  */
-  protected $value = array();
+class RankingList extends AbstractElement {
   
-  public function addToField(Form_Field $field){
-    $element = $field->newElement('RankingList', 'el' . $this->element->id);
-    $element->label = $this->element->title;
-    $element->instructions = $this->element->instructions;
-    $element->format = $this->element->format;
-    $element->rankItems = $this->element->max;
-    $element->minimumItems = $this->element->min;
-    foreach($this->element->ListItems as $item){
-      $element->addItem($item->id, $item->value);
+  public function addToField(\Foundation\Form\Field $field){
+    $element = $field->newElement('RankingList', 'el' . $this->_element->getId());
+    $element->setLabel($this->_element->getTitle());
+    $element->setInstructions($this->_element->getInstructions());
+    $element->setFormat($this->_element->getFormat());
+    $element->setDefaultValue($this->_element->getDefaultValue());
+    
+    $element->setRequiredItems($this->_element->getMin());
+    $element->setTotalItems($this->_element->getMax());
+    if($this->_element->isRequired()){
+      $validator = new \Foundation\Form\Validator\NotEmpty($element);
+      $element->addValidator($validator);
+    }
+    foreach($this->_element->getListItems() as $item){
+      if($item->isActive()) $element->newItem($item->getId(), $item->getValue());
     }
     return $element;
   }
   
-  public function setValueFromInput($input){
-    if(!is_null($input))
-      $this->value = $input;
-  }
-  
-  public function setValueFromAnswer($answers){
-    $this->value = array();
-    foreach($answers as $answerElement)
-      $this->value[$answerElement->position] = $answerElement->eInteger;
-  }
-  
-  public function getAnswers(){
-    $return = array();
-    foreach($this->value as $position => $value){
-      if($value){
-        $elementAnswer = new Entity\ElementAnswer;
-        $elementAnswer->setElement($this->element);
+  public function getElementAnswers($input){
+    $elementAnswers = array();
+    foreach($input as $position => $value){
+      if(!empty($value)){
+        $elementAnswer = new \Jazzee\Entity\ElementAnswer;
+        $elementAnswer->setElement($this->_element);
         $elementAnswer->setPosition($position);
-        $elementAnswer->setEInteger($this->value);
-        $return[] = $elementAnswer;
+        $elementAnswer->setEInteger($value);
+        $elementAnswers[] = $elementAnswer;
       }
     }
-    return $return;
+    return $elementAnswers;
   }
   
-  public function displayValue(){
-    $keys = $this->element->ListItems->getPrimaryKeys();
+  public function displayValue(\Jazzee\Entity\Answer $answer){
     $arr = array();
-    foreach($this->value as $rank => $value){
-      if(($key = array_search($value, $keys)) !== false)
-        $arr[] = ordinalValue($rank+1) . ' choice: ' . (string)$this->element->ListItems->get($key)->value;
+    $elementAnswers = $answer->getElementAnswersForElement($this->_element);
+    foreach($elementAnswers as $position => $elementAnswer){
+      $arr[] = ordinalValue($position+1) . ' ' . $this->_element->getItemById($elementAnswer->getEInteger())->getValue();
     }
-    return implode('<br />', $arr);
+    return empty($arr)?null:implode(', ', $arr);
   }
   
-  public function formValue(){
-    return $this->value;
+  public function formValue(\Jazzee\Entity\Answer $answer){
+    $arr = array();
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    foreach($elementsAnswers as $elementsAnswer){
+      $arr[] = $this->_element->getItemById($elementsAnswer->getEInteger())->getId();
+    }
+    return $arr;
   }
 }
 ?>

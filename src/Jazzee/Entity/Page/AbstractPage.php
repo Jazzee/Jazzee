@@ -75,7 +75,7 @@ abstract class AbstractPage implements \Jazzee\Page {
     if($input = $this->getForm()->processInput($arr)){
       return $input;
     }
-    $this->_controller->addMessage('error', ApplyPageController::ERROR_MESSAGE);
+    $this->_controller->addMessage('error', \ApplyPageController::ERROR_MESSAGE);
     return false;
   }
   

@@ -113,7 +113,7 @@ div.form label{
 	padding-right: 16px;
 }
 
-div.form div.required div.label{
+div.form div.required div.label, div.form div.label.required{
   background-image: url(./index.php?url=resource/foundation/media/icons/asterisk_yellow.png);
   background-repeat: no-repeat;
   background-position:top right;

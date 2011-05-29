@@ -154,10 +154,14 @@ div.form div.label{
   text-align: right;
 }
 
-div.form div.control *{
+div.form div.control div, div.form div.control ol{
   float: left;
   margin: 0;
   padding: 0;
+}
+
+div.form div.control label{
+	clear: left;
 }
 
 div.form div.control ol li{
