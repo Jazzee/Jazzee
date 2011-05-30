@@ -9,10 +9,10 @@
 if($elementTypes): ?>
   <h5>Current Element Types:</h5>
   <ul>
-  <?php foreach($elementTypes as $arr): ?>
-  <li><?php print $arr['name'] ?>
+  <?php foreach($elementTypes as $type): ?>
+  <li><?php print $type->getName() ?>
   <?php if($this->controller->checkIsAllowed('manage_elementtypes', 'edit')): ?>
-    (<a href='<?php print $this->path('manage/elementtypes/edit/') . $arr['id']?>'>Edit</a>)
+    (<a href='<?php print $this->path('manage/elementtypes/edit/') . $type->getId()?>'>Edit</a>)
   <?php endif;?>
     
   </li>
