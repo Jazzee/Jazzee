@@ -157,7 +157,7 @@ class Role{
    */
   public function isAllowed($controllerName, $actionName){
     foreach($this->actions as $action){
-      if($action->getController() == $controllerName and $action->getAction() == $actionName) return true;
+      if($action->getController() == $controllerName and $action->getAction() == strtolower($actionName)) return true;
     }
     return false;
   }

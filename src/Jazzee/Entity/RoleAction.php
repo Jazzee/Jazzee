@@ -62,7 +62,7 @@ class RoleAction{
    * @param string $action
    */
   public function setAction($action){
-    $this->action = $action;
+    $this->action = strtolower($action);
   }
 
   /**
