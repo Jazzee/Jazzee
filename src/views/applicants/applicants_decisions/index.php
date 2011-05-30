@@ -19,9 +19,9 @@
 		<tbody>
 		<?php foreach($list['noDecision'] as $applicant):?>
 		<tr>
-		  <td><?php print "{$applicant->lastName}, {$applicant->firstName} {$applicant->middleName}"?></td>
-		  <td><input type='checkbox' name='admit[]' value='<?php print $applicant->id ?>' class='preliminaryAdmit' /></td>
-		  <td><input type='checkbox' name='deny[]' value='<?php print $applicant->id ?>' class='preliminaryDeny' /></td>
+		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
+		  <td><input type='checkbox' name='admit[]' value='<?php print $applicant->getId() ?>' class='preliminaryAdmit' /></td>
+		  <td><input type='checkbox' name='deny[]' value='<?php print $applicant->getId() ?>' class='preliminaryDeny' /></td>
 		<?php endforeach;?>
 		</tbody>
 	</table>
@@ -42,9 +42,9 @@
 		<tbody>
 		<?php foreach($list['nominateDeny'] as $applicant):?>
 		<tr>
-		  <td><?php print "{$applicant->lastName}, {$applicant->firstName} {$applicant->middleName}"?></td>
-		  <td><input type='checkbox' name='undo[]' value='<?php print $applicant->id ?>' class='undoPreliminaryDeny' /></td>
-		  <td><input type='checkbox' name='deny[]' value='<?php print $applicant->id ?>' class='finalDeny' /></td>
+		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
+		  <td><input type='checkbox' name='undo[]' value='<?php print $applicant->getId() ?>' class='undoPreliminaryDeny' /></td>
+		  <td><input type='checkbox' name='deny[]' value='<?php print $applicant->getId() ?>' class='finalDeny' /></td>
 		  </tr>
 		<?php endforeach;?>
 		</tbody>
@@ -66,9 +66,9 @@
 		<tbody>
 		<?php foreach($list['nominateAdmit'] as $applicant):?>
 		<tr>
-		  <td><?php print "{$applicant->lastName}, {$applicant->firstName} {$applicant->middleName}"?></td>
-		  <td><input type='checkbox' name='undo[]' value='<?php print $applicant->id ?>' class='undoPreliminaryAdmit' /></td>
-		  <td><input type='checkbox' name='admit[]' value='<?php print $applicant->id ?>' class='finalAdmit' /></td>
+		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
+		  <td><input type='checkbox' name='undo[]' value='<?php print $applicant->getId() ?>' class='undoPreliminaryAdmit' /></td>
+		  <td><input type='checkbox' name='admit[]' value='<?php print $applicant->getId() ?>' class='finalAdmit' /></td>
 		</tr>
 		<?php endforeach;?>
 		</tbody>
@@ -91,21 +91,21 @@
 		<tbody>
 		<?php foreach($list['finalAdmit'] as $applicant):?>
 		<tr>
-		  <td><?php print "{$applicant->lastName}, {$applicant->firstName} {$applicant->middleName}"; ?></td>
-		  <td><?php $this->renderElement('long_date', array('date' =>$applicant->Decision->offerResponseDeadline)) ?></td>
+		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
+		  <td><?php $applicant->getDecision()->getOfferResponseDeadline()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT) ?></td>
 		  <td>
-		  <?php if($applicant->Decision->decisionLetterViewed){
-		    print 'Viewed: '; $this->renderElement('long_date', array('date' =>$applicant->Decision->decisionLetterViewed));
-		  } else if($applicant->Decision->decisionLetterSent){
-		    print 'Sent: '; $this->renderElement('long_date', array('date' =>$applicant->Decision->decisionLetterSent));
+		  <?php if($applicant->getDecision()->getDecisionLetterViewed()){
+		    print 'Viewed: '; $applicant->getDecision()->getDecisionLetterViewed()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
+		  } else if($applicant->getDecision()->getDecisionLetterSent()){
+		    print 'Sent: '; $applicant->getDecision()->getDecisionLetterSent()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
 		  }
 		  ?>
 		  </td>
 		  <td>
-		  <?php if($applicant->Decision->acceptOffer){
-		    print 'Accepted Offer  '; $this->renderElement('long_date', array('date' =>$applicant->Decision->acceptOffer));
-		  } else if($applicant->Decision->declineOffer){
-		    print 'Declined Offer '; $this->renderElement('long_date', array('date' =>$applicant->Decision->declineOffer));
+		  <?php if($applicant->getDecision()->getAcceptOffer()){
+		    print 'Accepted Offer  '; $applicant->getDecision()->getAcceptOffer()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
+		  } else if($applicant->getDecision()->getDeclineOffer()){
+		    print 'Declined Offer '; $applicant->getDecision()->getDeclineOffer()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
 		  } else {
 		    print "No Decision";
 		  } 
@@ -123,7 +123,7 @@
 <h4>Denied Applicants</h4>
   <ul>
   	<?php foreach($list['finalDeny'] as $applicant):?>
-  	<li><?php print "{$applicant->lastName}, {$applicant->firstName} {$applicant->middleName}"; ?></li>
+  	<li><?php print print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName(); ?></li>
 		<?php endforeach;?>
 	</ul>
 </div>

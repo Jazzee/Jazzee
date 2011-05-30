@@ -10,22 +10,28 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
   const TITLE = 'Decisions';
   const PATH = 'applicants/decisions';
   
-  protected $layout = 'json';
+  const ACTION_INDEX = 'List applicant admission status';
   
-    
+  /**
+   * @const string format for dates in display
+   */
+  const LONG_DATE_FORMAT = 'm/d/Y';
+  
   /**
    * Add the required JS
    */
   protected function setUp(){
     parent::setUp();
-    $this->addScript('common/scripts/status.js');
-    $this->addScript('common/scripts/decisions.js');
+    $this->layout = 'json';
+    $this->addScript($this->path('resource/scripts/status.js'));
+    $this->addScript($this->path('resource/scripts/decisions.js'));
   }
   
   /**
    * Build the blank page
    */
   public function actionIndex(){
+    
     $list = array(
       'noDecision' => array(),
       'finalDeny' => array(),
@@ -33,18 +39,19 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
       'nominateDeny' => array(),
       'nominateAdmit' => array()
     );
-    
-    foreach($this->application->findLockedApplicants() AS $applicant){
-      if($applicant->Decision->finalDeny){
-        $list['finalDeny'][] = $applicant;
-      } else if($applicant->Decision->finalAdmit){
-        $list['finalAdmit'][] = $applicant;
-      } else if($applicant->Decision->nominateDeny){
-        $list['nominateDeny'][] = $applicant;
-      } else if($applicant->Decision->nominateAdmit){
-        $list['nominateAdmit'][] = $applicant;
-      } else {
-        $list['noDecision'][] = $applicant;
+    foreach($this->_application->getApplicants() AS $applicant){
+      if($applicant->isLocked()){
+        if($applicant->getDecision()->getFinalDeny()){
+          $list['finalDeny'][] = $applicant;
+        } else if($applicant->getDecision()->getFinalAdmit()){
+          $list['finalAdmit'][] = $applicant;
+        } else if($applicant->getDecision()->getNominateDeny()){
+          $list['nominateDeny'][] = $applicant;
+        } else if($applicant->getDecision()->geNominateAdmit()){
+          $list['nominateAdmit'][] = $applicant;
+        } else {
+          $list['noDecision'][] = $applicant;
+        }
       }
     }
     $this->setVar('list', $list);
@@ -71,7 +78,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     $message = '';
     if($count['admit']) $message .= "{$count['admit']} applicant(s) nominated for admit.  ";
     if($count['deny']) $message .= "{$count['deny']} applicant(s) nominated for deny.";
-    if($message)  $this->messages->write('success', $message);
+    if($message)  $this->addMessage('success', $message);
     $this->redirect($this->path('applicants/decisions'));
     exit();
   }
@@ -97,7 +104,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     $message = '';
     if($count['undo']) $message .= "{$count['undo']} applicant(s) changed to no decision.  ";
     if($count['deny']) $message .= "{$count['deny']} applicant(s) denied.";
-    if($message)  $this->messages->write('success', $message);
+    if($message)  $this->addMessage('success', $message);
     $this->redirect($this->path('applicants/decisions'));
     exit();
   }
@@ -116,12 +123,12 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     }
     if(!empty($this->post['admit'])){
       if(!isset($this->post['sirdeadline']) OR empty($this->post['sirdeadline'])){
-        $this->messages->write('error', 'You must specify a SIR deadline if you are admiting applicants.');
+        $this->addMessage('error', 'You must specify a SIR deadline if you are admiting applicants.');
         $this->redirect($this->path('applicants/decisions'));
         exit();
       }
       if(!$timestamp = strtotime($this->post['sirdeadline']) OR $timestamp <= time()){
-        $this->messages->write('error', 'You must specify a valid future date for the SIR deadline if you are admiting applicants.');
+        $this->addMessage('error', 'You must specify a valid future date for the SIR deadline if you are admiting applicants.');
         $this->redirect($this->path('applicants/decisions'));
         exit();
       }
@@ -139,7 +146,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     $message = '';
     if($count['undo']) $message .= "{$count['undo']} applicant(s) changed to no decision.  ";
     if($count['admit']) $message .= "{$count['admit']} applicant(s) admitted.";
-    if($message)  $this->messages->write('success', $message);
+    if($message)  $this->addMessage('success', $message);
     $this->redirect($this->path('applicants/decisions'));
     exit();
   }

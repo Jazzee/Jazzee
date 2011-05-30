@@ -203,4 +203,77 @@ class Decision{
   public function decisionLetterViewed($dateString = null){
     $this->decisionLetterViewed = $this->decisionStamp($dateString);
   }
+   
+  /**
+   * get finalDeny
+   *
+   * @return \DateTime
+   */
+  public function getFinalDeny(){
+    return $this->finalDeny;
+  }
+   
+  /**
+   * get finalAdmit
+   *
+   * @return \DateTime
+   */
+  public function getFinalAdmit(){
+    return $this->finalAdmit;
+  }
+   
+  /**
+   * get nominateDeny
+   *
+   * @return \DateTime
+   */
+  public function getNominateDeny(){
+    return $this->nominateDeny;
+  }
+   
+  /**
+   * get nominateAdmit
+   *
+   * @return \DateTime
+   */
+  public function getNominateAdmit(){
+    return $this->nominateAdmit;
+  }
+   
+  /**
+   * get acceptOffer
+   *
+   * @return \DateTime
+   */
+  public function getAcceptOffer(){
+    return $this->acceptOffer;
+  }
+   
+  /**
+   * get decline offer
+   *
+   * @return \DateTime
+   */
+  public function getDeclineOffer(){
+    return $this->declineOffer;
+  }
+   
+  /**
+   * get decisionLetterSent
+   *
+   * @return \DateTime
+   */
+  public function getDecisionLetterSent(){
+    return $this->decisionLetterSent;
+  }
+   
+  /**
+   * get decisionLetterViewed
+   *
+   * @return \DateTime
+   */
+  public function getDecisionLetterViewed(){
+    return $this->decisionLetterViewed;
+  }
+   
 }
