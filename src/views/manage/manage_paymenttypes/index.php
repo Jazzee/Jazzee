@@ -8,10 +8,10 @@
 if($paymentTypes): ?>
   <h5>Current Payment Types:</h5>
   <ul>
-  <?php foreach($paymentTypes as $arr): ?>
-  <li><?php print $arr['name'] ?>
+  <?php foreach($paymentTypes as $type): ?>
+  <li><?php print $type->getName() ?>
     <?php if($this->controller->checkIsAllowed('manage_paymenttypes', 'edit')): ?>
-      (<a href='<?php print $this->path('manage/paymenttypes/edit/') . $arr['id']?>'>Edit</a>)
+      (<a href='<?php print $this->path('manage/paymenttypes/edit/') . $type->getId()?>'>Edit</a>)
     <?php endif;?>
     
   </li>
