@@ -340,6 +340,13 @@ class Page{
     foreach($this->variables as $variable)
       if($variable->getName() == $name)return $variable->getValue();
   }
+  /**
+   * get page variables
+   * @return array \Jazzee\Entity\PageVariable
+   */
+  public function getVariables(){
+    return $this->variables;
+  }
 
   /**
    * Get elements

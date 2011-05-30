@@ -29,7 +29,7 @@ $(document).ready(function(){
   $('#save-pages').bind('click', function(){
     pageStore.save();
   });
-  $.get(baseUrl + 'listPageTypes',function(json){  
+  $.get(baseUrl + '/listPageTypes',function(json){  
     var ol = $('<ol>').addClass('add-list');
     $(json.data.result).each(function(i){
       var pageType = this;

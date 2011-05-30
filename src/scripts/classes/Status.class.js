@@ -1,7 +1,7 @@
 function Status(canvas){
   this.counter = 0;
   this.canvas = canvas;
-  $(canvas).append($('<div>').attr('id', 'status-bar').append($('<img src="resource/common/media/ajax-bar.gif">').hide()));
+  $(canvas).append($('<div>').attr('id', 'status-bar').append($('<img src="./index.php?url=resource/foundation/media/ajax-bar.gif">').hide()));
   $(canvas).append($('<div>').attr('id', 'status-message'));
 }
 

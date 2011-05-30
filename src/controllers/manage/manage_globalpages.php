@@ -10,37 +10,39 @@ class ManageGlobalpagesController extends \Jazzee\AdminController {
   const TITLE = 'Global Pages';
   const PATH = 'manage/globalpages';
   
-  /**
-   * Set the default layout to json
-   * @var string
-   */
-  protected $layout = 'json';
+  const ACTION_INDEX = 'Edit Global Pages';
   
   /**
    * Add the required JS
    */
   public function setUp(){
-    parent::setUp();
-    $this->addScript('foundation/scripts/form.js');
-    $this->addScript('common/scripts/classes/Status.class.js');
-    $this->addScript('common/scripts/classes/AuthenticationTimeout.class.js');
+    $this->layout = 'json';
+    $this->addScript($this->path('resource/foundation/scripts/form.js'));
+    $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/AuthenticationTimeout.class.js'));
+    $this->addScript($this->path('resource/scripts/page_types/ApplyPage.class.js'));
     
-    $this->addScript('common/scripts/page_types/ApplyPage.class.js');
-    $types = Doctrine::getTable('PageType')->findAll(Doctrine::HYDRATE_ARRAY);
+    $types = $this->_em->getRepository('\Jazzee\Entity\PageType')->findAll();
     foreach($types as $type){
-      $this->addScript("common/scripts/page_types/{$type['class']}.class.js");
+      $class = \explode('\\', $type->getClass());
+      $class = $class[count($class) - 1];
+      $this->addScript($this->path('resource/scripts/page_types/' . $class . 'Page.class.js'));
     }
-    $this->addScript('common/scripts/element_types/ApplyElement.class.js');
-    $this->addScript('common/scripts/element_types/ListElement.class.js');
-    $this->addScript('common/scripts/element_types/FileInputElement.class.js');
-    $types = Doctrine::getTable('ElementType')->findAll(Doctrine::HYDRATE_ARRAY);
+    $this->addScript($this->path('resource/scripts/element_types/ApplyElement.class.js'));
+    $this->addScript($this->path('resource/scripts/element_types/ListElement.class.js'));
+    $this->addScript($this->path('resource/scripts/element_types/FileInputElement.class.js'));
+    
+    $types = $this->_em->getRepository('\Jazzee\Entity\ElementType')->findAll();
     foreach($types as $type){
-      $this->addScript("common/scripts/element_types/{$type['class']}.class.js");
+      $class = \explode('\\', $type->getClass());
+      $class = $class[count($class) - 1];
+      $this->addScript($this->path('resource/scripts/element_types/' . $class . 'Element.class.js'));
     }
-    $this->addScript('common/scripts/classes/PageStore.class.js');
-    $this->addScript('common/scripts/controllers/manage_globalpages.controller.js');
-   
-    $this->addCss('common/styles/pages.css');
+    $this->addScript($this->path('resource/scripts/classes/PageStore.class.js'));
+    $this->addScript($this->path('resource/scripts/controllers/manage_globalpages.controller.js'));
+    
+    
+    $this->addCss($this->path('resource/styles/pages.css'));
     
   }
   
@@ -56,7 +58,7 @@ class ManageGlobalpagesController extends \Jazzee\AdminController {
    */
   public function actionListPages(){
     $pages = array();
-    foreach(Doctrine::getTable('Page')->findByIsGlobal(true) AS $page){
+    foreach($this->_em->getRepository('\Jazzee\Entity\Page')->findByIsGlobal(true) AS $page){
       $pages[] = $this->pageArray($page);
     }
     $this->setVar('result', $pages);
@@ -65,33 +67,60 @@ class ManageGlobalpagesController extends \Jazzee\AdminController {
   
   /**
    * Create an array from a page suitable for json_encoding
-   * @param Page $page
+   * @param \Jazzee\Entity\Page $page
    * @return array
    */
-  protected function pageArray(Page $page){
-    $arr = $page->toArray(false);
-    $arr['pageId'] = $arr['id'];
-    $arr['className'] = $page->PageType->class;
+  protected function pageArray(\Jazzee\Entity\Page $page){
+    $arr = array(
+      'pageId' => $page->getId(),
+      'title' => $page->getTitle(),
+      'min' => $page->getMin(),
+      'max' => $page->getMax(),
+      'isRequired' => $page->isRequired(),
+      'answerStatusDisplay' => $page->answerStatusDisplay(),
+      'instructions' => $page->getInstructions(),
+      'leadingText' => $page->getLeadingText(),
+      'trailingText' => $page->getTrailingText(),
+    );
+    $class = \explode('\\', $page->getType()->getClass());
+    $class = $class[count($class) - 1];
+    $arr['className'] = $class . 'Page';
     $arr['elements'] = array();
-    foreach($page->Elements as $element){
-      $e = $element->toArray();
-      $e['className'] = $element->ElementType->class;
+    foreach($page->getElements() as $element){
+      $e = array(
+        'id' => $element->getId(),
+        'weight' => $element->getWeight(),
+        'title' => $element->getTitle(),
+        'format' => $element->getFormat(),
+        'min' => $element->getMin(),
+        'max' => $element->getMax(),
+        'isRequired' => $element->isRequired(),
+        'instructions' => $element->getInstructions(),
+        'defaultValue' => $element->getDefaultValue()
+      );
+      
+      $class = \explode('\\', $element->getType()->getClass());
+      $class = $class[count($class) - 1];
+      $e['className'] = $class . 'Element';
       $e['list'] = array();
-      foreach($element->ListItems as $item){
+      foreach($element->getListItems() as $item){
         $e['list'][] = array(
-          'id' => $item->id,
-          'value' => $item->value,
-          'active' => (int)$item->active
+          'id' => $item->getId(),
+          'value' => $item->getValue(),
+          'active' => (int)$item->isActive()
         );
       }
       $arr['elements'][] = $e;
     }
     $arr['variables'] = array();
-    foreach($page->Variables as $variable){
-      $arr['variables'][] = $variable->toArray();
+    foreach($page->getVariables() as $variable){
+      $arr['variables'][] = array(
+        'name' => $variable->getName(),
+        'value' => $variable->getValue()
+      );
     }
     $arr['children'] = array();
-    foreach($page->Children as $child){
+    foreach($page->getChildren() as $child){
       $arr['children'][] = $this->pageArray($child);
     }
     return $arr;
@@ -101,11 +130,11 @@ class ManageGlobalpagesController extends \Jazzee\AdminController {
    * List the available page types
    */
   public function actionListPageTypes(){
-    $pageTypes = Doctrine::getTable('PageType')->findAll(Doctrine::HYDRATE_ARRAY);
+    $pageTypes = $this->_em->getRepository('\Jazzee\Entity\PageType')->findAll();
     $pages = array();
     foreach($pageTypes as $type){
-      $pages[$type['name']] = $type['id'];
-      $pageTypes[$type['id']] = $type;
+      $pages[$type->getName()] = $type->getId();
+      $pageTypes[$type->getId()] = $type;
     }
     //alphabetize the page types
     ksort($pages);
@@ -113,8 +142,8 @@ class ManageGlobalpagesController extends \Jazzee\AdminController {
     foreach($pages as $id){
       $arr[] = array(
         'id' => $id,
-        'name' => $pageTypes[$id]['name'],
-        'class' => $pageTypes[$id]['class'],
+        'name' => $pageTypes[$id]->getName(),
+        'class' => $pageTypes[$id]->getClass(),
       );
     }
     $this->setVar('result', $arr);
@@ -133,7 +162,7 @@ class ManageGlobalpagesController extends \Jazzee\AdminController {
         if($page = Doctrine::getTable('Page')->findOneByIdAndIsGlobal($pageId,true)){
           if(Doctrine::getTable('ApplicationPage')->findByPageId($page->id)->count()){
             $this->setLayoutVar('status', 'error');
-            $this->messages->write('error',"{$page->title} could not be deleted becuase it is part of at least on application");
+            $this->addMessage('error',"{$page->title} could not be deleted becuase it is part of at least on application");
           } else {
             $page->delete();
             return true;
@@ -328,15 +357,8 @@ class ManageGlobalpagesController extends \Jazzee\AdminController {
     $this->loadView($this->controllerName . '/result');
   }
   
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Manage Global Pages';
-    $auth->addAction('index', new ActionAuth('View the Page'));
-    $auth->addAction('listPages', new ActionAuth('List Global Pages'));
-    $auth->addAction('listPageTypes', new ActionAuth('List the Page Types'));
-    $auth->addAction('savePage', new ActionAuth('Edit a Page'));
-    $auth->addAction('previewPage', new ActionAuth('Preview a Page'));
-    $auth->addAction('listElementTypes', new ActionAuth('List the Element Types'));
-    return $auth;
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
+    //all action authorizations are controlled by the index action
+    return parent::isAllowed($controller, 'index', $user, $program);
   }
 }

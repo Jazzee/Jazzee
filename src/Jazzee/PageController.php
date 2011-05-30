@@ -80,6 +80,7 @@ class PageController extends \Foundation\VC\Controller
     $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', __DIR__ . '/../../lib/foundation/src/lib/jquery/plugins/jquery.json-2.2.min.js'));
     $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', __DIR__ . '/../../lib/foundation/src/lib/jquery/plugins/jquery.cookie-1.min.js'));
     $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', __DIR__ . '/../../lib/foundation/src/lib/jquery/jquery-ui-1.8.11.min.js'));
+    $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', __DIR__ . '/../../lib/foundation/src/javascript/form.js'));
     
     $styles = new \Foundation\Virtual\VirtualDirectory();
     $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/src/lib/jquery/themes'));

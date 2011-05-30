@@ -23,7 +23,7 @@ function PageStore(baseUrl,index, workspace){
  */
 PageStore.prototype.refreshPageList = function(){
   var pageStore = this;
-  $.get(this.baseUrl + 'listPages',function(json){  
+  $.get(this.baseUrl + '/listPages',function(json){  
     $('#workspace').hide();
     $('li',$(pageStore.workspace)).remove();
     pageStore.pages = {};
