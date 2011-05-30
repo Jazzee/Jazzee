@@ -17,25 +17,25 @@ abstract class AdminController extends Controller{
   
   /**
    * The user
-   * @var User
+   * @var \Jazzee\Entity\User
    */
   protected $_user;
   
   /**
    * The current program
-   * @var Program
+   * @var \Jazzee\Entity\Program
    */
   protected $_program;
   
   /**
    * The current Cycle
-   * @var Cycle
+   * @var \Jazzee\Entity\Cycle
    */
   protected $_cycle;
   
   /**
    * The current application
-   * @var Application
+   * @var \Jazzee\Entity\Application
    */
   protected $_application;
   
@@ -56,7 +56,10 @@ abstract class AdminController extends Controller{
     $attrs = $as->getAttributes();
     if (!isset($attrs['eduPersonPrincipalName'][0])) throw new Exception('eduPersonPrincipalName attribute is missing from authentication source.');
     $this->_user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('eduPersonPrincipalName'=>$attrs['eduPersonPrincipalName'][0]));
-
+    $this->_user->setFirstName($attrs['givenName'][0]);
+    $this->_user->setLastName($attrs['sn'][0]);
+    $this->_user->setEmail($attrs['mail'][0]);
+    $this->_em->persist($this->_user);
     $store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime());
     
