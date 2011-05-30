@@ -10,13 +10,10 @@ $this->renderElement('form', array('form'=>$form));?>
 <?php if($results): ?>
   <h5>Results</h5>
   <ul>
-  <?php foreach($results as $arr): ?>
-  <li><?php print $arr['lastName'] . ', ' . $arr['firstName'] ?> 
+  <?php foreach($results as $user): ?>
+  <li><?php print $user->getLastName() . ', ' . $user->getFirstName() . ' (' . $user->geteduPersonPrincipalName() . ')' ?> 
     <?php if($this->controller->checkIsAllowed('manage_users', 'edit')): ?>
-    (<a href='<?php print $this->path('manage/users/edit/') . $arr['id']?>'>Edit</a>)
-    <?php endif;?>
-    <?php if($this->controller->checkIsAllowed('manage_users', 'reset')): ?>
-    (<a href='<?php print $this->path('manage/users/reset/') . $arr['id']?>'>Reset Password</a>)
+    (<a href='<?php print $this->path('manage/users/edit/') . $user->getId()?>'>Edit</a>)
     <?php endif;?>
   </li>
   <?php endforeach;?>

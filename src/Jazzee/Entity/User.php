@@ -4,7 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * User
  * Admin users details
- * @Entity @Table(name="users") 
+ * @Entity(repositoryClass="\Jazzee\Entity\UserRepository")
+ * @Table(name="users") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -203,5 +204,27 @@ class User{
       }
     }
     return false;
+  }
+}
+
+/**
+ * UserRepository
+ * Special Repository methods for User to make searchign for special conditions easier
+ */
+class UserRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * find all by name
+   * 
+   * @param string $firstName
+   * @param string $lastName
+   * 
+   * @return Doctrine\Common\Collections\Collection \Jazzee\Entity\User
+   */
+  public function findByName($firstName, $lastName){
+    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u WHERE (u.firstName IS NULL OR u.firstName LIKE :firstName) AND (u.lastName IS NULL OR u.lastName LIKE :lastName)');
+    $query->setParameter('firstName', $firstName);
+    $query->setParameter('lastName', $lastName);
+    return $query->getResult();
   }
 }
