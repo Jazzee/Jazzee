@@ -10,11 +10,15 @@ class ManageRolesController extends \Jazzee\AdminController {
   const TITLE = 'Roles';
   const PATH = 'manage/roles';
   
+  const ACTION_INDEX = 'View Roles';
+  const ACTION_EDIT = 'Edit Role';
+  const ACTION_NEW = 'New Role';
+  
   /**
    * List all the Roles
    */
   public function actionIndex(){
-    $this->setVar('roles', Doctrine::getTable('Role')->findByGlobal(true));
+    $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findByIsGlobal(true));
   }
   
   /**
@@ -22,51 +26,61 @@ class ManageRolesController extends \Jazzee\AdminController {
    * @param integer $roleID
    */
    public function actionEdit($roleID){ 
-    if($role = Doctrine::getTable('Role')->find($roleID)){
-      $form = new Form;
-      $form->action = $this->path("manage/roles/edit/{$role->id}");
-      $field = $form->newField(array('legend'=>"Edit {$role->name} role"));
+    if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->find($roleID)){
+      $form = new \Foundation\Form;
+      $form->setAction($this->path('manage/roles/edit/' . $role->getId()));
+      $field = $form->newField();
+      $field->setLegend('Edit ' . $role->getName() . ' role');
       $element = $field->newElement('TextInput','name');
-      $element->label = 'Role Name';
-      $element->addValidator('NotEmpty');
-      $element->value = $role->name;
-      $auths = $this->getAuths();
-      foreach($auths as $controllerName => $controller){
-        $element = $field->newElement('CheckboxList',$controllerName);
-        $element->label = "{$controller->name} actions";
-        foreach($controller->getActions() as $actionName => $action){
-          $element->addItem($actionName, $action->name);
+      $element->setLabel('Role Name');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->setValue($role->getName());
+      $menus = $this->getControllerActions();
+      ksort($menus);
+      foreach($menus as $menu => $list){
+        foreach($list as $controller){
+          $element = $field->newElement('CheckboxList',$controller['name']);
+          $element->setLabel($menu . ' ' . $controller['title'] . ' actions');
+          foreach($controller['actions'] as $actionName => $actionTitle){
+            $element->newItem($actionName, $actionTitle);
+          }
+          $values = array();
+          foreach($role->getActions() as $action){
+            if($action->getController() == $controller['name'])
+              $values[] = $action->getAction();
+          }
+          $element->setValue($values);
         }
-        $values = array();
-        foreach($role->Actions as $action){
-          if($action->controller == $controllerName)
-            $values[] = $action->action;
-        }
-        $element->value = $values;
       }
       $form->newButton('submit', 'Edit Role');
       $this->setVar('form', $form);
       if($input = $form->processInput($this->post)){
-        $role->name = $input->name;
-        $role->Actions->clear();
-        foreach($auths as $controllerName => $controller){
-          if(!empty($input->$controllerName)){
-            foreach($input->$controllerName as $actionName){
-              $action = new RoleAction;
-              $action->controller = $controllerName;
-              $action->action = $actionName;
-              $role->Actions[] = $action;
+        $role->setName($input->get('name'));
+        foreach($role->getActions() as $action){
+          $this->_em->remove($action);
+          $role->getActions()->removeElement($action);
+        }
+        
+        foreach($menus as $menu => $list){
+          foreach($list as $controller){
+            $actions = $input->get($controller['name']);
+            if(!empty($actions)){
+              foreach($actions as $actionName){
+                $action = new \Jazzee\Entity\RoleAction;
+                $action->setController($controller['name']);
+                $action->setAction($actionName);
+                $action->setRole($role);
+                $this->_em->persist($action);
+              }
             }
           }
         }
-        $role->save();
-        $this->messages->write('success', "Role Saved Successfully");
-        $this->redirect($this->path("manage/roles/"));
-        $this->afterAction();
-        exit(); 
+        $this->_em->persist($role);
+        $this->addMessage('success', "Role Saved Successfully");
+        $this->redirectPath('manage/roles/');
       }
     } else {
-      $this->messages->write('error', "Error: Role #{$roleID} does not exist.");
+      $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
     }
   }
    
@@ -79,7 +93,7 @@ class ManageRolesController extends \Jazzee\AdminController {
     $field = $form->newField(array('legend'=>"New Global Role"));
     $element = $field->newElement('TextInput','name');
     $element->label = 'Role Name';
-    $element->addValidator('NotEmpty');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Add Role');
     $this->setVar('form', $form); 
@@ -99,23 +113,20 @@ class ManageRolesController extends \Jazzee\AdminController {
    * Get All of the possible controllers and actions
    * @return array of ControllerAuths
    */
-  protected function getAuths(){
-    $auths = array();
+  protected function getControllerActions(){
+    $controllers = array();
     foreach($this->listControllers() as $controller){
-      FoundationVC_Config::includeController($controller);
-      $auth = call_user_func(array(Lvc_Config::getControllerClassName($controller), 'getControllerAuth'));
-      if($auth instanceof ControllerAuth) $auths[$controller] = $auth;
+      $class = \Foundation\VC\Config::getControllerClassName($controller);
+      $arr = array('name'=> $controller, 'title' => $class::TITLE, 'actions'=>array());
+      foreach(get_class_methods($class) as $method){
+        if(substr($method, 0, 6) == 'action'){
+          $constant = 'ACTION_' . strtoupper(substr($method, 6));
+          if(defined("{$class}::{$constant}")) $arr['actions'][strtolower(substr($method, 6))] = constant("{$class}::{$constant}");
+        }
+      }
+      if(!empty($arr['actions'])) $controllers[$class::MENU][] = $arr;
     }
-    return $auths;
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Manage Roles';
-    $auth->addAction('index', new ActionAuth('View Roles'));
-    $auth->addAction('edit', new ActionAuth('Edit'));
-    $auth->addAction('new', new ActionAuth('Create New'));
-    return $auth;
+    return $controllers;
   }
 }
 ?>
