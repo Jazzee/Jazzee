@@ -63,9 +63,12 @@ abstract class AdminController extends Controller{
     $store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime());
     
-    if(isset($store->currentProgramId)) $this->_program = $this->_em->getRepository('\Jazzee\Enity\Program')->find($store->currentProgramId);
-    if(isset($store->currentCycleId)) $this->_cycle = $this->_em->getRepository('\Jazzee\Enity\Cycle')->find($store->currentCycleId);
-
+    if($this->_user->getDefaultCycle()) $this->_cycle = $this->_user->getDefaultCycle();
+    if($this->_user->getDefaultProgram()) $this->_program = $this->_user->getDefaultProgram();
+    
+    if(isset($store->currentProgramId)) $this->_program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($store->currentProgramId);
+    if(isset($store->currentCycleId)) $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($store->currentCycleId);
+    
     if($this->_cycle AND $this->_program) $this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->program,$this->cycle);
 
   }
@@ -86,6 +89,19 @@ abstract class AdminController extends Controller{
     }
     $this->setLayoutVar('navigation', $this->getNavigation());
     $this->setup();
+  }
+  
+  /**
+   * After action
+   * 
+   * Save the current cycle,progra, and application
+   */
+  public function afterAction(){
+    $store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
+    if($this->_program) $store->currentProgramId = $this->_program->getId();
+    if($this->_cycle) $store->currentCycleId = $this->_cycle->getId();
+    
+    parent::afterAction();
   }
   
   /**
