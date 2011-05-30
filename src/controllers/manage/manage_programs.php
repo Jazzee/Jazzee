@@ -10,11 +10,15 @@ class ManageProgramsController extends \Jazzee\AdminController {
   const TITLE = 'Programs';
   const PATH = 'manage/programs';
   
+  const ACTION_INDEX = 'View Programs';
+  const ACTION_EDIT = 'Edit Program';
+  const ACTION_NEW = 'New Program';
+  
   /**
    * List programs
    */
   public function actionIndex(){
-    $this->setVar('programs', Doctrine::getTable('Program')->findAll(Doctrine::HYDRATE_ARRAY));
+    $this->setVar('programs', $this->_em->getRepository('\Jazzee\Entity\Program')->findAll());
   }
   
   /**
@@ -22,48 +26,35 @@ class ManageProgramsController extends \Jazzee\AdminController {
    * @param integer $programID
    */
    public function actionEdit($programID){ 
-    if($program = Doctrine::getTable('Program')->find($programID)){
-      $form = new Form;
+    if($program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($programID)){
+      $form = new \Foundation\Form();
       
-      $form->action = $this->path("manage/programs/edit/{$programID}");
-      $field = $form->newField(array('legend'=>"Edit Program {$program->name}"));
+      $form->setAction($this->path("manage/programs/edit/{$programID}"));
+      $field = $form->newField();
+      $field->setLegend('Edit ' . $program->getName() . ' program');
       $element = $field->newElement('TextInput','name');
-      $element->label = 'Program Name';
-      $element->addValidator('NotEmpty');
-      $element->value = $program->name;
+      $element->setLabel('Program Name');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->setValue($program->getName());
       
       $element = $field->newElement('TextInput','shortName');
-      $element->label = 'Short Name';
-      $element->instructions = 'Forms the URL for accessing this program, must be unique';
-      $element->addValidator('NotEmpty');
-      $element->addFilter('UrlSafe');
-      $element->value = $program->shortName;
+      $element->setLabel('Short Name');
+      $element->setInstructions('Forms the URL for accessing this program, must be unique');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
+      $element->setValue($program->getShortName());
   
       $form->newButton('submit', 'Save Changes');
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
-        $program->name = $input->name;
-        $program->shortName = $input->shortName;
-        try {
-          $program->save();
-          $this->messages->write('success', "Changes Saved Successfully");
-          $this->redirect($this->path("manage/programs"));
-          $this->afterAction();
-          exit(); 
-        } catch (Doctrine_Validator_Exception $e){
-          $records = $e->getInvalidRecords();
-          $errors = $records[0]->getErrorStack();
-          if($errors->contains('shortName')){
-            if(in_array('unique', $errors->get('shortName'))){
-              $this->messages->write('error', "Program with short name {$input->shortName} already exists.");
-              return;
-            }
-          }
-          throw new Jazzee_Exception($e->getMessage(),E_USER_ERROR,'There was a problem creating a new program.');
-        }
+        $program->setName($input->get('name'));
+        $program->setShortName($input->get('shortName'));
+        $this->addMessage('success', "Changes Saved");
+        $this->_em->persist($program);
+        $this->redirect('manage/programs');
       }
     } else {
-      $this->messages->write('error', "Error: Program #{$programID} does not exist.");
+      $this->addMessage('error', "Error: Program #{$programID} does not exist.");
     }
   }
    
@@ -71,53 +62,30 @@ class ManageProgramsController extends \Jazzee\AdminController {
    * Create a new program
    */
    public function actionNew(){
-    $form = new Form;
-    $form->action = $this->path("manage/programs/new/");
-    $field = $form->newField(array('legend'=>"New Application Program"));
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("manage/programs/new"));
+    $field = $form->newField();
+    $field->setLegend('New Program');
     $element = $field->newElement('TextInput','name');
-    $element->label = 'Program Name';
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Program Name');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $element = $field->newElement('TextInput','shortName');
-    $element->label = 'Short Name';
-    $element->instructions = 'Forms the URL for accessing this program, must be unique';
-    $element->addValidator('NotEmpty');
-    $element->addFilter('UrlSafe');
+    $element->setLabel('Short Name');
+    $element->setInstructions('Forms the URL for accessing this program, must be unique');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
 
     $form->newButton('submit', 'Save Changes');
     $this->setVar('form', $form); 
     if($input = $form->processInput($this->post)){
-      $program = new Program;
-      $program->name = $input->name;
-      $program->shortName = $input->shortName;
-      try {
-        $program->save();
-        $this->messages->write('success', "Program Created Successfully");
-        $this->redirect($this->path("manage/programs"));
-        $this->afterAction();
-        exit(); 
-      }
-      catch (Doctrine_Validator_Exception $e){
-        $records = $e->getInvalidRecords();
-        $errors = $records[0]->getErrorStack();
-        if($errors->contains('shortName')){
-          if(in_array('unique', $errors->get('shortName'))){
-            $this->messages->write('error', "Program with short name {$input->shortName} already exists.");
-            return;
-          }
-        }
-        throw new Jazzee_Exception($e->getMessage(),E_USER_ERROR,'There was a problem creating a new program.');
-      }
+      $program = new \Jazzee\Entity\Program();
+      $program->setName($input->get('name'));
+      $program->setShortName($input->get('shortName'));
+      $this->addMessage('success', "New Program Saved");
+      $this->_em->persist($program);
+      $this->redirect('manage/programs');
     }
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Manage Programs';
-    $auth->addAction('index', new ActionAuth('List Programs'));
-    $auth->addAction('edit', new ActionAuth('Edit Program'));
-    $auth->addAction('new', new ActionAuth('Create New Program'));
-    return $auth;
   }
 }
 ?>

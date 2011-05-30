@@ -9,10 +9,10 @@
 if($programs): ?>
   <h5>Programs:</h5>
   <ul>
-  <?php foreach($programs as $arr): ?>
-  <li><?php print $arr['name'] ?>
+  <?php foreach($programs as $program): ?>
+  <li><?php print $program->getName() ?>
   <?php if($this->controller->checkIsAllowed('manage_programs', 'edit')): ?>
-    (<a href='<?php print $this->path('manage/programs/edit/') . $arr['id']?>'>Edit</a>)
+    (<a href='<?php print $this->path('manage/programs/edit/') . $program->getId()?>'>Edit</a>)
   <?php endif;?>
     
   </li>
