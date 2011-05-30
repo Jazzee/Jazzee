@@ -9,10 +9,10 @@
 if($cycles): ?>
   <h5>Current Cycles:</h5>
   <ul>
-  <?php foreach($cycles as $arr): ?>
-  <li><?php print $arr['name'] ?>
+  <?php foreach($cycles as $cycle): ?>
+  <li><?php print $cycle->getName() ?>
     <?php if($this->controller->checkIsAllowed('manage_cycles', 'edit')): ?>
-    (<a href='<?php print $this->path('manage/cycles/edit/') . $arr['id']?>'>Edit</a>)
+    (<a href='<?php print $this->path('manage/cycles/edit/') . $cycle->getId()?>'>Edit</a>)
     <?php endif;?>
   </li>
   <?php endforeach;?>

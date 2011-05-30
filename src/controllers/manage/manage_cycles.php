@@ -10,11 +10,15 @@ class ManageCyclesController extends \Jazzee\AdminController {
   const TITLE = 'Cycles';
   const PATH = 'manage/cycles';
   
+  const ACTION_INDEX = 'View Cycles';
+  const ACTION_EDIT = 'New Cycle';
+  const ACTION_NEW = 'Edit Cycle';
+  
   /**
    * List cycles
    */
   public function actionIndex(){
-    $this->setVar('cycles', Doctrine::getTable('Cycle')->findAll(Doctrine::HYDRATE_ARRAY));
+    $this->setVar('cycles', $this->_em->getRepository('\Jazzee\Entity\Cycle')->findAll());
   }
   
   /**
@@ -22,110 +26,78 @@ class ManageCyclesController extends \Jazzee\AdminController {
    * @param integer $cycleID
    */
    public function actionEdit($cycleID){ 
-    if($cycle = Doctrine::getTable('Cycle')->find($cycleID)){
-      $form = new Form;
+    if($cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($cycleID)){
+      $form = new \Foundation\Form;
       
-      $form->action = $this->path("manage/cycles/edit/{$cycleID}");
-      $field = $form->newField(array('legend'=>"Edit Cycle {$cycle->name}"));
+      $form->setAction($this->path("manage/cycles/edit/{$cycleID}"));
+      $field = $form->newField();
+      $field->setLegend('Edit ' . $cycle->getName() . ' cycle');
       $element = $field->newElement('TextInput','name');
-      $element->label = 'Cycle Name';
-      $element->addValidator('NotEmpty');
-      $element->addFilter('UrlSafe');
-      $element->value = $cycle->name;
+      $element->setLabel('Cycle Name');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
+      $element->setValue($cycle->getName());
       
-      $element = $field->newElement('TextInput','start');
-      $element->label = 'Start Date';
-      $element->addValidator('Date');
-      $element->addValidator('DateBeforeElement','end');
-      $element->addValidator('NotEmpty');
-      $element->addFilter('DateFormat','Y-m-d');
-      $element->value = date('m/d/Y',strtotime($cycle->start));
+      $element = $field->newElement('DateInput','start');
+      $element->setLabel('Start Date');
+      $element->addValidator(new \Foundation\Form\Validator\DateBeforeElement($element, 'end'));
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->setValue($cycle->getStart()->format('m/d/Y'));
       
-      $element = $field->newElement('TextInput','end');
-      $element->label = 'End Date';
-      $element->addValidator('Date');
-      $element->addValidator('NotEmpty');
-      $element->addFilter('DateFormat','Y-m-d');
-      $element->value = date('m/d/Y',strtotime($cycle->end));
+      $element = $field->newElement('DateInput','end');
+      $element->setLabel('End Date');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->setValue($cycle->getEnd()->format('m/d/Y'));
   
       $form->newButton('submit', 'Save Changes');
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
-        $cycle->name = $input->name;
-        $cycle->start = $input->start;
-        $cycle->end = $input->end;
-        
-        $cycle->save();
-        $this->messages->write('success', "Changes Saved Successfully");
-        $this->redirect($this->path("manage/cycles"));
-        $this->afterAction();
-        exit(); 
+        $cycle->setName($input->get('name'));
+        $cycle->setStart($input->get('start'));
+        $cycle->setEnd($input->get('end'));
+        $this->_em->persist($cycle);
+        $this->addMessage('success', "Changes Saved Successfully");
+        $this->redirectPath('manage/cycles');
       }
     } else {
-      $this->messages->write('error', "Error: Cycle #{$cycleID} does not exist.");
+      $this->addMessage('error', "Error: Cycle #{$cycleID} does not exist.");
     }
   }
    
   /**
    * Create a new cycle
    */
-   public function actionNew(){
-    $form = new Form;
-    $form->action = $this->path("manage/cycles/new/");
-    $field = $form->newField(array('legend'=>"New Application Cycle"));
+  public function actionNew(){
+    $form = new \Foundation\Form;
+      
+    $form->setAction($this->path("manage/cycles/new"));
+    $field = $form->newField();
+    $field->setLegend('New cycle');
     $element = $field->newElement('TextInput','name');
-    $element->label = 'Cycle Name';
-    $element->addValidator('NotEmpty');
-    $element->addFilter('UrlSafe');
+    $element->setLabel('Cycle Name');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
     
-    $element = $field->newElement('TextInput','start');
-    $element->label = 'Start Date';
-    $element->addValidator('Date');
-    $element->addValidator('DateBeforeElement','end');
-    $element->addValidator('NotEmpty');
-    $element->addFilter('DateFormat','Y-m-d');
+    $element = $field->newElement('DateInput','start');
+    $element->setLabel('Start Date');
+    $element->addValidator(new \Foundation\Form\Validator\DateBeforeElement($element, 'end'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
-    $element = $field->newElement('TextInput','end');
-    $element->label = 'End Date';
-    $element->addValidator('Date');
-    $element->addValidator('NotEmpty');
-    $element->addFilter('DateFormat','Y-m-d');
+    $element = $field->newElement('DateInput','end');
+    $element->setLabel('End Date');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Save Changes');
-    $this->setVar('form', $form); 
+    $this->setVar('form', $form);  
     if($input = $form->processInput($this->post)){
-      $cycle = new Cycle;
-      $cycle->name = $input->name;
-      $cycle->start = $input->start;
-      $cycle->end = $input->end;
-      try {
-        $cycle->save();
-        $this->messages->write('success', "Changes Saved Successfully");
-        $this->redirect($this->path("manage/cycles"));
-        $this->afterAction();
-        exit(); 
-      }
-      catch (Doctrine_Validator_Exception $e){
-        $records = $e->getInvalidRecords();
-        $errors = $records[0]->getErrorStack();
-        if($errors->contains('name')){
-          if(in_array('unique', $errors->get('name'))){
-            $this->messages->write('error', "Cycle with name {$input->name} already exists.");
-            return;
-          }
-        }
-        throw new Jazzee_Exception($e->getMessage(),E_USER_ERROR,'There was a problem creating a new cycle.');
-      }
+      $cycle = new \Jazzee\Entity\Cycle;
+      $cycle->setName($input->get('name'));
+      $cycle->setStart($input->get('start'));
+      $cycle->setEnd($input->get('end'));
+      $this->_em->persist($cycle);
+      $this->addMessage('success', "New Cycle Saved");
+      $this->redirectPath('manage/cycles');
     }
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Manage Cycles';
-    $auth->addAction('index', new ActionAuth('View Cycles'));
-    $auth->addAction('edit', new ActionAuth('Edit Cycle'));
-    $auth->addAction('new', new ActionAuth('Create New Cycle'));
-    return $auth;
   }
 }
 ?>
