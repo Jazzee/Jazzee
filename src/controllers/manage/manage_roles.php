@@ -85,27 +85,25 @@ class ManageRolesController extends \Jazzee\AdminController {
   }
    
   /**
-   * Create a new pagetype
+   * Create a new role
    */
    public function actionNew(){
-    $form = new Form;
-    $form->action = $this->path("manage/roles/new/");
-    $field = $form->newField(array('legend'=>"New Global Role"));
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("manage/roles/new"));
+    $field = $form->newField();
+    $field->setLegend('New Global Role');
     $element = $field->newElement('TextInput','name');
-    $element->label = 'Role Name';
+    $element->setLabel('Role Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-
     $form->newButton('submit', 'Add Role');
     $this->setVar('form', $form); 
     if($input = $form->processInput($this->post)){
-      $role = new Role;
-      $role->global = true;
-      $role->name = $input->name;
-      $role->save();
-      $this->messages->write('success', "Role Saved Successfully");
-      $this->redirect($this->path("manage/roles/"));
-      $this->afterAction();
-      exit(); 
+      $role = new \Jazzee\Entity\Role();
+      $role->makeGlobal();
+      $role->setName($input->get('name'));
+      $this->_em->persist($role);
+      $this->addMessage('success', "Role Saved Successfully");
+      $this->redirectPath("manage/roles/");
     }
   }
   
