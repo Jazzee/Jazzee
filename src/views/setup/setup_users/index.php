@@ -10,10 +10,23 @@ $this->renderElement('form', array('form'=>$form));?>
 <?php if($results): ?>
   <h5>Results</h5>
   <ul>
-  <?php foreach($results as $arr): ?>
-  <li><?php print $arr['lastName'] . ', ' . $arr['firstName'] ?> 
-    <?php if($this->controller->checkIsAllowed('setup_users', 'programRoles')): ?>
-    (<a href='<?php print $this->path('setup/users/programRoles/') . $arr['id']?>'>Modify Program Role</a>)
+  <?php foreach($results as $user): ?>
+  <li><?php print $user->getLastName() . ', ' . $user->getFirstName() . ' (' . $user->getEmail() . ')' ?> 
+    <?php if($this->controller->checkIsAllowed('manage_users', 'edit')): ?>
+    (<a href='<?php print $this->path('setup/users/programRoles/') . $user->getId()?>'>Edit</a>)
+    <?php endif;?>
+  </li>
+  <?php endforeach;?>
+  </ul>
+<?php endif; ?>
+
+<?php if($users): ?>
+  <h5>Program Users</h5>
+  <ul>
+  <?php foreach($users as $user): ?>
+  <li><?php print $user->getLastName() . ', ' . $user->getFirstName() . ' (' . $user->getEmail() . ')' ?> 
+    <?php if($this->controller->checkIsAllowed('manage_users', 'edit')): ?>
+    (<a href='<?php print $this->path('setup/users/programRoles/') . $user->getId()?>'>Edit</a>)
     <?php endif;?>
   </li>
   <?php endforeach;?>

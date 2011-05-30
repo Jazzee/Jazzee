@@ -10,31 +10,32 @@ class SetupUsersController extends \Jazzee\AdminController {
   const TITLE = 'Program Users';
   const PATH = 'setup/users';
   
+  const ACTION_INDEX = 'Search Users';
+  const ACTION_PROGRAMROLES = 'Grant Permissions';
+  
   /**
    * Search for a user to modify
    */
   public function actionIndex(){
-    $form = new Form;
-    $form->action = $this->path("setup/users/index");
-    $field = $form->newField(array('legend'=>'Search Users'));
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('setup/users'));
+    $field = $form->newField();
+    $field->setLegend('Search For New');
     $element = $field->newElement('TextInput','firstName');
-    $element->label = 'First Name';
+    $element->setLabel('First Name');
 
     $element = $field->newElement('TextInput','lastName');
-    $element->label = 'Last Name';
+    $element->setLabel('Last Name');
     
     $form->newButton('submit', 'Search');
     
     $results = array();  //array of all the users who match the search
     if($input = $form->processInput($this->post)){
-      $q = Doctrine_Query::create()
-            ->from('User u')
-            ->where('u.firstName LIKE ?', "%{$input->firstName}%")
-            ->andwhere('u.lastName LIKE ?', "%{$input->lastName}%")
-            ->orderby('u.lastName, u.firstName');
-      $results = $q->execute(array(),Doctrine_Core::HYDRATE_ARRAY);
+      $results = $this->_em->getRepository('\Jazzee\Entity\User')->findByName('%' . $input->get('firstName') . '%', '%' . $input->get('lastName') . '%');
     }
+    
     $this->setVar('results', $results);
+    $this->setVar('users', $this->_em->getRepository('\Jazzee\Entity\User')->findByProgram($this->_program));
     $this->setVar('form', $form);
   }
   
@@ -43,52 +44,39 @@ class SetupUsersController extends \Jazzee\AdminController {
    * @param integer $userID
    */
    public function actionProgramRoles($userID){ 
-    if($user = Doctrine::getTable('User')->find($userID)){
-      $form = new Form;
-      $form->action = $this->path("setup/users/programRoles/{$userID}");
-      $field = $form->newField(array('legend'=>"Roles for {$user->firstName} {$user->lastName}"));
+    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
+      $form = new \Foundation\Form();
+      $form->setAction($this->path('setup/users/programRoles/' . $userID));
+      $field = $form->newField();
+      $field->setLegend('Roles for ' . $user->getFirstName() . ' ' . $user->getLastName());
 
       $element = $field->newElement('CheckboxList','roles');
-      $element->label = 'Roles';
-      foreach(Doctrine::getTable('Role')->findByProgramID($this->program->id) as $role){
-        $element->addItem($role->id, $role->name);
+      $element->setLabel('Program Roles');
+      foreach($this->_em->getRepository('\Jazzee\Entity\Role')->findBy(array('program' => $this->_program->getId())) as $role){
+        $element->newItem($role->getId(), $role->getName());
       }
       $values = array();
-      foreach($user->Roles as $role){
-        $values[] = $role->Role->id;
+      foreach($user->getRoles() as $role){
+        $values[] = $role->getId();
       }
-      $element->value = $values;
+      $element->setValue($values);
       $form->newButton('submit', 'Save Changes');
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
-        foreach($user->Roles as $id => $role){
-          if($role->Role->programID == $this->program->id)
-            $user->Roles->remove($id);
+        //clear out all current global roles
+        foreach($user->getRoles() as $role)if($role->getProgram() == $this->_program) $user->getRoles()->removeElement($role);            
+        
+        foreach($input->get('roles') as $roleID){
+          $role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program' => $this->_program->getId()));
+          $user->addRole($role);
         }
-        if(!empty($input->roles)){
-          foreach($input->roles as $roleID){
-            $role = new UserRole;
-            $role->roleID = $roleID;
-            $user->Roles[] = $role;
-          }
-        }
-        $user->save();
-        $this->messages->write('success', "Changes Saved Successfully");
-        $this->redirect($this->path("setup/users"));
-        $this->afterAction();
-        exit(); 
+        $this->_em->persist($user);
+        $this->addMessage('success', "Changes Saved Successfully");
+        $this->redirectPath('setup/users');
       }
     } else {
-      $this->messages->write('error', "Error: User #{$userID} does not exist.");
+      $this->addMessage('error', "Error: User #{$userID} does not exist.");
     }
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Manage Program Users';
-    $auth->addAction('index', new ActionAuth('Find'));
-    $auth->addAction('programRoles', new ActionAuth('Modify Program Roles'));
-    return $auth;
   }
 }
 ?>

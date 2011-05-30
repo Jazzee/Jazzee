@@ -227,4 +227,17 @@ class UserRepository extends \Doctrine\ORM\EntityRepository{
     $query->setParameter('lastName', $lastName);
     return $query->getResult();
   }
+  
+/**
+   * find all users in a program
+   * 
+   * @param \Jazzee\Entity\Program $program
+   * 
+   * @return Doctrine\Common\Collections\Collection \Jazzee\Entity\User
+   */
+  public function findByProgram($program){
+    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u JOIN u.roles r WHERE r.program = :programId');
+    $query->setParameter('programId', $program->getId());
+    return $query->getResult();
+  }
 }
