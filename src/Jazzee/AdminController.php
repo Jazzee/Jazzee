@@ -69,7 +69,7 @@ abstract class AdminController extends Controller{
     if(isset($store->currentProgramId)) $this->_program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($store->currentProgramId);
     if(isset($store->currentCycleId)) $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($store->currentCycleId);
     
-    if($this->_cycle AND $this->_program) $this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->program,$this->cycle);
+    if($this->_cycle AND $this->_program) $this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->_program,$this->_cycle);
 
   }
   /**
