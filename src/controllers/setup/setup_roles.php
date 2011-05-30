@@ -10,11 +10,15 @@ class SetupRolesController extends \Jazzee\AdminController {
   const TITLE = 'Program Roles';
   const PATH = 'setup/roles';
   
+  const ACTION_INDEX = 'View';
+  const ACTION_EDIT = 'Edit';
+  const ACTION_NEW = 'New';
+  
   /**
    * List all the Roles
    */
   public function actionIndex(){
-    $this->setVar('roles', Doctrine::getTable('Role')->findByProgramID($this->program->id));
+    $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findByProgram($this->_program->getId()));
   }
   
   /**
@@ -22,54 +26,65 @@ class SetupRolesController extends \Jazzee\AdminController {
    * @param integer $roleID
    */
    public function actionEdit($roleID){ 
-    if($role = Doctrine::getTable('Role')->findOneByIDAndProgramID($roleID, $this->program->id)){
-      $form = new Form;
-      $form->action = $this->path("setup/roles/edit/{$role->id}");
-      $field = $form->newField(array('legend'=>"Edit {$role->name} role"));
+    if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program'=>$this->_program->getId()))){
+      $form = new \Foundation\Form;
+      $form->setAction($this->path('setup/roles/edit/' . $role->getId()));
+      $field = $form->newField();
+      $field->setLegend('Edit ' . $role->getName() . ' role');
       $element = $field->newElement('TextInput','name');
-      $element->label = 'Role Name';
-      $element->addValidator('NotEmpty');
-      $element->value = $role->name;
-      $auths = $this->getAuths();
-      foreach($auths as $controllerName => $controller){
-        if($this->checkIsAllowed($controllerName, 'index')){
-          $element = $field->newElement('CheckboxList',$controllerName);
-          $element->label = "{$controller->name} actions";
-          foreach($controller->getActions() as $actionName => $action){
-            if($this->checkIsAllowed($controllerName, $actionName))
-              $element->addItem($actionName, $action->name);
+      $element->setLabel('Role Name');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->setValue($role->getName());
+      $menus = $this->getControllerActions();
+      ksort($menus);
+      foreach($menus as $menu => $list){
+        foreach($list as $controller){
+          $element = $field->newElement('CheckboxList',$controller['name']);
+          $element->setLabel($menu . ' ' . $controller['title'] . ' actions');
+          foreach($controller['actions'] as $actionName => $actionTitle){
+            $element->newItem($actionName, $actionTitle);
           }
           $values = array();
-          foreach($role->Actions as $action){
-            if($action->controller == $controllerName)
-              $values[] = $action->action;
+          foreach($role->getActions() as $action){
+            if($action->getController() == $controller['name'])
+              $values[] = $action->getAction();
           }
-          $element->value = $values;
+          $element->setValue($values);
         }
       }
       $form->newButton('submit', 'Edit Role');
-      $this->setVar('form', $form); 
+      $this->setVar('form', $form);
       if($input = $form->processInput($this->post)){
-        $role->name = $input->name;
-        $role->Actions->clear();
-        foreach($auths as $controllerName => $controller){
-          if(!empty($input->$controllerName)){
-            foreach($input->$controllerName as $actionName){
-              $action = new RoleAction;
-              $action->controller = $controllerName;
-              $action->action = $actionName;
-              $role->Actions[] = $action;
+        $role->setName($input->get('name'));
+        $role->notGlobal();
+        $role->setProgram($this->_program);
+        foreach($role->getActions() as $action){
+          $this->_em->remove($action);
+          $role->getActions()->removeElement($action);
+        }
+        
+        foreach($menus as $menu => $list){
+          foreach($list as $controller){
+            $actions = $input->get($controller['name']);
+            if(!empty($actions)){
+              foreach($actions as $actionName){
+                if($this->checkIsAllowed($controller['name'], $actionName)){
+                  $action = new \Jazzee\Entity\RoleAction;
+                  $action->setController($controller['name']);
+                  $action->setAction($actionName);
+                  $action->setRole($role);
+                  $this->_em->persist($action);
+                }
+              }
             }
           }
         }
-        $role->save();
-        $this->messages->write('success', "Role Saved Successfully");
-        $this->redirect($this->path("setup/roles/"));
-        $this->afterAction();
-        exit(); 
+        $this->_em->persist($role);
+        $this->addMessage('success', "Role Saved Successfully");
+        $this->redirectPath('setup/roles/');
       }
     } else {
-      $this->messages->write('error', "Error: Role #{$roleID} does not exist.");
+      $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
     }
   }
    
@@ -77,67 +92,52 @@ class SetupRolesController extends \Jazzee\AdminController {
    * Create a new pagetype
    */
    public function actionNew(){
-    $form = new Form;
-    $form->action = $this->path("setup/roles/new/");
-    $field = $form->newField(array('legend'=>"New Program Role"));
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('setup/roles/new'));
+    $field = $form->newField();
+    $field->setLegend('New program role');
     $element = $field->newElement('TextInput','name');
-    $element->label = 'Role Name';
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Role Name');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Add Role');
     $this->setVar('form', $form); 
     if($input = $form->processInput($this->post)){
-      $role = new Role;
-      $role->global = false;
-      $role->programID = $this->program->id;
-      $role->name = $input->name;
-      $role->save();
-      $this->messages->write('success', "Role Saved Successfully");
-      $this->redirect($this->path("setup/roles/"));
-      $this->afterAction();
-      exit(); 
+      $role = new \Jazzee\Entity\Role();
+      $role->notGLobal();
+      $role->setProgram($this->_program);
+      $role->setName($input->get('name'));
+      $this->_em->persist($role);
+      $this->addMessage('success', "Role Saved Successfully");
+      $this->redirectPath('setup/roles');
     }
   }
+  
+
   
   /**
    * Get All of the possible controllers and actions
-   * @return array of ControllerAuths
+   * 
+   * only allowed to set the ones that we are authorized for
+   * @return array
    */
-  protected function getAuths(){
-    $auths = array();
-    //all of the admin controllers, shoudl probably autodetect
-    $controllers = array(
-      'manage_users',
-      'manage_configuration',
-      'manage_roles',
-      'manage_scores',
-      'manage_programs',
-      'manage_cycles',
-      'manage_pagetypes',
-      'manage_elementtypes',
-      'applicants_view',
-      'setup_application',
-      'setup_pages',
-      'setup_roles',
-      'setup_users',
-      'admin_profile',
-      'admin_changecycle',
-      'admin_changeprogram'
-    );
-    foreach($controllers as $controller){
-      Lvc_FoundationConfig::includeController($controller);
-      $auths[$controller] = call_user_func(array(Lvc_Config::getControllerClassName($controller), 'getControllerAuth')); 
+  protected function getControllerActions(){
+    $controllers = array();
+    foreach($this->listControllers() as $controller){
+      $class = \Foundation\VC\Config::getControllerClassName($controller);
+      $arr = array('name'=> $controller, 'title' => $class::TITLE, 'actions'=>array());
+      foreach(get_class_methods($class) as $method){
+        
+        if(substr($method, 0, 6) == 'action'){
+          $actionName = strtolower(substr($method, 6));
+          $constant = 'ACTION_' . strtoupper(substr($method, 6));
+          if($this->checkIsAllowed($controller, $actionName) and defined("{$class}::{$constant}")) $arr['actions'][$actionName] = constant("{$class}::{$constant}");
+          
+        }
+      }
+      if(!empty($arr['actions'])) $controllers[$class::MENU][] = $arr;
     }
-    return $auths;
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Program Roles';
-    $auth->addAction('index', new ActionAuth('View Roles'));
-    $auth->addAction('edit', new ActionAuth('Edit'));
-    $auth->addAction('new', new ActionAuth('Create New'));
-    return $auth;
+    return $controllers;
   }
 }
 ?>

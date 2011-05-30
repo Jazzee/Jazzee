@@ -9,10 +9,10 @@
 if($roles): ?>
   <h5>Roles:</h5>
   <ul>
-  <?php foreach($roles as $arr): ?>
-  <li><?php print $arr['name'] ?>
+  <?php foreach($roles as $role): ?>
+  <li><?php print $role->getName() ?>
     <?php if($this->controller->checkIsAllowed('setup_roles', 'edit')): ?>
-      (<a href='<?php print $this->path('setup/roles/edit/') . $arr['id']?>'>Edit</a>)
+      (<a href='<?php print $this->path('setup/roles/edit/') . $role->getId()?>'>Edit</a>)
     <?php endif;?>
     
   </li>
