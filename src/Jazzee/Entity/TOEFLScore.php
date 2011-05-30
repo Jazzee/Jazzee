@@ -41,7 +41,7 @@ class TOEFLScore{
   /** @Column(type="datetime") */
   private $birthDate;
   
-  /** @Column(type="string", length=1) */
+  /** @Column(type="string", length=1, nullable="true") */
   private $gender;
   
   /** @Column(type="string") */
@@ -231,7 +231,7 @@ class TOEFLScore{
    * @param string $gender
    */
   public function setGender($gender){
-    if(!in_array(strtolower($gender), array('m', 'f'))) throw new \Jazzee_Exception("{$gender} is not a valid gender");
+    if(!in_array(strtolower($gender), array('m', 'f'))) throw new \Jazzee\Exception("{$gender} is not a valid gender");
     $this->gender = $gender;
   }
 

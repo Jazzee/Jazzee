@@ -11,57 +11,41 @@ class ManageScoresController extends \Jazzee\AdminController {
   const TITLE = 'Scores';
   const PATH = 'manage/scores';
   
+  const ACTION_INDEX = 'Manage Scores';
+  
   /**
    * Allow the user to pick a score type and upload the file
+   * @todo fix the stats
    */
   public function actionIndex(){
-    $form = new Form;
-    $form->action = $this->path("manage/scores/");
-    $field = $form->newField(array('legend'=>"Import Scores"));
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('manage/scores'));
+    $field = $form->newField();
+    $field->setLegend('Import Scores');
     
     $element = $field->newElement('SelectList','type');
-    $element->label = 'Score Type';
-    $element->addValidator('NotEmpty');
-    $element->addItem('etsgre', 'GRE Scores (Ets Flat File Format)');
-    $element->addItem('etstoefl', 'TOEFL Scores (Ets Flat File Format)');
+    $element->setLabel('Score Type');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->newItem('etsgre', 'GRE Scores (Ets Flat File Format)');
+    $element->newItem('etstoefl', 'TOEFL Scores (Ets Flat File Format)');
     
     $element = $field->newElement('FileInput','file');
-    $element->label = 'File';
-    $element->addValidator('NotEmpty');
+    $element->setLabel('File');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newButton('submit', 'Import');
     $this->setVar('form', $form);
-    $this->setVar('greCount', Doctrine::getTable('GREScore')->count());
-    $q = Doctrine_Query::create()
-        ->select('ID')
-        ->from('Score')
-        ->where('ScoreType = ?', 'gre')
-        ->andWhere('ScoreID IS NOT NULL');
-    $this->setVar('greMatchedCount', $q->execute()->count());
-    $q = Doctrine_Query::create()
-        ->select('ID')
-        ->from('Score')
-        ->where('ScoreType = ?', 'gre')
-        ->andWhere('ScoreID IS NULL');
-    $this->setVar('greUnmatchedCount', $q->execute()->count());
+    $this->setVar('greCount', 0);
+    $this->setVar('greMatchedCount','Not updated');
+    $this->setVar('greUnmatchedCount','Not updated');
     
+    $this->setVar('toeflCount', 0);
+    $this->setVar('toeflMatchedCount','Not updated');
+    $this->setVar('toeflUnmatchedCount','Not updated');
     
-    $this->setVar('toeflCount', Doctrine::getTable('TOEFLScore')->count());
-    $q = Doctrine_Query::create()
-        ->select('ID')
-        ->from('Score')
-        ->where('ScoreType = ?', 'toefl')
-        ->andWhere('ScoreID IS NOT NULL');
-    $this->setVar('toeflMatchedCount', $q->execute()->count());
-    $q = Doctrine_Query::create()
-        ->select('ID')
-        ->from('Score')
-        ->where('ScoreType = ?', 'toefl')
-        ->andWhere('ScoreID IS NULL');
-    $this->setVar('toeflUnmatchedCount', $q->execute()->count());
     
     if($input = $form->processInput($this->post)){
-      $method = $input->type . 'Scores';
+      $method = $input->get('type') . 'Scores';
       $this->$method($input);
     }
   }
@@ -71,38 +55,67 @@ class ManageScoresController extends \Jazzee\AdminController {
    * @param FormInput $input
    */
   protected function etsgreScores($input){
-    $f = file($input->file['tmp_name'], FILE_IGNORE_NEW_LINES);
+    $file = $input->get('file');
+    $f = file($file['tmp_name'], FILE_IGNORE_NEW_LINES);
     switch(strlen($f[0])){
       case 500:
+        print 'version1'; die;
         $scores = $this->parseGREVersion1($f);
         break;
       case 600:
         $scores = $this->parseGREVersion2($f);
         break;
       default:
-        $this->messages->write('error', "Unrecognized GRE format:  ({$input->file['name']}) has " . strlen($f[0]) . ' characters per line.');
+        $this->addMessage('error', "Unrecognized GRE format:  ({$file['name']}) has " . strlen($f[0]) . ' characters per line.');
         return false;
     }
-    $work = new UnitOfWork();
-    $table = Doctrine::getTable('GREScore');
-    $total = 0;
     $new = 0;
     foreach ($scores AS $arr){
-      if(!$score = $table->findOneByRegistrationNumberAndTestMonthAndTestYear($arr['registrationNumber'], $arr['testMonth'], $arr['testYear'])){
-        $score = new GREScore;
-        $score->synchronizeWithArray($arr);
+      $parameters = array(
+        'registrationNumber' => $arr['registrationNumber'],
+        'testMonth' => $arr['testMonth'],
+        'testYear' => $arr['testYear']
+      );
+      if(!$score = $this->_em->getRepository('\Jazzee\Entity\GREScore')->findOneBy($parameters)){
+        $score = new \Jazzee\Entity\GREScore();
+        $score->setRegistrationNumber($arr['registrationNumber'], $arr['testMonth'], $arr['testYear']);
+        $score->setDepartmentCode($arr['departmentCode']);
+        $score->setDepartmentName($arr['departmentName']);
+        $score->setFirstName($arr['firstName']);
+        $score->setMiddleInitial($arr['middleInitial']);
+        $score->setLastName($arr['lastName']);
+        $score->setBirthDate($arr['birthDate']);
+        $score->setGender($arr['gender']);
+        $score->setTestDate($arr['testDate']);
+        $score->setTestCode($arr['testCode']);
+        $score->setTestName($arr['testName']);
+        $score->setScore1Type($arr['score1Type']);
+        $score->setScore1Converted($arr['score1Converted']);
+        $score->setScore1Percentile($arr['score1Percentile']);
+        $score->setScore2Type($arr['score2Type']);
+        $score->setScore2Converted($arr['score2Converted']);
+        $score->setScore2Percentile($arr['score2Percentile']);
+        $score->setScore3Type($arr['score3Type']);
+        $score->setScore3Converted($arr['score3Converted']);
+        $score->setScore3Percentile($arr['score3Percentile']);
+        $score->setScore4Type($arr['score4Type']);
+        $score->setScore4Converted($arr['score4Converted']);
+        $score->setScore4Percentile($arr['score4Percentile']);
+        $score->setSequenceNumber($arr['sequenceNumber']);
+        $score->setRecordSerialNumber($arr['recordSerialNumber']);
+        $score->setCycleNumber($arr['cycleNumber']);
+        $score->setProcessDate($arr['processDate']);
         $new++;
       } else {
-        $score->processDate = $arr['processDate'];
-        $score->cycleNumber = $arr['cycleNumber'];
-        $score->recordSerialNumber = $arr['recordSerialNumber'];
-        $score->sequenceNumber = $arr['sequenceNumber'];
+        $score->setProcessDate($arr['processDate']);
+        $score->setCycleNumber($arr['cycleNumber']);
+        $score->setRecordSerialNumber($arr['recordSerialNumber']);
+        $score->setSequenceNumber($arr['sequenceNumber']);
       }
-      $work->registerModelForCreateOrUpdate($score);
-      $total++;
+      $this->_em->persist($score);
     }
-    $work->commitAll();
-    $this->messages->write('success', "{$total} scores read from file, {$new} of them were new.");
+    $this->addMessage('success', count($scores) . " scores read from file, {$new} of them were new.");
+    $this->redirectPath('manage/scores');
   }
   
   /**
@@ -114,15 +127,15 @@ class ManageScoresController extends \Jazzee\AdminController {
       foreach ($arr AS $line) {
         $score = array();
         $score['registrationNumber'] = substr($line, 376, 7);
-        $score['testMonth'] = date('n', strtotime(substr($line, 383, 2) . '/' . substr($line, 385, 2) . '/' . substr($line, 387, 4)));
-        $score['testYear'] = date('Y', strtotime(substr($line, 383, 2) . '/' . substr($line, 385, 2) . '/' . substr($line, 387, 4)));
+        $score['testMonth'] = (int)substr($line, 383, 2);
+        $score['testYear'] = substr($line, 387, 4);
         $score['departmentCode'] = substr($line, 36, 4);
         $score['departmentName'] = substr($line, 40, 30);
         $score['firstName'] = substr($line, 102, 24);
         $score['middleInitial'] = substr($line, 126, 1);
         $score['lastName'] = substr($line, 70, 32);
         $score['birthDate'] = date('Y-m-d', strtotime(substr($line, 288, 2) . '/' . substr($line, 290, 2) . '/' . substr($line, 292, 4)));
-        $score['sex'] = substr($line, 296, 1);
+        $score['gender'] = substr($line, 296, 1);
         $score['testDate'] = date('Y-m-d H:i:s', strtotime(substr($line, 383, 2) . '/' . substr($line, 385, 2) . '/' . substr($line, 387, 4)));
         $score['testCode'] = substr($line, 391, 2);
         $score['testName'] = substr($line, 393, 20);
@@ -155,15 +168,15 @@ class ManageScoresController extends \Jazzee\AdminController {
       foreach ($arr AS $line) {
         $score = array();
         $score['registrationNumber'] = substr($line, 409, 7);
-        $score['testMonth'] = date('n', strtotime(substr ($line, 416, 2) . "/" . substr ($line, 418, 2) . "/" . substr ($line, 420, 4)));
-        $score['testYear'] = date('Y', strtotime(substr ($line, 416, 2) . "/" . substr ($line, 418, 2) . "/" . substr ($line, 420, 4)));
+        $score['testMonth'] = (int)substr ($line, 416, 2);
+        $score['testYear'] = substr ($line, 420, 4);
         $score['departmentCode'] = substr($line, 36, 4);
         $score['departmentName'] = substr($line, 40, 30);
         $score['firstName'] = substr($line, 136, 24);
         $score['middleInitial'] = substr($line, 160, 1);
         $score['lastName'] = substr($line, 104, 32);
         $score['birthDate'] = date('Y-m-d', strtotime(substr($line, 335, 4) . "-" . substr ($line, 331, 2) . "-" . substr ($line, 333, 2)));
-        $score['sex'] = substr($line, 339, 1);
+        $score['gender'] = substr($line, 339, 1);
         $score['testDate'] = date('Y-m-d H:i:s', strtotime(substr ($line, 416, 2) . "/" . substr ($line, 418, 2) . "/" . substr ($line, 420, 4)));
         $score['testCode'] = substr($line, 424, 2);
         $score['testName'] = substr($line, 426, 20);
@@ -194,30 +207,58 @@ class ManageScoresController extends \Jazzee\AdminController {
    * @param FormInput $input
    */
   protected function etstoeflScores($input){
-    $f = file($input->file['tmp_name'], FILE_IGNORE_NEW_LINES);
+    $file = $input->get('file');
+    $f = file($file['tmp_name'], FILE_IGNORE_NEW_LINES);
     switch(strlen($f[0])){
       case 590:
         $scores = $this->parseTOEFLVersion1($f);
         break;
       default:
-        $this->messages->write('error', "Unrecognized GRE format:  ({$input->file['name']}) has " . strlen($f[0]) . ' characters per line.');
+        $this->addMessage('error', "Unrecognized TOEFL format:  ({$file['name']}) has " . strlen($f[0]) . ' characters per line.');
         return false;
     }
-    $work = new UnitOfWork();
-    $table = Doctrine::getTable('TOEFLScore');
-    $total = 0;
+    
     $new = 0;
     foreach ($scores AS $arr){
-      if(!$score = $table->findOneByRegistrationNumberAndTestMonthAndTestYear($arr['registrationNumber'], $arr['testMonth'], $arr['testYear'])){
-        $score = new TOEFLScore;
-        $score->synchronizeWithArray($arr);
+      $parameters = array(
+        'registrationNumber' => $arr['registrationNumber'],
+        'testMonth' => $arr['testMonth'],
+        'testYear' => $arr['testYear']
+      );
+      if(!$score = $this->_em->getRepository('\Jazzee\Entity\TOEFLScore')->findOneBy($parameters)){
+        $score = new \Jazzee\Entity\TOEFLScore();
+        $score->setRegistrationNumber($arr['registrationNumber'],$arr['testMonth'], $arr['testYear']);
+        $score->setDepartmentCode($arr['departmentCode']);
+        $score->setFirstName($arr['firstName']);
+        $score->setMiddleName($arr['middleName']);
+        $score->setLastName($arr['lastName']);
+        $score->setBirthDate($arr['birthDate']);
+        if(!is_null($arr['gender'])) $score->setGender($arr['gender']);
+        $score->setNativeCountry($arr['nativeCountry']);
+        $score->setNativeLanguage($arr['nativeLanguage']);
+        $score->setTestDate($arr['testDate']);
+        $score->setTestType($arr['testType']);
+        $score->setListeningIndicator($arr['listeningIndicator']);
+        $score->setSpeakingIndicator($arr['speakingIndicator']);
+        $score->setIBTListening($arr['IBTListening']);
+        $score->setIBTReading($arr['IBTReading']);
+        $score->setIBTSpeaking($arr['IBTSpeaking']);
+        $score->setIBTWriting($arr['IBTWriting']);
+        $score->setIBTTotal($arr['IBTTotal']);
+        $score->setTSEScore($arr['TSEScore']);
+        $score->setListening($arr['listening']);
+        $score->setWriting($arr['writing']);
+        $score->setReading($arr['reading']);
+        $score->setEssay($arr['essay']);
+        $score->setTotal($arr['total']);
+        $score->setTimesTaken($arr['timesTaken']);
+        $score->setOffTopic($arr['offTopic']);
         $new++;
+        $this->_em->persist($score);
       }
-      $work->registerModelForCreateOrUpdate($score);
-      $total++;
     }
-    $work->commitAll();
-    $this->messages->write('success', "{$total} scores read from file, {$new} of them were new.");
+    $this->addMessage('success', count($scores) . " scores read from file, {$new} of them were new.");
+    $this->redirectPath('manage/scores');
   }
   
   /**
@@ -238,13 +279,13 @@ class ManageScoresController extends \Jazzee\AdminController {
         $score['birthDate'] = date('Y-m-d', strtotime(substr ($line, 533, 2) . "/" . substr ($line, 535, 2) . "/" . substr ($line, 529, 4)));
         switch(substr($line, 537, 1)){
           case 1:
-            $score['sex'] = 'm';
+            $score['gender'] = 'm';
             break;
           case 2:
-            $score['sex'] = 'f';
+            $score['gender'] = 'f';
             break;
           default:
-            $score['sex'] = null;
+            $score['gender'] = null;
         }
         $score['nativeCountry'] = substr($line, 446, 40);
         $score['nativeLanguage'] = substr($line, 489, 40);
@@ -272,7 +313,7 @@ class ManageScoresController extends \Jazzee\AdminController {
   
   /**
    * Take a score as an array and clean it up
-   * Enter description here ...
+   * Get rid of extra space and replace blanks with null
    * @param unknown_type $score
    */
   protected function cleanScore($score){
@@ -285,13 +326,6 @@ class ManageScoresController extends \Jazzee\AdminController {
       }
     }
     return $score;
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Manage Scores';
-    $auth->addAction('index', new ActionAuth('Import Scores'));
-    return $auth;
   }
 }
 ?>
