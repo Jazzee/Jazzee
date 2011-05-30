@@ -26,7 +26,7 @@ class ManageRolesController extends \Jazzee\AdminController {
    * @param integer $roleID
    */
    public function actionEdit($roleID){ 
-    if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->find($roleID)){
+    if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'isGlobal'=>true))){
       $form = new \Foundation\Form;
       $form->setAction($this->path('manage/roles/edit/' . $role->getId()));
       $field = $form->newField();
