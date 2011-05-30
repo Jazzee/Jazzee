@@ -538,4 +538,20 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
     if(count($result)) return $result[0];
     return false;
   }
+  
+  /**
+   * Find applicants by name
+   * 
+   * @param string $firstName
+   * @param string $lastName
+   * @param Application $application
+   * @return Application
+   */
+  public function findApplicantsByName($firstName, $lastName, Application $application){
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a.application = :applicationId AND a.firstName LIKE :firstName AND a.lastName LIKE :lastName order by a.lastName, a.firstName');
+    $query->setParameter('applicationId', $application->getId());
+    $query->setParameter('firstName', $firstName);
+    $query->setParameter('lastName', $lastName);
+    return $query->getResult();
+  }
 }

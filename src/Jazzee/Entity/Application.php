@@ -349,6 +349,15 @@ class Application{
   public function getPages(){
     return $this->pages;
   }
+  
+  /**
+   * Get applicants
+   *
+   * @return \Doctrine\Common\Collections\Collection \Jazzee\Entity\Applicant
+   */
+  public function getApplicants(){
+    return $this->applicants;
+  }
 }
 
 /**

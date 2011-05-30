@@ -10,6 +10,8 @@ class ApplicantsListController extends \Jazzee\AdminController {
   const TITLE = 'By Tag';
   const PATH = 'applicants/list';
   
+  const ACTION_INDEX = 'All Applicants';
+  
   /**
    * List all applicants
    */
@@ -18,22 +20,15 @@ class ApplicantsListController extends \Jazzee\AdminController {
     $tags['Locked'] = array();
     $tags['Not Locked'] = array();
     $tags['All Applicants'] = array();
-    foreach($this->application->findApplicantsByName() as $applicant){
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
       $tags['All Applicants'][] = $applicant;
-      if(!is_null($applicant->locked)) $tags['Locked'][] = $applicant;
+      if($applicant->isLocked()) $tags['Locked'][] = $applicant;
       else $tags['Not Locked'][] = $applicant;
-      foreach($applicant->Tags as $tag){
-        if(!isset($tags[$tag->title])) $tags = array($tag->title => array()) + $tags;
-        $tags[$tag->title][] = $applicant;
+      foreach($applicant->getTags() as $tag){
+        if(!isset($tags[$tag->getTitle()])) $tags = array($tag->getTitle() => array()) + $tags;
+        $tags[$tag->getTitle()][] = $applicant;
       }
     }
     $this->setVar('tags', $tags);
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'List Applicants';
-    $auth->addAction('index', new ActionAuth('All Applicants'));
-    return $auth;
   }
 }
