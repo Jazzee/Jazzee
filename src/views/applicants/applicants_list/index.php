@@ -14,12 +14,12 @@ foreach($tags as $title => $applicants):?>
   <tbody>
     <?foreach($applicants as $applicant):?>
       <tr>
-        <td><a href='<?php print $this->path("applicants/single/byId/{$applicant->id}")?>' title='<?php print "{$applicant->firstName} {$applicant->lastName}"?>'>Application</a></td>
-        <td><?php print $applicant->lastName; ?></td>
-        <td><?php print $applicant->firstName; ?></td>
-        <td><?php print $applicant->updatedAt; ?></td>
-        <td><?php print $applicant->lastLogin; ?></td>
-        <td><?php print $applicant->createdAt; ?></td>
+        <td><a href='<?php print $this->path('applicants/single/byId/' . $applicant->getId())?>' title='<?php print $applicant->getFirstName() . ' ' . $applicant->getLastName()?>'>Application</a></td>
+        <td><?php print $applicant->getLastName(); ?></td>
+        <td><?php print $applicant->getFirstName(); ?></td>
+        <td><?php if($applicant->getUpdatedAt()) print $applicant->getUpdatedAt()->format('m/d/y'); ?></td>
+        <td><?php if($applicant->getLastLogin()) print $applicant->getLastLogin()->format('m/d/y'); ?></td>
+        <td><?php if($applicant->getCreatedAt()) print $applicant->getCreatedAt()->format('m/d/y'); ?></td>
       </tr>
     <?php endforeach;?>
   </tbody>
