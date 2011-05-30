@@ -9,10 +9,10 @@
 if($pageTypes): ?>
   <h5>Current Page Types:</h5>
   <ul>
-  <?php foreach($pageTypes as $arr): ?>
-  <li><?php print $arr['name'] ?>
+  <?php foreach($pageTypes as $type): ?>
+  <li><?php print $type->getName() ?>
     <?php if($this->controller->checkIsAllowed('manage_pagetypes', 'edit')): ?>
-      (<a href='<?php print $this->path('manage/pagetypes/edit/') . $arr['id']?>'>Edit</a>)
+      (<a href='<?php print $this->path('manage/pagetypes/edit/') . $type->getId()?>'>Edit</a>)
     <?php endif;?>
     
   </li>
