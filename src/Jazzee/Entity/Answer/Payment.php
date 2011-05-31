@@ -38,7 +38,7 @@ class Payment implements \Jazzee\Answer
   }
   
   public function update(\Foundation\Form\Input $input){
-    $this->_payment->getType()->getJazzeePaymentType()->pendingPayment($this->_payment, $input);
+    return $this->_payment->getType()->getJazzeePaymentType()->pendingPayment($this->_payment, $input);
   }
   
   public function applyTools(){
@@ -53,10 +53,10 @@ class Payment implements \Jazzee\Answer
       'Status' => $this->getStatusText()
     );
     //add the reson to refunded payments
-    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REFUNDED) $arr['Reason'] = $this->_payment->getVar('refundedReason');
+    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REFUNDED) $arr['Reason'] = $this->_payment->getVar('reasonText');
     
     //add the reson to rejected payments
-    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REJECTED) $arr['Reason'] = $this->_payment->getVar('rejectedReason');
+    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REJECTED) $arr['Reason'] = $this->_payment->getVar('reasonText');
     return $arr;
   }
   
@@ -66,7 +66,7 @@ class Payment implements \Jazzee\Answer
       'Applicant Status Message' => $this->getStatusText()
     );
     //add the reson to rejected payments
-    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REJECTED) $arr['Reason'] = $this->_payment->getVar('rejectedReason');
+    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REJECTED) $arr['Reason'] = $this->_payment->getVar('reasonText');
     return $arr;
   }
   

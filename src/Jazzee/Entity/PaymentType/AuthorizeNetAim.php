@@ -1,9 +1,10 @@
 <?php
-require_once SRC_ROOT . '/lib/anet_sdk/AuthorizeNet.php'; 
+namespace Jazzee\Entity\PaymentType;
+require_once __DIR__ . '/../../../../lib/anet_sdk/AuthorizeNet.php'; 
 /**
  * Pay via Authorize.net Advanced Integration Method
  */
-class AuthorizeNetAIMPayment extends ApplyPayment{
+class AuthorizeNetAIM extends AbstractPaymentType{
   const PENDING_TEXT = 'Approved';
   const SETTLED_TEXT = 'Approved';
   const REJECTED_TEXT = 'Rejected or Voided';
@@ -13,145 +14,146 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    * Display the button to pass applicant to Authorize.net's hosted payment page
    * @see ApplyPayment::paymentForm()
    */
-  public function paymentForm(Applicant $applicant, $amount, $actionPath){
-    $form = new Form;
+  public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath){
+    $form = new \Foundation\Form();
     //we pass the amount back as a hidden element so PaymentPage will have it again
     $form->newHiddenElement('amount', $amount);
 
-    $form->action = $actionPath;
+    $form->setAction($actionPath);
     $field = $form->newField();
-    $field->legend = $this->paymentType->name;
-    $field->instructions = "<p><strong>Application Fee:</strong> &#36;{$amount}</p>";
+    $field->setLegend($this->_paymentType->getName());
+    $field->setInstructions("<p><strong>Application Fee:</strong> &#36;{$amount}</p>");
     
     $e = $field->newElement('TextInput', 'cardNumber');
-    $e->label = 'Credit Card Number';
-    $e->addValidator('NotEmpty');
-    $e->addValidator('CreditCard', explode(',',$this->paymentType->getVar('acceptedCards')));
+    $e->setLabel('Credit Card Number');
+    $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+    $e->addValidator(new \Foundation\Form\Validator\CreditCard($e, explode(',',$this->_paymentType->getVar('acceptedCards'))));
     
     $e = $field->newElement('ShortDateInput', 'expirationDate');
-    $e->label = 'Expiration Date';
-    $e->addValidator('NotEmpty');
-    $e->addValidator('Date');
-    $e->addValidator('DateAfter', date('m/d/Y', strtotime('Last Month')));
-    $e->addFilter('DateFormat', 'my');
+    $e->setLabel('Expiration Date');
+    $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+    $e->addValidator(new \Foundation\Form\Validator\DateAfter($e, 'last month'));
+    $e->addFilter(new \Foundation\Form\Filter\DateFormat($e, 'mY'));
     
     $e = $field->newElement('TextInput', 'cardCode');
-    $e->label = 'CCV';
-    $e->addValidator('NotEmpty');
+    $e->setLabel('CCV');
+    $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
     
     $e = $field->newElement('TextInput', 'postalCode');
-    $e->label = 'Billing Postal Code';
-    $e->instructions = 'US Credit Cards which do not provide a postal code will be rejected.';
+    $e->setLabel('Billing Postal Code');
+    $e->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
 
     $form->newButton('submit', 'Pay with Credit Card');
     return $form;
   }
   
   /**
-   * Setup the instructions for mailing the check including the address and any special markings (like appicant ID)
+   * Setup the payment types and the AIM credentials
    * @see ApplyPayment::setupForm()
    */
-  public static function setupForm(PaymentType $paymentType = null){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Setup Authorize.net AIM Payments"));        
+  public function getSetupForm(){
+    $form = new \Foundation\Form();
+    $field = $form->newField();
+    $field->setLegend('Setup Authorize.net AIM Payments');        
     $element = $field->newElement('TextInput','name');
-    $element->label = 'Payment Name';
-    if($paymentType) $element->value = $paymentType->name;
-    $element->addValidator('NotEmpty');
-    
+    $element->setLabel('Payment Name');
+    $element->setValue($this->_paymentType->getName());
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
     $element = $field->newElement('TextInput','description');
-    $element->label = 'Description';
-    if($paymentType) $element->value = $paymentType->getVar('description');
-    $element->label = 'Appears on credit card statement for applicant';
-    $element->addValidator('NotEmpty');
-    
+    $element->setLabel('Description');
+    $element->setFormat('Appears on credit card statement for applicant');
+    $element->setValue($this->_paymentType->getVar('description'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
     $element = $field->newElement('TextInput','gatewayId');
-    $element->label = 'Payment Gateway ID';
-    if($paymentType) $element->value = $paymentType->getVar('gatewayId');
-    $element->addValidator('NotEmpty');
-    
+    $element->setLabel('Payment Gateway ID');
+    $element->setValue($this->_paymentType->getVar('gatewayId'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
     $element = $field->newElement('TextInput','gatewayKey');
-    $element->label = 'Payment Gateway Key';
-    if($paymentType) $element->value = $paymentType->getVar('gatewayKey');
-    $element->addValidator('NotEmpty');
-    
+    $element->setLabel('Payment Gateway Key');
+    $element->setValue($this->_paymentType->getVar('gatewayKey'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
     $element = $field->newElement('TextInput','gatewayHash');
-    $element->label = 'Payment Gateway Hashphrase';
-    if($paymentType) $element->value = $paymentType->getVar('gatewayHash');
-    $element->addValidator('NotEmpty');
-    
+    $element->setLabel('Payment Gateway Hashphrase');
+    $element->setValue($this->_paymentType->getVar('gatewayHash'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
     $element = $field->newElement('RadioList','testAccount');
-    $element->label = 'Is this a test account?';
-    $element->addItem(0, 'No');
-    $element->addItem(1, 'Yes');
-    if($paymentType) $element->value = $paymentType->getVar('testAccount');
-    $element->format = 'Test accounts are handled differenty by Authorize.net and need to be sent to a different URL';
-    $element->addValidator('NotEmpty');
-    
+    $element->setLabel('Is this a test account?');
+    $element->setFormat('Test accounts are handled differenty by Authorize.net and need to be sent to a different URL.');
+    $element->setValue($this->_paymentType->getVar('testAccount'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->newItem(0, 'No');
+    $element->newItem(1, 'Yes');
+
     $element = $field->newElement('CheckboxList','acceptedCards');
-    $element->label = 'What credit card types do you accept?';
-    $types = Form_CreditCardValidator::listTypes();
+    $element->setLabel('What credit card types do you accept?');
+    $types = \Foundation\Form\Validator\CreditCard::listTypes();
     foreach($types as $id => $value){
-      $element->addItem($id, $value);
+      $element->newitem($id, $value);
     }
-    if($paymentType) $element->value = explode(',',$paymentType->getVar('acceptedCards'));
-    $element->addValidator('NotEmpty');
+    $element->setValue(explode(',',$this->_paymentType->getVar('acceptedCards')));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
+    $form->newButton('submit', 'Save');
     return $form;
   }
   
-  public static function setup(PaymentType $paymentType, FormInput $input){
-    $paymentType->name = $input->name;
-    $paymentType->class = 'AuthorizeNetAIMPayment';
-    $paymentType->setVar('description', $input->description);
-    $paymentType->setVar('gatewayId', $input->gatewayId);
-    $paymentType->setVar('gatewayKey', $input->gatewayKey);
-    $paymentType->setVar('gatewayHash', $input->gatewayHash);
-    $paymentType->setVar('testAccount', $input->testAccount);
-    $paymentType->setVar('acceptedCards', implode(',',$input->acceptedCards));
+  public function setup(\Foundation\Form\Input $input){
+    $this->_paymentType->setName($input->get('name'));
+    $this->_paymentType->setClass('\\Jazzee\\Entity\\PaymentType\AuthorizeNetAim');
+    $this->_paymentType->setVar('description', $input->get('description'));
+    $this->_paymentType->setVar('gatewayId', $input->get('gatewayId'));
+    $this->_paymentType->setVar('gatewayKey', $input->get('gatewayKey'));
+    $this->_paymentType->setVar('gatewayHash', $input->get('gatewayHash'));
+    $this->_paymentType->setVar('testAccount', $input->get('testAccount'));
+    $this->_paymentType->setVar('acceptedCards', implode(',',$input->get('acceptedCards')));
   }
   
   /**
    * Record transaction information pending until it is settled with the bank
    * @see ApplyPaymentInterface::pendingPayment()
    */
-  public function pendingPayment(Payment $payment, FormInput $input){
-    $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
-    $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
-    $aim->amount = $input->amount;
-    $aim->cust_id = $payment->Applicant->id;
+  public function pendingPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
+    $aim = new \AuthorizeNetAIM($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+    $aim->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $aim->amount = $input->get('amount');
+    $aim->cust_id = $payment->getApplicant()->getId();
     $aim->customer_ip = $_SERVER['REMOTE_ADDR'];
-    $aim->email = $payment->Applicant->email;
+    $aim->email = $payment->getApplicant()->getEmail();
     $aim->email_customer = 0;
-    $aim->card_num = $input->cardNumber;
-    $aim->exp_date = $input->expirationDate;
-    $aim->card_code = $input->cardCode;
-    $aim->zip = $input->postalCode;
-    $aim->description = $this->paymentType->getVar('description');
-    $aim->test_request = $this->config->status == 'PRODUCTION'?0:1;
+    $aim->card_num = $input->get('cardNumber');
+    $aim->exp_date = $input->get('expirationDate');
+    $aim->card_code = $input->get('cardCode');
+    $aim->zip = $input->get('cardCode');
+    $aim->description = $this->_paymentType->getVar('description');
+    $config = new \Jazzee\Configuration();
+    $aim->test_request = ($config->getStatus() == 'PRODUCTION')?0:1;
     $response = $aim->authorizeAndCapture();
     if($response->approved) {
-      $payment->amount = $response->amount;
+      $payment->setAmount($response->amount);
       $payment->setVar('transactionId', $response->transaction_id);
       $payment->setVar('authorizationCode', $response->authorization_code);
       $payment->pending();
+      return true;
     } else {
-      $payment->amount = $response->amount;
+      $payment->setAmount($response->amount);
       $payment->setVar('transactionId', $response->transaction_id);
       $payment->setVar('reasonCode', $response->response_reason_code);
       $payment->setVar('reasonText', $response->response_reason_text);
       $payment->rejected();
-      $this->messages->write('error', 'Your credit card was rejected by our payment processor.');
       return false;
     }
-    return true;
   }
   
   /**
    * Attempt to settle payment with anet's API
    * @see ApplyPaymentInterface::settlePaymentForm()
    */
-  public function getSettlePaymentForm(Payment $payment){
+  public function getSettlePaymentForm(\Jazzee\Entity\Payment $payment){
     $form = new Form;
     $field = $form->newField(array('legend'=>"Settle {$this->paymentType->name} Payment"));
     $element = $field->newElement('Plaintext','info');
@@ -164,7 +166,7 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    * Once checks have been cashed we settle the payment
    * @see ApplyPaymentInterface::settlePayment()
    */
-  public function settlePayment(Payment $payment, FormInput $input){
+  public function settlePayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $td = new AuthorizeNetTD($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
     $td->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     // Get Transaction Details
@@ -194,7 +196,7 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    * Record the reason the payment was rejected
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
-  public function getRejectPaymentForm(Payment $payment){
+  public function getRejectPaymentForm(\Jazzee\Entity\Payment $payment){
     $form = new Form;
     $field = $form->newField(array('legend'=>"Reject {$this->paymentType->name} Payment"));        
     $element = $field->newElement('Textarea','reason');
@@ -209,14 +211,14 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    * Void a transaction before it is settled
    * @see ApplyPaymentInterface::rejectPayment()
    */
-  public function rejectPayment(Payment $payment, FormInput $input){
+  public function rejectPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
     $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     $aim->test_request = $this->config->status == 'PRODUCTION'?0:1;
     $response = $aim->void($payment->getVar('transactionId'));
     if($response->approved) {
       $payment->rejected();
-      $payment->setVar('rejectedReason', $input->reason);
+      $payment->setVar('reasonText', $input->reason);
       $payment->save();
       return true;
     }
@@ -228,7 +230,7 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    * Record the reason the payment was refunded
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
-  public function getRefundPaymentForm(Payment $payment){
+  public function getRefundPaymentForm(\Jazzee\Entity\Payment $payment){
     $td = new AuthorizeNetTD($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
     $td->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     // Get Transaction Details
@@ -255,21 +257,21 @@ class AuthorizeNetAIMPayment extends ApplyPayment{
    * Check payments are refunded outside Jazzee and then marked as refunded
    * @see ApplyPaymentInterface::refundPayment()
    */
-  public function refundPayment(Payment $payment, FormInput $input){
+  public function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
     $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     $aim->test_request = $this->config->status == 'PRODUCTION'?0:1;
     $response = $aim->credit($payment->getVar('transactionId'), $payment->amount, $input->cardNumber);
     if($response->approved) {
       $payment->refunded();
-      $payment->setVar('refundedReason', $input->reason);
+      $payment->setVar('reasonText', $input->reason);
       $payment->save();
       return true;
     }
     return false;
   }
   
-  public function applicantTools(Payment $payment){
+  public function applicantTools(\Jazzee\Entity\Payment $payment){
     $arr = array();
     switch($payment->status){
       case Payment::PENDING:

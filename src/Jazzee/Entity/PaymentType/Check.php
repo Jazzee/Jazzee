@@ -10,7 +10,7 @@ class Check extends AbstractPaymentType{
   const REFUNDED_TEXT = 'We have sent you a refund for this payment';
   
   public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath){
-    $form = new \Foundation\Form;
+    $form = new \Foundation\Form();
     $form->setAction($actionPath);
     $form->newHiddenElement('amount', $amount);
     $field = $form->newField();
@@ -47,42 +47,44 @@ class Check extends AbstractPaymentType{
       'Program Name' => '%Program_Name%',
       'Program ID' => '%Program_ID%'
     );
-    $format = 'These wildcards will be replaced in the text: ';
+    $instructions = 'These wildcards will be replaced in the text of each element: ';
     foreach($filters as $title => $wildcard){
-      $format .= "<br />{$title}:{$wildcard}";
+      $instructions .= "<br />{$title}:{$wildcard}";
     }
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Setup Check Payments"));        
+    $form = new \Foundation\Form();
+    $field = $form->newField();
+    $field->setLegend('Setup Payment');    
+    $field->setInstructions($instructions);    
     $element = $field->newElement('TextInput','name');
-    $element->label = 'Payment Name';
-    if($paymentType) $element->value = $paymentType->name;
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Payment Name');
+    $element->setValue($this->_paymentType->getName());
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
     $element = $field->newElement('TextInput','payable');
-    $element->label = 'Make the check payable to';
-    if($paymentType) $element->value = $paymentType->getVar('payable');
-    $element->format = $format;
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Make the check payable to');
+    $element->setValue($this->_paymentType->getVar('payable'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $element = $field->newElement('Textarea','address');
-    $element->label = 'Address to send the check to';
-    if($paymentType) $element->value = $paymentType->getVar('address');
-    $element->format = $format;
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Address to send the check to');
+    $element->setValue($this->_paymentType->getVar('address'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $element = $field->newElement('Textarea','coupon');
-    $element->label = 'Text for Payment Coupon';
-    if($paymentType) $element->value = $paymentType->getVar('coupon');
-    $element->format = $format;
+    $element->setLabel('Text for Payment Coupon');
+    $element->setValue($this->_paymentType->getVar('coupon'));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
+    $form->newButton('submit', 'Save');
     return $form;
   }
   
   public function setup(\Foundation\Form\Input $input){
-    $paymentType->name = $input->name;
-    $paymentType->class = 'CheckPayment';
-    $paymentType->setVar('payable', $input->payable);
-    $paymentType->setVar('address', $input->address);
-    $paymentType->setVar('coupon', $input->coupon);
+    $this->_paymentType->setName($input->get('name'));
+    $this->_paymentType->setClass('\\Jazzee\\Entity\\PaymentType\\Check');
+    $this->_paymentType->setVar('payable', $input->get('payable'));
+    $this->_paymentType->setVar('address', $input->get('address'));
+    $this->_paymentType->setVar('coupon', $input->get('coupon'));
   }
   
   /**
@@ -92,6 +94,7 @@ class Check extends AbstractPaymentType{
   function pendingPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $payment->setAmount($input->get('amount'));
     $payment->pending();
+    return true;
   }
   
   /**

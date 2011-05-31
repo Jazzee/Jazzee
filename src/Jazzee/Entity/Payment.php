@@ -67,6 +67,15 @@ class Payment{
   public function setApplicant(Applicant $applicant){
     $this->applicant = $applicant;
   }
+  
+  /**
+   * Get applicant
+   *
+   * @return \Jazzee\Entity\Applicant $applicant
+   */
+  public function getApplicant(){
+    return $this->applicant;
+  }
 
   /**
    * Set amount
@@ -114,6 +123,15 @@ class Payment{
   }
 
   /**
+   * Get all the variables
+   * 
+   * @return array \Jazzee\Entity\PaymentVarialbe
+   */
+  public function getVariables(){
+    return $this->variables->toArray();
+  }
+  
+  /**
    * Add variable
    *
    * @param Entity\PaymentVariable $variable
@@ -159,10 +177,22 @@ class Payment{
     foreach($this->variables as $variable)
       if($variable->getName() == $name)return $variable->setValue($value);
     //create a new empty variable with that name
-    $var = new PaymentVariable();
-    $var->setPayment($this);
-    $var->setName($name);
-    $var->setValue($value);
-    $this->variables->add($var);
+    $variable = new PaymentVariable();
+    $variable->setPayment($this);
+    $variable->setName($name);
+    $variable->setValue($value);
+    $this->variables[] = $variable;
+  }
+  
+
+
+  /**
+   * get payment variable
+   * @param string $name
+   * @return string $value
+   */
+  public function getVar($name){
+    foreach($this->variables as $variable)
+      if($variable->getName() == $name)return $variable->getValue();
   }
 }

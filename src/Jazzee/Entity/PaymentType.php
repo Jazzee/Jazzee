@@ -80,7 +80,16 @@ class PaymentType{
   public function getClass(){
     return $this->class;
   }
-
+  
+  /**
+   * get the varialbes
+   * 
+   * @return array \Jazzee\Entity\PaymentTypeVariable
+   */
+  public function getVariables(){
+    return $this->variables->toArray();
+  }
+  
   /**
    * Set variable
    * @param string $name

@@ -26,22 +26,16 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
    * @param integer $paymentTypeId
    */
    public function actionEdit($paymentTypeId){ 
-    if($paymentType =$this->_em->getRepository('\Jazzee\Entity\PaymentType')->find($paymentTypeId)){
-      $form = new \Foundation\Form();
+    if($paymentType = $this->_em->getRepository('\Jazzee\Entity\PaymentType')->find($paymentTypeId)){
+      
+      $form = $paymentType->getJazzeePaymentType()->getSetupForm();
       $form->setAction($this->path("manage/paymenttypes/edit/{$paymentTypeId}"));
-      $field = $form->newField();
-      $field->setLegend('Edit ' . $paymentType->getName() . ' page type');
-      $element = $field->newElement('TextInput','name');
-      $element->setLabel('Name');
-      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-      $element->setValue($paymentType->getName());
-  
-      $form->newButton('submit', 'Save Changes');
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
-        $paymentType->setName($input->get('name'));
-        $this->addMessage('success', "Changes Saved");
+        $paymentType->getJazzeePaymentType()->setup($input);
         $this->_em->persist($paymentType);
+        foreach($paymentType->getVariables() as $var) $this->_em->persist($var);
+        $this->addMessage('success', "Changes Saved");
         $this->redirectPath('manage/paymenttypes');
       }
     } else {
@@ -56,26 +50,38 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
     $form = new \Foundation\Form();
     $form->setAction($this->path("manage/paymenttypes/new"));
     $field = $form->newField();
-    $field->setLegend('New payment type');
-    $element = $field->newElement('TextInput','name');
-    $element->setLabel('Name');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    
-    $element = $field->newElement('TextInput','class');
+    $element = $field->newElement('TextInput','className');
     $element->setLabel('Class');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    
-    $form->newButton('submit', 'Add Payment Type');
-    $this->setVar('form', $form); 
-    if($input = $form->processInput($this->post)){
-      if(!class_exists($input->get('class'))){
-        $this->addMessage('error', "That is not a valid class name");
-      } else {
+    $form->newButton('submit', 'Next');
+    if(isset($this->post['className'])){  
+      $className = $this->post['className'];
+      if(!isset($this->post['newtypeform'])) $this->post = array(); //reset $_POST so we don't try and validate the empty form
+      //class_exists causes doctrine to try and load the class which fails so we look first if doctrine can load it and then
+      //if that fails we use class exists with no auto_load so it just looks in existing includes
+      if(\Doctrine\Common\ClassLoader::classExists(ltrim($className,'\\')) or class_exists($className, false)){
         $paymentType = new \Jazzee\Entity\PaymentType();
-        $paymentType->setName($input->get('name'));
-        $paymentType->setClass($input->get('class'));
-        $this->_em->persist($paymentType);
+        $paymentClass = new $className($paymentType);
+        $form = $paymentClass->getSetupForm();
+        $form->setAction($this->path("manage/paymenttypes/new"));
+        $form->newHiddenElement('className', $className);
+        $form->newHiddenElement('newtypeform', true);
+      } else {
+        $form->getElementByName('className')->addMessage('That is not a valid class name.  The class must eithier by loadable by a Doctrine::classLoader in the autoload stack or already be included.');
       }
+      
+    }
+    $this->setVar('form', $form); 
+    
+    if($input = $form->processInput($this->post)){
+      if($input->get('newtypeform')){
+        $paymentClass->setup($input);
+        $this->_em->persist($paymentType);
+        foreach($paymentType->getVariables() as $var) $this->_em->persist($var);
+        $this->addMessage('success', $input->get('name') . ' saved.');
+        $this->redirectPath('manage/paymenttypes');
+      }
+
     }
   }
 }

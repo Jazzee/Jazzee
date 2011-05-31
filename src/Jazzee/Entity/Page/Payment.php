@@ -73,10 +73,15 @@ class Payment extends AbstractPage {
     $payment->setApplicant($this->_applicant);
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
     $answer = new \Jazzee\Entity\Answer\Payment($payment);
-    $this->_controller->getEntityManager()->persist($payment);
     $result = $answer->update($input);
-    
-    if($result) $this->_form = null;
+    if($result){
+      $this->_controller->addMessage('success', 'Your payment has been recorded.');
+      $this->_form = null;
+    } else {
+      $this->_controller->addMessage('error', 'There was a problem processing your payment.');
+    }
+    $this->_controller->getEntityManager()->persist($payment);
+    foreach($payment->getVariables() as $var) $this->_controller->getEntityManager()->persist($var);
     $this->_controller->getEntityManager()->flush();
     return $result;
   }
