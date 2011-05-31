@@ -307,6 +307,16 @@ class Page{
   }
 
   /**
+   * Add Child
+   *
+   * @param \Jazzee\Entity\Page $page
+   */
+  public function addChild(\Jazzee\Entity\Page $page){
+    $this->children[] = $page;
+    if($page->getParent() != $this) $page->setParent($this);
+  }
+
+  /**
    * Get children
    *
    * @return Doctrine\Common\Collections\Collection $children

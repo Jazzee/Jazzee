@@ -1,6 +1,6 @@
 /**
  * The JazzeeEntityPageBranching type
-  @extends ApplyPage
+  @extends JazzeePage
  */
 function JazzeeEntityPageBranching(){}
 JazzeeEntityPageBranching.prototype = new JazzeePage();
@@ -11,8 +11,8 @@ JazzeeEntityPageBranching.prototype.constructor = JazzeeEntityPageBranching;
  * @param {String} id the id to use
  * @returns {JazzeeEntityPageBranching}
  */
-JazzeeEntityPageBranching.prototype.newPage = function(id,title,pageType,pageClass,status,pageStore){
-  var page = ApplyPage.prototype.newPage.call(this, id,title,pageType,pageClass,status,pageStore);
+JazzeeEntityPageBranching.prototype.newPage = function(id,title,classId,className,status,pageStore){
+  var page = JazzeePage.prototype.newPage.call(this, id,title,classId,className,status,pageStore);
   page.setVariable('branchingElementLabel', title);
   return page;
 };
@@ -20,15 +20,16 @@ JazzeeEntityPageBranching.prototype.newPage = function(id,title,pageType,pageCla
 JazzeeEntityPageBranching.prototype.workspace = function(){
   //call the parent workspace method
   JazzeePage.prototype.workspace.call(this);
-  $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
-  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
+  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {0:'Optional',1:'Required'}));
+  $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  
   
   $('#workspace-left-middle-left').show();
   $('#workspace-left-middle-left').append(this.textInputVariableBlock('branchingElementLabel', 'Branching Element Label: ', 'click to edit'));
-  $('#workspace-left-middle-left').append(this.listJazzeeEntityPageBranchingsBlock());
+  $('#workspace-left-middle-left').append(this.listBranchesBlock());
 };
 
-JazzeeEntityPageBranching.prototype.listJazzeeEntityPageBranchingsBlock = function(){
+JazzeeEntityPageBranching.prototype.listBranchesBlock = function(){
   var div = $('<div>').append($('<h5>').html('Branched Pages'));
   var pageClass = this;
   var ol = $('<ol>').addClass('page-list');
@@ -51,9 +52,9 @@ JazzeeEntityPageBranching.prototype.listJazzeeEntityPageBranchingsBlock = functi
     ol.append(li);
   }
   var p = $('<p>').addClass('add').html('New Branch').bind('click',function(){
-    var branch = new StandardPage.prototype.newPage('newpage' + pageClass.pageStore.getUniqueId(),'New Branch','StandardPage','new',pageClass.pageStore);
+    var branch = new JazzeeEntityPageStandard.prototype.newPage('newpage' + pageClass.pageStore.getUniqueId(),'New Branch',1,'JazzeeEntityPageStandard','new',pageClass.pageStore);
     pageClass.addChild(branch);
-    div.replaceWith(pageClass.listJazzeeEntityPageBranchingsBlock());
+    div.replaceWith(pageClass.listBranchesBlock());
   });
   return div.append(ol).append(p);
 };

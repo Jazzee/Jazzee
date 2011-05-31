@@ -137,7 +137,7 @@ JazzeePage.prototype.deleteElement = function(element){
  * @returns {JazzeePage}
  */
 JazzeePage.prototype.addChild = function(page){
-  this.children[page.pageId] = page;
+  this.children[page.id] = page;
   return page;
 };
 
