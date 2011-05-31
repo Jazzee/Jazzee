@@ -11,8 +11,8 @@ JazzeeEntityPagePayment.prototype.constructor = JazzeeEntityPagePayment;
  * @param {String} id the id to use
  * @returns {PaymentPage}
  */
-JazzeeEntityPagePayment.prototype.newPage = function(id,title,pageType,pageClass,status,pageStore){
-  var page = ApplyPage.prototype.newPage.call(this, id,title,pageType,pageClass,status,pageStore);
+JazzeeEntityPagePayment.prototype.newPage = function(id,title,classId,className,status,pageStore){
+  var page = JazzeePage.prototype.newPage.call(this, id,title,classId,className,status,pageStore);
   page.setVariable('amounts', 0);
   return page;
 };
@@ -22,7 +22,7 @@ JazzeeEntityPagePayment.prototype.newPage = function(id,title,pageType,pageClass
  */
 JazzeeEntityPagePayment.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
-  $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
   $('#workspace-left-middle-left').append(this.paymentAmountsBlock());
 };
 
