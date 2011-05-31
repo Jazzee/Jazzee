@@ -4,9 +4,8 @@
  * @param {String} index whether to use applicationPageId or pageId as our primary index for pages
  * @param {jQuery} workspace
  */
-function PageStore(baseUrl,index, workspace){
+function PageStore(baseUrl, workspace){
   this.baseUrl = baseUrl;
-  this.index = index;
   this.pages = {};
   this.deletedPages = [];
   this.workspace = workspace;
@@ -66,8 +65,8 @@ PageStore.prototype.createPageObject = function(obj){
  * @param {PageStore} page
  */
 PageStore.prototype.addPage = function(page){ 
-  this.pages[page[this.index]] = page;
-  var li = $('<li>').html(page.title).attr('id', 'page-' + page[this.index]);
+  this.pages[page.id] = page;
+  var li = $('<li>').html(page.title).attr('id', 'page-' + page.id);
   $(li).data('page', page);
   $('ol', this.workspace).append(li);
   this.synchronizePageList();
@@ -79,8 +78,8 @@ PageStore.prototype.addPage = function(page){
  */
 PageStore.prototype.deletePage = function(page){
   this.deletedPages.push(page);
-  delete this.pages[page[this.index]];
-  $('#page-' + page[this.index]).remove();
+  delete this.pages[page.id];
+  $('#page-' + page.id).remove();
 };
 
 /**
@@ -99,8 +98,7 @@ PageStore.prototype.copyPage = function(page){
  */
 PageStore.prototype.createPageCopy = function(obj){
   var id = 'newpage' + this.getUniqueId();
-  obj.pageId = id;
-  obj.applicationPageId = id;
+  obj.id = id;
   obj.title = 'Copy of ' + obj.title;
   var copy = new window[obj.className]();
   copy.init(obj, this);
@@ -136,7 +134,7 @@ PageStore.prototype.getPagePreview = function(page){
   var div = $('<div>');
   $.ajax({
     type: 'POST',
-    url: this.baseUrl + 'previewPage/',
+    url: this.baseUrl + '/previewPage',
     data: {data: $.toJSON(page.getDataObject())},
     async: false,
     success: function(html){
@@ -176,7 +174,7 @@ PageStore.prototype.save = function(){
 PageStore.prototype.savePage = function(page){
   var pageStore = this;
   var obj = page.getDataObject();
-  $.post(this.baseUrl + 'savePage/' + obj[this.index],{data: $.toJSON(obj)},function(){
+  $.post(this.baseUrl + '/savePage/' + obj.id,{data: $.toJSON(obj)},function(){
     pageStore.refreshPageList();
   });
 };

@@ -1,17 +1,17 @@
 /**
- * The PaymentPage type
+ * The JazzeeEntityPagePayment type
   @extends ApplyPage
  */
-function PaymentPage(){}
-PaymentPage.prototype = new ApplyPage();
-PaymentPage.prototype.constructor = PaymentPage;
+function JazzeeEntityPagePayment(){}
+JazzeeEntityPagePayment.prototype = new JazzeePage();
+JazzeeEntityPagePayment.prototype.constructor = JazzeeEntityPagePayment;
 
 /**
  * Create a new object with good default page values
  * @param {String} id the id to use
  * @returns {PaymentPage}
  */
-PaymentPage.prototype.newPage = function(id,title,pageType,pageClass,status,pageStore){
+JazzeeEntityPagePayment.prototype.newPage = function(id,title,pageType,pageClass,status,pageStore){
   var page = ApplyPage.prototype.newPage.call(this, id,title,pageType,pageClass,status,pageStore);
   page.setVariable('amounts', 0);
   return page;
@@ -20,13 +20,13 @@ PaymentPage.prototype.newPage = function(id,title,pageType,pageClass,status,page
 /**
  * Create the PaymentPage workspace
  */
-PaymentPage.prototype.workspace = function(){
-  ApplyPage.prototype.workspace.call(this);
+JazzeeEntityPagePayment.prototype.workspace = function(){
+  JazzeePage.prototype.workspace.call(this);
   $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
   $('#workspace-left-middle-left').append(this.paymentAmountsBlock());
 };
 
-PaymentPage.prototype.paymentAmountsBlock = function(){
+JazzeeEntityPagePayment.prototype.paymentAmountsBlock = function(){
   var pageClass = this;
   var div = $('<div>').append($('<h5>').html('Payment Amounts and Descriptions'));
   var amounts = this.getVariable('amounts');
@@ -49,14 +49,14 @@ PaymentPage.prototype.paymentAmountsBlock = function(){
   return div;
 };
 
-PaymentPage.prototype.amountRow = function(amount, description){
+JazzeeEntityPagePayment.prototype.amountRow = function(amount, description){
   var tr = $('<tr class="amount">');
   tr.append($('<td>').append($('<input type="text" class="paymentAmount">').val(amount)));
   tr.append($('<td>').append($('<input type="text" class="paymentDescription">').val(description)));
   return tr;
 };
 
-PaymentPage.prototype.trackPaymentUpdates = function(table){
+JazzeeEntityPagePayment.prototype.trackPaymentUpdates = function(table){
   var pageClass = this;
   $('input', table).unbind('change');
   $('input', table).bind('change', function(e){

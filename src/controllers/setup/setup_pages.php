@@ -11,6 +11,8 @@ class SetupPagesController extends \Jazzee\AdminController {
   const TITLE = 'Pages';
   const PATH = 'setup/pages';
   
+  const ACTION_INDEX = 'Edit Program Pages';
+  
   /**
    * Set the default layout to json
    * @var string
@@ -23,7 +25,7 @@ class SetupPagesController extends \Jazzee\AdminController {
   public function setUp(){
     parent::setUp();
     if($this->application === false){
-      $this->messages->write('error', 'Please setup the application before creating pages');
+      $this->addMessage('error', 'Please setup the application before creating pages');
       $this->redirect($this->path("setup/application"));
       $this->afterAction();
       exit();
@@ -380,12 +382,5 @@ class SetupPagesController extends \Jazzee\AdminController {
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
     //all action authorizations are controlled by the index action
     return parent::isAllowed($controller, 'index', $user, $program);
-  }
-  
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Setup Pages';
-    $auth->addAction('index', new ActionAuth('Make Changes'));
-    return $auth;
   }
 }

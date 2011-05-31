@@ -102,11 +102,7 @@ class JazzeeController extends PageController
    */
   public function path($path){
     $prefix = $this->_serverPath . rtrim(dirname($_SERVER['SCRIPT_NAME']),'/\\.');
-    if(false and $this->_config->getPrettyUrls()){
-      return $prefix . '/' . $path;
-    } else {
-      return $prefix . '/index.php?url=' . $path;
-    }
+    return $prefix . '/' . $path;
   }
 
   /**

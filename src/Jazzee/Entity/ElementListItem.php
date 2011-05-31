@@ -47,6 +47,16 @@ class ElementListItem{
    */
   public function setElement(Element $element){
     $this->element = $element;
+    $element->addItem($this);
+  }
+  
+  /**
+   * get element
+   *
+   * @return Entity\Element $element
+   */
+  public function getElement(){
+    return $this->element;
   }
 
   /**

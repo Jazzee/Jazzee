@@ -68,13 +68,17 @@ class ManageElementtypesController extends \Jazzee\AdminController {
     $form->newButton('submit', 'Add Element');
     $this->setVar('form', $form); 
     if($input = $form->processInput($this->post)){
-      if(!class_exists($input->get('class'))){
-        $this->addMessage('error', "That is not a valid class name");
-      } else {
+      //class_exists causes doctrine to try and load the class which fails so we look first if doctrine can load it and then
+      //if that fails we use class exists with no auto_load so it just looks in existing includes
+      if(\Doctrine\Common\ClassLoader::classExists(ltrim($input->get('class'),'\\')) or class_exists($input->get('class'), false)){
         $elementType = new \Jazzee\Entity\ElementType;
         $elementType->setName($input->get('name'));
         $elementType->setClass($input->get('class'));
+        $this->addMessage('success', $input->get('name') . " saved.");
         $this->_em->persist($elementType);
+        $this->redirectPath('manage/elementtypes');
+      } else {
+        $this->addMessage('error', "That is not a valid class name.  The class must eithier by loadable by a Doctrine::classLoader registered in the autoload stack or already be included.");
       }
     }
   }

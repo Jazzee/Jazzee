@@ -1,18 +1,19 @@
 /**
- * Initialize the ApplyElement
+ * Initialize the JazzeeElement
   @class The base class for all element types
   @property {String} status the element status This is sent to the server so we can decide to create a new element or modify an existing one
   @property {boolean} isModified Only modified elements will be saved back to the server
  */
-function ApplyElement(){
+function JazzeeElement(){
   this.page;
   this.id;
-  this.className,
+  this.classId;
+  this.className;
   this.title;
   this.format;
   this.instructions;
   this.defaultValue;
-  this.required;
+  this.isRequired;
   this.min;
   this.max;
   this.weight;
@@ -27,15 +28,16 @@ function ApplyElement(){
  * @param {Object} obj
  * @param {ApplyPage} page
  */
-ApplyElement.prototype.init = function(obj, page){
+JazzeeElement.prototype.init = function(obj, page){
   this.page = page;
   this.id = obj.id;
-  this.className = obj.className,
+  this.classId = obj.classId;
+  this.className = obj.className;
   this.title = obj.title;
   this.instructions = obj.instructions;
   this.format = obj.format;
   this.defaultValue = obj.defaultValue;
-  this.required = (obj.required)?1:0;
+  this.isRequired = (obj.isRequired)?1:0;
   this.min = obj.min;
   this.max = obj.max;
   this.weight = obj.weight;
@@ -43,24 +45,23 @@ ApplyElement.prototype.init = function(obj, page){
   
   this.status = '';
   this.isModified = false;
-  
-//    this.weight = obj.weight;
 };
   
 /**
  * Create a new element object with good default values
  * @param {String} id the id to use
- * @returns {ApplyElement}
+ * @returns {JazzeeElement}
  */
-ApplyElement.prototype.newElement = function(id,title,className,status,page){
+JazzeeElement.prototype.newElement = function(id,title,classId,className,status,page){
   var obj = {
     id: id,
     title: title,
+    classId: classId,
     className: className,
     format: '',
     instructions: '',
     defaultValue: '',
-    required: true,
+    isRequired: 1,
     min: null,
     max: null,
     weight: null
@@ -73,10 +74,10 @@ ApplyElement.prototype.newElement = function(id,title,className,status,page){
 };
 
 /**
- * Check to see if the ApplyElement has been modified
+ * Check to see if the JazzeeElement has been modified
  * @returns {Boolean}
  */
-ApplyElement.prototype.checkModified = function(){
+JazzeeElement.prototype.checkModified = function(){
   return this.isModified;
 };
 
@@ -86,7 +87,7 @@ ApplyElement.prototype.checkModified = function(){
  * @param {Mixed} value
  * @return {Mixed}
  */
-ApplyElement.prototype.setProperty = function(name, value){
+JazzeeElement.prototype.setProperty = function(name, value){
   if(typeof this[name] == 'undefined' || this[name] !== value){
     this[name] = value;
     this.isModified = true;
@@ -100,7 +101,7 @@ ApplyElement.prototype.setProperty = function(name, value){
  * @para, {String} valueIfBlank what do display if the property isn't set
  * @return {jQuery}
  */
-ApplyElement.prototype.textInputBlock = function(propertyName, valueIfBlank){
+JazzeeElement.prototype.textInputBlock = function(propertyName, valueIfBlank){
   var elementClass = this;
   var field = $('<input>').attr('value',(this[propertyName]))
   .bind('change',function(){
@@ -123,7 +124,7 @@ ApplyElement.prototype.textInputBlock = function(propertyName, valueIfBlank){
  * @param {Object} options
  * @returns {jQuery}
  */
-ApplyElement.prototype.selectListBlock = function(propertyName, description, options){
+JazzeeElement.prototype.selectListBlock = function(propertyName, description, options){
   var elementClass = this;
   var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(options[this[propertyName]]).bind('click',function(e){
     $(this).unbind('click');
@@ -150,7 +151,7 @@ ApplyElement.prototype.selectListBlock = function(propertyName, description, opt
  * @param {String} propertyName
  * @return {jQuery}
  */
-ApplyElement.prototype.editTitleBlock = function(){
+JazzeeElement.prototype.editTitleBlock = function(){
   var elementClass = this;
   var field = $('<input>').attr('value', this.title).attr('type', 'text')
     .bind('change',function(){
@@ -171,16 +172,17 @@ ApplyElement.prototype.editTitleBlock = function(){
  * Get an object suitable for json
  * @returns {Object}
  */
-ApplyElement.prototype.getDataObject = function(){
+JazzeeElement.prototype.getDataObject = function(){
   var obj = {
     id: this.id,
+    classId: this.classId,
     className: this.className,
     status: this.status,
     title: this.title,
     format: this.format,
     instructions: this.instructions,
     defaultValue: this.defaultValue,
-    required: this.required,
+    isRequired: this.isRequired,
     min: this.min,
     max: this.max,
     weight: this.weight,
@@ -195,7 +197,7 @@ ApplyElement.prototype.getDataObject = function(){
 /**
  * Create the element workspace
  */
-ApplyElement.prototype.workspace = function(){
+JazzeeElement.prototype.workspace = function(){
   var elementClass = this;
   var field = $('#element-'+this.id);
   if(field.length == 0){
@@ -217,7 +219,7 @@ ApplyElement.prototype.workspace = function(){
 /**
  * Create the options workspace for the element
  */
-ApplyElement.prototype.optionsBlock = function(){
+JazzeeElement.prototype.optionsBlock = function(){
   var elementClass = this;
   var div = $('#element-options-'+this.id);
   if(div.length == 0){
@@ -238,7 +240,7 @@ ApplyElement.prototype.optionsBlock = function(){
     $('#workspace-left-middle-left div.field:first').trigger('click');
   });
   div.append(p);
-  div.append(this.selectListBlock('required', 'This element is', {0:'Optional',1:'Required'}));
+  div.append(this.selectListBlock('isRequired', 'This element is', {0:'Optional',1:'Required'}));
   div.hide();
   return div;
 };
@@ -248,7 +250,7 @@ ApplyElement.prototype.optionsBlock = function(){
  * Always overridden by the actual element
  * @returns {jQuery}
  */
-ApplyElement.prototype.avatar = function(){
+JazzeeElement.prototype.avatar = function(){
   return $('<span>').html('default avatar');
 };
 
@@ -257,7 +259,7 @@ ApplyElement.prototype.avatar = function(){
  * Get a string representation of the element which can be used to represent the element
  * @returns {String}
  */
-ApplyElement.prototype.replacementTitle = function(){
+JazzeeElement.prototype.replacementTitle = function(){
   var text = this.title.replace(/\s+/, '_');
   text = '%' + text.toUpperCase() + '%';
   return text;

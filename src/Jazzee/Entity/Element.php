@@ -57,6 +57,7 @@ class Element{
   
   /** 
    * @OneToMany(targetEntity="ElementListItem",mappedBy="element")
+   * @OrderBy({"weight" = "ASC"})
    */
   private $listItems;
   
@@ -77,6 +78,16 @@ class Element{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Generate a Temporary id
+   *
+   * This should only be used when we need to termporarily generate an element 
+   * but have no intention of persisting it.  Use a string to be sure we cant persist
+   */
+  public function tempId(){
+    $this->id = uniqid('element');
   }
 
   /**
@@ -279,6 +290,16 @@ class Element{
    */
   public function getPage(){
     return $this->page;
+  }
+
+  /**
+   * Add list item
+   *
+   * @param Entity\ElementListItem $item
+   */
+  public function addItem(\Jazzee\Entity\ElementListItem $item){
+    $this->items[] = $item;
+    if($item->getElement() != $this) $item->setElement($this);
   }
 
   /**

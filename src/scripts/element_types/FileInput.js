@@ -1,12 +1,12 @@
 /**
- * The FileInputElement type is generic for any type of file
-  @extends ApplyElement
+ * The FileInput type is generic for any type of file
+  @extends JazzeeElement
  */
-function FileInputElement(){}
-FileInputElement.prototype = new ApplyElement();
-FileInputElement.prototype.constructor = FileInputElement;
+function FileInput(){}
+FileInput.prototype = new JazzeeElement();
+FileInput.prototype.constructor = FileInput;
 
-FileInputElement.prototype.avatar = function(){
+FileInput.prototype.avatar = function(){
   return $('<input>').attr('type', 'file').attr('disabled', true);
 };
 
@@ -14,10 +14,9 @@ FileInputElement.prototype.avatar = function(){
  * Add size restrictions to the options block
  * @returns {jQuery}
  */
-FileInputElement.prototype.optionsBlock = function(){
-  this.convertShorthandValue('20487');
+FileInput.prototype.optionsBlock = function(){
   var element = this;
-  var optionsBlockDiv = ApplyElement.prototype.optionsBlock.call(this);
+  var optionsBlockDiv = JazzeeElement.prototype.optionsBlock.call(this);
   optionsBlockDiv.append(this.maxFileSizeBlock());
   return optionsBlockDiv;
 };
@@ -26,7 +25,7 @@ FileInputElement.prototype.optionsBlock = function(){
  * Maximum file size block
  * @return {jQuery}
  */
-FileInputElement.prototype.maxFileSizeBlock = function(){
+FileInput.prototype.maxFileSizeBlock = function(){
   var elementClass = this;
   var field = $('<input>').attr('value',(this.convertBytesToString(this.max)))
   .bind('change',function(){
@@ -48,7 +47,7 @@ FileInputElement.prototype.maxFileSizeBlock = function(){
  * @param bytes
  * @returns {String}
  */
-FileInputElement.prototype.convertBytesToString = function(bytes) {
+FileInput.prototype.convertBytesToString = function(bytes) {
   if(isNaN(bytes) || bytes == null) return '';
   var suffixes = ['b', 'k', 'm', 'g', 't'];
   //convert to base 1024 and find our position in the suffixes index
@@ -61,7 +60,7 @@ FileInputElement.prototype.convertBytesToString = function(bytes) {
  * @param {String} value 
  * @return {Integer}
  */
-FileInputElement.prototype.convertShorthandValue = function(value){
+FileInput.prototype.convertShorthandValue = function(value){
   value = value.replace(/^\s*|\s*$/g,'');
   var number = value.slice(0, -1);
   var description = value.substr(value.length-1).toLowerCase();

@@ -46,6 +46,7 @@ class Page{
 
   /** 
    * @OneToMany(targetEntity="Element", mappedBy="page")
+   * @OrderBy({"weight" = "ASC"})
    */
   private $elements;
   
@@ -83,6 +84,16 @@ class Page{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Generate a Temporary id
+   *
+   * This should only be used when we need to termporarily generate a page 
+   * but have no intention of persisting it.  Use a string to be sure we cant persist
+   */
+  public function tempId(){
+    $this->id = uniqid('page');
   }
 
   /**
@@ -346,6 +357,16 @@ class Page{
    */
   public function getVariables(){
     return $this->variables;
+  }
+
+  /**
+   * Add element
+   *
+   * @param Entity\Element $element
+   */
+  public function addElement(\Jazzee\Entity\Element $element){
+    $this->elements[] = $element;
+    if($element->getPage() != $this) $element->setPage($this);
   }
 
   /**

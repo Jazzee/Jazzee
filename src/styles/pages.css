@@ -23,7 +23,7 @@ ol.page-list li{
 }
 
 ol.page-list li.active{
-  list-style-image: url('resource/foundation/icons/page_edit.png');
+  list-style-image: url(./index.php?url=resource/foundation/media/icons/page_edit.png);
 }
 
 ol.add-list li{

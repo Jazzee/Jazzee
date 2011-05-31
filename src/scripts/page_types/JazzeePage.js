@@ -1,23 +1,24 @@
 /**
- * Initialize the ApplyPage
+ * Initialize the \\Jazzee\Page Abstract Type
   @class The base class for all page types
   @property {String} status the pages status This is sent to the server so we can decide to create a new page or modify an existing one
   @property {boolean} isModified Is the page modified or new Pages will only be saved back to the server if this is true
  */
-function ApplyPage(){
+function JazzeePage(){
   this.pageStore;
   this.pageId;
   this.applicationPageId;
   this.className;
+  this.classId;
   this.isGlobal;
   this.title;
   this.min;
   this.max;
-  this.optional;
+  this.isRequired;
   this.instructions;
   this.leadingText;
   this.trailingText;
-  this.showAnswerStatus;
+  this.answerStatusDisplay;
   this.weight;
 
   this.variables;
@@ -35,20 +36,20 @@ function ApplyPage(){
  * @param {Object} pageObject
  * @param {PageStore} pageStore
  */
-ApplyPage.prototype.init = function(pageObject, pageStore){
+JazzeePage.prototype.init = function(pageObject, pageStore){
   this.pageStore = pageStore;
-  this.pageId = pageObject.pageId;
-  this.applicationPageId = pageObject.applicationPageId;
+  this.id = pageObject.id;
+  this.classId = pageObject.classId;
   this.className = pageObject.className;
   this.title = pageObject.title;
   this.isGlobal = pageObject.isGlobal;
   this.min = pageObject.min;
   this.max = pageObject.max;
-  this.optional = (pageObject.optional)?1:0;
+  this.isRequired = (pageObject.isRequired)?1:0;
   this.instructions = pageObject.instructions;
   this.leadingText = pageObject.leadingText;
   this.trailingText = pageObject.trailingText;
-  this.showAnswerStatus = (pageObject.showAnswerStatus)?1:0;
+  this.answerStatusDisplay = (pageObject.answerStatusDisplay)?1:0;
   this.weight = pageObject.weight;
 
   this.variables = {};
@@ -64,12 +65,12 @@ ApplyPage.prototype.init = function(pageObject, pageStore){
 /**
  * Create a new object with good default page values
  * @param {String} id the id to use
- * @returns {ApplyPage}
+ * @returns {JazzeePage}
  */
-ApplyPage.prototype.newPage = function(id,title,className,status,pageStore){
+JazzeePage.prototype.newPage = function(id,title,classId,className,status,pageStore){
   var obj = {
-    pageId: id,
-    applicationPageId: id,
+    id: id,
+    classId: classId,
     className: className,
     title: title,
     isGlobal: false,
@@ -90,10 +91,10 @@ ApplyPage.prototype.newPage = function(id,title,className,status,pageStore){
 };
 
 /**
- * Check to see if the ApplyPage has been modified
+ * Check to see if the JazzeePage has been modified
  * @returns {Boolean}
  */
-ApplyPage.prototype.checkModified = function(){
+JazzeePage.prototype.checkModified = function(){
   if(this.isModified) return true;
   for(var i in this.children) {
     if(this.children[i].checkModified()) return true;
@@ -109,7 +110,7 @@ ApplyPage.prototype.checkModified = function(){
  * @param {ApplyElement} the ApplyElement object
  * @returns {ApplyElement}
  */
-ApplyPage.prototype.addElement = function(element){
+JazzeePage.prototype.addElement = function(element){
   this.elements.push(element);
   return element;
 };
@@ -119,7 +120,7 @@ ApplyPage.prototype.addElement = function(element){
  * @param {ApplyElement} the element to delete
  * @returns {boolean}
  */
-ApplyPage.prototype.deleteElement = function(element){
+JazzeePage.prototype.deleteElement = function(element){
   for(var i = 0; i < this.elements.length; i++){
     if(this.elements[i] == element){ 
       this.elements.splice(i,1);
@@ -132,19 +133,19 @@ ApplyPage.prototype.deleteElement = function(element){
   
 /**
  * Add a child to the page
- * @param {ApplyPage} page
- * @returns {ApplyPage}
+ * @param {JazzeePage} page
+ * @returns {JazzeePage}
  */
-ApplyPage.prototype.addChild = function(page){
+JazzeePage.prototype.addChild = function(page){
   this.children[page.pageId] = page;
   return page;
 };
 
 /**
  * Delete a child page
- * @param {ApplyPage} page
+ * @param {JazzeePage} page
  */
-ApplyPage.prototype.deleteChild = function(page){
+JazzeePage.prototype.deleteChild = function(page){
   delete this.children[page.pageId];
   this.isModified = true;
   page.status = 'delete';
@@ -158,7 +159,7 @@ ApplyPage.prototype.deleteChild = function(page){
  * @param {String} value
  * @returns {Object} the varialbe we created
  */
-ApplyPage.prototype.setVariable = function(name, value){
+JazzeePage.prototype.setVariable = function(name, value){
   //only set the variable and mark as modified if it is new or different
   if(typeof this.variables[name] == 'undefined'  || this.variables[name].value !== value){
     this.variables[name] = {name : name, value: value};
@@ -172,7 +173,7 @@ ApplyPage.prototype.setVariable = function(name, value){
  * @param {String} name
  * @returns {String|Null}
  */
-ApplyPage.prototype.getVariable = function(name){
+JazzeePage.prototype.getVariable = function(name){
   if(name in this.variables) return this.variables[name].value;
   return null;
 };
@@ -183,8 +184,10 @@ ApplyPage.prototype.getVariable = function(name){
  * @param {Mixed} value
  * @return {Mixed}
  */
-ApplyPage.prototype.setProperty = function(name, value){
-  if(typeof this[name] == 'undefined' || this[name] !== value){
+JazzeePage.prototype.setProperty = function(name, value){
+  if(typeof this[name] == 'undefined'){
+    console.log('Attempting to set JazzePage "' + name + '" property to ' + value + ' but it is not defined');
+  } else if(this[name] != value){
     this[name] = value;
     this.isModified = true;
     this.pageStore.synchronizePageList();
@@ -198,7 +201,7 @@ ApplyPage.prototype.setProperty = function(name, value){
  * Block for deleting the current page
  * @returns {jQuery}
  */
-ApplyPage.prototype.deletePageBlock = function(){
+JazzeePage.prototype.deletePageBlock = function(){
   var pageClass = this;
   var p = $('<p>Delete this page</p>').addClass('delete').bind('click', function(e){
     $('#workspace').effect('explode',500);
@@ -212,7 +215,7 @@ ApplyPage.prototype.deletePageBlock = function(){
  * Block for copying the page
  * @returns {jQuery}
  */
-ApplyPage.prototype.copyPageBlock = function(){
+JazzeePage.prototype.copyPageBlock = function(){
   var pageClass = this;
   var p = $('<p>Copy this page</p>').addClass('copy').bind('click', function(e){
     pageClass.pageStore.copyPage(pageClass);
@@ -220,7 +223,7 @@ ApplyPage.prototype.copyPageBlock = function(){
   return p;
 };
 
-ApplyPage.prototype.previewPageBlock = function(){
+JazzeePage.prototype.previewPageBlock = function(){
   var pageClass = this;
   var p = $('<p>Preview the page</p>').addClass('preview').bind('click',function(e){
     var preview = pageClass.pageStore.getPagePreview(pageClass);
@@ -235,7 +238,7 @@ ApplyPage.prototype.previewPageBlock = function(){
  * Create the page title block
  * @returns {jQuery}
  */
-ApplyPage.prototype.titleBlock = function(){
+JazzeePage.prototype.titleBlock = function(){
   var pageClass = this;
   var field = $('<input type="text">').attr('value',this.title)
     .bind('change',function(){
@@ -257,7 +260,7 @@ ApplyPage.prototype.titleBlock = function(){
  * @para, {String} valueIfBlank what do display if the property isn't set
  * @return {jQuery}
  */
-ApplyPage.prototype.textAreaBlock = function(propertyName, valueIfBlank){
+JazzeePage.prototype.textAreaBlock = function(propertyName, valueIfBlank){
   var pageClass = this;
   var field = $('<textarea>').html(this[propertyName])
   .bind('change',function(){
@@ -279,7 +282,7 @@ ApplyPage.prototype.textAreaBlock = function(propertyName, valueIfBlank){
  * @para, {String} valueIfBlank what do display if the property isn't set
  * @return {jQuery}
  */
-ApplyPage.prototype.textInputBlock = function(propertyName, valueIfBlank){
+JazzeePage.prototype.textInputBlock = function(propertyName, valueIfBlank){
   var pageClass = this;
   var field = $('<input>').attr('value',(this[propertyName]))
   .bind('change',function(){
@@ -302,7 +305,7 @@ ApplyPage.prototype.textInputBlock = function(propertyName, valueIfBlank){
  * @param {Object} options
  * @returns {jQuery}
  */
-ApplyPage.prototype.selectListBlock = function(propertyName, description, options){
+JazzeePage.prototype.selectListBlock = function(propertyName, description, options){
   var pageClass = this;
   var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(options[this[propertyName]]).bind('click',function(e){
     $(this).unbind('click');
@@ -329,7 +332,7 @@ ApplyPage.prototype.selectListBlock = function(propertyName, description, option
  * @para, {String} valueIfBlank what do display if the property isn't set
  * @return {jQuery}
  */
-ApplyPage.prototype.textInputVariableBlock = function(variableName, title, valueIfBlank){
+JazzeePage.prototype.textInputVariableBlock = function(variableName, title, valueIfBlank){
   var pageClass = this;
   var field = $('<input>').attr('value',(this.getVariable(variableName)))
   .bind('change',function(){
@@ -354,7 +357,7 @@ ApplyPage.prototype.textInputVariableBlock = function(variableName, title, value
  * @param {Object} options
  * @returns {jQuery}
  */
-ApplyPage.prototype.selectListVariableBlock = function(variableName, description, options){
+JazzeePage.prototype.selectListVariableBlock = function(variableName, description, options){
   var pageClass = this;
   var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(options[this.getVariable(variableName)]).bind('click',function(e){
     $(this).unbind('click');
@@ -379,17 +382,17 @@ ApplyPage.prototype.selectListVariableBlock = function(variableName, description
  * Get an object suitable for json
  * @returns {Object}
  */
-ApplyPage.prototype.getDataObject = function(){
+JazzeePage.prototype.getDataObject = function(){
   var obj = {
+    classId: this.classId,
     className: this.className,
-    pageId: this.pageId,
-    applicationPageId: this.applicationPageId,
+    id: this.id,
     status: this.status,
     title: this.title,
     min: this.min,
     max: this.max,
-    optional: this.optional,
-    showAnswerStatus: this.showAnswerStatus,        
+    isRequired: this.isRequired,
+    answerStatusDisplay: this.answerStatusDisplay,        
     instructions: this.instructions,
     leadingText: this.leadingText,
     trailingText: this.trailingText,
@@ -416,7 +419,7 @@ ApplyPage.prototype.getDataObject = function(){
 /**
  * Clear the workspace
  */
-ApplyPage.prototype.clearWorkspace = function(){
+JazzeePage.prototype.clearWorkspace = function(){
   $('#workspace').hide();
   $('#workspace-left-top').empty();
   $('#workspace-left-middle-left').empty();
@@ -434,7 +437,7 @@ ApplyPage.prototype.clearWorkspace = function(){
  * Create the page workspace
  * This is overridden by most page types
  */
-ApplyPage.prototype.workspace = function(){
+JazzeePage.prototype.workspace = function(){
   this.clearWorkspace();
   $('#workspace-left-top').parent().addClass('form');
   $('#workspace-left-top').append(this.titleBlock());

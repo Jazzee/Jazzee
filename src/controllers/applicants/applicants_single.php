@@ -69,12 +69,12 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionEditApplicant($id){
     $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
-    $form = new Form;
+    $form = new \Foundation\Form();
     $form->action = $this->path("applicants/view/editApplicant/{$id}");
     $field = $form->newField(array('legend'=>"Edit Applicant {$applicant->firstName} {$applicant->lastName}"));
     $element = $field->newElement('TextInput', 'firstName');
     $element->label = 'First Name';
-    $element->addValidator('NotEmpty');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->value = $applicant->firstName;
     
     $element = $field->newElement('TextInput', 'middleName');
@@ -83,7 +83,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     
     $element = $field->newElement('TextInput','lastName');
     $element->label = 'Last Name';
-    $element->addValidator('NotEmpty');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->value = $applicant->lastName;
         
     $element = $field->newElement('TextInput', 'suffix');
@@ -93,7 +93,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
 
     $element = $field->newElement('TextInput', 'email');
     $element->label = 'Email Address';
-    $element->addValidator('NotEmpty');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator('EmailAddress');
     $element->addFilter('Lowercase');
     $element->value = $applicant->email;
@@ -199,7 +199,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
         if($paymentType->settlePayment($payment, $input)){
-          $this->messages->write('success', 'Payment Settled Successfully');
+          $this->addMessage('success', 'Payment Settled Successfully');
           $this->redirectPath('applicants/single/byId/'.$applicant->id);
         }
       } else {
@@ -228,7 +228,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
         if($paymentType->refundPayment($payment, $input)){
-          $this->messages->write('success', 'Payment Refunded Successfully');
+          $this->addMessage('success', 'Payment Refunded Successfully');
           $this->redirectPath('applicants/single/byId/'.$applicant->id);
         }
       } else {
@@ -257,7 +257,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
         if($paymentType->rejectPayment($payment, $input)){
-          $this->messages->write('success', 'Payment Rejected Successfully');
+          $this->addMessage('success', 'Payment Rejected Successfully');
           $this->redirectPath('applicants/single/byId/'.$applicant->id);
         }
       } else {
@@ -315,12 +315,12 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionExtendDeadline($id){
     $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
-    $form = new Form;
+    $form = new \Foundation\Form();
     $form->action = $this->path("applicants/view/extendDeadline/{$id}");
     $field = $form->newField(array('legend'=>"Extend Deadline for {$applicant->firstName} {$applicant->lastName}"));
     $element = $field->newElement('DateInput', 'deadline');
     $element->label = 'New Deadline';
-    $element->addValidator('NotEmpty');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator('DateAfter', 'today');
     $element->addFilter('DateFormat', 'Y-m-d H:i:s');
     if($applicant->deadlineExtension){
@@ -358,7 +358,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
         if($page->updateAnswer($input,$id)){
-          $this->messages->write('success', 'Answer Updated Successfully');
+          $this->addMessage('success', 'Answer Updated Successfully');
         }
       } else {
         $this->setLayoutVar('status', 'error');
@@ -383,7 +383,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
         if($page->newAnswer($input)){
-          $this->messages->write('success', 'Answer Saved Successfully');
+          $this->addMessage('success', 'Answer Saved Successfully');
         }
       } else {
         $this->setLayoutVar('status', 'error');
@@ -402,7 +402,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->layout = 'json';
     $page = new $answer->Page->PageType->class($this->application->getApplicationPageByGlobalID($answer->Page->id), $applicant);
     if($page->deleteAnswer($id)){
-      $this->messages->write('success', 'Answer Deleted Successfully');
+      $this->addMessage('success', 'Answer Deleted Successfully');
     }
     $this->redirectPath('applicants/single/byId/'.$applicant->id);
   }
@@ -415,7 +415,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
     $statusTypes = Doctrine::getTable('StatusType')->findAll();
-    $form = new Form;
+    $form = new \Foundation\Form();
     $form->action = $this->path("applicants/view/verifyAnswer/{$id}");
     $field = $form->newField(array('legend'=>"Verify Answer"));
     $element = $field->newElement('SelectList', 'publicStatus');
@@ -456,7 +456,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionAttachAnswerPDF($id){
     $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
-    $form = new Form;
+    $form = new \Foundation\Form();
     $form->action = $this->path("applicants/view/attachAnswerPDF/{$id}");
     $field = $form->newField(array('legend'=>"Attach PDF"));
     $element = $field->newElement('FileInput', 'pdf');
@@ -483,7 +483,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionAttachApplicantPDF($id){
     $applicant = $this->getApplicantById($id);
     $this->layout = 'json';
-    $form = new Form;
+    $form = new \Foundation\Form();
     $form->action = $this->path("applicants/view/attachApplicantPDF/{$id}");
     $field = $form->newField(array('legend'=>"Attach PDF to Applicant"));
     $element = $field->newElement('FileInput', 'pdf');

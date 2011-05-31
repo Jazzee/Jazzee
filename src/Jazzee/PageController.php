@@ -40,6 +40,9 @@ class PageController extends \Foundation\VC\Controller
     //our css
     $this->addCss($this->path('resource/styles/layout.css'));
     $this->addCss($this->path('resource/styles/style.css'));
+    
+    //default jquery theme
+    $this->addCss($this->path('resource/foundation/styles/jquerythemes/ui-lightness/style.css'));
   }
   
   /**

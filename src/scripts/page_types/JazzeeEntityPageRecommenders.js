@@ -1,17 +1,17 @@
 /**
- * The RecommendersPage type
-  @extends ApplyPage
+ * The JazzeeEntityPageRecommenders type
+  @extends JazzeePage
  */
-function RecommendersPage(){}
-RecommendersPage.prototype = new ApplyPage();
-RecommendersPage.prototype.constructor = RecommendersPage;
+function JazzeeEntityPageRecommenders(){}
+JazzeeEntityPageRecommenders.prototype = new JazzeePage();
+JazzeeEntityPageRecommenders.prototype.constructor = JazzeeEntityPageRecommenders;
 
 /**
  * Create a new RecommendersPage with good default values
  * @param {String} id the id to use
  * @returns {RecommendersPage}
  */
-RecommendersPage.prototype.newPage = function(id,title,pageClass,status,pageStore){
+JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,pageClass,status,pageStore){
   var page = ApplyPage.prototype.newPage.call(this, id,title,pageClass,status,pageStore);
   page.setVariable('lorDeadline', null);
   page.setVariable('lorDeadlineEnforced', 0);
@@ -26,8 +26,8 @@ RecommendersPage.prototype.newPage = function(id,title,pageClass,status,pageStor
   return page;
 };
 
-RecommendersPage.prototype.workspace = function(){
-  ApplyPage.prototype.workspace.call(this);
+JazzeeEntityPageRecommenders.prototype.workspace = function(){
+  JazzeePage.prototype.workspace.call(this);
   var pageClass = this;
   $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
   $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
@@ -53,7 +53,7 @@ RecommendersPage.prototype.workspace = function(){
  * Get the recommendation page (it is the first child)
  * @returns {ApplyPage}
  */
-RecommendersPage.prototype.getRecommendationPage = function(){
+JazzeeEntityPageRecommenders.prototype.getRecommendationPage = function(){
   for (var firstId in this.children) break;
   return this.children[firstId];
 };
@@ -62,7 +62,7 @@ RecommendersPage.prototype.getRecommendationPage = function(){
  * Edit the recommendation Page block
  * @returns {jQuery}
  */
-RecommendersPage.prototype.recommendationPageBlock = function(){
+JazzeeEntityPageRecommenders.prototype.recommendationPageBlock = function(){
   var pageClass = this;
   var p = $('<p>').addClass('edit lorPage').html('Edit Recommendation Page').bind('click',function(e){
     pageClass.getRecommendationPage().workspace();
@@ -77,7 +77,7 @@ RecommendersPage.prototype.recommendationPageBlock = function(){
  * Answer status Block
  * @returns {jQuery}
  */
-RecommendersPage.prototype.recommenderEmailBlock = function(){
+JazzeeEntityPageRecommenders.prototype.recommenderEmailBlock = function(){
   var pageClass = this;
   var p = $('<p>').addClass('edit recommenderEmail').html('Recommender Email').append($('<br>')).append($('<em>').html(this.getVariable('emailText'))).bind('click', function(e){
     var obj = new FormObject();

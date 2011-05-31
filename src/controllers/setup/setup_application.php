@@ -52,15 +52,15 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element = $field->newElement('DateInput','open');
     $element->setLabel('Application Open');
     $element->addValidator(new \Foundation\Form\Validator\DateBeforeElement($element, 'close'));
-    $element->setValue($this->_application->getOpen()->format('c'));
+    if($this->_application->getOpen()) $element->setValue($this->_application->getOpen()->format('c'));
     
     $element = $field->newElement('DateInput','close');
     $element->setLabel('Application close');
-    $element->setValue($this->_application->getClose()->format('c'));
+    if($this->_application->getClose()) $element->setValue($this->_application->getClose()->format('c'));
 
     $element = $field->newElement('DateInput','begin');
     $element->setLabel('Program Start Date');
-    $element->setValue($this->_application->getBegin()->format('c'));
+    if($this->_application->getOpen()) $element->setValue($this->_application->getBegin()->format('c'));
     
     $element = $field->newElement('RadioList','visible');
     $element->setLabel('Visible');

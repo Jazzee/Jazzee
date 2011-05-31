@@ -1,17 +1,17 @@
 /**
- * The ListElement is an abstract for other list elements
-  @extends ApplyElement
+ * The List is an abstract for other list elements
+  @extends JazzeeElement
  */
-function ListElement(){}
-ListElement.prototype = new ApplyElement();
-ListElement.prototype.constructor = ListElement;
+function List(){}
+List.prototype = new JazzeeElement();
+List.prototype.constructor = List;
 
 /**
  * Add a list manager to the options block
  */
-ListElement.prototype.optionsBlock = function(){
+List.prototype.optionsBlock = function(){
   var element = this;
-  var optionsBlockDiv = ApplyElement.prototype.optionsBlock.call(this);
+  var optionsBlockDiv = JazzeeElement.prototype.optionsBlock.call(this);
   
   var div = $('<div>').addClass('listItems container').append($('<h5>').html('List Items'));
   var ol = $('<ol>');
@@ -21,8 +21,9 @@ ListElement.prototype.optionsBlock = function(){
   ol.sortable();
   ol.bind("sortupdate", function(event, ui) {
     $('li', this).each(function(i){
-      $(this).data('item').weight = i;
+      $(this).data('item').weight = i+1;
     });
+    element.isModified = true;
   });
   div.append(ol);
   var form = $('<form>').bind('submit', function(){
@@ -48,9 +49,9 @@ ListElement.prototype.optionsBlock = function(){
  * @param {Object} item the item
  * @returns {jQuery}
  */
-ListElement.prototype.itemBlock = function(item){
+List.prototype.itemBlock = function(item){
   var element = this;
-  var li = $('<li>').addClass((item.active)?'active':'inactive').data('item',item).html(item.value).bind('click', function(){
+  var li = $('<li>').addClass((item.isActive)?'active':'inactive').data('item',item).html(item.value).bind('click', function(){
   $(this).unbind('click');
     var field = $('<input>').attr('type', 'text').attr('value',item.value)
     .bind('change', function(){
@@ -73,9 +74,9 @@ ListElement.prototype.itemBlock = function(item){
  * Add a new New item for the list
  * @param {String} value the items text
  */
-ListElement.prototype.newListItem = function(value){
+List.prototype.newListItem = function(value){
   var itemId = 'new-list-item' + this.page.pageStore.getUniqueId();
-  var item = {id: itemId, value: value, active: true};
+  var item = {id: itemId, value: value, isActive: true};
   this.listItems.push(item);
   this.isModified = true;
   return item;
@@ -86,7 +87,7 @@ ListElement.prototype.newListItem = function(value){
  * Add a new item to the list
  * @param {String} value the items text
  */
-ListElement.prototype.addListItem = function(item){
+List.prototype.addListItem = function(item){
   this.listItems.push(item);
   return item;
 };

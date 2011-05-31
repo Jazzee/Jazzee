@@ -1,16 +1,16 @@
 /**
- * The TextPage type
-  @extends ApplyPage
+ * The JazzeeEntityPageText type
+  @extends JazzeePage
  */
-function TextPage(){}
-TextPage.prototype = new ApplyPage();
-TextPage.prototype.constructor = TextPage;
+function JazzeeEntityPageText(){}
+JazzeeEntityPageText.prototype = new JazzeePage();
+JazzeeEntityPageText.prototype.constructor = JazzeeEntityPageText;
 
 /**
  * Create the page workspace
  * For text pages we don't have a lot of options
  */
-TextPage.prototype.workspace = function(){
+JazzeeEntityPageText.prototype.workspace = function(){
   this.clearWorkspace();
   $('#workspace-left-top').append(this.titleBlock());
   $('#workspace-left-top').append(this.textInputBlock('leadingText', 'click to edit'));

@@ -65,7 +65,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
     $element->setLabel('Class');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
-    $form->newButton('submit', 'Add Element');
+    $form->newButton('submit', 'Add Page');
     $this->setVar('form', $form); 
     if($input = $form->processInput($this->post)){
       if(!class_exists($input->get('class'))){
@@ -74,7 +74,9 @@ class ManagePagetypesController extends \Jazzee\AdminController {
         $pageType = new \Jazzee\Entity\PageType();
         $pageType->setName($input->get('name'));
         $pageType->setClass($input->get('class'));
+        $this->addMessage('success', $input->get('name') . "  added.");
         $this->_em->persist($pageType);
+        $this->redirectPath('manage/pagetypes');
       }
     }
   }

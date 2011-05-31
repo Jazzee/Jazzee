@@ -2,15 +2,15 @@
  * The ETSMatchPage type
   @extends ApplyPage
  */
-function ETSMatchPage(){}
-ETSMatchPage.prototype = new ApplyPage();
-ETSMatchPage.prototype.constructor = ETSMatchPage;
+function JazzeeEntityPageETSMatch(){}
+JazzeeEntityPageETSMatch.prototype = new JazzeePage();
+JazzeeEntityPageETSMatch.prototype.constructor = JazzeeEntityPageETSMatch;
 
 /**
  * Create the ETSMatchPage workspace
  */
-ETSMatchPage.prototype.workspace = function(){
-  ApplyPage.prototype.workspace.call(this);
+JazzeeEntityPageETSMatch.prototype.workspace = function(){
+  JazzeePage.prototype.workspace.call(this);
   $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
   $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
   

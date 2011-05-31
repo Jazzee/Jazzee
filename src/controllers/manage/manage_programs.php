@@ -84,7 +84,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
       $program->setShortName($input->get('shortName'));
       $this->addMessage('success', "New Program Saved");
       $this->_em->persist($program);
-      $this->redirect('manage/programs');
+      $this->redirectPath('manage/programs');
     }
   }
 }

@@ -1,15 +1,15 @@
 /**
- * The StandardPage type
+ * The JazzeeEntityPageStandard type
   @extends ApplyPage
  */
-function StandardPage(){}
-StandardPage.prototype = new ApplyPage();
-StandardPage.prototype.constructor = StandardPage;
+function JazzeeEntityPageStandard(){}
+JazzeeEntityPageStandard.prototype = new JazzeePage();
+JazzeeEntityPageStandard.prototype.constructor = JazzeeEntityPageStandard;
 
-StandardPage.prototype.workspace = function(){
-  ApplyPage.prototype.workspace.call(this);
+JazzeeEntityPageStandard.prototype.workspace = function(){
+  JazzeePage.prototype.workspace.call(this);
   var pageClass = this;
-  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
+  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {0:'Required',1:'Optional'}));
   $('#workspace-right-top').append(this.showAnswerStatusBlock());
   
   var min = {0: 'No Minimum'};
@@ -32,14 +32,14 @@ StandardPage.prototype.workspace = function(){
   this.synchronizeElementList();
   $('#workspace-left-middle-left div.field:first').trigger('click');
   
-  $.get(pageClass.pageStore.baseUrl + 'listElementTypes',function(json){
+  $.get(pageClass.pageStore.baseUrl + '/listElementTypes',function(json){
     var div = $('<div>').addClass('new-elements').append($('<h5>').html('New Elements'));
     var ol = $('<ol>').addClass('add-list');
     $(json.data.result).each(function(i){
       var elementType = this;
       var li = $('<li>').html(elementType.name);
       $(li).bind('click',function(e){
-        var element = new window[elementType.class].prototype.newElement('new' + pageClass.pageStore.getUniqueId(),'New ' + elementType.name + ' Element',elementType.class,'new',pageClass);
+        var element = new window[elementType.className].prototype.newElement('new' + pageClass.pageStore.getUniqueId(),'New ' + elementType.name + ' Element',elementType.id,elementType.className,'new',pageClass);
         pageClass.addElement(element);
         element.workspace();
         pageClass.synchronizeElementList();
@@ -55,7 +55,7 @@ StandardPage.prototype.workspace = function(){
  * Add a copy of an element to the page
  * @param {ApplyElement} element
  */
-StandardPage.prototype.copyElement = function(e){
+JazzeeEntityPageStandard.prototype.copyElement = function(e){
   var obj = e.getDataObject();
   obj.id = 'newelement' + this.pageStore.getUniqueId();
   obj.title = 'Copy of ' + obj.title;
@@ -75,7 +75,7 @@ StandardPage.prototype.copyElement = function(e){
  * Synchronize the element list after it has been created
  * Walk through the elements and make sure they are all have the right weight and click functionality
  */
-StandardPage.prototype.synchronizeElementList = function(){
+JazzeeEntityPageStandard.prototype.synchronizeElementList = function(){
   var pageClass = this;
   $('#workspace-left-middle-left div.field').unbind('click');
   $('#workspace-left-middle-left div.field').each(function(i){
@@ -98,7 +98,7 @@ StandardPage.prototype.synchronizeElementList = function(){
  * Answer status Block
  * @returns {jQuery}
  */
-StandardPage.prototype.showAnswerStatusBlock = function(){
+JazzeeEntityPageStandard.prototype.showAnswerStatusBlock = function(){
   var pageClass = this;
   var value = (this.showAnswerStatus == 1)?'shown':'not shown';
   var p = $('<p>').addClass('edit showAnswerStatus').html('Answer status ').append($('<span>').html(value)).bind('click', function(e){
