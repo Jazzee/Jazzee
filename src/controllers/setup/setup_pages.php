@@ -73,6 +73,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
         $applicationPage->setPage($page);
         $applicationPage->setWeight($data->weight);
         $applicationPage->setApplication($this->_application);
+        $applicationPage->getJazzeePage()->setController($this);
         $applicationPage->getJazzeePage()->setupNewPage();
       default:
         if(!isset($applicationPage)) $applicationPage = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page' => $pageId, 'application'=>$this->_application->getId()));

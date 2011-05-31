@@ -328,18 +328,27 @@ class Page{
   
   /**
    * Set page variable
+   * 
+   * we retunt he variable to is can be persisted
+   * 
    * @param string $name
    * @param string $value
+   * 
+   * @return \Jazzee\Entity\PageVariable 
    */
   public function setVar($name, $value){
     foreach($this->variables as $variable)
-      if($variable->getName() == $name)return $variable->setValue($value);
+      if($variable->getName() == $name){
+        $variable->setValue($value);
+        return $variable;
+      }
     //create a new empty variable with that name
-    $var = new PageVariable;
-    $var->setPage($this);
-    $var->setName($name);
-    $this->variables[] = $var;
-    $var->setValue($value);
+    $variable = new PageVariable;
+    $variable->setPage($this);
+    $variable->setName($name);
+    $this->variables[] = $variable;
+    $variable->setValue($value);
+    return $variable;
   }
 
   /**

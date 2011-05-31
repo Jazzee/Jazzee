@@ -11,8 +11,8 @@ JazzeeEntityPageRecommenders.prototype.constructor = JazzeeEntityPageRecommender
  * @param {String} id the id to use
  * @returns {RecommendersPage}
  */
-JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,pageClass,status,pageStore){
-  var page = ApplyPage.prototype.newPage.call(this, id,title,pageClass,status,pageStore);
+JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,classId,className,status,pageStore){
+  var page = JazzeePage.prototype.newPage.call(this, id,title,classId,className,status,pageStore);
   page.setVariable('lorDeadline', null);
   page.setVariable('lorDeadlineEnforced', 0);
   page.setVariable('recommenderEmailText', "Dear %RECOMMENDER_FIRST_NAME% %RECOMMENDER_LAST_NAME%,\n"
@@ -21,7 +21,7 @@ JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,pageClass,sta
       + "Click the following link to access the online system; or, you may need to copy and paste this link into your browser. \n"
       + "%LINK% \n"
       + "Questions or comments about submitting your recommendation may be addressed to %PROGRAM_CONTACT_NAME% %PROGRAM_CONTACT_EMAIL%");
-  var recommendation = new StandardPage.prototype.newPage('newpage' + pageStore.getUniqueId(),'Recommendation','StandardPage','new',pageStore);
+  var recommendation = new JazzeeEntityPageStandard.prototype.newPage('newchildpage' + pageStore.getUniqueId(),'Recommendation',1,'JazzeeEntityPageStandard','new',pageStore);
   page.addChild(recommendation);
   return page;
 };
@@ -29,8 +29,8 @@ JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,pageClass,sta
 JazzeeEntityPageRecommenders.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
   var pageClass = this;
-  $('#workspace-right-top').append(this.selectListBlock('optional', 'This page is', {0:'Required',1:'Optional'}));
-  $('#workspace-right-top').append(this.selectListBlock('showAnswerStatus', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {0:'Optional',1:'Required'}));
+  $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
   
   var min = {0: 'No Minimum'};
   for(var i = 1; i<=20;i++){

@@ -195,7 +195,8 @@ abstract class PageBuilder extends AdminController{
       $page = $page->getPage();
     }
     foreach($data->variables as $v){
-      $page->setVar($v->name, $v->value);
+      $var = $page->setVar($v->name, $v->value);
+      $this->_em->persist($var);
     }
     $this->savePageElements($page, $data->elements);
     foreach($data->children as $child){
@@ -208,7 +209,7 @@ abstract class PageBuilder extends AdminController{
           $childPage = new \Jazzee\Entity\Page();
           $childPage->setParent($page);
           $childPage->notGlobal();
-          $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->findOneByClass($child->className));
+          $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->classId));
         case 'save':
           if(!isset($childPage)) $childPage = $page->getChildById($child->id);
           $this->savePage($childPage, $child);

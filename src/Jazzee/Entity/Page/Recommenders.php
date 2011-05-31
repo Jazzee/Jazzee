@@ -104,35 +104,36 @@ public function sendEmail(){
       $elementTypes[$type->getClass()] = $type;
     };
     $count = 1;
-    foreach(array(RecommendersPage::FID_FIRST_NAME=>'First Name',RecommendersPage::FID_LAST_NAME=>'Last Name',RecommendersPage::FID_INSTITUTION=>'Institution',RecommendersPage::FID_EMAIL=>'Email Address',RecommendersPage::FID_PHONE=>'Phone Number') as $fid => $title){
-      $element = new Entity\Element;
-      $element->setPage($page);
-      $element->setType($elementTypes['TextInputElement']);
+    foreach(array(self::FID_FIRST_NAME=>'First Name',self::FID_LAST_NAME=>'Last Name',self::FID_INSTITUTION=>'Institution',self::FID_EMAIL=>'Email Address',self::FID_PHONE=>'Phone Number') as $fid => $title){
+      $element = new \Jazzee\Entity\Element;
+      $element->setType($elementTypes['\\Jazzee\\Entity\Element\TextInput']);
       $element->setTitle($title);
       $element->required();
       $element->setWeight($count);
       $element->setFixedId($fid);
+      $this->_applicationPage->getPage()->addElement($element);
       $em->persist($element);
       $count++;
     }
-    $element = new Entity\Element;
-    $element->setPage($page);
-    $element->setType($elementTypes['RadioListElement']);
+    $element = new \Jazzee\Entity\Element;
+    $element->setType($elementTypes['\\Jazzee\\Entity\Element\RadioList']);
     $element->setTitle('Do you waive your right to view this letter at a later time?');
     $element->required();
     $element->setWeight(7);
-    $element->setFixedId(RecommendersPage::FID_WAIVE_RIGHT);
+    $element->setFixedId(self::FID_WAIVE_RIGHT);
+    $this->_applicationPage->getPage()->addElement($element);
     $em->persist($element);
-    $item = new Entity\ElementListItem;
-    $item->setElement($element);
+    
+    $item = new \Jazzee\Entity\ElementListItem;
     $item->setValue('Yes');
     $item->setWeight(1);
+    $element->addItem($item);
     $em->persist($item);
     
-    $item = new Entity\ElementListItem;
-    $item->setElement($element);
+    $item = new \Jazzee\Entity\ElementListItem;
     $item->setValue('No');
     $item->setWeight(2);
+    $element->addItem($item);
     $em->persist($item);
   }
 }
