@@ -50,12 +50,6 @@ abstract class PageBuilder extends AdminController{
   abstract public function actionSavePage($pageId);
   
   /**
-   * Preview the changes to a page
-   * 
-   */
-  abstract public function actionPreviewPage();
-  
-  /**
    * Javascript does the display work unless there is no application
    */
   public function actionIndex(){
@@ -64,12 +58,11 @@ abstract class PageBuilder extends AdminController{
   
   /**
    * Create an array from a page suitable for json_encoding
-   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Page of \Jazzee\Entity\ApplicationPage $page
    * @return array
    */
-  protected function pageArray(\Jazzee\Entity\Page $page){
+  protected function pageArray($page){
     $arr = array(
-      'id' => $page->getId(),
       'title' => $page->getTitle(),
       'min' => $page->getMin(),
       'max' => $page->getMax(),
@@ -79,6 +72,13 @@ abstract class PageBuilder extends AdminController{
       'leadingText' => $page->getLeadingText(),
       'trailingText' => $page->getTrailingText(),
     );
+    
+    //now that we have completed the general setup replace $applicationPage with $page
+    if($page instanceof \Jazzee\Entity\ApplicationPage){
+      $arr['weight'] = $page->getWeight();
+      $page = $page->getPage();
+    } 
+    $arr['id'] = $page->getId();
     $arr['className'] = $this->getClassName($page->getType()->getClass());
     $arr['classId'] = $page->getType()->getId();
     $arr['elements'] = array();
@@ -174,7 +174,7 @@ abstract class PageBuilder extends AdminController{
    * Save a page
    * @param \Jazzee\Entity\Page $page
    */
-  public function savePage(\Jazzee\Entity\Page $page, $data){
+  public function savePage($page, $data){
     $page->setTitle($data->title);
     $page->setMin($data->min);
     $page->setMax($data->max);
@@ -182,6 +182,18 @@ abstract class PageBuilder extends AdminController{
     $page->setInstructions($data->instructions);
     $page->setLeadingText($data->leadingText);
     $page->setTrailingText($data->trailingText);
+    $this->_em->persist($page);
+    
+    if($page instanceof \Jazzee\Entity\ApplicationPage){
+      $page->setWeight($data->weight);
+      //if this is a global page then we are done
+      //programs can't edit any of the remaining properties on a globa page
+      if($page->getPage()->isGlobal()){
+        return;
+      }
+      //otherwise continue making changes by swaping the $page varialbe for the correct \Jazzee\Entity\Page class
+      $page = $page->getPage();
+    }
     foreach($data->variables as $v){
       $page->setVar($v->name, $v->value);
     }
@@ -203,7 +215,6 @@ abstract class PageBuilder extends AdminController{
         break;
       }
     }
-    $this->_em->persist($page);
   }
   
   /**
@@ -249,6 +260,22 @@ abstract class PageBuilder extends AdminController{
           unset($element); //this isn't for memory management if it stays set it gets re-used at the begning of the default switch
       }
     }
+  }
+
+  /**
+   * Preview a page
+   * 
+   * We use a fake page to construct a preview
+   */
+  public function actionPreviewPage(){
+    $data = json_decode($this->post['data']);
+    $page = new \Jazzee\Entity\Page();
+    $this->genericPage($page, $data);
+    $this->layout = 'blank';
+    $ap = new \Jazzee\Entity\ApplicationPage();
+    $ap->setPage($page);
+    $ap->getJazzeePage()->setController($this);
+    $this->setVar('page', $ap);
   }
   
   /**

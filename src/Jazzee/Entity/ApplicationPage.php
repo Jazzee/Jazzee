@@ -172,8 +172,8 @@ class ApplicationPage
    * Is this page required
    */
   public function isRequired(){
-    if(is_null($this->required)) return $this->page->getRequired();
-    return $this->required;
+    if(is_null($this->isRequired)) return $this->page->isRequired();
+    return $this->isRequired;
   }
   
   /**
@@ -190,7 +190,7 @@ class ApplicationPage
    * If this isn't a global page then store the required in Page and not here
    */
   public function optional(){
-    if(!$this->page->isGlobal()) $this->page->optioal();
+    if(!$this->page->isGlobal()) $this->page->optional();
     else $this->isRequired = false;
   }
   
@@ -232,7 +232,7 @@ class ApplicationPage
    * @param string $value
    */
   public function setInstructions($value){
-    if(!$this->page->isGlobal()) $this->page->instructions($value);
+    if(!$this->page->isGlobal()) $this->page->setInstructions($value);
     else $this->instructions = $value;
   }
   

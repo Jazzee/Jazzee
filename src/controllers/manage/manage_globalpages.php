@@ -67,15 +67,4 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
         $this->savePage($page, $data);
     }
   }
-  
-  public function actionPreviewPage(){
-    $data = json_decode($this->post['data']);
-    $page = new \Jazzee\Entity\Page();
-    $this->genericPage($page, $data);
-    $this->layout = 'blank';
-    $ap = new \Jazzee\Entity\ApplicationPage();
-    $ap->setPage($page);
-    $ap->getJazzeePage()->setController($this);
-    $this->setVar('page', $ap);
-  }
 }

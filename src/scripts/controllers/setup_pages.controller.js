@@ -25,30 +25,31 @@ $(document).ready(function(){
     status.end();
   });
   var baseUrl = document.location.href;
-  var pageStore = new PageStore(baseUrl, 'applicationPageId', $('#pages'));
+  var pageStore = new PageStore(baseUrl, $('#pages'));
   $('#save-pages').bind('click', function(){
     pageStore.save();
   });
-  $.get(baseUrl + 'listPageTypes',function(json){  
+  $.get(baseUrl + '/listPageTypes',function(json){  
     var ol = $('<ol>').addClass('add-list');
     $(json.data.result).each(function(i){
       var pageType = this;
       var li = $('<li>').html(pageType.name);
       li.bind('click', function(){
-        var page = new window[pageType.class].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.class,'new',pageStore);
+        var page = new window[pageType.className].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.id,pageType.className,'new',pageStore);
         pageStore.addPage(page);
       });
       ol.append(li);
     });
     $('#new-pages').append(ol);
   });
-  $.get(baseUrl + 'listGlobalPages',function(json){  
+  
+  $.get(baseUrl + '/listGlobalPages',function(json){  
     var ol = $('<ol>').addClass('add-list');
     $(json.data.result).each(function(i){
       var globalPage = this;
       var li = $('<li>').html(globalPage.title);
       li.bind('click', function(){
-        var page = new window[globalPage.className].prototype.newPage(globalPage.id,globalPage.title,globalPage.className,'new-global',pageStore);
+        var page = new window[globalPage.className].prototype.newPage(globalPage.id,globalPage.title,globalPage.classId,globalPage.className,'new-global',pageStore);
         page.isGlobal = true;
         pageStore.addPage(page);
       });
