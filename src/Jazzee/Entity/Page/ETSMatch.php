@@ -63,51 +63,51 @@ class ETSMatch extends Standard {
    */
   public function setupNewPage(){
     $em = $this->_controller->getEntityManager();
-    $em->getRepository('Entity\ElementType')->findAll();
+    $types = $em->getRepository('\Jazzee\Entity\ElementType')->findAll();
     $elementTypes = array();
     foreach($types as $type){
       $elementTypes[$type->getClass()] = $type;
     };
     $count = 1;
 
-    $element = new Entity\Element;
-    $element->setPage($page);
-    $element->setType($elementTypes['RadioListElement']);
+    $element = new \Jazzee\Entity\Element;
+    $this->_applicationPage->getPage()->addElement($element);
+    $element->setType($elementTypes['\\Jazzee\Entity\Element\RadioList']);
     $element->setTitle('Test Type');
     $element->required();
     $element->setWeight(1);
-    $element->setFixedId(ETSMatchPage::FID_TEST_TYPE);
+    $element->setFixedId(self::FID_TEST_TYPE);
     $em->persist($element);
     
-    $item = new Entity\ElementListItem;
-    $item->setElement($element);
+    $item = new \Jazzee\Entity\ElementListItem;
+    $element->addItem($item);
     $item->setValue('GRE/GRE Subject');
     $item->setWeight(1);
     $em->persist($item);
     
-    $item = new Entity\ElementListItem;
-    $item->setElement($element);
+    $item = new \Jazzee\Entity\ElementListItem;
+    $element->addItem($item);
     $item->setValue('TOEFL');
     $item->setWeight(2);
     $em->persist($item);
     
-    $element = new Entity\Element;
-    $element->setPage($page);
-    $element->setType($elementTypes['TextInputElement']);
+    $element = new \Jazzee\Entity\Element;
+    $this->_applicationPage->getPage()->addElement($element);
+    $element->setType($elementTypes['\\Jazzee\Entity\Element\TextInput']);
     $element->setTitle('ETS Registration Number');
     $element->setFormat('no leading zeros');
     $element->required();
     $element->setWeight(2);
-    $element->setFixedId(ETSMatchPage::FID_REGISTRATION_NUMBER);
+    $element->setFixedId(self::FID_REGISTRATION_NUMBER);
     $em->persist($element);
     
-    $element = new Entity\Element;
-    $element->setPage($page);
-    $element->setType($elementTypes['ShortDateElement']);
+    $element = new \Jazzee\Entity\Element;
+    $this->_applicationPage->getPage()->addElement($element);
+    $element->setType($elementTypes['\\Jazzee\Entity\Element\ShortDate']);
     $element->setTitle('Test Date');
     $element->required();
     $element->setWeight(3);
-    $element->setFixedId(ETSMatchPage::FID_TEST_DATE);
+    $element->setFixedId(self::FID_TEST_DATE);
     $em->persist($element);
   } 
 }
