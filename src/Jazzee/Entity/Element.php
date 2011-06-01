@@ -298,7 +298,7 @@ class Element{
    * @param Entity\ElementListItem $item
    */
   public function addItem(\Jazzee\Entity\ElementListItem $item){
-    $this->items[] = $item;
+    $this->listItems[] = $item;
     if($item->getElement() != $this) $item->setElement($this);
   }
 
