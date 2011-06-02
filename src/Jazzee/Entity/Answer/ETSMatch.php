@@ -21,8 +21,6 @@ class ETSMatch extends Standard
           $arr['Score Status'] = 'TOEFL Score recieved for test taken on ' . $this->_answer->getTOEFLScore()->getTestDate()->format('m/d/Y');
         else $arr['Score Status'] = 'This score has not been received from ETS';
       break;
-      default:
-        throw new \Jazzee\Exception("Unknown test type: {$testType} when trying to match a score");
     }
     return $arr;
   }

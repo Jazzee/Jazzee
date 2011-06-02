@@ -47,8 +47,8 @@ try {
     )
   ));
   
-  //special do type sends a second string to identify the method and an answerid
-  $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/do/(.*)/([0-9]+)$#i', array(
+  //special do type sends a second string to identify the method and an optional answerid
+  $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/do/([^/]+)/?([0-9]+)?$#i', array(
     'controller' => 'apply_page',
     'action' => 'do',
     'action_params' => array(

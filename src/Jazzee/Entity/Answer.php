@@ -59,6 +59,9 @@ class Answer{
    */
   protected $privateStatus;
   
+  /** @Column(type="integer", nullable=true) */
+  protected $pageStatus;
+  
   /** @Column(type="text", nullable=true) */
   protected $attachment;
   
@@ -402,5 +405,23 @@ class Answer{
    */
   public function setTOEFLScore($score){
     $this->toeflScore = $score;
+  }
+
+  /**
+   * Set page status
+   * 
+   * @param integer $pageStatus
+   */
+  public function setPageStatus($pageStatus){
+    $this->pageStatus = $pageStatus;
+  }
+  
+  /**
+   * Get the page status
+   * 
+   * @return integer $pageStatus
+   */
+  public function getPageStatus(){
+    return $this->pageStatus;
   }
 }

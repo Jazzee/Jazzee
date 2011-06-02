@@ -30,6 +30,31 @@ class Standard extends AbstractPage {
     return $form;
   }
   
+  /**
+   * Skip an optional page
+   * 
+   */
+  public function skip(){
+    if(count($this->getAnswers())){
+      $this->_controller->addMessage('error', 'You must delete your existing answers before you can skip this page.');
+      return false;
+    }
+    if(!$this->_applicationPage->required()){
+      $answer = new \Jazzee\Entity\Answer();
+      $answer->setPage($this->_applicationPage->getPage());
+      $answer->setApplicant($this->_applicant);
+      $answer->setPageStatus(self::SKIPPED);
+      $this->_controller->getEntityManager()->persist($answer);
+    }
+  }
+  
+  public function unskip(){
+    $answers = $this->getAnswers();
+    if(count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){
+      $this->_applicant->getAnswers()->removeElement($answers[0]);
+      $this->_controller->getEntityManager()->remove($answers[0]);
+    }
+  }
   
   public function newAnswer($input){
     $answer = new \Jazzee\Entity\Answer();
@@ -79,6 +104,10 @@ class Standard extends AbstractPage {
   }
   
   public function getStatus(){
+    $answers = $this->getAnswers();
+    if(!$this->_applicationPage->isRequired() and count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){
+      return self::SKIPPED;
+    }
     if(is_null($this->_applicationPage->getMin()) or count($this->getAnswers()) < $this->_applicationPage->getMin()){
       return self::INCOMPLETE;
     } else {
