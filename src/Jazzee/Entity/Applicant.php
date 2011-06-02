@@ -306,6 +306,15 @@ class Applicant{
   }
 
   /**
+   * set lastLogin
+   *
+   * @param string $lastLogin
+   */
+  public function setLastLogin($lastLogin){
+    $this->lastLogin = new \DateTime($lastLogin);
+  }
+
+  /**
    * Get lastLogin
    *
    * @return \DateTime $lastLogin
