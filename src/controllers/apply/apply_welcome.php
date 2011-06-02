@@ -36,7 +36,6 @@ class ApplyWelcomeController extends \Jazzee\Controller {
     if(!empty($this->actionParams['programShortName'])) $this->program = $this->_em->getRepository('Jazzee\Entity\Program')->findOneByShortName($this->actionParams['programShortName']);
     if(!empty($this->actionParams['cycleName'])) $this->cycle = $this->_em->getRepository('Jazzee\Entity\Cycle')->findOneByName($this->actionParams['cycleName']);
     if(!is_null($this->program) AND !is_null($this->cycle)) $this->application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->program,$this->cycle);
-    $this->setLayoutVar('navigation', $this->getNavigation());
   }
   
   /**

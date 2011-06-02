@@ -96,4 +96,11 @@ class PageController extends \Foundation\VC\Controller
     $virtualFoundation->addDirectory('styles',$styles);
     $this->_vfs->addDirectory('foundation', $virtualFoundation);
   }
+  
+  /**
+   * No Navigation
+   */
+  public function getNavigation(){
+    return false;
+  }
 }

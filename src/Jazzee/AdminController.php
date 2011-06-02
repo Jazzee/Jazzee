@@ -93,7 +93,6 @@ abstract class AdminController extends Controller{
       $this->setLayoutVar('pageTitle', $this->_cycle->getName() . ' ' . $this->_program->getName());
       $this->setLayoutVar('layoutTitle', $this->_cycle->getName() . ' ' . $this->_program->getName());
     }
-    $this->setLayoutVar('navigation', $this->getNavigation());
     $this->setup();
   }
   

@@ -23,7 +23,6 @@ class ApplyApplicantController extends \Jazzee\Controller {
       $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/');
     }
     $this->setLayoutVar('layoutTitle', $this->application->getCycle()->getName() . ' ' . $this->application->getProgram()->getName() . ' Application');
-    $this->setLayoutVar('navigation', $this->getNavigation());
   }
   
   /**

@@ -41,7 +41,6 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $this->setVar('page', $this->_page);
     $this->setVar('currentAnswerID', false);
     $n = $this->getNavigation();
-    $this->setLayoutVar('navigation', $this->getNavigation());
   }
   
   /**
