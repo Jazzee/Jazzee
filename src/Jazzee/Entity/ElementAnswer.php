@@ -210,7 +210,6 @@ class ElementAnswer{
    */
   public function setAnswer(Answer $answer){
     $this->answer = $answer;
-    $answer->addElementAnswer($this);
   }
   
   /**

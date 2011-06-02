@@ -46,8 +46,8 @@ class Standard extends AbstractPage {
   public function updateAnswer($input, $answerId){
     if($answer = $this->_applicant->findAnswerById($answerId)){
       foreach($answer->getElementAnswers() as $ea){
-        $this->_controller->getEntityManager()->remove($ea);
         $answer->getElementAnswers()->removeElement($ea);
+        $this->_controller->getEntityManager()->remove($ea);
       }
       $answer->getJazzeeAnswer()->update($input);
       $this->getForm()->applyDefaultValues();

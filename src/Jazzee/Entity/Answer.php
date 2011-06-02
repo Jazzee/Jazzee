@@ -286,8 +286,8 @@ class Answer{
     $this->elements[] = $element;
     if($element->getAnswer() != $this) $element->setAnswer($this);
   }
-
-
+  
+  
   /**
    * Get elements
    *
@@ -305,7 +305,7 @@ class Answer{
    */
   public function getElementAnswersForElement(Element $element){
     $arr = array();
-    foreach($this->elements as $elementAnswer)if($elementAnswer->getElement() == $element) $arr[] = $elementAnswer;
+    foreach($this->elements as $elementAnswer)if($elementAnswer->getElement() === $element) $arr[] = $elementAnswer;
     return new \Doctrine\Common\Collections\ArrayCollection($arr);
   }
 

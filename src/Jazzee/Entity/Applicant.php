@@ -440,7 +440,7 @@ class Applicant{
    */
   public function findAnswersByPage(Page $page){
     $return = array();
-    foreach($this->answers as $answer) if($answer->getPage() == $page) $return[] = $answer;
+    foreach($this->answers as $answer) if($answer->getPage() === $page) $return[] = $answer;
     return $return;
   }
   
