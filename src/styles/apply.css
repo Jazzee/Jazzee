@@ -13,7 +13,7 @@
     margin-bottom: 2px;
     color: #79b;
     background-color: #ffd;
-    border-bottom: 1px solid #7799bb;
+    border-bottom: 1px solid #ffcc66;
 }
 
 .answer p {
@@ -78,4 +78,13 @@ p.skip {
   background-image: url(resource/foundation/media/icons/tick.png);
   background-repeat: no-repeat;
   background-position: center left;
+}
+
+#counter p{
+  margin: 0 6em;
+  border: 1px outset #7799bb;
+  text-align: center;
+  padding: .5em;
+  color: #000000;
+  background-color: #ffcc66;
 }
