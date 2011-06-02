@@ -40,10 +40,13 @@ dbPassword=
 dbDriver=
 
 ;Server/account to send email from
-;Format: type://[username:password@]host:port
-;eg smpt+ssl://user:123Pass$@mail.example.com:443
-;leave null to use PHPs built in mail()
-mailServer=
+;type must be one of 'php','sendmail','smtp','smtp+ssl'
+mailServerType=php
+mailServerHost=
+mailServerPort=
+mailServerName=
+mailServerUser=
+mailServerPassword=
 
 ;The FROM email address to apply by default and to system messages (like logs), if blank mail server will probably apply a default
 mailDefaultFrom=

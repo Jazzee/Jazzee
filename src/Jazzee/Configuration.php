@@ -71,7 +71,27 @@ protected $_adminSessionLifetime;
 /**
  * @var string
  */
-protected $_mailServer;
+protected $_mailServerType;
+
+/**
+ * @var string
+ */
+protected $_mailServerHost;
+
+/**
+ * @var string
+ */
+protected $_mailServerPort;
+
+/**
+ * @var string
+ */
+protected $_mailServerUsername;
+
+/**
+ * @var string
+ */
+protected $_mailServerPassword;
 
 /**
  * @var string
@@ -86,12 +106,17 @@ protected $_mailDefaultFrom;
 /**
  * @var string
  */
-protected $_mailDefaultName;
+protected $_mailDefaultFromName;
 
 /**
  * @var string
  */
-protected $_mailOverrideTo;
+protected $_mailOverrideToAddress;
+
+/**
+ * @var string
+ */
+protected $_mailOverrideToName;
 
 /**
  * @var string
@@ -326,19 +351,83 @@ protected $_maximumApplicantFileUpload;
   }
     
   /**
-   * get mailServer
+   * get mailServerType
    * @return string
    */
-  public function getMailServer() {
-    return $this->_mailServer;
+  public function getMailServerType() {
+    return $this->_mailServerType;
   }
   
   /**
-   * set mailServer
-   * @var string mailServer
+   * set mailServerType
+   * @var string mailServerType
    */
-  public function setMailServer($mailServer) {
-    $this->_mailServer = $mailServer;
+  public function setMailServerType($mailServerType) {
+    $this->_mailServerType = $mailServerType;
+  }
+    
+  /**
+   * get mailServerHost
+   * @return string
+   */
+  public function getMailServeHostr() {
+    return $this->_mailServerHost;
+  }
+  
+  /**
+   * set mailServerHost
+   * @var string mailServerHost
+   */
+  public function setMailServerHost($mailServerHost) {
+    $this->_mailServerHost = $mailServerHost;
+  }
+    
+  /**
+   * get mailServerPort
+   * @return string
+   */
+  public function getMailServerPort() {
+    return $this->_mailServerPort;
+  }
+  
+  /**
+   * set mailServerPort
+   * @var string mailServerPort
+   */
+  public function setMailServerPort($mailServerPort) {
+    $this->_mailServerPort = $mailServerPort;
+  }
+    
+  /**
+   * get mailServerUsername
+   * @return string
+   */
+  public function getMailServerUsername() {
+    return $this->_mailServerUsername;
+  }
+  
+  /**
+   * set mailServerUsername
+   * @var string mailServerUsername
+   */
+  public function setMailServerUsername($mailServerUsername) {
+    $this->_mailServerUsername = $mailServerUsername;
+  }
+    
+  /**
+   * get mailServerPassword
+   * @return string
+   */
+  public function getMailServerPassword() {
+    return $this->_mailServerPassword;
+  }
+  
+  /**
+   * set mailServerPassword
+   * @var string mailServerPassword
+   */
+  public function setMailServerPassword($mailServerPassword) {
+    $this->_mailServerPassword = $mailServerPassword;
   }
   
   /**
@@ -358,51 +447,67 @@ protected $_maximumApplicantFileUpload;
   }
   
   /**
-   * get mailDefaultFrom
+   * get mailDefaultFromAddress
    * @return string
    */
-  public function getMailDefaultFrom() {
-    return $this->_mailDefaultFrom;
+  public function getMailDefaultFromAddress() {
+    return $this->_mailDefaultFromAddress;
   }
   
   /**
    * set mailDefaultFrom
-   * @var string mailDefaultFrom
+   * @var string mailDefaultFromAddress
    */
-  public function setMailDefaultFrom($mailDefaultFrom) {
-    $this->_mailDefaultFrom = $mailDefaultFrom;
+  public function setMailDefaultFromAddress($mailDefaultFromAddress) {
+    $this->_mailDefaultFromAddress = $mailDefaultFromAddress;
   }
   
   /**
    * get mailDefaultName
    * @return string
    */
-  public function getMailDefaultName() {
-    return $this->_mailDefaultName;
+  public function getMailDefaultFromName() {
+    return $this->_mailDefaultFromName;
   }
   
   /**
    * set mailDefaultName
    * @var string mailDefaultName
    */
-  public function setMailDefaultName($mailDefaultName) {
-    $this->_mailDefaultName = $mailDefaultName;
+  public function setMailDefaultFromName($mailDefaultFromName) {
+    $this->_mailDefaultFromName = $mailDefaultFromName;
   }
   
   /**
-   * get mailOverrideTo
+   * get mailOverrideToAddress
    * @return string
    */
-  public function getMailOverrideTo() {
-    return $this->_mailOverrideTo;
+  public function getMailOverrideToAddress() {
+    return $this->_mailOverrideToAddress;
   }
   
   /**
-   * set mailOverrideTo
+   * set mailOverrideToAddress
    * @var string mailOverrideTo
    */
-  public function setMailOverrideTo($mailOverrideTo) {
-    $this->_mailOverrideTo = $mailOverrideTo;
+  public function setMailOverrideToAddress($mailOverrideToAddress) {
+    $this->_mailOverrideToAddress = $mailOverrideToAddress;
+  }
+  
+  /**
+   * get mailOverrideToName
+   * @return string
+   */
+  public function getMailOverrideToName() {
+    return $this->_mailOverrideToName;
+  }
+  
+  /**
+   * set mailOverrideToName
+   * @var string mailOverrideToName
+   */
+  public function setMailOverrideToName($mailOverrideToName) {
+    $this->_mailOverrideTonName = $mailOverrideToName;
   }
   
   /**

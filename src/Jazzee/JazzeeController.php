@@ -129,7 +129,7 @@ class JazzeeController extends PageController
   
   /**
    * Get messages
-   * @return arrau
+   * @return array
    */
   public function getMessages(){
     $messages = array();
@@ -138,6 +138,28 @@ class JazzeeController extends PageController
       $this->_session->getStore('messages')->messages = array();
     } 
     return $messages;
+  }
+  
+  /**
+   * Send Email
+   * 
+   * @param string $toAddress Email Address
+   * @param string $toName
+   * @param string $fromAddress
+   * @param string $fromName
+   * @param string $subject
+   * @param string $body
+   * 
+   * @return boolean true on success false if error
+   */
+  public function sendEmail($toAddress, $toName, $fromAddress, $fromName, $subject, $body){
+    if(!isset($this->_mailServer)) $this->_mailServer = new \Foundation\Mail\Server($this->_foundationConfig);
+    $message = new \Foundation\Mail\Message($this->_foundationConfig);
+    $message->addTo($toAddress, $toName);
+    $message->setFrom($fromAddress, $fromName);
+    $message->setSubject($subject);
+    $message->setBody($body);
+    return $this->_mailServer->send($message);
   }
   
   /**
@@ -167,7 +189,16 @@ class JazzeeController extends PageController
       $this->_foundationConfig->setCacheType('apc');
     }
     $this->_foundationConfig->setMailSubjectPrefix($this->_config->getMailSubjectPrefix());
-    $this->_foundationConfig->setMailDefaultFromAddress($this->_config->getMailDefaultFrom());
+    $this->_foundationConfig->setMailDefaultFromAddress($this->_config->getMailDefaultFromAddress());
+    $this->_foundationConfig->setMailDefaultFromName($this->_config->getMailDefaultFromName());
+    $this->_foundationConfig->setMailOverrideToAddress($this->_config->getMailOverrideToAddress());
+    $this->_foundationConfig->setMailOverrideToName($this->_config->getMailOverrideToName());
+    $this->_foundationConfig->setMailServerType($this->_config->getMailServerType());
+    $this->_foundationConfig->setMailServerHost($this->_config->getMailServeHostr());
+    $this->_foundationConfig->setMailServerPort($this->_config->getMailServerPort());
+    $this->_foundationConfig->setMailServerUsername($this->_config->getMailServerUsername());
+    $this->_foundationConfig->setMailServerPassword($this->_config->getMailServerPassword());
+    
     
     $this->_cache = new \Foundation\Cache('Jazzee',$this->_foundationConfig);
     
