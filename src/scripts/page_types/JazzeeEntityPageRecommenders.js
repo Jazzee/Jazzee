@@ -19,8 +19,7 @@ JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,classId,class
       + "%APPLICANT_NAME% has requested a letter of recommendation from you in support of their application for admission to our program. \n"
       + "We use an online system to collect letters of recommendation.  You have been assigned a unique URL for accessing this system.  Please save this email so that you can return to your letter at a later date. \n"
       + "Click the following link to access the online system; or, you may need to copy and paste this link into your browser. \n"
-      + "%LINK% \n"
-      + "Questions or comments about submitting your recommendation may be addressed to %PROGRAM_CONTACT_NAME% %PROGRAM_CONTACT_EMAIL%");
+      + "%LINK% \n");
   var recommendation = new JazzeeEntityPageStandard.prototype.newPage('newchildpage' + pageStore.getUniqueId(),'Recommendation',1,'JazzeeEntityPageStandard','new',pageStore);
   page.addChild(recommendation);
   return page;
@@ -86,9 +85,6 @@ JazzeeEntityPageRecommenders.prototype.recommenderEmailBlock = function(){
       {title: 'Applicant Name', replacement: '%APPLICANT_NAME%'},
       {title: 'Recommendation Dealine', replacement:'%DEADLINE%'},
       {title: 'Link to the Recommendation', replacement:'%LINK%'},
-      {title: 'Program Contact Name', replacement:'%PROGRAM_CONTACT_NAME%'},
-      {title: 'Program Contact Email', replacement:'%PROGRAM_CONTACT_EMAIL%'},
-      {title: 'Program Contact Phone', replacement:'%PROGRAM_CONTACT_PHONE%'},
       {title: 'Recommender First Name', replacement:'%RECOMMENDER_FIRST_NAME%'},
       {title: 'Recommender Last Name', replacement:'%RECOMMENDER_LAST_NAME%'},
       {title: 'Recommender Institution', replacement:'%RECOMMENDER_INSTITUTION%'},

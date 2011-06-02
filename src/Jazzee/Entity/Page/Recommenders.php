@@ -35,63 +35,50 @@ class Recommenders extends Standard {
   public function sendEmail($answerId, $postData){
     if($answer = $this->_applicant->findAnswerById($answerId)){
       if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND time() - $answer->getUpdatedAt()->format('U') > self::RECOMMENDATION_EMAIL_WAIT_TIME)){
-        $this->_controller->addMessage('info', 'Need to setup email sending - but will lock app');
+        $search = array(
+         '%APPLICANT_NAME%',
+         '%DEADLINE%',
+         '%LINK%',
+         '%RECOMMENDER_FIRST_NAME%',
+         '%RECOMMENDER_LAST_NAME%',
+         '%RECOMMENDER_INSTITUTION%',
+         '%RECOMMENDER_EMAIL%',
+         '%RECOMMENDER_PHONE%',
+         '%APPLICANT_WAIVE_RIGHT%'
+        );
+        if($deadline = $this->_applicationPage->getPage()->getVar('lorDeadline')){
+          $deadline = new \DateTime($deadline);
+        } else {
+          $deadline = $this->_applicant->getApplication()->getClose();
+        }
+        $replace = array(
+         $this->_applicant->getFullName(),
+         $deadline->format('l F jS Y g:ia'),
+         $this->_controller->path('lor/' . $answer->getUniqueId())
+        );
+        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer);
+        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer);
+        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_INSTITUTION)->getJazzeeElement()->displayValue($answer);
+        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer);
+        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_PHONE)->getJazzeeElement()->displayValue($answer);
+        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer);
+        $body = str_ireplace($search, $replace, $this->_applicationPage->getPage()->getVar('recommenderEmailText'));
+
+        $this->_controller->sendEmail(
+          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
+          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer), 
+          $this->_applicant->getApplication()->getContactEmail(),
+          $this->_applicant->getApplication()->getContactName(),
+          'Letter of Recommendation Request', 
+          $body
+        );
         $answer->lock();
         $answer->markLastUpdate();
         $this->_controller->getEntityManager()->persist($answer);
+        $this->_controller->addMessage('success', 'Your invitation was sent successfully.');
       }
     }
   }
-  /*
-public function sendEmail(){
-    $mail = JazzeeMail::getInstance();
-    $search = array(
-     '%APPLICANT_NAME%',
-     '%DEADLINE%',
-     '%LINK%',
-     '%PROGRAM_CONTACT_NAME%',
-     '%PROGRAM_CONTACT_EMAIL%',
-     '%PROGRAM_CONTACT_PHONE%',
-     '%RECOMMENDER_FIRST_NAME%',
-     '%RECOMMENDER_LAST_NAME%',
-     '%RECOMMENDER_INSTITUTION%',
-     '%RECOMMENDER_EMAIL%',
-     '%RECOMMENDER_PHONE%',
-     '%APPLICANT_WAIVE_RIGHT%'
-    );
-    if($this->answer->Page->getVar('lorDeadline')){
-      $deadline = strtotime($this->answer->Page->getVar('lorDeadline'));
-    } else {
-      $deadline = strtotime($this->answer->Applicant->Application->close);
-    }
-    $replace = array(
-     "{$this->answer->Applicant->firstName} {$this->answer->Applicant->lastName}",
-     date('l F jS Y g:ia', $deadline),
-     $mail->path('lor/' . $this->answer->uniqueID),
-     $this->answer->Applicant->Application->contactName,
-     $this->answer->Applicant->Application->contactEmail,
-     $this->answer->Applicant->Application->contactPhone
-    );
-    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_FIRST_NAME);
-    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_LAST_NAME);
-    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_INSTITUTION);
-    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_EMAIL);
-    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_PHONE);
-    $replace[] = $this->getDisplayValueForFixedElement(RecommendersPage::FID_WAIVE_RIGHT);
-    $text = str_ireplace($search, $replace, $this->answer->Page->getVar('recommenderEmailText'));
-
-    $message = new EmailMessage;
-    $message->to($this->getDisplayValueForFixedElement(RecommendersPage::FID_EMAIL), '');
-    $message->from($this->answer->Applicant->Application->contactEmail, $this->answer->Applicant->Application->contactName);
-    $message->subject = 'Letter of Recommendation Request';
-    $message->body = $text;
-    if(!$mail->send($message)){
-      return false;
-    }
-    $this->answer->locked = true;
-    $this->answer->save();
-    return true;
-  }*/
   
   /**
    * Create the recommenders form
