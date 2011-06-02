@@ -31,7 +31,7 @@ interface Answer
    * Tools for applicant_view view
    * @return array of links
    */
-  function applicantTools();
+  function applicantsTools();
   
   /**
    * The Status text for apply_page view
@@ -39,9 +39,9 @@ interface Answer
    */
   function applyStatus();
   
-    /**
+  /**
    * The Status text for applicants_view single
    * @return array of statuses
    */
-  function applicantStatus();
+  function applicantsStatus();
 }

@@ -45,7 +45,7 @@ class Payment implements \Jazzee\Answer
     return array();
   }
   
-  public function applicantTools(){
+  public function applicantsTools(){
     return $this->_payment->getType()->getJazzeePaymentType()->applicantTools();
   }
   public function applyStatus(){
@@ -60,7 +60,7 @@ class Payment implements \Jazzee\Answer
     return $arr;
   }
   
-  public function applicantStatus(){
+  public function applicantsStatus(){
     $arr = array(
       'Status' => $this->_payment->getStatus(),
       'Applicant Status Message' => $this->getStatusText()

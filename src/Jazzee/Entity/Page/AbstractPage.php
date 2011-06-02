@@ -94,6 +94,14 @@ abstract class AbstractPage implements \Jazzee\Page {
   public function showReviewPage(){
     return true;
   }
+  
+  /**
+   * (non-PHPdoc)
+   * @see src/Jazzee/Jazzee.Page::allowAttachments()
+   */
+  public function allowAttachments(){
+    return true;
+  }
 }
 
 ?>

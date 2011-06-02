@@ -49,49 +49,46 @@ class Standard implements \Jazzee\Answer
     );
   }
   
-  public function applicantTools(){
-    return array();
+  public function applicantsTools(){
     $arr = array(
       array(
         'title' => 'Edit',
          'class' => 'editAnswer',
-         'path' => "editAnswer/{$this->answer->id}"
+         'path' => '/editAnswer/' . $this->_answer->getId()
        ),
        array(
         'title' => 'Delete',
          'class' => 'deleteAnswer',
-         'path' => "deleteAnswer/{$this->answer->id}"
+         'path' => '/deleteAnswer/' . $this->_answer->getId()
        ),
        array(
         'title' => 'Verify',
          'class' => 'verifyAnswer',
-         'path' => "verifyAnswer/{$this->answer->id}"
+         'path' => '/verifyAnswer/' . $this->_answer->getId()
        )
     );
     return $arr;
   }
 
   public function applyStatus(){
-    return array();
     $arr = array(
-      'Last updated' => date('M d Y g:i a',$this->getUpdatedAt())
+      'Last updated' => $this->_answer->getUpdatedAt()->format('M d Y g:i a')
     );
-    if($this->answer->publicStatus){
-      $arr['Status'] = $this->answer->PublicStatus->name;
+    if($this->_answer->getPublicStatus()){
+      $arr['Status'] = $this->_answer->getPublicStatus()->getName();
     }
     return $arr;
   }
   
-  public function applicantStatus(){
-    return array();
+  public function applicantsStatus(){
     $arr = array(
-      'Last updated' => date('M d Y g:i a',$this->getUpdatedAt())
+      'Last updated' => $this->_answer->getUpdatedAt()->format('M d Y g:i a')
     );
-    if($this->answer->publicStatus){
-      $arr['Public Status'] = $this->answer->PublicStatus->name;
+    if($this->_answer->getPublicStatus()){
+      $arr['Public Status'] = $this->_answer->getPublicStatus()->getName();
     }
-    if($this->answer->privateStatus){
-      $arr['Private Status'] = $this->answer->PrivateStatus->name;
+    if($this->_answer->getPrivateStatus()){
+      $arr['Private Status'] = $this->_answer->getPrivateStatus()->getName();
     }
     return $arr;
   }

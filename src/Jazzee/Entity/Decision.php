@@ -276,4 +276,50 @@ class Decision{
     return $this->decisionLetterViewed;
   }
    
+  /**
+   * get decision summaray
+   * 
+   * and array with each decision status
+   * @param string $format optionally provide a format to convert status times to
+   * @return array
+   */
+  public function summary($format = null){
+    $decisions = array(
+      'nominateAdmit' => $this->nominateAdmit,
+      'nominateDeny' => $this->nominateDeny,
+      'finalAdmit' => $this->finalAdmit,
+      'finalDeny' => $this->finalDeny,
+      'decisionLetterSent' => $this->decisionLetterSent,
+      'decisionLetterViewed' => $this->decisionLetterViewed,
+      'acceptOffer' => $this->acceptOffer,
+      'declineOffer' => $this->declineOffer,
+    );
+    if($format) foreach($decisions as $key => $value) if($value) $decisions[$key] = $value->format($format);
+    return $decisions;
+  }
+  
+   
+  /**
+   * get decision status
+   * 
+   * Look at all the status's and pick the trumping final one
+   * eg (nominateAdmit, finalAdmit, declineOffer = 'declineOffer')
+   * @return string
+   */
+  public function status($format = 'c'){
+    $decisions = array(
+      'nominateAdmit',
+      'nominateDeny',
+      'finalAdmit',
+      'finalDeny',
+      'decisionLetterSent',
+      'decisionLetterViewed',
+      'acceptOffer',
+      'declineOffer',
+    );
+    $final = '';
+    foreach($decisions as $decision) if($this->$decision) $final = $decision;
+    return $final;
+  }
+   
 }

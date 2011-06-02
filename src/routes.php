@@ -78,6 +78,16 @@ try {
       'urlKey' => 1
     )
   ));
+  
+  //single applicant view
+  $basicRouter->addRoute('#^applicants/single/([0-9]+)/?([^/]+)?/?(.*)$#i', array(
+    'controller' => 'applicants_single',
+    'action' => 2,
+    'action_params' => array(
+      'applicantId' => 1
+    ),
+    'additional_params' => 3
+  ));
   $fc->addRouter($basicRouter);
   
   

@@ -19,15 +19,15 @@
 }
 
 ol.page-list li{
-  list-style-image: url(./index.php?url=resource/foundation/media/icons/page.png);
+  list-style-image: url(resource/foundation/media/icons/page.png);
 }
 
 ol.page-list li.active{
-  list-style-image: url(./index.php?url=resource/foundation/media/icons/page_edit.png);
+  list-style-image: url(resource/foundation/media/icons/page_edit.png);
 }
 
 ol.add-list li{
-	list-style-image: url(./index.php?url=resource/foundation/media/icons/bullet_add.png);
+	list-style-image: url(resource/foundation/media/icons/bullet_add.png);
 }
 
 #workspace p, #save-pages{
@@ -36,31 +36,31 @@ ol.add-list li{
 }
 
 p.edit{
-  background-image: url(./index.php?url=resource/foundation/media/icons/pencil.png);
+  background-image: url(resource/foundation/media/icons/pencil.png);
 }
 
 p.delete{
-	background-image: url(./index.php?url=resource/foundation/media/icons/delete.png);
+	background-image: url(resource/foundation/media/icons/delete.png);
 }
 
 p.preview{
-  background-image: url(./index.php?url=resource/foundation/media/icons/page_code.png);
+  background-image: url(resource/foundation/media/icons/page_code.png);
 }
 
 p.save{
-  background-image: url(./index.php?url=resource/foundation/media/icons/page_save.png);
+  background-image: url(resource/foundation/media/icons/page_save.png);
 }
 
 p.add{
-  background-image: url(./index.php?url=resource/foundation/media/icons/add.png);
+  background-image: url(resource/foundation/media/icons/add.png);
 }
 
 p.copy{
-  background-image: url(./index.php?url=resource/foundation/media/icons/page_copy.png);
+  background-image: url(resource/foundation/media/icons/page_copy.png);
 }
 
 span.deactivate{
-  background-image: url('./index.php?url=resource/foundation/media/icons/bullet_delete.png);
+  background-image: url('resource/foundation/media/icons/bullet_delete.png);
   padding-left: 16px;
   background-repeat: no-repeat;
 }

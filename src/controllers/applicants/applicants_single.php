@@ -9,34 +9,125 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const TITLE = 'Single Applicant';
   const PATH = 'applicants/single';
   
+  const ACTION_INDEX = 'View';
+  const ACTION_PDF = 'Print as PDF';
+  const ACTION_EDITACCOUNT = 'Edit Acount';
+  const ACTION_EXTENDDEADLINE = 'Extend Deadline';
+  const ACTION_LOCK = 'Lock Application';
+  const ACTION_UNLOCK = 'UnLock Application';
+  const ACTION_TAG = 'Tag Applicant';
+  const ACTION_ATTACHAPPLICANTPDF = 'Attach PDF to Applicant';
+  const ACTION_EDITANSWER = 'Edit Answer';
+  const ACTION_DELETEANSWER = 'Delete Answer';
+  const ACTION_ADDANSWER = 'Add Answer';
+  const ACTION_ATTACHANSWERPDF = 'Attach PDF to Answer';
+  const ACTION_VERIFYANSWER = 'Verify Answer';
+  const ACTION_NOMINATEADMIT = 'Nominate for Admission';
+  const ACTION_NOMINATEDENY = 'Nominate for Deny';
+  const ACTION_UNDONOMINATEADMIT = 'Undo Admit Nomination';
+  const ACTION_UNDONOMINATEDENY = 'Undo Deny Nomination';
+  const ACTION_FINALADMIT = 'Final Admit';
+  const ACTION_FINALDENY = 'Final Deny';
+  const ACTION_NEWPAYMENT = 'Record Payment';
+  const ACTION_SETTLEPAYMENT = 'Settle Payment';
+  const ACTION_REFUNDPAYMENT = 'Refund Payment';
+  const ACTION_REJECTPAYMENT = 'Reject Payment';
+  
+  
   /**
    * Add the required JS
    */
   protected function setUp(){
     parent::setUp();
-    $this->addScript('foundation/scripts/form.js');
-    $this->addScript('common/scripts/classes/Status.class.js');
-    $this->addScript('common/scripts/applicants_view.js');
+    $this->layout = 'json';
+    $this->setLayoutVar('status', 'error');  //default to an error
+    $this->addScript($this->path('resource/foundation/scripts/form.js'));
+    $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/AuthenticationTimeout.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/Applicant.class.js'));
+    $this->addScript($this->path('resource/scripts/controllers/applicants_single.controller.js'));
+    \Foundation\VC\Config::addElementViewPath(__DIR__ . '/../../views/applicants/applicants_single/elements/');
   }
   
   /**
-   * Index doesn't do anything right now
+   * Javascript does the display work
+   * @param integer $id the applicants id
    */
-  public function actionIndex(){}
+  public function actionIndex($id){
+    $applicant = $this->getApplicantById($id);
+    $this->layout = 'wide';
+    $this->setVar('applicant', $applicant);
+  }
   
   /**
-   * View a single applicants by ID
-   * @param integer $id the applicant id
+   * Get an applicants action status
    */
-  public function actionById($id){
+  public function actionUpdateActions($id){
     $applicant = $this->getApplicantById($id);
-    $pages = array();
-    foreach($this->application->Pages as $page){
-      $pages[$page->id] = new $page->Page->PageType->class($page, $applicant);
+    $actions = array(
+      'createdAt'=>$applicant->getCreatedAt(),
+      'updatedAt'=>$applicant->getUpdatedAt(),
+      'lastLogin'=>$applicant->getLastLogin()
+    );
+    $actions['allowUnlock'] = $this->checkIsAllowed($this->controllerName, 'unlock');
+    $actions['allowLock'] = $this->checkIsAllowed($this->controllerName, 'lock');
+    $actions['isLocked'] = $applicant->isLocked();
+    $this->setVar('result', $actions);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Get an applicants status
+   */
+  public function actionUpdateStatus($id){
+    $applicant = $this->getApplicantById($id);
+    $status = array(
+      'status'=> 'Not Complete'
+    );
+    $this->setVar('result', $status);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Get an applicants tags
+   */
+  public function actionUpdateTags($id){
+    $applicant = $this->getApplicantById($id);
+    $tags = array();
+    foreach($applicant->getTags() as $tag){
+      $tags[] = array(
+        'id' => $tag->getId(),
+        'title' => $tag->getTitle()
+      );
     }
-    $this->setVar('pages', $pages);
-    $this->setVar('applicant', $applicant);
-    $this->loadView('applicants_single/single');
+    $this->setVar('result', $tags);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Update a page
+   */
+  public function actionUpdatePage($applicantId, $pageId){
+    $this->layout = 'blank';
+    $applicant = $this->getApplicantById($applicantId);
+    $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
+    $this->setVar('variables', array('page'=>$page,'applicant'=>$applicant));
+    $this->setVar('element', 'applicants-single-page');
+    $this->loadView($this->controllerName . '/element');
+  }
+  
+  /**
+   * Update an answer
+   */
+  public function actionUpdateAnswer($applicantId, $answerId){
+    $this->layout = 'blank';
+    $applicant = $this->getApplicantById($applicantId);
+    $answer = $this->_em->getRepository('\Jazzee\Entity\Answer')->findOneBy(array('id'=>$answerId, 'applicant'=>$applicant->getId()));
+    $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
+    
+    $this->setVar('variables', array('page'=>$page,'answer'=>$answer));
+    $this->setVar('element', 'applicants-single-answer');
+    $this->loadView($this->controllerName . '/element');
   }
   
   /**
@@ -44,73 +135,73 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    * @param integer $id the applicant id
    * @param string $type the page orientation
    */
-  public function actionPdf($id, $type = 'portrait'){
-    $applicant = $this->getApplicantById($id);
+  public function actionPdf($applicantId, $type = 'portrait'){
+    $applicant = $this->getApplicantById($applicantId);
     switch($type){
       case 'landscape':
-        $orientation = ApplicantPDF::USLETTER_LANDSCAPE;
+        $orientation = \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE;
         break;
       default:
-        $orientation = ApplicantPDF::USLETTER_PORTRAIT;
+        $orientation = \Jazzee\ApplicantPDF::USLETTER_PORTRAIT;
     }
-    $pdf = new ApplicantPDF($orientation, $this->config->pdflib_key);
+    $key = '';
+    $pdf = new \Jazzee\ApplicantPDF($orientation, $key);
     $blob = $pdf->pdf($applicant);
     header("Content-type: application/pdf");
     header("Content-Length: " . strlen($blob));
-    header('Content-Disposition: inline; filename=' . "{$applicant->lastName}-{$applicant->firstName}-" . date('m-d-y') . '.pdf');
+    header('Content-Disposition: inline; filename=' . $applicant->getLastName() .'-' . $applicant->getFirstName() . '-' . date('m-d-y') . '.pdf');
     print $blob; 
     exit();
   }
   
   /**
    * Edit the intial data entered by the applicant when creating an account
-   * @param integer $id
+   * @param integer $applicantId
    */
-  public function actionEditApplicant($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
+  public function actionEditAccount($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
     $form = new \Foundation\Form();
-    $form->action = $this->path("applicants/view/editApplicant/{$id}");
-    $field = $form->newField(array('legend'=>"Edit Applicant {$applicant->firstName} {$applicant->lastName}"));
+    $form->setAction($this->path("applicants/single/{$applicantId}/editAccount"));
+    $field = $form->newField();
+    $field->setLegend('Edit ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+    
     $element = $field->newElement('TextInput', 'firstName');
-    $element->label = 'First Name';
+    $element->setLabel('First Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->value = $applicant->firstName;
+    $element->setValue($applicant->getFirstName());
     
     $element = $field->newElement('TextInput', 'middleName');
-    $element->label = 'Middle Name';
-    $element->value = $applicant->middleName;
+    $element->setLabel('Middle Name');
+    $element->setValue($applicant->getMiddleName());
     
-    $element = $field->newElement('TextInput','lastName');
-    $element->label = 'Last Name';
+    $element = $field->newElement('TextInput', 'lastName');
+    $element->setLabel('Last Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->value = $applicant->lastName;
-        
+    $element->setValue($applicant->getLastName());
+    
     $element = $field->newElement('TextInput', 'suffix');
-    $element->label = 'Suffix';
-    $element->format = 'Example: Jr., III';
-    $element->value = $applicant->suffix;
-
+    $element->setLabel('Suffix');
+    $element->setValue($applicant->getSuffix());
+    
     $element = $field->newElement('TextInput', 'email');
-    $element->label = 'Email Address';
+    $element->setLabel('Email');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->addValidator('EmailAddress');
-    $element->addFilter('Lowercase');
-    $element->value = $applicant->email;
+    $element->addValidator(new \Foundation\Form\Validator\EmailAddress($element));
+    $element->addFilter(new \Foundation\Form\Filter\Lowercase($element));
+    $element->setValue($applicant->getEmail());
     
     $form->newButton('submit', 'Save Changes');
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
-        $applicant->firstName = $input->firstName;
-        $applicant->middleName = $input->middleName;
-        $applicant->lastName = $input->lastName;
-        $applicant->suffix = $input->suffix;
-        $applicant->email = $input->email;
-        $applicant->save();
-        $this->redirectPath('applicants/single/byId/'.$applicant->id);
-      } else {
-        $this->setLayoutVar('status', 'error');
+        $applicant->setFirstName($input->get('firstName'));
+        $applicant->setMiddleName($input->get('middleName'));
+        $applicant->setLastName($input->get('lastName'));
+        $applicant->setSuffix($input->get('suffix'));
+        $applicant->setEmail($input->get('email'));
+        
+        $this->_em->persist($applicant);
+        $this->setLayoutVar('status', 'success');
       }
     }
     $this->setVar('form', $form);
@@ -504,37 +595,11 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->loadView('applicants_single/form');
   }
   
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Single Applicant';
-    $auth->addAction('index', new ActionAuth('Access single applicant'));
-    $auth->addAction('byId', new ActionAuth('View a single applicant by id'));
-    $auth->addAction('editApplicant', new ActionAuth('Edit Applicant Data'));
-    $auth->addAction('editAnswer', new ActionAuth('Edit Answers'));
-    $auth->addAction('deleteAnswer', new ActionAuth('Delete Answers'));
-    $auth->addAction('addAnswer', new ActionAuth('Add an Answer'));
-    $auth->addAction('addTag', new ActionAuth('Add a tag to an applicant'));
-    
-    
-    $auth->addAction('nominateAdmit', new ActionAuth('Nominate Applicant for admission'));
-    $auth->addAction('nominateDeny', new ActionAuth('Nominate Applicant for denial'));
-    $auth->addAction('undoNomination', new ActionAuth('Undo nomination'));
-    $auth->addAction('finalAdmit', new ActionAuth('Admit Applicant'));
-    $auth->addAction('finalDeny', new ActionAuth('Deny Applicant'));
-    
-    $auth->addAction('attachAnswerPDF', new ActionAuth('Attach PDF to answers'));
-    $auth->addAction('attachApplicantPDF', new ActionAuth('Attach PDF to an applicant'));
-    $auth->addAction('verifyAnswer', new ActionAuth('Verify Applicant Answer'));
-    $auth->addAction('unlock', new ActionAuth('Unlock an application'));
-    $auth->addAction('lock', new ActionAuth('Lock an application'));
-    $auth->addAction('extendDeadline', new ActionAuth('Extend the deadline for an applicant'));
-    $auth->addAction('pdf', new ActionAuth('Generate PDF from applicant data'));
-    
-    $auth->addAction('newPayment', new ActionAuth('Add New Payment'));
-    $auth->addAction('settlePayment', new ActionAuth('Settle Applicant payment'));
-    $auth->addAction('refundPayment', new ActionAuth('Settle Applicant payment'));
-    $auth->addAction('rejectPayment', new ActionAuth('Settle Applicant payment'));
-    
-    return $auth;
+
+  
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
+    //several views are controller by the complete action
+    if(in_array($action, array('updateBio', 'updateActions', 'updateStatus', 'updateTags', 'updatePage', 'updateAnswer'))) $action = 'index';
+    return parent::isAllowed($controller, $action, $user, $program);
   }
 }

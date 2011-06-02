@@ -221,12 +221,12 @@ abstract class AdminController extends Controller{
    * Get an applicant by ID
    * Ensures we are fetching an applicant from our current program and cycle
    * @param integer $applicantId
-   * @return Applicant
+   * @return \Jazzee\Entity\Applicant
    * 
    */
   protected function getApplicantById($applicantId){
-    if(!$applicant = $this->application->getApplicantByID($applicantId)){
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to access applicant {$applicantId} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
+    if(!$applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findOneBy(array('id'=>$applicantId, 'application'=>$this->_application->getId()))){
+      throw new Exception($this->_user->getFirstName() . ' ' . $this->_user->getLastName() . ' (#' . $this->_user->getId() . ") attempted to access applicant {$applicantId} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
     }
     return $applicant;
   }

@@ -111,4 +111,8 @@ class Payment extends AbstractPage {
     //need to check if we have at least one pending or settled payment not rejected or refunded
     return self::INCOMPLETE;
   }
+  
+  public function showReviewPage(){
+    return false;
+  }
 }

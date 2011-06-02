@@ -69,13 +69,13 @@ p.skip {
 }
 
 #bar li a.skipped {
-  background-image: url(./index.php?url=resource/foundation/media/icons/error.png);
+  background-image: url(resource/foundation/media/icons/error.png);
   background-repeat: no-repeat;
   background-position: center left;
 }
 
 #bar li a.complete {
-  background-image: url(./index.php?url=resource/foundation/media/icons/tick.png);
+  background-image: url(resource/foundation/media/icons/tick.png);
   background-repeat: no-repeat;
   background-position: center left;
 }

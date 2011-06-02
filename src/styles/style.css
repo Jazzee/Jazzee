@@ -104,7 +104,7 @@ div.form legend{
 }
 
 div.form p.required{
-  background-image: url(./index.php?url=resource/foundation/media/icons/asterisk_yellow.png);
+  background-image: url('resource/foundation/media/icons/asterisk_yellow.png');
   background-repeat: no-repeat;
   padding-left: 20px;
 }
@@ -114,7 +114,7 @@ div.form label{
 }
 
 div.form div.required div.label, div.form div.label.required{
-  background-image: url(./index.php?url=resource/foundation/media/icons/asterisk_yellow.png);
+  background-image: url(resource/foundation/media/icons/asterisk_yellow.png);
   background-repeat: no-repeat;
   background-position:top right;
 }

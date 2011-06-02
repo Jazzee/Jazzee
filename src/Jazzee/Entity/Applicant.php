@@ -264,7 +264,19 @@ class Applicant{
   public function getSuffix(){
     return $this->suffix;
   }
-
+  
+  /**
+   * Get an applicants full name
+   * 
+   * Combines all the name parts nicely
+   */
+  public function getFullName(){
+    $name = $this->firstName . ' ' . $this->lastName;
+    if($this->middleName) $name .= ', ' . $this->middleName;
+    if($this->suffix) $name .= $this->suffix;
+    return $name;
+  }
+  
   /**
    * Set deadlineExtension
    *

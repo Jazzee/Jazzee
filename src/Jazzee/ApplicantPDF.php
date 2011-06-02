@@ -1,4 +1,5 @@
 <?php
+namespace Jazzee;
 /**
  * Create a PDF from an Applicant object
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -65,13 +66,12 @@ class ApplicantPDF {
    * @param string $key the PDFLib license key we are using
    */
   public function __construct($pageType = self::USLETTER_PORTRAIT, $key = ''){
-    $this->pdf = new PDFlib();
-    
+    $this->pdf = new \PDFlib();
     if($key){
       try{
         $this->pdf->set_parameter("license", $key);
       } catch (PDFlibException $e){
-        trigger_error("Unable to validate PDFLib license key, check that your PDFLib version is compatible with your key: " . $e->getMessage());
+        throw new Exception("Unable to validate PDFLib license key, check that your PDFLib version is compatible with your key: " . $e->getMessage());
       }
     } 
     //This means we must check return values of load_font() etc.
@@ -110,71 +110,43 @@ class ApplicantPDF {
     //  open new PDF file in memory
     $this->pdf->begin_document("", "");
     $this->pdf->set_info("Creator", "Jazzee");
-    $this->pdf->set_info("Author", "Jazzee Application Management System");
+    $this->pdf->set_info("Author", "Jazzee Open Applicatoin Platform");
     $this->currentText  = $this->pdf->create_textflow('', '');
   }
   
   /**
    * PDF a full single applicant
-   * @param Application $applicant
+   * @param \Jazzee\Entity\Applicant $applicant
    * @return string the PDF buffer suitable for display
    */
-  public function pdf(Applicant $applicant){
-    $this->pdf->set_info("Title", "{$applicant->firstName} {$applicant->lastName} Application");
-        
-    $name = "{$applicant->firstName} {$applicant->middleName} {$applicant->lastName}";
-    if($applicant->suffix){
-      $name .= ", {$applicant->suffix}";
-    }
-    if($applicant->previousName){
-      $name .= " ({$applicant->previousName})";
-    }
+  public function pdf(\Jazzee\Entity\Applicant $applicant){
+    $this->pdf->set_info("Title", $applicant->getFullName() . ' Application');
     
     $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
     $this->setFont('p');
-    $this->addText($name . "\n", 'h1');
-    $this->addText("Email Address: {$applicant->email}\n", 'p');
-  
-    if($applicant->relatedExists('Decision')){
-      //the priority of differnt addmission status from most to least important
-      $statusPriority = array(
-        'declineOffer' => 'Declined offer of admission',
-        'acceptOffer' => 'Accepted offer of admission',
-        'decisionLetterViewed' => 'Decision letter recieved',
-        'decisionLetterSent' => 'Decision letter sent',
-        'finalDeny' => 'Denied (Final)',
-        'finalAdmit' => 'Admitted (Final)',
-        'nominateDeny' => 'Denied (Preliminary)',
-        'nominateAdmit' => 'Admitted (Preliminary)',
-      );
-      $arr = array();
-      //loop through each status and find the one with the highest priority and a timestamp
-      foreach($statusPriority as $key => $value){
-        if($applicant->Decision->$key){
-          $arr[] = $value . ' ' . date('m/d/y', strtotime($applicant->Decision->$key));
-        }
-      }
-      $status = implode(', ', $arr);
+    $this->addText($applicant->getFullName() . "\n", 'h1');
+    $this->addText('Email Address: ' . $applicant->getEmail() . "\n", 'p');
+    
+    
+    if($applicant->getDecision()){
+      $status = $applicant->getDecision()->status();
     } else {
       $status = 'Under Review';
     }
     $this->addText("Admission Status: {$status}\n", 'p');
     $this->writeTextFlow();
     
-    foreach($applicant->Application->Pages as $page){
-      $className = $page->Page->class . 'Page';
-      if(class_exists($className) AND is_subclass_of($className, 'ApplyPage')){
-        $page = new $className($page, $applicant);
-        $this->addText($page->title, 'h3');
-        if($answers = $page->getAnswers()){
-          $this->addText('Page answers go here, but need to be rendered by page type', 'p');
-        } else {
-          $this->addText('Applicant has not answered this section', 'h3');
-        }
+    foreach($applicant->getApplication()->getPages() as $page){
+      $page->getJazzeePage()->setApplicant($applicant);
+      $this->addText($page->getTitle(), 'h3');
+      if($answers = $page->getJazzeePage()->getAnswers()){
+        $this->addText('Page answers go here, but need to be rendered by page type', 'p');
+      } else {
+        $this->addText('Applicant has not answered this section', 'h3');
       }
       $this->writeTextFlow();
     }
-
+    
     $this->pdf->end_page_ext("");
     $this->pdf->end_document("");
     return $this->pdf->get_buffer();
