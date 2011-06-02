@@ -5,7 +5,7 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class LorController extends JazzeeController{
+class LorController extends \Jazzee\JazzeeController{
   
   /**
    * The index page
@@ -15,38 +15,40 @@ class LorController extends JazzeeController{
    * @param string $urlKey 
    */
   public function actionIndex($urlKey){
-    $answer = Doctrine::getTable('Answer')->findOneByUniqueID($urlKey);
-    if(!$answer OR !$answer->locked) $this->send404();
-    if($answer->Children->getFirst()->Elements->count() > 0){
+    $answer = $this->_em->getRepository('\Jazzee\Entity\Answer')->findOneBy(array('uniqueId'=>$urlKey));
+    if(!$answer OR !$answer->isLocked()) $this->send404();
+    if($answer->getChildren()->count()){
       $this->loadView($this->controllerName . '/complete');
       exit;
     }
-    $page = $answer->Page->Children->getFirst();
+    
+    $page = $answer->getPage()->getChildren()->first();
     $this->setVar('page', $page);
-    $form = new Form;
-    $form->action = $this->path("lor/{$urlKey}");
+    
+    $form = new \Foundation\Form;
+    $form->setAction($this->path('lor/'.$urlKey));
     $field = $form->newField();
-    $field->legend = $page->title;
-    $field->instructions = $page->instructions;
-    foreach($page->Elements as $e){
-      $element = new $e->ElementType->class($e);
-      $element->addToField($field);
+    $field->setLegend($page->getTitle());
+    $field->setInstructions($page->getInstructions());
+    foreach($page->getElements() as $element){
+      $element->getJazzeeElement()->addToField($field);
     }
-    $form->newButton('submit', 'Save');
+    $form->newButton('submit', 'Submit Recommendation');
     $form->newButton('reset', 'Clear Form');
+    
     if($input = $form->processInput($this->post)){
-      $a = $answer->Children->getFirst();
-      foreach($page->Elements as $e){
-        $element = new $e->ElementType->class($e);
-        $element->setValueFromInput($input->{'el'.$e->id});
-        foreach($element->getAnswers() as $elementAnswer){
-          $a->Elements[] = $elementAnswer;
-        }
-      }
-      $a->save();
-      $this->messages->write('success', 'Recommendation Saved Successfully');
+      $childAnswer = new \Jazzee\Entity\Answer();
+      $childAnswer->setParent($answer);
+      $childAnswer->setApplicant($answer->getApplicant());
+      $childAnswer->setPage($page);
+      $childAnswer->getJazzeeAnswer()->update($input);
       
-      $this->setVar('answer', $a);
+      $this->_em->persist($childAnswer);
+      $this->addMessage('success', 'Recommendation Received');
+      //flush here so the answerId will be correct when we view
+      $this->_em->flush();
+      
+      $this->setVar('answer', $childAnswer);
       $this->loadView($this->controllerName . '/review');
       exit();
     }
@@ -60,7 +62,7 @@ class LorController extends JazzeeController{
     $request = new Lvc_Request();
     $request->setControllerName('error');
     $request->setActionName('index');
-    $request->setActionParams(array('error' => '404', 'message'=>'File Not Found'));
+    $request->setActionParams(array('error' => '404', 'message'=>'We were unable to locate this recommendation, or it has already been submitted.'));
   
     // Get a new front controller without any routers, and have it process our handmade request.
     $fc = new Lvc_FrontController();

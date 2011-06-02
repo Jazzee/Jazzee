@@ -6,10 +6,7 @@
  * @package jazzee
  * @subpackage lor
  */
-
-print "<div id='leadingText'>{$page->leadingText}</div>";
-if($form){
-  $this->renderElement('form', array('form'=> $form));
-}
-print "<div id='trailingText'>{$page->trailingText}</div>";
 ?>
+<div id='leadingText'><?php print $page->getLeadingText() ?></div>
+<?php $this->renderElement('form', array('form'=> $form));?>
+<div id='trailingText'><?php print $page->getTrailingText() ?></div>

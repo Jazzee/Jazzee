@@ -11,16 +11,16 @@
 <h3>Thank you.  We have recieved your recommendation.</h3>
 <p>For our applicant's security this page will only display once.  If you wish to have a copy of this recommendation for your records you should make one now.</p>
 <?php
-if($answer){
-  $allAnswersByElementId = array();
-  foreach($answer->Elements as $answerElement){
-    $allAnswersByElementId[$answerElement->elementID][] = $answerElement;
+if($answer){?>
+  <h5>Submitted Recommendation</h5>
+  <p>
+  <?php 
+  foreach($answer->getPage()->getElements() as $element){
+    $value = $element->getJazzeeElement()->displayValue($answer);
+    if($value){
+      print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>'; 
+    }
   }
-  foreach($answer->Page->Elements as $e){
-    $element = new $e->ElementType->class($e);
-    if(!empty($allAnswersByElementId[$e->id])) $element->setValueFromAnswer($allAnswersByElementId[$e->id]);
-    $value = $element->displayValue();
-    if($value) print "<p><strong>{$e->title}:</strong>&nbsp;" . $value . '</p>'; 
-  }
-}
-?>
+  ?>
+  </p>
+<?php }

@@ -8,4 +8,4 @@
  * @subpackage lor
  */
 ?>
-<p>This recommendation has alreadybeen completed.</p>
+<p>This recommendation has already been completed.</p>
