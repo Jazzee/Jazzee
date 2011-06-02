@@ -81,6 +81,15 @@ class ApplicationPage
   }
   
   /**
+   * get application
+   *
+   * @return \Jazzee\Entity\Application $application
+   */
+  public function getApplication(){
+    return $this->application;
+  }
+  
+  /**
    * Set page
    *
    * @param Entity\Page $page

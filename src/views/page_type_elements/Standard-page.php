@@ -7,13 +7,16 @@
  * @subpackage apply
  */
 ?>
-<?php
-if($page->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED){?>
-  <p class="skip">You have selected to skip this page.  You can still change your mind and <a href='<?php print $this->controller->getActionPath() . '/do/unskip';?>' title='complete this page'>Complete This Page</a> if you wish.</p>
-<?php } else {
-  if(!$page->required() and !count($page->getJazzeePage()->getAnswers())){?>
-    <p class="skip">This page is optional, if you do not have any information to enter you can <a href='<?php print $this->controller->getActionPath() . '/do/skip';?>' title='skip this page'>Skip This Page</a>.</p>
-  <?php }
+<div id='apply-page-header'>
+<p class='deadline<?php if($page->getApplication()->getClose()->diff(new DateTime('today'))->days < 7){ print ' approaching-deadline';}  ?>'>Application Deadline: <?php print $page->getApplication()->getClose()->format('m/d/Y g:ia T');?></p>
+  <?php if($page->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED){?>
+    <p class="skip">You have selected to skip this page.  You can still change your mind and <a href='<?php print $this->controller->getActionPath() . '/do/unskip';?>' title='complete this page'>Complete This Page</a> if you wish.</p>
+  <?php } else {
+    if(!$page->required() and !count($page->getJazzeePage()->getAnswers())){?>
+      <p class="skip">This page is optional, if you do not have any information to enter you can <a href='<?php print $this->controller->getActionPath() . '/do/skip';?>' title='skip this page'>Skip This Page</a>.</p>
+  <?php }?>
+</div>
+  <?php 
   if($answers = $page->getJazzeePage()->getAnswers()){
     print "<div id='answers'>";
     $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-answer');
