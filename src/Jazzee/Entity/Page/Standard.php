@@ -79,7 +79,7 @@ class Standard extends AbstractPage {
   }
   
   public function getStatus(){
-    if(count($this->getAnswers()) < $this->_applicationPage->getMin()){
+    if(is_null($this->_applicationPage->getMin()) or count($this->getAnswers()) < $this->_applicationPage->getMin()){
       return self::INCOMPLETE;
     } else {
       return self::COMPLETE;

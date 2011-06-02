@@ -23,7 +23,7 @@ if($answers = $page->getJazzeePage()->getAnswers()){
   }?>
 </div>
 <?php
-if(is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax()){
+if(!empty($currentAnswerID) or is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax()){
   $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-form');
   $this->renderElement($elementName, array('page'=>$page));
 }
