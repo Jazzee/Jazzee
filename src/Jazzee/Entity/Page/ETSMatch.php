@@ -24,7 +24,7 @@ class ETSMatch extends Standard {
    * @param \Jazzee\Entity\Answer
    */
   public function matchScore(\Jazzee\Entity\Answer $answer){
-    if(!is_null($answer->greScore) and !is_null($answer->toeflScore)) return; //we already have a match
+    if(!is_null($answer->getGREScore()) and !is_null($answer->getTOEFLScore())) return; //we already have a match
     $testType = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer);
     $registrationNumber = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer);
     $testDate = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getJazzeeElement()->formValue($answer);
@@ -56,7 +56,6 @@ class ETSMatch extends Standard {
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
   }
-  
 /**
    * Create the ets match form
    * @param Entity\Page $page
