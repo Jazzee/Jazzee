@@ -66,19 +66,21 @@ p.skip {
 
 /* make room for the status icon */
 #bar li a {
-  padding-left: 16px;
+  padding-left: 12px;
 }
 
 #bar li a.skipped {
   background-image: url(resource/foundation/media/icons/error.png);
   background-repeat: no-repeat;
   background-position: center left;
+  background-size: 12px 12px;
 }
 
 #bar li a.complete {
   background-image: url(resource/foundation/media/icons/tick.png);
   background-repeat: no-repeat;
   background-position: center left;
+  background-size: 12px 12px;
 }
 
 #counter p{

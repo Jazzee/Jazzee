@@ -81,6 +81,7 @@ div.v-navigation li{
 
 div.v-navigation a {
   text-decoration: none;
+  display: block;
 }
 
 /***** FORM STYLE *****/
@@ -122,6 +123,7 @@ div.form div.required div.label, div.form div.label.required{
 div.form p.instructions, div.form div.instructions {
   border: 1px groove #000000;
   background-color: #ffffdd;
+  padding: 1em 2em;
 }
 
 div.form div.field p.message {
