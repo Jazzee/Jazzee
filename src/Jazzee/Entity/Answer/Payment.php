@@ -3,71 +3,11 @@ namespace Jazzee\Entity\Answer;
 /**
  * A single StandardPage Applicant Answer
  */
-class Payment implements \Jazzee\Answer 
+class Payment extends Standard
 {
-  /**
-  * The Payment entity
-  * @var \Jazzee\Entity\Payment
-  */
-  protected $_payment;
-
- /**
-  * Contructor
-  * 
-  * Store the payment
-  * @param \Jazzee\Entity\Payment $payment
-  */
-  public function __construct(\Jazzee\Entity\Payment $payment){
-    $this->_payment = $payment;
-  }
-  
-  /**
-   * Get the Payment
-   * 
-   * @return \Jazzee\Entity\Payment
-   */
-  public function getPayment(){
-    return $this->_payment;
-  }
-  /**
-   * 
-   * @see Jazzee.Answer::getID()
-   */
-  public function getID(){
-    return $this->_payment->getId();
-  }
   
   public function update(\Foundation\Form\Input $input){
-    return $this->_payment->getType()->getJazzeePaymentType()->pendingPayment($this->_payment, $input);
-  }
-  
-  public function applyTools(){
-    return array();
-  }
-  
-  public function applicantsTools(){
-    return $this->_payment->getType()->getJazzeePaymentType()->applicantTools();
-  }
-  public function applyStatus(){
-    $arr = array(
-      'Status' => $this->getStatusText()
-    );
-    //add the reson to refunded payments
-    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REFUNDED) $arr['Reason'] = $this->_payment->getVar('reasonText');
-    
-    //add the reson to rejected payments
-    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REJECTED) $arr['Reason'] = $this->_payment->getVar('reasonText');
-    return $arr;
-  }
-  
-  public function applicantsStatus(){
-    $arr = array(
-      'Status' => $this->_payment->getStatus(),
-      'Applicant Status Message' => $this->getStatusText()
-    );
-    //add the reson to rejected payments
-    if($this->_payment->getStatus() == \Jazzee\Entity\Payment::REJECTED) $arr['Reason'] = $this->_payment->getVar('reasonText');
-    return $arr;
+    return $this->_answer->getPayment()->getType()->getJazzeePaymentType()->pendingPayment($this->_answer->getPayment(), $input);
   }
   
   /**

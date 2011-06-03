@@ -84,6 +84,11 @@ class Answer{
    */
   private $toeflScore;
   
+  /** 
+   * @OneToOne(targetEntity="Payment")
+   */
+  private $payment;
+  
   /**
    * The Jazzee Answer instance
    * @var \Jazzee\Answer
@@ -369,6 +374,25 @@ class Answer{
    */
   public function markLastUpdate(){
       $this->updatedAt = new \DateTime();
+  }
+  
+  /**
+   * get payment
+   *
+   * @return \Jazzee\Entity\Payment $payment
+   */
+  public function getPayment(){
+    return $this->payment;
+  }
+  
+  /**
+   * Set payment
+   *
+   * @param \Jazzee\Entity\Payment $payment
+   */
+  public function setPayment($payment){
+    $this->payment = $payment;
+    if($payment->getAnswer() != $this) $payment->setAnswer($this);
   }
   
   /**

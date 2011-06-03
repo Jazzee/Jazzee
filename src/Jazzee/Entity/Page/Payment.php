@@ -69,33 +69,29 @@ class Payment extends AbstractPage {
   }
   
   public function newAnswer($input){
+    $answer = new \Jazzee\Entity\Answer();
+    $answer->setPage($this->_applicationPage->getPage());
+    $answer->setApplicant($this->_applicant);
     $payment = new \Jazzee\Entity\Payment();
-    $payment->setApplicant($this->_applicant);
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
-    $answer = new \Jazzee\Entity\Answer\Payment($payment);
-    $result = $answer->update($input);
+    
+    $answer->setPayment($payment);
+    $result = $answer->getJazzeeAnswer()->update($input);
     if($result){
       $this->_controller->addMessage('success', 'Your payment has been recorded.');
       $this->_form = null;
     } else {
       $this->_controller->addMessage('error', 'There was a problem processing your payment.');
     }
+    
+    $this->_controller->getEntityManager()->persist($answer);
     $this->_controller->getEntityManager()->persist($payment);
     foreach($payment->getVariables() as $var) $this->_controller->getEntityManager()->persist($var);
-    $this->_controller->getEntityManager()->flush();
     return $result;
   }
   
   public function updateAnswer($input, $answerID){
     return false;
-  }
-  
-  public function getAnswers(){
-    $answers = array();
-    foreach($this->_applicant->getPayments() as $p){
-      $answers[] = new \Jazzee\Entity\Answer\Payment($p);
-    }
-    return $answers;
   }
   
   public function deleteAnswer($answerId){
@@ -110,6 +106,16 @@ class Payment extends AbstractPage {
   public function getStatus(){
     //need to check if we have at least one pending or settled payment not rejected or refunded
     return self::INCOMPLETE;
+  }
+  
+  public function getAnswers(){
+    $answers = array();
+    foreach($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer){
+      if($answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::PENDING or $answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::SETTLED){
+        $answers[] = $answer;
+      }
+    }
+    return $answers;
   }
   
   public function showReviewPage(){

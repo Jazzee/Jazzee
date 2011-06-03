@@ -16,10 +16,10 @@ class Payment{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Applicant",inversedBy="payments")
+   * @OneToOne(targetEntity="Answer",inversedBy="payment")
    * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
-  private $applicant;
+  private $answer;
   
   /** 
    * @ManyToOne(targetEntity="PaymentType")
@@ -60,21 +60,21 @@ class Payment{
   }
   
   /**
-   * Set applicant
+   * Set answer
    *
-   * @param Entity\Applicant $applicant
+   * @param \Jazzee\Entity\Answer $answer
    */
-  public function setApplicant(Applicant $applicant){
-    $this->applicant = $applicant;
+  public function setAnswer(Answer $answer){
+    $this->answer = $answer;
   }
   
   /**
-   * Get applicant
+   * Get answer
    *
-   * @return \Jazzee\Entity\Applicant $applicant
+   * @return \Jazzee\Entity\Answer $answer
    */
-  public function getApplicant(){
-    return $this->applicant;
+  public function getAnswer(){
+    return $this->answer;
   }
 
   /**

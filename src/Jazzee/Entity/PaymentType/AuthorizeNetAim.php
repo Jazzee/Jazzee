@@ -121,9 +121,9 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $aim = new \AuthorizeNetAIM($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
     $aim->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     $aim->amount = $input->get('amount');
-    $aim->cust_id = $payment->getApplicant()->getId();
+    $aim->cust_id = $payment->getAnswer()->getApplicant()->getId();
     $aim->customer_ip = $_SERVER['REMOTE_ADDR'];
-    $aim->email = $payment->getApplicant()->getEmail();
+    $aim->email = $payment->getAnswer()->getApplicant()->getEmail();
     $aim->email_customer = 0;
     $aim->card_num = $input->get('cardNumber');
     $aim->exp_date = $input->get('expirationDate');

@@ -14,9 +14,9 @@
   ?>
   <p class='status'>
   <?php
-  foreach($answer->applyStatus() as $title => $value){
-    print "{$title}: {$value} <br />"; 
-  }
+//  foreach($answer->applyStatus() as $title => $value){
+//    print "{$title}: {$value} <br />"; 
+//  }
   ?>
   </p>
 </div>
