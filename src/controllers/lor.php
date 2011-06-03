@@ -41,8 +41,11 @@ class LorController extends \Jazzee\JazzeeController{
       $childAnswer->setParent($answer);
       $childAnswer->setApplicant($answer->getApplicant());
       $childAnswer->setPage($page);
-      $childAnswer->getJazzeeAnswer()->update($input);
-      
+      foreach($page->getElements() as $element){
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $childAnswer->addElementAnswer($elementAnswer);
+        }
+      }
       $this->_em->persist($childAnswer);
       $this->addMessage('success', 'Recommendation Received');
       //flush here so the answerId will be correct when we view
