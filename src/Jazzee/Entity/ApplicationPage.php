@@ -44,8 +44,8 @@ class ApplicationPage
   /** @Column(type="boolean") */
   private $isRequired = true;
   
-  /** @Column(type="boolean") */
-  private $answerStatusDisplay = false;
+  /** @Column(type="boolean", nullable=true) */
+  private $answerStatusDisplay;
   
   /** @Column(type="text", nullable=true) */
   private $instructions;

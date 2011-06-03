@@ -101,6 +101,7 @@ abstract class PageBuilder extends AdminController{
         $e['list'][] = array(
           'id' => $item->getId(),
           'value' => $item->getValue(),
+          'weight' => $item->getWeight(),
           'isActive' => (int)$item->isActive()
         );
       }
@@ -179,6 +180,7 @@ abstract class PageBuilder extends AdminController{
     $page->setMin($data->min);
     $page->setMax($data->max);
     if($data->isRequired) $page->required(); else $page->optional();
+    if($data->answerStatusDisplay) $page->showAnswerStatus(); else $page->hideAnswerStatus();
     $page->setInstructions($data->instructions);
     $page->setLeadingText($data->leadingText);
     $page->setTrailingText($data->trailingText);
