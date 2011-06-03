@@ -6,7 +6,7 @@
  * @subpackage apply
  */
  
-class ApplyStatusController extends ApplyController {  
+class ApplyStatusController extends \Jazzee\ApplyController {  
   /**
    * Status array
    * @var array
@@ -16,25 +16,11 @@ class ApplyStatusController extends ApplyController {
   public function beforeAction(){
     parent::beforeAction();
     //if the applicant hasn't locked and the application isn't closed
-    if(!$this->applicant->locked and strtotime($this->applicant->Application->close) > time()){
-      $this->messages->write('notice', "You have not completed your application.");
-      $this->redirect($this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/page/{$this->application['Pages']->getFirst()->id}"));
-      $this->afterAction();
-      die();
+    if(!$this->_applicant->isLocked() AND $this->_application->getClose() > new DateTime('now')){
+      $this->addMessage('notice', "You have not completed your application.");
+      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_application->getPages()->first()->getId());
     }
-    $this->status = array('deny'=>false,'admit'=>false,'accept'=>false,'decline'=>false);
-    if($this->applicant->relatedExists('Decision')){
-      if($this->applicant->Decision->finalDeny)
-        $this->status['deny'] = true;
-      if($this->applicant->Decision->finalAdmit)
-        $this->status['admit'] = true;
-      if($this->applicant->Decision->declineOffer)
-        $this->status['decline'] = true;
-      if($this->applicant->Decision->acceptOffer)
-        $this->status['accept'] = true;
-    }
-    $this->setVar('status', $this->status);
-    $this->setVar('applicant', $this->applicant);
+    $this->setVar('applicant', $this->_applicant);
   }
   
   /**
@@ -42,12 +28,8 @@ class ApplyStatusController extends ApplyController {
    */
   public function actionIndex() {
     $pages = array();
-    foreach($this->application->Pages as $page){
-      if($page->Page->showAnswerStatus == true){
-        $pages[] = $this->pages[$page->id];
-      }
-    }
-    $this->setVar('answerStatusPages', $pages);
+    foreach($this->_pages as $key => $page)if($page->answerStatusDisplay()) $pages[] = $page;
+    $this->setVar('pages', $pages);
   }
   
   /**
@@ -82,14 +64,25 @@ class ApplyStatusController extends ApplyController {
    * @return Navigation
    */
   public function getNavigation(){
-    $navigation = new Navigation;
-    $menu = $navigation->newMenu();
-    $menu->title = 'Navigation';
-    $menu->newLink(array('text'=>'Your Status', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status")));
-    if($this->status['admit'] and (!$this->status['accept'] and !$this->status['decline']))
-      $menu->newLink(array('text'=>'Confirm Enrolment', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status/sir")));
-    $menu->newLink(array('text'=>'Get Help', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/support/")));
-    $menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/logout")));
+    $navigation = new \Foundation\Navigation\Container();
+    $menu = new \Foundation\Navigation\Menu();
+    
+    $menu->setTitle('Navigation');
+
+    $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status';
+    $link = new \Foundation\Navigation\Link('Your Status');
+    $link->setHref($this->path($path));
+    $menu->addLink($link); 
+    if($this->_applicant->getDecision() and $this->_applicant->getDecision()->getFinalAdmit() and !($this->_applicant->getDecision()->getAcceptOffer() or $this->_applicant->getDecision()->getDeclineOffer()) ){
+      $link = new \Foundation\Navigation\Link('Confirm Enrolment');
+      $link->setHref($this->path($path . '/sir'));
+      $menu->addLink($link); 
+    }
+    $link = new \Foundation\Navigation\Link('Logout');
+    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/applicant/logout'));
+    $menu->addLink($link);
+    
+    $navigation->addMenu($menu);
     return $navigation;
   }
   
