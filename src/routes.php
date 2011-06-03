@@ -99,6 +99,11 @@ try {
       'messageId' => 4,
     )
   ));
+  
+  //applicant support
+  $basicRouter->addRoute('#^admin$#i', array(
+    'redirect' => 'admin/welcome'
+  ));
   $fc->addRouter($basicRouter);
   
   
