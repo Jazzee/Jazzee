@@ -6,6 +6,6 @@ function JazzeeEntityElementRankingList(){}
 JazzeeEntityElementRankingList.prototype = new List();
 JazzeeEntityElementRankingList.prototype.constructor = JazzeeEntityElementRankingList;
 
-TextInputElement.prototype.avatar = function(){
+JazzeeEntityElementRankingList.prototype.avatar = function(){
   return $('<input type="text" disabled="true">');
 };
