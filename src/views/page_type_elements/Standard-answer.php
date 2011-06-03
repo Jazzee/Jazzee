@@ -16,7 +16,7 @@
   }
   ?>
   <p class='status'>
-    Last Updated: <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
+    <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
     <?php if($answer->getPublicStatus()){?><br />Status: <?php print $answer->getPublicStatus()->getName();}?>
   </p>
   <p class='controls'>

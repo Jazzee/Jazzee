@@ -21,7 +21,7 @@ print '<?xml version="1.0" encoding="iso-8859-1"?>' ?>
   ?>
   </head>
   <body>
-    <div id='doc2' class='yui-t2'>
+    <div id='doc4' class='yui-t3'>
       <div id='hd'><h1><?php echo $layoutTitle ?></h1></div>
       <div id='bd'>
       <div id='bar' class='yui-b tall'>

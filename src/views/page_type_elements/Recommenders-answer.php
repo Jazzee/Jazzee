@@ -6,7 +6,7 @@
  */
 ?>
 <div class='answer<?php if($currentAnswerID and $currentAnswerID == $answer->getID()) print ' active'; ?>'>
-  <h5>Saved Recommenders</h5>
+  <h5>Recommender</h5>
   <?php 
   foreach($answer->getPage()->getElements() as $element){
     $value = $element->getJazzeeElement()->displayValue($answer);
@@ -16,12 +16,12 @@
   }
   ?>
   <p class='status'>
-    Last Updated: <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?><br />
+    <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?><br />
     <?php if($child = $answer->getChildren()->first()){?>
-      <br />Status: This recommendation was received on <?php print $child->getLastUpdatedAt('l F jS Y g:ia');
+      <br /><strong>Status:</strong> This recommendation was received on <?php print $child->getLastUpdatedAt('l F jS Y g:ia');
     } else if($answer->isLocked()){?>
-      Invitation Sent: <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?><br />
-      Status: You cannot make changes to this recommendation becuase the invitation has already been sent.
+      <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?><br />
+      <strong>Status:</strong> You cannot make changes to this recommendation becuase the invitation has already been sent.
       <?php if($answer->getUpdatedAt()->diff(new DateTime('now'))->days < \Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS){?> 
         You will be able to send the invitation to your recommender again in <?php print (\Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS - $answer->getUpdatedAt()->diff(new DateTime('now'))->days);?> days.
       <?php }?>
