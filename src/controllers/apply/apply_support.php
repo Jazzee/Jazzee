@@ -11,8 +11,32 @@ class ApplySupportController extends \Jazzee\ApplyController {
    * Display the page
    */
   public function actionIndex() {
-    $messages = $this->_applicant->getMessages();
-    $this->setVar('messages', $messages);
+    $threads = $this->_em->getRepository('\Jazzee\Entity\Message')->findBy(array('applicant'=>$this->_applicant->getId(), 'parent'=>null));
+    $arr = array();
+    foreach($threads as $message){
+      $arr[] = $this->messageArray($message);
+    }
+    $this->setVar('threads', $arr);
+  }
+  
+  /**
+   * Recursive message array
+   * 
+   * @param \Jazzee\Entity\Message $message
+   * @return array
+   */
+  protected function messageArray(\Jazzee\Entity\Message $message){
+    $arr = array(
+      'date' =>  $message->getCreatedAt()->format('l F jS Y \a\t g:ia'),
+      'sender' => ($message->getSender() == 'applicant')?'you':'your program',
+      'text' => $message->getText(),
+      'replyLink' => $this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/reply/' . $message->getId()),
+      'replies' => array()
+    );
+    foreach($message->getReplies() as $reply){
+      $arr['replies'][] = $this->messageArray($reply);
+    }
+    return $arr;
   }
   
   /**
