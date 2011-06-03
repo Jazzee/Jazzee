@@ -1,0 +1,6 @@
+etc/config.ini.php
+build
+var/cache/*
+var/log/*
+var/sesion/*
+var/tmp/*
