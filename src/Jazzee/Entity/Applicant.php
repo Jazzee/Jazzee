@@ -29,8 +29,8 @@ class Applicant{
   /** @Column(type="string") */
   private $password;
   
-  /** @Column(type="datetime", nullable=true) */
-  private $locked;
+  /** @Column(type="boolean") */
+  private $isLocked;
   
   /** @Column(type="string") */
   private $firstName;
@@ -76,7 +76,7 @@ class Applicant{
   private $attachments;
   
   /** 
-   * @OneToOne(targetEntity="Decision",mappedBy="applicant")
+   * @OneToOne(targetEntity="Decision",mappedBy="applicant", cascade={"persist"})
    */
   private $decision;
   
@@ -102,6 +102,7 @@ class Applicant{
     $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
     $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
     $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->isLocked = false;
   }
   
   /**
@@ -174,14 +175,18 @@ class Applicant{
    * Lock the Applicant
    */
   public function lock(){
-    $this->locked = new \DateTime('now');
+    $this->isLocked = true;
+    if(is_null($this->decision)){
+      $this->decision = new Decision();
+      $this->decision->setApplicant($this);
+    } 
   }
   
   /**
    * UnLock the Applicant
    */
   public function unLock(){
-    $this->locked = null;
+    $this->isLocked = false;
   }
 
   /**
@@ -190,7 +195,7 @@ class Applicant{
    * @return boolean $locked
    */
   public function isLocked(){
-    return $this->locked;
+    return $this->isLocked;
   }
 
   /**

@@ -306,7 +306,7 @@ class Decision{
    * eg (nominateAdmit, finalAdmit, declineOffer = 'declineOffer')
    * @return string
    */
-  public function status($format = 'c'){
+  public function status(){
     $decisions = array(
       'nominateAdmit',
       'nominateDeny',
