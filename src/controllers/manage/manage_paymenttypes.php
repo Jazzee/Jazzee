@@ -29,14 +29,14 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
     if($paymentType = $this->_em->getRepository('\Jazzee\Entity\PaymentType')->find($paymentTypeId)){
       
       $form = $paymentType->getJazzeePaymentType()->getSetupForm();
-      $form->setAction($this->path("manage/paymenttypes/edit/{$paymentTypeId}"));
+      $form->setAction($this->path("admin/manage/paymenttypes/edit/{$paymentTypeId}"));
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
         $paymentType->getJazzeePaymentType()->setup($input);
         $this->_em->persist($paymentType);
         foreach($paymentType->getVariables() as $var) $this->_em->persist($var);
         $this->addMessage('success', "Changes Saved");
-        $this->redirectPath('manage/paymenttypes');
+        $this->redirectPath('admin/manage/paymenttypes');
       }
     } else {
       $this->addMessage('error', "Error: Paymenttype #{$paymentTypeId} does not exist.");
@@ -48,7 +48,7 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
    */
   public function actionNew(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("manage/paymenttypes/new"));
+    $form->setAction($this->path("admin/manage/paymenttypes/new"));
     $field = $form->newField();
     $element = $field->newElement('TextInput','className');
     $element->setLabel('Class');
@@ -63,7 +63,7 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
         $paymentType = new \Jazzee\Entity\PaymentType();
         $paymentClass = new $className($paymentType);
         $form = $paymentClass->getSetupForm();
-        $form->setAction($this->path("manage/paymenttypes/new"));
+        $form->setAction($this->path("admin/manage/paymenttypes/new"));
         $form->newHiddenElement('className', $className);
         $form->newHiddenElement('newtypeform', true);
       } else {
@@ -79,7 +79,7 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
         $this->_em->persist($paymentType);
         foreach($paymentType->getVariables() as $var) $this->_em->persist($var);
         $this->addMessage('success', $input->get('name') . ' saved.');
-        $this->redirectPath('manage/paymenttypes');
+        $this->redirectPath('admin/manage/paymenttypes');
       }
 
     }

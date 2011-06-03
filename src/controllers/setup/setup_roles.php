@@ -28,7 +28,7 @@ class SetupRolesController extends \Jazzee\AdminController {
    public function actionEdit($roleID){ 
     if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program'=>$this->_program->getId()))){
       $form = new \Foundation\Form;
-      $form->setAction($this->path('setup/roles/edit/' . $role->getId()));
+      $form->setAction($this->path('admin/setup/roles/edit/' . $role->getId()));
       $field = $form->newField();
       $field->setLegend('Edit ' . $role->getName() . ' role');
       $element = $field->newElement('TextInput','name');
@@ -81,7 +81,7 @@ class SetupRolesController extends \Jazzee\AdminController {
         }
         $this->_em->persist($role);
         $this->addMessage('success', "Role Saved Successfully");
-        $this->redirectPath('setup/roles/');
+        $this->redirectPath('admin/setup/roles/');
       }
     } else {
       $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
@@ -93,7 +93,7 @@ class SetupRolesController extends \Jazzee\AdminController {
    */
    public function actionNew(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('setup/roles/new'));
+    $form->setAction($this->path('admin/setup/roles/new'));
     $field = $form->newField();
     $field->setLegend('New program role');
     $element = $field->newElement('TextInput','name');
@@ -109,7 +109,7 @@ class SetupRolesController extends \Jazzee\AdminController {
       $role->setName($input->get('name'));
       $this->_em->persist($role);
       $this->addMessage('success', "Role Saved Successfully");
-      $this->redirectPath('setup/roles');
+      $this->redirectPath('admin/setup/roles');
     }
   }
   

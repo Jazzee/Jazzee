@@ -13,12 +13,12 @@ $this->renderElement('form', array('form'=>$form));?>
   <?php foreach($results as $user): ?>
   <li><?php print $user->getLastName() . ', ' . $user->getFirstName() . ' (' . $user->geteduPersonPrincipalName() . ')' ?> 
     <?php if($this->controller->checkIsAllowed('manage_users', 'edit')): ?>
-    (<a href='<?php print $this->path('manage/users/edit/') . $user->getId()?>'>Edit</a>)
+    (<a href='<?php print $this->path('admin/manage/users/edit/') . $user->getId()?>'>Edit</a>)
     <?php endif;?>
   </li>
   <?php endforeach;?>
   </ul>
 <?php endif; ?>
 <?php if($this->controller->checkIsAllowed('manage_users', 'new')): ?>
-<p><a href='<?php print $this->path('manage/users/new')?>'>Add a New User</a></p>
+<p><a href='<?php print $this->path('admin/manage/users/new')?>'>Add a New User</a></p>
 <?php endif;?>

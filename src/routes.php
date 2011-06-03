@@ -104,10 +104,17 @@ try {
   
   //We use preg replace in the admin routers to cleanly group the administrative responsiblities in the URL
   $advancedRouter = new \Foundation\VC\FullRegexRewriteRouter();
-  $advancedRouter->addRoute('#^(admin|manage|setup|applicants)/([^/]+)/?([^/]*)/?(.*)$#i', array(
+  
+  
+  $advancedRouter->addRoute('#^admin/(manage|setup|applicants)/([^/]+)/?([^/]*)/?(.*)$#i', array(
     'controller' => '$1_$2',
     'action' => '$3',
     'additional_params' => '$4'
+  ));
+  
+  $advancedRouter->addRoute('#^(admin)/([^/]+)/?([^/]+)?$#i', array(
+    'controller' => '$1_$2',
+    'action' => '$3'
   ));
   
   //applicant actions

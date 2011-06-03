@@ -26,6 +26,6 @@ $page->getJazzeePage()->setApplicant($applicant);
     </table>
  </div><!-- answers -->
 <?php if($this->controller->checkIsAllowed('applicants_single', 'addAnswer')){?>
-    <a class='addAnswer' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/addAnswer/' . $page->getPage()->getId());?>'>Add Answer</a>
+    <a class='addAnswer' href='<?php print $this->path('admin/applicants/single/' . $applicant->getId() . '/addAnswer/' . $page->getPage()->getId());?>'>Add Answer</a>
 <?php }?>
 </div> <!-- page -->

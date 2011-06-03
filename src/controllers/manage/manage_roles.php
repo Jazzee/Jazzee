@@ -28,7 +28,7 @@ class ManageRolesController extends \Jazzee\AdminController {
    public function actionEdit($roleID){ 
     if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'isGlobal'=>true))){
       $form = new \Foundation\Form;
-      $form->setAction($this->path('manage/roles/edit/' . $role->getId()));
+      $form->setAction($this->path('admin/manage/roles/edit/' . $role->getId()));
       $field = $form->newField();
       $field->setLegend('Edit ' . $role->getName() . ' role');
       $element = $field->newElement('TextInput','name');
@@ -77,7 +77,7 @@ class ManageRolesController extends \Jazzee\AdminController {
         }
         $this->_em->persist($role);
         $this->addMessage('success', "Role Saved Successfully");
-        $this->redirectPath('manage/roles/');
+        $this->redirectPath('admin/manage/roles/');
       }
     } else {
       $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
@@ -89,7 +89,7 @@ class ManageRolesController extends \Jazzee\AdminController {
    */
    public function actionNew(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("manage/roles/new"));
+    $form->setAction($this->path("admin/manage/roles/new"));
     $field = $form->newField();
     $field->setLegend('New Global Role');
     $element = $field->newElement('TextInput','name');

@@ -30,7 +30,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("setup/application"));
+    $form->setAction($this->path("admin/setup/application"));
     $field = $form->newField();
     $field->setLegend('Setup Applicant');
     
@@ -89,7 +89,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
       if($input->get('published')) $this->_application->publish(); else $this->_application->unPublish();
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application saved.');
-      $this->redirectPath('setup/application');
+      $this->redirectPath('admin/setup/application');
     }
     
     $this->setVar('form', $form);

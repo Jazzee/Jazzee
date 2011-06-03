@@ -79,7 +79,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     if($count['admit']) $message .= "{$count['admit']} applicant(s) nominated for admit.  ";
     if($count['deny']) $message .= "{$count['deny']} applicant(s) nominated for deny.";
     if($message)  $this->addMessage('success', $message);
-    $this->redirect($this->path('applicants/decisions'));
+    $this->redirect($this->path('admin/applicants/decisions'));
     exit();
   }
 
@@ -105,7 +105,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     if($count['undo']) $message .= "{$count['undo']} applicant(s) changed to no decision.  ";
     if($count['deny']) $message .= "{$count['deny']} applicant(s) denied.";
     if($message)  $this->addMessage('success', $message);
-    $this->redirect($this->path('applicants/decisions'));
+    $this->redirect($this->path('admin/applicants/decisions'));
     exit();
   }
   
@@ -124,12 +124,12 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     if(!empty($this->post['admit'])){
       if(!isset($this->post['sirdeadline']) OR empty($this->post['sirdeadline'])){
         $this->addMessage('error', 'You must specify a SIR deadline if you are admiting applicants.');
-        $this->redirect($this->path('applicants/decisions'));
+        $this->redirect($this->path('admin/applicants/decisions'));
         exit();
       }
       if(!$timestamp = strtotime($this->post['sirdeadline']) OR $timestamp <= time()){
         $this->addMessage('error', 'You must specify a valid future date for the SIR deadline if you are admiting applicants.');
-        $this->redirect($this->path('applicants/decisions'));
+        $this->redirect($this->path('admin/applicants/decisions'));
         exit();
       }
       $sirDeadline = date('Y-m-d H:i:s', $timestamp);
@@ -147,7 +147,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     if($count['undo']) $message .= "{$count['undo']} applicant(s) changed to no decision.  ";
     if($count['admit']) $message .= "{$count['admit']} applicant(s) admitted.";
     if($message)  $this->addMessage('success', $message);
-    $this->redirect($this->path('applicants/decisions'));
+    $this->redirect($this->path('admin/applicants/decisions'));
     exit();
   }
   

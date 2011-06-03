@@ -29,7 +29,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
     if($cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($cycleID)){
       $form = new \Foundation\Form;
       
-      $form->setAction($this->path("manage/cycles/edit/{$cycleID}"));
+      $form->setAction($this->path("admin/manage/cycles/edit/{$cycleID}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $cycle->getName() . ' cycle');
       $element = $field->newElement('TextInput','name');
@@ -57,7 +57,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
         $cycle->setEnd($input->get('end'));
         $this->_em->persist($cycle);
         $this->addMessage('success', "Changes Saved Successfully");
-        $this->redirectPath('manage/cycles');
+        $this->redirectPath('admin/manage/cycles');
       }
     } else {
       $this->addMessage('error', "Error: Cycle #{$cycleID} does not exist.");
@@ -70,7 +70,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
   public function actionNew(){
     $form = new \Foundation\Form;
       
-    $form->setAction($this->path("manage/cycles/new"));
+    $form->setAction($this->path("admin/manage/cycles/new"));
     $field = $form->newField();
     $field->setLegend('New cycle');
     $element = $field->newElement('TextInput','name');
@@ -96,7 +96,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
       $cycle->setEnd($input->get('end'));
       $this->_em->persist($cycle);
       $this->addMessage('success', "New Cycle Saved");
-      $this->redirectPath('manage/cycles');
+      $this->redirectPath('admin/manage/cycles');
     }
   }
 }

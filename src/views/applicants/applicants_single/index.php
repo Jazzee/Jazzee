@@ -8,13 +8,13 @@
 <div id='container'>
   <div id='bio'>
     <h1><?php print $applicant->getFullName() ?> <?php print $applicant->getEmail() ?>
-    <?php if($this->controller->checkIsAllowed('applicants_single', 'editAccount')){?> (<a class='editAccount' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/editAccount')?>'>Edit</a>) <?php } ?></h1>
+    <?php if($this->controller->checkIsAllowed('applicants_single', 'editAccount')){?> (<a class='editAccount' href='<?php print $this->path('admin/applicants/single/' . $applicant->getId() . '/editAccount')?>'>Edit</a>) <?php } ?></h1>
   </div><!-- bio -->
     <div id='status'>
     <?php if($this->controller->checkIsAllowed('applicants_single', 'pdf')){ ?>
       <p>Print PDF 
-        <a href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/pdf/portrait.pdf')?>'>Portrait</a>
-        <a href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/pdf/landscape.pdf')?>'>Landscape</a>
+        <a href='<?php print $this->path('admin/applicants/single/' . $applicant->getId() . '/pdf/portrait.pdf')?>'>Portrait</a>
+        <a href='<?php print $this->path('admin/applicants/single/' . $applicant->getId() . '/pdf/landscape.pdf')?>'>Landscape</a>
       </p>
     <?php } ?>
     <table>

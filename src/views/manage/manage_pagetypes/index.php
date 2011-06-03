@@ -12,7 +12,7 @@ if($pageTypes): ?>
   <?php foreach($pageTypes as $type): ?>
   <li><?php print $type->getName() ?>
     <?php if($this->controller->checkIsAllowed('manage_pagetypes', 'edit')): ?>
-      (<a href='<?php print $this->path('manage/pagetypes/edit/') . $type->getId()?>'>Edit</a>)
+      (<a href='<?php print $this->path('admin/manage/pagetypes/edit/') . $type->getId()?>'>Edit</a>)
     <?php endif;?>
     
   </li>
@@ -21,5 +21,5 @@ if($pageTypes): ?>
 <?php endif; ?>
 
 <?php if($this->controller->checkIsAllowed('manage_pagetypes', 'new')): ?>
-  <p><a href='<?php print $this->path('manage/pagetypes/new')?>'>Add a New Page Type</a></p> 
+  <p><a href='<?php print $this->path('admin/manage/pagetypes/new')?>'>Add a New Page Type</a></p> 
 <?php endif;?>

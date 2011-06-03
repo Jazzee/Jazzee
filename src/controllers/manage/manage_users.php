@@ -20,7 +20,7 @@ class ManageUsersController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("manage/users/index"));
+    $form->setAction($this->path("admin/manage/users/index"));
     $field = $form->newField();
     $field->setLegend('Search Users');
     $element = $field->newElement('TextInput','firstName');
@@ -47,7 +47,7 @@ class ManageUsersController extends \Jazzee\AdminController {
     if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
       $form = new \Foundation\Form();
       
-      $form->setAction($this->path("manage/users/edit/{$userID}"));
+      $form->setAction($this->path("admin/manage/users/edit/{$userID}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $user->getFirstName() . ' ' . $user->getLastName());
       
@@ -74,7 +74,7 @@ class ManageUsersController extends \Jazzee\AdminController {
         $this->_em->persist($user);
         
         $this->addMessage('success', "Changes Saved Successfully");
-        $this->redirectPath('manage/users');
+        $this->redirectPath('admin/manage/users');
       }
     } else {
       $this->addMessage('error', "Error: User #{$userID} does not exist.");
@@ -86,7 +86,7 @@ class ManageUsersController extends \Jazzee\AdminController {
    */
    public function actionNew(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('manage/users/new'));
+    $form->setAction($this->path('admin/manage/users/new'));
     $field = $form->newField();
     $field->setLegend('New User');
     
@@ -101,7 +101,7 @@ class ManageUsersController extends \Jazzee\AdminController {
       $user->setEduPersonPrincipalName($input->get('eduPersonPrincipalName'));
       $this->_em->persist($user);
       $this->addMessage('success', "New User Added");
-      $this->redirectPath('manage/users');
+      $this->redirectPath('admin/manage/users');
       
     }
   }

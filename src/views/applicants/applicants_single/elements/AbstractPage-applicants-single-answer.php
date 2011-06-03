@@ -13,7 +13,7 @@
   <td>
     <?php foreach($answer->getJazzeeAnswer()->applicantsTools() as $tool){?>
       <?php if($this->controller->checkIsAllowed('applicants_single', $tool['class'])){ ?>
-        <a href='<?php print $this->path('/applicants/single/' . $answer->getApplicant()->getId() . $tool['path'])?>' class='<?php print $tool['class']?>'><?php print $tool['title']?></a><br />     
+        <a href='<?php print $this->path('admin//applicants/single/' . $answer->getApplicant()->getId() . $tool['path'])?>' class='<?php print $tool['class']?>'><?php print $tool['title']?></a><br />     
       <?php } ?>
     <?php }?>
   </td>
