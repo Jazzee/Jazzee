@@ -31,11 +31,11 @@
    border-top: 1px solid #990000;
    text-align: right;
 }
-.answer a.Delete {
+.answer a.delete {
     margin: 5px;
     color: #990000;
 }
-.answer a.Edit {
+.answer a.edit {
     margin: 5px;
     color: #7799bb;
 }

@@ -8,19 +8,23 @@
 <div class='answer<?php if($currentAnswerID and $currentAnswerID == $answer->getID()) print ' active'; ?>'>
   <h5>Saved Answer</h5>
   <?php 
-  $child = $answer->getChildren()->first();
-  print '<p><strong>' . $page->getPage()->getVar('branchingElementLabel') . ':</strong>&nbsp' . $child->getPage()->getTitle() . '</p>';
-  
-  foreach($child->getPage()->getElements() as $element){
-    $value = $element->getJazzeeElement()->displayValue($child);
+  foreach($answer->getPage()->getElements() as $element){
+    $value = $element->getJazzeeElement()->displayValue($answer);
     if($value){
       print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>'; 
     }
   }
+  
   ?>
   <p class='status'>
     Last Updated: <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
     <?php if($answer->getPublicStatus()){?><br />Status: <?php print $answer->getPublicStatus()->getName();}?>
+    <br />Score Status: 
+      <?php if($answer->getMatchedScore()){?>
+        Score received for test taken on <?php print $answer->getMatchedScore()->getTestDate()->format('F jS Y')?>.
+      <?php } else { ?>
+        This score has not been received from ETS.
+      <?php }?>
   </p>
   <p class='controls'>
     <?php 

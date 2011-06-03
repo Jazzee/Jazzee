@@ -9,12 +9,6 @@ namespace Jazzee\Entity\Page;
 class Branching extends Standard 
 {
   /**
-   * The answer class for this page type
-   * @const string
-   */
-  const ANSWER_CLASS = '\Jazzee\Entity\Answer\Branching';
-  
-  /**
    * 
    * Enter description here ...
    */
@@ -70,10 +64,16 @@ class Branching extends Standard
     $childAnswer = new \Jazzee\Entity\Answer;
     $childAnswer->setPage($answer->getPage()->getChildById($input->get('branching')));
     $answer->addChild($childAnswer);
-    $this->_controller->getEntityManager()->persist($childAnswer);
-    $answer->getJazzeeAnswer()->update($input);
+    
+    foreach($this->_applicationPage->getPage()->getChildById($input->get('branching'))->getElements() as $element){
+      foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+        $childAnswer->addElementAnswer($elementAnswer);
+      }
+    }
+  
     $this->_form = $this->makeForm();
     $this->_form->applyDefaultValues();
+    $this->_controller->getEntityManager()->persist($childAnswer);
     $this->_controller->getEntityManager()->persist($answer);
     $this->_controller->addMessage('success', 'Answered Saved Successfully');
     //flush here so the answerId will be correct when we view
@@ -93,17 +93,21 @@ class Branching extends Standard
       $childAnswer = new \Jazzee\Entity\Answer;
       $childAnswer->setPage($answer->getPage()->getChildById($input->get('branching')));
       $answer->addChild($childAnswer);
-      $answer->getJazzeeAnswer()->update($input);
-      $this->_form = $this->makeForm();
-      $this->getForm()->applyDefaultValues();
+      foreach($this->_applicationPage->getPage()->getChildById($input->get('branching'))->getElements() as $element){
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $childAnswer->addElementAnswer($elementAnswer);
+        }
+      }
+      $this->_form = null;
       $this->_controller->getEntityManager()->persist($answer);
+      $this->_controller->getEntityManager()->persist($childAnswer);
       $this->_controller->addMessage('success', 'Answer Updated Successfully');
     }
   }
   
   public function fill($answerId){
     if($answer = $this->_applicant->findAnswerById($answerId)){
-      $child = $answer->getJazzeeAnswer()->getActiveChild();
+      $child = $answer->getChildren()->first();
       $this->branchingForm($child->getPage()->getId());
       foreach($child->getPage()->getElements() as $element){
         $value = $element->getJazzeeElement()->formValue($child);

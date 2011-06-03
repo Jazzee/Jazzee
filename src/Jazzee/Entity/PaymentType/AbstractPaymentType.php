@@ -27,5 +27,31 @@ abstract class AbstractPaymentType implements \Jazzee\PaymentType{
     $this->_paymentType = $paymentType;
   }
   
+  /**
+   * Get Status Text
+   * Get the ApplyPayment status text for the specific payment type
+   * 
+   * @param \Jazzee\Entity\Payment $payment
+   * @return string
+   */
+  public function getStatusText($payment){
+    $class = $payment->getType()->getClass();
+    switch($payment->getStatus()){
+      case \Jazzee\Entity\Payment::PENDING:
+        $status = $class::PENDING_TEXT;
+        break;
+      case \Jazzee\Entity\Payment::SETTLED:
+        $status = $class::SETTLED_TEXT;
+        break;
+      case \Jazzee\Entity\Payment::REJECTED:
+        $status = $class::REJECTED_TEXT;
+        break;
+      case \Jazzee\Entity\Payment::REFUNDED:
+        $status = $class::REFUNDED_TEXT;
+        break;
+    } 
+    return $status;
+  }
+  
 }
 

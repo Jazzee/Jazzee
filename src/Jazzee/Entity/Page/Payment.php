@@ -5,14 +5,7 @@ namespace Jazzee\Entity\Page;
  * 
  * Branching form to select payment type
  */
-class Payment extends AbstractPage {
-  /**
-   * The answer class for this page type
-   * @const string
-   */
-  const ANSWER_CLASS = '\Jazzee\Entity\Answer\Payment';
-  
-  
+class Payment extends Standard {
   /**
    * The payment type and the amount are selected first
    * then we display the form for the payment type
@@ -74,16 +67,14 @@ class Payment extends AbstractPage {
     $answer->setApplicant($this->_applicant);
     $payment = new \Jazzee\Entity\Payment();
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
-    
-    $answer->setPayment($payment);
-    $result = $answer->getJazzeeAnswer()->update($input);
+    $result = $answer->getPayment()->getType()->getJazzeePaymentType()->pendingPayment($payment, $input);
     if($result){
       $this->_controller->addMessage('success', 'Your payment has been recorded.');
       $this->_form = null;
     } else {
       $this->_controller->addMessage('error', 'There was a problem processing your payment.');
     }
-    
+    $answer->setPayment($payment);
     $this->_controller->getEntityManager()->persist($answer);
     $this->_controller->getEntityManager()->persist($payment);
     foreach($payment->getVariables() as $var) $this->_controller->getEntityManager()->persist($var);
@@ -101,11 +92,6 @@ class Payment extends AbstractPage {
   
   public function fill($answerId){
     //no edit so not fill
-  }
-  
-  public function getStatus(){
-    //need to check if we have at least one pending or settled payment not rejected or refunded
-    return self::INCOMPLETE;
   }
   
   public function getAnswers(){

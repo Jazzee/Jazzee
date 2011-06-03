@@ -5,12 +5,6 @@ namespace Jazzee\Entity\Page;
  */
 class ETSMatch extends Standard {
   /**
-   * The answer class for this page type
-   * @const string
-   */
-  const ANSWER_CLASS = '\Jazzee\Entity\Answer\ETSMatch';
-  
-  /**
    * These fixedIDs make it easy to find the element we are looking for
    * @const integer
    */
@@ -56,6 +50,13 @@ class ETSMatch extends Standard {
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
   }
+  
+  public function updateAnswer($input, $answerId){
+    parent::updateAnswer($input, $answerId);
+    //attempt to match any scores
+    foreach($this->getAnswers() as $answer) $this->matchScore($answer);
+  }
+  
 /**
    * Create the ets match form
    * @param Entity\Page $page

@@ -16,21 +16,16 @@
   }
   ?>
   <p class='status'>
-  <?php
-  foreach($answer->getJazzeeAnswer()->applyStatus() as $title => $value){
-    print "{$title}: {$value} <br />"; 
-  }
-  ?>
+    Last Updated: <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
+    <?php if($answer->getPublicStatus()){?><br />Status: <?php print $answer->getPublicStatus()->getName();}?>
   </p>
   <p class='controls'>
-  <?php 
-  if($currentAnswerID and $currentAnswerID == $answer->getID()){
-    print '<a class="undo" href="' . $this->controller->getActionPath() . '">Undo</a>';
-  } else {
-    foreach($answer->getJazzeeAnswer()->applyTools() as $name => $path){
-      print "<a class='{$name}' href='" . $this->controller->getActionPath() . $path . "'>{$name}</a>";
-    }
-  }
-  ?>
+    <?php 
+    if($currentAnswerID and $currentAnswerID == $answer->getID()){?>
+      <a class='undo' href='<?php print $this->controller->getActionPath() ?>'>Undo</a>
+    <?php } else { ?>
+      <a class='edit' href='<?php print $this->controller->getActionPath();?>/edit/<?php print $answer->getId()?>'>Edit</a>
+      <a class='delete' href='<?php print $this->controller->getActionPath();?>/delete/<?php print $answer->getId()?>'>Delete</a>
+    <?php } ?>
   </p>
 </div>

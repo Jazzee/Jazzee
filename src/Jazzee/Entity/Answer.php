@@ -354,21 +354,6 @@ class Answer{
   }
   
   /**
-   * Get the jazzeeAnswer
-   * 
-   * @return \Jazzee\Answer
-   */
-  public function getJazzeeAnswer(){
-    if(is_null($this->jazzeeAnswer)){
-      $pageClass = $this->page->getType()->getClass();
-      $class = $pageClass::ANSWER_CLASS;
-      if(!class_exists($class)) $class = 'Jazzee\Entity\Answer\Text';
-      $this->jazzeeAnswer = new $class($this);
-    }
-    return $this->jazzeeAnswer;
-  }
-  
-  /**
    * Mark the lastUpdate automatically 
    * @PrePersist
    */
@@ -430,7 +415,20 @@ class Answer{
   public function setTOEFLScore($score){
     $this->toeflScore = $score;
   }
-
+  
+  /**
+   * Conviently get a matched score
+   * 
+   * Try both GRE and TOEFL and grab a match from wherever it might be
+   * 
+   * @return \Jazzee\Entity\GREScore | \Jazzee\Entity\TOEFLScore | false if no score is present
+   */
+  public function getMatchedScore(){
+    if($this->greScore) return $this->greScore;
+    if($this->toeflScore) return $this->toeflScore;
+    return false;
+  }
+  
   /**
    * Set page status
    * 

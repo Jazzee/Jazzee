@@ -13,10 +13,9 @@
   print '<p><strong>Amount:</strong>&nbsp;$' . $payment->getAmount() . '</p>';
   ?>
   <p class='status'>
-  <?php
-//  foreach($answer->applyStatus() as $title => $value){
-//    print "{$title}: {$value} <br />"; 
-//  }
-  ?>
+  Status: <?php print $answer->getPayment()->getType()->getJazzeePaymentType()->getStatusText($payment);?>
+  <?php if($payment->getStatus() == \Jazzee\Entity\Payment::REFUNDED or $payment->getStatus() == \Jazzee\Entity\Payment::REJECTED){?>
+    Reason: <?php print $payment->getVar('reasonText'); ?>
+  <?php } ?>
   </p>
 </div>

@@ -4,16 +4,12 @@ namespace Jazzee\Entity\Page;
  * Get recommender information from applicnats and send out invitations
  */
 class Recommenders extends Standard {
+  
   /**
-   * The answer class for this page type
-   * @const string
+   * The time to wait between sending emails to recommenders in days
+   * @cons integer 14 days
    */
-  const ANSWER_CLASS = '\Jazzee\Entity\Answer\Recommenders';
-  /**
-   * The time to wait between sending emails to recommenders in seconds
-   * @cons integer 2 weeks (86400 * 14)
-   */
-  const RECOMMENDATION_EMAIL_WAIT_TIME = 1209600;
+  const RECOMMENDATION_EMAIL_WAIT_DAYS = 14;
   
   /**
    * These fixedIDs make it easy to find the element we are looking for
@@ -34,7 +30,7 @@ class Recommenders extends Standard {
    */
   public function sendEmail($answerId, $postData){
     if($answer = $this->_applicant->findAnswerById($answerId)){
-      if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND time() - $answer->getUpdatedAt()->format('U') > self::RECOMMENDATION_EMAIL_WAIT_TIME)){
+      if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND $answer->getUpdatedAt()->diff(new \DateTime('now'))->days >= self::RECOMMENDATION_EMAIL_WAIT_DAYS)){
         $search = array(
          '%APPLICANT_NAME%',
          '%DEADLINE%',
@@ -64,14 +60,14 @@ class Recommenders extends Standard {
         $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer);
         $body = str_ireplace($search, $replace, $this->_applicationPage->getPage()->getVar('recommenderEmailText'));
 
-        $this->_controller->sendEmail(
-          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
-          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer), 
-          $this->_applicant->getApplication()->getContactEmail(),
-          $this->_applicant->getApplication()->getContactName(),
-          'Letter of Recommendation Request', 
-          $body
-        );
+//        $this->_controller->sendEmail(
+//          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
+//          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer), 
+//          $this->_applicant->getApplication()->getContactEmail(),
+//          $this->_applicant->getApplication()->getContactName(),
+//          'Letter of Recommendation Request', 
+//          $body
+//        );
         $answer->lock();
         $answer->markLastUpdate();
         $this->_controller->getEntityManager()->persist($answer);

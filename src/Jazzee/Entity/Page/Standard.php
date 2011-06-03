@@ -7,12 +7,6 @@ namespace Jazzee\Entity\Page;
  */
 class Standard extends AbstractPage {
   /**
-   * The answer class for this page type
-   * @const string
-   */
-  const ANSWER_CLASS = '\Jazzee\Entity\Answer\Standard';
-  
-  /**
    * 
    * @see Jazzee\Page.AbstractPage::makeForm()
    */
@@ -60,7 +54,11 @@ class Standard extends AbstractPage {
     $answer = new \Jazzee\Entity\Answer();
     $answer->setPage($this->_applicationPage->getPage());
     $answer->setApplicant($this->_applicant);
-    $answer->getJazzeeAnswer()->update($input);
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+        $answer->addElementAnswer($elementAnswer);
+      }
+    }
     $this->_form->applyDefaultValues();
     $this->_controller->getEntityManager()->persist($answer);
     $this->_controller->addMessage('success', 'Answered Saved Successfully');
@@ -74,7 +72,11 @@ class Standard extends AbstractPage {
         $answer->getElementAnswers()->removeElement($ea);
         $this->_controller->getEntityManager()->remove($ea);
       }
-      $answer->getJazzeeAnswer()->update($input);
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $answer->addElementAnswer($elementAnswer);
+        }
+      }
       $this->getForm()->applyDefaultValues();
       $this->_controller->getEntityManager()->persist($answer);
       $this->_controller->addMessage('success', 'Answer Updated Successfully');

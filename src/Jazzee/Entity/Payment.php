@@ -184,8 +184,6 @@ class Payment{
     $this->variables[] = $variable;
   }
   
-
-
   /**
    * get payment variable
    * @param string $name
