@@ -4,7 +4,9 @@ namespace Jazzee\Entity;
 /** 
  * Message
  * Threaded Messages between Applicants and Users
- * @Entity @Table(name="messages") 
+ * @Entity 
+ * @HasLifecycleCallbacks
+ * @Table(name="messages") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -18,7 +20,7 @@ class Message{
   
   /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="messages") 
-   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $applicant;
   
@@ -34,9 +36,6 @@ class Message{
   private $replies;
   
   /** @Column(type="string") */
-  private $recipient;
-  
-  /** @Column(type="string") */
   private $sender;
 
   /** @Column(type="text") */
@@ -50,6 +49,7 @@ class Message{
   
   public function __construct(){
     $this->replies = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->isRead = false;
   }
   
   /**
@@ -62,31 +62,12 @@ class Message{
   }
 
   /**
-   * Set recipient
-   *
-   * @param string $recipient
-   */
-  public function setRecipient($recipient){
-    if(!in_array(strtolower($recipient), array('applicant', 'user'))) throw new Jazzee_Exception("{$recipient} is not a valid receipient");
-    $this->recipient = $recipient;
-  }
-
-  /**
-   * Get recipient
-   *
-   * @return string $recipient
-   */
-  public function getRecipient(){
-    return $this->recipient;
-  }
-
-  /**
    * Set sender
    *
    * @param string $sender
    */
   public function setSender($sender){
-    if(!in_array(strtolower($sender), array('applicant', 'user'))) throw new Jazzee_Exception("{$sender} is not a valid sender");
+    if(!in_array(strtolower($sender), array('applicant', 'program'))) throw new \Jazzee\Exception("{$sender} is not a valid sender");
     $this->sender = $sender;
   }
 
@@ -115,6 +96,16 @@ class Message{
    */
   public function getText(){
     return $this->text;
+  }
+  
+
+  
+  /**
+   * Mark the created at automatically
+   * @PrePersist
+   */
+  public function markCreatedAt(){
+    $this->createdAt = new \DateTime();
   }
 
   /**
@@ -184,6 +175,27 @@ class Message{
    */
   public function getReplies(){
     return $this->replies;
+  }
+  
+  /**
+   * Add Reply
+   * 
+   * Add a reply to this message
+   * @param \Jazzee\Entity\Message $reply
+   */
+  public function addReply(\Jazzee\Entity\Message $message){
+    $this->replies[] = $message;
+    if($message->getParent() !== $this) $message->setParent($this);
+  }
+  
+  /**
+   * Set Parent
+   * 
+   * Set the parent for this message
+   * @param \Jazzee\Entity\Message $parent
+   */
+  public function setParent(\Jazzee\Entity\Message $parent){
+    $this->parent = $parent;
   }
   
 }

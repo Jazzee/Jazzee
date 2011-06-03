@@ -5,42 +5,69 @@
  * @package jazzee
  * @subpackage apply
  */
-class ApplySupportController extends ApplyController {  
-  public function beforeAction(){
-    parent::beforeAction();
-    $this->setLayoutVar('layoutTitle', $this->application->Cycle->name . ' ' . $this->application->Program->name . ' Support');
-    $this->setVar('applicant', $this->applicant);
-    $this->form = new Form;
-    $this->form->action = $this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/support/new");
-    $field = $this->form->newField();
-    $field->legend = 'Ask a question';
-    $element = $field->newElement('Textarea', 'text');
-    $element->label = 'Your Question';
-    $element->addValidator('NotEmpty');
-    $this->form->newButton('submit', 'Submit');
-    $this->setVar('form', $this->form);
-  }
+class ApplySupportController extends \Jazzee\ApplyController {  
   
   /**
    * Display the page
    */
   public function actionIndex() {
-    
+    $messages = $this->_applicant->getMessages();
+    $this->setVar('messages', $messages);
   }
   
   /**
    * Ask a new question
    */
   public function actionNew() {
-    if($input = $this->form->processInput($this->post)){
-      $communication = new Communication;
-      $communication->sentBy = 'applicant';
-      $communication->applicantID = $this->applicant->id;
-      $communication->text = $input->text;
-      $communication->save();
-      $this->messages->write('success', 'Your message has been sent.');
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/new'));
+    $field = $form->newField();
+    $field->setLegend('Ask a question');
+    $element = $field->newElement('Textarea', 'text');
+    $element->setLabel('Your Question');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $form->newButton('submit', 'Submit');
+    $this->setVar('form', $form);
+    
+    if($input = $form->processInput($this->post)){
+      $message = new \Jazzee\Entity\Message();
+      $message->setApplicant($this->_applicant);
+      $message->setSender('applicant');
+      $message->setText($input->get('text'));
+      $this->_em->persist($message);
+      $this->addMessage('success', 'Your message has been sent.');
+      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
     }
-    $this->loadView($this->controllerName . '/index');
+  }
+  
+  /**
+   * Reply to a message
+   */
+  public function actionReply() {
+    $form = new \Foundation\Form();
+    $message = $this->_em->getRepository('\Jazzee\Entity\Message')->findOneBy(array('id'=>$this->actionParams['messageId'], 'applicant'=>$this->_applicant->getId()));
+    if(!$message) die;
+    $this->setVar('message', $message);
+    $form->setAction($this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/reply/' . $message->getId()));
+    
+    $field = $form->newField();
+    $field->setLegend('Reply to message');
+    $element = $field->newElement('Textarea', 'text');
+    $element->setLabel('Your Reply');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $form->newButton('submit', 'Submit');
+    $this->setVar('form', $form);
+    
+    if($input = $form->processInput($this->post)){
+      $reply = new \Jazzee\Entity\Message();
+      $reply->setApplicant($this->_applicant);
+      $reply->setSender('applicant');
+      $message->addReply($reply);
+      $reply->setText($input->get('text'));
+      $this->_em->persist($reply);
+      $this->addMessage('success', 'Your reply has been sent.');
+      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
+    }
   }
   
   /**
@@ -48,12 +75,20 @@ class ApplySupportController extends ApplyController {
    * @return Navigation
    */
   public function getNavigation(){
-    $navigation = new Navigation;
-    $menu = $navigation->newMenu();
-    $menu->title = 'Navigation';
-    $menu->newLink(array('text'=>'Back to Application', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/page/{$this->application['Pages']->getFirst()->id}")));
-    $menu->newLink(array('text'=>'Your Questions', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/support/")));
-    $menu->newLink(array('text'=>'Logout', 'href'=>$this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/applicant/logout")));
+    $navigation = new \Foundation\Navigation\Container();
+    $menu = new \Foundation\Navigation\Menu();
+    
+    $menu->setTitle('Navigation');
+
+    $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName();
+    $link = new \Foundation\Navigation\Link('Back to Application');
+    $link->setHref($this->path($path . '/page/' . $this->_application->getPages()->first()->getId()));
+    $menu->addLink($link); 
+    $link = new \Foundation\Navigation\Link('Logout');
+    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/applicant/logout'));
+    $menu->addLink($link);
+    
+    $navigation->addMenu($menu);
     return $navigation;
   }
 }

@@ -88,6 +88,17 @@ try {
     ),
     'additional_params' => 3
   ));
+  
+  //applicant support
+  $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/support/?([^/]+)?/?([0-9]+)?$#i', array(
+    'controller' => 'apply_support',
+    'action' => 3,
+    'action_params' => array(
+      'programShortName' => 1,
+      'cycleName' => 2,
+      'messageId' => 4,
+    )
+  ));
   $fc->addRouter($basicRouter);
   
   
@@ -100,7 +111,7 @@ try {
   ));
   
   //applicant actions
-  $advancedRouter->addRoute('#^apply/([^/]+)/([^/]+)/(applicant|status|support)/(.*)$#i', array(
+  $advancedRouter->addRoute('#^apply/([^/]+)/([^/]+)/(applicant|status)/?(.*)?$#i', array(
     'controller' => 'apply_$3',
     'action' => '$4',
     'action_params' => array(

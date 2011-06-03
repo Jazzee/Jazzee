@@ -91,3 +91,16 @@ p.skip {
   color: #000000;
   background-color: #ffcc66;
 }
+
+div.threaded div {
+	margin-left: 2em;
+}
+
+div.threaded p.header {
+	font-weight: bold;
+	border-top: 1px solid #000000;
+}
+
+div.threaded p.footer {
+  text-align: right;
+}
