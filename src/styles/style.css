@@ -84,6 +84,10 @@ div.v-navigation a {
   display: block;
 }
 
+div.v-navigation a.current {
+  color:#cc6600;
+}
+
 /***** FORM STYLE *****/
 
 div.form {
