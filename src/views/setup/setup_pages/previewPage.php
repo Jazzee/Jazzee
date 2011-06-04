@@ -7,14 +7,10 @@
  * @subpackage admin
  * @subpackage setup
  */
-if($page){
-  if(!is_null($page->leadingText))
-    print "<div id='leadingText'>{$page->leadingText}</div>";
-  $form = $page->getForm();
-  if($form){
-    $this->renderElement('form', array('form'=> $form));
-  }
-  if(!is_null($page->trailingText))
-    print "<div id='trailingText'>{$page->trailingText}</div>";
-}
 ?>
+<div id='doc3'>
+  <?php 
+    $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-page');
+    $this->renderElement($elementName, array('page'=>$page, 'currentAnswerID'=>null));
+?>
+</div>

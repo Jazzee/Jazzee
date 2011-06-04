@@ -41,13 +41,22 @@ class ElementListItem{
   }
   
   /**
+   * Generate a Temporary id
+   *
+   * This should only be used when we need to termporarily generate an item 
+   * but have no intention of persisting it.  Use a string to be sure we cant persist
+   */
+  public function tempId(){
+    $this->id = uniqid('item');
+  }
+  
+  /**
    * Set element
    *
    * @param Entity\Element $element
    */
   public function setElement(Element $element){
     $this->element = $element;
-    $element->addItem($this);
   }
   
   /**

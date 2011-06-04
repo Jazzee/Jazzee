@@ -277,7 +277,9 @@ abstract class PageBuilder extends AdminController{
     $this->layout = 'blank';
     $ap = new \Jazzee\Entity\ApplicationPage();
     $ap->setPage($page);
+    $ap->setApplication($this->_application);
     $ap->getJazzeePage()->setController($this);
+    $ap->getJazzeePage()->setApplicant(new \Jazzee\Entity\Applicant());
     $this->setVar('page', $ap);
   }
   
@@ -291,13 +293,17 @@ abstract class PageBuilder extends AdminController{
     $page->notGlobal();
     $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->classId));
     //create a temporary application page so we can access the JazzeePage and do setup
-    $ap = new \Jazzee\Entity\ApplicationPage();
-    $ap->setPage($page);
-    $ap->getJazzeePage()->setupNewPage();
-    unset($ap);
-    //give any created elements a temporary id so they will display in the form
-    foreach($page->getElements() as $element){
-      $element->tempId();
+    if($data->status == 'new'){
+      $ap = new \Jazzee\Entity\ApplicationPage();
+      $ap->setPage($page);
+      $ap->getJazzeePage()->setController($this);
+      $ap->getJazzeePage()->setupNewPage();
+      unset($ap);
+      //give any created elements a temporary id so they will display in the form
+      foreach($page->getElements() as $element){
+        $element->tempId();
+        foreach($element->getListItems() as $item) $item->tempId();
+      }
     }
     $page->setTitle($data->title);
     $page->setMin($data->min);
@@ -319,6 +325,7 @@ abstract class PageBuilder extends AdminController{
       $this->genericPage($childPage, $obj);
       $page->addChild($childPage);
     }
+    $this->_em->clear();
   }
   
   /**
@@ -338,9 +345,10 @@ abstract class PageBuilder extends AdminController{
     $element->setMax($e->max);
     foreach($e->list as $i){
       $item = new \Jazzee\Entity\ElementListItem();
+      $item->tempId();
       $element->addItem($item);
       $item->setValue($i->value);
-      if($item->active) $item->activate(); else $item->deActivate();
+      if($item->isActive()) $item->activate(); else $item->deActivate();
     }
   }
   
