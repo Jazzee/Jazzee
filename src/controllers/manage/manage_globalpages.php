@@ -48,9 +48,6 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
           } else {
             $this->_em->remove($page);
           }
-        } else {
-          $this->setLayoutVar('status', 'error');
-          $this->addMessage('error',"Unable to find a page with id {$pageId}");
         }
       break;
       case 'new':

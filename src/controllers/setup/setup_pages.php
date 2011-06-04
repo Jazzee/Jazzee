@@ -45,9 +45,6 @@ class SetupPagesController extends \Jazzee\PageBuilder {
         if($applicationPage = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page' => $pageId, 'application'=>$this->_application->getId()))){
           $this->_em->remove($applicationPage);
           $this->_application->getPages()->remove($applicationPage->getId());
-        } else {
-          $this->setLayoutVar('status', 'error');
-          $this->addMessage('error',"Unable to find a page with id {$pageId} in this application.");
         }
       break;
       case 'new-global':

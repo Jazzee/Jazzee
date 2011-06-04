@@ -165,6 +165,7 @@ PageStore.prototype.save = function(){
   }
   for(var i = 0; i < this.deletedPages.length; i++){
     this.savePage(this.deletedPages[i]);
+    delete this.deletedPages[i];
   }
 };
 
