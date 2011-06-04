@@ -52,7 +52,8 @@ JazzeeEntityPageBranching.prototype.listBranchesBlock = function(){
     ol.append(li);
   }
   var p = $('<p>').addClass('add').html('New Branch').bind('click',function(){
-    var branch = new JazzeeEntityPageStandard.prototype.newPage('newpage' + pageClass.pageStore.getUniqueId(),'New Branch',1,'JazzeeEntityPageStandard','new',pageClass.pageStore);
+	var standardPageTypeId = pageClass.pageStore.getPageType('JazzeeEntityPageStandard');
+    var branch = new JazzeeEntityPageStandard.prototype.newPage('newpage' + pageClass.pageStore.getUniqueId(),'New Branch',standardPageTypeId,'JazzeeEntityPageStandard','new',pageClass.pageStore);
     pageClass.addChild(branch);
     div.replaceWith(pageClass.listBranchesBlock());
   });

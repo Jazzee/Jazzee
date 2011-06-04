@@ -8,6 +8,7 @@ function PageStore(baseUrl, workspace){
   this.baseUrl = baseUrl;
   this.pages = {};
   this.deletedPages = [];
+  this.pageTypes = [];
   this.workspace = workspace;
   $(this.workspace).append($('<ol>').addClass('page-list'));
   
@@ -164,6 +165,26 @@ PageStore.prototype.save = function(){
   }
   for(var i = 0; i < this.deletedPages.length; i++){
     this.savePage(this.deletedPages[i]);
+  }
+};
+
+/**
+ * Add a page type
+ * @param {object} pageType
+ */
+PageStore.prototype.addPageType = function(pageType){
+  this.pageTypes.push(pageType);
+};
+
+/**
+ * get a page type
+ * @param {string} name of the page type
+ */
+PageStore.prototype.getPageType = function(name){
+  for(var i = 0; i < this.pageTypes.length; i++){
+    if(this.pageTypes[i].className == name){
+      return this.pageTypes[i].id;
+    }
   }
 };
 

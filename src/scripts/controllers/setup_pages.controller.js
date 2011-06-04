@@ -33,6 +33,7 @@ $(document).ready(function(){
     var ol = $('<ol>').addClass('add-list');
     $(json.data.result).each(function(i){
       var pageType = this;
+      pageStore.addPageType(pageType);
       var li = $('<li>').html(pageType.name);
       li.bind('click', function(){
         var page = new window[pageType.className].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.id,pageType.className,'new',pageStore);

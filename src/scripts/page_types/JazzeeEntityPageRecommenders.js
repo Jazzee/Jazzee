@@ -12,6 +12,7 @@ JazzeeEntityPageRecommenders.prototype.constructor = JazzeeEntityPageRecommender
  * @returns {RecommendersPage}
  */
 JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,classId,className,status,pageStore){
+  var standardPageTypeId = pageStore.getPageType('JazzeeEntityPageStandard');
   var page = JazzeePage.prototype.newPage.call(this, id,title,classId,className,status,pageStore);
   page.setVariable('lorDeadline', null);
   page.setVariable('lorDeadlineEnforced', 0);
@@ -20,7 +21,7 @@ JazzeeEntityPageRecommenders.prototype.newPage = function(id,title,classId,class
       + "We use an online system to collect letters of recommendation.  You have been assigned a unique URL for accessing this system.  Please save this email so that you can return to your letter at a later date. \n"
       + "Click the following link to access the online system; or, you may need to copy and paste this link into your browser. \n"
       + "%LINK% \n");
-  var recommendation = new JazzeeEntityPageStandard.prototype.newPage('newchildpage' + pageStore.getUniqueId(),'Recommendation',1,'JazzeeEntityPageStandard','new',pageStore);
+  var recommendation = new JazzeeEntityPageStandard.prototype.newPage('newchildpage' + pageStore.getUniqueId(),'Recommendation',standardPageTypeId,'JazzeeEntityPageStandard','new',pageStore);
   page.addChild(recommendation);
   return page;
 };
