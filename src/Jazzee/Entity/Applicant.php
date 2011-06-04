@@ -80,11 +80,6 @@ class Applicant{
    */
   private $decision;
   
-  /** 
-   * @OneToMany(targetEntity="Payment",mappedBy="applicant")
-   */
-  private $payments;
-  
   /**
    * @ManyToMany(targetEntity="Tag", inversedBy="applicants")
    * @JoinTable(name="applicant_tags")
@@ -99,7 +94,6 @@ class Applicant{
   public function __construct(){
     $this->answers = new \Doctrine\Common\Collections\ArrayCollection();
     $this->attachments = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
     $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
     $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
     $this->isLocked = false;
@@ -485,24 +479,6 @@ class Applicant{
    */
   public function getDecision(){
     return $this->decision;
-  }
-
-  /**
-   * Add payments
-   *
-   * @param Entity\Payment $payment
-   */
-  public function addPayment(Payment $payment){
-    $this->payments[] = $payment;
-  }
-
-  /**
-   * Get payments
-   *
-   * @return Doctrine\Common\Collections\Collection $payments
-   */
-  public function getPayments(){
-    return $this->payments;
   }
 
   /**

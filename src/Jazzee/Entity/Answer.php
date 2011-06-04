@@ -85,7 +85,7 @@ class Answer{
   private $toeflScore;
   
   /** 
-   * @OneToOne(targetEntity="Payment")
+   * @OneToOne(targetEntity="Payment", mappedBy="answer")
    */
   private $payment;
   
