@@ -103,7 +103,7 @@ class ManageRolesController extends \Jazzee\AdminController {
       $role->setName($input->get('name'));
       $this->_em->persist($role);
       $this->addMessage('success', "Role Saved Successfully");
-      $this->redirectPath("manage/roles/");
+      $this->redirectPath('admin/manage/roles/');
     }
   }
   
@@ -114,6 +114,7 @@ class ManageRolesController extends \Jazzee\AdminController {
   protected function getControllerActions(){
     $controllers = array();
     foreach($this->listControllers() as $controller){
+      \Foundation\VC\Config::includeController($controller);
       $class = \Foundation\VC\Config::getControllerClassName($controller);
       $arr = array('name'=> $controller, 'title' => $class::TITLE, 'actions'=>array());
       foreach(get_class_methods($class) as $method){
