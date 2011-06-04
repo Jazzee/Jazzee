@@ -4,7 +4,12 @@ namespace Jazzee\Entity;
 /** 
  * ElementType
  * The ApplyElement class we are going to use for an element
- * @Entity @Table(name="element_types") 
+ * @Entity 
+ * @Table(name="element_types", 
+ * uniqueConstraints={
+ *   @UniqueConstraint(name="elementtype_class",columns={"class"}),
+ *   @UniqueConstraint(name="elementtype_name",columns={"name"})
+ *   })
  * @package    jazzee
  * @subpackage orm
  **/
@@ -19,7 +24,7 @@ class ElementType{
   /** @Column(type="string") */
   private $name;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="string") */
   private $class;
 
   /**

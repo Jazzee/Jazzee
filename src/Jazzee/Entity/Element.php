@@ -4,7 +4,7 @@ namespace Jazzee\Entity;
 /** 
  * Element
  * Elements are the individual fields on a Page
- * @Entity @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="fixedId", columns={"page_id", "fixedId"})}) 
+ * @Entity @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"})}) 
  * @package    jazzee
  * @subpackage orm
  **/

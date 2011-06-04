@@ -6,7 +6,8 @@ namespace Jazzee\Entity;
  * Applicant answer to a page
  * @Entity
  * @HasLifecycleCallbacks 
- * @Table(name="answers") 
+ * @Table(name="answers", 
+ * uniqueConstraints={@UniqueConstraint(name="answer_uniqueId",columns={"uniqueId"})})
  * @package    jazzee
  * @subpackage orm
  **/
@@ -65,7 +66,7 @@ class Answer{
   /** @Column(type="text", nullable=true) */
   protected $attachment;
   
-  /** @Column(type="string", length=255, unique=true) */
+  /** @Column(type="string", length=255) */
   protected $uniqueId;
   
   /** @Column(type="boolean") */

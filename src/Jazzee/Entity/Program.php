@@ -6,7 +6,11 @@ namespace Jazzee\Entity;
  * Represents a single program which contains Applications for Cycles 
  * and Users with roles in the program
  * @Entity(repositoryClass="Jazzee\Entity\ProgramRepository")
- * @Table(name="programs")
+ * @Table(name="programs", 
+ * uniqueConstraints={
+ *   @UniqueConstraint(name="program_name",columns={"name"}),
+ *   @UniqueConstraint(name="program_shortname",columns={"shortName"})
+ * })
  **/
 class Program{
   /**
@@ -16,10 +20,10 @@ class Program{
   */
   private $id;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="string") */
   private $name;
   
-  /** @Column(type="string", length=32, unique=true) */
+  /** @Column(type="string", length=32) */
   private $shortName;
   
   /** @Column(type="boolean") */

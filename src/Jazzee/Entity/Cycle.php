@@ -4,7 +4,9 @@ namespace Jazzee\Entity;
 /** 
  * Cycle
  * Applications are divided into cycles which represent a single admission period
- * @Entity @Table(name="cycles") 
+ * @Entity 
+ * @Table(name="cycles", 
+ * uniqueConstraints={@UniqueConstraint(name="cycle_name_unique",columns={"name"})})
  * @package    jazzee
  * @subpackage orm
  */
@@ -16,7 +18,7 @@ class Cycle{
   */
   private $id;
   
-  /** @Column(type="string", length=32, unique=true) */
+  /** @Column(type="string", length=32) */
   private $name;
   
   /** @Column(type="datetime", nullable=true) */

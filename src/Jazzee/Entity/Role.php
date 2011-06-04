@@ -4,7 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * Role
  * Roles grant access to admin users
- * @Entity @Table(name="roles") 
+ * @Entity 
+ * @Table(name="roles") 
  * @package    jazzee
  * @subpackage orm
  **/

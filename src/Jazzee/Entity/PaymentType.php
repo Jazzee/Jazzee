@@ -3,7 +3,12 @@ namespace Jazzee\Entity;
 /** 
  * PaymentType
  * The ApplyPayment class we are going to use
- * @Entity @Table(name="payment_types") 
+ * @Entity 
+ * @Table(name="payment_types", 
+ * uniqueConstraints={
+ *   @UniqueConstraint(name="payemnttype_class",columns={"class"}),
+ *   @UniqueConstraint(name="paymenttype_name",columns={"name"})
+ * })
  * @package    jazzee
  * @subpackage orm
  **/
@@ -18,7 +23,7 @@ class PaymentType{
   /** @Column(type="string") */
   private $name;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="string") */
   private $class;
   
   /** 

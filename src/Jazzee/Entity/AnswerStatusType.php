@@ -4,7 +4,9 @@ namespace Jazzee\Entity;
 /** 
  * AnswerStatusType
  * types of answer status
- * @Entity @Table(name="answer_status_types") 
+ * @Entity 
+ * @Table(name="answer_status_types", 
+ * uniqueConstraints={@UniqueConstraint(name="answerstatustype_name",columns={"name"})})
  * @package    jazzee
  * @subpackage orm
  **/

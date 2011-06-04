@@ -26,7 +26,7 @@ class Page{
   private $type;
   
   /** @Column(type="boolean") */
-  private $isGlobal = false;
+  private $isGlobal;
   
   /** 
    * @ManyToOne(targetEntity="Page",inversedBy="children")
@@ -75,6 +75,7 @@ class Page{
     $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
     $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->isGlobal = false;
   }
   
   /**

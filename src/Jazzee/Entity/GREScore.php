@@ -4,7 +4,7 @@ namespace Jazzee\Entity;
 /** 
  * GREScore
  * Scores imported from ETS
- * @Entity @Table(name="gre_scores",uniqueConstraints={@UniqueConstraint(name="registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
+ * @Entity @Table(name="gre_scores",uniqueConstraints={@UniqueConstraint(name="gre_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
  * @package    jazzee
  * @subpackage orm
  **/

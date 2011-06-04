@@ -4,7 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * Tag
  * Applicants can be tagged with a string to group them - we store all these strings in the tags table and then link them to applicants when they are requested
- * @Entity @Table(name="tags") 
+ * @Entity @Table(name="tags", 
+ * uniqueConstraints={@UniqueConstraint(name="tag_title",columns={"title"})})
  * @package    jazzee
  * @subpackage orm
  **/
@@ -16,7 +17,7 @@ class Tag{
   */
   private $id;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="string") */
   private $title;
   
   /**

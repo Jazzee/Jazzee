@@ -3,7 +3,7 @@ namespace Jazzee\Entity;
 /** 
  * PageVariable
  * Allow developers to store arbitrary data as a PageVariable so we don't need new tables for every new ApplyPage type
- * @Entity @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="page_variable", columns={"page_id", "name"})}) 
+ * @Entity @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="pagevariable_name", columns={"page_id", "name"})}) 
  * @package    jazzee
  * @subpackage orm
  **/

@@ -3,7 +3,12 @@ namespace Jazzee\Entity;
 /** 
  * PageType
  * The ApplyPage class we are going to use
- * @Entity @Table(name="page_types") 
+ * @Entity 
+ * @Table(name="page_types", 
+ * uniqueConstraints={
+ *   @UniqueConstraint(name="pagetype_class",columns={"class"}),
+ *   @UniqueConstraint(name="pagetype_name",columns={"name"})
+ *   })
  * @package    jazzee
  * @subpackage orm
  **/
@@ -18,7 +23,7 @@ class PageType{
   /** @Column(type="string") */
   private $name;
   
-  /** @Column(type="string", unique=true) */
+  /** @Column(type="string") */
   private $class;
   
 /**
