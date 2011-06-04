@@ -9,7 +9,7 @@ JazzeeEntityPageStandard.prototype.constructor = JazzeeEntityPageStandard;
 JazzeeEntityPageStandard.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
   var pageClass = this;
-  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {0:'Required',1:'Optional'}));
+  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {1:'Required',0:'Optional'}));
   $('#workspace-right-top').append(this.showAnswerStatusBlock());
   
   var min = {0: 'No Minimum'};

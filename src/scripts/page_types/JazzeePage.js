@@ -319,7 +319,7 @@ JazzeePage.prototype.selectListBlock = function(propertyName, description, optio
       pageClass.setProperty(propertyName, $(this).val());
     });
     select.bind('blur', function(e){
-      $(this).parent().replaceWith(pageClass.selectListBlock(propertyName,description, options));
+     p.replaceWith(pageClass.selectListBlock(propertyName,description, options));
     });
     $(this).empty().append(select);
   }));
@@ -441,7 +441,7 @@ JazzeePage.prototype.workspace = function(){
   this.clearWorkspace();
   $('#workspace-left-top').parent().addClass('form');
   $('#workspace-left-top').append(this.titleBlock());
-  $('#workspace-left-top').append(this.textInputBlock('leadingText', 'click to edit'));
+  $('#workspace-left-top').append(this.textAreaBlock('leadingText', 'click to edit'));
   $('#workspace-left-top').append(this.textAreaBlock('instructions', 'click to edit'));
   $('#workspace-left-bottom-left').append(this.textAreaBlock('trailingText', 'click to edit'));
   $('#workspace-right-top').append(this.copyPageBlock());
