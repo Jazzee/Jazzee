@@ -177,13 +177,14 @@ abstract class PageBuilder extends AdminController{
    */
   public function savePage($page, $data){
     $page->setTitle($data->title);
-    $page->setMin($data->min);
-    $page->setMax($data->max);
+    $page->setMin(empty($data->min)?null:$data->min);
+    $page->setMax(empty($data->max)?null:$data->max);
     if($data->isRequired) $page->required(); else $page->optional();
     if($data->answerStatusDisplay) $page->showAnswerStatus(); else $page->hideAnswerStatus();
-    $page->setInstructions($data->instructions);
-    $page->setLeadingText($data->leadingText);
-    $page->setTrailingText($data->trailingText);
+    $page->setInstructions(empty($data->instructions)?null:$data->instructions);
+    $page->setLeadingText(empty($data->leadingText)?null:$data->leadingText);
+    $page->setTrailingText(empty($data->trailingText)?null:$data->trailingText);
+    
     $this->_em->persist($page);
     
     if($page instanceof \Jazzee\Entity\ApplicationPage){
@@ -244,12 +245,12 @@ abstract class PageBuilder extends AdminController{
           if(!isset($element)) $element = $page->getElementByID($e->id);
           $element->setWeight($e->weight);
           $element->setTitle($e->title);
-          $element->setFormat($e->format);
-          $element->setInstructions($e->instructions);
-          $element->setDefaultValue($e->defaultValue);
+          $element->setFormat(empty($e->format)?null:$e->format);
+          $element->setInstructions(empty($e->instructions)?null:$e->instructions);
+          $element->setDefaultValue(empty($e->defaultValue)?null:$e->defaultValue);
           if($e->isRequired) $element->required(); else $element->optional();
-          $element->setMin($e->min);
-          $element->setMax($e->max);
+          $element->setMin(empty($e->min)?null:$e->min);
+          $element->setMax(empty($e->max)?null:$e->max);
           foreach($e->list as $i){
             if(!$item = $element->getItemById($i->id)){
               $item = new \Jazzee\Entity\ElementListItem();
@@ -307,12 +308,14 @@ abstract class PageBuilder extends AdminController{
       }
     }
     $page->setTitle($data->title);
-    $page->setMin($data->min);
-    $page->setMax($data->max);
+    $page->setMin(empty($data->min)?null:$data->min);
+    $page->setMax(empty($data->max)?null:$data->max);
     if($data->isRequired) $page->required(); else $page->optional();
-    $page->setInstructions($data->instructions);
-    $page->setLeadingText($data->leadingText);
-    $page->setTrailingText($data->trailingText);
+    if($data->answerStatusDisplay) $page->showAnswerStatus(); else $page->hideAnswerStatus();
+    $page->setInstructions(empty($data->instructions)?null:$data->instructions);
+    $page->setLeadingText(empty($data->leadingText)?null:$data->leadingText);
+    $page->setTrailingText(empty($data->trailingText)?null:$data->trailingText);
+    
     foreach($data->variables as $v){
       $page->setVar($v->name, $v->value);
     }
@@ -338,12 +341,13 @@ abstract class PageBuilder extends AdminController{
     $element->tempId();
     $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($e->classId));
     $element->setTitle($e->title);
-    $element->setFormat($e->format);
-    $element->setInstructions($e->instructions);
-    $element->setDefaultValue($e->defaultValue);
+    $element->setTitle($e->title);
+    $element->setFormat(empty($e->format)?null:$e->format);
+    $element->setInstructions(empty($e->instructions)?null:$e->instructions);
+    $element->setDefaultValue(empty($e->defaultValue)?null:$e->defaultValue);
     if($e->isRequired) $element->required(); else $element->optional();
-    $element->setMin($e->min);
-    $element->setMax($e->max);
+    $element->setMin(empty($e->min)?null:$e->min);
+    $element->setMax(empty($e->max)?null:$e->max);
     foreach($e->list as $i){
       $item = new \Jazzee\Entity\ElementListItem();
       $item->tempId();
