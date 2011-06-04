@@ -212,11 +212,12 @@ abstract class PageBuilder extends AdminController{
           $childPage->setParent($page);
           $childPage->notGlobal();
           $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->classId));
-        case 'save':
+        default:
           if(!isset($childPage)) $childPage = $page->getChildById($child->id);
           $this->savePage($childPage, $child);
         break;
       }
+      unset($childPage);
     }
   }
   
@@ -260,8 +261,8 @@ abstract class PageBuilder extends AdminController{
             $this->_em->persist($item);
           }
           $this->_em->persist($element);
-          unset($element); //this isn't for memory management if it stays set it gets re-used at the begning of the default switch
       }
+      unset($element); //this isn't for memory management if it stays set it gets re-used at the begning of the default switch
     }
   }
 
