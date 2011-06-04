@@ -41,8 +41,8 @@ class ApplicationPage
   /** @Column(type="integer", nullable=true) */
   private $max;
   
-  /** @Column(type="boolean") */
-  private $isRequired = true;
+  /** @Column(type="boolean", nullable=true) */
+  private $isRequired;
   
   /** @Column(type="boolean", nullable=true) */
   private $answerStatusDisplay;
