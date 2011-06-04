@@ -8,7 +8,7 @@
 class AdminChangecycleController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'Change Cycle';
-  const PATH = 'admin/changecycle';
+  const PATH = 'changecycle';
   
   const ACTION_INDEX = 'Change Cycle';
   

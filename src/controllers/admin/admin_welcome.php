@@ -8,7 +8,7 @@
  */
 class AdminWelcomeController extends \Jazzee\AdminController {
   const TITLE = 'Home';
-  const PATH = 'admin/welcome';
+  const PATH = 'welcome';
   
   /**
    * Display index

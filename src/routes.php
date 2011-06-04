@@ -117,9 +117,9 @@ try {
     'additional_params' => '$4'
   ));
   
-  $advancedRouter->addRoute('#^(admin)/([^/]+)/?([^/]+)?$#i', array(
-    'controller' => '$1_$2',
-    'action' => '$3'
+  $advancedRouter->addRoute('#^admin/([^/]+)/?([^/]+)?$#i', array(
+    'controller' => 'admin_$1',
+    'action' => '$2'
   ));
   
   //applicant actions
