@@ -12,6 +12,12 @@ namespace Jazzee\Entity;
  **/
 class Message{
   /**
+   * Sender Types 
+   */
+  const APPLICANT = 2;
+  const PROGRAM = 4;
+  
+  /**
     * @Id 
     * @Column(type="bigint")
     * @GeneratedValue(strategy="AUTO")
@@ -35,7 +41,7 @@ class Message{
    */
   private $replies;
   
-  /** @Column(type="string") */
+  /** @Column(type="integer") */
   private $sender;
 
   /** @Column(type="text") */
@@ -67,7 +73,7 @@ class Message{
    * @param string $sender
    */
   public function setSender($sender){
-    if(!in_array(strtolower($sender), array('applicant', 'program'))) throw new \Jazzee\Exception("{$sender} is not a valid sender");
+    if(!in_array($sender, array(self::APPLICANT, self::PROGRAM))) throw new \Jazzee\Exception("Invalid sender type.  Must be one of the constants APPLICANT or PROGRAM");
     $this->sender = $sender;
   }
 
@@ -103,9 +109,10 @@ class Message{
   /**
    * Mark the created at automatically
    * @PrePersist
+   * @param string $createdAt
    */
-  public function markCreatedAt(){
-    $this->createdAt = new \DateTime();
+  public function markCreatedAt($createdAt = 'now'){
+    $this->createdAt = new \DateTime($createdAt);
   }
 
   /**
