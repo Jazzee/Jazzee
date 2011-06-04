@@ -419,7 +419,7 @@ class Applicant{
    */
   public function addAnswer(\Jazzee\Entity\Answer $answer){
     $this->answers[] = $answer;
-    if($answer->getApplicant() != $this) $answer->getApplicant($applicant);
+    if($answer->getApplicant() != $this) $answer->setApplicant($this);
   }
   
   /**
@@ -506,6 +506,7 @@ class Applicant{
    */
   public function addMessage(Message $message){
     $this->messages[] = $message;
+    if($message->getApplicant() != $this) $message->setApplicant($this);
   }
 
   /**
