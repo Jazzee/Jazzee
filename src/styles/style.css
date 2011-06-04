@@ -118,6 +118,12 @@ div.form label{
 	padding-right: 16px;
 }
 
+
+/** Remove the background if we are two labels deep - link in ranking lists **/
+div.form div.required div.control div.label{
+  background: none;
+}
+
 div.form div.required div.label, div.form div.label.required{
   background-image: url(resource/foundation/media/icons/asterisk_yellow.png);
   background-repeat: no-repeat;
