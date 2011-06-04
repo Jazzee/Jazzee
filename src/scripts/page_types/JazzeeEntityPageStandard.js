@@ -12,12 +12,12 @@ JazzeeEntityPageStandard.prototype.workspace = function(){
   $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {1:'Required',0:'Optional'}));
   $('#workspace-right-top').append(this.showAnswerStatusBlock());
   
-  var min = {0: 'No Minimum'};
+  var min = {null: 'No Minimum'};
   for(var i = 1; i<=50;i++){
     min[i] = i;
   }
   $('#workspace-right-top').append(this.selectListBlock('min','Minimum Answers Required:', min));
-  var max = {0: 'No Maximum'};
+  var max = {null: 'No Maximum'};
   for(var i = 1; i<=50;i++){
     max[i] = i;
   }

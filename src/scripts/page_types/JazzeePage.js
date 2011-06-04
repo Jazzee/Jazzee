@@ -74,13 +74,13 @@ JazzeePage.prototype.newPage = function(id,title,classId,className,status,pageSt
     className: className,
     title: title,
     isGlobal: false,
-    min: 0,
-    max: 0,
+    min: null,
+    max: null,
     optional: false,
     showAnswerStatus: false,        
-    instructions: '',
-    leadingText: '',
-    trailingText: '',
+    instructions: null,
+    leadingText: null,
+    trailingText: null,
     weight: 0
   };
   var page = new window[className]();
@@ -269,7 +269,7 @@ JazzeePage.prototype.textAreaBlock = function(propertyName, valueIfBlank){
   .bind('blur', function(){
     $(this).parent().replaceWith(pageClass.textAreaBlock(propertyName, valueIfBlank));
   }).hide();
-  var p = $('<p>').addClass('edit').addClass(propertyName).html(((this[propertyName] == '')?valueIfBlank:this[propertyName])).bind('click', function(){
+  var p = $('<p>').addClass('edit').addClass(propertyName).html(((this[propertyName] == null)?valueIfBlank:this[propertyName])).bind('click', function(){
     $(this).hide();
     $(this).parent().children('textarea').eq(0).show().focus();
   });
@@ -291,7 +291,7 @@ JazzeePage.prototype.textInputBlock = function(propertyName, valueIfBlank){
   .bind('blur', function(){
     $(this).parent().replaceWith(pageClass.textInputBlock(propertyName, valueIfBlank));
   }).hide();
-  var p = $('<p>').addClass('edit').addClass(propertyName).html(((this[propertyName] == '')?valueIfBlank:this[propertyName])).bind('click', function(){
+  var p = $('<p>').addClass('edit').addClass(propertyName).html(((this[propertyName] == null)?valueIfBlank:this[propertyName])).bind('click', function(){
     $(this).hide();
     $(this).parent().children('input').eq(0).show().focus();
   });
