@@ -96,6 +96,7 @@ class Applicant{
     $this->attachments = new \Doctrine\Common\Collections\ArrayCollection();
     $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
     $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->createdAt = new \DateTime('now');
     $this->isLocked = false;
   }
   

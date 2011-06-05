@@ -61,10 +61,10 @@ class Application{
   private $begin;
   
   /** @Column(type="boolean") */
-  private $published = false;
+  private $published;
   
   /** @Column(type="boolean") */
-  private $visible = false;
+  private $visible;
   
   /** @Column(type="text", nullable=true) */
   private $admitLetter;
@@ -78,6 +78,8 @@ class Application{
   public function __construct(){
     $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->publised = false;
+    $this->visible = false;
   }
   
   /**
