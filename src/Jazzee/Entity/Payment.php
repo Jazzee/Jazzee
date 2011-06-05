@@ -3,7 +3,9 @@ namespace Jazzee\Entity;
 /** 
  * Payment
  * Records all applicant payment attempts
- * @Entity @Table(name="payments") 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="payments") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -57,6 +59,14 @@ class Payment{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Mark the lastUpdate automatically
+   * @PrePersist
+   */
+  public function markLastUpdate(){
+      $this->answer->markLastUpdate();
   }
   
   /**

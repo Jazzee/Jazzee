@@ -226,7 +226,6 @@ class Answer{
    */
   public function setApplicant(Applicant $applicant){
     $this->applicant = $applicant;
-    $applicant->addAnswer($this);
   }
 
   /**
@@ -360,6 +359,7 @@ class Answer{
    */
   public function markLastUpdate(){
       $this->updatedAt = new \DateTime();
+      $this->applicant->markLastUpdate();
   }
   
   /**

@@ -4,7 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * Applicant
  * Individual applicants are tied to an Application - but a single person can be multiple Applicants
- * @Entity(repositoryClass="\Jazzee\Entity\ApplicantRepository") 
+ * @Entity(repositoryClass="\Jazzee\Entity\ApplicantRepository")
+ * @HasLifecycleCallbacks 
  * @Table(name="applicants",uniqueConstraints={@UniqueConstraint(name="application_email", columns={"application_id", "email"})}) 
  * @package    jazzee
  * @subpackage orm
@@ -376,6 +377,14 @@ class Applicant{
   public function getCreatedAt(){
     return $this->createdAt;
   }
+  
+  /**
+   * Mark the lastUpdate automatically
+   * @PrePersist
+   */
+  public function markLastUpdate(){
+    $this->updatedAt = new \DateTime();
+  }
 
   /**
    * Set updatedAt
@@ -454,6 +463,16 @@ class Applicant{
     foreach($this->answers as $answer) if($answer->getId() == $id) return $answer;
     return false;
   }
+
+  /**
+   * Add attachment
+   *
+   * @param \Jazzee\Entity\Attachment $attachment
+   */
+  public function addAttachment(Attachment $attachment){
+    $this->attachments[] = $attachment;
+    if($attachment->getApplicant() != $this) $attachment->setApplicant($this);
+  }
   
   /**
    * Get attachments
@@ -489,6 +508,7 @@ class Applicant{
    */
   public function addTag(Tag $tag){
     $this->tags[] = $tag;
+    $this->markLastUpdate();
   }
 
   /**

@@ -3,7 +3,9 @@ namespace Jazzee\Entity;
 /** 
  * Attachment
  * Attach a file to an applicant
- * @Entity @Table(name="attachments") 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="attachments") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -57,5 +59,13 @@ class Attachment{
    */
   public function getAttachment(){
     return base64_decode($this->attachment);
+  }
+  
+  /**
+   * Mark the lastUpdate automatically 
+   * @PrePersist
+   */
+  public function markLastUpdate(){
+      $this->applicant->markLastUpdate();
   }
 }

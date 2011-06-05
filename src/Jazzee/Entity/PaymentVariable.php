@@ -3,7 +3,9 @@ namespace Jazzee\Entity;
 /** 
  * PaymentVariable
  * Allow developers to store arbitrary data as a PaymentVariable so we don't need new tables for every new ApplyPayment type
- * @Entity @Table(name="payment_variables",uniqueConstraints={@UniqueConstraint(name="payment_variables", columns={"payment_id", "value"})}) 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="payment_variables",uniqueConstraints={@UniqueConstraint(name="payment_variables", columns={"payment_id", "value"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -34,6 +36,14 @@ class PaymentVariable{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Mark the lastUpdate automatically
+   * @PrePersist
+   */
+  public function markLastUpdate(){
+      $this->payment->markLastUpdate();
   }
 
   /**

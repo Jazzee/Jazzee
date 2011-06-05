@@ -4,7 +4,9 @@ namespace Jazzee\Entity;
 /** 
  * Applicant
  * Individual applicants are tied to an Application - but a single person can be multiple Applicants
- * @Entity @Table(name="decisions") 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="decisions") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -56,6 +58,14 @@ class Decision{
    */
   public function setApplicant(Applicant $applicant){
     $this->applicant = $applicant;
+  }
+  
+  /**
+   * Mark the lastUpdate automatically
+   * @PreUpdate
+   */
+  public function markLastUpdate(){
+      $this->applicant->markLastUpdate();
   }
   
   /**

@@ -66,6 +66,14 @@ class Message{
   public function getId(){
     return $this->id;
   }
+  
+  /**
+   * Mark the lastUpdate automatically
+   * @PrePersist
+   */
+  public function markLastUpdate(){
+      $this->applicant->markLastUpdate();
+  }
 
   /**
    * Set sender

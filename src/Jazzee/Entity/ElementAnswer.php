@@ -5,7 +5,9 @@ namespace Jazzee\Entity;
  * ElementAnswer
  * Break down the response from each Element on a Page into an ElementAnswer
  * In cases where there are multiple answers (like checkboxes) a single answer gets multiple rows by position
- * @Entity @Table(name="element_answers") 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="element_answers") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -57,6 +59,14 @@ class ElementAnswer{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Mark the lastUpdate automatically
+   * @PrePersist
+   */
+  public function markLastUpdate(){
+      $this->answer->markLastUpdate();
   }
 
   /**
