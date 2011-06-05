@@ -100,16 +100,16 @@ JazzeeEntityPageStandard.prototype.synchronizeElementList = function(){
  */
 JazzeeEntityPageStandard.prototype.showAnswerStatusBlock = function(){
   var pageClass = this;
-  var value = (this.showAnswerStatus == 1)?'shown':'not shown';
+  var value = (this.answerStatusDisplay)?'shown':'not shown';
   var p = $('<p>').addClass('edit showAnswerStatus').html('Answer status ').append($('<span>').html(value)).bind('click', function(e){
     var obj = new FormObject();
     var field = obj.newField({name: 'legend', value: 'Answer Status'});
-    var element = field.newElement('RadioList', 'showAnswerStatus');
+    var element = field.newElement('RadioList', 'answerStatusDisplay');
     element.label = 'Show status on this page?';
     element.required = true;
     element.addItem('Yes', 1);
     element.addItem('No', 0);
-    element.value = (pageClass.showAnswerStatus == 1)?1:0;
+    element.value = (pageClass.answerStatusDisplay)?1:0;
     var element = field.newElement('TextInput', 'title');
     element.label = 'Title';
     element.value = pageClass.getVariable('answerStatusTitle');
@@ -139,8 +139,8 @@ JazzeeEntityPageStandard.prototype.showAnswerStatusBlock = function(){
       }
     });
     $('form', div).unbind().bind('submit',function(e){
-      var show = $('input[name=showAnswerStatus]:checked', this).val();
-      pageClass.setProperty('showAnswerStatus', show);
+      var show = $('input[name=answerStatusDisplay]:checked', this).val();
+      pageClass.setProperty('answerStatusDisplay', show);
       if(show == 1){
         var title = $('input[name=title]', this).val();
         var text = $('input[name=text]', this).val();
