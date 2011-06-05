@@ -119,4 +119,19 @@ class Recommenders extends Standard {
     $element->addItem($item);
     $em->persist($item);
   }
+  
+  public function getStatus(){
+    $answers = $this->getAnswers();
+    if(!$this->_applicationPage->isRequired() and count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){
+      return self::SKIPPED;
+    }
+    $completedAnswers = 0;
+    foreach($answers as $answer)if($answer->isLocked()) $completedAnswers++;
+    
+    if(is_null($this->_applicationPage->getMin()) or $completedAnswers < $this->_applicationPage->getMin()){
+      return self::INCOMPLETE;
+    } else {
+      return self::COMPLETE;
+    }
+  }
 }
