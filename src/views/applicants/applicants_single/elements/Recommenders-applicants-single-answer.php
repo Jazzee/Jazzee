@@ -4,19 +4,30 @@
  */
 ?>
 <tr id='answer<?print $answer->getId() ?>'>
-  <td><?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer); ?></td>
+  <td>
+    <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer); ?>;
+    <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer); ?><br />
+    <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_INSTITUTION)->getJazzeeElement()->displayValue($answer); ?><br />
+    <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_EMAIL)->getJazzeeElement()->displayValue($answer); ?><br />
+    <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_PHONE)->getJazzeeElement()->displayValue($answer); ?><br />
+  </td>
   <?php foreach($page->getPage()->getChildren()->first()->getElements() as $element){?><td><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php }?>
 <td>
-  <?php foreach($answer->getJazzeeAnswer()->applicantsStatus() as $name => $value) print $name?>: <?php print $value?><br />
+  <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?><br />
+  <?php if($child = $answer->getChildren()->first()){?>
+      <br /><strong>Status:</strong> This recommendation was received on <?php print $child->getLastUpdatedAt('l F jS Y g:ia');
+    } else if($answer->isLocked()){?>
+      <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?><br />
+  <?php }?>
 </td>
-<?php if($page->getJazzeePage()->allowAttachments()){?><td>Attachment</td><?php }?>
-<?php if($this->controller->checkIsAllowed('applicants_single', 'edit')){ ?>
+<td>Attachment</td>
   <td>
-    <?php foreach($answer->getJazzeeAnswer()->applicantsTools() as $tool){?>
-      <?php if($this->controller->checkIsAllowed('applicants_single', $tool['class'])){ ?>
-        <a href='<?php print $this->page('/applicants/single/' . $answer->getApplicant->getId() . $tool['path'])?>' class='<?php print $tool['class']?>'><?php print $tool['title']?></a><br />     
-      <?php } ?>
-    <?php }?>
+    <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer')){ ?>
+      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='editAnswer'>Edit</a><br />
+      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/do/sendInvitation/' . $answer->getId());?>' class='editAnswer'>Send Invitation</a><br />
+      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/do/viewLink/' . $answer->getId());?>' class='editAnswer'>View Link</a><br />
+    <?php } ?><?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')){ ?>
+      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId());?>' class='deleteAnswer'>Delete</a><br />     
+    <?php } ?>
   </td>
-<?php }?>
 </tr>

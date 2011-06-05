@@ -6,16 +6,18 @@
 <tr id='answer<?print $answer->getId() ?>'>
   <?php foreach($page->getPage()->getElements() as $element){?><td><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php }?>
 <td>
-  <?php foreach($answer->getJazzeeAnswer()->applicantsStatus() as $name => $value) print $name?>: <?php print $value?><br />
+  <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
+    <?php if($answer->getPublicStatus()){?><br />Public Status: <?php print $answer->getPublicStatus()->getName();}?>
+    <?php if($answer->getPrivateStatus()){?><br />Private Status: <?php print $answer->getPrivateStatus()->getName();}?>
 </td>
-<?php if($page->getJazzeePage()->allowAttachments()){?><td>Attachment</td><?php }?>
+<td>Attachment</td>
 <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer')){ ?>
   <td>
-    <?php foreach($answer->getJazzeeAnswer()->applicantsTools() as $tool){?>
-      <?php if($this->controller->checkIsAllowed('applicants_single', $tool['class'])){ ?>
-        <a href='<?php print $this->path('admin//applicants/single/' . $answer->getApplicant()->getId() . $tool['path'])?>' class='<?php print $tool['class']?>'><?php print $tool['title']?></a><br />     
-      <?php } ?>
-    <?php }?>
+    <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer')){ ?>
+      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='editAnswer'>Edit</a><br />     
+    <?php } ?><?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')){ ?>
+      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId());?>' class='deleteAnswer'>Delete</a><br />     
+    <?php } ?>
   </td>
 <?php }?>
 </tr>

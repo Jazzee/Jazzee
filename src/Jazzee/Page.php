@@ -42,14 +42,6 @@ interface Page
   public function showReviewPage();
   
   /**
-   * Attachemnts control
-   * 
-   * Does this page allow answer attachments
-   * @return bool
-   */
-  public function allowAttachments();
-  
-  /**
    * Validate user input
    * 
    * @param array $postData straight post data from the form
