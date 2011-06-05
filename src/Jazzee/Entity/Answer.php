@@ -376,7 +376,7 @@ class Answer{
    *
    * @param \Jazzee\Entity\Payment $payment
    */
-  public function setPayment($payment){
+  public function setPayment(\Jazzee\Entity\Payment $payment){
     $this->payment = $payment;
     if($payment->getAnswer() != $this) $payment->setAnswer($this);
   }

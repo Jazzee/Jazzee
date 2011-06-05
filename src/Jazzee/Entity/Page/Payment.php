@@ -67,7 +67,8 @@ class Payment extends Standard {
     $answer->setApplicant($this->_applicant);
     $payment = new \Jazzee\Entity\Payment();
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
-    $result = $answer->getPayment()->getType()->getJazzeePaymentType()->pendingPayment($payment, $input);
+
+    $result = $payment->getType()->getJazzeePaymentType()->pendingPayment($payment, $input);
     if($result){
       $this->_controller->addMessage('success', 'Your payment has been recorded.');
       $this->_form = null;
