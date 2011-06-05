@@ -33,7 +33,7 @@ class Standard extends AbstractPage {
       $this->_controller->addMessage('error', 'You must delete your existing answers before you can skip this page.');
       return false;
     }
-    if(!$this->_applicationPage->required()){
+    if(!$this->_applicationPage->isRequired()){
       $answer = new \Jazzee\Entity\Answer();
       $answer->setPage($this->_applicationPage->getPage());
       $answer->setApplicant($this->_applicant);

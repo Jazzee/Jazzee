@@ -57,10 +57,10 @@ class Page{
   private $max;
   
   /** @Column(type="boolean") */
-  private $isRequired = true;
+  private $isRequired;
   
   /** @Column(type="boolean") */
-  private $answerStatusDisplay = false;
+  private $answerStatusDisplay;
   
   /** @Column(type="text", nullable=true) */
   private $instructions;
@@ -76,6 +76,8 @@ class Page{
     $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
     $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
     $this->isGlobal = false;
+    $this->isRequired = true;
+    $this->answerStatusDisplay = false;
   }
   
   /**
