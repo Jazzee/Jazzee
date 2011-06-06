@@ -51,6 +51,10 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $pxml->setAttribute('weight', $page->getWeight());
       $page = $page->getPage();
+      if($page->isGlobal()){
+        $pxml->setAttribute('globalPageUuid', $page->getUuid());
+        return $pxml;
+      }
     }
     $pxml->setAttribute('class', $page->getType()->getClass());
     
