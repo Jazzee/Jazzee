@@ -19,9 +19,11 @@ $preferences->appendChild($xml->createElement('denyletter', $application->getDen
 $preferences->appendChild($xml->createElement('statuspagetext', $application->getStatusPageText()));
 
 $app->appendChild($preferences);
-foreach($application->getPages() as $page){
-  $app->appendChild($this->controller->pageXml($xml, $page));
-}
 
+$pages = $xml->createElement("pages");
+foreach($application->getPages() as $page){
+  $pages->appendChild($this->controller->pageXml($xml, $page));
+}
+$app->appendChild($pages);
 $xml->appendChild($app);
 echo $xml->saveXML();
