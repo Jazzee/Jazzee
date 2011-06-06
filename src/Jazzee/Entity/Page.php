@@ -4,7 +4,10 @@ namespace Jazzee\Entity;
 /** 
  * Page
  * A page is not directly associated with an application - it can be a single case or a global page associated with many applications
- * @Entity @Table(name="pages") 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="pages", 
+ * uniqueConstraints={@UniqueConstraint(name="page_uuid",columns={"uuid"})})
  * @package    jazzee
  * @subpackage orm
  **/
@@ -15,6 +18,9 @@ class Page{
     * @GeneratedValue(strategy="AUTO")
   */
   private $id;
+  
+  /** @Column(type="string") */
+  private $uuid;
   
   /** @Column(type="string") */
   private $title;
@@ -78,6 +84,7 @@ class Page{
     $this->isGlobal = false;
     $this->isRequired = true;
     $this->answerStatusDisplay = false;
+    $this->replaceUuid();
   }
   
   /**
@@ -90,6 +97,15 @@ class Page{
   }
   
   /**
+   * Get uuid
+   *
+   * @return string $uuid
+   */
+  public function getUuid(){
+    return $this->uuid;
+  }
+  
+  /**
    * Generate a Temporary id
    *
    * This should only be used when we need to termporarily generate a page 
@@ -97,6 +113,17 @@ class Page{
    */
   public function tempId(){
     $this->id = uniqid('page');
+  }
+  
+  /**
+   * Replace UUID
+   * @PreUpdate
+   * UUIDs are designed to be permanent.  
+   * You should only replace it if the page is being modified
+   */
+  public function replaceUuid(){
+    $this->uuid = \Foundation\UUID::v4();
+    if($this->parent) $this->parent->replaceUuid();
   }
 
   /**

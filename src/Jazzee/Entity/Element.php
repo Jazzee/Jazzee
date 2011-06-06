@@ -4,7 +4,9 @@ namespace Jazzee\Entity;
 /** 
  * Element
  * Elements are the individual fields on a Page
- * @Entity @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"})}) 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -88,6 +90,16 @@ class Element{
    */
   public function tempId(){
     $this->id = uniqid('element');
+  }
+  
+  /**
+   * Replace Page UUID
+   * @PreUpdate
+   * 
+   * When an element is modified it changes its parents UUID
+   */
+  public function replacePageUuid(){
+    $this->page->replaceUuid();
   }
 
   /**

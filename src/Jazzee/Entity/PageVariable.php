@@ -3,7 +3,9 @@ namespace Jazzee\Entity;
 /** 
  * PageVariable
  * Allow developers to store arbitrary data as a PageVariable so we don't need new tables for every new ApplyPage type
- * @Entity @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="pagevariable_name", columns={"page_id", "name"})}) 
+ * @Entity
+ * @HasLifecycleCallbacks 
+ * @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="pagevariable_name", columns={"page_id", "name"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -34,6 +36,16 @@ class PageVariable{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Replace Page UUID
+   * @PreUpdate
+   * 
+   * When a variable is modified it changes its parents UUID
+   */
+  public function replacePageUuid(){
+    $this->page->replaceUuid();
   }
   
   /**

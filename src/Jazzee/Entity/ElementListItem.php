@@ -4,7 +4,9 @@ namespace Jazzee\Entity;
 /** 
  * ElementListItem
  * Elements like selects and checkboxes have list items
- * @Entity @Table(name="element_list_items") 
+ * @Entity
+ * @HasLifecycleCallbacks
+ * @Table(name="element_list_items") 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -48,6 +50,16 @@ class ElementListItem{
    */
   public function tempId(){
     $this->id = uniqid('item');
+  }
+  
+  /**
+   * Replace Page UUID
+   * @PreUpdate
+   * 
+   * When an list items is modified it changes its page's UUID
+   */
+  public function replacePageUuid(){
+    $this->element->replacePageUuid();
   }
   
   /**
