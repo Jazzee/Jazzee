@@ -41,6 +41,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
    */
   public function pageXml(DOMDocument $dom, $page){
     $pxml = $dom->createElement('page');
+    $pxml->setAttribute('title', $page->getTitle());
     $pxml->setAttribute('min', $page->getMin());
     $pxml->setAttribute('max', $page->getMax());
     $pxml->setAttribute('required', $page->isRequired());
@@ -60,7 +61,8 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
     
     $elements = $pxml->appendChild($dom->createElement('elements'));
     foreach($page->getElements() as $element){
-      $exml = $dom->createElement('page');
+      $exml = $dom->createElement('element');
+      $exml->setAttribute('title', $element->getTitle());
       $exml->setAttribute('class', $element->getType()->getClass());
       $exml->setAttribute('fixedId', $element->getFixedId());
       $exml->setAttribute('weight', $element->getWeight());
