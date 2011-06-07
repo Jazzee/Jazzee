@@ -51,19 +51,21 @@ class Standard extends AbstractPage {
   }
   
   public function newAnswer($input){
-    $answer = new \Jazzee\Entity\Answer();
-    $answer->setPage($this->_applicationPage->getPage());
-    $answer->setApplicant($this->_applicant);
-    foreach($this->_applicationPage->getPage()->getElements() as $element){
-      foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
-        $answer->addElementAnswer($elementAnswer);
+    if(is_null($this->_applicationPage->getMax()) or count($this->getAnswers()) < $this->_applicationPage->getMax()){
+      $answer = new \Jazzee\Entity\Answer();
+      $answer->setPage($this->_applicationPage->getPage());
+      $this->_applicant->addAnswer($answer);
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $answer->addElementAnswer($elementAnswer);
+        }
       }
+      $this->_form->applyDefaultValues();
+      $this->_controller->getEntityManager()->persist($answer);
+      $this->_controller->addMessage('success', 'Answered Saved Successfully');
+      //flush here so the answerId will be correct when we view
+      $this->_controller->getEntityManager()->flush();
     }
-    $this->_form->applyDefaultValues();
-    $this->_controller->getEntityManager()->persist($answer);
-    $this->_controller->addMessage('success', 'Answered Saved Successfully');
-    //flush here so the answerId will be correct when we view
-    $this->_controller->getEntityManager()->flush();
   }
   
   public function updateAnswer($input, $answerId){

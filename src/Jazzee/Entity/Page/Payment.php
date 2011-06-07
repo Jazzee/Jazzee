@@ -64,7 +64,7 @@ class Payment extends Standard {
   public function newAnswer($input){
     $answer = new \Jazzee\Entity\Answer();
     $answer->setPage($this->_applicationPage->getPage());
-    $answer->setApplicant($this->_applicant);
+    $this->_applicant->addAnswer($answer);
     $payment = new \Jazzee\Entity\Payment();
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
 
