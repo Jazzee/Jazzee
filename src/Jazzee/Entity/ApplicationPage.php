@@ -155,6 +155,7 @@ class ApplicationPage
    * @param string $value
    */
   public function setMin($value){
+    if(empty($value)) $value = null;
     if(!$this->page->isGlobal()) $this->page->setMin($value);
     else $this->min = $value;
   }
@@ -173,6 +174,7 @@ class ApplicationPage
    * @param string $value
    */
   public function setMax($value){
+    if(empty($value)) $value = null;
     if(!$this->page->isGlobal()) $this->page->setMax($value);
     else $this->max = $value;
   }
@@ -241,6 +243,7 @@ class ApplicationPage
    * @param string $value
    */
   public function setInstructions($value){
+    if(empty($value)) $value = null;
     if(!$this->page->isGlobal()) $this->page->setInstructions($value);
     else $this->instructions = $value;
   }
@@ -259,6 +262,7 @@ class ApplicationPage
    * @param string $value
    */
   public function setLeadingText($value){
+    if(empty($value)) $value = null;
     if(!$this->page->isGlobal()) $this->page->setLeadingText($value);
     else $this->leadingText = $value;
   }
@@ -277,6 +281,7 @@ class ApplicationPage
    * @param string $value
    */
   public function setTrailingText($value){
+    if(empty($value)) $value = null;
     if(!$this->page->isGlobal()) $this->page->setTrailingText($value);
     else $this->trailingText = $value;
   }

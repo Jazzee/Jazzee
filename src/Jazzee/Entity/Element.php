@@ -162,6 +162,7 @@ class Element{
    * @param string $format
    */
   public function setFormat($format){
+    if(empty($format)) $format = null;
     $this->format = $format;
   }
 
@@ -180,6 +181,7 @@ class Element{
    * @param decimal $min
    */
   public function setMin($min){
+    if(empty($min)) $min = null;
     $this->min = $min;
   }
 
@@ -198,6 +200,7 @@ class Element{
    * @param decimal $max
    */
   public function setMax($max){
+    if(empty($max)) $max = null;
     $this->max = $max;
   }
 
@@ -238,6 +241,7 @@ class Element{
    * @param text $instructions
    */
   public function setInstructions($instructions){
+    if(empty($instructions)) $instructions = null;
     $this->instructions = $instructions;
   }
 
@@ -256,6 +260,7 @@ class Element{
    * @param string $defaultValue
    */
   public function setDefaultValue($defaultValue){
+    if(empty($defaultValue)) $defaultValue = null;
     $this->defaultValue = $defaultValue;
   }
 

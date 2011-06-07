@@ -172,6 +172,7 @@ class Page{
    * @param integer $min
    */
   public function setMin($min){
+    if(empty($min)) $min = null;
     $this->min = $min;
   }
 
@@ -190,6 +191,7 @@ class Page{
    * @param integer $max
    */
   public function setMax($max){
+    if(empty($max)) $max = null;
     $this->max = $max;
   }
 
@@ -252,6 +254,7 @@ class Page{
    * @param text $instructions
    */
   public function setInstructions($instructions){
+    if(empty($instructions)) $instructions = null;
     $this->instructions = $instructions;
   }
 
@@ -270,6 +273,7 @@ class Page{
    * @param text $leadingText
    */
   public function setLeadingText($leadingText){
+    if(empty($leadingText)) $leadingText = null;
     $this->leadingText = $leadingText;
   }
 
@@ -288,6 +292,7 @@ class Page{
    * @param text $trailingText
    */
   public function setTrailingText($trailingText){
+    if(empty($trailingText)) $trailingText = null;
     $this->trailingText = $trailingText;
   }
 
