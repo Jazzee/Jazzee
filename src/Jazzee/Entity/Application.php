@@ -78,7 +78,7 @@ class Application{
   public function __construct(){
     $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->publised = false;
+    $this->published = false;
     $this->visible = false;
   }
   
