@@ -13,7 +13,7 @@ $page->getJazzeePage()->setApplicant($applicant);
           <th>Recommender</th>
           <?php foreach($page->getPage()->getChildren()->first()->getElements() as $element){?><th><?php print $element->getTitle() ?></th><?php }?>
           <th>Status</th>
-          <?php if($page->getJazzeePage()->allowAttachments()){?><th>Attachment</th><?php }?>
+          <th>Attachment</th>
           <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer') or $this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')){ ?><th>Tools</th><?php }?>
         </tr>
       </thead>
