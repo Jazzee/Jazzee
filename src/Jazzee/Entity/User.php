@@ -66,21 +66,21 @@ class User{
   }
 
   /**
-   * Set eduPersonPrincipalName
+   * Set uniqueName
    *
-   * @param string $eduPersonPrincipalName
+   * @param string $uniqueName
    */
-  public function setEduPersonPrincipalName($eduPersonPrincipalName){
-    $this->eduPersonPrincipalName = $eduPersonPrincipalName;
+  public function setUniqueName($uniqueName){
+    $this->uniqueName = $uniqueName;
   }
 
   /**
-   * Get eduPersonPrincipalName
+   * Get uniqueName
    *
-   * @return string $eduPersonPrincipalName
+   * @return string $uniqueName
    */
-  public function getEduPersonPrincipalName(){
-    return $this->eduPersonPrincipalName;
+  public function getUniqueName(){
+    return $this->uniqueName;
   }
 
   /**
