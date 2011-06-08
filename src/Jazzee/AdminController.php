@@ -16,6 +16,12 @@ abstract class AdminController extends Controller{
   const PATH = null;
   
   /**
+   * AdminAuthentication Class
+   * @var \Jazzee\AdminAuthentication
+   */
+  protected $_adminAuthentication;
+  
+  /**
    * The user
    * @var \Jazzee\Entity\User
    */
@@ -52,10 +58,10 @@ abstract class AdminController extends Controller{
     parent::__construct();
     $this->layout = 'wide';
     $class = $this->_config->getAdminAuthenticationClass();
-    $adminAuth = new $class($this->_em);
-    if(!($adminAuth instanceof AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthInterface.');
+    $this->_adminAuthentication = new $class($this->_em);
+    if(!($this->_adminAuthentication instanceof AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthentication Interface.');
     
-    if(!$adminAuth->isValidUser()){
+    if(!$this->_adminAuthentication->isValidUser()){
       //send a 401 not authorized error
       $request = new \Lvc_Request();
       $request->setControllerName('error');
@@ -67,7 +73,7 @@ abstract class AdminController extends Controller{
       $fc->processRequest($request);
       exit();
     }
-    $this->_user = $adminAuth->getUser();
+    $this->_user = $this->_adminAuthentication->getUser();
     $store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     if($this->_config->getAdminSessionLifetime()){
       setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime());
