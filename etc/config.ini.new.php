@@ -73,3 +73,7 @@ localBootstrap=
 ;Recaptch keys are free - go to http://www.google.com/recaptcha
 recaptchaPrivateKey=
 recaptchaPublicKey=
+
+;admin authentication class
+;admin authentication is replacable by any class which implement AdminAuthInterface
+adminAuthenticationClass=

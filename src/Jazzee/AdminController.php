@@ -51,15 +51,23 @@ abstract class AdminController extends Controller{
   public final function __construct(){
     parent::__construct();
     $this->layout = 'wide';
-    $as = new \SimpleSAML_Auth_Simple('default-sp');
-    $as->requireAuth();
-    $attrs = $as->getAttributes();
-    if (!isset($attrs['eduPersonPrincipalName'][0])) throw new Exception('eduPersonPrincipalName attribute is missing from authentication source.');
-    $this->_user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('eduPersonPrincipalName'=>$attrs['eduPersonPrincipalName'][0]));
-    $this->_user->setFirstName($attrs['givenName'][0]);
-    $this->_user->setLastName($attrs['sn'][0]);
-    $this->_user->setEmail($attrs['mail'][0]);
-    $this->_em->persist($this->_user);
+    $class = $this->_config->getAdminAuthenticationClass();
+    $adminAuth = new $class($this->_em);
+    if(!($adminAuth instanceof AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthInterface.');
+    
+    if(!$adminAuth->isValidUser()){
+      //send a 401 not authorized error
+      $request = new \Lvc_Request();
+      $request->setControllerName('error');
+      $request->setActionName('index');
+      $request->setActionParams(array('error' => '401', 'message'=>'We were able to log you in successfully, however you do not have permission to access the system.'));
+    
+      // Get a new front controller without any routers, and have it process our handmade request.
+      $fc = new \Lvc_FrontController();
+      $fc->processRequest($request);
+      exit();
+    }
+    $this->_user = $adminAuth->getUser();
     $store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     if($this->_config->getAdminSessionLifetime()){
       setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime());

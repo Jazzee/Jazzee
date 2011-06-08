@@ -11,7 +11,6 @@
 $src = realpath(__DIR__ . '/..');
 
 require_once($src . '/lib/foundation/src/foundation.php');
-require_once('/usr/share/simplesamlphp/lib/_autoload.php');
 $classLoader = new Doctrine\Common\ClassLoader('Jazzee', $src . '/src');
 $classLoader->register();
 

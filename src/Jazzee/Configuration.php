@@ -143,6 +143,11 @@ protected $_localBootstrap;
  */
 protected $_maximumApplicantFileUpload;
 
+/**
+ * @var string
+ */
+protected $_adminAuthenticationClass;
+
   /**
    * Construct
    * Load data from the ini file
@@ -620,6 +625,22 @@ protected $_maximumApplicantFileUpload;
    */
   public function setMaximumApplicantFileUpload($maximumApplicantFileUpload) {
     $this->_maximumApplicantFileUpload = $maximumApplicantFileUpload;
+  }
+  
+  /**
+   * get adminAuthClass
+   * @return string
+   */
+  public function getAdminAuthenticationClass() {
+    return $this->_adminAuthClass;
+  }
+  
+  /**
+   * set adminAuthClass
+   * @var string $adminAuthClass
+   */
+  public function setAdminAuthenticationClass($adminAuthClass) {
+    $this->_adminAuthClass = $adminAuthClass;
   }
 
 }

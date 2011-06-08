@@ -6,7 +6,7 @@ namespace Jazzee\Entity;
  * Admin users details
  * @Entity(repositoryClass="\Jazzee\Entity\UserRepository")
  * @Table(name="users", 
- * uniqueConstraints={@UniqueConstraint(name="user_eppn",columns={"eduPersonPrincipalName"})})
+ * uniqueConstraints={@UniqueConstraint(name="user_name",columns={"uniqueName"})})
  * @package    jazzee
  * @subpackage orm
  **/
@@ -19,10 +19,10 @@ class User{
   private $id;
   
   /**
-   * Unique eduPersonPrincipalName for use with SAML authentication
+   * Unique name for use with federated authentication
    * @Column(type="string") 
    * */
-  private $eduPersonPrincipalName;
+  private $uniqueName;
   
   /** @Column(type="string", nullable="true") */
   private $email;
