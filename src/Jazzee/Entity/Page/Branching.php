@@ -61,7 +61,7 @@ class Branching extends Standard
     if(is_null($this->_applicationPage->getMax()) or count($this->getAnswers()) < $this->_applicationPage->getMax()){
       $answer = new \Jazzee\Entity\Answer();
       $answer->setPage($this->_applicationPage->getPage());
-      $answer->setApplicant($this->_applicant);
+      $this->_applicant->addAnswer($answer);
       $childAnswer = new \Jazzee\Entity\Answer;
       $childAnswer->setPage($answer->getPage()->getChildById($input->get('branching')));
       $answer->addChild($childAnswer);
@@ -74,8 +74,8 @@ class Branching extends Standard
     
       $this->_form = $this->makeForm();
       $this->_form->applyDefaultValues();
-      $this->_controller->getEntityManager()->persist($childAnswer);
       $this->_controller->getEntityManager()->persist($answer);
+      $this->_controller->getEntityManager()->persist($childAnswer);
       $this->_controller->addMessage('success', 'Answered Saved Successfully');
       //flush here so the answerId will be correct when we view
       $this->_controller->getEntityManager()->flush();

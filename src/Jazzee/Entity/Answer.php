@@ -359,7 +359,10 @@ class Answer{
    */
   public function markLastUpdate(){
       $this->updatedAt = new \DateTime();
-      $this->applicant->markLastUpdate();
+      if($this->applicant) //child pages dont have direct links to the application
+        $this->applicant->markLastUpdate();
+      if($this->parent) //child pages should update their parents
+        $this->parent->markLastUpdate();
   }
   
   /**
