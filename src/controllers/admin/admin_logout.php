@@ -15,16 +15,34 @@ class AdminLogoutController extends \Jazzee\AdminController {
    * Display index
    */
   public function actionIndex(){
+    $this->layout = 'default';
+    $this->setLayoutVar('pageTitle', 'Logout');
+    $this->setLayoutVar('layoutTitle', 'Logout');
     $this->_adminAuthentication->logoutUser();
+    $this->_user = null;
   }
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
-    //Check to be sure a valid user object has been set
-    //Any user is allowed access
-    if($user){
-      return true;
+    //anyone can logout
+    return true;
+  }
+  
+  /**
+   * Get the navigation
+   * @return Navigation
+   */
+  public function getNavigation(){
+    $navigation = new \Foundation\Navigation\Container();
+    $menu = new \Foundation\Navigation\Menu();
+    
+    $menu->setTitle('Navigation');
+    if(empty($this->application)){
+      $link = new \Foundation\Navigation\Link('Login');
+      $link->setHref($this->path('admin/welcome'));
+      $menu->addLink($link);
     }
-    return false;
+    $navigation->addMenu($menu);
+    return $navigation;
   }
 }
 ?>
