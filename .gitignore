@@ -1,4 +1,5 @@
 etc/config.ini.php
+etc/simplesaml.ini.php
 etc/noauthentication.ini.php
 build
 var/cache/*
