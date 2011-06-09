@@ -6,6 +6,7 @@
  * @package jazzee
  */
 header("Content-type: application/xml");
+header('Content-Disposition: attachment; filename='. $filename);
 $xml = new DOMDocument();
 $xml->formatOutput = true;
 

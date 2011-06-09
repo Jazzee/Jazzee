@@ -29,6 +29,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $this->setLayout('xml');
+    $this->setLayoutVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . '.xml');
     $this->setVar('application', $this->_application);
   }
   
