@@ -143,7 +143,7 @@ JazzeeEntityPageStandard.prototype.showAnswerStatusBlock = function(){
       pageClass.setProperty('answerStatusDisplay', show);
       if(show == 1){
         var title = $('input[name=title]', this).val();
-        var text = $('input[name=text]', this).val();
+        var text = $('textarea[name=text]', this).val();
       } else {
         var title = null;
         var text = null;
