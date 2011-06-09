@@ -58,6 +58,7 @@ PageStore.prototype.createPageObject = function(obj){
   $(obj.children).each(function(){
     page.addChild(pageStore.createPageObject(this));
   });
+  page.isModified = false; //reset isModified now that we have added cildren and varialbes
   return page;
 };
   
