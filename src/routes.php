@@ -35,6 +35,15 @@ try {
     )
   ));
   
+  //dynmaic files like applicant pdfs and previews stored in sessions
+  $basicRouter->addRoute('#^(?:.*)/?virtualfiles/(.*)$#i', array( 
+    'controller' => 'virtualfile',
+    'action' => 'get',
+    'action_params' => array(
+      'name' => 1
+    )
+  ));
+  
   //the apply page is the actual application
   $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(index|edit|delete)/([0-9]+)(/[0-9]+)?)?$#i', array(
     'controller' => 'apply_page',
