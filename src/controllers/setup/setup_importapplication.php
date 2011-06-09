@@ -40,7 +40,6 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $this->_application = new \Jazzee\Entity\Application();
         $this->_application->setProgram($this->_program);
         $this->_application->setCycle($this->_cycle);
-        $this->_em->persist($this->_application);
       }
       if($this->_application->isPublished()){
         $this->addMessage('error', 'This application is already published.  No changes can be made.');
@@ -72,6 +71,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
             $this->_em->persist($applicationPage);
         }
       }
+      $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application imported successfully');
     }
     
@@ -102,6 +102,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         if ($node instanceof DOMElement && $node->tagName == "element") {
           $element = new \Jazzee\Entity\Element;
           $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class'=>$node->getAttribute('class'))));
+          if($node->getAttribute('fixedId')) $element->setFixedId($node->getAttribute('fixedId'));
           $element->setTitle($node->getAttribute('title'));
           $element->setMin($node->getAttribute('min'));
           $element->setMax($node->getAttribute('max'));
