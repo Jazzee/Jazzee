@@ -18,7 +18,7 @@ class SetupUsersController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('admin/setup/users'));
+    $form->setAction($this->path('setup/users'));
     $field = $form->newField();
     $field->setLegend('Search For New');
     $element = $field->newElement('TextInput','firstName');
@@ -46,7 +46,7 @@ class SetupUsersController extends \Jazzee\AdminController {
    public function actionProgramRoles($userID){ 
     if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
       $form = new \Foundation\Form();
-      $form->setAction($this->path('admin/setup/users/programRoles/' . $userID));
+      $form->setAction($this->path('setup/users/programRoles/' . $userID));
       $field = $form->newField();
       $field->setLegend('Roles for ' . $user->getFirstName() . ' ' . $user->getLastName());
 
@@ -72,7 +72,7 @@ class SetupUsersController extends \Jazzee\AdminController {
         }
         $this->_em->persist($user);
         $this->addMessage('success', "Changes Saved Successfully");
-        $this->redirectPath('admin/setup/users');
+        $this->redirectPath('setup/users');
       }
     } else {
       $this->addMessage('error', "Error: User #{$userID} does not exist.");

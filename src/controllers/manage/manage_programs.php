@@ -29,7 +29,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
     if($program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($programID)){
       $form = new \Foundation\Form();
       
-      $form->setAction($this->path("admin/manage/programs/edit/{$programID}"));
+      $form->setAction($this->path("manage/programs/edit/{$programID}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $program->getName() . ' program');
       $element = $field->newElement('TextInput','name');
@@ -63,7 +63,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
    */
    public function actionNew(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("admin/manage/programs/new"));
+    $form->setAction($this->path("manage/programs/new"));
     $field = $form->newField();
     $field->setLegend('New Program');
     $element = $field->newElement('TextInput','name');
@@ -84,7 +84,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
       $program->setShortName($input->get('shortName'));
       $this->addMessage('success', "New Program Saved");
       $this->_em->persist($program);
-      $this->redirectPath('admin/manage/programs');
+      $this->redirectPath('manage/programs');
     }
   }
 }

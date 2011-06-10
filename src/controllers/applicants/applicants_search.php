@@ -17,7 +17,7 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('admin/applicants/search'));
+    $form->setAction($this->path('applicants/search'));
     $field = $form->newField();
     $field->setLegend('Search Applicants');
     $element = $field->newElement('TextInput','firstName');

@@ -19,7 +19,7 @@ class ManageScoresController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('admin/manage/scores'));
+    $form->setAction($this->path('manage/scores'));
     $field = $form->newField();
     $field->setLegend('Import Scores');
     
@@ -115,7 +115,7 @@ class ManageScoresController extends \Jazzee\AdminController {
       $this->_em->persist($score);
     }
     $this->addMessage('success', count($scores) . " scores read from file, {$new} of them were new.");
-    $this->redirectPath('admin/manage/scores');
+    $this->redirectPath('manage/scores');
   }
   
   /**
@@ -258,7 +258,7 @@ class ManageScoresController extends \Jazzee\AdminController {
       }
     }
     $this->addMessage('success', count($scores) . " scores read from file, {$new} of them were new.");
-    $this->redirectPath('admin/manage/scores');
+    $this->redirectPath('manage/scores');
   }
   
   /**

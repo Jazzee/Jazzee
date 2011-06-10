@@ -28,7 +28,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
    public function actionEdit($elementTypeID){ 
     if($elementType =$this->_em->getRepository('\Jazzee\Entity\ElementType')->find($elementTypeID)){
       $form = new \Foundation\Form();
-      $form->setAction($this->path("admin/manage/elementtypes/edit/{$elementTypeID}"));
+      $form->setAction($this->path("manage/elementtypes/edit/{$elementTypeID}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $elementType->getName() . ' element type');
       $element = $field->newElement('TextInput','name');
@@ -42,7 +42,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
         $elementType->setName($input->get('name'));
         $this->addMessage('success', "Changes Saved");
         $this->_em->persist($elementType);
-        $this->redirectPath('admin/manage/elementtypes');
+        $this->redirectPath('manage/elementtypes');
       }
     } else {
       $this->addMessage('error', "Error: ElementType #{$elementTypeID} does not exist.");
@@ -54,7 +54,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
    */
   public function actionNew(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("admin/manage/elementtypes/new"));
+    $form->setAction($this->path("manage/elementtypes/new"));
     $field = $form->newField();
     $field->setLegend('New element type');
     $element = $field->newElement('TextInput','name');
@@ -76,7 +76,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
         $elementType->setClass($input->get('class'));
         $this->addMessage('success', $input->get('name') . " saved.");
         $this->_em->persist($elementType);
-        $this->redirectPath('admin/manage/elementtypes');
+        $this->redirectPath('manage/elementtypes');
       } else {
         $this->addMessage('error', "That is not a valid class name.  The class must eithier by loadable by a Doctrine::classLoader registered in the autoload stack or already be included.");
       }

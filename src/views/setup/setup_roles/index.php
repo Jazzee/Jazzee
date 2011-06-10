@@ -12,7 +12,7 @@ if($roles): ?>
   <?php foreach($roles as $role): ?>
   <li><?php print $role->getName() ?>
     <?php if($this->controller->checkIsAllowed('setup_roles', 'edit')): ?>
-      (<a href='<?php print $this->path('admin/setup/roles/edit/') . $role->getId()?>'>Edit</a>)
+      (<a href='<?php print $this->path('setup/roles/edit/') . $role->getId()?>'>Edit</a>)
     <?php endif;?>
     
   </li>
@@ -20,5 +20,5 @@ if($roles): ?>
   </ul>
 <?php endif; ?>
 <?php if($this->controller->checkIsAllowed('setup_roles', 'new')): ?>
-  <p><a href='<?php print $this->path('admin/setup/roles/new')?>'>Add a new role</a></p>
+  <p><a href='<?php print $this->path('setup/roles/new')?>'>Add a new role</a></p>
 <?php endif;?>

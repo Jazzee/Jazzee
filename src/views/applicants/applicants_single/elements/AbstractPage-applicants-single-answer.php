@@ -14,9 +14,9 @@
 <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer')){ ?>
   <td>
     <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer')){ ?>
-      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='editAnswer'>Edit</a><br />     
+      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='editAnswer'>Edit</a><br />     
     <?php } ?><?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')){ ?>
-      <a href='<?php print $this->path('admin/applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId());?>' class='deleteAnswer'>Delete</a><br />     
+      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId());?>' class='deleteAnswer'>Delete</a><br />     
     <?php } ?>
   </td>
 <?php }?>

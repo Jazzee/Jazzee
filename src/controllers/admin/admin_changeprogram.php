@@ -17,7 +17,7 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('admin/changeprogram'));
+    $form->setAction($this->path('changeprogram'));
     $field = $form->newField();
     $field->setLegend('Select Program');
     $element = $field->newElement('SelectList','program');
@@ -48,7 +48,7 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
         $this->addMessage('success', 'Default program changed to ' . $this->_program->getName());
       }
       $this->addMessage('success', 'Program changed to ' . $this->_program->getName());
-      $this->redirectPath('admin/welcome');
+      $this->redirectPath('welcome');
     }
     
     $this->setVar('form', $form);

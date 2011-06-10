@@ -13,7 +13,7 @@ $this->renderElement('form', array('form'=>$form));?>
   <?php foreach($results as $user): ?>
   <li><?php print $user->getLastName() . ', ' . $user->getFirstName() . ' (' . $user->getEmail() . ')' ?> 
     <?php if($this->controller->checkIsAllowed('manage_users', 'edit')): ?>
-    (<a href='<?php print $this->path('admin/setup/users/programRoles/') . $user->getId()?>'>Edit</a>)
+    (<a href='<?php print $this->path('setup/users/programRoles/') . $user->getId()?>'>Edit</a>)
     <?php endif;?>
   </li>
   <?php endforeach;?>
@@ -26,7 +26,7 @@ $this->renderElement('form', array('form'=>$form));?>
   <?php foreach($users as $user): ?>
   <li><?php print $user->getLastName() . ', ' . $user->getFirstName() . ' (' . $user->getEmail() . ')' ?> 
     <?php if($this->controller->checkIsAllowed('manage_users', 'edit')): ?>
-    (<a href='<?php print $this->path('admin/setup/users/programRoles/') . $user->getId()?>'>Edit</a>)
+    (<a href='<?php print $this->path('setup/users/programRoles/') . $user->getId()?>'>Edit</a>)
     <?php endif;?>
   </li>
   <?php endforeach;?>

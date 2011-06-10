@@ -171,7 +171,7 @@ abstract class AdminController extends Controller{
             $navigation->addMenu($menus[$class::MENU]);
           }
           $link = new \Foundation\Navigation\Link($class::TITLE);
-          $link->setHref($this->path('admin/' . $class::PATH));
+          $link->setHref($this->path($class::PATH));
           $menus[$class::MENU]->addLink($link);
         }
       }

@@ -11,7 +11,7 @@ if($paymentTypes): ?>
   <?php foreach($paymentTypes as $type): ?>
   <li><?php print $type->getName() ?>
     <?php if($this->controller->checkIsAllowed('manage_paymenttypes', 'edit')): ?>
-      (<a href='<?php print $this->path('admin/manage/paymenttypes/edit/') . $type->getId()?>'>Edit</a>)
+      (<a href='<?php print $this->path('manage/paymenttypes/edit/') . $type->getId()?>'>Edit</a>)
     <?php endif;?>
     
   </li>
@@ -20,5 +20,5 @@ if($paymentTypes): ?>
 <?php endif; ?>
 
 <?php if($this->controller->checkIsAllowed('manage_paymenttypes', 'new')): ?>
-  <p><a href='<?php print $this->path('admin/manage/paymenttypes/new')?>'>Add a New Payment Type</a></p> 
+  <p><a href='<?php print $this->path('manage/paymenttypes/new')?>'>Add a New Payment Type</a></p> 
 <?php endif;?>

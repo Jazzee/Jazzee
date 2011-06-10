@@ -12,7 +12,7 @@ if($programs): ?>
   <?php foreach($programs as $program): ?>
   <li><?php print $program->getName() ?>
   <?php if($this->controller->checkIsAllowed('manage_programs', 'edit')): ?>
-    (<a href='<?php print $this->path('admin/manage/programs/edit/') . $program->getId()?>'>Edit</a>)
+    (<a href='<?php print $this->path('manage/programs/edit/') . $program->getId()?>'>Edit</a>)
   <?php endif;?>
     
   </li>
@@ -20,5 +20,5 @@ if($programs): ?>
   </ul>
 <?php endif; ?>
 <?php if($this->controller->checkIsAllowed('manage_programs', 'new')): ?>
-  <p><a href='<?php print $this->path('admin/manage/programs/new')?>'>Add a New Program</a></p>
+  <p><a href='<?php print $this->path('manage/programs/new')?>'>Add a New Program</a></p>
 <?php endif;?>

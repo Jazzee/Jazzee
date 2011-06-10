@@ -38,7 +38,7 @@ class AdminLogoutController extends \Jazzee\AdminController {
     $menu->setTitle('Navigation');
     if(empty($this->application)){
       $link = new \Foundation\Navigation\Link('Login');
-      $link->setHref($this->path('admin/welcome'));
+      $link->setHref($this->path('welcome'));
       $menu->addLink($link);
     }
     $navigation->addMenu($menu);

@@ -12,12 +12,12 @@ if($cycles): ?>
   <?php foreach($cycles as $cycle): ?>
   <li><?php print $cycle->getName() ?>
     <?php if($this->controller->checkIsAllowed('manage_cycles', 'edit')): ?>
-    (<a href='<?php print $this->path('admin/manage/cycles/edit/') . $cycle->getId()?>'>Edit</a>)
+    (<a href='<?php print $this->path('manage/cycles/edit/') . $cycle->getId()?>'>Edit</a>)
     <?php endif;?>
   </li>
   <?php endforeach;?>
   </ul>
 <?php endif; ?>
 <?php if($this->controller->checkIsAllowed('manage_cycles', 'new')): ?>
-<p><a href='<?php print $this->path('admin/manage/cycles/new')?>'>Add a New Cycle</a></p>
+<p><a href='<?php print $this->path('manage/cycles/new')?>'>Add a New Cycle</a></p>
 <?php endif;?>

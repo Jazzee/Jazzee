@@ -30,7 +30,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
     if($file = $this->_em->getRepository('\Jazzee\Entity\VirtualFile')->find($fileId)){
       $form = new \Foundation\Form;
       
-      $form->setAction($this->path("admin/manage/virtualfiles/edit/" . $file->getId()));
+      $form->setAction($this->path("manage/virtualfiles/edit/" . $file->getId()));
       $field = $form->newField();
       $field->setLegend('Edit Virtual File: ' . $file->getName());
       $element = $field->newElement('TextInput','name');
@@ -51,7 +51,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
         if($input->get('contents')) $file->setContents($input->get('contents'));
         $this->_em->persist($file);
         $this->addMessage('success', "Changes Saved Successfully");
-        $this->redirectPath('admin/manage/virtualfiles');
+        $this->redirectPath('manage/virtualfiles');
       }
     } else {
       $this->addMessage('error', "Error: File #{$fileId} does not exist.");
@@ -64,7 +64,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
   public function actionNew(){
     $form = new \Foundation\Form;
       
-    $form->setAction($this->path("admin/manage/virtualfiles/new"));
+    $form->setAction($this->path("manage/virtualfiles/new"));
     $field = $form->newField();
     $field->setLegend('New Virtual File');
     $element = $field->newElement('TextInput','name');
@@ -85,7 +85,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
       $file->setContents($input->get('contents'));
       $this->_em->persist($file);
       $this->addMessage('success', "New Virtual File Saved");
-      $this->redirectPath('admin/manage/virtualfiles');
+      $this->redirectPath('manage/virtualfiles');
     }
   }
 }

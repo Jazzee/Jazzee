@@ -17,7 +17,7 @@ class AdminChangecycleController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('admin/changecycle'));
+    $form->setAction($this->path('changecycle'));
     $field = $form->newField();
     $field->setLegend('Select Cycle');
     $element = $field->newElement('SelectList','cycle');
@@ -48,7 +48,7 @@ class AdminChangecycleController extends \Jazzee\AdminController {
         $this->addMessage('success', 'Default cycle changed to ' . $this->_cycle->getName());
       }
       $this->addMessage('success', 'Cycle changed to ' . $this->_cycle->getName());
-      $this->redirectPath('admin/welcome');
+      $this->redirectPath('welcome');
     }
     
     $this->setVar('form', $form);

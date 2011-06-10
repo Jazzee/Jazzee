@@ -28,7 +28,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
    public function actionEdit($pageTypeId){ 
     if($pageType =$this->_em->getRepository('\Jazzee\Entity\PageType')->find($pageTypeId)){
       $form = new \Foundation\Form();
-      $form->setAction($this->path("admin/manage/pagetypes/edit/{$pageTypeId}"));
+      $form->setAction($this->path("manage/pagetypes/edit/{$pageTypeId}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $pageType->getName() . ' page type');
       $element = $field->newElement('TextInput','name');
@@ -42,7 +42,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
         $pageType->setName($input->get('name'));
         $this->addMessage('success', "Changes Saved");
         $this->_em->persist($pageType);
-        $this->redirectPath('admin/manage/pagetypes');
+        $this->redirectPath('manage/pagetypes');
       }
     } else {
       $this->addMessage('error', "Error: PageType #{$elementTypeID} does not exist.");
@@ -54,7 +54,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
    */
   public function actionNew(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("admin/manage/pagetypes/new"));
+    $form->setAction($this->path("manage/pagetypes/new"));
     $field = $form->newField();
     $field->setLegend('New page type');
     $element = $field->newElement('TextInput','name');
@@ -76,7 +76,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
         $pageType->setClass($input->get('class'));
         $this->addMessage('success', $input->get('name') . "  added.");
         $this->_em->persist($pageType);
-        $this->redirectPath('admin/manage/pagetypes');
+        $this->redirectPath('manage/pagetypes');
       }
     }
   }

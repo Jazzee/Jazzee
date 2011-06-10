@@ -18,7 +18,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path("admin/setup/importapplication"));
+    $form->setAction($this->path("setup/importapplication"));
     $field = $form->newField();
     $field->setLegend('Import Application');
     
@@ -40,11 +40,11 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
       }
       if($this->_application->isPublished()){
         $this->addMessage('error', 'This application is already published.  No changes can be made.');
-        $this->redirectPath('admin/setup/importapplication');
+        $this->redirectPath('setup/importapplication');
       }
       if(count($this->_application->getPages())){
         $this->addMessage('error', 'This application already has pages.  You cannot import a configuration for an application with pages.');
-        $this->redirectPath('admin/setup/importapplication');
+        $this->redirectPath('setup/importapplication');
       }
       $preferences = $xml->xpath('/response/application/preferences');
       foreach($preferences[0]->children() as $element){
@@ -81,7 +81,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
       $page = $this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('isGlobal'=>true,'uuid'=>$attributes['globalPageUuid']));
       if(!$page){
         $this->addMessage('error', $xml->getAttribute('title') . ' page in import references global page with uuid '. $xml->getAttribute('globalPageUuid') . ' but this page does not exist.  You need to import it before importing this application.');
-        $this->redirectPath('admin/setup/importapplication');
+        $this->redirectPath('setup/importapplication');
       }
     } else {
       $page = new \Jazzee\Entity\Page();

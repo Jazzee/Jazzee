@@ -20,7 +20,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
     parent::setUp();
     if(!$this->_application){
       $this->addMessage('notice', 'There is no data to export in this application.');
-      $this->redirectPath('admin/welcome');
+      $this->redirectPath('welcome');
     }
   }
   
