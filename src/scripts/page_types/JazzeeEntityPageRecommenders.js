@@ -44,7 +44,8 @@ JazzeeEntityPageRecommenders.prototype.workspace = function(){
   $('#workspace-right-top').append(this.selectListBlock('max','Maximum Recommenders Allows:', max));
   
   $('#workspace-right-top').append(this.textInputVariableBlock('lorDeadline', 'The deadine for submitting recommendations is ', 'the same as the application'));
-  $('#workspace-right-top').append(this.selectListVariableBlock('lorDeadlineEnforced', 'The deadine for recommender is', {'':'Not Enforced',true:'Enforced'}));
+
+  $('#workspace-right-top').append(this.selectListVariableBlock('lorDeadlineEnforced', 'The deadine for recommender is', {0:'Not Enforced',1:'Enforced'}));
   $('#workspace-right-top').append(this.recommendationPageBlock());
   $('#workspace-right-top').append(this.recommenderEmailBlock());
 };

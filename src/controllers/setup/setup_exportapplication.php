@@ -89,7 +89,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
     
     $variables = $pxml->appendChild($dom->createElement('variables'));
     foreach($page->getVariables() as $var){
-      $variable = $dom->createElement('variable', $var->getValue());
+      $variable = $dom->createElement('variable', (string)$var->getValue());
       $variable->setAttribute('name', $var->getName());
       $variables->appendChild($variable);
     } 
