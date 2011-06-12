@@ -148,6 +148,11 @@ protected $_maximumApplicantFileUpload;
  */
 protected $_adminAuthenticationClass;
 
+/**
+ * @var string
+ */
+protected $_publicKeyCertificatePath;
+
   /**
    * Construct
    * Load data from the ini file
@@ -641,6 +646,22 @@ protected $_adminAuthenticationClass;
    */
   public function setAdminAuthenticationClass($adminAuthClass) {
     $this->_adminAuthClass = $adminAuthClass;
+  }
+  
+  /**
+   * get publicKeyCertificatePath
+   * @return string
+   */
+  public function getPublicKeyCertificatePath() {
+    return $this->_publicKeyCertificatePath;
+  }
+  
+  /**
+   * set publicKeyCertificatePath
+   * @var string $publicKeyCertificatePath
+   */
+  public function setPublicKeyCertificatePath($publicKeyCertificatePath) {
+    $this->_publicKeyCertificatePath = $publicKeyCertificatePath;
   }
 
 }

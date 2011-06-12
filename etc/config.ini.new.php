@@ -44,18 +44,20 @@ dbDriver=
 mailServerType=php
 mailServerHost=
 mailServerPort=
-mailServerName=
-mailServerUser=
+mailServerUsername=
 mailServerPassword=
 
 ;The FROM email address to apply by default and to system messages (like logs), if blank mail server will probably apply a default
-mailDefaultFrom=
+mailDefaultFromAddress=
 
 ;If an address was specified above you can also give it a nice name like Jazzee System which will be displayed in most mail clients
-mailDefaultName=
+mailDefaultFromName=
 
 ;If an email addres is specified here all mail will go to that address. Usefull for testing and development environments
-mailOverrideTo=
+mailOverrideToAddress='graduate.administrator@ucsf.edu'
+
+;Nice name for the receipient
+mailOverrideToName='Graduate Administrator'
 
 ;Path to the var directory where sessions, caches, logs etc are stored
 ;This only needs to be changed in development environments where the applicaiton root is over written regularly
@@ -77,3 +79,7 @@ recaptchaPublicKey=
 ;admin authentication class
 ;admin authentication is replacable by any class which implement AdminAuthInterface
 adminAuthenticationClass=
+
+;Public PKI certificate is used in the EncryptedTextInput element
+;For security only the public key should be stored with the application
+publicCertificatePath=
