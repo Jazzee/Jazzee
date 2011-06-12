@@ -7,4 +7,4 @@
  * @subpackage apply
  */
 $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-page');
-$this->renderElement($elementName, array('page'=>$page, 'currentAnswerID'=>$currentAnswerID));
+$this->renderElement($elementName, array('page'=>$page, 'currentAnswerID'=>$currentAnswerID, 'applicant'=>$applicant));
