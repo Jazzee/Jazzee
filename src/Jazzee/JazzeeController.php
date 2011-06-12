@@ -167,8 +167,12 @@ class JazzeeController extends PageController
    * @return string
    */
   protected function getVarPath(){
-    //The var root is the base for storing logs, sessions, cache files, tmp and uploaded files
-    return \realpath($this->_config->getVarPath()?$this->_config->getVarPath():__DIR__ . '/../../var');
+    $path = $this->_config->getVarPath()?$this->_config->getVarPath():__DIR__ . '/../../var';
+    if(!$realPath = \realpath($path) or !\is_dir($realPath) or !\is_writable($realPath)){
+      if($realPath) $path = $realPath; //nicer error message if the path exists
+      throw new Exception("{$path} is not readable by the webserver so we cannot use it as the 'var' directory");
+    }
+    return $realPath;
   }
   
   /**
@@ -268,10 +272,6 @@ class JazzeeController extends PageController
    */
   protected function setupVarPath(){
     $var = $this->getVarPath();
-    if(!\is_dir($var) or !\is_writable($var)){
-      throw new Exception("{$var} is not readable by the webserver so we cannot use it as the 'var' directory");
-    }
-    
     //check to see if all the directories exist and are writable
     $varDirectories = array('log','session','tmp','uploads');
     foreach($varDirectories as $dir){
