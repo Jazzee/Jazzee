@@ -40,6 +40,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $this->_path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_page->getId();
     $this->setVar('page', $this->_page);
     $this->setVar('currentAnswerID', false);
+    $this->setVar('applicant', $this->_applicant);
   }
   
   /**
