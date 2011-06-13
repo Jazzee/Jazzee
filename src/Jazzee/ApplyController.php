@@ -34,7 +34,7 @@ class ApplyController extends Controller
     ){
       //Not authenticated 
       $this->addMessage('error', "You are not logged in or your session has expired.  Please log in again");
-      $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login/");
+      $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login");
     }
     $this->_applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($store->applicantID);
     $this->_application = $this->_applicant->getApplication();
