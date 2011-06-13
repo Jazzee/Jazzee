@@ -77,7 +77,7 @@ class ManageRolesController extends \Jazzee\AdminController {
         }
         $this->_em->persist($role);
         $this->addMessage('success', "Role Saved Successfully");
-        $this->redirectPath('manage/roles/');
+        $this->redirectPath('manage/roles');
       }
     } else {
       $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
@@ -103,7 +103,7 @@ class ManageRolesController extends \Jazzee\AdminController {
       $role->setName($input->get('name'));
       $this->_em->persist($role);
       $this->addMessage('success', "Role Saved Successfully");
-      $this->redirectPath('manage/roles/');
+      $this->redirectPath('manage/roles');
     }
   }
   

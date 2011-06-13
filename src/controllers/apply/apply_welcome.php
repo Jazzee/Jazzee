@@ -87,15 +87,15 @@ class ApplyWelcomeController extends \Jazzee\Controller {
       
       $menu->addLink($link); 
       $link = new \Foundation\Navigation\Link('Other Cycles');
-      $link->setHref($this->path('apply/' . $this->program->getShortName() . '/'));
+      $link->setHref($this->path('apply/' . $this->program->getShortName()));
       $menu->addLink($link);
       
       $link = new \Foundation\Navigation\Link('Returning Applicants');
-      $link->setHref($this->path($path . '/applicant/login/'));
+      $link->setHref($this->path($path . '/applicant/login'));
       $menu->addLink($link);
       
       $link = new \Foundation\Navigation\Link('Start a New Application');
-      $link->setHref($this->path($path . '/applicant/new/'));
+      $link->setHref($this->path($path . '/applicant/new'));
       $menu->addLink($link);
     }
     $navigation->addMenu($menu);
