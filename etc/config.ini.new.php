@@ -23,8 +23,8 @@ adminAuthenticationClass=
 ;#Uncomment and set the options for the authentication type you have selected
 
 ;##NoAuthentication##;
-;userId=0
-;ipAddresses='127.0.0.1'
+;noAuthUserId=0
+;noAuthIpAddresses='127.0.0.1'
 
 ;##SimpleSAML##;
 ;#include path for simplesamle autoloader
@@ -33,12 +33,12 @@ adminAuthenticationClass=
 ;#firstname attribute name
 ;#last anme attribute name
 ;#email address attribute name
-;includePath=
-;authenticationSource='default-sp'
-;usernameAttribute='eduPersonPrincipalName'
-;firstNameAttribute='givenName'
-;lastNameAttribute='sn'
-;emailAddressAttribute='mail'
+;simpleSAMLIncludePath=
+;simpleSAMLAuthenticationSource='default-sp'
+;simpleSAMLUsernameAttribute='eduPersonPrincipalName'
+;simpleSAMLFirstNameAttribute='givenName'
+;simpleSAMLLastNameAttribute='sn'
+;simpleSAMLEmailAddressAttribute='mail'
 
 
 ;### MAIL SERVER ###;
