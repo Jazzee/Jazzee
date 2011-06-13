@@ -36,7 +36,7 @@ class Standard extends AbstractPage {
     if(!$this->_applicationPage->isRequired()){
       $answer = new \Jazzee\Entity\Answer();
       $answer->setPage($this->_applicationPage->getPage());
-      $answer->setApplicant($this->_applicant);
+      $this->_applicant->addAnswer($answer);
       $answer->setPageStatus(self::SKIPPED);
       $this->_controller->getEntityManager()->persist($answer);
     }
