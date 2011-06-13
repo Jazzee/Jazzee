@@ -1,85 +1,90 @@
-;This file was auto generated during the jazzee installation.
-;The syntax of the file is extremely simple. Whitespace and Lines
-;beginning with a semicolon are silently ignored (as you probably guessed).
-;Section headers (e.g. [Foo]) are also silently ignored, even though
-;they might mean something in the future.
+;PHP ini file for Jazzee Configuration
+;Many of these items are optional and have been commented out
+;In places where a default is usefull it is selected
 
-;Directives are specified using the following syntax:
-;directive = value
-;Directive names are *case sensitive* - foo=bar is different from FOO=bar.
 
-;The value can be a string, a number, a PHP constant (e.g. E_ALL or M_PI), one
-;of the INI constants (On, Off, True, False, Yes, No and None) or an expression
-;(e.g. E_ALL ~E_NOTICE), or a quoted string ("foo").
-
-;Mode is used to controll access to a production jazzee installation
-;There are three possible levels
-;LIVE - No access Controll
-;SOFT - GET Requests are redirected to the maintence page, but POST requests are saved before they are redirected
-;DOWN - ALL requests are redirected to the maintence page. No database access
-mode=LIVE
-
-;There are three status levels available which controll things like log output
-; and payment processing:
-;PRODUCTION - Live jazzee site open to the public
-;PREVIEW - Open to testers and internal users only
-;DEVELOPMENT - Open only to developers. Logs and other dangerous information available on screen
-status=PRODUCTION
-
-;Force HTTPS connection and secure cookies. Should only be disabled on internal development sites when SSL is not available.
-;On productions systems it is also a good idea to reidrect non-secure traffic at the webserver level to ensure no data is transmitted in the clear.
-forceSSL=on
-
-;Database connection details
-;Details at http://www.doctrine-project.org/docs/dbal/2.0/en/reference/configuration.html
+;### DATABASE CONNECTION ###;
+;#specifics and allowed options at http://www.doctrine-project.org/docs/dbal/2.0/en/reference/configuration.html
 dbHost=
-dbPort=
+;dbPort=
 dbName=
 dbUser=
 dbPassword=
 dbDriver=
 
-;Server/account to send email from
-;type must be one of 'php','sendmail','smtp','smtp+ssl'
-mailServerType=php
-mailServerHost=
-mailServerPort=
-mailServerUsername=
-mailServerPassword=
 
-;The FROM email address to apply by default and to system messages (like logs), if blank mail server will probably apply a default
-mailDefaultFromAddress=
-
-;If an address was specified above you can also give it a nice name like Jazzee System which will be displayed in most mail clients
-mailDefaultFromName=
-
-;If an email addres is specified here all mail will go to that address. Usefull for testing and development environments
-mailOverrideToAddress='graduate.administrator@ucsf.edu'
-
-;Nice name for the receipient
-mailOverrideToName='Graduate Administrator'
-
-;Path to the var directory where sessions, caches, logs etc are stored
-;This only needs to be changed in development environments where the applicaiton root is over written regularly
-varPath=
-
-;A comma seperated list of email addresses that critical system events should be sent to.
-adminEmail=
-
-;The timezone this machine is located in. A list of supported options can be found at http://php.net/manual/en/timezones.php
-timezone=
-
-;Call this bootstrap file to load local customizations.
-localBootstrap=
-
-;Recaptch keys are free - go to http://www.google.com/recaptcha
-recaptchaPrivateKey=
-recaptchaPublicKey=
-
-;admin authentication class
-;admin authentication is replacable by any class which implement AdminAuthInterface
+;### ADMIN AUTHENTICATION ###;
+;#admin authentication is replacable by any class which implements AdminAuthInterface
+;#there are buit in classes for Shibboleth and simplesaml 
+;#there is also a dangerous developement type called NoAuthentication that can be used for development
+;#Builtin options: '\Jazzee\AdminAuthentication\SimpleSAML', '\Jazzee\AdminAuthentication\Shibboleth', '\Jazzee\AdminAuthentication\NoAuthentication'
 adminAuthenticationClass=
 
-;Public PKI certificate is used in the EncryptedTextInput element
-;For security only the public key should be stored with the application
-publicCertificatePath=
+;#Uncomment and set the options for the authentication type you have selected
+
+;##NoAuthentication##;
+;userId=0
+;ipAddresses='127.0.0.1'
+
+;##SimpleSAML##;
+;#include path for simplesamle autoloader
+;#authentication source
+;#username attribute name
+;#firstname attribute name
+;#last anme attribute name
+;#email address attribute name
+;includePath=
+;authenticationSource='default-sp'
+;usernameAttribute='eduPersonPrincipalName'
+;firstNameAttribute='givenName'
+;lastNameAttribute='sn'
+;emailAddressAttribute='mail'
+
+
+;### MAIL SERVER ###;
+;#Server/account to send email from
+;#type must be one of 'php','sendmail','smtp','smtp+ssl'
+mailServerType=php
+;mailServerHost=
+;mailServerPort=
+;mailServerUsername=
+;mailServerPassword=
+
+;#The FROM email address to apply by default and to messages without a sender (like logs)
+;#if blank mail server will probably apply a default based on your hostname
+;#if you speicify an address you can also specify a nice name like 'Jazzee System'
+;mailDefaultFromAddress=
+;mailDefaultFromName=
+
+;#Email address for system events and logs to be sent to
+;adminEmail=
+
+;### MISC OPTIONS ###;
+;#Recaptch keys are free - go to http://www.google.com/recaptcha
+;recaptchaPrivateKey=
+;recaptchaPublicKey=
+
+;#Public OPENSSL PKI certificate is used to encrypt applicant input for especially sensitive data like SSNs
+;#For security only the public key should be stored on the Jazzee System and decryption should happen offline
+;publicKeyCertificatePath=
+
+;#Mode is used to controll access to a production jazzee installation
+;#There are three possible levels
+;#LIVE - No access Controll
+;#MAINTENANCE - ALL requests are redirected to the maintence page. No database access
+mode=LIVE
+;maintenanceMessage=
+
+;### DEVELOPMENT OPTIONS ###;
+;#There are three status levels available which controll things like log output and payment processing:
+;#PRODUCTION - Live jazzee site open to the public
+;#PREVIEW - Open to testers and internal users only - some things like recommendation emails get routed differently and payments are in testing mode
+;#DEVELOPMENT - Open only to developers. Logs and other dangerous information available on screen
+status=PRODUCTION
+
+;#Path to the var directory where sessions, caches, logs etc are stored
+;#This only needs to be changed in development environments where the applicaiton root is over written regularly
+;varPath=
+
+;#You can override the TO address of all mail in order to catch it in development
+;mailOverrideToAddress=

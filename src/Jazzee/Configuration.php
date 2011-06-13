@@ -27,11 +27,6 @@ protected $_status;
 /**
  * @var string
  */
-protected $_forceSSL;
-
-/**
- * @var string
- */
 protected $_dbHost;
 
 /**
@@ -107,7 +102,7 @@ protected $_mailSubjectPrefix;
 /**
  * @var string
  */
-protected $_mailDefaultFrom;
+protected $_mailDefaultFromAddress;
 
 /**
  * @var string
@@ -122,11 +117,6 @@ protected $_mailOverrideToAddress;
 /**
  * @var string
  */
-protected $_mailOverrideToName;
-
-/**
- * @var string
- */
 protected $_varPath;
 
 /**
@@ -137,17 +127,52 @@ protected $_adminEmail;
 /**
  * @var string
  */
-protected $_timezone;
-
-/**
- * @var string
- */
 protected $_maximumApplicantFileUpload;
 
 /**
  * @var string
  */
 protected $_adminAuthenticationClass;
+
+/**
+ * @var string
+ */
+protected $_noAuthUserId;
+
+/**
+ * @var string
+ */
+protected $_noAuthIpAddresses;
+
+/**
+ * @var string
+ */
+protected $_simpleSAMLIncludePath;
+
+/**
+ * @var string
+ */
+protected $_simpleSAMLAuthenticationSource;
+
+/**
+ * @var string
+ */
+protected $_simpleSAMLUsernameAttribute;
+
+/**
+ * @var string
+ */
+protected $_simpleSAMLFirstNameAttribute;
+
+/**
+ * @var string
+ */
+protected $_simpleSAMLLastNameAttribute;
+
+/**
+ * @var string
+ */
+protected $_simpleSAMLEmailAddressAttribute;
 
 /**
  * @var string
@@ -212,22 +237,6 @@ protected $_publicKeyCertificatePath;
    */
   public function setStatus($status) {
     $this->_status = $status;
-  }
-  
-  /**
-   * get forceSSL
-   * @return string
-   */
-  public function getForceSSL() {
-    return $this->_forceSSL;
-  }
-  
-  /**
-   * set forceSSL
-   * @var string forceSSL
-   */
-  public function setForceSSL($forceSSL) {
-    $this->_forceSSL = $forceSSL;
   }
   
   /**
@@ -519,22 +528,6 @@ protected $_publicKeyCertificatePath;
   }
   
   /**
-   * get mailOverrideToName
-   * @return string
-   */
-  public function getMailOverrideToName() {
-    return $this->_mailOverrideToName;
-  }
-  
-  /**
-   * set mailOverrideToName
-   * @var string mailOverrideToName
-   */
-  public function setMailOverrideToName($mailOverrideToName) {
-    $this->_mailOverrideTonName = $mailOverrideToName;
-  }
-  
-  /**
    * get varPath
    * @return string
    */
@@ -564,22 +557,6 @@ protected $_publicKeyCertificatePath;
    */
   public function setAdminEmail($adminEmail) {
     $this->_adminEmail = $adminEmail;
-  }
-  
-  /**
-   * get timezone
-   * @return string
-   */
-  public function getTimezone() {
-    return $this->_timezone;
-  }
-  
-  /**
-   * set timezone
-   * @var string timezone
-   */
-  public function setTimezone($timezone) {
-    $this->_timezone = $timezone;
   }
   
   /**
@@ -644,6 +621,134 @@ protected $_publicKeyCertificatePath;
    */
   public function setAdminAuthenticationClass($adminAuthClass) {
     $this->_adminAuthClass = $adminAuthClass;
+  }
+  
+  /**
+   * get noAuthUserId
+   * @return string
+   */
+  public function getNoAuthUserId() {
+    return $this->_noAuthUserId;
+  }
+  
+  /**
+   * set noAuthUserId
+   * @var string $noAuthUserId
+   */
+  public function setNoAuthUserId($noAuthUserId) {
+    $this->_noAuthUserId = $noAuthUserId;
+  }
+  
+  /**
+   * get noAuthIpAddresses
+   * @return string
+   */
+  public function getNoAuthIpAddresses() {
+    return $this->_noAuthIpAddresses;
+  }
+  
+  /**
+   * set noAuthIpAddresses
+   * @var string $noAuthIpAddresses
+   */
+  public function setNoAuthIpAddresses($noAuthIpAddresses) {
+    $this->_noAuthIpAddresses = $noAuthIpAddresses;
+  }
+  
+  /**
+   * get simpleSAMLIncludePath
+   * @return string
+   */
+  public function getSimpleSAMLIncludePath() {
+    return $this->_simpleSAMLIncludePath;
+  }
+  
+  /**
+   * set simpleSAMLIncludePath
+   * @var string $simpleSAMLIncludePath
+   */
+  public function setSimpleSAMLIncludePath($simpleSAMLIncludePath) {
+    $this->_simpleSAMLIncludePath = $simpleSAMLIncludePath;
+  }  
+  
+  /**
+   * get simpleSAMLAuthenticationSource
+   * @return string
+   */
+  public function getSimpleSAMLAuthenticationSource() {
+    return $this->_simpleSAMLAuthenticationSource;
+  }
+  
+  /**
+   * set simpleSAMLAuthenticationSource
+   * @var string $simpleSAMLAuthenticationSource
+   */
+  public function setSimpleSAMLAuthenticationSource($simpleSAMLAuthenticationSource) {
+    $this->_simpleSAMLAuthenticationSource = $simpleSAMLAuthenticationSource;
+  }  
+  
+  /**
+   * get simpleSAMLUsernameAttribute
+   * @return string
+   */
+  public function getSimpleSAMLUsernameAttribute() {
+    return $this->_simpleSAMLUsernameAttribute;
+  }
+  
+  /**
+   * set simpleSAMLUsernameAttribute
+   * @var string $simpleSAMLUsernameAttribute
+   */
+  public function setSimpleSAMLUsernameAttribute($simpleSAMLUsernameAttribute) {
+    $this->_simpleSAMLUsernameAttribute = $simpleSAMLUsernameAttribute;
+  }  
+  
+  /**
+   * get simpleSAMLFirstNameAttribute
+   * @return string
+   */
+  public function getSimpleSAMLFirstNameAttribute() {
+    return $this->_simpleSAMLFirstNameAttribute;
+  }
+  
+  /**
+   * set simpleSAMLFirstNameAttribute
+   * @var string $simpleSAMLFirstNameAttribute
+   */
+  public function setSimpleSAMLFirstNameAttribute($simpleSAMLFirstNameAttribute) {
+    $this->_simpleSAMLFirstNameAttribute = $simpleSAMLFirstNameAttribute;
+  }  
+  
+  /**
+   * get simpleSAMLLastNameAttribute
+   * @return string
+   */
+  public function getSimpleSAMLLastNameAttribute() {
+    return $this->_simpleSAMLLastNameAttribute;
+  }
+  
+  /**
+   * set simpleSAMLLastNameAttribute
+   * @var string $simpleSAMLLastNameAttribute
+   */
+  public function setSimpleSAMLLastNameAttribute($simpleSAMLLastNameAttribute) {
+    $this->_simpleSAMLLastNameAttribute = $simpleSAMLLastNameAttribute;
+  }  
+  
+  /**
+   * get simpleSAMLEmailAddressAttribute
+   * @return string
+   */
+  public function getSimpleSAMLEmailAddressAttribute() {
+    return $this->_simpleSAMLEmailAddressAttribute;
+  }
+  
+  /**
+   * set simpleSAMLEmailAddressAttribute
+   * @var string $simpleSAMLEmailAddressAttribute
+   */
+  public function setSimpleSAMLEmailAddressAttribute($simpleSAMLEmailAddressAttribute) {
+    $this->_simpleSAMLEmailAddressAttribute = $simpleSAMLEmailAddressAttribute;
   }
   
   /**

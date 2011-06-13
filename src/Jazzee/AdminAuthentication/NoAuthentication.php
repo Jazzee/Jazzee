@@ -21,16 +21,14 @@ class NoAuthentication implements \Jazzee\AdminAuthentication{
    * @param \Doctrine\ORM\EntityManager
    */
   public function __construct(\Doctrine\ORM\EntityManager $em){
-    $jzConfig = new \Jazzee\Configuration();
-    if($jzConfig->getStatus() != 'DEVELOPMENT'){
+    $config = new \Jazzee\Configuration();
+    if($config->getStatus() != 'DEVELOPMENT'){
       throw new \Jazzee\Exception('Attmpted to use NoAuthentication in a non development environment.');
     }
-    $configurationFile = realpath(__DIR__ . '/../../../etc') . '/noauthentication.ini.php';
-    if(!is_readable($configurationFile)) throw new \Jazzee\Exception("Unable to load noauthentication configuration file: {$configurationFile}.", E_ERROR);
-    $config = parse_ini_file($configurationFile);
-    $allowedIps = explode(',', $config['ipAddresses']);
-    if(in_array($_SERVER['SERVER_ADDR'], $allowedIps)){
-      $this->_user = $em->getRepository('\Jazzee\Entity\User')->find($config['userId']);
+    
+    $allowedIps = explode(',', $config->getNoAuthIpAddresses());
+    if(in_array($_SERVER['REMOTE_ADDR'], $allowedIps)){
+      $this->_user = $em->getRepository('\Jazzee\Entity\User')->find($config->getNoAuthUserId());
     }
   }
   

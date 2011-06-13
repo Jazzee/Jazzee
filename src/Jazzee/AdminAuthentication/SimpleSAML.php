@@ -29,20 +29,18 @@ class SimpleSAML implements \Jazzee\AdminAuthentication{
    * @param \Doctrine\ORM\EntityManager
    */
   public function __construct(\Doctrine\ORM\EntityManager $em){
-    $configurationFile = realpath(__DIR__ . '/../../../etc') . '/simplesaml.ini.php';
-    if(!is_readable($configurationFile)) throw new \Jazzee\Exception("Unable to load simplesaml configuration file: {$configurationFile}.", E_ERROR);
-    $config = parse_ini_file($configurationFile);
-    require_once($config['includePath']);
+    $config = new \Jazzee\Configuration();
+    require_once($config->getSimpleSAMLIncludePath());
     
-    $this->_as = new \SimpleSAML_Auth_Simple($config['authenticationSource']);
+    $this->_as = new \SimpleSAML_Auth_Simple($config->getSimpleSAMLAuthenticationSource());
     $this->_as->requireAuth();
     $attrs = $this->_as->getAttributes();
-    if (!isset($attrs[$config['usernameAttribute']][0])) throw new Exception($config['usernameAttribute'] . ' attribute is missing from authentication source.');
-    $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$attrs[$config['usernameAttribute']][0]));
+    if (!isset($attrs[$config->getSimpleSAMLUsernameAttribute()][0])) throw new Exception($config->getSimpleSAMLUsernameAttribute() . ' attribute is missing from authentication source.');
+    $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$attrs[$config->getSimpleSAMLUsernameAttribute()][0]));
     if($this->_user){
-      $this->_user->setFirstName($attrs[$config['firstNameAttribute']][0]);
-      $this->_user->setLastName($attrs[$config['lastNameAttribute']][0]);
-      $this->_user->setEmail($attrs[$config['emailAddressAttribute']][0]);
+      $this->_user->setFirstName($attrs[$config->getSimpleSAMLFirstNameAttribute()][0]);
+      $this->_user->setLastName($attrs[$config->getSimpleSAMLLastNameAttribute()][0]);
+      $this->_user->setEmail($attrs[$config->getSimpleSAMLEmailAddressAttribute()][0]);
       $em->persist($this->_user);
     }
   }

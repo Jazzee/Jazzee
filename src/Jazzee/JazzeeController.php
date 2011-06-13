@@ -196,7 +196,6 @@ class JazzeeController extends PageController
     $this->_foundationConfig->setMailDefaultFromAddress($this->_config->getMailDefaultFromAddress());
     $this->_foundationConfig->setMailDefaultFromName($this->_config->getMailDefaultFromName());
     $this->_foundationConfig->setMailOverrideToAddress($this->_config->getMailOverrideToAddress());
-    $this->_foundationConfig->setMailOverrideToName($this->_config->getMailOverrideToName());
     $this->_foundationConfig->setMailServerType($this->_config->getMailServerType());
     $this->_foundationConfig->setMailServerHost($this->_config->getMailServeHostr());
     $this->_foundationConfig->setMailServerPort($this->_config->getMailServerPort());
@@ -208,16 +207,13 @@ class JazzeeController extends PageController
     
     \Foundation\VC\Config::setCache($this->_cache);
     
-    if((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off') AND !$this->_config->getForceSSL()){
+    if((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off')){
       $protocol = 'http';
     } else {
       $protocol = 'https';
     }
     
     $this->_serverPath = $protocol . '://' .  $_SERVER['SERVER_NAME'];
-    
-    //set the default timezone
-    date_default_timezone_set($this->_config->getTimezone());
   }
   
   /**
@@ -304,7 +300,7 @@ class JazzeeController extends PageController
     $this->_session->setConfigVariable('use_only_cookies', true);
     $this->_session->setConfigVariable('hash_function', 1);
     $this->_session->setConfigVariable('save_path', $this->getVarPath() . '/session/');
-    if($this->_config->getForceSSL() OR (!empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] == 'on')){
+    if(!empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] == 'on'){
       $this->_session->setConfigVariable('cookie_secure', true);
     }
     $this->_session->setConfigVariable('cookie_path', rtrim(dirname($_SERVER['SCRIPT_NAME']),'/\\.') . '/');
