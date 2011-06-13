@@ -7,6 +7,12 @@ namespace Jazzee;
  */
 class Configuration
 {
+  
+  /**
+   * Path to the configuration file
+   * @var string
+   */
+  static protected $_configPath;
 
     /**
  * @var string
@@ -136,11 +142,6 @@ protected $_timezone;
 /**
  * @var string
  */
-protected $_localBootstrap;
-
-/**
- * @var string
- */
 protected $_maximumApplicantFileUpload;
 
 /**
@@ -158,9 +159,11 @@ protected $_publicKeyCertificatePath;
    * Load data from the ini file
    */
   public function __construct(){
-    $configurationFile = realpath(__DIR__ . '/../../etc') . '/config.ini.php';
-    if(!is_readable($configurationFile)) throw new Exception("Unable to load {$configurationFile}.", E_ERROR, 'We were unable to load the configuration file for this site.');
-    $arr = parse_ini_file($configurationFile);
+    if(!self::$_configPath){
+      //try the default path
+      self::setPath(__DIR__ . '/../../etc/config.ini.php');
+    }
+    $arr = parse_ini_file(self::$_configPath);
     foreach($arr as $name => $value){
       $setter = 'set' . \ucfirst($name);
       if(!method_exists($this, $setter)) throw new Exception("Configuration variable ({$name}) found in file, but it is not a recognized option.");
@@ -168,6 +171,17 @@ protected $_publicKeyCertificatePath;
     }  
   }
   
+  /**
+   * Set the configuration path
+   * @param string $path
+   */
+  public static function setPath($path){
+    if(!$realPath = \realpath($path) or !\is_readable($realPath)){
+      if($realPath) $path = $realPath;
+      throw new Exception("Unable to load {$path}.", E_ERROR); 
+    }
+    self::$_configPath=$realPath;
+  }
   /**
    * get mode
    * @return string
@@ -566,22 +580,6 @@ protected $_publicKeyCertificatePath;
    */
   public function setTimezone($timezone) {
     $this->_timezone = $timezone;
-  }
-  
-  /**
-   * get localBootstrap
-   * @return string
-   */
-  public function getLocalBootstrap() {
-    return $this->_localBootstrap;
-  }
-  
-  /**
-   * set localBootstrap
-   * @var string localBootstrap
-   */
-  public function setLocalBootstrap($localBootstrap) {
-    $this->_localBootstrap = $localBootstrap;
   }
   
   /**

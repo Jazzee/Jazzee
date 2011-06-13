@@ -1,11 +1,12 @@
 <?php
 /**
- * This index file should be place in your servers webroot.  
- * It is the only file in jazzee that shoud be publically availalble.
+ * Index for admin
  * 
- * by modifiy the paths for the bootstrap and routes files you can put the jazzee source wherever you want
+ * It is the only public location available for administrators 
+ * Make sure the .htaccess file is properly redirecting all admin traffic here
+ * 
+ * by modifying the paths for the bootstrap and routes files you can put this file and the jazzee source wherever you want
  */
-
 //include the jazzee bootstrap file
 require_once(__DIR__ . '/../../src/jazzee-bootstrap.php');
 

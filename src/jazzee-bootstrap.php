@@ -14,13 +14,6 @@ require_once($src . '/lib/foundation/src/foundation.php');
 $classLoader = new Doctrine\Common\ClassLoader('Jazzee', $src . '/src');
 $classLoader->register();
 
-//load the configuration and cache it
-$jazzeeConfig = new \Jazzee\Configuration();
-
-//The localbootstrap can overload any of the above 
-//or by adding something to the LVC paths will load before the stuff below this
-if($jazzeeConfig->getLocalBootstrap()) require_once $jazzeeConfig->getLocalBootstrap();
-
 //Setup the Lvc options
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/');
 \Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/');
