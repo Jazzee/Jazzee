@@ -230,7 +230,7 @@ class JazzeeController extends PageController
       $cache = new \Doctrine\Common\Cache\ArrayCache;
     } else {
       $doctrineConfig->setAutoGenerateProxyClasses(false);
-      $doctrineConfig->setProxyDir(__DIR__ . '/Jazzee/Entity/Proxy');
+      $doctrineConfig->setProxyDir(__DIR__ . '/Entity/Proxy');
       if(!extension_loaded('apc')) throw new Exception('APC cache is required, but was not available.');
       $cache = new \Doctrine\Common\Cache\ApcCache;
     }
