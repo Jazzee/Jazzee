@@ -114,20 +114,19 @@ div.form p.required{
   padding-left: 20px;
 }
 
-div.form label{
-	padding-right: 16px;
-}
-
-
 /** Remove the background if we are two labels deep - link in ranking lists **/
-div.form div.required div.control div.label{
+div.form div.required div.control div.control{
   background: none;
 }
 
-div.form div.required div.label, div.form div.label.required{
+div.form div.control{
+	padding-left: 16px;
+	margin-left: -16px;
+}
+div.form div.required div.control, div.form div.control.required{
   background-image: url(resource/foundation/media/icons/asterisk_yellow.png);
   background-repeat: no-repeat;
-  background-position:top right;
+  background-position:top left;
 }
 
 div.form p.instructions, div.form div.instructions {
@@ -152,4 +151,8 @@ div.form div.field p.instructions, div.form div.field p.format, div.form div.fie
 div.form textarea {
   height: 15em;
   width: 80%;
+}
+
+div.form div.control li{
+	padding-bottom: .25em;
 }
