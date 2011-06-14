@@ -11,7 +11,7 @@
 $src = realpath(__DIR__ . '/..');
 
 require_once($src . '/lib/foundation/src/foundation.php');
-$classLoader = new Doctrine\Common\ClassLoader('Jazzee', $src . '/src');
+$classLoader = new Foundation\ClassLoader('Jazzee', $src . '/src');
 $classLoader->register();
 
 //Setup the Lvc options

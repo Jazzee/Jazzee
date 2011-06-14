@@ -11,7 +11,7 @@ if($files): ?>
   <ul>
   <?php foreach($files as $file): ?>
   <li><?php print $file->getName() ?>
-    (<a href='<?php print $this->path('virtualfiles/'.$file->getName())?>'>Preview</a>)
+    (<a href='<?php print $this->path('virtualfile/'.$file->getName())?>'>Preview</a>)
     <?php if($this->controller->checkIsAllowed('manage_virtualfiles', 'edit')): ?>
     (<a href='<?php print $this->path('manage/virtualfiles/edit/') . $file->getId()?>'>Edit</a>)
     <?php endif;?>

@@ -9,6 +9,15 @@ try {
   
   $basicRouter = new Lvc_RegexRewriteRouter;
   
+  //dynmaic files like applicant pdfs and previews stored in sessions
+  $basicRouter->addRoute('#^(?:.*)/?virtualfile/(.*)$#i', array( 
+    'controller' => 'virtualfile',
+    'action' => 'get',
+    'action_params' => array(
+      'name' => 1
+    )
+  ));
+  
   //resources in the virtual file system
   $basicRouter->addRoute('#^(?:.*)/?resource/(.*)$#i', array( 
     'controller' => 'resource',
@@ -21,15 +30,6 @@ try {
   //dynmaic files like applicant pdfs and previews stored in sessions
   $basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array( 
     'controller' => 'file',
-    'action' => 'get',
-    'action_params' => array(
-      'name' => 1
-    )
-  ));
-  
-  //dynmaic files like applicant pdfs and previews stored in sessions
-  $basicRouter->addRoute('#^(?:.*)/?virtualfiles/(.*)$#i', array( 
-    'controller' => 'virtualfile',
     'action' => 'get',
     'action_params' => array(
       'name' => 1
