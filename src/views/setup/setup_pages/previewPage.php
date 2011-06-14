@@ -11,6 +11,6 @@
 <div id='doc3'>
   <?php 
     $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-page');
-    $this->renderElement($elementName, array('page'=>$page, 'currentAnswerID'=>null));
+    $this->renderElement($elementName, array('page'=>$page, 'currentAnswerID'=>null, 'applicant'=>$applicant));
 ?>
 </div>

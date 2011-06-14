@@ -277,12 +277,19 @@ abstract class PageBuilder extends AdminController{
     $page = new \Jazzee\Entity\Page();
     $this->genericPage($page, $data);
     $this->layout = 'blank';
+    $applicant = new \Jazzee\Entity\Applicant();
+    $applicant->setFirstName('John');
+    $applicant->setLastName('Smith');
+    $applicant->setMiddleName('T');
+    $applicant->setSuffix('Jr.');
+    $applicant->setEmail('jtSmith@example.com');
     $ap = new \Jazzee\Entity\ApplicationPage();
     $ap->setPage($page);
     $ap->setApplication($this->_application);
     $ap->getJazzeePage()->setController($this);
-    $ap->getJazzeePage()->setApplicant(new \Jazzee\Entity\Applicant());
+    $ap->getJazzeePage()->setApplicant($applicant);
     $this->setVar('page', $ap);
+    $this->setVar('applicant', $applicant);
   }
   
   /**
