@@ -135,7 +135,7 @@ class Role{
    *
    * @param Entity\User $user
    */
-  public function addUser(\Entity\User $user){
+  public function addUser(User $user){
     $this->users[] = $user;
   }
 
