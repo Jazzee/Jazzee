@@ -272,9 +272,11 @@ class Applicant{
    * Combines all the name parts nicely
    */
   public function getFullName(){
-    $name = $this->firstName . ' ' . $this->lastName;
-    if($this->middleName) $name .= ', ' . $this->middleName;
-    if($this->suffix) $name .= $this->suffix;
+    $name = $this->firstName . ' ';
+    if($this->middleName) $name .= $this->middleName;
+    $name .= ' ' . $this->lastName;
+    if($this->suffix) $name .= ' ' . $this->suffix;
+    
     return $name;
   }
   
