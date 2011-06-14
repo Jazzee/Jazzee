@@ -22,6 +22,16 @@ adminAuthenticationClass=
 
 ;#Uncomment and set the options for the authentication type you have selected
 
+;##Shibboleth##;
+;#username attribute name
+;#firstname attribute name
+;#last anme attribute name
+;#email address attribute name
+;ShibbolethUsernameAttribute='eppn'
+;ShibbolethFirstNameAttribute='givenName'
+;ShibbolethLastNameAttribute='sn'
+;ShibbolethEmailAddressAttribute='mail'
+
 ;##NoAuthentication##;
 ;noAuthUserId=0
 ;noAuthIpAddresses='127.0.0.1'

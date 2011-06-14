@@ -137,6 +137,26 @@ protected $_adminAuthenticationClass;
 /**
  * @var string
  */
+protected $_shibbolethUsernameAttribute;
+
+/**
+ * @var string
+ */
+protected $_shibbolethFirstNameAttribute;
+
+/**
+ * @var string
+ */
+protected $_shibbolethLastNameAttribute;
+
+/**
+ * @var string
+ */
+protected $_shibbolethEmailAddressAttribute;
+
+/**
+ * @var string
+ */
 protected $_noAuthUserId;
 
 /**
@@ -621,6 +641,70 @@ protected $_publicKeyCertificatePath;
    */
   public function setAdminAuthenticationClass($adminAuthClass) {
     $this->_adminAuthClass = $adminAuthClass;
+  }
+  
+  /**
+   * get shibbolethUsernameAttribute
+   * @return string
+   */
+  public function getShibbolethUsernameAttribute() {
+    return $this->_shibbolethUsernameAttribute;
+  }
+  
+  /**
+   * set shibbolethUsernameAttribute
+   * @var string $shibbolethUsernameAttribute
+   */
+  public function setShibbolethUsernameAttribute($shibbolethUsernameAttribute) {
+    $this->_shibbolethUsernameAttribute = $shibbolethUsernameAttribute;
+  }  
+  
+  /**
+   * get shibbolethFirstNameAttribute
+   * @return string
+   */
+  public function getShibbolethFirstNameAttribute() {
+    return $this->_shibbolethFirstNameAttribute;
+  }
+  
+  /**
+   * set shibbolethFirstNameAttribute
+   * @var string $shibbolethFirstNameAttribute
+   */
+  public function setShibbolethFirstNameAttribute($shibbolethFirstNameAttribute) {
+    $this->_shibbolethFirstNameAttribute = $shibbolethFirstNameAttribute;
+  }  
+  
+  /**
+   * get shibbolethLastNameAttribute
+   * @return string
+   */
+  public function getShibbolethLastNameAttribute() {
+    return $this->_shibbolethLastNameAttribute;
+  }
+  
+  /**
+   * set shibbolethLastNameAttribute
+   * @var string $shibbolethLastNameAttribute
+   */
+  public function setShibbolethLastNameAttribute($shibbolethLastNameAttribute) {
+    $this->_shibbolethLastNameAttribute = $shibbolethLastNameAttribute;
+  }  
+  
+  /**
+   * get shibbolethEmailAddressAttribute
+   * @return string
+   */
+  public function getShibbolethEmailAddressAttribute() {
+    return $this->_shibbolethEmailAddressAttribute;
+  }
+  
+  /**
+   * set shibbolethEmailAddressAttribute
+   * @var string $shibbolethEmailAddressAttribute
+   */
+  public function setShibbolethEmailAddressAttribute($shibbolethEmailAddressAttribute) {
+    $this->_shibbolethEmailAddressAttribute = $shibbolethEmailAddressAttribute;
   }
   
   /**
