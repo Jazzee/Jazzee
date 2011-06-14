@@ -29,7 +29,6 @@ class PageController extends \Foundation\VC\Controller
     $this->setLayoutVar('pageTitle', '');
     $this->setLayoutVar('layoutTitle', '');
     $this->setLayoutVar('layoutContentTop', '');
-    $this->setLayoutVar('layoutContentFooter', '<p>This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.</p>');
     $this->setLayoutVar('navigation', false);
     $this->setLayoutVar('status', 'success'); //used in some json ajax requests
     
