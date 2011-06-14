@@ -76,10 +76,10 @@ abstract class AdminController extends Controller{
     $this->_user = $this->_adminAuthentication->getUser();
     $store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     if($this->_config->getAdminSessionLifetime()){
-      setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime());
+      setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime(), 0, '/');
     } else {
       //if there is no seesion limiter then setup for 24 hours
-      setcookie('JazzeeAdminLoginTimeout', time()+86400);
+      setcookie('JazzeeAdminLoginTimeout', time()+86400, 0, '/');
     }
     
     
