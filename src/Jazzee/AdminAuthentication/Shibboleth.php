@@ -25,7 +25,7 @@ class Shibboleth implements \Jazzee\AdminAuthentication{
   public function __construct(\Doctrine\ORM\EntityManager $em){
     $config = new \Jazzee\Configuration();
     
-    if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
+    if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
     
     $uniqueName = $_SERVER[$config->getShibbolethUsernameAttribute()];
     $firstName = $_SERVER[$config->getShibbolethFirstNameAttribute()];
