@@ -78,17 +78,17 @@ class JazzeePageController extends \Foundation\VC\Controller
     $media->addDirectory('icons', new \Foundation\Virtual\ProxyDirectory( __DIR__ . '/../../lib/foundation/src/media/famfamfam_silk_icons_v013/icons'));
     
     $scripts = new \Foundation\Virtual\VirtualDirectory();
-    $scripts->addFile('jquery.js', new \Foundation\Virtual\RealFile('jquery.js', __DIR__ . '/../../lib/foundation/src/lib/jquery/jquery-1.6.1.min.js'));
-    $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', __DIR__ . '/../../lib/foundation/src/lib/jquery/plugins/jquery.json-2.2.min.js'));
-    $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', __DIR__ . '/../../lib/foundation/src/lib/jquery/plugins/jquery.cookie-1.min.js'));
-    $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', __DIR__ . '/../../lib/foundation/src/lib/jquery/jquery-ui-1.8.13.min.js'));
+    $scripts->addFile('jquery.js', new \Foundation\Virtual\RealFile('jquery.js', __DIR__ . '/../../lib/foundation/lib/jquery/jquery-1.6.1.min.js'));
+    $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jquery.json-2.2.min.js'));
+    $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jquery.cookie-1.min.js'));
+    $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', __DIR__ . '/../../lib/foundation/lib/jquery/jquery-ui-1.8.13.min.js'));
     $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', __DIR__ . '/../../lib/foundation/src/javascript/form.js'));
     
     $styles = new \Foundation\Virtual\VirtualDirectory();
-    $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/src/lib/jquery/themes'));
+    $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/lib/jquery/themes'));
     
-    $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', __DIR__ . '/../../lib/foundation/src/lib/yui/base-min.css'));
-    $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../lib/foundation/src/lib/yui/reset-fonts-grids-min.css'));
+    $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', __DIR__ . '/../../lib/foundation/lib/yui/base-min.css'));
+    $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../lib/foundation/lib/yui/reset-fonts-grids-min.css'));
 
     $virtualFoundation->addDirectory('media',$media);
     $virtualFoundation->addDirectory('scripts',$scripts);
