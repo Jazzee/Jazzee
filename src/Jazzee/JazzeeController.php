@@ -57,7 +57,7 @@ class JazzeeController extends PageController
     $this->setupVarPath();
     $this->setupDoctrine(); 
     $this->setupSession();
-    //$this->setupLogging();
+    $this->setupLogging();
   }
   
   /**
@@ -312,48 +312,115 @@ class JazzeeController extends PageController
   /**
    * Setup logging
    */
-  protected function setupLoggind(){
+  protected function setupLogging(){
+    $path = $this->getVarPath() . '/log';
     //create an access log with browser information
-    $accessLog = Log::singleton('file', VAR_ROOT . '/log/access_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
+    $accessLog = \Log::singleton('file', $path . '/access_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
     $accessMessage ="[{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} {$_SERVER['SERVER_PROTOCOL']}] " .
       '[' . (!empty($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'-') . '] ' .
       '[' . (!empty($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:'-') . ']';
     $accessLog->log($accessMessage, PEAR_LOG_INFO);
     
-    //Add an observer to catch all generated errors and put them in the error_log
-    Error::getInstance()->attach(
-      new PearLogObserver(
-        Log::singleton('file',VAR_ROOT . '/log/error_log')
-      ),E_ALL ^ (E_NOTICE | E_USER_NOTICE)
-    );
     
-    //special log for Strict errors which are the results of depriciation mostly
-    Error::getInstance()->attach(
-      new PearLogObserver(
-        Log::singleton('file',VAR_ROOT . '/log/strict_log')
-      ),E_DEPRECATED | E_USER_DEPRECATED | E_STRICT | E_NOTICE | E_USER_NOTICE
-    );
+    $log = \Log::singleton('file', $path . '/error_log', '',array(), PEAR_LOG_ERR);
+    $strict = \Log::singleton('file', $path . '/strict_log');
+    $php = \Log::singleton('error_log', PEAR_LOG_TYPE_SYSTEM, 'Jazzee Error');
+    $this->_log = \Log::singleton('composite');
+    $this->_log->addChild($log);
+    $this->_log->addChild($strict);
+    $this->_log->addChild($php);
     
-    //Also direct all errors out to PHP error_log function where the belong
-    Error::getInstance()->attach(
-      new PearLogObserver(
-        Log::factory('error_log',PEAR_LOG_TYPE_SYSTEM,'Jazzee Error')
-      ),E_ALL
-    );
-    
-    //In developemnt log errors to screen
-    if($this->config->status == 'DEVELOPMENT'){
-      Error::getInstance()->attach(
-        new PearLogObserver(
-          Log::factory('display','','', array(),PEAR_LOG_DEBUG)
-        ),E_ALL
-      );
+    //Handle PHP errors with out logs
+    set_error_handler(array($this, 'handleError'));
+    //catch any excpetions
+    set_exception_handler(array($this, 'handleException'));
+  }
+  
+  /**
+   * Handle PHP error
+   * Takes input from PHPs built in error handler logs it  
+   * throws a jazzee exception to handle if the error reporting level is high enough
+   * @param $code
+   * @param $message
+   * @param $file
+   * @param $line
+   * @throws \Jazzee\Exception
+   */
+  public function handleError($code, $message, $file, $line){
+    /* Map the PHP error to a Log priority. */
+    switch ($code) {
+      case E_WARNING:
+      case E_USER_WARNING:
+        $priority = PEAR_LOG_WARNING;
+        break;
+      case E_NOTICE:
+      case E_USER_NOTICE:
+        $priority = PEAR_LOG_NOTICE;
+        break;
+      case E_ERROR:
+      case E_USER_ERROR:
+        $priority = PEAR_LOG_ERR;
+        break;
+      default:
+        $priority = PEAR_LOG_INFO;
     }
+    $this->_log->log($message . ' in ' . $file . ' at line ' . $line, $priority);
+    throw new Exception('Jazzee caught a PHP error');
+  }
+  
+
+  
+  /**
+   * Handle PHP Exception
+   * @param Exception $e
+   */
+  public function handleException(Exception $e){
+    $message = $e->getMessage();
+    $userMessage = 'Unspecified Technical Difficulties';
+    $error = 500;
+    if($e instanceof \Lvc_Exception){
+      $code = 404;
+      $userMessage = 'Page not found.';
+    }
+    if($e instanceof \PDOException){
+      $message = 'Problem with database connection. PDO says: ' . $message;
+      $userMessage = 'We are experiencing a problem connecting to our database.  Please try your request again.';
+    }
+    if($e instanceof \Foundation\Exception){
+      $userMessage = $e->getUserMessage();
+    }
+    if($e instanceof \Foundation\Virtual\Exception){
+      $userMessage = $e->getUserMessage();
+      $code = $e->getHttpErrorCode();
+    }
+    /* Map the PHP error to a Log priority. */
+    switch ($e->getCode()) {
+      case E_WARNING:
+      case E_USER_WARNING:
+        $priority = PEAR_LOG_WARNING;
+        break;
+      case E_NOTICE:
+      case E_USER_NOTICE:
+        $priority = PEAR_LOG_NOTICE;
+        break;
+      case E_ERROR:
+      case E_USER_ERROR:
+        $priority = PEAR_LOG_ERR;
+        break;
+      default:
+        $priority = PEAR_LOG_INFO;
+    }
+    $this->_log->log($message, $priority);
     
-    //Set Error to be the default error handler
-    set_error_handler(array(Error::getInstance(), 'register'));
-    
-    //set Error to handle uncaught exceptions
-    set_exception_handler(array(Error::getInstance(), 'exception'));
+    // Get a request for the error page
+    $request = new \Lvc_Request();
+    $request->setControllerName('error');
+    $request->setActionName('index');
+    $request->setActionParams(array('error' => $error, 'message'=>$userMessage));
+  
+    // Get a new front controller without any routers, and have it process our handmade request.
+    $fc = new \Lvc_FrontController();
+    $fc->processRequest($request);
+    exit(1);
   }
 }
