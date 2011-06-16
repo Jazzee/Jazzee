@@ -9,7 +9,7 @@
  */
 ?>
 <h3>Thank you.  We have recieved your recommendation.</h3>
-<p>For our applicant's security this page will only display once.  If you wish to have a copy of this recommendation for your records you should make one now.</p>
+<p>For our applicant's security this page will only display once.  If you wish to have a copy of this recommendation for your records you should print one now.</p>
 <?php
 if($answer){?>
   <h5>Submitted Recommendation</h5>
