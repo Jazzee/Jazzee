@@ -28,7 +28,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
   protected function messageArray(\Jazzee\Entity\Message $message){
     $arr = array(
       'date' =>  $message->getCreatedAt()->format('l F jS Y \a\t g:ia'),
-      'sender' => ($message->getSender() == 'applicant')?'you':'your program',
+      'sender' => ($message->getSender() == \Jazzee\Entity\Message::APPLICANT)?'you':'your program',
       'text' => $message->getText(),
       'replyLink' => $this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/reply/' . $message->getId()),
       'replies' => array()
@@ -56,7 +56,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
     if($input = $form->processInput($this->post)){
       $message = new \Jazzee\Entity\Message();
       $message->setApplicant($this->_applicant);
-      $message->setSender('applicant');
+      $message->setSender(\Jazzee\Entity\Message::APPLICANT);
       $message->setText($input->get('text'));
       $this->_em->persist($message);
       $this->addMessage('success', 'Your message has been sent.');
@@ -85,7 +85,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
     if($input = $form->processInput($this->post)){
       $reply = new \Jazzee\Entity\Message();
       $reply->setApplicant($this->_applicant);
-      $reply->setSender('applicant');
+      $reply->setSender(\Jazzee\Entity\Message::APPLICANT);
       $message->addReply($reply);
       $reply->setText($input->get('text'));
       $this->_em->persist($reply);
