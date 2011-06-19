@@ -144,6 +144,8 @@ class Applicant{
   public function setPassword($password){
     $p = new \PasswordHash(8, FALSE);
     $this->password = $p->HashPassword($password);
+    //when a new password is set reset the failedLogin counter
+    $this->failedLoginAttempts = 0;
   }
   
   /**
@@ -170,7 +172,6 @@ class Applicant{
    * @param string $hashedPassword
    */
   public function checkPassword($password){
-    $this->setPassword($password);
     $p = new \PasswordHash(8, FALSE);
     return $p->CheckPassword($password, $this->password);
   }

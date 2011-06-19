@@ -4,6 +4,12 @@
  */
 class ApplyApplicantController extends \Jazzee\Controller {
   /**
+   * Maximum number of times an applicant is allowed to fail
+   * @var integer
+   */
+  const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+  
+  /**
    * The application
    * @var \Jazzee\Entity\Application
    */
@@ -51,19 +57,26 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $form->newButton('submit', 'Login');
     
     if($input = $form->processInput($this->post)){
+      $message = '';
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
       if($applicant){
-        if($applicant->checkPassword($input->get('password'))){
-          $applicant->login();
-          
-          $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
-          $store->applicantID = $applicant->getId();
-          $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-          $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $this->application->getPages()->first()->getId());
+        if($applicant->getFailedLoginAttempts() >= self::MAX_FAILED_LOGIN_ATTEMPTS){
+          $this->addMessage('error', 'Your account has been locked because an incorect password was entered too many times.  Please reset your password to unlock your account.');
+          $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword');
+        } else {
+          if($applicant->checkPassword($input->get('password'))){
+            $applicant->login();
+            
+            $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
+            $store->applicantID = $applicant->getId();
+            $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
+            $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $this->application->getPages()->first()->getId());
+          }
+          $applicant->loginFail();
+          $message = ' After ' . self::MAX_FAILED_LOGIN_ATTEMPTS . ' failed login attempts your account will be locked and you will need to reset your password to gain access.  You have ' . (string)(self::MAX_FAILED_LOGIN_ATTEMPTS - $applicant->getFailedLoginAttempts()) . ' more attempts.';
         }
-        $applicant->loginFail();
       }
-      $this->addMessage('error', 'Incorrect username or password.');
+      $this->addMessage('error', 'Incorrect username or password.' . $message);
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
     }
     $this->setVar('form', $form);
