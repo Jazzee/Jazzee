@@ -60,14 +60,15 @@ class Recommenders extends Standard {
         $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer);
         $body = str_ireplace($search, $replace, $this->_applicationPage->getPage()->getVar('recommenderEmailText'));
 
-        $this->_controller->sendEmail(
+        $message = $this->_controller->newMessage();
+        $message->AddAddress(
           $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
-          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer), 
-          $this->_applicant->getApplication()->getContactEmail(),
-          $this->_applicant->getApplication()->getContactName(),
-          'Letter of Recommendation Request', 
-          $body
-        );
+          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer));
+        $message->setFrom($this->_applicant->getApplication()->getContactEmail(), $this->_applicant->getApplication()->getContactName());
+        $message->Subject = 'Letter of Recommendation Request';
+        $message->Body = $body;
+        $message->Send();
+        
         $answer->lock();
         $answer->markLastUpdate();
         $this->_controller->getEntityManager()->persist($answer);
