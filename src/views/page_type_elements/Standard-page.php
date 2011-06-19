@@ -7,7 +7,6 @@
  * @subpackage apply
  */
 ?>
-<p class='deadline<?php if($page->getApplication()->getClose()->diff(new DateTime('today'))->days < 7){ print ' approaching-deadline';}  ?>'>Application Deadline: <?php print $page->getApplication()->getClose()->format('m/d/Y g:ia T');?></p>
   <?php if($page->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED){?>
     <p class="skip">You have selected to skip this page.  You can still change your mind and <a href='<?php print $this->controller->getActionPath() . '/do/unskip';?>' title='complete this page'>Complete This Page</a> if you wish.</p>
   <?php } else {

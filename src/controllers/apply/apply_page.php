@@ -41,6 +41,10 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $this->setVar('page', $this->_page);
     $this->setVar('currentAnswerID', false);
     $this->setVar('applicant', $this->_applicant);
+    $layoutContentTop = "<p class='deadline";
+    if($this->_application->getClose()->diff(new DateTime('today'))->days < 7){ $layoutContentTop .= ' approaching-deadline';}
+    $layoutContentTop .= "'>Application Deadline: " . $this->_application->getClose()->format('m/d/Y g:ia T') . '</p>';
+    $this->setLayoutVar('layoutContentTop', $layoutContentTop);
   }
   
   /**
