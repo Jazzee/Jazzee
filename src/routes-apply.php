@@ -115,5 +115,16 @@ $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/?([^/]+)?$#i', array(
   )
 ));
 
+//applicant status
+$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/resetpassword/([a-z0-9]+)$#i', array(
+  'controller' => 'apply_applicant',
+  'action' => 'resetpassword',
+  'action_params' => array(
+    'programShortName' => 1,
+    'cycleName' => 2,
+    'uniqueId' => 3
+  )
+));
+
 $fc->addRouter($basicRouter);
 $fc->processRequest(new Lvc_HttpRequest());

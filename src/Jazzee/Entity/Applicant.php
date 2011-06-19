@@ -6,7 +6,12 @@ namespace Jazzee\Entity;
  * Individual applicants are tied to an Application - but a single person can be multiple Applicants
  * @Entity(repositoryClass="\Jazzee\Entity\ApplicantRepository")
  * @HasLifecycleCallbacks 
- * @Table(name="applicants",uniqueConstraints={@UniqueConstraint(name="application_email", columns={"application_id", "email"})}) 
+ * @Table(name="applicants",
+ *   uniqueConstraints={
+ *     @UniqueConstraint(name="application_email", columns={"application_id", "email"}),
+ *     @UniqueConstraint(name="applicant_uniqueId", columns={"uniqueId"})
+ *   }
+ * ) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -17,6 +22,9 @@ class Applicant{
     * @GeneratedValue(strategy="AUTO")
   */
   private $id;
+  
+  /** @Column(type="string", length=255, nullable=true) */
+  private $uniqueId;
   
   /** 
    * @ManyToOne(targetEntity="Application", inversedBy="applicants")
@@ -165,6 +173,36 @@ class Applicant{
     $this->setPassword($password);
     $p = new \PasswordHash(8, FALSE);
     return $p->CheckPassword($password, $this->password);
+  }
+
+  /**
+   * Generate a unique id
+   */
+  public function generateUniqueId(){
+    //PHPs uniquid function is time based and therefor guessable
+    //A stright random MD5 sum is too long for email and tends to line break causing usability problems
+    //So we get unique through uniquid and we get random by prefixing it with a part of an MD5
+    //hopefully this results in a URL friendly short, but unguessable string
+    $prefix = substr(md5($this->password . mt_rand()*mt_rand()),rand(0,24), rand(6,8));
+    $this->uniqueId = \uniqid($prefix);
+  }
+  
+  /**
+   * Set a uniqueid
+   * Prefferably call generateUniqueId - but it can also be set manually
+   * @param string $uniqueId;
+   */
+  public function setUniqueId($uniqueId){
+    $this->uniqueId = $uniqueId;
+  }
+  
+  /**
+   * Get uniqueId
+   *
+   * @return string $uniqueId
+   */
+  public function getUniqueId(){
+    return $this->uniqueId;
   }
   
   /**

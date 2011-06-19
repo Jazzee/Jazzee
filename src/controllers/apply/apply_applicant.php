@@ -27,9 +27,6 @@ class ApplyApplicantController extends \Jazzee\Controller {
   
   /**
    * Authenticate applicants
-   * @param string $programShortName
-   * @param string $cycleName
-   * @return null
    */
   public function actionLogin() {
     $form = new \Foundation\Form();
@@ -46,6 +43,10 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $element = $field->newElement('PasswordInput','password');
     $element->setLabel('Password');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $element = $field->newElement('Plaintext','forgotlink');
+    $element->setValue('<a href="' . $this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword') . '">Forgot your password?</a>');
+    
     
     $form->newButton('submit', 'Login');
     
@@ -66,29 +67,91 @@ class ApplyApplicantController extends \Jazzee\Controller {
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
     }
     $this->setVar('form', $form);
-    
   }
   
   /**
-   * Reset applicant password
-   * @param string $programShortName
-   * @param string $cycleName
-   * @return null
+   * Send Forgot applicant password email request
    */
-  public function actionReset($programShortName, $cycleName) {
-//    $form = new Form;
-//    $form->attr('action', $this->url('manage_user', 'reset'));
-//    $field = $form->newField();
-//    $field->attr('legend', 'Reset Password');
-//    $email = $field->newElement('TextInput');
-//    $email->attr('name', 'email');
-//    $email->attr('label', 'Email Address');
-//    $email->addValidator('NotEmpty');
-//    $email->addFilter('Lowercase');
-//    if($input = $this->getFormInput($form)){
-//      
-//    }
-//    $this->setVar('form', $form->render('html'));
+  public function actionForgotpassword() {
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword'));
+    $field = new \Foundation\Form\Field($form);
+    $field->setLegend('Forgot Password');
+    $form->addField($field);
+    
+    $element = $field->newElement('TextInput','email');
+    $element->setLabel('Email Address');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Lowercase($element));
+    
+    $form->newButton('submit', 'Submit');
+    
+    if($input = $form->processInput($this->post)){
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
+      if($applicant){
+        $applicant->generateUniqueId();
+        $body = "We have received a request to reset your password.  In order to reset your password you will need to click on the link at the bottom of this email.  This will take you back to the secure website were you will be ale to enter a new password. \n \n"
+      . "If you cannot click on the link you should copy and paste it into your browser. \n"
+      . "For your protection this link will only be valid for a limited time. \n \n"
+      . $this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/resetpassword/' . $applicant->getUniqueId());
+        $message = $this->newMessage();
+        $message->AddAddress($applicant->getEmail(), $applicant->getFullName());
+        $message->Subject = 'Password Reset Request';
+        $message->Body = $body;
+        $message->Send();
+        $this->_em->persist($applicant);
+        $this->addMessage('success', 'Instructions for reseting your password have been sent to your email address.');
+        $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login');
+      }
+      $this->addMessage('error', 'Invalid email address.');
+      sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
+    }
+    $this->setVar('form', $form);
+  }
+  
+
+  
+  /**
+   * Reset applicant password
+   */
+  public function actionResetpassword() {
+    $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneBy(array('uniqueId'=>$this->actionParams['uniqueId']));
+    if(!$applicant){
+      sleep(3);
+      throw new \Jazzee\Exception(
+      'Bad uniqueId in applicant password reset request', E_STRICT, 
+      'We were not able to find your password reset request.  It may have expired. ' .
+      'You can <a href="' . $this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword/') . '">Try your request again.</a>');
+    }
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/resetpassword/' . $this->actionParams['uniqueId']));
+    $field = new \Foundation\Form\Field($form);
+    $field->setLegend('Reset Password');
+    $form->addField($field);
+    
+    $element = $field->newElement('PasswordInput','password');
+    $element->setLabel('New Password');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $element = $field->newElement('PasswordInput','confirm-password');
+    $element->setLabel('Confirm Password');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\SameAs($element, 'password'));
+    
+    //setup recaptcha element keys
+    \Foundation\Form\Element\Captcha::setKeys($this->_config->getRecaptchaPrivateKey(), $this->_config->getRecaptchaPublicKey());
+    $element = $field->newElement('Captcha','captcha');
+    
+    $form->newButton('submit', 'Reset Password');
+    
+    if($input = $form->processInput($this->post)){
+      $applicant->setPassword($input->get('password'));
+      $applicant->setUniqueId(null);
+      $this->_em->persist($applicant);
+      $this->addMessage('success', 'Your password was reset successfully.');
+      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login');
+    }
+    $this->setVar('form', $form);
   }
   
   /**

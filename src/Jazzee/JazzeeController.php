@@ -100,25 +100,12 @@ class JazzeeController extends PageController
   }
   
   /**
-   * Send Email
+   * Get a new mail message class
    * 
-   * @param string $toAddress Email Address
-   * @param string $toName
-   * @param string $fromAddress
-   * @param string $fromName
-   * @param string $subject
-   * @param string $body
-   * 
-   * @return boolean true on success false if error
+   * @return \Foundation\Mail\Message
    */
-  public function sendEmail($toAddress, $toName, $fromAddress, $fromName, $subject, $body){
-    if(!isset($this->_mailServer)) $this->_mailServer = new \Foundation\Mail\Server($this->_foundationConfig);
-    $message = new \Foundation\Mail\Message($this->_foundationConfig);
-    $message->addTo($toAddress, $toName);
-    $message->setFrom($fromAddress, $fromName);
-    $message->setSubject($subject);
-    $message->setBody($body);
-    return $this->_mailServer->send($message);
+  public function newMessage(){
+    return new \Foundation\Mail\Message($this->_foundationConfig);
   }
   
   /**
