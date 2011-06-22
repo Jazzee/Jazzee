@@ -96,9 +96,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $this->_page->getJazzeePage()->fill($this->actionParams['answerID']);
     $this->setVar('currentAnswerID', $this->actionParams['answerID']);
     if(!empty($this->post)){
-      if(!$input = $this->_page->getJazzeePage()->validateInput($this->post)){
-        $this->addMessage('error', self::ERROR_MESSAGE);
-      } else {
+      if($input = $this->_page->getJazzeePage()->validateInput($this->post)){
         $this->_page->getJazzeePage()->updateAnswer($input, $this->actionParams['answerID']);
         $this->setVar('currentAnswerID', null);
       }
