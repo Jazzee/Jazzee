@@ -88,7 +88,7 @@ class Recommenders extends Standard {
       $elementTypes[$type->getClass()] = $type;
     };
     $count = 1;
-    foreach(array(self::FID_FIRST_NAME=>'First Name',self::FID_LAST_NAME=>'Last Name',self::FID_INSTITUTION=>'Institution',self::FID_EMAIL=>'Email Address',self::FID_PHONE=>'Phone Number') as $fid => $title){
+    foreach(array(self::FID_FIRST_NAME=>'First Name',self::FID_LAST_NAME=>'Last Name',self::FID_INSTITUTION=>'Institution') as $fid => $title){
       $element = new \Jazzee\Entity\Element;
       $element->setType($elementTypes['\\Jazzee\\Entity\Element\TextInput']);
       $element->setTitle($title);
@@ -99,6 +99,25 @@ class Recommenders extends Standard {
       $em->persist($element);
       $count++;
     }
+    
+    $element = new \Jazzee\Entity\Element;
+    $element->setType($elementTypes['\\Jazzee\\Entity\Element\EmailAddress']);
+    $element->setTitle('Email Address');
+    $element->required();
+    $element->setWeight(5);
+    $element->setFixedId(self::FID_EMAIL);
+    $this->_applicationPage->getPage()->addElement($element);
+    $em->persist($element);
+    
+    $element = new \Jazzee\Entity\Element;
+    $element->setType($elementTypes['\\Jazzee\\Entity\Element\Phonenumber']);
+    $element->setTitle('Phone Number');
+    $element->required();
+    $element->setWeight(6);
+    $element->setFixedId(self::FID_PHONE);
+    $this->_applicationPage->getPage()->addElement($element);
+    $em->persist($element);
+    
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\\Jazzee\\Entity\Element\RadioList']);
     $element->setTitle('Do you waive your right to view this letter at a later time?');
