@@ -58,6 +58,22 @@ a:hover {color:#cc6600;}
 	font-weight: bold;
 }
 
+#topbar p.links{	
+  float: right;
+}
+
+#topbar p.links a{
+	background-color: #7799bb;
+  color: #ffffff;
+  padding: .5em;
+  text-decoration: none;
+}
+
+#topbar p.links a:hover {
+	background-color: #336699;
+	color:#cc6600;
+}
+
 div.threaded div{
   margin-left: 2em;	
 }

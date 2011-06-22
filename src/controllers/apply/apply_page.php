@@ -41,10 +41,6 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $this->setVar('page', $this->_page);
     $this->setVar('currentAnswerID', false);
     $this->setVar('applicant', $this->_applicant);
-    $layoutContentTop = "<p class='deadline";
-    if($this->_application->getClose()->diff(new DateTime('today'))->days < 7){ $layoutContentTop .= ' approaching-deadline';}
-    $layoutContentTop .= "'>Application Deadline: " . $this->_application->getClose()->format('m/d/Y g:ia T') . '</p>';
-    $this->setLayoutVar('layoutContentTop', $layoutContentTop);
   }
   
   /**
@@ -149,17 +145,6 @@ class ApplyPageController extends \Jazzee\ApplyController {
       }
       $menu->addLink($link);
     }
-    $applicant_menu = new \Foundation\Navigation\Menu();
-    $navigation->addMenu($applicant_menu);
-    $applicant_menu->setTitle("User Menu");
-    
-    $link = new \Foundation\Navigation\Link('Support');
-    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support'));
-    $applicant_menu->addLink($link);
-
-    $link = new \Foundation\Navigation\Link('Logout');
-    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/applicant/logout'));
-    $applicant_menu->addLink($link);
     
     return $navigation;
   }
