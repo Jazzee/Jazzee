@@ -177,3 +177,38 @@ div.form textarea {
 div.form div.control li{
 	padding-bottom: .25em;
 }
+
+/***** TABLE STYLE *****/
+
+#main table {
+  border-collapse: collapse;
+  border: 1px solid #000000;
+  
+}
+#main td, #main th {
+  padding: .25em;
+  border: 1px solid #000000;
+}
+
+#main thead {
+  background-color: #CCCCCC;
+  font-weight: bold;
+  border-bottom: 2px solid black;
+}
+
+#main .highlight td{
+  background-color: #ffcc66;
+}
+
+#main table caption {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+#main table tr.even {
+  background-color: #fffff;
+}
+
+#main table tr.odd {
+  background-color: #eeeeee;
+}
