@@ -58,6 +58,11 @@ a:hover {color:#cc6600;}
 	font-weight: bold;
 }
 
+#topbar {
+  background-color: #003366;
+  color: #ffffff; 
+}
+
 #topbar p.links{	
   float: right;
 }
