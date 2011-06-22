@@ -18,7 +18,7 @@
   <p class='status'>
     <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?><br />
     <?php if($child = $answer->getChildren()->first()){?>
-      <br /><strong>Status:</strong> This recommendation was received on <?php print $child->getLastUpdatedAt('l F jS Y g:ia');
+      <br /><strong>Status:</strong> This recommendation was received on <?php print $child->getUpdatedAt()->format('l F jS Y g:ia');
     } else if($answer->isLocked()){?>
       <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?><br />
       <strong>Status:</strong> You cannot make changes to this recommendation becuase the invitation has already been sent.
