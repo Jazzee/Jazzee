@@ -106,6 +106,15 @@ class Page{
   }
   
   /**
+   * Set uuid
+   *
+   * @param string $uuid
+   */
+  public function setUuid($uuid){
+    $this->uuid = $uuid;
+  }
+  
+  /**
    * Generate a Temporary id
    *
    * This should only be used when we need to termporarily generate a page 
