@@ -14,7 +14,7 @@ class Date extends AbstractElement {
     if($this->_element->getFormat()){
       $format = $this->_element->getFormat();
     } else {
-      $format = 'mm/dd/yyyy eg ' . date('m/d/Y');
+      $format = 'm/d/yyyy eg ' . date('n/j/Y');
     }
     $element->setFormat($format);
     $element->setDefaultValue($this->_element->getDefaultValue());
@@ -50,7 +50,7 @@ class Date extends AbstractElement {
   public function formValue(\Jazzee\Entity\Answer $answer){
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEDate()->format('Y-n-j');
+      return $elementsAnswers[0]->getEDate()->format('n/j/Y');
     }
     return null;
   }
