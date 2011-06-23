@@ -75,12 +75,15 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
       $exml->setAttribute('defaultValue', $element->getDefaultValue());
       $listItems = $exml->appendChild($dom->createElement('listitems'));
       foreach($element->getListItems() as $item){
-        $ixml = $dom->createElement('item');
-        $ixml->nodeValue = htmlentities($item->getValue());
-        $ixml->setAttribute('active', (integer)$item->isActive());
-        $ixml->setAttribute('weight', $item->getWeight());
-        $listItems->appendChild($ixml);
-        unset($ixml);
+        //only export active items
+        if($item->isActive()){
+          $ixml = $dom->createElement('item');
+          $ixml->nodeValue = htmlentities($item->getValue());
+          $ixml->setAttribute('active', (integer)$item->isActive());
+          $ixml->setAttribute('weight', $item->getWeight());
+          $listItems->appendChild($ixml);
+          unset($ixml);
+        }
       }
       $elements->appendChild($exml);
     }
