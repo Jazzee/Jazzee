@@ -11,7 +11,12 @@ class Date extends AbstractElement {
     $element = $field->newElement('DateInput', 'el' . $this->_element->getId());
     $element->setLabel($this->_element->getTitle());
     $element->setInstructions($this->_element->getInstructions());
-    $element->setFormat($this->_element->getFormat());
+    if($this->_element->getFormat()){
+      $format = $this->_element->getFormat();
+    } else {
+      $format = 'mm/dd/yyyy eg ' . date('m/d/Y');
+    }
+    $element->setFormat($format);
     $element->setDefaultValue($this->_element->getDefaultValue());
     if($this->_element->isRequired()){
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
