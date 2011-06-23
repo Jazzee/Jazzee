@@ -358,8 +358,16 @@ JazzeePage.prototype.textInputVariableBlock = function(variableName, title, valu
  * @returns {jQuery}
  */
 JazzeePage.prototype.selectListVariableBlock = function(variableName, description, options){
+  var choice = options[this.getVariable(variableName)];
+  // if the choice isn't availalbe then just grab the first one off the array
+  if(choice == undefined){
+	for (var option in options){
+	  choice = option;
+	  break;
+	}
+  }
   var pageClass = this;
-  var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(options[this.getVariable(variableName)]).bind('click',function(e){
+  var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(options[choice]).bind('click',function(e){
     $(this).unbind('click');
     var select = $('<select>');
     $.each(options,function(value, text){
