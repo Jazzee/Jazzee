@@ -269,7 +269,7 @@ class JazzeePageController extends \Foundation\VC\Controller
         $priority = PEAR_LOG_INFO;
     }
     $this->_log->log($message . ' in ' . $file . ' at line ' . $line, $priority);
-    throw new Exception('Jazzee caught a PHP error');
+    throw new \Exception('Jazzee caught a PHP error');
   }
   
 
