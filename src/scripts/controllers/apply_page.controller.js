@@ -4,5 +4,9 @@
  */
 $(document).ready(function(){
   //Add the datepicker to the DateInput element
-  $('div.form input.DateInput').datepicker();
+  $('div.form input.DateInput').datepicker({
+		showOn: "button",
+		buttonImage: "resource/foundation/media/icons/calendar_edit.png",
+		buttonImageOnly: true
+	});
 });
