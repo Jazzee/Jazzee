@@ -126,7 +126,7 @@ class JazzeeController extends PageController
       if(!extension_loaded('apc')) throw new Exception('APC cache is required, but was not available.');
       $cache = new \Doctrine\Common\Cache\ApcCache;
     }
-    $driver = $doctrineConfig->newDefaultAnnotationDriver(array(__DIR__."/Jazzee/Entity"));
+    $driver = $doctrineConfig->newDefaultAnnotationDriver(array(__DIR__."/Entity"));
     $doctrineConfig->setMetadataDriverImpl($driver);
     
     $doctrineConfig->setProxyNamespace('Jazzee\Entity\Proxy');
