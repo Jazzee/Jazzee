@@ -31,6 +31,7 @@ adminAuthenticationClass=
 ;ShibbolethFirstNameAttribute='givenName'
 ;ShibbolethLastNameAttribute='sn'
 ;ShibbolethEmailAddressAttribute='mail'
+;ShibbolethLogoutUrl='/Shibboleth.sso/Logout'
 
 ;##NoAuthentication##;
 ;noAuthUserId=0

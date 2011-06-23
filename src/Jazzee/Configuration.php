@@ -157,6 +157,11 @@ protected $_shibbolethEmailAddressAttribute;
 /**
  * @var string
  */
+protected $_shibbolethLogoutUrl;
+
+/**
+ * @var string
+ */
 protected $_noAuthUserId;
 
 /**
@@ -705,6 +710,22 @@ protected $_publicKeyCertificatePath;
    */
   public function setShibbolethEmailAddressAttribute($shibbolethEmailAddressAttribute) {
     $this->_shibbolethEmailAddressAttribute = $shibbolethEmailAddressAttribute;
+  }  
+  
+  /**
+   * get shibbolethLogoutUrl
+   * @return string
+   */
+  public function getShibbolethLogoutUrl() {
+    return $this->_shibbolethLogoutUrl;
+  }
+  
+  /**
+   * set shibbolethLogoutUrl
+   * @var string $shibbolethLogoutUrl
+   */
+  public function setShibbolethLogoutUrl($shibbolethLogoutUrl) {
+    $this->_shibbolethLogoutUrl = $shibbolethLogoutUrl;
   }
   
   /**
