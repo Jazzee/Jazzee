@@ -110,10 +110,12 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $element->setWeight((string)$attributes['weight']);
         $page->addElement($element);
         foreach($elementElement->xpath('listitems/item') as $listElement){
+          $attributes = $listElement->attributes();
           $listItem = new \Jazzee\Entity\ElementListItem();
           $listItem->setValue((string)$listElement);
-          $listItem->setWeight((string)$listElement->attributes['weight']);
-          if((string)$listElement->attributes['active']) $listItem->activate(); else $listItem->deactivate();
+          $listItem->setWeight((string)$attributes['weight']);
+          
+          if((string)$attributes['active']) $listItem->activate(); else $listItem->deactivate();
           $element->addItem($listItem);
           $this->_em->persist($listItem);
         }
