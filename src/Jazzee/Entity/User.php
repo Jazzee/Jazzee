@@ -51,6 +51,11 @@ class User{
   **/
   private $roles;
   
+  /** 
+   * @OneToMany(targetEntity="AuditLog", mappedBy="user")
+   */
+  protected $logs;
+  
 
   public function __construct(){
     $this->roles = new \Doctrine\Common\Collections\ArrayCollection();
@@ -189,6 +194,24 @@ class User{
    */
   public function getRoles(){
     return $this->roles;
+  }
+
+  /**
+   * Add log
+   *
+   * @param Entity\Log $log
+   */
+  public function addLog(log $log){
+    $this->logs[] = $log;
+  }
+
+  /**
+   * Get logs
+   *
+   * @return Doctrine\Common\Collections\Collection $logs
+   */
+  public function getLogs(){
+    return $this->logs;
   }
   
   /**
