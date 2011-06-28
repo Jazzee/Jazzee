@@ -100,7 +100,7 @@ abstract class AdminController extends Controller{
     parent::beforeAction();
     if(!$this->checkIsAllowed($this->controllerName, $this->actionName)){
       $this->addMessage('error', 'You have attempted to access an un-authorized resource.');
-      $this->redirect($this->path("admin/welcome"));
+      $this->redirect($this->path('welcome'));
       exit();
     }
     if($this->_cycle AND $this->_program){
