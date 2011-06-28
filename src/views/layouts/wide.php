@@ -27,13 +27,14 @@ print '<?xml version="1.0" encoding="iso-8859-1"?>' ?>
       <div id='bd'>
           <div id='main'>
             <div id='topbar'>
-            <?php
-              if($navigation = $this->controller->getNavigation()){
-                $navigation->addClass('h-navigation');
-                $this->renderElement('navigation', array('container'=>$navigation));
-              }
-            ?>
-            <?php echo $layoutContentTop ?></div>
+              <?php
+                if($navigation = $this->controller->getNavigation()){
+                  $navigation->addClass('h-navigation');
+                  $this->renderElement('navigation', array('container'=>$navigation));
+                }
+              ?>
+              <?php echo $layoutContentTop ?>
+            </div>
             <div id='messages'><?php $this->renderElement('messages') ?></div>
             <div id='content' class='tall'><?php echo $layoutContent ?></div>
             <div id='ft'><p>This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.</p></div>

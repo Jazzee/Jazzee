@@ -160,6 +160,9 @@ abstract class AdminController extends Controller{
   public function getNavigation(){
     if($this->_cache->contains('AdminControllerGetNavigation')) return $this->_cache->fetch('AdminControllerGetNavigation');
     $navigation = new \Foundation\Navigation\Container();
+    $link = new \Foundation\Navigation\Link('Home');
+    $link->setHref($this->path('welcome'));
+    $navigation->addLink($link);
     $menus = array();
     foreach($this->listControllers() as $controller){
       if($this->checkIsAllowed($controller)){

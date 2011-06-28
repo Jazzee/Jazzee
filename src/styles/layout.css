@@ -72,9 +72,8 @@ div.h-navigation li {
   position: relative;
   z-index: 5;
   display: block;
-  padding-right:5em;
   font-weight:bold;
-  width: 180px;
+  width: 140px;
 }
 
 div.h-navigation li:hover {
@@ -88,7 +87,6 @@ div.h-navigation li ol {
   position: absolute;
   z-index: 10;
   left: 0; /*place the dropdown directly or IE7 throws it right*/
-
 }
 
 div.h-navigation li:hover ol {
