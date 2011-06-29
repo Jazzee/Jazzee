@@ -553,6 +553,16 @@ class Applicant{
   }
 
   /**
+   * Remove tag
+   *
+   * @param Entity\Tag $tag
+   */
+  public function removeTag(Tag $tag){
+    $this->tags->removeElement($tag);
+    $this->markLastUpdate();
+  }
+
+  /**
    * Get tags
    *
    * @return Doctrine\Common\Collections\Collection $tags

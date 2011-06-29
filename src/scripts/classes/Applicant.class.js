@@ -169,21 +169,40 @@ Applicant.prototype.displayDecisions = function(json){
  * Display Tags
  * @param Object tags
  */
-Applicant.prototype.displayTags = function(tags){
+Applicant.prototype.displayTags = function(json){
   var self = this;
   $('#tags').empty();
   var ul = $('<ul>');
-  for(var i=0; i<tags.length; i++){
-    ul.append($('<li>').html(tags[i].title));
+  for(var i=0; i<json.tags.length; i++){
+    var li = $('<li>').html(json.tags[i].title).data('tagId', json.tags[i].id);
+    if(json.allowRemove){
+      li.prepend($('<img>').attr('src',self.baseUrl + '/resource/foundation/media/icons/delete.png').click(function(e){
+        $.post(self.baseUrl + '/removeTag',{tagId: $(e.target).parent().data('tagId')},function(json){
+          self.displayTags(json.data.result.tags);
+        });
+      })
+      );
+    }
+    ul.append(li);
   }
   $('#tags').append(ul);
-  var form = $('<form>').append($('<input name="tag" type="text">'));
-  form.submit(function(e){
-    var value = $('input', e.target).first().val();
-    $.post(self.baseUrl + '/addTag',{tag: value},function(json){
-      self.displayTags(json.data.result.tags);
+  if(json.allowAdd){
+    var input = $('<input name="tag" type="text" value="add tag">');
+    input.focus(function(e){
+      $(e.target).attr('value', '');
     });
-    return false;
-  });
-  $('#tags').append(form);
+    input.blur(function(e){
+      $(e.target).attr('value', 'add tag');
+    });
+    var form = $('<form>').append(input);
+    
+    form.submit(function(e){
+      var value = $('input', e.target).first().val();
+      $.post(self.baseUrl + '/addTag',{tagTitle: value},function(json){
+        self.displayTags(json.data.result.tags);
+      });
+      return false;
+    });
+    $('#tags').append(form);
+  }
 };

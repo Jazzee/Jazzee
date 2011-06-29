@@ -161,9 +161,13 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    * @param \Jazzee\Entity\Applicant $applicant
    */
   protected function getTags(\Jazzee\Entity\Applicant $applicant){
-    $tags = array();
+    $tags = array(
+      'tags'=>array(),
+      'allowAdd' => $this->checkIsAllowed($this->controllerName, 'addTag'),
+      'allowRemove' => $this->checkIsAllowed($this->controllerName, 'removeTag')
+    );
     foreach($applicant->getTags() as $tag){
-      $tags[] = array(
+      $tags['tags'][] = array(
         'id'=> $tag->getId(),
         'title'=>$tag->getTitle()
       );
@@ -243,13 +247,27 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    */
   public function actionAddTag($applicantId){
     $applicant = $this->getApplicantById($applicantId);
-    $tag = $this->_em->getRepository('\Jazzee\Entity\Tag')->findOneBy(array('title'=> $this->post['tag']));
+    $tag = $this->_em->getRepository('\Jazzee\Entity\Tag')->findOneBy(array('title'=> $this->post['tagTitle']));
     if(!$tag){
       $tag = new \Jazzee\Entity\Tag();
-      $tag->setTitle($this->post['tag']);
+      $tag->setTitle($this->post['tagTitle']);
       $this->_em->persist($tag);
     }
     $applicant->addTag($tag);
+    $this->_em->persist($applicant);
+    $this->_em->flush(); //flush here so the tag ID will be available
+    $this->setVar('result', array('tags'=>$this->getTags($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Remove a tag from an applicant
+   * @param integer $applicantID
+   */
+  public function actionRemoveTag($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $tag = $this->_em->getRepository('\Jazzee\Entity\Tag')->find($this->post['tagId']);
+    $applicant->removeTag($tag);
     $this->_em->persist($applicant);
     $this->setVar('result', array('tags'=>$this->getTags($applicant)));
     $this->loadView($this->controllerName . '/result');
