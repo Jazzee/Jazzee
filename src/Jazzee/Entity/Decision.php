@@ -83,7 +83,7 @@ class Decision{
    */
   public function nominateAdmit($dateString = null){
     if(!is_null($this->nominateDeny)){
-      throw new Jazzee_Exception('Cannot record two preliminary decisions');
+      throw new \Jazzee\Exception('Cannot record two preliminary decisions');
     }
     if(is_null($this->nominateAdmit)) $this->nominateAdmit = $this->decisionStamp($dateString);
   }
@@ -93,7 +93,7 @@ class Decision{
    */
   public function undoNominateAdmit(){
     if(!is_null($this->finalAdmit)){
-      throw new Jazzee_Exception('Cannot remove a preliminary decision if a final decision has been recorded');
+      throw new \Jazzee\Exception('Cannot remove a preliminary decision if a final decision has been recorded');
     }
     $this->nominateAdmit = null;
   }
@@ -104,7 +104,7 @@ class Decision{
    */
   public function nominateDeny($dateString = null){
     if(!is_null($this->nominateAdmit)){
-      throw new Jazzee_Exception('Cannot record two preliminary decisions');
+      throw new \Jazzee\Exception('Cannot record two preliminary decisions');
     }
     if(is_null($this->nominateDeny)) $this->nominateDeny = $this->decisionStamp($dateString);
   }
@@ -115,7 +115,7 @@ class Decision{
    */
   public function undoNominateDeny(){
     if(!is_null($this->finalDeny)){
-      throw new Jazzee_Exception('Cannot remove a preliminary decision if a final decision has been recorded');
+      throw new \Jazzee\Exception('Cannot remove a preliminary decision if a final decision has been recorded');
     }
     $this->nominateDeny = null;
   }
@@ -126,7 +126,7 @@ class Decision{
    */
   public function finalDeny($dateString = null){
     if(!is_null($this->finalAdmit)){
-      throw new Jazzee_Exception('Cannot record two final decisions');
+      throw new \Jazzee\Exception('Cannot record two final decisions');
     }
     //if we don't have a preliminary decision record it now
     if(is_null($this->nominateDeny)) $this->nominateDeny = $this->decisionStamp($dateString);
@@ -162,7 +162,7 @@ class Decision{
    */
   public function finalAdmit($dateString = null){
     if(!is_null($this->finalDeny)){
-      throw new Jazzee_Exception('Cannot record two final decisions');
+      throw new \Jazzee\Exception('Cannot record two final decisions');
     }
     //if we don't have a preliminary decision record it now
     if(is_null($this->nominateAdmit)) $this->nominateAdmit = $this->decisionStamp($dateString);
@@ -182,7 +182,7 @@ class Decision{
    */
   public function acceptOffer($dateString = null){
     if(is_null($this->finalAdmit)){
-      throw new Jazzee_Exception('Cannot accept offer for an applicant who has not been admitted');
+      throw new \Jazzee\Exception('Cannot accept offer for an applicant who has not been admitted');
     }
     if(is_null($this->acceptOffer)) $this->acceptOffer = $this->decisionStamp($dateString);
   }
@@ -193,7 +193,7 @@ class Decision{
    */
   public function declineOffer($dateString = null){
     if(is_null($this->finalAdmit)){
-      throw new Jazzee_Exception('Cannot decline offer for an applicant who has not been admitted');
+      throw new \Jazzee\Exception('Cannot decline offer for an applicant who has not been admitted');
     }
     if(is_null($this->declineOffer)) $this->declineOffer = $this->decisionStamp($dateString);
   }
@@ -331,5 +331,31 @@ class Decision{
     foreach($decisions as $decision) if($this->$decision) $final = $decision;
     return $final;
   }
-   
+  
+  /**
+   * Check if a status can be set
+   * @param string $status
+   * 
+   * @return boolean
+   */
+   public function can($status){
+     switch($status){
+       case 'nominateAdmit':
+         return (is_null($this->nominateAdmit) and is_null($this->nominateDeny));
+       case 'undoNominateAdmit':
+         return ($this->nominateAdmit and is_null($this->finalAdmit));
+       case 'nominateDeny':
+         return (is_null($this->nominateAdmit) and is_null($this->nominateDeny));
+       case 'undoNominateDeny':
+         return (!is_null($this->nominateDeny) and is_null($this->finalDeny));
+       case 'finalAdmit':
+         return ($this->nominateAdmit and is_null($this->finalAdmit));
+       case 'finalDeny':
+         return ($this->nominateDeny and is_null($this->finalDeny));
+       case 'acceptOffer':
+       case 'declineOffer':
+         return ($this->finalAdmit and is_null($this->acceptOffer) and is_null($this->declineOffer));
+     }
+     throw new \Jazzee\Exception("{$status} is not a valid decision status type");
+   }
 }
