@@ -35,7 +35,7 @@ class ApplicantsListController extends \Jazzee\AdminController {
       $tags['All Applicants'][] = $applicant;
       if($applicant->isLocked()) $tags['Locked'][] = $applicant;
       else $tags['Not Locked'][] = $applicant;
-      if($applicant->getDecision() and $applicant->getDecision()->getAccepted()) $tags['Accepted'][] = $applicant;
+      if($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer()) $tags['Accepted'][] = $applicant;
       foreach($applicant->getTags() as $tag){
         if(!isset($tags[$tag->getTitle()])) $tags = array($tag->getTitle() => array()) + $tags;
         $tags[$tag->getTitle()][] = $applicant;
