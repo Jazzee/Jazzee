@@ -39,6 +39,8 @@ a:hover {color:#cc6600;}
   border-size: 1px;
 }
 
+#ajaxstatus { float: right;}
+
 .success {
   color: #7799bb;
   border-color:#7799bb;

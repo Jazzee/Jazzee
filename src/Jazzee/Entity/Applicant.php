@@ -536,7 +536,7 @@ class Applicant{
   /**
    * Get decision
    *
-   * @return Entity\Decision $decision
+   * @return \Jazzee\Entity\Decision $decision
    */
   public function getDecision(){
     return $this->decision;

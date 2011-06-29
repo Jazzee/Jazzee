@@ -5,24 +5,26 @@
 function Applicant(workspace){
   this.workspace = workspace;
   this.baseUrl = document.location.href;
-  var self = this;
-  this.refreshActions();
-  this.refreshTags();
-  $('a.editAccount').bind('click', function(e){
-	  $.get($(e.target).attr('href'),function(json){
-		  var obj = {
-		    reload: function(){
-			    $('#container').hide('fade');
-		    	window.location.reload();
-		    }
-		  };
-		  self.createForm(json.data.form, obj);
-	  });
-	  return false;
-  });
-  
 };
 
+Applicant.prototype.init = function(){
+  var self = this;
+  this.workspace
+    .append($('<div>').attr('id', 'bio'))
+    .append($('<div>').attr('id', 'status'))
+    .append($('<div>').attr('id', 'pages'))
+    .append($('<div>').attr('id', 'attachments'));
+  var statusTable = $('<table>').attr('id', 'statusTable');
+  statusTable.append($('<thead>').append('<tr><th>Actions</th><th>Admission Status</th><th>Tags</th></tr>'));
+  statusTable.append($('<tbody>').append('<tr><td id="actions"></td><td id="decisions"></td><td id="tags"></td></tr>'));
+  $('#status').html(statusTable);
+  $.get(this.baseUrl + '/refresh',function(json){
+    self.displayBio(json.data.result.bio);
+    self.displayActions(json.data.result.actions);
+    self.displayDecisions(json.data.result.decisions);
+    self.displayTags(json.data.result.tags);
+  });
+};
 /**
  * Create a form from json and display it
  * 
@@ -60,68 +62,128 @@ Applicant.prototype.createForm = function(json, callback){
         var json = eval("(" + $(this).contents().find('textarea').get(0).value + ")");
         div.dialog("destroy").remove();
         if(json.status == 'success'){
-          callback.reload();
+          callback.display(json);
         } else {
           applicant.createForm(json.data.form, callback);
         }
       }); //end iFrame Load
     });//end submit
-}
-
-/**
- * Refresh the status table
- */
-Applicant.prototype.refreshActions = function(){
-  $.get(this.baseUrl + '/updateActions',function(json){
-	$('#actions').html(
-		'Account Created: ' + json.data.result.createdAt + '<br />' + 
-		'Last Update: ' + json.data.result.updatedAt + '<br />' + 
-		'Last Login: ' + json.data.result.lastLogin + '<br />'
-	);
-  });
 };
 
 /**
- * Refresh decision status
+ * Display Biographic information
+ * @param Object json
  */
-Applicant.prototype.refreshDecisions = function(){
-  $.get(this.baseUrl + '/updateStatus',function(json){
-	$('#decisions').html(
-		'Status: ' + json.data.result.status + '<br />'
-	);
-  });
+Applicant.prototype.displayBio = function(json){
+  $('#bio').empty().hide();
+  var self = this;
+  var h1 = $('<h1>').html(json.name);
+  if(json.allowEdit){
+    var a = $('<a>').attr('href', this.baseUrl + '/updateBio').html(' (edit)');
+    a.click(function(e){
+      $.get($(e.target).attr('href'),function(json){
+        var obj = {
+          display: function(json){
+            self.displayBio(json.data.result.bio);
+          }
+        };
+        self.createForm(json.data.form, obj);
+      });
+      return false;
+    });
+    h1.append(a);
+  }
+  $('#bio').append(h1);
+  $('#bio').show();
 };
 
 /**
- * Refresh tags
+ * Display Actions
+ * @param Object json
  */
-Applicant.prototype.refreshTags = function(){
-  $.get(this.baseUrl + '/updateTags',function(json){
-	var ol = $('<ol>');
-	$.each(json.data.result, function(i, tag){
-	  ol.append($('<li>').data('tagId', tag.id).html(tag.title));		
-	});
-	$('#tags').html(ol);
-  });
+Applicant.prototype.displayActions = function(json){
+  $('#actions').empty();
+  var self = this;
+  $('#actions').html(
+    'Account Created: ' + json.createdAt.date + '<br />' + 
+    'Last Update: ' + json.updatedAt.date + '<br />' + 
+    'Last Login: ' + json.lastLogin.date + '<br />'
+  );
 };
 
 
+
 /**
- * Refresh a page
- * @param interger pageId
+ * Display Actions
+ * @param Object json
  */
-Applicant.prototype.refreshPage = function(pageId){
-  $.get(this.baseUrl + '/updatePage/'+pageId,function(html){
-	$('#page'+pageId).html(html);
-  });
+Applicant.prototype.displayDecisions = function(json){
+  $('#decisions').empty();
+  var self = this;
+  if(json.isLocked){
+    $('#decisions').html('Status: ' + json.status + '<br />');
+    var types = [
+      {title: 'Nominate for Admission', 'action': 'nominateAdmit'},
+      {title: 'Undo Nomination', 'action': 'undoNominateAdmit'},
+      {title: 'Nominate for Deny', 'action': 'nominateDeny'}, 
+      {title: 'Undo Nomination', 'action': 'undoNominateDeny'}, 
+      {title: 'Admit Applicant', 'action': 'finalAdmit'},
+      {title: 'Deny Applicant', 'action': 'finalDeny'},          
+    ];
+    for(var i = 0; i < types.length; i++){
+      if(json['allow'+types[i].action]){
+        var a = $('<a>').attr('href', this.baseUrl + '/' + types[i].action).html(types[i].title +'<br />');
+        a.click(function(e){
+          $.get($(e.target).attr('href'),function(json){
+            self.displayDecisions(json.data.result.decisions);
+          });
+          return false;
+        });
+        $('#decisions').append(a);
+      }
+    }
+  }else {$('#decisions').html('Status: Not Complete<br />');}
+  if(json.allowUnlock && json.isLocked){
+    var a = $('<a>').attr('href', this.baseUrl + '/unlock').html('Unlock Application <br />');
+    a.click(function(e){
+      $.get($(e.target).attr('href'),function(json){
+        self.displayDecisions(json.data.result.decisions);
+      });
+      return false;
+    });
+    $('#decisions').append(a);
+  }
+  if(json.allowLock && !json.isLocked){
+    var a = $('<a>').attr('href', this.baseUrl + '/lock').html('Lock Application <br />');
+    a.click(function(e){
+      $.get($(e.target).attr('href'),function(json){
+        self.displayDecisions(json.data.result.decisions);
+      });
+      return false;
+    });
+    $('#decisions').append(a);
+  }
 };
 
 /**
- * Refresh an answer
- * @param interger answerId
+ * Display Tags
+ * @param Object tags
  */
-Applicant.prototype.refreshAnswer = function(answerId){
-  $.get(this.baseUrl + '/updateAnswer/'+answerId,function(html){
-	$('#answer'+answerId).replaceWith(html);
+Applicant.prototype.displayTags = function(tags){
+  var self = this;
+  $('#tags').empty();
+  var ul = $('<ul>');
+  for(var i=0; i<tags.length; i++){
+    ul.append($('<li>').html(tags[i].title));
+  }
+  $('#tags').append(ul);
+  var form = $('<form>').append($('<input name="tag" type="text">'));
+  form.submit(function(e){
+    var value = $('input', e.target).first().val();
+    $.post(self.baseUrl + '/addTag',{tag: value},function(json){
+      self.displayTags(json.data.result.tags);
+    });
+    return false;
   });
+  $('#tags').append(form);
 };

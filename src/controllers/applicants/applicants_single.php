@@ -15,7 +15,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_EXTENDDEADLINE = 'Extend Deadline';
   const ACTION_LOCK = 'Lock Application';
   const ACTION_UNLOCK = 'UnLock Application';
-  const ACTION_TAG = 'Tag Applicant';
+  const ACTION_ADDTAG = 'Tag Applicant';
+  const ACTION_REMOVETAG = 'Remove Tag from Applicant';
   const ACTION_ATTACHAPPLICANTPDF = 'Attach PDF to Applicant';
   const ACTION_EDITANSWER = 'Edit Answer';
   const ACTION_DELETEANSWER = 'Delete Answer';
@@ -56,112 +57,45 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionIndex($id){
     $applicant = $this->getApplicantById($id);
     $this->layout = 'wide';
-    $this->setVar('applicant', $applicant);
   }
   
   /**
-   * Get an applicants action status
-   */
-  public function actionUpdateActions($id){
-    $applicant = $this->getApplicantById($id);
-    $actions = array(
-      'createdAt'=>$applicant->getCreatedAt(),
-      'updatedAt'=>$applicant->getUpdatedAt(),
-      'lastLogin'=>$applicant->getLastLogin()
-    );
-    $actions['allowUnlock'] = $this->checkIsAllowed($this->controllerName, 'unlock');
-    $actions['allowLock'] = $this->checkIsAllowed($this->controllerName, 'lock');
-    $actions['isLocked'] = $applicant->isLocked();
-    $this->setVar('result', $actions);
-    $this->loadView($this->controllerName . '/result');
-  }
-  
-  /**
-   * Get an applicants status
-   */
-  public function actionUpdateStatus($id){
-    $applicant = $this->getApplicantById($id);
-    $status = array(
-      'status'=> 'Not Complete'
-    );
-    $this->setVar('result', $status);
-    $this->loadView($this->controllerName . '/result');
-  }
-  
-  /**
-   * Get an applicants tags
-   */
-  public function actionUpdateTags($id){
-    $applicant = $this->getApplicantById($id);
-    $tags = array();
-    foreach($applicant->getTags() as $tag){
-      $tags[] = array(
-        'id' => $tag->getId(),
-        'title' => $tag->getTitle()
-      );
-    }
-    $this->setVar('result', $tags);
-    $this->loadView($this->controllerName . '/result');
-  }
-  
-  /**
-   * Update a page
-   */
-  public function actionUpdatePage($applicantId, $pageId){
-    $this->layout = 'blank';
-    $applicant = $this->getApplicantById($applicantId);
-    $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
-    $this->setVar('variables', array('page'=>$page,'applicant'=>$applicant));
-    $this->setVar('element', 'applicants-single-page');
-    $this->loadView($this->controllerName . '/element');
-  }
-  
-  /**
-   * Update an answer
-   */
-  public function actionUpdateAnswer($applicantId, $answerId){
-    $this->layout = 'blank';
-    $applicant = $this->getApplicantById($applicantId);
-    $answer = $this->_em->getRepository('\Jazzee\Entity\Answer')->findOneBy(array('id'=>$answerId, 'applicant'=>$applicant->getId()));
-    $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
-    
-    $this->setVar('variables', array('page'=>$page,'answer'=>$answer));
-    $this->setVar('element', 'applicants-single-answer');
-    $this->loadView($this->controllerName . '/element');
-  }
-  
-  /**
-   * PDF a single applicant
-   * @param integer $id the applicant id
-   * @param string $type the page orientation
-   */
-  public function actionPdf($applicantId, $type = 'portrait'){
-    $applicant = $this->getApplicantById($applicantId);
-    switch($type){
-      case 'landscape':
-        $orientation = \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE;
-        break;
-      default:
-        $orientation = \Jazzee\ApplicantPDF::USLETTER_PORTRAIT;
-    }
-    $key = '';
-    $pdf = new \Jazzee\ApplicantPDF($orientation, $key);
-    $blob = $pdf->pdf($applicant);
-    header("Content-type: application/pdf");
-    header("Content-Length: " . strlen($blob));
-    header('Content-Disposition: inline; filename=' . $applicant->getLastName() .'-' . $applicant->getFirstName() . '-' . date('m-d-y') . '.pdf');
-    print $blob; 
-    exit();
-  }
-  
-  /**
-   * Edit the intial data entered by the applicant when creating an account
+   * Refresh evverything
    * @param integer $applicantId
    */
-  public function actionEditAccount($applicantId){
+  public function actionRefresh($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $result = array(
+     'bio' => $this->getBio($applicant),
+     'actions' => $this->getActions($applicant),
+     'decisions' => $this->getDecisions($applicant),
+     'tags' => $this->getTags($applicant)
+    );
+    $this->setVar('result', $result);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Get bio
+   * @param \Jazzee\Entity\Applicant $applicant
+   * @return array
+   */
+  protected function getBio(\Jazzee\Entity\Applicant $applicant){
+    $bio = array(
+     'name' => $applicant->getFullName(),
+     'allowEdit' => $this->checkIsAllowed($this->controllerName, 'updateBio')
+    );
+    return $bio;
+  }
+  
+  /**
+   * Update Biography
+   * @param integer $applicantId
+   */
+  public function actionUpdateBio($applicantId){
     $applicant = $this->getApplicantById($applicantId);
     $form = new \Foundation\Form();
-    $form->setAction($this->path("applicants/single/{$applicantId}/editAccount"));
+    $form->setAction($this->path("applicants/single/{$applicantId}/updateBio"));
     $field = $form->newField();
     $field->setLegend('Edit ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
     
@@ -202,404 +136,190 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         
         $this->_em->persist($applicant);
         $this->setLayoutVar('status', 'success');
+        $this->setVar('result', array('bio'=> $this->getBio($applicant)));
       }
     }
     $this->setVar('form', $form);
     $this->loadView('applicants_single/form');
   }
   
-  
   /**
-   * Nominate and applicant for admission
-   * @param integer $id applicantID
+   * Get an applicants action status
+   * @param \Jazzee\Entity\Applicant $applicant
    */
-  public function actionNominateAdmit($id){
-    $applicant = $this->getApplicantById($id);
-    if($applicant->Decision->nominateDeny OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to admit applicant {$id} who already has a deny or final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
-    $applicant->Decision->nominateAdmit = date('Y-m-d H:i:s');
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  protected function getActions(\Jazzee\Entity\Applicant $applicant){
+    $actions = array(
+      'createdAt'=>$applicant->getCreatedAt(),
+      'updatedAt'=>$applicant->getUpdatedAt(),
+      'lastLogin'=>$applicant->getLastLogin()
+    );
+    return $actions;
   }
   
   /**
-   * Final Deny an applicant
-   * @param integer $id applicantID
+   * Get an applicants tags
+   * @param \Jazzee\Entity\Applicant $applicant
    */
-  public function actionFinalAdmit($id){
-    $applicant = $this->getApplicantById($id);
-    if(!$applicant->Decision->nominateAdmit OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to admit applicant {$id} who doesnt has a preliminary status or already final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
-    $applicant->Decision->finalAdmit = date('Y-m-d H:i:s');
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  protected function getTags(\Jazzee\Entity\Applicant $applicant){
+    $tags = array();
+    foreach($applicant->getTags() as $tag){
+      $tags[] = array(
+        'id'=> $tag->getId(),
+        'title'=>$tag->getTitle()
+      );
+    }
+    return $tags;
+  }
+  
+  
+  /**
+   * Get an applicants decisions status
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  protected function getDecisions(\Jazzee\Entity\Applicant $applicant){
+    $status = '';
+    if($applicant->getDecision()) $status = $applicant->getDecision()->status();
+    switch($status){
+      case '': $status = 'No Decision'; break;
+      case 'nominateAdmit': $status = 'Nominated for Admission'; break; 
+      case 'nominateDeny': $status = 'Nominated for Deny'; break; 
+      case 'finalDeny': $status = 'Denied'; break; 
+      case 'finalAdmit': $status = 'Admited'; break; 
+      case 'acceptOffer': $status = 'Accepted'; break; 
+      case 'declineOffer': $status = 'Declined'; break;
+    }
+    if($applicant->isLocked()){
+      $decisions = array('status'=>$status);
+      foreach(array('nominateAdmit', 'undoNominateAdmit', 'nominateDeny', 'undoNominateDeny', 'finalAdmit', 'finalDeny') as $type){
+        $decisions["allow{$type}"] = ($this->checkIsAllowed($this->controllerName, $type) && $applicant->getDecision()->can($type));
+      }
+    }
+    $decisions['allowUnlock'] = $this->checkIsAllowed($this->controllerName, 'unlock');
+    $decisions['allowLock'] = $this->checkIsAllowed($this->controllerName, 'lock');
+    $decisions['isLocked'] = $applicant->isLocked();
+    return $decisions;
+  }
+  
+  /**
+   * Nominate and applicant for admission
+   * @param integer $applicantId
+   */
+  public function actionNominateAdmit($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$applicant->isLocked()) throw new \Jazzee\Exception('Tried to nominate an applicant that was not locked');
+    $applicant->getDecision()->nominateAdmit();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Undo Nominate an applicant for admission
+   * @param integer $applicantId
+   */
+  public function actionUndoNominateAdmit($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->undoNominateAdmit();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Final Admit applicant
+   * @param integer $applicantId
+   */
+  public function actionFinalAdmit($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->finalAdmit();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
    * Tag an applicant
-   * @param integer $id applicantID
+   * @param integer $applicantID
    */
-  public function actionAddTag($id){
-    $applicant = $this->getApplicantById($id);
-    $applicant->addTag($this->post['tag']);
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  public function actionAddTag($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $tag = $this->_em->getRepository('\Jazzee\Entity\Tag')->findOneBy(array('title'=> $this->post['tag']));
+    if(!$tag){
+      $tag = new \Jazzee\Entity\Tag();
+      $tag->setTitle($this->post['tag']);
+      $this->_em->persist($tag);
+    }
+    $applicant->addTag($tag);
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('tags'=>$this->getTags($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
    * Nominate and applicant for deny
-   * @param integer $id applicantID
+   * @param integer $applicantId
    */
-  public function actionNominateDeny($id){
-    $applicant = $this->getApplicantById($id);
-    if($applicant->Decision->nominateAdmit OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to deny applicant {$id} who already has a admit or final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
-    $applicant->Decision->nominateDeny = date('Y-m-d H:i:s');
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  public function actionNominateDeny($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$applicant->isLocked()) throw new \Jazzee\Exception('Tried to nominate an applicant that was not locked');
+    $applicant->getDecision()->nominateDeny();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
-   * Final Deny an applicant
-   * @param integer $id applicantID
+   * Undo Nominate an applicant for deny
+   * @param integer $applicantId
    */
-  public function actionFinalDeny($id){
-    $applicant = $this->getApplicantById($id);
-    if(!$applicant->Decision->nominateDeny OR $applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to deny applicant {$id} who already has a final status", E_USER_ERROR, 'A decision has already been recorded for that applicant');
-    $applicant->Decision->finalDeny = date('Y-m-d H:i:s');
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  public function actionUndoNominateDeny($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->undoNominateDeny();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
-   * Settle a payment
-   * @param integer $paymentId 
+   * Final Deny applicant
+   * @param integer $applicantId
    */
-  public function actionSettlePayment($paymentId){
-    $payment = Doctrine::getTable('Payment')->find($paymentId);
-    if(!$payment)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to settle payment {$paymentID} that doesn't exist", E_USER_ERROR, 'That payment is not valid');
-    $applicant = $this->getApplicantById($payment->Applicant->id);
-    $this->layout = 'json';
-    $paymentType = new $payment->PaymentType->class($payment->PaymentType);
-    
-    $form = $paymentType->getSettlePaymentForm($payment);
-    $form->action = $this->path("applicants/single/settlePayment/{$payment->id}");
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        if($paymentType->settlePayment($payment, $input)){
-          $this->addMessage('success', 'Payment Settled Successfully');
-          $this->redirectPath('applicants/single/byId/'.$applicant->id);
-        }
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  /**
-   * Refund a payment
-   * @param integer $paymentId 
-   */
-  public function actionRefundPayment($paymentId){
-    $payment = Doctrine::getTable('Payment')->find($paymentId);
-    if(!$payment)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to settle payment {$paymentID} that doesn't exist", E_USER_ERROR, 'That payment is not valid');
-    $applicant = $this->getApplicantById($payment->Applicant->id);
-    $this->layout = 'json';
-    $paymentType = new $payment->PaymentType->class($payment->PaymentType);
-    
-    $form = $paymentType->getRefundPaymentForm($payment);
-    $form->action = $this->path("applicants/single/refundPayment/{$payment->id}");
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        if($paymentType->refundPayment($payment, $input)){
-          $this->addMessage('success', 'Payment Refunded Successfully');
-          $this->redirectPath('applicants/single/byId/'.$applicant->id);
-        }
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  /**
-   * Reject a payment
-   * @param integer $paymentId 
-   */
-  public function actionRejectPayment($paymentId){
-    $payment = Doctrine::getTable('Payment')->find($paymentId);
-    if(!$payment)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to reject payment {$paymentID} that doesn't exist", E_USER_ERROR, 'That payment is not valid');
-    $applicant = $this->getApplicantById($payment->Applicant->id);
-    $this->layout = 'json';
-    $paymentType = new $payment->PaymentType->class($payment->PaymentType);
-    
-    $form = $paymentType->getRejectPaymentForm($payment);
-    $form->action = $this->path("applicants/single/rejectPayment/{$payment->id}");
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        if($paymentType->rejectPayment($payment, $input)){
-          $this->addMessage('success', 'Payment Rejected Successfully');
-          $this->redirectPath('applicants/single/byId/'.$applicant->id);
-        }
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  /**
-   * Undo a nomination decision
-   * Can't be done for a final decision
-   * @param integer $id applicantID
-   */
-  public function actionUndoNomination($id){
-    $applicant = $this->getApplicantById($id);
-    if($applicant->Decision->finalAdmit OR $applicant->Decision->finalDeny)
-      throw new Jazzee_Exception("{$this->user->firstName} {$this->user->lastName} (#{$this->user->id}) attempted to undo nomination for applicant {$id} who already has a final status", E_USER_ERROR, 'A final decision has already been recorded for that applicant');
-    $this->layout = 'json';
-    $applicant->Decision->nominateAdmit = null;
-    $applicant->Decision->nominateDeny = null;
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+  public function actionFinalDeny($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->finalDeny();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
    * Unlock an application
-   * @param integer $id
+   * @param integer $applicantId
    */
-  public function actionUnlock($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
+  public function actionUnlock($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
     $applicant->unlock();
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
    * Lock an application
-   * @param integer $id
+   * @param integer $applicantId
    */
-  public function actionLock($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
+  public function actionLock($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
     $applicant->lock();
-    $applicant->save();
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
-  /**
-   * Extend the deadline for a single applicant
-   * @param integer $id
-   */
-  public function actionExtendDeadline($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
-    $form = new \Foundation\Form();
-    $form->action = $this->path("applicants/view/extendDeadline/{$id}");
-    $field = $form->newField(array('legend'=>"Extend Deadline for {$applicant->firstName} {$applicant->lastName}"));
-    $element = $field->newElement('DateInput', 'deadline');
-    $element->label = 'New Deadline';
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->addValidator('DateAfter', 'today');
-    $element->addFilter('DateFormat', 'Y-m-d H:i:s');
-    if($applicant->deadlineExtension){
-      $element->value = $applicant->deadlineExtension;
-    } else {
-      $element->value = 'today';
-    }
-    $form->newButton('submit', 'Save');
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        $applicant->deadlineExtension = $input->deadline;
-        $applicant->save();
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  
-  /**
-   * Edit an answer
-   * @param integer $id answerID
-   */
-  public function actionEditAnswer($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
-    $page = new $answer->Page->PageType->class($this->application->getApplicationPageByGlobalID($answer->Page->id), $applicant);
-    $form = $page->getForm();
-    $form->action = $this->path("applicants/view/editAnswer/{$id}");
-    $page->fill($id);
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        if($page->updateAnswer($input,$id)){
-          $this->addMessage('success', 'Answer Updated Successfully');
-        }
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  /**
-   * Add an answer
-   * @param integer $applicantID
-   * @param integer $pageID
-   */
-  public function actionAddAnswer($applicantID, $pageID){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
-    $page = new $page->Page->PageType->class($page, $applicant);
-    $form = $page->getForm();
-    $form->action = $this->path("applicants/view/addAnswer/{$applicantID}/{$pageID}");
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        if($page->newAnswer($input)){
-          $this->addMessage('success', 'Answer Saved Successfully');
-        }
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  /**
-   * Delete an answer
-   * @param integer $id answerID
-   */
-  public function actionDeleteAnswer($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
-    $page = new $answer->Page->PageType->class($this->application->getApplicationPageByGlobalID($answer->Page->id), $applicant);
-    if($page->deleteAnswer($id)){
-      $this->addMessage('success', 'Answer Deleted Successfully');
-    }
-    $this->redirectPath('applicants/single/byId/'.$applicant->id);
-  }
-  
-  /**
-   * Verify an answer
-   * @param integer $id answerID
-   */
-  public function actionVerifyAnswer($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
-    $statusTypes = Doctrine::getTable('StatusType')->findAll();
-    $form = new \Foundation\Form();
-    $form->action = $this->path("applicants/view/verifyAnswer/{$id}");
-    $field = $form->newField(array('legend'=>"Verify Answer"));
-    $element = $field->newElement('SelectList', 'publicStatus');
-    $element->label = 'Public Status';
-    $element->addItem(null, '');
-    foreach($statusTypes as $type){
-      $element->addItem($type->id, $type->name);
-    }
-    $element->value = $answer->publicStatus;
-    
-    $element = $field->newElement('SelectList', 'privateStatus');
-    $element->label = 'Private Status';
-    $element->addItem(null, '');
-    foreach($statusTypes as $type){
-      $element->addItem($type->id, $type->name);
-    }
-    $element->value = $answer->privateStatus;
-    $form->newButton('submit', 'Save');
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        $answer->publicStatus = $input->publicStatus;
-        $answer->privateStatus = $input->privateStatus;
-        $answer->save();
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  
-  /**
-   * Attach a PDF to an Answer
-   * @param integer $id answerID
-   */
-  public function actionAttachAnswerPDF($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
-    $form = new \Foundation\Form();
-    $form->action = $this->path("applicants/view/attachAnswerPDF/{$id}");
-    $field = $form->newField(array('legend'=>"Attach PDF"));
-    $element = $field->newElement('FileInput', 'pdf');
-    $element->label = 'PDF';
-
-    $form->newButton('submit', 'Save');
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        $answer->attachment = file_get_contents($input->pdf['tmp_name']);
-        $answer->save();
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-  /**
-   * Attach a PDF to an Applicant
-   * @param integer $id applicantID
-   */
-  public function actionAttachApplicantPDF($id){
-    $applicant = $this->getApplicantById($id);
-    $this->layout = 'json';
-    $form = new \Foundation\Form();
-    $form->action = $this->path("applicants/view/attachApplicantPDF/{$id}");
-    $field = $form->newField(array('legend'=>"Attach PDF to Applicant"));
-    $element = $field->newElement('FileInput', 'pdf');
-    $element->label = 'PDF';
-
-    $form->newButton('submit', 'Attach');
-    if(!empty($this->post)){
-      $this->setLayoutVar('textarea', true);
-      if($input = $form->processInput($this->post)){
-        $attachment = $applicant->Attachments->get(null);
-        $attachment->attachment = file_get_contents($input->pdf['tmp_name']);
-        $applicant->save();
-      } else {
-        $this->setLayoutVar('status', 'error');
-      }
-    }
-    $this->setVar('form', $form);
-    $this->loadView('applicants_single/form');
-  }
-  
-
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
     //several views are controller by the complete action
-    if(in_array($action, array('updateBio', 'updateActions', 'updateStatus', 'updateTags', 'updatePage', 'updateAnswer'))) $action = 'index';
+    if(in_array($action, array('refresh'))) $action = 'index';
     return parent::isAllowed($controller, $action, $user, $program);
   }
 }
