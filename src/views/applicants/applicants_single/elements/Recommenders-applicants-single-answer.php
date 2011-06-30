@@ -3,7 +3,7 @@
  * Applicants single answer
  */
 ?>
-<tr id='answer<?print $answer->getId() ?>'>
+<tr id='answer<?php print $answer->getId() ?>'>
   <td>
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer); ?>;
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer); ?><br />
@@ -23,11 +23,11 @@
 <td>Attachment</td>
   <td>
     <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer')){ ?>
-      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='editAnswer'>Edit</a><br />
-      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/sendInvitation/' . $answer->getId());?>' class='editAnswer'>Send Invitation</a><br />
-      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/viewLink/' . $answer->getId());?>' class='editAnswer'>View Link</a><br />
+      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='actionForm'>Edit</a><br />
+      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/sendAdminInvitation/' . $answer->getId());?>' class='actionForm'>Send Invitation</a><br />
+      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/viewLink/' . $answer->getId());?>' class='actionForm'>View Link</a><br />
     <?php } ?><?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')){ ?>
-      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId());?>' class='deleteAnswer'>Delete</a><br />     
+      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId());?>' class='action'>Delete</a><br />     
     <?php } ?>
   </td>
 </tr>

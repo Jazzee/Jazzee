@@ -8,7 +8,6 @@
  */
  
 class ApplyPageController extends \Jazzee\ApplyController {  
-  const ERROR_MESSAGE = 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.';
   /**
    * Convienece string holding the path to this page
    * @var  string    

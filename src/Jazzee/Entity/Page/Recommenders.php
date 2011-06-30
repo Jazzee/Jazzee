@@ -22,6 +22,50 @@ class Recommenders extends Standard {
   const FID_PHONE = 10;
   const FID_WAIVE_RIGHT = 12;
   
+  /**
+   * Get the message
+   * @param \Jazzee\Entity\Answer $answer
+   * @return \Foundation\Mail\Message
+   */
+  protected function getMessage(\Jazzee\Entity\Answer $answer){
+    $search = array(
+     '%APPLICANT_NAME%',
+     '%DEADLINE%',
+     '%LINK%',
+     '%RECOMMENDER_FIRST_NAME%',
+     '%RECOMMENDER_LAST_NAME%',
+     '%RECOMMENDER_INSTITUTION%',
+     '%RECOMMENDER_EMAIL%',
+     '%RECOMMENDER_PHONE%',
+     '%APPLICANT_WAIVE_RIGHT%'
+    );
+    if($deadline = $this->_applicationPage->getPage()->getVar('lorDeadline')){
+      $deadline = new \DateTime($deadline);
+    } else {
+      $deadline = $this->_applicant->getApplication()->getClose();
+    }
+    $replace = array(
+     $this->_applicant->getFullName(),
+     $deadline->format('l F jS Y g:ia'),
+     $this->_controller->path('lor/' . $answer->getUniqueId())
+    );
+    $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer);
+    $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer);
+    $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_INSTITUTION)->getJazzeeElement()->displayValue($answer);
+    $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer);
+    $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_PHONE)->getJazzeeElement()->displayValue($answer);
+    $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer);
+    $body = str_ireplace($search, $replace, $this->_applicationPage->getPage()->getVar('recommenderEmailText'));
+
+    $message = $this->_controller->newMessage();
+    $message->AddAddress(
+      $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
+      $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer));
+    $message->setFrom($this->_applicant->getApplication()->getContactEmail(), $this->_applicant->getApplication()->getContactName());
+    $message->Subject = 'Letter of Recommendation Request';
+    $message->Body = $body;
+    return $message;
+  }
   
   /**
    * Send the invitaiton email
@@ -31,50 +75,76 @@ class Recommenders extends Standard {
   public function sendEmail($answerId, $postData){
     if($answer = $this->_applicant->findAnswerById($answerId)){
       if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND $answer->getUpdatedAt()->diff(new \DateTime('now'))->days >= self::RECOMMENDATION_EMAIL_WAIT_DAYS)){
-        $search = array(
-         '%APPLICANT_NAME%',
-         '%DEADLINE%',
-         '%LINK%',
-         '%RECOMMENDER_FIRST_NAME%',
-         '%RECOMMENDER_LAST_NAME%',
-         '%RECOMMENDER_INSTITUTION%',
-         '%RECOMMENDER_EMAIL%',
-         '%RECOMMENDER_PHONE%',
-         '%APPLICANT_WAIVE_RIGHT%'
-        );
-        if($deadline = $this->_applicationPage->getPage()->getVar('lorDeadline')){
-          $deadline = new \DateTime($deadline);
-        } else {
-          $deadline = $this->_applicant->getApplication()->getClose();
-        }
-        $replace = array(
-         $this->_applicant->getFullName(),
-         $deadline->format('l F jS Y g:ia'),
-         $this->_controller->path('lor/' . $answer->getUniqueId())
-        );
-        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer);
-        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer);
-        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_INSTITUTION)->getJazzeeElement()->displayValue($answer);
-        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer);
-        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_PHONE)->getJazzeeElement()->displayValue($answer);
-        $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer);
-        $body = str_ireplace($search, $replace, $this->_applicationPage->getPage()->getVar('recommenderEmailText'));
-
-        $message = $this->_controller->newMessage();
-        $message->AddAddress(
-          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
-          $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer));
-        $message->setFrom($this->_applicant->getApplication()->getContactEmail(), $this->_applicant->getApplication()->getContactName());
-        $message->Subject = 'Letter of Recommendation Request';
-        $message->Body = $body;
+        $message = $this->getMessage($answer);
         $message->Send();
-        
         $answer->lock();
         $answer->markLastUpdate();
         $this->_controller->getEntityManager()->persist($answer);
         $this->_controller->addMessage('success', 'Your invitation was sent successfully.');
       }
     }
+  }
+  
+
+  
+  /**
+   * Send the invitaiton email
+   * @param integer $answerID
+   * @param array $postData
+   * @param bool $bool //thrid required argument for admin functions to be sure they aren't called from the applicant side
+   */
+  public function sendAdminInvitation($answerId, $postData, $bool){
+    //need a check here or a way to be sure that applicanst can't access this or view link'
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      $message = $this->getMessage($answer);
+      $form = new \Foundation\Form;
+      $field = $form->newField();
+      $field->setLegend('Send Invitation');
+      $element = $field->newElement('Textarea', 'body');
+      $element->setLabel('Email Text');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->setValue($message->Body);
+      if(!empty($postData)){
+        if($input = $form->processInput($postData)){
+          $message->Body = $input->get('body');
+          $message->Send();
+          $answer->lock();
+          $answer->markLastUpdate();
+          $this->_controller->setLayoutVar('status', 'success');
+        } else {
+          $this->_controller->setLayoutVar('status', 'error');
+        }
+      }
+      $form->newButton('submit', 'Send Email');
+      return $form;
+    }
+    return false;
+  }
+  
+  /**
+   * View the recommendation Link
+   * Admin feature to display the link that recommenders are emailed
+   * @param integer $answerID
+   * @param array $postData
+   * @param bool $bool //third required argument for admin functions to be sure they aren't called from the applicant side
+   */
+  public function viewLink($answerId, $postData, $bool){
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      $form = new \Foundation\Form;
+      $field = $form->newField();
+      $field->setLegend('Recommendation Link');
+      $element = $field->newElement('Plaintext', 'link');
+      if($answer->isLocked()){
+        $path = $this->_controller->path('lor/' . $answer->getUniqueId());
+        $path = str_ireplace('admin/', '', $path);
+        $element->setValue($path);
+      } else {
+        $element->setValue('No link is available until an invitation has been sent.');
+      }
+      $this->_controller->setLayoutVar('status', 'success');
+      return $form;
+    }
+    $this->_controller->setLayoutVar('status', 'error');
   }
   
   /**

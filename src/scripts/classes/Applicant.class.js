@@ -9,20 +9,21 @@ function Applicant(workspace){
 
 Applicant.prototype.init = function(){
   var self = this;
-  this.workspace
-    .append($('<div>').attr('id', 'bio'))
-    .append($('<div>').attr('id', 'status'))
-    .append($('<div>').attr('id', 'pages'))
-    .append($('<div>').attr('id', 'attachments'));
-  var statusTable = $('<table>').attr('id', 'statusTable');
-  statusTable.append($('<thead>').append('<tr><th>Actions</th><th>Admission Status</th><th>Tags</th></tr>'));
-  statusTable.append($('<tbody>').append('<tr><td id="actions"></td><td id="decisions"></td><td id="tags"></td></tr>'));
-  $('#status').html(statusTable);
   $.get(this.baseUrl + '/refresh',function(json){
+    self.workspace
+      .append($('<div>').attr('id', 'bio'))
+      .append($('<div>').attr('id', 'status'))
+      .append($('<div>').attr('id', 'pages'))
+      .append($('<div>').attr('id', 'attachments'));
+    var statusTable = $('<table>').attr('id', 'statusTable');
+    statusTable.append($('<thead>').append('<tr><th>Actions</th><th>Admission Status</th><th>Tags</th></tr>'));
+    statusTable.append($('<tbody>').append('<tr><td id="actions"></td><td id="decisions"></td><td id="tags"></td></tr>'));
+    $('#status').html(statusTable);
     self.displayBio(json.data.result.bio);
     self.displayActions(json.data.result.actions);
     self.displayDecisions(json.data.result.decisions);
     self.displayTags(json.data.result.tags);
+    self.displayPages(json.data.result.pages);
   });
 };
 /**
@@ -206,3 +207,56 @@ Applicant.prototype.displayTags = function(json){
     $('#tags').append(form);
   }
 };
+
+/**
+ * Display Pages
+ * @param Object json
+ */
+Applicant.prototype.displayPages = function(json){
+  var self = this;
+  $('#pages').empty();
+  for(var i=0; i<json.pages.length; i++){
+    var div = $('<div>').attr('id','page'+json.pages[i].id).data('pageId', json.pages[i].id);
+    div.html(json.pages[i].content);
+    $('#pages').append(div);
+    this.catchPageLinks(json.pages[i].id);
+  }
+};
+
+/**
+ * Display Pages
+ * @param Int pageId
+ */
+Applicant.prototype.displayPage = function(pageId){
+  var self = this;
+  $.get(this.baseUrl + '/refreshPage/' + pageId,function(html){
+    $('#page'+pageId).html(html);
+    self.catchPageLinks(pageId);
+  });
+};
+
+/**
+ * Catch the links on a page
+ * @param Int pageId
+ */
+Applicant.prototype.catchPageLinks = function(pageId){
+  var self = this;
+  $('#page'+pageId + ' a.actionForm').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      var obj = {
+        display: function(json){
+          self.displayPage(pageId);
+        }
+      };
+      self.createForm(json.data.form, obj);
+    });
+    return false;
+  });
+  $('#page'+pageId + ' a.action').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      self.displayPage(pageId);
+    });
+    return false;
+  });
+};
+

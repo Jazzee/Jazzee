@@ -11,13 +11,13 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   
   const ACTION_INDEX = 'View';
   const ACTION_PDF = 'Print as PDF';
-  const ACTION_EDITACCOUNT = 'Edit Acount';
+  const ACTION_UPDATEBIO = 'Edit Account';
   const ACTION_EXTENDDEADLINE = 'Extend Deadline';
-  const ACTION_LOCK = 'Lock Application';
-  const ACTION_UNLOCK = 'UnLock Application';
-  const ACTION_ADDTAG = 'Tag Applicant';
-  const ACTION_REMOVETAG = 'Remove Tag from Applicant';
-  const ACTION_ATTACHAPPLICANTPDF = 'Attach PDF to Applicant';
+  const ACTION_LOCK = 'Lock';
+  const ACTION_UNLOCK = 'UnLock';
+  const ACTION_ADDTAG = 'Tag';
+  const ACTION_REMOVETAG = 'Remove Tag';
+  const ACTION_ATTACHAPPLICANTPDF = 'Attach PDF';
   const ACTION_EDITANSWER = 'Edit Answer';
   const ACTION_DELETEANSWER = 'Delete Answer';
   const ACTION_ADDANSWER = 'Add Answer';
@@ -69,8 +69,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
      'bio' => $this->getBio($applicant),
      'actions' => $this->getActions($applicant),
      'decisions' => $this->getDecisions($applicant),
-     'tags' => $this->getTags($applicant)
+     'tags' => $this->getTags($applicant),
+     'pages' => $this->getPages($applicant)
     );
+    $this->layout = 'json'; //set the layout back since getPages changes it
     $this->setVar('result', $result);
     $this->loadView($this->controllerName . '/result');
   }
@@ -86,6 +88,95 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
      'allowEdit' => $this->checkIsAllowed($this->controllerName, 'updateBio')
     );
     return $bio;
+  }
+  
+  
+  /**
+   * Get an applicants action status
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  protected function getActions(\Jazzee\Entity\Applicant $applicant){
+    $actions = array(
+      'createdAt'=>$applicant->getCreatedAt(),
+      'updatedAt'=>$applicant->getUpdatedAt(),
+      'lastLogin'=>$applicant->getLastLogin()
+    );
+    return $actions;
+  }
+  
+  /**
+   * Get an applicants tags
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  protected function getTags(\Jazzee\Entity\Applicant $applicant){
+    $tags = array(
+      'tags'=>array(),
+      'allowAdd' => $this->checkIsAllowed($this->controllerName, 'addTag'),
+      'allowRemove' => $this->checkIsAllowed($this->controllerName, 'removeTag')
+    );
+    foreach($applicant->getTags() as $tag){
+      $tags['tags'][] = array(
+        'id'=> $tag->getId(),
+        'title'=>$tag->getTitle()
+      );
+    }
+    return $tags;
+  }
+  
+  
+  /**
+   * Get application pages
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  protected function getPages(\Jazzee\Entity\Applicant $applicant){
+    $pages = array(
+      'pages'=>array(),
+      'allowAddAnswer' => $this->checkIsAllowed($this->controllerName, 'addAnswer'),
+      'allowEditAnswer' => $this->checkIsAllowed($this->controllerName, 'editAnswer'),
+      'allowDeleteAnswer' => $this->checkIsAllowed($this->controllerName, 'deleteAnswer')
+    );
+    foreach($applicant->getApplication()->getPages() as $applicationPage){
+      if($applicationPage->getJazzeePage()->showReviewPage()){
+        $params = array($applicant->getId(), $applicationPage->getPage()->getId());
+        $content = $this->getActionOutput('refreshPage', $params);
+        $content = str_replace(array("\n", "\r"), '', $content);
+        $pages['pages'][] = array(
+          'id' => $applicationPage->getPage()->getId(),
+          'content' => $content
+        );
+      }
+    }
+    
+    return $pages;
+  }
+  
+  
+  /**
+   * Get an applicants decisions status
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  protected function getDecisions(\Jazzee\Entity\Applicant $applicant){
+    $status = '';
+    if($applicant->getDecision()) $status = $applicant->getDecision()->status();
+    switch($status){
+      case '': $status = 'No Decision'; break;
+      case 'nominateAdmit': $status = 'Nominated for Admission'; break; 
+      case 'nominateDeny': $status = 'Nominated for Deny'; break; 
+      case 'finalDeny': $status = 'Denied'; break; 
+      case 'finalAdmit': $status = 'Admited'; break; 
+      case 'acceptOffer': $status = 'Accepted'; break; 
+      case 'declineOffer': $status = 'Declined'; break;
+    }
+    if($applicant->isLocked()){
+      $decisions = array('status'=>$status);
+      foreach(array('nominateAdmit', 'undoNominateAdmit', 'nominateDeny', 'undoNominateDeny', 'finalAdmit', 'finalDeny') as $type){
+        $decisions["allow{$type}"] = ($this->checkIsAllowed($this->controllerName, $type) && $applicant->getDecision()->can($type));
+      }
+    }
+    $decisions['allowUnlock'] = $this->checkIsAllowed($this->controllerName, 'unlock');
+    $decisions['allowLock'] = $this->checkIsAllowed($this->controllerName, 'lock');
+    $decisions['isLocked'] = $applicant->isLocked();
+    return $decisions;
   }
   
   /**
@@ -144,64 +235,18 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
-   * Get an applicants action status
-   * @param \Jazzee\Entity\Applicant $applicant
+   * Get content for a page
+   * @param integer $applicantId
+   * @param integer $pageId
    */
-  protected function getActions(\Jazzee\Entity\Applicant $applicant){
-    $actions = array(
-      'createdAt'=>$applicant->getCreatedAt(),
-      'updatedAt'=>$applicant->getUpdatedAt(),
-      'lastLogin'=>$applicant->getLastLogin()
-    );
-    return $actions;
-  }
-  
-  /**
-   * Get an applicants tags
-   * @param \Jazzee\Entity\Applicant $applicant
-   */
-  protected function getTags(\Jazzee\Entity\Applicant $applicant){
-    $tags = array(
-      'tags'=>array(),
-      'allowAdd' => $this->checkIsAllowed($this->controllerName, 'addTag'),
-      'allowRemove' => $this->checkIsAllowed($this->controllerName, 'removeTag')
-    );
-    foreach($applicant->getTags() as $tag){
-      $tags['tags'][] = array(
-        'id'=> $tag->getId(),
-        'title'=>$tag->getTitle()
-      );
-    }
-    return $tags;
-  }
-  
-  
-  /**
-   * Get an applicants decisions status
-   * @param \Jazzee\Entity\Applicant $applicant
-   */
-  protected function getDecisions(\Jazzee\Entity\Applicant $applicant){
-    $status = '';
-    if($applicant->getDecision()) $status = $applicant->getDecision()->status();
-    switch($status){
-      case '': $status = 'No Decision'; break;
-      case 'nominateAdmit': $status = 'Nominated for Admission'; break; 
-      case 'nominateDeny': $status = 'Nominated for Deny'; break; 
-      case 'finalDeny': $status = 'Denied'; break; 
-      case 'finalAdmit': $status = 'Admited'; break; 
-      case 'acceptOffer': $status = 'Accepted'; break; 
-      case 'declineOffer': $status = 'Declined'; break;
-    }
-    if($applicant->isLocked()){
-      $decisions = array('status'=>$status);
-      foreach(array('nominateAdmit', 'undoNominateAdmit', 'nominateDeny', 'undoNominateDeny', 'finalAdmit', 'finalDeny') as $type){
-        $decisions["allow{$type}"] = ($this->checkIsAllowed($this->controllerName, $type) && $applicant->getDecision()->can($type));
-      }
-    }
-    $decisions['allowUnlock'] = $this->checkIsAllowed($this->controllerName, 'unlock');
-    $decisions['allowLock'] = $this->checkIsAllowed($this->controllerName, 'lock');
-    $decisions['isLocked'] = $applicant->isLocked();
-    return $decisions;
+  public function actionRefreshPage($applicantId, $pageId){
+    $this->layout = 'blank';
+    $applicant = $this->getApplicantById($applicantId);
+    $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
+    $this->setVar('variables', array('page'=>$page,'applicant'=>$applicant));
+    $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-applicants-single-page');
+    $this->setVar('element', $elementName);
+    $this->loadView($this->controllerName . '/element');
   }
   
   /**
@@ -334,10 +379,105 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->loadView($this->controllerName . '/result');
   }
   
+  /**
+   * Add an answer
+   * @param integer $applicantId
+   * @param integer $pageId
+   */
+  public function actionAddAnswer($applicantId, $pageId){
+    $applicant = $this->getApplicantById($applicantId);
+    $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
+    $pageEntity->getJazzeePage()->setApplicant($applicant);
+    $pageEntity->getJazzeePage()->setController($this);
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $pageEntity->getJazzeePage()->validateInput($this->post)){
+        $pageEntity->getJazzeePage()->newAnswer($input);
+        $this->setLayoutVar('status', 'success');
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $form = $pageEntity->getJazzeePage()->getForm();
+    $form->setAction($this->path("applicants/single/{$applicantId}/addAnswer/{$pageId}"));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Edit an answer
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionEditAnswer($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
+    $pageEntity->getJazzeePage()->setApplicant($applicant);
+    $pageEntity->getJazzeePage()->setController($this);
+    $pageEntity->getJazzeePage()->fill($answerId);
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $pageEntity->getJazzeePage()->validateInput($this->post)){
+        $pageEntity->getJazzeePage()->updateAnswer($input, $answerId);
+        $this->setLayoutVar('status', 'success');
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $form = $pageEntity->getJazzeePage()->getForm();
+    $form->setAction($this->path("applicants/single/{$applicantId}/editAnswer/{$answerId}"));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Delete an answer
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionDeleteAnswer($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
+    $pageEntity->getJazzeePage()->setApplicant($applicant);
+    $pageEntity->getJazzeePage()->setController($this);
+    $pageEntity->getJazzeePage()->fill($answerId);
+    $pageEntity->getJazzeePage()->deleteAnswer($answerId);
+    $this->setVar('result', true);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Do something with an answer
+   * Passes everything off to the page to perform a special action
+   * @param integer $applicantId
+   * @param string $what the special method name
+   * @param integer $answerId
+   */
+  public function actionDo($applicantId, $what, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
+    $pageEntity->getJazzeePage()->setApplicant($applicant);
+    $pageEntity->getJazzeePage()->setController($this);
+    if(method_exists($pageEntity->getJazzeePage(), $what)){
+      $form = $pageEntity->getJazzeePage()->$what($answerId, $this->post, true);
+      $form->setAction($this->path("applicants/single/{$applicantId}/do/{$what}/{$answerId}"));
+      $this->setVar('form', $form);
+      if(!empty($this->post)) $this->setLayoutVar('textarea', true);
+    }
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  public function getActionPath(){
+    return null;
+  }
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
     //several views are controller by the complete action
-    if(in_array($action, array('refresh'))) $action = 'index';
+    if(in_array($action, array('refresh', 'refreshPage'))) $action = 'index';
+    if(in_array($action, array('do'))) $action = 'editAnswer';
     return parent::isAllowed($controller, $action, $user, $program);
   }
 }

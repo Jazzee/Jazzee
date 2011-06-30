@@ -4,6 +4,7 @@ namespace Jazzee\Entity\Page;
  * AbstractPage
  */
 abstract class AbstractPage implements \Jazzee\Page {
+  const ERROR_MESSAGE = 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.';
  /**
   * The ApplicationPage Entity
   * @var \Jazzee\Entity\ApplicationPage
@@ -75,7 +76,7 @@ abstract class AbstractPage implements \Jazzee\Page {
     if($input = $this->getForm()->processInput($arr)){
       return $input;
     }
-    $this->_controller->addMessage('error', \ApplyPageController::ERROR_MESSAGE);
+    $this->_controller->addMessage('error', self::ERROR_MESSAGE);
     return false;
   }
   

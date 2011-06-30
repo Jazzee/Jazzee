@@ -25,7 +25,7 @@ $page->getJazzeePage()->setApplicant($applicant);
       </tbody>
     </table>
  </div><!-- answers -->
-<?php if($this->controller->checkIsAllowed('applicants_single', 'addAnswer')){?>
-    <a class='addAnswer' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/addAnswer/' . $page->getPage()->getId());?>'>Add Answer</a>
+<?php if($this->controller->checkIsAllowed('applicants_single', 'addAnswer') and (is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax())){?>
+    <a class='actionForm' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/addAnswer/' . $page->getPage()->getId());?>'>Add Answer</a>
 <?php }?>
 </div> <!-- page -->
