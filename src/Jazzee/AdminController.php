@@ -163,7 +163,7 @@ abstract class AdminController extends Controller{
    * Get Navigation
    */
   public function getNavigation(){
-    if($this->_cache->contains('AdminControllerGetNavigation')) return $this->_cache->fetch('AdminControllerGetNavigation');
+    if(isset($this->_store->AdminControllerGetNavigation)) return $this->_store->AdminControllerGetNavigation;
     $navigation = new \Foundation\Navigation\Container();
     $link = new \Foundation\Navigation\Link('Home');
     $link->setHref($this->path('welcome'));
@@ -187,7 +187,7 @@ abstract class AdminController extends Controller{
     }
     foreach($menus as $menu) $menu->sortLinks();
     if(empty($menus)) return false;  //if there are no controllers or no authorization there are no menus
-    $this->_cache->save('AdminControllerGetNavigation', $navigation);
+    $this->_store->AdminControllerGetNavigation = $navigation;
     return $navigation;
   }
   

@@ -81,6 +81,7 @@ class SetupRolesController extends \Jazzee\AdminController {
         }
         $this->_em->persist($role);
         $this->addMessage('success', "Role Saved Successfully");
+        unset($this->_store->AdminControllerGetNavigation);
         $this->redirectPath('setup/roles');
       }
     } else {
