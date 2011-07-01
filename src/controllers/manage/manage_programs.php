@@ -13,6 +13,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Programs';
   const ACTION_EDIT = 'Edit Program';
   const ACTION_NEW = 'New Program';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * List programs

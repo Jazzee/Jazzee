@@ -13,6 +13,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Cycles';
   const ACTION_EDIT = 'New Cycle';
   const ACTION_NEW = 'Edit Cycle';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * List cycles

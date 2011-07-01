@@ -14,6 +14,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
   const ACTION_EDIT = 'New File';
   const ACTION_NEW = 'Replace File';
   const ACTION_DELETE = 'Delete File';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * List cycles

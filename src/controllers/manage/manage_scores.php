@@ -12,6 +12,7 @@ class ManageScoresController extends \Jazzee\AdminController {
   const PATH = 'manage/scores';
   
   const ACTION_INDEX = 'Manage Scores';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * Allow the user to pick a score type and upload the file

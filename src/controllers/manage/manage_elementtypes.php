@@ -13,6 +13,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Element Types';
   const ACTION_EDIT = 'Edit Element Types';
   const ACTION_NEW = 'New Element Type';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * List all the active ElementTypes and find any new classes on the file system

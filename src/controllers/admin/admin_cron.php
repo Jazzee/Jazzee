@@ -11,6 +11,8 @@ class AdminCronController extends \Jazzee\AdminController {
    * The maximum time a cron semephor can stick around before throwing an exception and deleting itself
    */
   const MAX_INTERVAL = 86400;
+  const REQUIRE_AUTHORIZATION = false;
+  const REQUIRE_APPLICATION = false;
   
   public function actionIndex(){
     $startTime = time();
@@ -29,10 +31,6 @@ class AdminCronController extends \Jazzee\AdminController {
     //cron outputs nothing
     exit(0);
 	}
-  
-  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
-    return true; //anyone is allowed to use cron
-  }
   
 /**
    * Get value from the cron store

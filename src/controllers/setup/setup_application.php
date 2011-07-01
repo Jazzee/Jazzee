@@ -12,6 +12,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
   const PATH = 'setup/application';
   
   const ACTION_INDEX = 'Make Changes';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * If there is no application then create a new one to work with

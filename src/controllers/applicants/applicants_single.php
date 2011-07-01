@@ -474,7 +474,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     return null;
   }
   
-  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     //several views are controller by the complete action
     if(in_array($action, array('refresh', 'refreshPage'))) $action = 'index';
     if(in_array($action, array('do'))) $action = 'editAnswer';

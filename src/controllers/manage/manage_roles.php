@@ -13,6 +13,7 @@ class ManageRolesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Roles';
   const ACTION_EDIT = 'Edit Role';
   const ACTION_NEW = 'New Role';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * List all the Roles

@@ -10,6 +10,8 @@ class AdminLogoutController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'Logout';
   const PATH = 'logout';
+  const REQUIRE_AUTHORIZATION = false;
+  const REQUIRE_APPLICATION = false;
   
   /**
    * Display index
@@ -23,11 +25,6 @@ class AdminLogoutController extends \Jazzee\AdminController {
     $this->_cycle = null;
     $this->_application = null;
     $this->_adminAuthentication->logoutUser();
-  }
-  
-  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
-    //anyone can logout
-    return true;
   }
   
   /**

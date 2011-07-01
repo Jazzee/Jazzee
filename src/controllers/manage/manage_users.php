@@ -14,6 +14,7 @@ class ManageUsersController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'Find User';
   const ACTION_EDIT = 'Edit User';
   const ACTION_NEW = 'New User';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * Search for a user to modify

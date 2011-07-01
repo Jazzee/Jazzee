@@ -12,6 +12,7 @@ class SetupUsersController extends \Jazzee\AdminController {
   
   const ACTION_INDEX = 'Search Users';
   const ACTION_PROGRAMROLES = 'Grant Permissions';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * Search for a user to modify

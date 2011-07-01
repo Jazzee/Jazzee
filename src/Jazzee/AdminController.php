@@ -16,6 +16,18 @@ abstract class AdminController extends Controller{
   const PATH = null;
   
   /**
+   * Is authorization required or can any user acess
+   * @constant boolean
+   */
+  const REQUIRE_AUTHORIZATION = true;
+  
+  /**
+   * Can this resource be accessed if not application is selected
+   * @constant boolean
+   */
+  const REQUIRE_APPLICATION = true;
+  
+  /**
    * AdminAuthentication Class
    * @var \Jazzee\AdminAuthentication
    */
@@ -96,8 +108,12 @@ abstract class AdminController extends Controller{
     if(isset($this->_store->currentProgramId)) $this->_program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($this->_store->currentProgramId);
     if(isset($this->_store->currentCycleId)) $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($this->_store->currentCycleId);
     
-    if($this->_cycle AND $this->_program) $this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->_program,$this->_cycle);
-
+    if($this->_cycle AND $this->_program){
+      if(!$this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->_program,$this->_cycle)){
+        $this->_application = null;
+      }
+    } 
+    
   }
   /**
    * Check set the default page title and layout title
@@ -138,7 +154,10 @@ abstract class AdminController extends Controller{
    * @param \Jazzee\Entity\Program $program
    * @return bool
    */
-  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
+    $class = \Foundation\VC\Config::getControllerClassName($controller);
+    if(!$class::REQUIRE_AUTHORIZATION and $user) return true;
+    if($class::REQUIRE_APPLICATION and is_null($application)) return false;
     if($user)  return $user->isAllowed($controller, $action, $program);
     return false;
   }
@@ -151,7 +170,7 @@ abstract class AdminController extends Controller{
    */
   public function checkIsAllowed($controller, $action = 'index'){
     \Foundation\VC\Config::includeController($controller);
-    return call_user_func(array(\Foundation\VC\Config::getControllerClassName($controller), 'isAllowed'),$controller, $action, $this->_user, $this->_program);
+    return call_user_func(array(\Foundation\VC\Config::getControllerClassName($controller), 'isAllowed'),$controller, $action, $this->_user, $this->_program, $this->_application);
   }
   
   /**

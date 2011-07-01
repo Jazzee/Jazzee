@@ -13,6 +13,7 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Payment Types';
   const ACTION_EDIT = 'Edit Payment Types';
   const ACTION_NEW = 'New Payment Type';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * List all the active PaymentTypes and find any new classes on the file system

@@ -9,6 +9,8 @@ class AdminChangecycleController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'Change Cycle';
   const PATH = 'changecycle';
+  const REQUIRE_AUTHORIZATION = false;
+  const REQUIRE_APPLICATION = false;
   
   /**
    * Display index
@@ -50,15 +52,6 @@ class AdminChangecycleController extends \Jazzee\AdminController {
     }
     
     $this->setVar('form', $form);
-  }
-  
-  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
-    //Check to be sure a valid user object has been set
-    //Any user is allowed access
-    if($user){
-      return true;
-    }
-    return false;
   }
 }
 ?>

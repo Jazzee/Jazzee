@@ -11,6 +11,7 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
   const PATH = 'manage/globalpages';
   
   const ACTION_INDEX = 'Edit Global Pages';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * Add the required JS

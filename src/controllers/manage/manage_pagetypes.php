@@ -13,6 +13,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Page Types';
   const ACTION_EDIT = 'Edit Page Types';
   const ACTION_NEW = 'New Page Type';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * List all the active ElementTypes and find any new classes on the file system
