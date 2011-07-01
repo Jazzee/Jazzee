@@ -64,10 +64,10 @@ abstract class PageBuilder extends AdminController{
   protected function pageArray($page){
     $arr = array(
       'title' => $page->getTitle(),
-      'min' => $page->getMin(),
-      'max' => $page->getMax(),
-      'isRequired' => $page->isRequired(),
-      'answerStatusDisplay' => $page->answerStatusDisplay(),
+      'min' => is_null($page->getMin())?0:$page->getMin(),
+      'max' => is_null($page->getMax())?0:$page->getMax(),
+      'isRequired' => (int)$page->isRequired(),
+      'answerStatusDisplay' => $page->answerStatusDisplay()?1:0,
       'instructions' => $page->getInstructions(),
       'leadingText' => $page->getLeadingText(),
       'trailingText' => $page->getTrailingText(),
@@ -88,9 +88,9 @@ abstract class PageBuilder extends AdminController{
         'weight' => $element->getWeight(),
         'title' => $element->getTitle(),
         'format' => $element->getFormat(),
-        'min' => $element->getMin(),
-        'max' => $element->getMax(),
-        'isRequired' => $element->isRequired(),
+        'min' => is_null($element->getMin())?0:$element->getMin(),
+        'max' => is_null($element->getMax())?0:$element->getMax(),
+        'isRequired' => (int)$element->isRequired(),
         'instructions' => $element->getInstructions(),
         'defaultValue' => $element->getDefaultValue()
       );

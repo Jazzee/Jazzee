@@ -52,6 +52,13 @@ $(document).ready(function(){
       li.bind('click', function(){
         var page = new window[globalPage.className].prototype.newPage(globalPage.id,globalPage.title,globalPage.classId,globalPage.className,'new-global',pageStore);
         page.isGlobal = true;
+        page.title = globalPage.title;
+        page.min = globalPage.min;
+        page.max = globalPage.max;
+        page.isRequired = globalPage.isRequired;
+        page.instructions = globalPage.instructions;
+        page.leadingText = globalPage.leadingText;
+        page.trailingText = globalPage.trailingText;
         pageStore.addPage(page);
       });
       ol.append(li);

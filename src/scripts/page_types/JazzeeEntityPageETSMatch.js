@@ -14,12 +14,12 @@ JazzeeEntityPageETSMatch.prototype.workspace = function(){
   $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
   $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {1:'Required',0:'Optional'}));
   
-  var min = {null: 'No Minimum'};
+  var min = {0: 'No Minimum'};
   for(var i = 1; i<=50;i++){
     min[i] = i;
   }
   $('#workspace-right-top').append(this.selectListBlock('min','Minimum Scores Required:', min));
-  var max = {null: 'No Maximum'};
+  var max = {0: 'No Maximum'};
   for(var i = 1; i<=50;i++){
     max[i] = i;
   }
