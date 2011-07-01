@@ -90,6 +90,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
       if($input->get('published')) $this->_application->publish(); else $this->_application->unPublish();
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application saved.');
+      unset($this->_store->AdminControllerGetNavigation);
       $this->redirectPath('setup/application');
     }
     
