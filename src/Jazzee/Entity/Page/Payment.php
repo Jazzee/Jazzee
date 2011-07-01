@@ -22,9 +22,10 @@ class Payment extends Standard {
     $element->setLabel('Payment Method');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
+    $allowedTypes = explode(',',$this->_applicationPage->getPage()->getVar('allowedPaymentTypes'));
     $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired'=>false));
     foreach($paymentTypes as $type){
-      $element->newItem($type->getId(), $type->getName());
+      if(in_array($type->getId(), $allowedTypes)) $element->newItem($type->getId(), $type->getName());
     }
     $element = $field->newElement('RadioList', 'amount');
     $element->setLabel('Type of payment');
@@ -48,7 +49,6 @@ class Payment extends Standard {
       //if there is an problem with the input then do what we would normally do
       if(!$result) return false;
     }
-    
     //we are eithier processing a good choice of payment and amount or the input from an \Jazzee\Payment form
     //eithier way we need to create the apply payment form
     $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType()->paymentForm($this->_applicant, $input['amount'], $this->_controller->getActionPath());

@@ -14,6 +14,7 @@ JazzeeEntityPagePayment.prototype.constructor = JazzeeEntityPagePayment;
 JazzeeEntityPagePayment.prototype.newPage = function(id,title,classId,className,status,pageStore){
   var page = JazzeePage.prototype.newPage.call(this, id,title,classId,className,status,pageStore);
   page.setVariable('amounts', 0);
+  page.setVariable('allowedPaymentTypes', '');
   return page;
 };
 
@@ -23,7 +24,29 @@ JazzeeEntityPagePayment.prototype.newPage = function(id,title,classId,className,
 JazzeeEntityPagePayment.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
   $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
-  $('#workspace-left-middle-left').append(this.paymentAmountsBlock());
+  
+  var pageClass = this;
+  $.get(pageClass.pageStore.baseUrl + '/listPaymentTypes',function(json){
+    var types = pageClass.getVariable('allowedPaymentTypes').split(',');
+    var div = $('<div>').append($('<h5>').html('Accepted Payment Types')).append($('<p>').html('These are the types visible to applicants.  All active types are available to administrators.'));
+    var ol = $('<ol>').addClass('payment-type-list');
+    $(json.data.result).each(function(i){
+      var paymentType = this;
+      var box = $('<input type="checkbox">').data('paymentTypeId', paymentType.id);
+      if($.inArray(paymentType.id, types) != -1) box.attr('checked', true);
+      $(box).click(function(e){
+        var types = [];
+        $('input:checkbox', $(this).parent().parent()).filter(":checked").each(function(i){
+          types.push($(this).data('paymentTypeId'));
+        });
+        pageClass.setVariable('allowedPaymentTypes', types.join(','));
+      });
+      ol.append($('<li>').html(paymentType.name).prepend(box));
+    });
+    div.append(ol);
+    $('#workspace-left-middle-left').append(div);
+    $('#workspace-left-middle-left').append(pageClass.paymentAmountsBlock());
+  });
 };
 
 JazzeeEntityPagePayment.prototype.paymentAmountsBlock = function(){

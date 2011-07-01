@@ -144,8 +144,6 @@ abstract class PageBuilder extends AdminController{
     $this->setVar('result', $arr);
     $this->loadView($this->controllerName . '/result');
   }
-  
-
 
   /**
    * List the available element types
@@ -165,6 +163,29 @@ abstract class PageBuilder extends AdminController{
         'id' => $id,
         'name' => $elementTypes[$id]->getName(),
         'className' => $this->getClassName($elementTypes[$id]->getClass()),
+      );
+    }
+    $this->setVar('result', $arr);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * List the available payment types
+   */
+  public function actionListPaymentTypes(){
+    $paymentTypes = $this->_em->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired'=>false));
+    $types = array();
+    foreach($paymentTypes as $type){
+      $types[$type->getName()] = $type->getId();
+      $paymentTypes[$type->getId()] = $type;
+    }
+    //alphabetize the page types
+    ksort($types);
+    $arr = array();
+    foreach($types as $id){
+      $arr[] = array(
+        'id' => $id,
+        'name' => $paymentTypes[$id]->getName(),
       );
     }
     $this->setVar('result', $arr);
