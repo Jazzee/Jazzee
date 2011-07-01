@@ -13,7 +13,16 @@ interface PaymentType{
    * @return Form
    */
   function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath);
-
+  
+  /**
+   * Applypage paymetn status text
+   * 
+   * Instructions to display in the status portion of a payment answer
+   * @param \Jazzee\Entity\Payment $payment
+   * @return string
+   */
+  function getStatusText(\Jazzee\Entity\Payment $payment);
+  
   /**
    * Get the setup form
    * @param PaymentType $paymentType

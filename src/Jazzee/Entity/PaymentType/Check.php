@@ -40,6 +40,25 @@ class Check extends AbstractPaymentType{
     return $form;
   }
   
+  public function getStatusText(\Jazzee\Entity\Payment $payment){
+    $status = '<p><strong>Make Checks Payable to:</strong> ' . $this->_paymentType->getVar('payable') . '</p>';
+    if($this->_paymentType->getVar('address')) $status .= '<p><h4>Mail Check to:</h4>' . nl2br($this->_paymentType->getVar('address')) . '</p>';
+    if($this->_paymentType->getVar('coupon')) $status .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($this->_paymentType->getVar('coupon')) . '</p>';
+    $search = array(
+     '%Applicant_Name%',
+     '%Applicant_ID%',
+     '%Program_Name%',
+     '%Program_ID%'
+    );
+    $replace = array();
+    $replace[] = $payment->getAnswer()->getApplicant()->getFirstName() . ' ' . $payment->getAnswer()->getApplicant()->getLastName();
+    $replace[] = $payment->getAnswer()->getApplicant()->getId();
+    $replace[] = $payment->getAnswer()->getApplicant()->getApplication()->getProgram()->getName();
+    $replace[] = $payment->getAnswer()->getApplicant()->getApplication()->getProgram()->getId();
+
+    return str_ireplace($search, $replace, $status);
+  }
+  
   public function getSetupForm(){
     $filters = array(
       'Applicant Name' => '%Applicant_Name%',

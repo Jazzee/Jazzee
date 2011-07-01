@@ -13,9 +13,27 @@
   print '<p><strong>Amount:</strong>&nbsp;$' . $payment->getAmount() . '</p>';
   ?>
   <p class='status'>
-  Status: <?php print $answer->getPayment()->getType()->getJazzeePaymentType()->getStatusText($payment);?>
+  <?php 
+    $class = $payment->getType()->getClass();
+    switch($payment->getStatus()){
+      case \Jazzee\Entity\Payment::PENDING:
+        $status = $class::PENDING_TEXT;
+        break;
+      case \Jazzee\Entity\Payment::SETTLED:
+        $status = $class::SETTLED_TEXT;
+        break;
+      case \Jazzee\Entity\Payment::REJECTED:
+        $status = $class::REJECTED_TEXT;
+        break;
+      case \Jazzee\Entity\Payment::REFUNDED:
+        $status = $class::REFUNDED_TEXT;
+        break;
+    }
+  ?>
+  Status: <?php print $status; ?>   
   <?php if($payment->getStatus() == \Jazzee\Entity\Payment::REFUNDED or $payment->getStatus() == \Jazzee\Entity\Payment::REJECTED){?>
     Reason: <?php print $payment->getVar('reasonText'); ?>
   <?php } ?>
   </p>
+  <p class='paymentStatusText'><?php print $answer->getPayment()->getType()->getJazzeePaymentType()->getStatusText($payment);?></p>
 </div>
