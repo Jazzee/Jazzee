@@ -10,8 +10,6 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
   const TITLE = 'Change Program';
   const PATH = 'changeprogram';
   
-  const ACTION_INDEX = 'Change Program';
-  
   /**
    * Display index
    */
@@ -52,11 +50,21 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
         $this->_em->persist($this->_user);
         $this->addMessage('success', 'Default program changed to ' . $this->_program->getName());
       }
+      unset($this->_store->AdminControllerGetNavigation);
       $this->addMessage('success', 'Program changed to ' . $this->_program->getName());
       $this->redirectPath('welcome');
     }
     
     $this->setVar('form', $form);
+  }
+  
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null){
+    //Check to be sure a valid user object has been set
+    //Any user is allowed access
+    if($user){
+      return true;
+    }
+    return false;
   }
 }
 ?>

@@ -80,6 +80,7 @@ abstract class AdminController extends Controller{
     }
     $this->_user = $this->_adminAuthentication->getUser();
     $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
+
     if($this->_config->getAdminSessionLifetime()){
       setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime(), 0, '/');
     } else {
@@ -87,6 +88,7 @@ abstract class AdminController extends Controller{
       setcookie('JazzeeAdminLoginTimeout', time()+86400, 0, '/');
     }
     
+    $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findBestCycle();
     
     if($this->_user->getDefaultCycle()) $this->_cycle = $this->_user->getDefaultCycle();
     if($this->_user->getDefaultProgram()) $this->_program = $this->_user->getDefaultProgram();
@@ -121,9 +123,8 @@ abstract class AdminController extends Controller{
    * Save the current cycle,progra, and application
    */
   public function afterAction(){
-    $store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
-    if($this->_program) $store->currentProgramId = $this->_program->getId();
-    if($this->_cycle) $store->currentCycleId = $this->_cycle->getId();
+    if($this->_program) $this->_store->currentProgramId = $this->_program->getId();
+    if($this->_cycle) $this->_store->currentCycleId = $this->_cycle->getId();
     
     parent::afterAction();
   }

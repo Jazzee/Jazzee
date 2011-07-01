@@ -114,26 +114,23 @@ class SetupRolesController extends \Jazzee\AdminController {
     }
   }
   
-
-  
   /**
    * Get All of the possible controllers and actions
    * 
-   * only allowed to set the ones that we are authorized for
-   * @return array
+   * only allow the ones the user has access to
+   * @return array of ControllerAuths
    */
   protected function getControllerActions(){
     $controllers = array();
     foreach($this->listControllers() as $controller){
+      \Foundation\VC\Config::includeController($controller);
       $class = \Foundation\VC\Config::getControllerClassName($controller);
       $arr = array('name'=> $controller, 'title' => $class::TITLE, 'actions'=>array());
       foreach(get_class_methods($class) as $method){
-        
         if(substr($method, 0, 6) == 'action'){
-          $actionName = strtolower(substr($method, 6));
           $constant = 'ACTION_' . strtoupper(substr($method, 6));
-          if($this->checkIsAllowed($controller, $actionName) and defined("{$class}::{$constant}")) $arr['actions'][$actionName] = constant("{$class}::{$constant}");
-          
+          $actionName = strtolower(substr($method, 6));
+          if($this->checkIsAllowed($controller, $actionName) AND defined("{$class}::{$constant}")) $arr['actions'][strtolower(substr($method, 6))] = constant("{$class}::{$constant}");
         }
       }
       if(!empty($arr['actions'])) $controllers[$class::MENU][] = $arr;

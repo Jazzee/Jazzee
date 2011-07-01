@@ -4,7 +4,7 @@ namespace Jazzee\Entity;
 /** 
  * Cycle
  * Applications are divided into cycles which represent a single admission period
- * @Entity 
+ * @Entity(repositoryClass="\Jazzee\Entity\CycleRepository")
  * @Table(name="cycles", 
  * uniqueConstraints={@UniqueConstraint(name="cycle_name_unique",columns={"name"})})
  * @package    jazzee
@@ -81,5 +81,27 @@ class Cycle{
    */
   public function setEnd($dateTime){
     $this->end = new \DateTime($dateTime);
+  }
+}
+
+/**
+ * CycleRepository
+ * Special Repository methods for Cycles
+ */
+class CycleRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * find best current cycle
+   * 
+   * If a user doesn't have a cycle we need to search for an find the best current cycle for them
+   * 
+   * @return Cycle
+   */
+  public function findBestCycle(){
+    $query = $this->_em->createQuery('SELECT c FROM Jazzee\Entity\Cycle c WHERE :currentDate BETWEEN c.start and c.end order by c.start DESC');
+    $query->setParameter('currentDate', new \DateTime(), \Doctrine\DBAL\Types\Type::DATETIME);
+    $result = $query->getResult();
+    if(count($result)) return $result[0];
+    return false;
   }
 }
