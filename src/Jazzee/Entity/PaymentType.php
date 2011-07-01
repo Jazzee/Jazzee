@@ -31,6 +31,9 @@ class PaymentType{
    */
   private $variables;
   
+  /** @Column(type="boolean") */
+  private $isExpired;
+  
   /**
    * The Jazzee Payment Type
    * @var \Jazzee\PaymentType
@@ -38,6 +41,7 @@ class PaymentType{
   private $jazzeePaymentType;
 
   public function __construct(){
+    $this->isExpired = false;
     $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
   }
   
@@ -119,6 +123,27 @@ class PaymentType{
   public function getVar($name){
     foreach($this->variables as $variable)
       if($variable->getName() == $name)return $variable->getValue();
+  }
+  
+  /**
+   * Expire the type
+   */
+  public function expire(){
+    $this->isExpired = true;
+  }
+  
+  /**
+   * UnExpire the type
+   */
+  public function unExpire(){
+    $this->isExpired = false;
+  }
+  
+  /**
+   * Get expires status
+   */
+  public function isExpired(){
+    return $this->isExpired;
   }
   
   /**

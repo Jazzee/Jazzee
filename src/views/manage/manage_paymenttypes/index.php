@@ -13,6 +13,12 @@ if($paymentTypes): ?>
     <?php if($this->controller->checkIsAllowed('manage_paymenttypes', 'edit')): ?>
       (<a href='<?php print $this->path('manage/paymenttypes/edit/') . $type->getId()?>'>Edit</a>)
     <?php endif;?>
+    <?php if(!$type->isExpired() and $this->controller->checkIsAllowed('manage_paymenttypes', 'expire')): ?>
+      (<a href='<?php print $this->path('manage/paymenttypes/expire/') . $type->getId()?>'>Expire</a>)
+    <?php endif;?>
+    <?php if($type->isExpired() and $this->controller->checkIsAllowed('manage_paymenttypes', 'unExpire')): ?>
+      (<a href='<?php print $this->path('manage/paymenttypes/unExpire/') . $type->getId()?>'>Un-Expire</a>)
+    <?php endif;?>
     
   </li>
   <?php endforeach;?>

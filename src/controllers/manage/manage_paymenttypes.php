@@ -13,6 +13,8 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Payment Types';
   const ACTION_EDIT = 'Edit Payment Types';
   const ACTION_NEW = 'New Payment Type';
+  const ACTION_EXPIRE = 'Expire Payment Type';
+  const ACTION_UNEXPIRE = 'Un-Expire Payment Type';
   const REQUIRE_APPLICATION = false;
   
   /**
@@ -39,6 +41,36 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
         $this->addMessage('success', "Changes Saved");
         $this->redirectPath('manage/paymenttypes');
       }
+    } else {
+      $this->addMessage('error', "Error: Paymenttype #{$paymentTypeId} does not exist.");
+    }
+  }
+  
+  /**
+   * Expire Type
+   * @param integer $paymentTypeId
+   */
+   public function actionExpire($paymentTypeId){ 
+    if($paymentType = $this->_em->getRepository('\Jazzee\Entity\PaymentType')->find($paymentTypeId)){
+      $paymentType->expire();
+      $this->_em->persist($paymentType);
+      $this->addMessage('success', "Payment Type Expired");
+      $this->redirectPath('manage/paymenttypes');
+    } else {
+      $this->addMessage('error', "Error: Paymenttype #{$paymentTypeId} does not exist.");
+    }
+  }
+  
+  /**
+   * Un-Expire Type
+   * @param integer $paymentTypeId
+   */
+   public function actionUnExpire($paymentTypeId){ 
+    if($paymentType = $this->_em->getRepository('\Jazzee\Entity\PaymentType')->find($paymentTypeId)){
+      $paymentType->unExpire();
+      $this->_em->persist($paymentType);
+      $this->addMessage('success', "Payment Type Un-Expired");
+      $this->redirectPath('manage/paymenttypes');
     } else {
       $this->addMessage('error', "Error: Paymenttype #{$paymentTypeId} does not exist.");
     }

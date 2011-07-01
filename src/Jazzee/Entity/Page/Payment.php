@@ -22,7 +22,7 @@ class Payment extends Standard {
     $element->setLabel('Payment Method');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
-    $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findAll();
+    $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired'=>false));
     foreach($paymentTypes as $type){
       $element->newItem($type->getId(), $type->getName());
     }
