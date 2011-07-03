@@ -12,6 +12,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
   const PATH = 'setup/importapplication';
   
   const ACTION_INDEX = 'Import Configuration';
+  const REQUIRE_APPLICATION = false;
   
   /**
    * Setup the current application and cycle
@@ -70,6 +71,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
       }
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application imported successfully');
+      unset($this->_store->AdminControllerGetNavigation);
     }
     
     $this->setVar('form', $form);

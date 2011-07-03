@@ -121,19 +121,19 @@ class Check extends AbstractPaymentType{
    * @see ApplyPaymentInterface::settlePaymentForm()
    */
   function getSettlePaymentForm(\Jazzee\Entity\Payment $payment){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Settle {$this->paymentType->name} Payment"));        
+    $form = new \Foundation\Form(); 
+    $field = $form->newField();
+    $field->setLegend('Settle Payment');
+    
     $element = $field->newElement('TextInput','checkNumber');
-    $element->label = 'Check Number';
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Check Number');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $element = $field->newElement('DateInput','checkSettlementDate');
-    $element->label = 'The Date the check was settled';
-    $element->value = 'today';
-      
-    $element->addValidator('DateBefore', 'tomorrow');
-    $element->addFilter('DateFormat', 'Y-m-d H:i:s');
-    $element->addValidator('NotEmpty');
+    $element->setLabel('The Date the check was settled');
+    $element->setValue('today');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\DateBefore($element, 'tomorrow'));
     
     $form->newButton('submit', 'Save');
     return $form;
@@ -145,35 +145,35 @@ class Check extends AbstractPaymentType{
    */
   function settlePayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $payment->settled();
-    $payment->setVar('checkNumber', $input->checkNumber);
-    $payment->setVar('checkSettlementDate', $input->checkSettlementDate);
-    $payment->save();
+    $payment->setVar('checkNumber', $input->get('checkNumber'));
+    $payment->setVar('checkSettlementDate', $input->get('checkSettlementDate'));
     return true;
   }
   
   /**
-   * Record the reason the payment was rejected
+   * Record the reason the payment was refunded
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
   function getRejectPaymentForm(\Jazzee\Entity\Payment $payment){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Reject {$this->paymentType->name} Payment"));        
-    $element = $field->newElement('Textarea','reason');
-    $element->label = 'Reason displayed to Applicant';
-    $element->addValidator('NotEmpty');
+    $form = new \Foundation\Form(); 
+    $field = $form->newField();
+    $field->setLegend('Reject Payment');
+    
+    $element = $field->newElement('Textarea','rejectedReason');
+    $element->setLabel('Reason displayed to Applicant');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newButton('submit', 'Save');
     return $form;
   }
   
   /**
-   * Bounced checks get rejected
-   * @see ApplyPaymentInterface::rejectPayment()
+   * Check payments are refunded outside Jazzee and then marked as refunded
+   * @see ApplyPaymentInterface::refundPayment()
    */
   function rejectPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $payment->rejected();
-    $payment->setVar('rejectedReason', $input->reason);
-    $payment->save();
+    $payment->setVar('rejectedReason', $input->get('rejectedReason'));
     return true;
   }
   
@@ -182,11 +182,13 @@ class Check extends AbstractPaymentType{
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
   function getRefundPaymentForm(\Jazzee\Entity\Payment $payment){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Refund {$this->paymentType->name} Payment"));        
-    $element = $field->newElement('Textarea','reason');
-    $element->label = 'Reason displayed to Applicant';
-    $element->addValidator('NotEmpty');
+    $form = new \Foundation\Form(); 
+    $field = $form->newField();
+    $field->setLegend('Refund Payment');
+    
+    $element = $field->newElement('Textarea','refundedReason');
+    $element->setLabel('Reason displayed to Applicant');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newButton('submit', 'Save');
     return $form;
@@ -198,37 +200,7 @@ class Check extends AbstractPaymentType{
    */
   function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $payment->refunded();
-    $payment->setVar('refundedReason', $input->reason);
-    $payment->save();
+    $payment->setVar('refundedReason', $input->get('refundedReason'));
     return true;
-  }
-  
-  /**
-   * Check tools
-   * @see ApplyPaymentInterface::applicantTools()
-   */
-  public function applicantTools(\Jazzee\Entity\Payment $payment){
-    $arr = array();
-    switch($payment->status){
-      case Payment::PENDING:
-        $arr[] = array(
-          'title' => 'Clear Check',
-          'class' => 'settlePayment',
-          'path' => "settlePayment/{$payment->id}"
-        );
-        $arr[] = array(
-          'title' => 'Reject Check',
-          'class' => 'rejectPayment',
-          'path' => "rejectPayment/{$payment->id}"
-        );
-        break;
-      case Payment::SETTLED:
-        $arr[] = array(
-          'title' => 'Apply Refund',
-          'class' => 'refundPayment',
-          'path' => "refundPayment/{$payment->id}"
-        );
-    }
-    return $arr;
   }
 }

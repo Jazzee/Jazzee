@@ -104,7 +104,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   
   public function setup(\Foundation\Form\Input $input){
     $this->_paymentType->setName($input->get('name'));
-    $this->_paymentType->setClass('\\Jazzee\\Entity\\PaymentType\AuthorizeNetAim');
+    $this->_paymentType->setClass('\\Jazzee\\Entity\\PaymentType\AuthorizeNetAIM');
     $this->_paymentType->setVar('description', $input->get('description'));
     $this->_paymentType->setVar('gatewayId', $input->get('gatewayId'));
     $this->_paymentType->setVar('gatewayKey', $input->get('gatewayKey'));
@@ -142,8 +142,8 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     } else {
       $payment->setAmount($response->amount);
       $payment->setVar('transactionId', $response->transaction_id);
-      $payment->setVar('reasonCode', $response->response_reason_code);
-      $payment->setVar('reasonText', $response->response_reason_text);
+      $payment->setVar('rejectedReasonCode', $response->response_reason_code);
+      $payment->setVar('rejectedReason', $response->response_reason_text);
       $payment->rejected();
       return false;
     }
@@ -154,10 +154,13 @@ class AuthorizeNetAIM extends AbstractPaymentType{
    * @see ApplyPaymentInterface::settlePaymentForm()
    */
   public function getSettlePaymentForm(\Jazzee\Entity\Payment $payment){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Settle {$this->paymentType->name} Payment"));
+    $form = new \Foundation\Form(); 
+    $field = $form->newField();
+    $field->setLegend('Settle Payment');
+    
     $element = $field->newElement('Plaintext','info');
-    $element->value = "{$this->paymentType->name} transactions have to be settled by Authorize.net.  To check the status of this payment click 'Attempt Settlement'";
+    $element->setValue("Transactions have to be settled by Authorize.net.  To check the status of this payment click 'Attempt Settlement'");
+
     $form->newButton('submit', 'Attempt Settlement');
     return $form;
   }
@@ -167,18 +170,17 @@ class AuthorizeNetAIM extends AbstractPaymentType{
    * @see ApplyPaymentInterface::settlePayment()
    */
   public function settlePayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
-    $td = new AuthorizeNetTD($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
-    $td->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $td = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+    $td->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     // Get Transaction Details
     $transactionId = $payment->getVar('transactionId');
     $response = $td->getTransactionDetails($transactionId);
     if($response->isError())
-      throw new Jazzee_Exception("Unable to get transaction details for {$payment->id} transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
+      throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
     //has this transaction has been settled already
     if($response->xml->transaction->transactionStatus == 'settledSuccessfully'){
       $payment->settled();
       $payment->setVar('settlementTimeUTC', (string)$response->xml->transaction->batch->settlementTimeUTC);
-      $payment->save();
       return true;
     } else if($response->xml->transaction->transactionStatus == 'voided'){
       $payment->rejected();
@@ -186,22 +188,23 @@ class AuthorizeNetAIM extends AbstractPaymentType{
         $payment->setVar('rejectedReason', $input->reason);
       else
         $payment->setVar('rejectedReason', 'This payment was voided.');
-      $payment->save();
       return true;
     }
     return false;
   }
   
   /**
-   * Record the reason the payment was rejected
+   * Record the reason the payment was refunded
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
-  public function getRejectPaymentForm(\Jazzee\Entity\Payment $payment){
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Reject {$this->paymentType->name} Payment"));        
-    $element = $field->newElement('Textarea','reason');
-    $element->label = 'Reason displayed to Applicant';
-    $element->addValidator('NotEmpty');
+  function getRejectPaymentForm(\Jazzee\Entity\Payment $payment){
+    $form = new \Foundation\Form(); 
+    $field = $form->newField();
+    $field->setLegend('Reject Payment');
+    
+    $element = $field->newElement('Textarea','rejectedReason');
+    $element->setLabel('Reason displayed to Applicant');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newButton('submit', 'Save');
     return $form;
@@ -212,14 +215,14 @@ class AuthorizeNetAIM extends AbstractPaymentType{
    * @see ApplyPaymentInterface::rejectPayment()
    */
   public function rejectPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
-    $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
-    $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
-    $aim->test_request = $this->config->status == 'PRODUCTION'?0:1;
+    $aim = new \AuthorizeNetAIM($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+    $aim->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $config = new \Jazzee\Configuration();
+    $aim->test_request = ($config->getStatus() == 'PRODUCTION')?0:1;
     $response = $aim->void($payment->getVar('transactionId'));
     if($response->approved) {
       $payment->rejected();
-      $payment->setVar('reasonText', $input->reason);
-      $payment->save();
+      $payment->setVar('rejectedReason', $input->get('rejectedReason'));
       return true;
     }
     //if we cant void we are probably already settled so try and settle the payment in our system
@@ -231,22 +234,24 @@ class AuthorizeNetAIM extends AbstractPaymentType{
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
   public function getRefundPaymentForm(\Jazzee\Entity\Payment $payment){
-    $td = new AuthorizeNetTD($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
-    $td->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $td = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+    $td->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     // Get Transaction Details
     $transactionId = $payment->getVar('transactionId');
     $response = $td->getTransactionDetails($transactionId);
     if($response->isError())
-      throw new Jazzee_Exception("Unable to get transaction details for {$payment->id} transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
-      
-    $form = new Form;
-    $field = $form->newField(array('legend'=>"Refund {$this->paymentType->name} Payment"));      
+      throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
+     
+    $form = new \Foundation\Form;
+    $field = $form->newField();
+    $field->setLegend('Refund Payment');
     $element = $field->newElement('Plaintext', 'details');
-    $element->label = 'Details';
-    $element->value = "Refund \${$payment->amount} to card " . $response->xml->transaction->payment->creditCard->cardNumber;  
-    $element = $field->newElement('Textarea','reason');
-    $element->label = 'Reason displayed to Applicant';
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Details');
+    $element->setValue('Refund $' . $payment->getAmmount() . ' to card ' . $response->xml->transaction->payment->creditCard->cardNumber);  
+    
+    $element = $field->newElement('Textarea','refundedReason');
+    $element->setLabel('Reason displayed to Applicant');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newHiddenElement('cardNumber', substr($response->xml->transaction->payment->creditCard->cardNumber, strlen($response->xml->transaction->payment->creditCard->cardNumber)-4, 4));
     $form->newButton('submit', 'Save');
@@ -254,45 +259,20 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   }
   
   /**
-   * Check payments are refunded outside Jazzee and then marked as refunded
+   * Contact anet and attempt to refund the payment
    * @see ApplyPaymentInterface::refundPayment()
    */
   public function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
-    $aim = new AuthorizeNetAIM($this->paymentType->getVar('gatewayId'), $this->paymentType->getVar('gatewayKey'));
-    $aim->setSandBox($this->paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
-    $aim->test_request = $this->config->status == 'PRODUCTION'?0:1;
-    $response = $aim->credit($payment->getVar('transactionId'), $payment->amount, $input->cardNumber);
+    $aim = new \AuthorizeNetAIM($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+    $aim->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $config = new \Jazzee\Configuration();
+    $aim->test_request = ($config->getStatus() == 'PRODUCTION')?0:1;
+    $response = $aim->credit($payment->getVar('transactionId'), $payment->getAmount(), $input->get('cardNumber'));
     if($response->approved) {
       $payment->refunded();
-      $payment->setVar('reasonText', $input->reason);
-      $payment->save();
+      $payment->setVar('refundedReason', $input->get('refundedReason'));
       return true;
     }
     return false;
-  }
-  
-  public function applicantTools(\Jazzee\Entity\Payment $payment){
-    $arr = array();
-    switch($payment->status){
-      case Payment::PENDING:
-        $arr[] = array(
-          'title' => 'Settle Payment',
-          'class' => 'settlePayment',
-          'path' => "settlePayment/{$payment->id}"
-        );
-        $arr[] = array(
-          'title' => 'Reject Payment',
-          'class' => 'rejectPayment',
-          'path' => "rejectPayment/{$payment->id}"
-        );
-        break;
-      case Payment::SETTLED:
-        $arr[] = array(
-          'title' => 'Refund Payment',
-          'class' => 'refundPayment',
-          'path' => "refundPayment/{$payment->id}"
-        );
-    }
-    return $arr;
   }
 }

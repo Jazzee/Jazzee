@@ -449,6 +449,87 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
+   * Settle a Payment
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionSettlePayment($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    if(!$payment = $answer->getPayment())  throw new \Jazzee\Exception("Answer {$answerId} does not have a payment.");
+    if($payment->getStatus() != \Jazzee\Entity\Payment::PENDING) throw new \Jazzee\Exception('Payment ' . $payment->getId() . ' is not pending so cannot be settled.');
+    $form = $payment->getType()->getJazzeePaymentType()->getSettlePaymentForm($payment);
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $payment->getType()->getJazzeePaymentType()->settlePayment($payment, $input);
+        $this->_em->persist($payment);
+        foreach($payment->getVariables() as $var) $this->_em->persist($var);
+        $this->setLayoutVar('status', 'success');
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $form->setAction($this->path("applicants/single/{$applicantId}/settlePayment/{$answerId}"));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Refund Payment
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionRefundPayment($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    if(!$payment = $answer->getPayment())  throw new \Jazzee\Exception("Answer {$answerId} does not have a payment.");
+    if($payment->getStatus() != \Jazzee\Entity\Payment::PENDING and $payment->getStatus() != \Jazzee\Entity\Payment::SETTLED) throw new \Jazzee\Exception('Payment ' . $payment->getId() . ' is not settled or pending so cannot be refunded.');
+    $form = $payment->getType()->getJazzeePaymentType()->getRefundPaymentForm($payment);
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $payment->getType()->getJazzeePaymentType()->refundPayment($payment, $input);
+        $this->_em->persist($payment);
+        foreach($payment->getVariables() as $var) $this->_em->persist($var);
+        $this->setLayoutVar('status', 'success');
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $form->setAction($this->path("applicants/single/{$applicantId}/refundPayment/{$answerId}"));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Reject Payment
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionRejectPayment($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    if(!$payment = $answer->getPayment())  throw new \Jazzee\Exception("Answer {$answerId} does not have a payment.");
+    if($payment->getStatus() != \Jazzee\Entity\Payment::PENDING and $payment->getStatus() != \Jazzee\Entity\Payment::SETTLED) throw new \Jazzee\Exception('Payment ' . $payment->getId() . ' is not settled or pending so cannot be rejected.');
+    $form = $payment->getType()->getJazzeePaymentType()->getRejectPaymentForm($payment);
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $payment->getType()->getJazzeePaymentType()->rejectPayment($payment, $input);
+        $this->_em->persist($payment);
+        foreach($payment->getVariables() as $var) $this->_em->persist($var);
+        $this->setLayoutVar('status', 'success');
+      } else {
+        $this->setLayoutVar('status', 'error');
+      }
+    }
+    $form->setAction($this->path("applicants/single/{$applicantId}/rejectPayment/{$answerId}"));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
    * Do something with an answer
    * Passes everything off to the page to perform a special action
    * @param integer $applicantId
@@ -478,6 +559,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     //several views are controller by the complete action
     if(in_array($action, array('refresh', 'refreshPage'))) $action = 'index';
     if(in_array($action, array('do'))) $action = 'editAnswer';
-    return parent::isAllowed($controller, $action, $user, $program);
+    return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }

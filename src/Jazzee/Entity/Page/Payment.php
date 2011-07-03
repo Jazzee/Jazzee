@@ -25,7 +25,7 @@ class Payment extends Standard {
     $allowedTypes = explode(',',$this->_applicationPage->getPage()->getVar('allowedPaymentTypes'));
     $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired'=>false));
     foreach($paymentTypes as $type){
-      if(in_array($type->getId(), $allowedTypes)) $element->newItem($type->getId(), $type->getName());
+      if($this->_controller instanceof \Jazzee\AdminController or in_array($type->getId(), $allowedTypes)) $element->newItem($type->getId(), $type->getName());
     }
     $element = $field->newElement('RadioList', 'amount');
     $element->setLabel('Type of payment');
@@ -67,7 +67,7 @@ class Payment extends Standard {
     $this->_applicant->addAnswer($answer);
     $payment = new \Jazzee\Entity\Payment();
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
-
+    $answer->setPayment($payment);
     $result = $payment->getType()->getJazzeePaymentType()->pendingPayment($payment, $input);
     if($result){
       $this->_controller->addMessage('success', 'Your payment has been recorded.');
@@ -75,7 +75,6 @@ class Payment extends Standard {
     } else {
       $this->_controller->addMessage('error', 'There was a problem processing your payment.');
     }
-    $answer->setPayment($payment);
     $this->_controller->getEntityManager()->persist($answer);
     $this->_controller->getEntityManager()->persist($payment);
     foreach($payment->getVariables() as $var) $this->_controller->getEntityManager()->persist($var);
@@ -97,7 +96,7 @@ class Payment extends Standard {
   
   public function getAnswers(){
     $answers = array();
-    foreach($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer){
+    foreach($this->getAllAnswers() as $answer){
       if($answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::PENDING or $answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::SETTLED){
         $answers[] = $answer;
       }
@@ -105,7 +104,7 @@ class Payment extends Standard {
     return $answers;
   }
   
-  public function showReviewPage(){
-    return false;
+  public function getAllAnswers(){
+    return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
 }

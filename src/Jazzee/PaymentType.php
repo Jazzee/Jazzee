@@ -86,10 +86,4 @@ interface PaymentType{
    * @param \Foundation\Form\Input $input
    */
   function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input);
-  
-  /**
-   * Get the applicant admin tools
-   * @param \Jazzee\Entity\Payment $payment
-   */
-  function applicantTools(\Jazzee\Entity\Payment $payment);
 }
