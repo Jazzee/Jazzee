@@ -268,6 +268,10 @@ class JazzeePageController extends \Foundation\VC\Controller
       default:
         $priority = PEAR_LOG_INFO;
     }
+    if(error_reporting() === 0){// Error reporting is currently turned off or suppressed with @
+      $this->_log->log('Supressed error: ' . $message . ' in ' . $file . ' at line ' . $line, PEAR_LOG_INFO);
+      return false;
+    }
     $this->_log->log($message . ' in ' . $file . ' at line ' . $line, $priority);
     throw new \Exception('Jazzee caught a PHP error');
   }
