@@ -3,8 +3,9 @@ namespace Jazzee\Entity;
 
 /** 
  * Message
- * Threaded Messages between Applicants and Users
- * @Entity 
+ * 
+ * Threaded Applicant Messages
+ * @Entity(repositoryClass="\Jazzee\Entity\MessageRepository")
  * @HasLifecycleCallbacks
  * @Table(name="messages") 
  * @package    jazzee
@@ -31,18 +32,21 @@ class Message{
   private $applicant;
   
   /** 
-   * @ManyToOne(targetEntity="Message",inversedBy="replies")
+   * @OneToOne(targetEntity="Message",inversedBy="reply")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $parent;
   
   /** 
-   * @OneToMany(targetEntity="Message", mappedBy="parent")
+   * @OneToOne(targetEntity="Message", mappedBy="parent")
    */
-  private $replies;
+  private $reply;
   
   /** @Column(type="integer") */
   private $sender;
+
+  /** @Column(type="string") */
+  private $subject;
 
   /** @Column(type="text") */
   private $text;
@@ -54,7 +58,6 @@ class Message{
   private $isRead;
   
   public function __construct(){
-    $this->replies = new \Doctrine\Common\Collections\ArrayCollection();
     $this->isRead = false;
   }
   
@@ -95,6 +98,24 @@ class Message{
   }
 
   /**
+   * Set subject
+   *
+   * @param string $subject
+   */
+  public function setSubject($subject){
+    $this->subject = $subject;
+  }
+
+  /**
+   * Get subject
+   *
+   * @return string $subject
+   */
+  public function getSubject(){
+    return $this->subject;
+  }
+
+  /**
    * Set text
    *
    * @param text $text
@@ -111,8 +132,6 @@ class Message{
   public function getText(){
     return $this->text;
   }
-  
-
   
   /**
    * Mark the created at automatically
@@ -150,10 +169,49 @@ class Message{
   /**
    * Get read status
    *
+   * @param integer $who
    * @return boolean $isRead
    */
-  public function isRead(){
-    return $this->isRead;
+  public function isRead($who){
+    return($this->sender == $who or $this->isRead);
+  }
+
+  /**
+   * Get read status of children
+   *
+   * @param integer $who
+   * @return boolean
+   */
+  public function isReadThread($who){
+    if(!$this->isRead($who)) return false;
+    if(!$this->reply or !$this->reply->isReadThread($who)) return false;
+    return true;
+  }
+
+  /**
+   * Get last message in chain
+   *
+   * @return \Jazzee\Entity\Message
+   */
+  public function getLastMessage(){
+    $message = $this;
+    while($message->reply){
+      $message = $message->reply;
+    }
+    return $message;
+  }
+
+  /**
+   * Get first message in chain
+   *
+   * @return \Jazzee\Entity\Message
+   */
+  public function getFirstMessage(){
+    $message = $this;
+    while($message->parent){
+      $message = $message->parent;
+    }
+    return $message;
   }
 
   /**
@@ -186,10 +244,10 @@ class Message{
   /**
    * Get replies
    *
-   * @return Doctrine\Common\Collections\Collection $replies
+   * @return Message
    */
-  public function getReplies(){
-    return $this->replies;
+  public function getReply(){
+    return $this->reply;
   }
   
   /**
@@ -198,8 +256,8 @@ class Message{
    * Add a reply to this message
    * @param \Jazzee\Entity\Message $reply
    */
-  public function addReply(\Jazzee\Entity\Message $message){
-    $this->replies[] = $message;
+  public function setReply(\Jazzee\Entity\Message $message){
+    $this->reply = $message;
     if($message->getParent() !== $this) $message->setParent($this);
   }
   
@@ -213,4 +271,23 @@ class Message{
     $this->parent = $parent;
   }
   
+}
+
+/**
+ * Message Repository
+ * Special Repository methods for Messages
+ */
+class MessageRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * Find all the messages for an application
+   * 
+   * @param Application $application
+   * @return Doctrine\Common\Collections\Collection $messages
+   */
+  public function findThreadByApplication(Application $application){
+    $query = $this->_em->createQuery('SELECT m FROM Jazzee\Entity\Message m WHERE m.parent IS NULL AND m.applicant IN (SELECT a.id from \Jazzee\Entity\Applicant a WHERE a.application = :applicationId)');
+    $query->setParameter('applicationId', $application->getId());
+    return $query->getResult();
+  }
 }

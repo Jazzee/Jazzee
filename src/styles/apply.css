@@ -104,3 +104,8 @@ div.threaded p.header {
 div.threaded p.footer {
   text-align: right;
 }
+
+sup.count{
+  background-color: #ff0000;
+  border-radius: .5em;
+}

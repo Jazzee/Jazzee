@@ -589,6 +589,17 @@ class Applicant{
   public function getMessages(){
     return $this->messages;
   }
+
+  /**
+   * Unread Message Count
+   *
+   * @return integer
+   */
+  public function unreadMessageCount(){
+    $count = 0;
+    foreach($this->messages as $message) if($message->getSender() != \Jazzee\Entity\Message::APPLICANT and !$message->isRead()) $count++;
+    return $count;
+  }
 }
 
 /**
