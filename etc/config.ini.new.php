@@ -84,7 +84,7 @@ mailServerType=php
 ;#LIVE - No access Controll
 ;#MAINTENANCE - ALL requests are redirected to the maintence page. No database access
 mode=LIVE
-;maintenanceMessage=
+;maintenanceModeMessage=
 
 ;### DEVELOPMENT OPTIONS ###;
 ;#There are three status levels available which controll things like log output and payment processing:

@@ -22,6 +22,11 @@ protected $_mode;
 /**
  * @var string
  */
+protected $_maintenanceModeMessage;
+
+/**
+ * @var string
+ */
 protected $_status;
 
 /**
@@ -247,6 +252,25 @@ protected $_publicKeyCertificatePath;
   public function setMode($mode) {
     $this->_mode = $mode;
   }
+  
+
+  /**
+   * get maintenanceModeMessage
+   * @return string
+   */
+  public function getMaintenanceModeMessage() {
+    return $this->_maintenanceModeMessage;
+  }
+  
+  /**
+   * set maintenanceModeMessage
+   * @var string $maintenanceModeMessage
+   */
+  public function setMaintenanceModeMessage($maintenanceModeMessage) {
+    $this->_maintenanceModeMessage = $maintenanceModeMessage;
+  }
+  
+  
   
   /**
    * get status
