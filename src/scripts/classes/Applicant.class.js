@@ -209,6 +209,7 @@ Applicant.prototype.displayTags = function(json){
     input.blur(function(e){
       $(e.target).attr('value', 'add tag');
     });
+    input.autocomplete({source: json.allTags});
     var form = $('<form>').append(input);
     
     form.submit(function(e){

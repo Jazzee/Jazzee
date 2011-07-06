@@ -112,8 +112,12 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $tags = array(
       'tags'=>array(),
       'allowAdd' => $this->checkIsAllowed($this->controllerName, 'addTag'),
-      'allowRemove' => $this->checkIsAllowed($this->controllerName, 'removeTag')
+      'allowRemove' => $this->checkIsAllowed($this->controllerName, 'removeTag'),
+      'allTags' => array()
     );
+    if($this->checkIsAllowed($this->controllerName, 'addTag')){
+      foreach($this->_em->getRepository('\Jazzee\Entity\Tag')->findAll() as $tag) $tags['allTags'][] = $tag->getTitle();
+    }
     foreach($applicant->getTags() as $tag){
       $tags['tags'][] = array(
         'id'=> $tag->getId(),
