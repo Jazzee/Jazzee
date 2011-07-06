@@ -214,6 +214,18 @@ protected $_simpleSAMLEmailAddressAttribute;
  */
 protected $_publicKeyCertificatePath;
 
+/**
+ * @var string
+ */
+protected $_recaptchaPrivateKey;
+
+/**
+ * @var string
+ */
+protected $_recaptchaPublicKey;
+
+
+
   /**
    * Construct
    * Load data from the ini file

@@ -151,10 +151,11 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\SameAs($element, 'password'));
     
-    //setup recaptcha element keys
-    \Foundation\Form\Element\Captcha::setKeys($this->_config->getRecaptchaPrivateKey(), $this->_config->getRecaptchaPublicKey());
-    $element = $field->newElement('Captcha','captcha');
-    
+    if($this->_config->getRecaptchaPrivateKey()){
+      //setup recaptcha element keys
+      \Foundation\Form\Element\Captcha::setKeys($this->_config->getRecaptchaPrivateKey(), $this->_config->getRecaptchaPublicKey());
+      $element = $field->newElement('Captcha','captcha');
+    }
     $form->newButton('submit', 'Reset Password');
     
     if($input = $form->processInput($this->post)){
@@ -211,10 +212,11 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\SameAs($element, 'password'));
     
-    //setup recaptcha element keys
-    \Foundation\Form\Element\Captcha::setKeys($this->_config->getRecaptchaPrivateKey(), $this->_config->getRecaptchaPublicKey());
-    $element = $field->newElement('Captcha','captcha');
-    
+    if($this->_config->getRecaptchaPrivateKey()){
+      //setup recaptcha element keys
+      \Foundation\Form\Element\Captcha::setKeys($this->_config->getRecaptchaPrivateKey(), $this->_config->getRecaptchaPublicKey());
+      $element = $field->newElement('Captcha','captcha');
+    }
     $form->newButton('submit', 'Create Account');
     if($input = $form->processInput($this->post)){
       $duplicate = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
