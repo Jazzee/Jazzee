@@ -9,4 +9,16 @@ $(document).ready(function(){
 		buttonImage: "resource/foundation/media/icons/calendar_edit.png",
 		buttonImageOnly: true
 	});
+  
+  $('div.field p.instructions').each(function(i){
+    var p = $(this);
+    p.hide();
+    var label = $('label', $(this).siblings('div.element').first()).first();
+    var img = $('<img>').attr('src', 'resource/foundation/media/icons/information.png').attr('title', p.html());
+    img.click(function(e){
+      p.toggle('slide',{direction: 'up'});
+      $(this).hide();
+    });
+    label.append(img);
+  });
 });
