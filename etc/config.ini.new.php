@@ -75,6 +75,9 @@ mailServerType=php
 ;recaptchaPrivateKey=
 ;recaptchaPublicKey=
 
+maximumApplicantFileUploadSize=1m
+maximumAdminFileUploadSize=5m
+
 ;#Public OPENSSL PKI certificate is used to encrypt applicant input for especially sensitive data like SSNs
 ;#For security only the public key should be stored on the Jazzee System and decryption should happen offline
 ;publicKeyCertificatePath=

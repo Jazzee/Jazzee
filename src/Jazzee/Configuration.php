@@ -132,7 +132,12 @@ protected $_adminEmail;
 /**
  * @var string
  */
-protected $_maximumApplicantFileUpload;
+protected $_maximumApplicantFileUploadSize;
+
+/**
+ * @var string
+ */
+protected $_maximumAdminFileUploadSize;
 
 /**
  * @var string
@@ -641,19 +646,41 @@ protected $_publicKeyCertificatePath;
   }
   
   /**
-   * get maximumApplicantFileUpload
+   * get maximumApplicantFileUploadSize
    * @return string
    */
-  public function getMaximumApplicantFileUpload() {
-    return $this->_maximumApplicantFileUpload;
+  public function getMaximumApplicantFileUploadSize() {
+    return $this->_maximumApplicantFileUploadSize;
   }
   
   /**
-   * set maximumApplicantFileUpload
-   * @var string $maximumApplicantFileUpload
+   * set maximumApplicantFileUploadSize
+   * @var string $maximumApplicantFileUploadSize
    */
-  public function setMaximumApplicantFileUpload($maximumApplicantFileUpload) {
-    $this->_maximumApplicantFileUpload = $maximumApplicantFileUpload;
+  public function setMaximumApplicantFileUploadSize($maximumApplicantFileUploadSize) {
+    if(\convertIniShorthandValue($maximumApplicantFileUploadSize) > \convertIniShorthandValue(\ini_get('upload_max_filesize'))){
+      throw new \Jazzee\Exception('Configured Applicant File Upload Size is larger than PHP upload_max_filesize');
+    }
+    $this->_maximumApplicantFileUploadSize = \convertIniShorthandValue($maximumApplicantFileUploadSize);
+  }
+  
+  /**
+   * get maximumAdminFileUploadSize
+   * @return string
+   */
+  public function getMaximumAdminFileUploadSize() {
+    return $this->_maximumAdminFileUploadSize;
+  }
+  
+  /**
+   * set maximumAdminFileUploadSize
+   * @var string $maximumAdminFileUploadSize
+   */
+  public function setMaximumAdminFileUploadSize($maximumAdminFileUploadSize) {
+    if(\convertIniShorthandValue($maximumAdminFileUploadSize) > \convertIniShorthandValue(\ini_get('upload_max_filesize'))){
+      throw new \Jazzee\Exception('Configured Admin File Upload Size is larger than PHP upload_max_filesize');
+    }
+    $this->_maximumAdminFileUploadSize = \convertIniShorthandValue($maximumAdminFileUploadSize);
   }
   
   /**

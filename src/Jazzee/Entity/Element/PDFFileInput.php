@@ -23,13 +23,13 @@ class PDFFileInput extends AbstractElement {
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
     
-    if($this->_element->getMax()){
-      $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $this->_element->getMax()));
-    } else {
-      $config = new \Jazzee\Configuration();
-      if($config->getMaximumApplicantFileUpload()) $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $config->getMaximumApplicantFileUpload()));
-      else $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, \ini_get('upload_max_filesize')));
-    }
+    $config = new \Jazzee\Configuration();
+    if($config->getMaximumApplicantFileUploadSize()) $max = $config->getMaximumApplicantFileUploadSize();
+    else $max = \convertIniShorthandValue(\ini_get('upload_max_filesize'));
+    if($this->_element->getMax() and \convertIniShorthandValue($this->_element->getMax()) < $max) $max = $this->_element->getMax();
+    
+    $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $max));
+    
     return $element;
   }
   
