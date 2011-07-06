@@ -59,6 +59,46 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     }
   }
   
+
+  
+  /**
+   * Admit Letter
+   */
+  public function actionAdmitLetter(){
+    $text = $this->_application->getAdmitLetter();
+    $search = array(
+     '%Admit_Date%',
+     '%Applicant_Name%',
+     '%Offer_Response_Deadline%'
+    );
+    $replace = array();
+    $replace[] = $this->_applicant->getDecision()->getFinalAdmit()->format('F jS Y');
+    $replace[] = $this->_applicant->getFullName();
+    $replace[] = $this->_applicant->getDecision()->getOfferResponseDeadline()->format('F jS Y g:ia');
+    $text = str_ireplace($search, $replace, $text);
+    
+    $text = nl2br($text);
+    $this->setVar('text', $text);
+  }
+  
+  /**
+   * Deny Letter
+   */
+  public function actionDenyLetter(){
+    $text = $this->_application->getDenyLetter();
+    $search = array(
+     '%Deny_Date%',
+     '%Applicant_Name%'
+    );
+    $replace = array();
+    $replace[] = $this->_applicant->getDecision()->getFinalDeny()->format('F jS Y');
+    $replace[] = $this->_applicant->getFullName();
+    $text = str_ireplace($search, $replace, $text);
+    
+    $text = nl2br($text);
+    $this->setVar('text', $text);
+  }
+  
   /**
    * Navigation
    * @return Navigation
@@ -76,6 +116,16 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     if($this->_applicant->getDecision() and $this->_applicant->getDecision()->getFinalAdmit() and !($this->_applicant->getDecision()->getAcceptOffer() or $this->_applicant->getDecision()->getDeclineOffer()) ){
       $link = new \Foundation\Navigation\Link('Confirm Enrolment');
       $link->setHref($this->path($path . '/sir'));
+      $menu->addLink($link); 
+    }
+    if($this->_applicant->getDecision() and $this->_applicant->getDecision()->getFinalAdmit()){
+      $link = new \Foundation\Navigation\Link('View Decision Letter');
+      $link->setHref($this->path($path . '/admitLetter'));
+      $menu->addLink($link); 
+    }
+    if($this->_applicant->getDecision() and $this->_applicant->getDecision()->getFinalDeny()){
+      $link = new \Foundation\Navigation\Link('View Decision Letter');
+      $link->setHref($this->path($path . '/denyLetter'));
       $menu->addLink($link); 
     }
     $link = new \Foundation\Navigation\Link('Logout');
