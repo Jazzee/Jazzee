@@ -280,10 +280,29 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    */
   public function actionFinalAdmit($applicantId){
     $applicant = $this->getApplicantById($applicantId);
-    $applicant->getDecision()->finalAdmit();
-    $this->_em->persist($applicant);
-    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
-    $this->loadView($this->controllerName . '/result');
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicantId}/finalAdmit"));
+    $field = $form->newField();
+    $field->setLegend('Admit ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+    
+    $element = $field->newElement('DateInput', 'offerResponseDeadline');
+    $element->setLabel('Offer Response Deadline');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'today'));
+    
+    $form->newButton('submit', 'Admit Applicant');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $applicant->getDecision()->finalAdmit();
+        $applicant->getDecision()->setOfferResponseDeadline($input->get('offerResponseDeadline'));
+        $this->_em->persist($applicant);
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('result', array('decisions'=> $this->getDecisions($applicant)));
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**

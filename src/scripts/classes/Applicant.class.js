@@ -123,13 +123,27 @@ Applicant.prototype.displayDecisions = function(json){
   var self = this;
   if(json.isLocked){
     $('#decisions').html('Status: ' + json.status + '<br />');
+    if(json.allowfinalAdmit){
+      var a = $('<a>').attr('href', this.baseUrl + '/finalAdmit').html('Admit Applicant<br />');
+      a.click(function(e){
+        $.get($(e.target).attr('href'),function(json){
+          var obj = {
+            display: function(json){
+              self.displayDecisions(json.data.result.decisions);
+            }
+          };
+          self.createForm(json.data.form, obj);
+        });
+        return false;
+      });
+      $('#decisions').append(a);
+    }
     var types = [
-      {title: 'Nominate for Admission', 'action': 'nominateAdmit'},
-      {title: 'Undo Nomination', 'action': 'undoNominateAdmit'},
-      {title: 'Nominate for Deny', 'action': 'nominateDeny'}, 
-      {title: 'Undo Nomination', 'action': 'undoNominateDeny'}, 
-      {title: 'Admit Applicant', 'action': 'finalAdmit'},
-      {title: 'Deny Applicant', 'action': 'finalDeny'},          
+      {title: 'Nominate for Admission', action: 'nominateAdmit'},
+      {title: 'Undo Nomination', action: 'undoNominateAdmit'},
+      {title: 'Nominate for Deny', action: 'nominateDeny'}, 
+      {title: 'Undo Nomination', action: 'undoNominateDeny'},
+      {title: 'Deny Applicant', action: 'finalDeny'},          
     ];
     for(var i = 0; i < types.length; i++){
       if(json['allow'+types[i].action]){
@@ -143,7 +157,7 @@ Applicant.prototype.displayDecisions = function(json){
         $('#decisions').append(a);
       }
     }
-  }else {$('#decisions').html('Status: Not Complete<br />');}
+  } else {$('#decisions').html('Status: Not Complete<br />');}
   if(json.allowUnlock && json.isLocked){
     var a = $('<a>').attr('href', this.baseUrl + '/unlock').html('Unlock Application <br />');
     a.click(function(e){
