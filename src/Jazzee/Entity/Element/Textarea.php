@@ -35,7 +35,7 @@ class Textarea extends AbstractElement {
   public function displayValue(\Jazzee\Entity\Answer $answer){
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if(isset($elementsAnswers[0])){
-      return $elementsAnswers[0]->getEText();
+      return nl2br(htmlentities($elementsAnswers[0]->getEText()));
     }
     return null;
   }
