@@ -89,6 +89,8 @@ class Standard extends AbstractPage {
     if($answer = $this->_applicant->findAnswerById($answerId)){
       $this->_controller->getEntityManager()->remove($answer);
       $this->_applicant->getAnswers()->removeElement($answer);
+      $this->_applicant->markLastUpdate();
+      $this->_controller->getEntityManager()->persist($this->_applicant);
       $this->_controller->addMessage('success', 'Answered Deleted Successfully');
     }
   }

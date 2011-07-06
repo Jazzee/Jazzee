@@ -15,6 +15,8 @@ namespace Jazzee\Entity;
  * @package    jazzee
  * @subpackage orm
  **/
+use Foundation\Mail\Message;
+
 class Applicant{
   /**
     * @Id 
@@ -597,7 +599,7 @@ class Applicant{
    */
   public function unreadMessageCount(){
     $count = 0;
-    foreach($this->messages as $message) if($message->getSender() != \Jazzee\Entity\Message::APPLICANT and !$message->isRead()) $count++;
+    foreach($this->messages as $message) if(!$message->isRead(\Jazzee\Entity\Message::APPLICANT)) $count++;
     return $count;
   }
 }
