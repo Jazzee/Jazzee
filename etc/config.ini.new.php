@@ -89,6 +89,9 @@ maximumAdminFileUploadSize=5m
 mode=LIVE
 ;maintenanceModeMessage=
 
+;broadcast messagesa are displayed on every screen to announce something critical
+;broadcastMessage=
+
 ;### DEVELOPMENT OPTIONS ###;
 ;#There are three status levels available which controll things like log output and payment processing:
 ;#PRODUCTION - Live jazzee site open to the public

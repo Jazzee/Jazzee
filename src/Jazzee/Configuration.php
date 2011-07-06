@@ -27,6 +27,11 @@ protected $_maintenanceModeMessage;
 /**
  * @var string
  */
+protected $_broadcastMessage;
+
+/**
+ * @var string
+ */
 protected $_status;
 
 /**
@@ -270,7 +275,6 @@ protected $_recaptchaPublicKey;
     $this->_mode = $mode;
   }
   
-
   /**
    * get maintenanceModeMessage
    * @return string
@@ -286,8 +290,22 @@ protected $_recaptchaPublicKey;
   public function setMaintenanceModeMessage($maintenanceModeMessage) {
     $this->_maintenanceModeMessage = $maintenanceModeMessage;
   }
+
+  /**
+   * get broadcastMessage
+   * @return string
+   */
+  public function getBroadcastMessage() {
+    return $this->_broadcastMessage;
+  }
   
-  
+  /**
+   * set broadcastMessage
+   * @var string $broadcastMessage
+   */
+  public function setbroadcastMessage($broadcastMessage) {
+    $this->_broadcastMessage = $broadcastMessage;
+  }
   
   /**
    * get status
