@@ -9,18 +9,20 @@
  */
 ?>
 <h3>Thank you.  We have recieved your recommendation.</h3>
-<p>For our applicant's security this page will only display once.  If you wish to have a copy of this recommendation for your records you should print one now.</p>
-<?php
-if($answer){?>
-  <h5>Submitted Recommendation</h5>
-  <p>
-  <?php 
-  foreach($answer->getPage()->getElements() as $element){
-    $value = $element->getJazzeeElement()->displayValue($answer);
-    if($value){
-      print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>'; 
+<h5>For our applicant's security this page will only display once.  If you wish to have a copy of this recommendation for your records you should print one now.</h5>
+<fieldset>
+  <legend>Submitted Recommendation</legend>
+  <?php
+  if($answer){?>
+    <p>
+    <?php 
+    foreach($answer->getPage()->getElements() as $element){
+      $value = $element->getJazzeeElement()->displayValue($answer);
+      if($value){
+        print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>'; 
+      }
     }
-  }
-  ?>
-  </p>
-<?php }
+    ?>
+    </p>
+  <?php } ?>
+</fieldset>

@@ -241,3 +241,12 @@ div.discussion td.unread{
   background-repeat: no-repeat;
   background-position:center center;
 }
+
+fieldset {
+	border: 1px solid #003366;
+	padding: 2em;
+}
+
+legend {
+	font-weight: bold;
+}
