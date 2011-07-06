@@ -77,7 +77,7 @@ p.skip {
 }
 
 #bar li a.complete {
-  background-image: url(resource/foundation/media/icons/tick.png);
+  background-image: url(resource/foundation/media/icons/accept.png);
   background-repeat: no-repeat;
   background-position: center left;
   background-size: 12px 12px;
