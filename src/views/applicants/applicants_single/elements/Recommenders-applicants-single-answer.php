@@ -3,6 +3,7 @@
  * Applicants single answer
  */
 ?>
+
 <tr id='answer<?php print $answer->getId() ?>'>
   <td>
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer); ?>;
@@ -11,11 +12,11 @@
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_EMAIL)->getJazzeeElement()->displayValue($answer); ?><br />
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_PHONE)->getJazzeeElement()->displayValue($answer); ?><br />
   </td>
-  <?php foreach($page->getPage()->getChildren()->first()->getElements() as $element){?><td><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php }?>
+  <?php foreach($page->getPage()->getChildren()->first()->getElements() as $element){?><td><?php print $element->getJazzeeElement()->displayValue(($answer->getChildren()->first()?$answer->getChildren()->first():$answer)); ?></td><?php }?>
 <td>
   <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?><br />
   <?php if($child = $answer->getChildren()->first()){?>
-      <br /><strong>Status:</strong> This recommendation was received on <?php print $child->getLastUpdatedAt('l F jS Y g:ia');
+      <br /><strong>Status:</strong> This recommendation was received on <?php print $child->getUpdatedAt()->format('l F jS Y g:ia');
     } else if($answer->isLocked()){?>
       <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?><br />
   <?php }?>
