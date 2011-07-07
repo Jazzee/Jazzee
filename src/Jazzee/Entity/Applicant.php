@@ -15,8 +15,6 @@ namespace Jazzee\Entity;
  * @package    jazzee
  * @subpackage orm
  **/
-use Foundation\Mail\Message;
-
 class Applicant{
   /**
     * @Id 
