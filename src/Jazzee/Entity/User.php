@@ -201,7 +201,7 @@ class User{
    *
    * @param Entity\Log $log
    */
-  public function addLog(log $log){
+  public function addLog(AuditLog $log){
     $this->logs[] = $log;
   }
 
