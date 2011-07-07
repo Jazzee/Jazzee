@@ -29,7 +29,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_UNDONOMINATEDENY = 'Undo Deny Nomination';
   const ACTION_FINALADMIT = 'Final Admit';
   const ACTION_FINALDENY = 'Final Deny';
-  const ACTION_NEWPAYMENT = 'Record Payment';
   const ACTION_SETTLEPAYMENT = 'Settle Payment';
   const ACTION_REFUNDPAYMENT = 'Refund Payment';
   const ACTION_REJECTPAYMENT = 'Reject Payment';

@@ -23,7 +23,7 @@ $page->getJazzeePage()->setApplicant($applicant);
       </tbody>
     </table>
  </div><!-- answers -->
-<?php if($this->controller->checkIsAllowed('applicants_single', 'newPayment')){?>
+<?php if($this->controller->checkIsAllowed('applicants_single', 'addAnswer')){?>
     <a class='actionForm' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/addAnswer/' . $page->getPage()->getId());?>'>Record new payment</a>
 <?php }?>
 </div> <!-- page -->
