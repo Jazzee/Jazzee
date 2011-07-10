@@ -23,6 +23,7 @@ JazzeeEntityPagePayment.prototype.newPage = function(id,title,classId,className,
  */
 JazzeeEntityPagePayment.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
+  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {1:'Required',0:'Optional'}));
   $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
   
   var pageClass = this;
