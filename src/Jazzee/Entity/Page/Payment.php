@@ -23,7 +23,7 @@ class Payment extends Standard {
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $allowedTypes = explode(',',$this->_applicationPage->getPage()->getVar('allowedPaymentTypes'));
-    $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired'=>false));
+    $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired'=>false), array('name' => 'ASC'));
     foreach($paymentTypes as $type){
       if($this->_controller instanceof \Jazzee\AdminController or in_array($type->getId(), $allowedTypes)) $element->newItem($type->getId(), $type->getName());
     }
