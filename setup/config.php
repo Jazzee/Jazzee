@@ -4,7 +4,7 @@ require_once __dir__ . '/../lib/foundation/src/foundation.php';
 $classLoader = new \Doctrine\Common\ClassLoader('Doctrine');
 $classLoader->register();
 
-$classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'Doctrine/');
+$classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'Doctrine');
 $classLoader->register();
 
 $classLoader = new Doctrine\Common\ClassLoader('Jazzee', __DIR__ . '/../src/');
