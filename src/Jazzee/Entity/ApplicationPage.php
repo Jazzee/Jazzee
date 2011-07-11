@@ -63,6 +63,9 @@ class ApplicationPage
   /** @Column(type="boolean", nullable=true) */
   private $isRequired;
   
+  /** @Column(type="boolean", nullable=true) */
+  private $answerStatusDisplay;
+  
   /** @Column(type="text", nullable=true) */
   private $instructions;
   
@@ -236,6 +239,22 @@ class ApplicationPage
   public function optional(){
     if(!$this->page->isGlobal()) $this->page->optional();
     else $this->isRequired = false;
+  }
+  
+  /**
+   * Show the answer status
+   */
+  public function showAnswerStatus(){
+    if(!$this->page->isGlobal()) $this->page->showAnswerStatus();
+    else $this->answerStatusDisplay = true;
+  }
+  
+/**
+   * Hide the answer status
+   */
+  public function hideAnswerStatus(){
+    if(!$this->page->isGlobal()) $this->page->hideAnswerStatus();
+    else $this->answerStatusDisplay = false;
   }
   
   /**
