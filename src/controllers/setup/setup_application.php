@@ -50,6 +50,10 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element->setLabel('Welcome Message');
     $element->setValue($this->_application->getWelcome());
     
+    $element = $field->newElement('Textarea','statusPageText');
+    $element->setLabel('Message for applicants after they complete their application');
+    $element->setValue($this->_application->getStatusPageText());
+    
     $element = $field->newElement('DateInput','open');
     $element->setLabel('Application Open');
     $element->addValidator(new \Foundation\Form\Validator\DateBeforeElement($element, 'close'));
@@ -83,6 +87,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
       $this->_application->setContactName($input->get('contactName'));
       $this->_application->setContactEmail($input->get('contactEmail'));
       $this->_application->setWelcome($input->get('welcome'));
+      $this->_application->setStatusPageText($input->get('statusPageText'));
       $this->_application->setOpen($input->get('open'));
       $this->_application->setClose($input->get('close'));
       $this->_application->setBegin($input->get('begin'));
