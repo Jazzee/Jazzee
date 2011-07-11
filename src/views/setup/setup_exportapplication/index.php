@@ -16,7 +16,12 @@ $preferences->appendChild($xml->createElement('close', $application->getClose()-
 $preferences->appendChild($xml->createElement('begin', $application->getBegin()->format('c')));
 $preferences->appendChild($xml->createElement('admitletter', $application->getAdmitLetter()));
 $preferences->appendChild($xml->createElement('denyletter', $application->getDenyLetter()));
-$preferences->appendChild($xml->createElement('statuspagetext', $application->getStatusPageText()));
+$preferences->appendChild($xml->createElement('statusIncompleteText', $application->getStatusIncompleteText()));
+$preferences->appendChild($xml->createElement('statusNoDecisionText', $application->getStatusNoDecisionText()));
+$preferences->appendChild($xml->createElement('statusAdmitText', $application->getStatusAdmitText()));
+$preferences->appendChild($xml->createElement('statusDenyText', $application->getStatusDenyText()));
+$preferences->appendChild($xml->createElement('statusAcceptText', $application->getStatusAcceptText()));
+$preferences->appendChild($xml->createElement('statusDeclineText', $application->getStatusDeclineText()));
 
 $app->appendChild($preferences);
 
