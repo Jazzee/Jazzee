@@ -119,6 +119,7 @@ class Role{
    */
   public function addAction(RoleAction $action){
     $this->actions[] = $action;
+    if($action->getRole() != $this) $action->setRole($this);
   }
 
   /**

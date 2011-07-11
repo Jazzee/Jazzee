@@ -82,4 +82,13 @@ class RoleAction{
   public function setRole(\Jazzee\Entity\Role $role){
     $this->role = $role;
   }
+  
+  /**
+   * get role
+   *
+   * @return \Jazzee\Entity\Role
+   */
+  public function getRole(){
+    return $this->role;
+  }
 }
