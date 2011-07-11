@@ -20,8 +20,7 @@ $page->getJazzeePage()->setApplicant($applicant);
       <tbody>
       <?php 
       foreach($page->getJazzeePage()->getAnswers() as $answer){
-        $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-applicants-single-answer');
-        $this->renderElement($elementName, array('page'=>$page, 'answer'=>$answer));
+        $this->renderElement('Recommenders-applicants-single-answer', array('page'=>$page, 'answer'=>$answer));
       }?>
       </tbody>
     </table>
