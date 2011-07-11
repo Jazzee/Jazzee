@@ -30,6 +30,45 @@ class ApplyStatusController extends \Jazzee\ApplyController {
    * Display the page
    */
   public function actionIndex() {
+    if(!$this->_applicant->isLocked()){
+      $statusPageText = $this->_application->getStatusIncompleteText();
+    } else {
+      switch($this->_applicant->getDecision()->status()){
+        case 'finalDeny': $statusPageText = $this->_application->getStatusDenyText(); break;
+        case 'finalAdmit': $statusPageText = $this->_application->getStatusAdmitText(); break;
+        case 'acceptOffer': $statusPageText = $this->_application->getStatusAcceptText(); break;
+        case 'declineOffer': $statusPageText = $this->_application->getStatusDeclineText(); break;
+        default: $statusPageText = $this->_application->getStatusNoDecisionText();
+      }
+    }
+    $search = array(
+     '%Applicant_Name%',
+     '%Application_Deadline%',
+     '%Offer_Response_Deadline%',
+     '%SIR_Link%',
+     '%Admit_Letter%',
+     '%Deny_Letter%',
+     '%Admit_Date%',
+     '%Deny_Date%',
+     '%Accept_Date%',
+     '%Decline_Date%'
+    );
+    $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status';
+    $replace = array(
+     $this->_applicant->getFullName(),
+     $this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia'),
+     $this->_application->getClose()->format('l F jS Y g:ia'),
+     $this->path($path . '/sir'),
+     $this->path($path . '/admitLetter'),
+     $this->path($path . '/denyLetter')
+    );
+    $replace[] = ($this->_applicant->getDecision()->getFinalAdmit())?$this->_applicant->getDecision()->getFinalAdmit()->format('l F jS Y g:ia'):null;
+    $replace[] = ($this->_applicant->getDecision()->getFinalDeny())?$this->_applicant->getDecision()->getFinalDeny()->format('l F jS Y g:ia'):null;
+    $replace[] = ($this->_applicant->getDecision()->getAcceptOffer())?$this->_applicant->getDecision()->getAcceptOffer()->format('l F jS Y g:ia'):null;
+    $replace[] = ($this->_applicant->getDecision()->getDeclineOffer())?$this->_applicant->getDecision()->getDeclineOffer()->format('l F jS Y g:ia'):null;
+    
+    $statusPageText = str_ireplace($search, $replace, $statusPageText);
+    $this->setVar('statusPageText', nl2br($statusPageText));
     $pages = array();
     foreach($this->_pages as $key => $page)if($page->answerStatusDisplay()) $pages[] = $page;
     $this->setVar('pages', $pages);

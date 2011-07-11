@@ -67,7 +67,22 @@ class Application{
   private $denyLetter;
   
   /** @Column(type="text", nullable=true) */
-  private $statusPageText;
+  private $statusIncompleteText;
+  
+  /** @Column(type="text", nullable=true) */
+  private $statusNoDecisionText;
+  
+  /** @Column(type="text", nullable=true) */
+  private $statusAdmitText;
+  
+  /** @Column(type="text", nullable=true) */
+  private $statusDenyText;
+  
+  /** @Column(type="text", nullable=true) */
+  private $statusAcceptText;
+  
+  /** @Column(type="text", nullable=true) */
+  private $statusDeclineText;
   
   public function __construct(){
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
@@ -274,21 +289,111 @@ class Application{
   }
 
   /**
-   * Set statusPageText
+   * Set statusIncompleteText
    *
-   * @param text $statusPageText
+   * @param text $statusIncompleteText
    */
-  public function setStatusPageText($statusPageText){
-    $this->statusPageText = $statusPageText;
+  public function setStatusIncompleteText($statusIncompleteText){
+    $this->statusIncompleteText = $statusIncompleteText;
   }
 
   /**
-   * Get statusPageText
+   * Get statusIncompleteText
    *
-   * @return text $statusPageText
+   * @return text $statusIncompleteText
    */
-  public function getStatusPageText(){
-    return $this->statusPageText;
+  public function getStatusIncompleteText(){
+    return $this->statusIncompleteText;
+  }
+
+  /**
+   * Set statusNoDecisionText
+   *
+   * @param text $statusNoDecisionText
+   */
+  public function setStatusNoDecisionText($statusNoDecisionText){
+    $this->statusNoDecisionText = $statusNoDecisionText;
+  }
+
+  /**
+   * Get statusNoDecisionText
+   *
+   * @return text $statusNoDecisionText
+   */
+  public function getStatusNoDecisionText(){
+    return $this->statusNoDecisionText;
+  }
+
+  /**
+   * Set statusAdmitText
+   *
+   * @param text $statusAdmitText
+   */
+  public function setStatusAdmitText($statusAdmitText){
+    $this->statusAdmitText = $statusAdmitText;
+  }
+
+  /**
+   * Get statusAdmitText
+   *
+   * @return text $statusAdmitText
+   */
+  public function getStatusAdmitText(){
+    return $this->statusAdmitText;
+  }
+
+  /**
+   * Set statusDenyText
+   *
+   * @param text $statusDenyText
+   */
+  public function setStatusDenyText($statusDenyText){
+    $this->statusDenyText = $statusDenyText;
+  }
+
+  /**
+   * Get statusDenyText
+   *
+   * @return text $statusDenyText
+   */
+  public function getStatusDenyText(){
+    return $this->statusDenyText;
+  }
+
+  /**
+   * Set statusAcceptText
+   *
+   * @param text $statusAcceptText
+   */
+  public function setStatusAcceptText($statusAcceptText){
+    $this->statusAcceptText = $statusAcceptText;
+  }
+
+  /**
+   * Get statusAcceptText
+   *
+   * @return text $statusAcceptText
+   */
+  public function getStatusAcceptText(){
+    return $this->statusAcceptText;
+  }
+
+  /**
+   * Set statusDeclineText
+   *
+   * @param text $statusDeclineText
+   */
+  public function setStatusDeclineText($statusDeclineText){
+    $this->statusDeclineText = $statusDeclineText;
+  }
+
+  /**
+   * Get statusDeclineText
+   *
+   * @return text $statusDeclineText
+   */
+  public function getStatusDeclineText(){
+    return $this->statusDeclineText;
   }
 
   /**

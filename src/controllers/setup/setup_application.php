@@ -50,9 +50,51 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element->setLabel('Welcome Message');
     $element->setValue($this->_application->getWelcome());
     
-    $element = $field->newElement('Textarea','statusPageText');
-    $element->setLabel('Message for applicants after they complete their application');
-    $element->setValue($this->_application->getStatusPageText());
+    
+    $search = array(
+     '%Applicant_Name%',
+     '%Application_Deadline%',
+     '%Offer_Response_Deadline%',
+     '%SIR_Link%',
+     '%Admit_Letter%',
+     '%Deny_Letter%',
+     '%Admit_Date%',
+     '%Deny_Date%',
+     '%Accept_Date%',
+     '%Decline_Date%'
+    );
+    
+    $instructions = 'You can use these tokens in the text: <br />' . implode('</br />', $search);
+    
+    $element = $field->newElement('Textarea','statusIncompleteText');
+    $element->setLabel('Message for applicants who missed the deadline.');
+    $element->setInstructions($instructions);
+    $element->setValue($this->_application->getStatusIncompleteText());
+    
+    $element = $field->newElement('Textarea','statusNoDecisionText');
+    $element->setLabel('Message for locked applicants with no decision');
+    $element->setInstructions($instructions);
+    $element->setValue($this->_application->getStatusNoDecisionText());
+    
+    $element = $field->newElement('Textarea','statusAdmitText');
+    $element->setLabel('Message for admitted applicants');
+    $element->setInstructions($instructions);
+    $element->setValue($this->_application->getStatusAdmitText());
+    
+    $element = $field->newElement('Textarea','statusDenyText');
+    $element->setLabel('Message for denied applicants');
+    $element->setInstructions($instructions);
+    $element->setValue($this->_application->getStatusDenyText());
+    
+    $element = $field->newElement('Textarea','statusAcceptText');
+    $element->setLabel('Message for applicants who accept their offer.');
+    $element->setInstructions($instructions);
+    $element->setValue($this->_application->getStatusAcceptText());
+    
+    $element = $field->newElement('Textarea','statusDeclineText');
+    $element->setLabel('Message for applicants who decline their offer');
+    $element->setInstructions($instructions);
+    $element->setValue($this->_application->getStatusDeclineText());
     
     $element = $field->newElement('DateInput','open');
     $element->setLabel('Application Open');
@@ -87,7 +129,12 @@ class SetupApplicationController extends \Jazzee\AdminController {
       $this->_application->setContactName($input->get('contactName'));
       $this->_application->setContactEmail($input->get('contactEmail'));
       $this->_application->setWelcome($input->get('welcome'));
-      $this->_application->setStatusPageText($input->get('statusPageText'));
+      $this->_application->setStatusIncompleteText($input->get('statusIncompleteText'));
+      $this->_application->setStatusNoDecisionText($input->get('statusNoDecisionText'));
+      $this->_application->setStatusAdmitText($input->get('statusAdmitText'));
+      $this->_application->setStatusDenyText($input->get('statusDenyText'));
+      $this->_application->setStatusAcceptText($input->get('statusAcceptText'));
+      $this->_application->setStatusDeclineText($input->get('statusDeclineText'));
       $this->_application->setOpen($input->get('open'));
       $this->_application->setClose($input->get('close'));
       $this->_application->setBegin($input->get('begin'));
