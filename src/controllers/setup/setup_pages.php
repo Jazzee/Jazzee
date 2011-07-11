@@ -26,11 +26,12 @@ class SetupPagesController extends \Jazzee\PageBuilder {
    * List the application Pages
    */
   public function actionListPages(){
-    $pages = array();
-    foreach($this->_application->getPages() AS $applicationPage){
-      $pages[] = $this->pageArray($applicationPage);
+    $applicationPages = array();
+    $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application()->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+    foreach($pages AS $applicationPage){
+      $applicationPages[] = $this->pageArray($applicationPage);
     }
-    $this->setVar('result', $pages);
+    $this->setVar('result', $applicationPages);
     $this->loadView($this->controllerName . '/result');
   }
   
@@ -44,7 +45,6 @@ class SetupPagesController extends \Jazzee\PageBuilder {
       case 'delete':
         if($applicationPage = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page' => $pageId, 'application'=>$this->_application->getId()))){
           $this->_em->remove($applicationPage);
-          $this->_application->getPages()->remove($applicationPage->getId());
         }
       break;
       case 'new-global':

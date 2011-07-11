@@ -103,10 +103,11 @@ class ApplySupportController extends \Jazzee\ApplyController {
     $menu = new \Foundation\Navigation\Menu();
     
     $menu->setTitle('Navigation');
-
     $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName();
     $link = new \Foundation\Navigation\Link('Back to Application');
-    $link->setHref($this->path($path . '/page/' . $this->_application->getPages()->first()->getId()));
+    reset($this->_pages);
+    $first = key($this->_pages);
+    $link->setHref($this->path($path . '/page/' . $first));
     $menu->addLink($link); 
     $link = new \Foundation\Navigation\Link('Logout');
     $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/applicant/logout'));

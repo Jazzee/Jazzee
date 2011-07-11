@@ -52,6 +52,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
     $pxml->setAttribute('trailingText', $page->getTrailingText());
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $pxml->setAttribute('weight', $page->getWeight());
+      $pxml->setAttribute('kind', $page->getKind());
       $page = $page->getPage();
       if($page->isGlobal()){
         $pxml->setAttribute('globalPageUuid', $page->getUuid());

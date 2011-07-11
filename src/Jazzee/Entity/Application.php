@@ -32,12 +32,6 @@ class Application{
   private $cycle;
   
   /** 
-   * @OneToMany(targetEntity="ApplicationPage", mappedBy="application")
-   * @OrderBy({"weight" = "ASC"})
-   */
-  private $pages;
-  
-  /** 
    * @OneToMany(targetEntity="Applicant", mappedBy="application")
    */
   private $applicants;
@@ -76,7 +70,6 @@ class Application{
   private $statusPageText;
   
   public function __construct(){
-    $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
     $this->published = false;
     $this->visible = false;
@@ -332,24 +325,6 @@ class Application{
    */
   public function getCycle(){
     return $this->cycle;
-  }
-
-  /**
-   * Add pages
-   *
-   * @param Entity\ApplicationPage $page
-   */
-  public function addPage(ApplicationPage $page){
-    $this->pages[] = $page;
-  }
-
-  /**
-   * Get pages
-   *
-   * @return Doctrine\Common\Collections\Collection $pages
-   */
-  public function getPages(){
-    return $this->pages;
   }
   
   /**

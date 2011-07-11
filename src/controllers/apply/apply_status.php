@@ -18,7 +18,10 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     //if the applicant hasn't locked and the application isn't closed
     if(!$this->_applicant->isLocked() AND $this->_application->getClose() > new DateTime('now')){
       $this->addMessage('notice', "You have not completed your application.");
-      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_application->getPages()->first()->getId());
+      reset($this->_pages);
+      $first = key($this->_pages);
+    
+      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $first);
     }
     $this->setVar('applicant', $this->_applicant);
   }

@@ -138,7 +138,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       'allowEditAnswer' => $this->checkIsAllowed($this->controllerName, 'editAnswer'),
       'allowDeleteAnswer' => $this->checkIsAllowed($this->controllerName, 'deleteAnswer')
     );
-    foreach($applicant->getApplication()->getPages() as $applicationPage){
+    $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$applicant->getApplication()->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+    foreach($pages as $applicationPage){
       if($applicationPage->getJazzeePage()->showReviewPage()){
         $params = array($applicant->getId(), $applicationPage->getPage()->getId());
         $content = $this->getActionOutput('refreshPage', $params);

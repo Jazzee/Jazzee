@@ -20,10 +20,11 @@ $preferences->appendChild($xml->createElement('statuspagetext', $application->ge
 
 $app->appendChild($preferences);
 
-$pages = $xml->createElement("pages");
-foreach($application->getPages() as $page){
-  $pages->appendChild($this->controller->pageXml($xml, $page));
+$applicationPages = $xml->createElement("pages");
+$pages = $this->controller->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$application->getId()));
+foreach($pages as $page){
+  $applicationPages->appendChild($this->controller->pageXml($xml, $page));
 }
-$app->appendChild($pages);
+$app->appendChild($applicationPages);
 $xml->appendChild($app);
 echo $xml->saveXML();

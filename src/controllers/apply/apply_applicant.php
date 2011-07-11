@@ -70,7 +70,8 @@ class ApplyApplicantController extends \Jazzee\Controller {
             $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
             $store->applicantID = $applicant->getId();
             $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-            $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $this->application->getPages()->first()->getId());
+            $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+            $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $pages[0]->getId());
           }
           $applicant->loginFail();
           $message = ' After ' . self::MAX_FAILED_LOGIN_ATTEMPTS . ' failed login attempts your account will be locked and you will need to reset your password to gain access.  You have ' . (string)(self::MAX_FAILED_LOGIN_ATTEMPTS - $applicant->getFailedLoginAttempts()) . ' more attempts.';
@@ -239,7 +240,8 @@ class ApplyApplicantController extends \Jazzee\Controller {
       $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
       $store->applicantID = $applicant->getId();
       $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $this->application->getPages()->first()->getId());
+      $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $pages[0]->getId());
     }
     $this->setVar('form', $form);
   }

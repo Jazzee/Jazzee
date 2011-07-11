@@ -135,8 +135,8 @@ class ApplicantPDF {
     }
     $this->addText("Admission Status: {$status}\n", 'p');
     $this->writeTextFlow();
-    
-    foreach($applicant->getApplication()->getPages() as $page){
+    $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$applicant->getApplication()->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+    foreach($pages as $page){
       $page->getJazzeePage()->setApplicant($applicant);
       $this->addText($page->getTitle(), 'h3');
       if($answers = $page->getJazzeePage()->getAnswers()){

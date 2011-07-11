@@ -4,12 +4,28 @@ namespace Jazzee\Entity;
 /** 
  * ApplicationPage
  * Assocaites a Page with an Application.  Allows the application to override many of the page varialbes for global pages
- * @Entity @Table(name="application_pages",uniqueConstraints={@UniqueConstraint(name="application_page", columns={"application_id", "page_id"})}) 
+ * @Entity
+ * @Table(name="application_pages",uniqueConstraints={@UniqueConstraint(name="application_page", columns={"application_id", "page_id"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
 class ApplicationPage
 {
+  /**
+   * Page type for regular application apges
+   */
+  const APPLICATION = 2;
+  
+  /**
+   * Page type for SIR accept
+   */
+  const SIR_ACCEPT = 4;
+  
+  /**
+   * Page type for SIR decline
+   */
+  const SIR_DECLINE = 8;
+  
   /**
     * @Id 
     * @Column(type="bigint")
@@ -18,7 +34,7 @@ class ApplicationPage
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Application", inversedBy="pages")
+   * @ManyToOne(targetEntity="Application")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   private $application;
@@ -31,6 +47,9 @@ class ApplicationPage
   
   /** @Column(type="integer") */
   private $weight;
+  
+  /** @Column(type="integer") */
+  private $kind;
   
   /** @Column(type="string", nullable=true) */
   private $title;
@@ -105,6 +124,23 @@ class ApplicationPage
    */
   public function getPage(){
     return $this->page;
+  }
+  
+  /**
+   * Get the kind
+   */
+  public function getKind(){
+    return $this->kind;
+  }
+  
+  /**
+   * Set the kind
+   * @param integer $kind
+   */
+  public function setKind($kind){
+    $allowed = array(self::APPLICATION, self::SIR_ACCEPT, self::SIR_DECLINE);
+    if(!in_array($kind, $allowed)) throw new \Jazzee\Exception($kind . ' is not a valid application page kind.');
+    $this->kind = $kind;
   }
   
   /**

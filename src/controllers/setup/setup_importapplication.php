@@ -43,7 +43,9 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $this->addMessage('error', 'This application is already published.  No changes can be made.');
         $this->redirectPath('setup/importapplication');
       }
-      if(count($this->_application->getPages())){
+      $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application()->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+    
+      if(count($pages)){
         $this->addMessage('error', 'This application already has pages.  You cannot import a configuration for an application with pages.');
         $this->redirectPath('setup/importapplication');
       }
@@ -58,6 +60,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $applicationPage = new \Jazzee\Entity\ApplicationPage();
         $applicationPage->setApplication($this->_application);
         $applicationPage->setPage($page);
+        $applicationPage->setKind((string)$attributes['kind']);
         $applicationPage->setTitle((string)$attributes['title']);
         $applicationPage->setMin((string)$attributes['min']);
         $applicationPage->setMax((string)$attributes['max']);
