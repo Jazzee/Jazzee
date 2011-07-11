@@ -96,6 +96,12 @@ class Answer{
    */
   private $jazzeeAnswer;
   
+  /**
+   * If we set a manual update don't override it
+   * @var boolean
+   */
+  private $updatedAtOveridden = false;
+  
   public function __construct(){
     $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
@@ -207,6 +213,7 @@ class Answer{
    * @param string $updatedAt
    */
   public function setUpdatedAt($updatedAt){
+    $this->updatedAtOveridden = true;
     $this->updatedAt = new \DateTime($updatedAt);
   }
 
@@ -358,7 +365,7 @@ class Answer{
    * @PrePersist
    */
   public function markLastUpdate(){
-      $this->updatedAt = new \DateTime();
+      if(!$this->updatedAtOveridden) $this->updatedAt = new \DateTime();
       if($this->applicant) //child pages dont have direct links to the application
         $this->applicant->markLastUpdate();
       if($this->parent) //child pages should update their parents

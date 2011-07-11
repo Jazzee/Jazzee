@@ -100,6 +100,12 @@ class Applicant{
    */
   private $messages;
   
+  /**
+   * If we set a manual update don't override it
+   * @var boolean
+   */
+  private $updatedAtOveridden = false;
+  
   public function __construct(){
     $this->answers = new \Doctrine\Common\Collections\ArrayCollection();
     $this->attachments = new \Doctrine\Common\Collections\ArrayCollection();
@@ -424,7 +430,7 @@ class Applicant{
    * @PrePersist
    */
   public function markLastUpdate(){
-    $this->updatedAt = new \DateTime();
+    if(!$this->updatedAtOveridden) $this->updatedAt = new \DateTime();
   }
 
   /**
@@ -433,6 +439,7 @@ class Applicant{
    * @param string $updatedAt
    */
   public function setUpdatedAt($updatedAt){
+    $this->updatedAtOveridden = true;
     $this->updatedAt = new \DateTime($updatedAt);
   }
 
