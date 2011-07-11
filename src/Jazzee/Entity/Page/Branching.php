@@ -118,4 +118,17 @@ class Branching extends Standard
       $this->getForm()->setAction($this->_controller->getActionPath() . "/edit/{$answerId}");
     }
   }
+  
+  /**
+   * Setup the default variables
+   */
+  public function setupNewPage(){
+    $defaultVars = array(
+      'branchingElementLabel' => ''
+    );
+    foreach($defaultVars as $name=>$value){
+      $var = $this->_applicationPage->getPage()->setVar($name, $value);
+      $this->_controller->getEntityManager()->persist($var);
+    }    
+  }
 }

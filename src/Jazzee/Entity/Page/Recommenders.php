@@ -208,6 +208,16 @@ class Recommenders extends Standard {
     $item->setWeight(2);
     $element->addItem($item);
     $em->persist($item);
+    
+    $defaultVars = array(
+      'lorDeadline' => null,
+      'lorDeadlineEnforced' => false,
+      'recommenderEmailText' => ''
+    );
+    foreach($defaultVars as $name=>$value){
+      $var = $this->_applicationPage->getPage()->setVar($name, $value);
+      $em->persist($var);
+    }    
   }
   
   public function getStatus(){

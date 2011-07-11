@@ -107,4 +107,18 @@ class Payment extends Standard {
   public function getAllAnswers(){
     return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
+  
+  /**
+   * Setup the default variables
+   */
+  public function setupNewPage(){
+    $defaultVars = array(
+      'amounts' => 0,
+      'allowedPaymentTypes' => ''
+    );
+    foreach($defaultVars as $name=>$value){
+      $var = $this->_applicationPage->getPage()->setVar($name, $value);
+      $this->_controller->getEntityManager()->persist($var);
+    }    
+  }
 }
