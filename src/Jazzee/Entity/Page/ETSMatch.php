@@ -46,12 +46,18 @@ class ETSMatch extends Standard {
   }
   
   public function newAnswer($input){
+    $e = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
+    //trim leading zeros from Registration Number
+    $input->set('el'.$e->getId(), ltrim($input->get('el'.$e->getId()), '0'));
     parent::newAnswer($input);
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
   }
   
   public function updateAnswer($input, $answerId){
+    $e = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
+    //trim leading zeros from Registration Number
+    $input->set('el'.$e->getId(), ltrim($input->get('el'.$e->getId()), '0'));
     parent::updateAnswer($input, $answerId);
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);

@@ -121,7 +121,8 @@ class TOEFLScore{
   public function setRegistrationNumber($registrationNumber, $testMonth, $testYear){
     if($testMonth < 1 OR $testMonth > 12) throw new \Jazzee_Exception("{$testMonth} is not a valid month");
     if($testYear < 1900 OR $testMonth > 2100) throw new \Jazzee_Exception("{$testYear} is not a valid year");
-    $this->registrationNumber = $registrationNumber;
+    //remove leading 0s
+    $this->registrationNumber = ltrim($registrationNumber, '0');
     $this->testMonth = $testMonth;
     $this->testYear = $testYear;
   }
