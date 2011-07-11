@@ -78,26 +78,28 @@ class ApplyStatusController extends \Jazzee\ApplyController {
    * SIR Form
    */
   public function actionSir(){
-    $form = new Form;
-    $form->action = $this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status/sir");
+    if($this->_applicant->getDecision()->status() != 'finalAdmit') throw new \Jazzee\Exception('Applicant is not in the status finalAdmit');
+    $form = new \Foundation\Form();
+    $form->setAction($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status/sir'));
     $field = $form->newField();
-    $field->legend = 'Confirm Enrolment';
-    $field->instructions = 'You must confirm your enrollment by <strong><em>' . $this->applicant->Decision->offerResponseDeadline . '</em></strong>. If you do not confirm your enrollment your space may be released to another applicant.';
+    $field->setLegend('Confirm Enrolment');
+    $field->setInstructions('You must confirm your enrollment by <strong><em>' . $this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia') . '</em></strong>. If you do not confirm your enrollment your space may be released to another applicant.');
     $element = $field->newElement('RadioList', 'confirm');
-    $element->label = 'Do you intend to register for the quarter in which you applied?';
-    $element->addItem(0,'No');
-    $element->addItem(1,'Yes');
-    $element->addValidator('NotEmpty');
+    $element->setLabel('Do you intend to register for the term in which you applied?');
+    $element->newItem(0,'No');
+    $element->newItem(1,'Yes');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $form->newButton('submit', 'Save');
     $this->setVar('form', $form);
     if($input = $form->processInput($this->post)){
-      if($input->confirm){
-        $this->applicant->Decision->acceptOffer();
+      if($input->get('confirm')){
+        $this->_applicant->getDecision()->acceptOffer();
       } else {
-        $this->applicant->Decision->declineOffer();
+        $this->_applicant->getDecision()->declineOffer();
       }
-      $this->applicant->save();
-      $this->redirect($this->path("apply/{$this->application['Program']->shortName}/{$this->application['Cycle']->name}/status"));
+      $this->_em->persist($this->_applicant);
+      $this->addMessage('success', 'Your intent was recorded.');
+      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
     }
   }
   
@@ -155,7 +157,7 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     $link = new \Foundation\Navigation\Link('Your Status');
     $link->setHref($this->path($path));
     $menu->addLink($link); 
-    if($this->_applicant->getDecision() and $this->_applicant->getDecision()->getFinalAdmit() and !($this->_applicant->getDecision()->getAcceptOffer() or $this->_applicant->getDecision()->getDeclineOffer()) ){
+    if($this->_applicant->getDecision() and $this->_applicant->getDecision()->status() == 'finalAdmit'){
       $link = new \Foundation\Navigation\Link('Confirm Enrolment');
       $link->setHref($this->path($path . '/sir'));
       $menu->addLink($link); 
