@@ -57,6 +57,12 @@ class Message{
   /** @Column(type="boolean") */
   private $isRead;
   
+  /**
+   * If we set a manual createdat don't override it
+   * @var boolean
+   */
+  private $createdAtOverridden = false;
+  
   public function __construct(){
     $this->isRead = false;
   }
@@ -138,7 +144,17 @@ class Message{
    * @PrePersist
    * @param string $createdAt
    */
-  public function markCreatedAt($createdAt = 'now'){
+  public function markCreatedAt(){
+    if(!$this->createdAtOverridden) $this->createdAt = new \DateTime();
+  }
+
+  /**
+   * Set createdAt
+   *
+   * @param string $createdAt
+   */
+  public function setCreatedAt($createdAt){
+    $this->createdAtOverridden = true;
     $this->createdAt = new \DateTime($createdAt);
   }
 
@@ -150,7 +166,6 @@ class Message{
   public function getCreatedAt(){
     return $this->createdAt;
   }
-
   
   /**
    * Mark as read
@@ -284,10 +299,13 @@ class MessageRepository extends \Doctrine\ORM\EntityRepository{
    * 
    * @param Application $application
    * @return Doctrine\Common\Collections\Collection $messages
+   * @todo Fix DQL when DDC-1250 is fixed in doctrine 2.1.1
    */
   public function findThreadByApplication(Application $application){
-    $query = $this->_em->createQuery('SELECT m FROM Jazzee\Entity\Message m WHERE m.parent IS NULL AND m.applicant IN (SELECT a.id from \Jazzee\Entity\Applicant a WHERE a.application = :applicationId)');
+    $query = $this->_em->createQuery('SELECT m.id FROM Jazzee\Entity\Message m WHERE m.parent IS NULL AND m.applicant IN (SELECT a.id from \Jazzee\Entity\Applicant a WHERE a.application = :applicationId)');
     $query->setParameter('applicationId', $application->getId());
-    return $query->getResult();
+    $return = array();
+    foreach($query->getResult() as $id) $return[] = $this->find($id);
+    return $return;
   }
 }
