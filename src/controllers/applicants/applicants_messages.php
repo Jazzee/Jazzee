@@ -12,6 +12,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   
   const ACTION_INDEX = 'View Messages';
   
+  const MIN_INTERVAL = 28800; //8 hours
   /**
    * List all unread messages
    */
@@ -94,6 +95,38 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
       $this->_em->persist($reply);
       $this->addMessage('success', 'Your reply has been sent.');
       $this->redirectPath('applicants/messages');
+    }
+  }
+  
+  /**
+   * Check for new messages in each program and email the administrator
+   * 
+   * @param AdminCronController $cron
+   */
+  public static function runCron(AdminCronController $cron){
+    if(time() - (int)$cron->getVar('applicantsMessagesLastRun') < self::MIN_INTERVAL) return false;
+    $cron->setVar('applicantsMessagesLastRun', time());
+    $threads = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Message')->findAll(array('parent' => null));
+    $applications = array();
+    foreach($threads as $thread) if(!$thread->isReadThread(\Jazzee\Entity\Message::PROGRAM)){
+      if(!array_key_exists($thread->getApplicant()->getApplication()->getId(), $applications)){
+        $applications[$thread->getApplicant()->getApplication()->getId()] = array(
+          'application' => $thread->getApplicant()->getApplication(),
+          'count' => 0
+        );
+      }
+      $applications[$thread->getApplicant()->getApplication()->getId()]['count']++;
+    }
+    foreach($applications as $arr){
+      $message = $cron->newMessage();
+      $message->AddAddress(
+        $arr['application']->getContactEmail(),
+        $arr['application']->getContactName());
+      $message->Subject = 'New Applicant Messages for ' . $arr['application']->getCycle()->getName() . ' ' . $arr['application']->getProgram()->getName();
+      $body = 'There are ' . $arr['count'] . ' unread messages for the ' . $arr['application']->getCycle()->getName() . ' ' . $arr['application']->getProgram()->getName() . ' program.' .
+        "\nYou can review them at: " . $cron->path('applicants/messages');
+      $message->Body = $body;
+      $message->Send();
     }
   }
   
