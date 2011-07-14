@@ -17,18 +17,19 @@ class AdminCronController extends \Jazzee\AdminController {
   public function actionIndex(){
     $startTime = time();
     if(!$this->semaphore()){
-      exit(1);
+      throw new Exception('Cron tried to run, but the semephore was still set');
     }
-    foreach($this->listControllers() as $className){
-      FoundationVC_Config::includeController($className);
-      $class = FoundationVC_Config::getControllerClassName($className);
-      if(call_user_func(array($class, 'runCron'),$this->get("{$className}lastRun"))){
-        $this->set("{$className}lastRun", time());
-      }
+    foreach($this->listControllers() as $controller){
+      \Foundation\VC\Config::includeController($controller);
+      $class = \Foundation\VC\Config::getControllerClassName($controller);
+      if(method_exists($class, 'runCron')){
+        $class::runCron($this);
+      }   
     }
     //clear the semephore
-    $this->set('adminCronSemephore', false);
+    $this->setVar('adminCronSemephore', false);
     //cron outputs nothing
+    $this->_em->flush();
     exit(0);
 	}
   
@@ -36,9 +37,9 @@ class AdminCronController extends \Jazzee\AdminController {
    * Get value from the cron store
    * @param string $name
    */
-  protected function get($name){
-    if($cron = Doctrine::getTable('Cron')->findOneByName($name)){
-      return $cron->value;
+  public function getVar($name){
+    if($var = $this->_em->getRepository('\Jazzee\Entity\CronVariable')->findOneBy(array('name'=>$name))){
+      return $var->getValue();
     }
     return false;
   }
@@ -48,30 +49,29 @@ class AdminCronController extends \Jazzee\AdminController {
    * @param string $name
    * @param mixed $value
    */
-  protected function set($name, $value){
-    if(!$cron = Doctrine::getTable('Cron')->findOneByName($name)){
-      $cron = new Cron;
-      $cron->name = $name;
+  public function setVar($name, $value){
+    if(!$var = $this->_em->getRepository('\Jazzee\Entity\CronVariable')->findOneBy(array('name'=>$name))){
+      $var = new \Jazzee\Entity\CronVariable();
+      $var->setName($name);
     }
-    $cron->value = $value;
-    $cron->save();
+    $var->setValue($value);
+    $this->_em->persist($var);
     return true;
   }
   
   protected function semaphore(){
-    $semephore = $this->get('adminCronSemephore');
-    $lastRun = $this->get('adminCronLastRun');
+    $semephore = $this->getVar('adminCronSemephore');
+    $lastRun = $this->getVar('adminCronLastRun');
     if(!empty($semephore)){
       //attempting to run cron again too soon
       if(time() - (int)$lastRun < self::MAX_INTERVAL) return false;
       
       //This semephore has been around for too long delete it and throw an exception so the next run can proceed normally
-      $this->set('adminCronSemephore', false);
-      throw new Jazzee_Exception('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' which was more than ' . self::MAX_INTERVAL . ' seconds ago.  This can indicate a broken cron process.', E_ERROR);
+      $this->setVar('adminCronSemephore', false);
+      trigger_error('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' which was more than ' . self::MAX_INTERVAL . ' seconds ago.  This can indicate a broken cron process.', E_USER_NOTICE);
     }
-    $this->set('adminCronSemephore', true);
-    $this->set('adminCronLastRun', time());
-    
+    $this->setVar('adminCronSemephore', true);
+    $this->setVar('adminCronLastRun', time());
     return true;
   }
 }

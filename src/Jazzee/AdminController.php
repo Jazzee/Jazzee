@@ -236,15 +236,6 @@ abstract class AdminController extends Controller{
   }
   
   /**
-   * Run the cron task for this controller
-   * @param integer $lastRun the last time this task was successfully completed in seconds
-   * @return bool true if successfull false otherwise
-   */
-  public static function runCron($lastRun){
-    return false;
-  }
-  
-  /**
    * Notify and applicant that their status has changed
    * Several controllers (ApplicantsView, ApplicantsDecisions) can change an applicants status (decisions, sir, answer status)
    * Use this method to send them notifications 
