@@ -47,6 +47,7 @@ class AdminChangecycleController extends \Jazzee\AdminController {
         $this->_em->persist($this->_user);
         $this->addMessage('success', 'Default cycle changed to ' . $this->_cycle->getName());
       }
+      unset($this->_store->AdminControllerGetNavigation);
       $this->addMessage('success', 'Cycle changed to ' . $this->_cycle->getName());
       $this->redirectPath('welcome');
     }
