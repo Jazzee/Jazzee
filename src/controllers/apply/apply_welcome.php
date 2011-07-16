@@ -25,6 +25,26 @@ class ApplyWelcomeController extends \Jazzee\Controller {
    */
   protected $application;
   
+ /**
+   * Constructor
+   * Check for maintenance mode
+   */
+  public function __construct(){
+    parent::__construct();
+    if($this->_config->getMode() == 'APPLY_MAINTENANCE'){
+      $request = new \Lvc_Request();
+      $request->setControllerName('error');
+      $request->setActionName('index');
+      if(!$message = $this->_config->getMaintenanceModeMessage()) $message = 'The application is currently down for maintenance';
+      $request->setActionParams(array('error' => '503', 'message'=>$message));
+    
+      // Get a new front controller without any routers, and have it process our handmade request.
+      $fc = new \Lvc_FrontController();
+      $fc->processRequest($request);
+      exit();
+    }
+  }
+  
   /**
    * Before any action do some setup
    * If we know the program and cycle load the applicant var

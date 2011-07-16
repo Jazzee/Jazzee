@@ -86,6 +86,7 @@ maximumAdminFileUploadSize=5m
 ;#There are three possible levels
 ;#LIVE - No access Controll
 ;#MAINTENANCE - ALL requests are redirected to the maintence page. No database access
+;#APPLY_MAINTENANCE - No access to apply controllers - admin area is available
 mode=LIVE
 ;maintenanceModeMessage=
 
