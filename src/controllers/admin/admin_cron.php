@@ -53,6 +53,9 @@ class AdminCronController extends \Jazzee\AdminController {
     if(!$var = $this->_em->getRepository('\Jazzee\Entity\CronVariable')->findOneBy(array('name'=>$name))){
       $var = new \Jazzee\Entity\CronVariable();
       $var->setName($name);
+      $var->setValue($value);
+      $this->_em->persist($var);
+      $this->_em->flush();
     }
     $var->setValue($value);
     $this->_em->persist($var);
