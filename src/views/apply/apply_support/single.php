@@ -2,16 +2,13 @@
 /**
  * apply_support single view
  */
-$messageId = $message->getId();
-$message = $message->getFirstMessage();
 $count = 0;
 ?>
 <a href='<?php print $this->path($basePath . '/support');?>'>All Messages</a>
-<h1>Message</h1>
+<h1><?php print $thread->getSubject();?></h1>
 <div class='threaded'>
-  <?php do{ ?>
-    <div class='<?php print ($message->isRead(\Jazzee\Entity\Message::APPLICANT)?'read':'unread'); ?>'>
-      <h4><?php print $message->getSubject();?></h4>
+  <?php foreach($thread->getMessages() as $message){ ?>
+    <div class='<?php print ($message->isRead(\Jazzee\Entity\Message::PROGRAM)?'read':'unread'); ?>'>
       <p class='header'>On <?php print $message->getCreatedAt()->format('l F jS Y \a\t g:ia') ?> 
       <?php if($message->getSender() == \Jazzee\Entity\Message::APPLICANT){
         print 'you';
@@ -22,10 +19,12 @@ $count = 0;
       } ?> said</p>
       <p><?php print $message->getText();?></p>
       <p class='footer'>
-          <a href='<?php print $this->path($basePath . '/markUnread/' .$message->getId());?>'>Mark as Unread</a>
+          <?php if($message->getSender() == \Jazzee\Entity\Message::PROGRAM) {?>
+            <a href='<?php print $this->path($basePath . '/support/markUnread/' .$message->getId());?>'>Mark as Unread</a>
+          <?php }?>
       </p>
   <?php $count++; ?>
-  <?php } while ($message = $message->getReply());?>
+  <?php } ?>
   <?php for($i = 0; $i<$count; $i++) print '</div>';?>
 </div>
-<a href='<?php print $this->path($basePath . '/support/reply/' .$messageId);?>'>Reply</a>
+<a href='<?php print $this->path($basePath . '/support/reply/' . $thread->getId());?>'>Reply</a>

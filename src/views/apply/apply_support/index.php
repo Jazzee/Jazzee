@@ -18,12 +18,12 @@
         foreach($threads as $thread){?>
           <tr>
             <td class='<?php
-              if($thread->isReadThread(\Jazzee\Entity\Message::APPLICANT)) print 'read';
-              else print 'unread';
+              if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM)) print 'unread';
+              else print 'read';
             ?>'>
             </td>
-            <td><?php print $thread->getLastMessage()->getCreatedAt()->format('l F jS Y \a\t g:ia')?></td>
-            <td><a href='<?php print $this->path($basePath . '/support/single/' . $thread->getId());?>'><?php print $thread->getLastMessage()->getSubject();?></a></td> 
+            <td><?php print $thread->getCreatedAt()->format('l F jS Y \a\t g:ia')?></td>
+            <td><a href='<?php print $this->path($basePath . '/support/single/' . $thread->getId());?>'><?php print $thread->getSubject();?></a></td> 
           </tr>
         <?php } //end foreach threads ?>
       </tbody>

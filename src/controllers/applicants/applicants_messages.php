@@ -13,14 +13,14 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Messages';
   
   const MIN_INTERVAL = 28800; //8 hours
+  
   /**
    * List all unread messages
    */
   public function actionIndex(){
-    $allMessages = $this->_em->getRepository('\Jazzee\Entity\Message')->findThreadByApplication($this->_application);
+    $allThreads = $this->_em->getRepository('\Jazzee\Entity\Thread')->findByApplication($this->_application);
     $threads = array();
-    foreach($allMessages as $message) if(!$message->isReadThread(\Jazzee\Entity\Message::PROGRAM)) $threads[] = $message;
-    
+    foreach($allThreads as $thread) if($thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)) $threads[] = $thread;
     $this->setVar('threads', $threads);
   }
   
@@ -28,20 +28,20 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
    * List all messages
    */
   public function actionAll(){
-    $threads = $this->_em->getRepository('\Jazzee\Entity\Message')->findThreadByApplication($this->_application);
+    $threads = $this->_em->getRepository('\Jazzee\Entity\Thread')->findByApplication($this->_application);
     $this->setVar('threads', $threads);
   }
   
   /**
    * View a single message
    * 
-   * @param integer $messageId
+   * @param integer $threadId
    */
-  public function actionSingle($messageId) {
-    $message = $this->_em->getRepository('\Jazzee\Entity\Message')->find($messageId);
-    if(!$message) throw new \Jazzee\Exception("{$messageId} is not a valid message id");
-    $applicant = $this->getApplicantById($message->getApplicant()->getId());
-    $this->setVar('message', $message);
+  public function actionSingle($threadId) {
+    $thread = $this->_em->getRepository('\Jazzee\Entity\Thread')->find($threadId);
+    if(!$thread) throw new \Jazzee\Exception("{$threadId} is not a valid thread id");
+    $applicant = $this->getApplicantById($thread->getApplicant()->getId());
+    $this->setVar('thread', $thread);
   }
   
   /**
@@ -52,8 +52,9 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   public function actionMarkUnread($messageId) {
     $message = $this->_em->getRepository('\Jazzee\Entity\Message')->find($messageId);
     if(!$message) throw new \Jazzee\Exception("{$messageId} is not a valid message id");
-    $applicant = $this->getApplicantById($message->getApplicant()->getId());
+    $applicant = $this->getApplicantById($message->getThread()->getApplicant()->getId());
     $message->unRead();
+    $this->_em->persist($message);
     $this->addMessage('success', 'Message marked as unread');
     $this->redirectPath('applicants/messages');
   }
@@ -61,23 +62,19 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   /**
    * Reply to a message
    * 
-   * @param integer $messageId
+   * @param integer $threadId
    */
-  public function actionReply($messageId) {
+  public function actionReply($threadId) {
+    $thread = $this->_em->getRepository('\Jazzee\Entity\Thread')->find($threadId);
+    if(!$thread) throw new \Jazzee\Exception("{$threadId} is not a valid thread id");
+    $applicant = $this->getApplicantById($thread->getApplicant()->getId());
+    $this->setVar('thread', $thread);
+    
     $form = new \Foundation\Form();
-    $message = $this->_em->getRepository('\Jazzee\Entity\Message')->find($messageId);
-    if(!$message) die;
-    $applicant = $this->getApplicantById($message->getApplicant()->getId());
-    $this->setVar('message', $message);
-    $form->setAction($this->path('applicants/messages/reply/' . $message->getId()));
+    $form->setAction($this->path('applicants/messages/reply/' . $thread->getId()));
     
     $field = $form->newField();
-    $field->setLegend('Reply to message');
-    
-    $element = $field->newElement('TextInput', 'subject');
-    $element->setLabel('Subject');
-    $element->setValue('re: ' . $message->getSubject());
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $field->setLegend('Reply');
     
     $element = $field->newElement('Textarea', 'text');
     $element->setLabel('Your Reply');
@@ -87,11 +84,9 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
     
     if($input = $form->processInput($this->post)){
       $reply = new \Jazzee\Entity\Message();
-      $reply->setApplicant($applicant);
       $reply->setSender(\Jazzee\Entity\Message::PROGRAM);
-      $message->setReply($reply);
-      $reply->setSubject($input->get('subject'));
       $reply->setText($input->get('text'));
+      $thread->addMessage($reply);
       $this->_em->persist($reply);
       $this->addMessage('success', 'Your reply has been sent.');
       $this->redirectPath('applicants/messages');
@@ -106,9 +101,9 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   public static function runCron(AdminCronController $cron){
     if(time() - (int)$cron->getVar('applicantsMessagesLastRun') < self::MIN_INTERVAL) return false;
     $cron->setVar('applicantsMessagesLastRun', time());
-    $threads = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Message')->findAll(array('parent' => null));
+    $threads = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Thread')->findAll();
     $applications = array();
-    foreach($threads as $thread) if(!$thread->isReadThread(\Jazzee\Entity\Message::PROGRAM)){
+    foreach($threads as $thread) if($thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)){
       if(!array_key_exists($thread->getApplicant()->getApplication()->getId(), $applications)){
         $applications[$thread->getApplicant()->getApplication()->getId()] = array(
           'application' => $thread->getApplicant()->getApplication(),

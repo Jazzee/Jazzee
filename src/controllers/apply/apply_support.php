@@ -11,8 +11,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
    * Display the page
    */
   public function actionIndex() {
-    $threads = $this->_em->getRepository('\Jazzee\Entity\Message')->findBy(array('applicant'=>$this->_applicant->getId(), 'parent'=>null));
-    $this->setVar('threads', $threads);
+    $this->setVar('threads', $this->_applicant->getThreads());
   }
   
   /**
@@ -35,11 +34,15 @@ class ApplySupportController extends \Jazzee\ApplyController {
     $this->setVar('form', $form);
     
     if($input = $form->processInput($this->post)){
+      $thread = new \Jazzee\Entity\Thread();
+      $thread->setSubject($input->get('subject'));
+      $thread->setApplicant($this->_applicant);
+      
       $message = new \Jazzee\Entity\Message();
-      $message->setApplicant($this->_applicant);
       $message->setSender(\Jazzee\Entity\Message::APPLICANT);
-      $message->setSubject($input->get('subject'));
       $message->setText($input->get('text'));
+      $thread->addMessage($message);
+      $this->_em->persist($thread);
       $this->_em->persist($message);
       $this->addMessage('success', 'Your message has been sent.');
       $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
@@ -47,23 +50,31 @@ class ApplySupportController extends \Jazzee\ApplyController {
   }
   
   /**
+   * Mark message as unread
+   * 
+   */
+  public function actionMarkUnread() {
+    $message = $this->_em->getRepository('\Jazzee\Entity\Message')->find($this->actionParams['id']);
+    if(!$message or $message->getThread()->getApplicant() != $this->_applicant) throw new \Jazzee\Exception($this->actionParams['id'] . " is not a valid message for " . $this->_applicant->getId());
+    $message->unRead();
+    $this->_em->persist($message);
+    $this->addMessage('success', 'Message marked as unread');
+    $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
+  }
+  
+  /**
    * Reply to a message
    */
   public function actionReply() {
+    $thread = $this->_em->getRepository('\Jazzee\Entity\Thread')->findOneBy(array('id'=>$this->actionParams['id'], 'applicant'=>$this->_applicant->getId()));
+    if(!$thread) throw new \Jazzee\Exception($this->actionParams['id'] . " is not a valid thread id for applicant " . $this->_applicant->getId());
+    $this->setVar('thread', $thread);
+    
     $form = new \Foundation\Form();
-    $message = $this->_em->getRepository('\Jazzee\Entity\Message')->findOneBy(array('id'=>$this->actionParams['messageId'], 'applicant'=>$this->_applicant->getId()));
-    if(!$message) throw new \Jazzee\Exception("{$messageId} is not a valid message id for applicant " . $this->_applicant->getId());
-    $message = $message->getLastMessage();
-    $this->setVar('thread', $message->getFirstMessage());
-    $form->setAction($this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/reply/' . $message->getId()));
+    $form->setAction($this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/reply/' . $thread->getId()));
     
     $field = $form->newField();
     $field->setLegend('Reply to message');
-    
-    $element = $field->newElement('TextInput', 'subject');
-    $element->setLabel('Subject');
-    $element->setValue('re: ' . $message->getSubject());
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $element = $field->newElement('Textarea', 'text');
     $element->setLabel('Your Reply');
@@ -73,11 +84,9 @@ class ApplySupportController extends \Jazzee\ApplyController {
     
     if($input = $form->processInput($this->post)){
       $reply = new \Jazzee\Entity\Message();
-      $reply->setApplicant($this->_applicant);
       $reply->setSender(\Jazzee\Entity\Message::APPLICANT);
-      $message->setReply($reply);
-      $reply->setSubject($input->get('subject'));
       $reply->setText($input->get('text'));
+      $thread->addMessage($reply);
       $this->_em->persist($reply);
       $this->addMessage('success', 'Your reply has been sent.');
       $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
@@ -89,9 +98,9 @@ class ApplySupportController extends \Jazzee\ApplyController {
    * 
    */
   public function actionSingle() {
-    $message = $this->_em->getRepository('\Jazzee\Entity\Message')->findOneBy(array('id'=>$this->actionParams['messageId'], 'applicant'=>$this->_applicant->getId()));
-    if(!$message) throw new \Jazzee\Exception("{$messageId} is not a valid message id for applicant " . $this->_applicant->getId());
-    $this->setVar('message', $message);
+    $thread = $this->_em->getRepository('\Jazzee\Entity\Thread')->findOneBy(array('id'=>$this->actionParams['id'], 'applicant'=>$this->_applicant->getId()));
+    if(!$thread) throw new \Jazzee\Exception($this->actionParams['id'] . " is not a valid thread id for applicant " . $this->_applicant->getId());
+    $this->setVar('thread', $thread);
   }
   
   /**

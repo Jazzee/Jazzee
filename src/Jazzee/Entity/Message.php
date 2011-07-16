@@ -4,8 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * Message
  * 
- * Threaded Applicant Messages
- * @Entity(repositoryClass="\Jazzee\Entity\MessageRepository")
+ * Messages between applicants and programs
+ * @Entity
  * @HasLifecycleCallbacks
  * @Table(name="messages") 
  * @package    jazzee
@@ -26,27 +26,13 @@ class Message{
   private $id;
   
   /** 
-   * @ManyToOne(targetEntity="Applicant",inversedBy="messages") 
+   * @ManyToOne(targetEntity="Thread",inversedBy="messages") 
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
-  private $applicant;
-  
-  /** 
-   * @OneToOne(targetEntity="Message",inversedBy="reply")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
-   */
-  private $parent;
-  
-  /** 
-   * @OneToOne(targetEntity="Message", mappedBy="parent")
-   */
-  private $reply;
+  private $thread;
   
   /** @Column(type="integer") */
   private $sender;
-
-  /** @Column(type="string") */
-  private $subject;
 
   /** @Column(type="text") */
   private $text;
@@ -57,14 +43,9 @@ class Message{
   /** @Column(type="boolean") */
   private $isRead;
   
-  /**
-   * If we set a manual createdat don't override it
-   * @var boolean
-   */
-  private $createdAtOverridden = false;
-  
   public function __construct(){
     $this->isRead = false;
+    $this->createdAt = new \DateTime();
   }
   
   /**
@@ -81,7 +62,7 @@ class Message{
    * @PrePersist
    */
   public function markLastUpdate(){
-      $this->applicant->markLastUpdate();
+      $this->thread->markLastUpdate();
   }
 
   /**
@@ -104,24 +85,6 @@ class Message{
   }
 
   /**
-   * Set subject
-   *
-   * @param string $subject
-   */
-  public function setSubject($subject){
-    $this->subject = $subject;
-  }
-
-  /**
-   * Get subject
-   *
-   * @return string $subject
-   */
-  public function getSubject(){
-    return $this->subject;
-  }
-
-  /**
    * Set text
    *
    * @param text $text
@@ -138,15 +101,6 @@ class Message{
   public function getText(){
     return $this->text;
   }
-  
-  /**
-   * Mark the created at automatically
-   * @PrePersist
-   * @param string $createdAt
-   */
-  public function markCreatedAt(){
-    if(!$this->createdAtOverridden) $this->createdAt = new \DateTime();
-  }
 
   /**
    * Set createdAt
@@ -154,7 +108,6 @@ class Message{
    * @param string $createdAt
    */
   public function setCreatedAt($createdAt){
-    $this->createdAtOverridden = true;
     $this->createdAt = new \DateTime($createdAt);
   }
 
@@ -184,128 +137,30 @@ class Message{
   /**
    * Get read status
    *
-   * @param integer $who
+   * @param integer $sender who is the sender
    * @return boolean $isRead
    */
-  public function isRead($who){
-    return($this->sender == $who or $this->isRead);
-  }
-
-  /**
-   * Get read status of children
-   *
-   * @param integer $who
-   * @return boolean
-   */
-  public function isReadThread($who){
-    if(!$this->isRead($who)) return false;
-    if(!$this->reply or !$this->reply->isReadThread($who)) return false;
+  public function isRead($sender){
+    if($this->sender == $sender) return $this->isRead;
     return true;
   }
 
   /**
-   * Get last message in chain
+   * Set thread
    *
-   * @return \Jazzee\Entity\Message
+   * @param Entity\Thread $thread
    */
-  public function getLastMessage(){
-    $message = $this;
-    while($message->reply){
-      $message = $message->reply;
-    }
-    return $message;
+  public function setThread(Thread $thread){
+    $this->thread = $thread;
   }
 
   /**
-   * Get first message in chain
+   * Get thread
    *
-   * @return \Jazzee\Entity\Message
+   * @return \Jazzee\Entity\Thread $thread
    */
-  public function getFirstMessage(){
-    $message = $this;
-    while($message->parent){
-      $message = $message->parent;
-    }
-    return $message;
-  }
-
-  /**
-   * Set applicant
-   *
-   * @param Entity\Applicant $applicant
-   */
-  public function setApplicant(Applicant $applicant){
-    $this->applicant = $applicant;
-  }
-
-  /**
-   * Get applicant
-   *
-   * @return Entity\Applicant $applicant
-   */
-  public function getApplicant(){
-    return $this->applicant;
-  }
-
-  /**
-   * Get parent
-   *
-   * @return Entity\Message $parent
-   */
-  public function getParent(){
-    return $this->parent;
-  }
-
-  /**
-   * Get replies
-   *
-   * @return Message
-   */
-  public function getReply(){
-    return $this->reply;
+  public function getThread(){
+    return $this->thread;
   }
   
-  /**
-   * Add Reply
-   * 
-   * Add a reply to this message
-   * @param \Jazzee\Entity\Message $reply
-   */
-  public function setReply(\Jazzee\Entity\Message $message){
-    $this->reply = $message;
-    if($message->getParent() !== $this) $message->setParent($this);
-  }
-  
-  /**
-   * Set Parent
-   * 
-   * Set the parent for this message
-   * @param \Jazzee\Entity\Message $parent
-   */
-  public function setParent(\Jazzee\Entity\Message $parent){
-    $this->parent = $parent;
-  }
-  
-}
-
-/**
- * Message Repository
- * Special Repository methods for Messages
- */
-class MessageRepository extends \Doctrine\ORM\EntityRepository{
-  
-  /**
-   * Find all the messages for an application
-   * 
-   * @param Application $application
-   * @return Doctrine\Common\Collections\Collection $messages
-   * @todo Fix DQL when DDC-1250 is fixed in doctrine 2.1.1
-   */
-  public function findThreadByApplication(Application $application){
-    $query = $this->_em->createQuery('SELECT m.id FROM Jazzee\Entity\Message m WHERE m.parent IS NULL AND m.applicant IN (SELECT a.id from \Jazzee\Entity\Applicant a WHERE a.application = :applicationId)');
-    $query->setParameter('applicationId', $application->getId());
-    $return = array();
-    foreach($query->getResult() as $id) $return[] = $this->find($id);
-    return $return;
-  }
 }

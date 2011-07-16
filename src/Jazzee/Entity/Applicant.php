@@ -96,9 +96,10 @@ class Applicant{
   private $tags;
   
   /** 
-   * @OneToMany(targetEntity="Message",mappedBy="applicant") 
+   * @OneToMany(targetEntity="Thread",mappedBy="applicant")
+   * @OrderBy({"createdAt" = "ASC"})
    */
-  private $messages;
+  private $threads;
   
   /**
    * If we set a manual update don't override it
@@ -110,7 +111,7 @@ class Applicant{
     $this->answers = new \Doctrine\Common\Collections\ArrayCollection();
     $this->attachments = new \Doctrine\Common\Collections\ArrayCollection();
     $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->threads = new \Doctrine\Common\Collections\ArrayCollection();
     $this->createdAt = new \DateTime('now');
     $this->isLocked = false;
   }
@@ -579,22 +580,22 @@ class Applicant{
   }
 
   /**
-   * Add messages
+   * Add thread
    *
-   * @param Entity\Message $messages
+   * @param \Jazzee\Entity\Thread $thread
    */
-  public function addMessage(Message $message){
-    $this->messages[] = $message;
-    if($message->getApplicant() != $this) $message->setApplicant($this);
+  public function addThread(Thread $thread){
+    $this->threads[] = $thread;
+    if($thread->getApplicant() != $this) $thread->setApplicant($this);
   }
 
   /**
-   * Get messages
+   * Get threads
    *
-   * @return Doctrine\Common\Collections\Collection $messages
+   * @return Doctrine\Common\Collections\Collection $threads
    */
-  public function getMessages(){
-    return $this->messages;
+  public function getThreads(){
+    return $this->threads;
   }
 
   /**
@@ -604,7 +605,9 @@ class Applicant{
    */
   public function unreadMessageCount(){
     $count = 0;
-    foreach($this->messages as $message) if(!$message->isRead(\Jazzee\Entity\Message::APPLICANT)) $count++;
+    foreach($this->threads as $thread)
+      foreach($thread->getMessages() as $message) 
+        if(!$message->isRead(\Jazzee\Entity\Message::PROGRAM)) $count++;
     return $count;
   }
 }

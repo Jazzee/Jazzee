@@ -16,15 +16,15 @@
       <thead><tr><th></th><th>Sent</th><th>Subject</th></tr></thead>
       <tbody>
         <?php 
-        foreach($threads as $message){?>
+        foreach($threads as $thread){?>
           <tr>
             <td class='<?php 
-              if($message->isReadThread(\Jazzee\Entity\Message::PROGRAM)) print 'read';
-              else print 'unread';
+              if($thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)) print 'unread';
+              else print 'read';
             ?>'>
             </td>
-            <td><?php print $message->getLastMessage()->getCreatedAt()->format('l F jS Y \a\t g:ia')?> by  by <?php print $message->getApplicant()->getFullName();?></td>
-            <td><a href='<?php print $this->path('applicants/messages/single/' . $message->getId());?>'><?php print $message->getLastMessage()->getSubject();?></a></td> 
+            <td><?php print $thread->getCreatedAt()->format('l F jS Y \a\t g:ia')?> by <?php print $thread->getApplicant()->getFullName();?></td>
+            <td><a href='<?php print $this->path('applicants/messages/single/' . $thread->getId());?>'><?php print $thread->getSubject();?></a></td> 
           </tr>
         <?php } //end foreach threads ?>
       </tbody>

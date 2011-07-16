@@ -91,7 +91,7 @@ $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/support/?([^/]+)?/?([0-9]+)?$#i'
   'action_params' => array(
     'programShortName' => 1,
     'cycleName' => 2,
-    'messageId' => 4,
+    'id' => 4,
   )
 ));
 
