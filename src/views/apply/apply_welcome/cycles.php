@@ -25,7 +25,7 @@ $dateFormat = 'm/d/Y';
             echo ' <strong>(Closed)</strong>';
           }
         } else {
-          echo $application->Cycle->getName() . ' Application <strong>(Closed)</strong';
+          echo $application->getCycle()->getName() . ' Application <strong>(Closed)</strong>';
         }
         echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
         echo '<br />Application Available: ' . $application->getOpen()->format($dateFormat);

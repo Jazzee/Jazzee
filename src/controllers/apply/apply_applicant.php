@@ -45,8 +45,9 @@ class ApplyApplicantController extends \Jazzee\Controller {
     parent::beforeAction();
     $this->application = $this->_em->getRepository('Jazzee\Entity\Application')->findEasy($this->actionParams['programShortName'],$this->actionParams['cycleName']);
     if(!$this->application) throw new \Jazzee\Exception("Unable to load {$this->actionParams['programShortName']} {$this->actionParams['cycleName']} application", E_USER_NOTICE, 'That is not a valid application');
-    if(!$this->application->isPublished()){
-      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/');
+    if(!$this->application->isPublished() or $this->application->getOpen() > new DateTime('now')){
+      $this->addMessage('error', $this->application->getCycle()->getName() . ' ' . $this->application->getProgram()->getName() . ' is not open for applicants');
+      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName());
     }
     $this->setLayoutVar('layoutTitle', $this->application->getCycle()->getName() . ' ' . $this->application->getProgram()->getName() . ' Application');
   }

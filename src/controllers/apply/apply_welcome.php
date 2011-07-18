@@ -76,8 +76,9 @@ class ApplyWelcomeController extends \Jazzee\Controller {
       $this->loadView($this->controllerName . '/cycles');
       return true;
     }
-    if(!$this->application->isPublished()){
-      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/');
+    if(!$this->application->isPublished() or $this->application->getOpen() > new DateTime('now')){
+      $this->addMessage('error', $this->application->getCycle()->getName() . ' ' . $this->application->getProgram()->getName() . ' is not open for applicants');
+      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName());
     }
     $this->setLayoutVar('layoutTitle', $this->cycle->getName() . ' ' . $this->program->getName() . ' Application');
     $this->setVar('application', $this->application);
