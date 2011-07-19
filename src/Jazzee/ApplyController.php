@@ -59,7 +59,7 @@ class ApplyController extends Controller
     $this->_applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($store->applicantID);
     $this->_application = $this->_applicant->getApplication();
   
-    if(!$this->_application->isPublished() or $this->_application->getOpen() > new DateTime('now')){
+    if(!$this->_application->isPublished() or $this->_application->getOpen() > new \DateTime('now')){
       $this->addMessage('error', $this->_application->getCycle()->getName() . ' ' . $this->_application->getProgram()->getName() . ' is not open for applicants');
       $this->redirectPath('apply/' . $this->application->getProgram()->getShortName());
     }
