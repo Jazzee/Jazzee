@@ -144,6 +144,19 @@ class Thread{
     return $this->messages;
   }
   
+  /**
+   * Get last unreadMessage
+   * 
+   * @param integer $sender
+   * @return Message $message
+   */
+  public function getLastUnreadMessage($sender){
+    if(!$this->hasUnreadMessage($sender)) return false;
+    $lastMessage = false;
+    foreach($this->messages as $message)if(!$message->isRead($sender)) $lastMessage = $message;
+    return $lastMessage;
+  }
+  
 }
 
 /**

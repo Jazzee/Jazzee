@@ -179,9 +179,6 @@ class ApplyStatusController extends \Jazzee\ApplyController {
       $link->setHref($this->path($path . '/denyLetter'));
       $menu->addLink($link); 
     }
-    $link = new \Foundation\Navigation\Link('Logout');
-    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/applicant/logout'));
-    $menu->addLink($link);
     
     $navigation->addMenu($menu);
     return $navigation;
