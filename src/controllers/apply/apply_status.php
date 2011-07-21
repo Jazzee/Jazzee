@@ -44,8 +44,8 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     $search = array(
      '%Applicant_Name%',
      '%Application_Deadline%',
-     '%Offer_Response_Deadline%',
      '%SIR_Link%',
+     '%Offer_Response_Deadline%',
      '%Admit_Letter%',
      '%Deny_Letter%',
      '%Admit_Date%',
@@ -54,20 +54,26 @@ class ApplyStatusController extends \Jazzee\ApplyController {
      '%Decline_Date%'
     );
     $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status';
-    $offerResponseDeadline = $this->_applicant->getDecision()?$this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia'):null;
     $replace = array(
      $this->_applicant->getFullName(),
-     $offerResponseDeadline,
      $this->_application->getClose()->format('l F jS Y g:ia'),
      $this->path($path . '/sir'),
      $this->path($path . '/admitLetter'),
      $this->path($path . '/denyLetter')
     );
-    $replace[] = ($this->_applicant->getDecision()->getFinalAdmit())?$this->_applicant->getDecision()->getFinalAdmit()->format('l F jS Y g:ia'):null;
-    $replace[] = ($this->_applicant->getDecision()->getFinalDeny())?$this->_applicant->getDecision()->getFinalDeny()->format('l F jS Y g:ia'):null;
-    $replace[] = ($this->_applicant->getDecision()->getAcceptOffer())?$this->_applicant->getDecision()->getAcceptOffer()->format('l F jS Y g:ia'):null;
-    $replace[] = ($this->_applicant->getDecision()->getDeclineOffer())?$this->_applicant->getDecision()->getDeclineOffer()->format('l F jS Y g:ia'):null;
-    
+    if($this->_applicant->getDecision()){
+      $replace[] = ($this->_applicant->getDecision()->getOfferResponseDeadline())?$this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia'):null;
+      $replace[] = ($this->_applicant->getDecision()->getFinalAdmit())?$this->_applicant->getDecision()->getFinalAdmit()->format('l F jS Y g:ia'):null;
+      $replace[] = ($this->_applicant->getDecision()->getFinalDeny())?$this->_applicant->getDecision()->getFinalDeny()->format('l F jS Y g:ia'):null;
+      $replace[] = ($this->_applicant->getDecision()->getAcceptOffer())?$this->_applicant->getDecision()->getAcceptOffer()->format('l F jS Y g:ia'):null;
+      $replace[] = ($this->_applicant->getDecision()->getDeclineOffer())?$this->_applicant->getDecision()->getDeclineOffer()->format('l F jS Y g:ia'):null;
+    } else {
+      $replace[] = null;
+      $replace[] = null;
+      $replace[] = null;
+      $replace[] = null;
+      $replace[] = null;
+    }
     $statusPageText = str_ireplace($search, $replace, $statusPageText);
     $this->setVar('statusPageText', nl2br($statusPageText));
     $pages = array();
