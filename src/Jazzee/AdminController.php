@@ -264,4 +264,15 @@ abstract class AdminController extends Controller{
     }
     return $applicant;
   }
+  
+  /**
+   * Create a path to the apply side
+   * @param string $path
+   * @return string
+   */
+  public function applyPath($path){
+    $prefix = $this->_serverPath . rtrim(dirname($_SERVER['SCRIPT_NAME']),'/\\.');
+    //trim /admin off the end of prefix
+    return substr($prefix, 0, -6) . '/' . $path;
+  }
 }
