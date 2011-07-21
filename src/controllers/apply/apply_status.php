@@ -54,9 +54,10 @@ class ApplyStatusController extends \Jazzee\ApplyController {
      '%Decline_Date%'
     );
     $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status';
+    $offerResponseDeadline = $this->_applicant->getDecision()?$this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia'):null;
     $replace = array(
      $this->_applicant->getFullName(),
-     $this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia'),
+     $offerResponseDeadline,
      $this->_application->getClose()->format('l F jS Y g:ia'),
      $this->path($path . '/sir'),
      $this->path($path . '/admitLetter'),
