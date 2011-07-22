@@ -12,8 +12,14 @@
   <?php } else {
     if(!$page->isRequired() and !count($page->getJazzeePage()->getAnswers())){?>
       <p class="skip">This page is optional, if you do not have any information to enter you can <a href='<?php print $this->controller->getActionPath() . '/do/skip';?>' title='skip this page'>Skip This Page</a>.</p>
-    <?php }
-  if($answers = $page->getJazzeePage()->getAnswers()){
+    <?php }?>
+    <div id='counter'><?php 
+      if($page->getJazzeePage()->getAnswers()){
+        $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-counter');
+        $this->renderElement($elementName, array('page'=>$page));
+      }?>
+  </div>
+  <?php if($answers = $page->getJazzeePage()->getAnswers()){
     print "<div id='answers'>";
     $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-answer');
     foreach($answers as $answer){
@@ -21,12 +27,6 @@
     }
     print '</div>';
   }?>
-  <div id='counter'><?php 
-    if($page->getJazzeePage()->getAnswers()){
-      $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-counter');
-      $this->renderElement($elementName, array('page'=>$page));
-    }?>
-  </div>
   <?php
   if(!empty($currentAnswerID) or is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax()){
     $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-form');

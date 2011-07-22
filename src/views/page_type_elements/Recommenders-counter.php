@@ -5,19 +5,23 @@
  * @subpackage apply
  */
 $answers = $page->getjazzeePage()->getAnswers();
+$totalAnswers = count($answers);
 $completedAnswers = 0;
 foreach($answers as $answer)if($answer->isLocked()) $completedAnswers++;
-
-if(is_null($page->getMax())){ //infinite answers page
-  if($completedAnswers > $page->getMax()){?>
-    <p>You may add as many additional recommenders as you wish, but it is not required.</p>
-  <?php } else { ?>
-    <p>You have invited <?php print $completedAnswers ?> recommenders of the <?php print $page->getMin() ?> required.</p>
-  <?php }?>
-<?php } else if($page->getMax() > 1){
- if($completedAnswers >= $page->getMin()){?>
-    <p>You may invite an additional <?php print ($page->getMax() - $completedAnswers) ?> recommenders, but it is not required.</p>
-  <?php } else { ?>
-    <p>You have invited <?php print $completedAnswers ?> recommenders of the <?php print $page->getMin() ?> required.</p>
-  <?php } 
-}?>
+?>
+<p>
+<?php 
+if(is_null($page->getMax())){
+  if($totalAnswers >= $page->getMin()) print 'You may add as many additional recommenders as you wish to this page, but it is not required.';
+  else print 'You have added ' . $totalAnswers . ' of the ' . $page->getMin() . ' required recommenders on this page.';
+} else {
+  if($page->getMax() - $totalAnswers == 0) print 'You cannot add any more recommenders to this page.';
+  else if($totalAnswers >= $page->getMin()) print 'You may add an additional ' . ($page->getMax() - $totalAnswers) . ' recommenders on this page, but it is not required.';
+  else print 'You have added ' . $totalAnswers . ' of the ' . $page->getMin() . ' required recommendres on this page.';
+}
+?>
+<?php 
+if($completedAnswers < $page->getMin() and $completedAnswers < $totalAnswers) print '&nbsp;You must invite ' . ($page->getMin() - $completedAnswers) . ' more recommender(s) to complete this page.';
+else if($completedAnswers < $totalAnswers) print '&nbsp;You have not invited ' . ($totalAnswers - $completedAnswers) . ' of your recommenders.';
+?>
+</p>
