@@ -84,6 +84,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   protected function getBio(\Jazzee\Entity\Applicant $applicant){
     $bio = array(
      'name' => $applicant->getFullName(),
+     'email' => $applicant->getEmail(),
      'allowEdit' => $this->checkIsAllowed($this->controllerName, 'updateBio')
     );
     return $bio;

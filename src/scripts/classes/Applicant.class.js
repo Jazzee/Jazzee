@@ -95,6 +95,7 @@ Applicant.prototype.displayBio = function(json){
     h1.append(a);
   }
   $('#bio').append(h1);
+  $('#bio').append($('<h4>').html(json.email));
   $('#bio').show();
 };
 
