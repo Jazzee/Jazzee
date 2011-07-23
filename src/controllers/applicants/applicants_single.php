@@ -148,7 +148,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         $content = str_replace(array("\n", "\r"), '', $content);
         $pages['pages'][] = array(
           'id' => $applicationPage->getPage()->getId(),
-          'content' => $content
+          'content' => utf8_encode($content)
         );
       }
     }
