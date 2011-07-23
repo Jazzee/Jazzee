@@ -34,6 +34,12 @@ abstract class AdminController extends Controller{
   protected $_adminAuthentication;
   
   /**
+   * AdminDirectory Class
+   * @var \Jazzee\AdminDirectory
+   */
+  protected $_adminDirectory;
+  
+  /**
    * The user
    * @var \Jazzee\Entity\User
    */
@@ -274,5 +280,19 @@ abstract class AdminController extends Controller{
     $prefix = $this->_serverPath . rtrim(dirname($_SERVER['SCRIPT_NAME']),'/\\.');
     //trim /admin off the end of prefix
     return substr($prefix, 0, -6) . '/' . $path;
+  }
+  
+  /**
+   * Get the admim directory create it if necessary
+   * 
+   * @return \Jazzee\AdminDirectory
+   */
+  protected function getAdminDirectory(){
+    if(!$this->_adminDirectory){
+      $class = $this->_config->getAdminDirectoryClass();
+      $this->_adminDirectory = new $class($this->_em);
+      if(!($this->_adminDirectory instanceof AdminDirectory)) throw new Exception($this->_config->getAdminDirectoryClass() . ' does not implement AdminDirectory Interface.');
+    }
+    return $this->_adminDirectory;
   }
 }

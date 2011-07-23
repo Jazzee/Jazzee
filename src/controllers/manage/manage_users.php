@@ -13,6 +13,8 @@ class ManageUsersController extends \Jazzee\AdminController {
   
   const ACTION_INDEX = 'Find User';
   const ACTION_EDIT = 'Edit User';
+  const ACTION_REFRESHUSER = 'Refresh User Directory Information';
+  const ACTION_SEARCH = 'Search Directory for users';
   const ACTION_NEW = 'New User';
   const REQUIRE_APPLICATION = false;
   
@@ -81,30 +83,88 @@ class ManageUsersController extends \Jazzee\AdminController {
       $this->addMessage('error', "Error: User #{$userID} does not exist.");
     }
   }
+  
+  /**
+   * Refresh a user
+   * Query the directory and refresh a users information
+   * @param integer $userID
+   */
+  public function actionRefreshUser($userID){ 
+    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
+      $directory = $this->getAdminDirectory();
+      $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $user->getUniqueName()));
+      if(!isset($result[0])){
+        $this->addMessage('error', "Unable to find entry in directory");
+        $this->redirectPath('manage/users');
+      }
+      $user->setFirstName($result[0]['firstName']);
+      $user->setLastName($result[0]['lastName']);
+      $user->setEmail($result[0]['emailAddress']);
+      $this->_em->persist($user);
+      $this->addMessage('success', "User Refreshed");
+      $this->redirectPath('manage/users');
+    } else {
+      $this->addMessage('error', "Error: User #{$userID} does not exist.");
+    }
+  }
+  
+  /**
+   * Add a user
+   * Add new user
+   * @param integer $uniqueName
+   */
+  public function actionNew($uniqueName){
+    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->findBy(array('uniqueName'=>$uniqueName))){
+      $this->addMessage('error', "Error: User exists");
+    } else {
+      $directory = $this->getAdminDirectory();
+      $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $uniqueName));
+      if(!isset($result[0])){
+        $this->addMessage('error', "Unable to find entry in directory");
+        $this->redirectPath('manage/users');
+      }
+      $user = new \Jazzee\Entity\User();
+      $user->setUniqueName($result[0]['userName']);
+      $user->setFirstName($result[0]['firstName']);
+      $user->setLastName($result[0]['lastName']);
+      $user->setEmail($result[0]['emailAddress']);
+      $this->_em->persist($user);
+      $this->_em->flush();
+      $this->addMessage('success', "User Added");
+      $this->redirectPath('manage/users/edit/' . $user->getId());
+    }
+  }
    
   /**
-   * Create a new user
+   * Search for a new user
    */
-   public function actionNew(){
+   public function actionSearch(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('manage/users/new'));
+    $form->setAction($this->path('manage/users/search'));
     $field = $form->newField();
-    $field->setLegend('New User');
+    $field->setLegend('Search Directory for User');
     
-    $element = $field->newElement('TextInput','eduPersonPrincipalName');
-    $element->setLabel('eduPersonPrincipalName Value');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element = $field->newElement('TextInput','firstName');
+    $element->setLabel('First Name');
+    
+    $element = $field->newElement('TextInput','lastName');
+    $element->setLabel('Last Name');
+    
+    $element = $field->newElement('TextInput','email');
+    $element->setLabel('Email Address');
  
-    $form->newButton('submit', 'Add User');
+    $form->newButton('submit', 'Search Directory');
     $this->setVar('form', $form);  
+    $results = array();
     if($input = $form->processInput($this->post)){
-      $user = new \Jazzee\Entity\User();
-      $user->setEduPersonPrincipalName($input->get('eduPersonPrincipalName'));
-      $this->_em->persist($user);
-      $this->addMessage('success', "New User Added");
-      $this->redirectPath('manage/users');
-      
+      $directory = $this->getAdminDirectory();
+      $attributes = array();
+      if($input->get('firstName')) $attributes[$this->_config->getLdapFirstNameAttribute()] = $input->get('firstName') . '*';
+      if($input->get('lastName')) $attributes[$this->_config->getLdapLastNameAttribute()] = $input->get('lastName') . '*';
+      if($input->get('email')) $attributes[$this->_config->getLdapEmailAddressAttribute()] = $input->get('email') . '*';
+      $results = $directory->search($attributes);
     }
+    $this->setVar('results', $results);
   }
 }
 ?>

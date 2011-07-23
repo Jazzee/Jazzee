@@ -31,7 +31,6 @@ adminAuthenticationClass=
 ;ShibbolethFirstNameAttribute='givenName'
 ;ShibbolethLastNameAttribute='sn'
 ;ShibbolethEmailAddressAttribute='mail'
-;ShibbolethLogoutUrl='/Shibboleth.sso/Logout'
 
 ;##NoAuthentication##;
 ;noAuthUserId=0
@@ -51,6 +50,20 @@ adminAuthenticationClass=
 ;simpleSAMLLastNameAttribute='sn'
 ;simpleSAMLEmailAddressAttribute='mail'
 
+;### ADMIN DIRECTORY ###;
+;#admin directory is replacable by any class which implements AdminDirectory interface
+;There is a builtin for LDAP
+;#Builtin options: '\Jazzee\AdminDirectory\Ldap'
+adminDirectoryClass=
+
+;LdapHostname=
+;LdapPort=
+;LdapBindRdn=
+;LdapBindPassword=
+;LdapUsernameAttribute='eppn'
+;LdapFirstNameAttribute='givenName'
+;LdapLastNameAttribute='sn'
+;LdapEmailAddressAttribute='mail'
 
 ;### MAIL SERVER ###;
 ;#Server/account to send email from

@@ -229,7 +229,48 @@ protected $_recaptchaPrivateKey;
  */
 protected $_recaptchaPublicKey;
 
+/**
+ * @var string
+ */
+protected $_adminDirectoryClass;
 
+/**
+ * @var string
+ * */
+protected $_ldapHostname;
+
+/**
+ * @var string
+ */
+protected $_ldapPort;
+/**
+ * @var string
+ */
+protected $_ldapBindRdn;
+/**
+ * @var string
+ */
+protected $_ldapBindPassword;
+/**
+ * @var string
+ */
+protected $_ldapUsernameAttribute;
+/**
+ * @var string
+ */
+protected $_ldapFirstNameAttribute;
+/**
+ * @var string
+ */
+protected $_ldapLastNameAttribute;
+/**
+ * @var string
+ */
+protected $_ldapEmailAddressAttribute;
+/**
+ * @var string
+ */
+protected $_ldapSearchBase;
 
   /**
    * Construct
@@ -951,6 +992,166 @@ protected $_recaptchaPublicKey;
    */
   public function setPublicKeyCertificatePath($publicKeyCertificatePath) {
     $this->_publicKeyCertificatePath = $publicKeyCertificatePath;
+  }
+  
+  /**
+   * get adminDirectoryClass
+   * @return string
+   */
+  public function getAdminDirectoryClass() {
+    return $this->_adminDirectoryClass;
+  }
+  
+  /**
+   * set adminDirectoryClass
+   * @var string $adminDirectoryClass
+   */
+  public function setAdminDirectoryClass($adminDirectoryClass) {
+    $this->_adminDirectoryClass = $adminDirectoryClass;
+  }  
+  
+  /**
+   * get LdapHostname
+   * @return string
+   */
+  public function getLdapHostname() {
+    return $this->_ldapHostname;
+  }
+  
+  /**
+   * set ldapHostname
+   * @var string $ldapHostname
+   */
+  public function setLdapHostname($ldapHostname) {
+    $this->_ldapHostname = $ldapHostname;
+  }  
+  
+  /**
+   * get LdapPort
+   * @return string
+   */
+  public function getLdapPort() {
+    return $this->_ldapPort;
+  }
+  
+  /**
+   * set ldapPort
+   * @var string $ldapPort
+   */
+  public function setLdapPort($ldapPort) {
+    $this->_ldapPort = $ldapPort;
+  }  
+  
+  /**
+   * get LdapBindRdn
+   * @return string
+   */
+  public function getLdapBindRdn() {
+    return $this->_ldapBindRdn;
+  }
+  
+  /**
+   * set ldapBindRdn
+   * @var string $ldapBindRdn
+   */
+  public function setLdapBindRdn($ldapBindRdn) {
+    $this->_ldapBindRdn = $ldapBindRdn;
+  }  
+  
+  /**
+   * get LdapBindPassword
+   * @return string
+   */
+  public function getLdapBindPassword() {
+    return $this->_ldapBindPassword;
+  }
+  
+  /**
+   * set ldapBindPassword
+   * @var string $ldapBindPassword
+   */
+  public function setLdapBindPassword($ldapBindPassword) {
+    $this->_ldapBindPassword = $ldapBindPassword;
+  }  
+  
+  /**
+   * get LdapUsernameAttribute
+   * @return string
+   */
+  public function getLdapUsernameAttribute() {
+    return $this->_ldapUsernameAttribute;
+  }
+  
+  /**
+   * set ldapUsernameAttribute
+   * @var string $ldapUsernameAttribute
+   */
+  public function setLdapUsernameAttribute($ldapUsernameAttribute) {
+    $this->_ldapUsernameAttribute = $ldapUsernameAttribute;
+  }  
+  
+  /**
+   * get LdapFirstNameAttribute
+   * @return string
+   */
+  public function getLdapFirstNameAttribute() {
+    return $this->_ldapFirstNameAttribute;
+  }
+  
+  /**
+   * set ldapFirstNameAttribute
+   * @var string $ldapFirstNameAttribute
+   */
+  public function setLdapFirstNameAttribute($ldapFirstNameAttribute) {
+    $this->_ldapFirstNameAttribute = $ldapFirstNameAttribute;
+  }  
+  
+  /**
+   * get LdapLastNameAttribute
+   * @return string
+   */
+  public function getLdapLastNameAttribute() {
+    return $this->_ldapLastNameAttribute;
+  }
+  
+  /**
+   * set ldapLastNameAttribute
+   * @var string $ldapLastNameAttribute
+   */
+  public function setLdapLastNameAttribute($ldapLastNameAttribute) {
+    $this->_ldapLastNameAttribute = $ldapLastNameAttribute;
+  }  
+  
+  /**
+   * get LdapEmailAddressAttribute
+   * @return string
+   */
+  public function getLdapEmailAddressAttribute() {
+    return $this->_ldapEmailAddressAttribute;
+  }
+  
+  /**
+   * set ldapEmailAddressAttribute
+   * @var string $ldapEmailAddressAttribute
+   */
+  public function setLdapEmailAddressAttribute($ldapEmailAddressAttribute) {
+    $this->_ldapEmailAddressAttribute = $ldapEmailAddressAttribute;
+  }  
+  
+  /**
+   * get LdapSearchBase
+   * @return string
+   */
+  public function getLdapSearchBase() {
+    return $this->_ldapSearchBase;
+  }
+  
+  /**
+   * set ldapSearchBase
+   * @var string $ldapSearchBase
+   */
+  public function setLdapSearchBase($ldapSearchBase) {
+    $this->_ldapSearchBase = $ldapSearchBase;
   }
 
 }
