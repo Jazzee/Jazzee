@@ -528,7 +528,7 @@ protected $_ldapSearchBase;
    * get mailServerHost
    * @return string
    */
-  public function getMailServeHostr() {
+  public function getMailServeHost() {
     return $this->_mailServerHost;
   }
   

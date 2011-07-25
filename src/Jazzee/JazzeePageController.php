@@ -194,7 +194,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->_foundationConfig->setMailDefaultFromName($this->_config->getMailDefaultFromName());
     $this->_foundationConfig->setMailOverrideToAddress($this->_config->getMailOverrideToAddress());
     $this->_foundationConfig->setMailServerType($this->_config->getMailServerType());
-    $this->_foundationConfig->setMailServerHost($this->_config->getMailServeHostr());
+    $this->_foundationConfig->setMailServerHost($this->_config->getMailServeHost());
     $this->_foundationConfig->setMailServerPort($this->_config->getMailServerPort());
     $this->_foundationConfig->setMailServerUsername($this->_config->getMailServerUsername());
     $this->_foundationConfig->setMailServerPassword($this->_config->getMailServerPassword());
