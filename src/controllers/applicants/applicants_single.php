@@ -296,12 +296,42 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'today'));
     
+    $element = $field->newElement('RadioList', 'sendMessage');
+    $element->setLabel('Send the applicant a notification?');
+    $element->newItem(0, 'No');
+    $element->newItem(1, 'Yes');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
     $form->newButton('submit', 'Admit Applicant');
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
         $applicant->getDecision()->finalAdmit();
         $applicant->getDecision()->setOfferResponseDeadline($input->get('offerResponseDeadline'));
+        if($input->get('sendMessage')){
+          $thread = new \Jazzee\Entity\Thread();
+          $thread->setSubject('Admission Decision');
+          $thread->setApplicant($applicant);
+          
+          $message = new \Jazzee\Entity\Message();
+          $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+          $text = $this->_application->getAdmitLetter();
+          $search = array(
+           '%Admit_Date%',
+           '%Applicant_Name%',
+           '%Offer_Response_Deadline%'
+          );
+          $replace = array();
+          $replace[] = $applicant->getDecision()->getFinalAdmit()->format('F jS Y');
+          $replace[] = $applicant->getFullName();
+          $replace[] = $applicant->getDecision()->getOfferResponseDeadline()->format('F jS Y g:ia');
+          $text = str_ireplace($search, $replace, $text);
+          $text = nl2br($text);
+          $message->setText($text);
+          $thread->addMessage($message);
+          $this->_em->persist($thread);
+          $this->_em->persist($message);
+        }
         $this->_em->persist($applicant);
         $this->setLayoutVar('status', 'success');
       }
@@ -374,10 +404,51 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    */
   public function actionFinalDeny($applicantId){
     $applicant = $this->getApplicantById($applicantId);
-    $applicant->getDecision()->finalDeny();
-    $this->_em->persist($applicant);
-    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
-    $this->loadView($this->controllerName . '/result');
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicantId}/finalDeny"));
+    $field = $form->newField();
+    $field->setLegend('Deny ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+
+    $element = $field->newElement('RadioList', 'sendMessage');
+    $element->setLabel('Send the applicant a notification?');
+    $element->newItem(0, 'No');
+    $element->newItem(1, 'Yes');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $form->newButton('submit', 'Deny Applicant');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $applicant->getDecision()->finalDeny();
+        if($input->get('sendMessage')){
+          $thread = new \Jazzee\Entity\Thread();
+          $thread->setSubject('Admission Decision');
+          $thread->setApplicant($applicant);
+          
+          $message = new \Jazzee\Entity\Message();
+          $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+          $text = $this->_application->getDenyLetter();
+          $search = array(
+           '%Deny_Date%',
+           '%Applicant_Name%'
+          );
+          $replace = array();
+          $replace[] = $applicant->getDecision()->getFinalDeny()->format('F jS Y');
+          $replace[] = $applicant->getFullName();
+          $text = str_ireplace($search, $replace, $text);
+          $text = nl2br($text);
+          $message->setText($text);
+          $thread->addMessage($message);
+          $this->_em->persist($thread);
+          $this->_em->persist($message);
+        }
+        $this->_em->persist($applicant);
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('result', array('decisions'=> $this->getDecisions($applicant)));
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**

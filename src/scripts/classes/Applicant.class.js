@@ -139,12 +139,26 @@ Applicant.prototype.displayDecisions = function(json){
       });
       $('#decisions').append(a);
     }
+    if(json.allowfinalDeny){
+      var a = $('<a>').attr('href', this.baseUrl + '/finalDeny').html('Deny Applicant<br />');
+      a.click(function(e){
+        $.get($(e.target).attr('href'),function(json){
+          var obj = {
+            display: function(json){
+              self.displayDecisions(json.data.result.decisions);
+            }
+          };
+          self.createForm(json.data.form, obj);
+        });
+        return false;
+      });
+      $('#decisions').append(a);
+    }
     var types = [
       {title: 'Nominate for Admission', action: 'nominateAdmit'},
       {title: 'Undo Nomination', action: 'undoNominateAdmit'},
       {title: 'Nominate for Deny', action: 'nominateDeny'}, 
-      {title: 'Undo Nomination', action: 'undoNominateDeny'},
-      {title: 'Deny Applicant', action: 'finalDeny'},          
+      {title: 'Undo Nomination', action: 'undoNominateDeny'}        
     ];
     for(var i = 0; i < types.length; i++){
       if(json['allow'+types[i].action]){
