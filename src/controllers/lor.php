@@ -5,8 +5,7 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class LorController extends \Jazzee\JazzeeController{
-  
+class LorController extends \Jazzee\JazzeeController{  
   /**
    * The index page
    * If the recommendation hasn't been completed show the form
@@ -56,6 +55,13 @@ class LorController extends \Jazzee\JazzeeController{
       exit();
     }
     $this->setVar('form', $form);
+    if(!$deadline = $page->getParent()->getVar('lorDeadline')){
+      $deadline = $answer->getApplicant()->getApplication()->getClose()->format('m/d/Y g:ia T');
+    }
+    $this->setVar('deadline', $deadline);
+    $this->setVar('applicantName', $answer->getApplicant()->getFullName());
+    $this->setLayoutVar('layoutTitle', $answer->getApplicant()->getApplication()->getCycle()->getName() . ' ' . $answer->getApplicant()->getApplication()->getProgram()->getName() . ' Recommendation');
+    
   }
   
   /**
