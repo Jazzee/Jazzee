@@ -124,7 +124,7 @@ class Answer{
    * @param text $attachment
    */
   public function setAttachment($attachment){
-    $this->attachment = $attachment;
+    $this->attachment = base64_encode($attachment);
   }
 
   /**
@@ -133,7 +133,7 @@ class Answer{
    * @return text $attachment
    */
   public function getAttachment(){
-    return $this->attachment;
+    return base64_decode($this->attachment);
   }
   
   /**
