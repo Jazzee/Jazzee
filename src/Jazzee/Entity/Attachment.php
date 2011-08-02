@@ -18,6 +18,12 @@ class Attachment{
   private $id;
   
   /** 
+   * @OneToOne(targetEntity="Answer",inversedBy="attachment")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   */
+  private $answer;
+  
+  /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="attachments")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
@@ -41,6 +47,22 @@ class Attachment{
    */
   public function setApplicant(Applicant $applicant){
     $this->applicant = $applicant;
+  }
+  
+  /**
+   * Set the answer
+   * @param Answer $answer
+   */
+  public function setAnswer(Answer $answer){
+    $this->answer = $answer;
+  }
+  
+  /**
+   * Get the answer
+   * @return Answer
+   */
+  public function getAnswer(){
+    return $this->answer;
   }
 
   /**

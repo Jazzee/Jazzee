@@ -22,7 +22,8 @@
   <?php }?>
 </td>
 <td>
-<?php if($blob = $answer->getAttachment()){
+<?php if($attachment = $answer->getAttachment()){
+    $blob = $attachment->getAttachment();
     $name = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId();
     $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $answer->getUpdatedAt()->format('c'));
     $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0), $answer->getUpdatedAt()->format('c'));

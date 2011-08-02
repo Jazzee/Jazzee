@@ -63,8 +63,10 @@ class Answer{
   /** @Column(type="integer", nullable=true) */
   protected $pageStatus;
   
-  /** @Column(type="text", nullable=true) */
-  protected $attachment;
+  /** 
+   * @OneToOne(targetEntity="Attachment",mappedBy="answer")
+   */
+  private $attachment;
   
   /** @Column(type="string", length=255) */
   protected $uniqueId;
@@ -121,19 +123,19 @@ class Answer{
   /**
    * Set attachment
    *
-   * @param text $attachment
+   * @param Attachment $attachment
    */
-  public function setAttachment($attachment){
-    $this->attachment = base64_encode($attachment);
+  public function setAttachment(Attachment $attachment){
+    $this->attachment = $attachment;
   }
 
   /**
    * Get attachment
    *
-   * @return text $attachment
+   * @return Attachment $attachment
    */
   public function getAttachment(){
-    return base64_decode($this->attachment);
+    return $this->attachment;
   }
   
   /**
