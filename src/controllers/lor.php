@@ -56,9 +56,10 @@ class LorController extends \Jazzee\JazzeeController{
     }
     $this->setVar('form', $form);
     if(!$deadline = $page->getParent()->getVar('lorDeadline')){
-      $deadline = $answer->getApplicant()->getApplication()->getClose()->format('m/d/Y g:ia T');
+      $deadline = $answer->getApplicant()->getApplication()->getClose()->format('c');
     }
-    $this->setVar('deadline', $deadline);
+    $deadline = new \DateTime($deadline);
+    $this->setVar('deadline', $deadline->format('m/d/Y g:ia T'));
     $this->setVar('applicantName', $answer->getApplicant()->getFullName());
     $this->setLayoutVar('layoutTitle', $answer->getApplicant()->getApplication()->getCycle()->getName() . ' ' . $answer->getApplicant()->getApplication()->getProgram()->getName() . ' Recommendation');
     
