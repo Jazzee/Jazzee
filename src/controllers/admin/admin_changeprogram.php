@@ -23,14 +23,9 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
     $element = $field->newElement('SelectList','program');
     $element->setLabel('Program');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $programList = $this->_em->getRepository('\Jazzee\Entity\Program')->findAll();
-    $programs = array();
-    foreach($programList as $program){
-      $programs[$program->getId()] = $program->getName();
-    }
-    asort($programs);
-    foreach($programs as $id => $name){
-      $element->newItem($id, $name);
+    $programs = $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array('isExpired' => false), array('name' => 'ASC'));
+    foreach($programs as $program){
+      $element->newItem($program->getId(), $program->getName());
     }
     if($this->_program) $element->setValue($this->_program->getId());
     //only ask if the user already has a default cycle
