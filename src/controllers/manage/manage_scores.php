@@ -36,11 +36,13 @@ class ManageScoresController extends \Jazzee\AdminController {
     
     $form->newButton('submit', 'Import');
     $this->setVar('form', $form);
-    $this->setVar('greCount', 0);
+    $greStats = $this->_em->getRepository('\Jazzee\Entity\GREScore')->getStatistics();
+    $this->setVar('greCount', $greStats['total']);
     $this->setVar('greMatchedCount','Not updated');
     $this->setVar('greUnmatchedCount','Not updated');
     
-    $this->setVar('toeflCount', 0);
+    $toeflStats = $this->_em->getRepository('\Jazzee\Entity\TOEFLScore')->getStatistics();
+    $this->setVar('toeflCount', $toeflStats['total']);
     $this->setVar('toeflMatchedCount','Not updated');
     $this->setVar('toeflUnmatchedCount','Not updated');
     

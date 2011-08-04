@@ -4,7 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * TOEFLScore
  * Scores imported from ETS
- * @Entity @Table(name="toefl_scores",uniqueConstraints={@UniqueConstraint(name="toefl_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
+ * @Entity(repositoryClass="\Jazzee\Entity\TOEFLScoreRepository")
+ * @Table(name="toefl_scores",uniqueConstraints={@UniqueConstraint(name="toefl_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -585,5 +586,26 @@ class TOEFLScore{
    */
   public function getOffTopic(){
     return $this->offTopic;
+  }
+}
+
+/**
+ * TOEFLScoreRepository
+ * Special Repository methods for TOEFLScore
+ */
+class TOEFLScoreRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * Score stats
+   * 
+   * Get statistics on scores in the system
+   * @return array
+   */
+  public function getStatistics(){
+    $return = array();
+    $query = $this->_em->createQuery('SELECT count(t) as Total FROM Jazzee\Entity\TOEFLScore t');
+    $result = $query->getResult();
+    $return['total'] = $result[0]['Total'];
+    return $return;
   }
 }

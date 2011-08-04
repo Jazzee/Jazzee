@@ -4,7 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * GREScore
  * Scores imported from ETS
- * @Entity @Table(name="gre_scores",uniqueConstraints={@UniqueConstraint(name="gre_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
+ * @Entity(repositoryClass="\Jazzee\Entity\GREScoreRepository")
+ * @Table(name="gre_scores",uniqueConstraints={@UniqueConstraint(name="gre_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
  * @package    jazzee
  * @subpackage orm
  **/
@@ -606,5 +607,26 @@ class GREScore{
    */
   public function getProcessDate(){
     return $this->processDate;
+  }
+}
+
+/**
+ * GREScoreRepository
+ * Special Repository methods for GREScore
+ */
+class GREScoreRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * Score stats
+   * 
+   * Get statistics on scores in the system
+   * @return array
+   */
+  public function getStatistics(){
+    $return = array();
+    $query = $this->_em->createQuery('SELECT count(g) as Total FROM Jazzee\Entity\GREScore g');
+    $result = $query->getResult();
+    $return['total'] = $result[0]['Total'];
+    return $return;
   }
 }
