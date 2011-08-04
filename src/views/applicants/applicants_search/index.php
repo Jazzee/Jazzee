@@ -6,7 +6,7 @@
  * @subpackage applicants
  */
 $this->renderElement('form', array('form'=>$form));
-if(isset($applicants)):?>
+if(isset($applicants)){?>
   <h4>Search Results</h4>
   <table>
   <caption>Your search returned (<?php print count($applicants); ?>) results</caption>
@@ -14,16 +14,17 @@ if(isset($applicants)):?>
       <tr><th>View</th><th>Last Name</th><th>First Name</th><th>Last Update</th><th>Last Login</th><th>Account Created</th></tr>
     </thead>
     <tbody>
-      <?foreach($applicants as $applicant):?>
+      <?php foreach($applicants as $applicant){?>
         <tr>
-          <td><a href='<?php print $this->path('applicants/single/' . $applicant->getId())?>' title='<?php print $applicant->getFirstName() . ' ' . $applicant->getLastName()?>'>Application</a></td>
+          <td><a href='<?php print $this->path('applicants/single/' . $applicant->getId());?>' title='<?php print $applicant->getFirstName() . ' ' . $applicant->getLastName();?>'>Application</a></td>
           <td><?php print $applicant->getLastName(); ?></td>
           <td><?php print $applicant->getFirstName(); ?></td>
-          <td><?php if($applicant->getUpdatedAt()) print $applicant->getUpdatedAt()->format('m/d/y'); ?></td>
-          <td><?php if($applicant->getLastLogin()) print $applicant->getLastLogin()->format('m/d/y'); ?></td>
-          <td><?php if($applicant->getCreatedAt()) print $applicant->getCreatedAt()->format('m/d/y'); ?></td>
+          <td><?php print $applicant->getUpdatedAt()->format('m/d/y'); ?></td>
+          <td><?php print $applicant->getLastLogin()->format('m/d/y'); ?></td>
+          <td><?php print $applicant->getCreatedAt()->format('m/d/y'); ?></td>
         </tr>
-      <?php endforeach;?>
+      <?php } //applicants?>
     </tbody>
   </table>
-<?php endif;?>
+  <?php 
+} //if applicants
