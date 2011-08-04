@@ -7,7 +7,7 @@
  */
 class ApplicantsListController extends \Jazzee\AdminController {
   const MENU = 'Applicants';
-  const TITLE = 'By Tag';
+  const TITLE = 'List by Tag';
   const PATH = 'applicants/list';
   
   const ACTION_INDEX = 'All Applicants';
@@ -36,6 +36,9 @@ class ApplicantsListController extends \Jazzee\AdminController {
       if($applicant->isLocked()) $tags['Locked'][] = $applicant;
       else $tags['Not Locked'][] = $applicant;
       if($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer()) $tags['Accepted'][] = $applicant;
+      if($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit()) $tags['Admitted'][] = $applicant;
+      if($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer()) $tags['Declined'][] = $applicant;
+      if($applicant->getDecision() and $applicant->getDecision()->getFinalDeny()) $tags['Denied'][] = $applicant;
       foreach($applicant->getTags() as $tag){
         if(!isset($tags[$tag->getTitle()])) $tags = array($tag->getTitle() => array()) + $tags;
         $tags[$tag->getTitle()][] = $applicant;
