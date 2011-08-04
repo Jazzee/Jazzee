@@ -43,6 +43,10 @@ $classLoader->register();
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/applicants/');
 \Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/applicants/');
 
+//Load scores controllers and views
+\Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/scores/');
+\Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/scores/');
+
 \Foundation\VC\Config::setViewClassName('\Jazzee\View');
 \Foundation\VC\Config::setDefaultControllerName('apply_welcome');
 \Foundation\VC\Config::setDefaultControllerActionName('index');
@@ -51,6 +55,7 @@ $classLoader->register();
 //add the builtin admin controller directories
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/manage');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/setup');
+\Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/scores');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/applicants');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/admin');
 
