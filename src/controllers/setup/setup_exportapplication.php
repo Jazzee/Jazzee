@@ -42,14 +42,14 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
    */
   public function pageXml(DOMDocument $dom, $page){
     $pxml = $dom->createElement('page');
-    $pxml->setAttribute('title', $page->getTitle());
+    $pxml->setAttribute('title', htmlentities($page->getTitle()));
     $pxml->setAttribute('min', $page->getMin());
     $pxml->setAttribute('max', $page->getMax());
     $pxml->setAttribute('required', $page->isRequired());
     $pxml->setAttribute('answerStatusDisplay', $page->answerStatusDisplay());
-    $pxml->setAttribute('instructions', $page->getInstructions());
-    $pxml->setAttribute('leadingText', $page->getLeadingText());
-    $pxml->setAttribute('trailingText', $page->getTrailingText());
+    $pxml->setAttribute('instructions', htmlentities($page->getInstructions()));
+    $pxml->setAttribute('leadingText', htmlentities($page->getLeadingText()));
+    $pxml->setAttribute('trailingText', htmlentities($page->getTrailingText()));
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $pxml->setAttribute('weight', $page->getWeight());
       $pxml->setAttribute('kind', $page->getKind());
@@ -71,8 +71,8 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
       $exml->setAttribute('min', $element->getMin());
       $exml->setAttribute('max', $element->getMax());
       $exml->setAttribute('required', $element->isRequired());
-      $exml->setAttribute('instructions', $element->getInstructions());
-      $exml->setAttribute('format', $element->getFormat());
+      $exml->setAttribute('instructions', htmlentities($element->getInstructions()));
+      $exml->setAttribute('format', htmlentities($element->getFormat()));
       $exml->setAttribute('defaultValue', $element->getDefaultValue());
       $listItems = $exml->appendChild($dom->createElement('listitems'));
       foreach($element->getListItems() as $item){
