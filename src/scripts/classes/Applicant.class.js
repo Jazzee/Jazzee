@@ -158,7 +158,11 @@ Applicant.prototype.displayDecisions = function(json){
       {title: 'Nominate for Admission', action: 'nominateAdmit'},
       {title: 'Undo Nomination', action: 'undoNominateAdmit'},
       {title: 'Nominate for Deny', action: 'nominateDeny'}, 
-      {title: 'Undo Nomination', action: 'undoNominateDeny'}        
+      {title: 'Undo Nomination', action: 'undoNominateDeny'}, 
+      {title: 'Undo Decision', action: 'undoFinalAdmit'}, 
+      {title: 'Undo Decision', action: 'undoFinalDeny'}, 
+      {title: 'Undo Offer Response', action: 'undoAcceptOffer'}, 
+      {title: 'Undo Offer Response', action: 'undoDeclineOffer'}        
     ];
     for(var i = 0; i < types.length; i++){
       if(json['allow'+types[i].action]){

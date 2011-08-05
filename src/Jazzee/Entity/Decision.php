@@ -173,6 +173,9 @@ class Decision{
    * Undo Final Deny Decision
    */
   public function undoFinalAdmit(){
+    if(!is_null($this->acceptOffer) and !is_null($this->declineOffer)){
+      throw new \Jazzee\Exception('Cannot undo admit for an applicant with a offer response.');
+    }
     $this->finalAdmit = null;
   }
   
@@ -188,6 +191,13 @@ class Decision{
   }
   
   /**
+   * Undo Accept Offer
+   */
+  public function undoAcceptOffer(){
+    $this->acceptOffer = null;
+  }
+  
+  /**
    * Decline Offer
    * @param string $dateString
    */
@@ -196,6 +206,13 @@ class Decision{
       throw new \Jazzee\Exception('Cannot decline offer for an applicant who has not been admitted');
     }
     if(is_null($this->declineOffer)) $this->declineOffer = $this->decisionStamp($dateString);
+  }
+  
+  /**
+   * Undo Decline Offer
+   */
+  public function undoDeclineOffer(){
+    $this->declineOffer = null;
   }
   
   /**
@@ -352,9 +369,17 @@ class Decision{
          return ($this->nominateAdmit and is_null($this->finalAdmit));
        case 'finalDeny':
          return ($this->nominateDeny and is_null($this->finalDeny));
+       case 'undoFinalAdmit':
+         return (!is_null($this->finalAdmit) and is_null($this->acceptOffer) and is_null($this->declineOffer));
+       case 'undoFinalDeny':
+         return (!is_null($this->finalDeny) and is_null($this->acceptOffer) and is_null($this->declineOffer));
        case 'acceptOffer':
        case 'declineOffer':
          return ($this->finalAdmit and is_null($this->acceptOffer) and is_null($this->declineOffer));
+       case 'undoAcceptOffer':
+         return !is_null($this->acceptOffer);
+       case 'undoDeclineOffer':
+         return !is_null($this->declineOffer);
      }
      throw new \Jazzee\Exception("{$status} is not a valid decision status type");
    }

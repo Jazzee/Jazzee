@@ -29,6 +29,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_UNDONOMINATEDENY = 'Undo Deny Nomination';
   const ACTION_FINALADMIT = 'Final Admit';
   const ACTION_FINALDENY = 'Final Deny';
+  const ACTION_UNDOFINALADMIT = 'Undo Final Admit';
+  const ACTION_UNDOFINALDENY = 'Undo Final Deny';
+  const ACTION_UNDOACCEPTOFFER = 'Undo Accept Offer';
+  const ACTION_UNDODECLINEOFFER = 'Undo Decline Offer';
   const ACTION_SETTLEPAYMENT = 'Settle Payment';
   const ACTION_REFUNDPAYMENT = 'Refund Payment';
   const ACTION_REJECTPAYMENT = 'Reject Payment';
@@ -175,7 +179,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     }
     if($applicant->isLocked()){
       $decisions = array('status'=>$status);
-      foreach(array('nominateAdmit', 'undoNominateAdmit', 'nominateDeny', 'undoNominateDeny', 'finalAdmit', 'finalDeny') as $type){
+      foreach(array('nominateAdmit', 'undoNominateAdmit', 'nominateDeny', 'undoNominateDeny', 'finalAdmit', 'finalDeny', 'undoFinalAdmit', 'undoFinalDeny', 'acceptOffer', 'declineOffer', 'undoAcceptOffer', 'undoDeclineOffer') as $type){
         $decisions["allow{$type}"] = ($this->checkIsAllowed($this->controllerName, $type) && $applicant->getDecision()->can($type));
       }
     }
@@ -342,6 +346,18 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
+   * Undo Final Admit
+   * @param integer $applicantId
+   */
+  public function actionUndoFinalAdmit($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->undoFinalAdmit();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
    * Tag an applicant
    * @param integer $applicantID
    */
@@ -449,6 +465,42 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->setVar('result', array('decisions'=> $this->getDecisions($applicant)));
     $this->setVar('form', $form);
     $this->loadView('applicants_single/form');
+  }
+  
+  /**
+   * Undo Final Deny
+   * @param integer $applicantId
+   */
+  public function actionUndoFinalDeny($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->undoFinalDeny();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Undo Accept Offer
+   * @param integer $applicantId
+   */
+  public function actionUndoAcceptOffer($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->undoAcceptOffer();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Undo Decline Offer
+   * @param integer $applicantId
+   */
+  public function actionUndoDeclineOffer($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->undoDeclineOffer();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
