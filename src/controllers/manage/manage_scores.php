@@ -216,6 +216,9 @@ class ManageScoresController extends \Jazzee\AdminController {
       case 590:
         $scores = $this->parseTOEFLVersion1($f);
         break;
+      case 900:
+        $scores = $this->parseTOEFLVersion1($f);
+        break;
       default:
         $this->addMessage('error', "Unrecognized TOEFL format:  ({$file['name']}) has " . strlen($f[0]) . ' characters per line.');
         return false;
@@ -273,8 +276,8 @@ class ManageScoresController extends \Jazzee\AdminController {
       foreach ($arr AS $line) {
         $score = array();
         $score['registrationNumber'] = ltrim(substr($line, 26, 16), 0);
-        $score['testMonth'] = date('n', strtotime(substr ($line, 540, 2) . "/" . substr ($line, 542, 2) . "/" . substr ($line, 538, 4)));
-        $score['testYear'] = date('Y', strtotime(substr ($line, 540, 2) . "/" . substr ($line, 542, 2) . "/" . substr ($line, 538, 4)));
+        $score['testMonth'] = date('n', strtotime(substr ($line, 542, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
+        $score['testYear'] = date('Y', strtotime(substr ($line, 5432, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
         $score['departmentCode'] = substr($line, 9, 2);
         $score['firstName'] = substr($line, 72, 30);
         $score['middleName'] = substr($line, 102, 30);
@@ -292,7 +295,57 @@ class ManageScoresController extends \Jazzee\AdminController {
         }
         $score['nativeCountry'] = substr($line, 446, 40);
         $score['nativeLanguage'] = substr($line, 489, 40);
-        $score['testDate'] = date('Y-m-d', strtotime(substr ($line, 540, 2) . "/" . substr ($line, 542, 2) . "/" . substr ($line, 538, 4)));
+        $score['testDate'] = date('Y-m-d', strtotime(substr ($line, 542, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
+        $score['testType'] = substr($line, 555, 1);
+        $score['listeningIndicator'] = substr($line, 556, 1);
+        $score['speakingIndicator'] = substr($line, 557, 1);
+        $score['IBTListening'] = substr($line, 558, 2);
+        $score['IBTReading'] = substr($line, 560, 2);
+        $score['IBTSpeaking'] = substr($line, 562, 2);
+        $score['IBTWriting'] = substr($line, 564, 2);
+        $score['IBTTotal'] = substr($line, 566, 3);
+        $score['TSEScore'] = substr($line, 569, 2);
+        $score['listening'] = substr($line, 573, 2);
+        $score['writing'] = substr($line, 575, 2);
+        $score['reading'] = substr($line, 577, 2);
+        $score['essay'] = substr($line, 579, 2);
+        $score['total'] = substr($line, 581, 3);
+        $score['timesTaken'] = substr($line, 588, 1);
+        $score['offTopic'] = substr($line, 589, 1);
+        $scores[] = $this->cleanScore($score);
+      }
+      return $scores;
+  }
+  
+  /**
+   * ETS TOEFL Flat file version 2
+   * @param array $arr
+   */
+  protected function parseTOEFLVersion2($arr){
+      $scores = array();
+      foreach ($arr AS $line) {
+        $score = array();
+        $score['registrationNumber'] = ltrim(substr($line, 26, 16), 0);
+        $score['testMonth'] = date('n', strtotime(substr ($line, 542, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
+        $score['testYear'] = date('Y', strtotime(substr ($line, 542, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
+        $score['departmentCode'] = substr($line, 9, 2);
+        $score['firstName'] = substr($line, 72, 30);
+        $score['middleName'] = substr($line, 102, 30);
+        $score['lastName'] = substr($line, 42, 30);
+        $score['birthDate'] = date('Y-m-d', strtotime(substr ($line, 533, 2) . "/" . substr ($line, 535, 2) . "/" . substr ($line, 529, 4)));
+        switch(substr($line, 537, 1)){
+          case 1:
+            $score['gender'] = 'm';
+            break;
+          case 2:
+            $score['gender'] = 'f';
+            break;
+          default:
+            $score['gender'] = null;
+        }
+        $score['nativeCountry'] = substr($line, 446, 40);
+        $score['nativeLanguage'] = substr($line, 489, 40);
+        $score['testDate'] = date('Y-m-d', strtotime(substr ($line, 542, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
         $score['testType'] = substr($line, 555, 1);
         $score['listeningIndicator'] = substr($line, 556, 1);
         $score['speakingIndicator'] = substr($line, 557, 1);
