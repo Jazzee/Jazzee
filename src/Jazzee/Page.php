@@ -82,6 +82,13 @@ interface Page
    * @return array \Jazzee\Answer
    */
   function getAnswers();
+  
+  /**
+   * Get the current answers as an xml element
+   * @param \DOMDocument $dom
+   * @return array DOMElement
+   */
+  function getXmlAnswers(\DOMDocument $dom);
 
   /**
    * Get the current status

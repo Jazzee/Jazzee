@@ -59,5 +59,13 @@ class EncryptedTextInput extends TextInput {
   public function formValue(\Jazzee\Entity\Answer $answer){
     return null;
   }
+  
+  public function rawValue(\Jazzee\Entity\Answer $answer){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(isset($elementsAnswers[0])){
+      return $elementsAnswers[0]->getEText();
+    }
+    return null;
+  }
 }
 ?>

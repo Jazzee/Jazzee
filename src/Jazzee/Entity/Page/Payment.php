@@ -104,6 +104,23 @@ class Payment extends Standard {
     return $answers;
   }
   
+  public function getXmlAnswers(\DOMDocument $dom){
+    $answers = array();
+    foreach($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer){
+      $payment = $answer->getPayment();
+      $answerXml = $dom->createElement('payments');
+      $answerXml->setAttribute('answerId', $answer->getId());
+      $answerXml->setAttribute('updatedAt', $answer->getUpdatedAt()->format('c'));
+      $eXml = $dom->createElement('payment');
+      $eXml->setAttribute('type', $payment->getType()->getName());
+      $eXml->setAttribute('status', $payment->getStatus());
+      $eXml->appendChild($dom->createCDATASection($payment->getAmount()));
+      $answerXml->appendChild($eXml);
+      $answers[] = $answerXml;
+    }
+    return $answers;
+  }
+  
   public function getAllAnswers(){
     return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }

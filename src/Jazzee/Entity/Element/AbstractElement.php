@@ -19,5 +19,9 @@ abstract class AbstractElement implements \Jazzee\Element {
   public function __construct(\Jazzee\Entity\Element $element){
     $this->_element = $element;
   }
+  
+  public function rawValue(\Jazzee\Entity\Answer $answer){
+    return $this->displayValue($answer);
+  }
 }
 ?>

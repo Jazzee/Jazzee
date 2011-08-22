@@ -47,5 +47,13 @@ class Textarea extends AbstractElement {
     }
     return null;
   }
+  
+  public function rawValue(\Jazzee\Entity\Answer $answer){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(isset($elementsAnswers[0])){
+      return $elementsAnswers[0]->getEText();
+    }
+    return null;
+  }
 }
 ?>

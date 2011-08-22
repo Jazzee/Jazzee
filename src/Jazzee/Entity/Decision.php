@@ -339,10 +339,8 @@ class Decision{
       'nominateDeny',
       'finalAdmit',
       'finalDeny',
-      'decisionLetterSent',
-      'decisionLetterViewed',
       'acceptOffer',
-      'declineOffer',
+      'declineOffer'
     );
     $final = '';
     foreach($decisions as $decision) if($this->$decision) $final = $decision;

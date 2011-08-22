@@ -109,6 +109,25 @@ class Standard extends AbstractPage {
     return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
   
+  public function getXmlAnswers(\DOMDocument $dom){
+    $answers = array();
+    foreach($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer){
+      $answerXml = $dom->createElement('answer');
+      $answerXml->setAttribute('answerId', $answer->getId());
+      $answerXml->setAttribute('updatedAt', $answer->getUpdatedAt()->format('c'));
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $eXml = $dom->createElement('element');
+        $eXml->setAttribute('elementId', $element->getId());
+        $eXml->setAttribute('title', $element->getTitle());
+        $eXml->setAttribute('type', $element->getType()->getClass());
+        if($value = $element->getJazzeeElement()->rawValue($answer)) $eXml->appendChild($dom->createCDATASection($value));
+        $answerXml->appendChild($eXml);
+      }
+      $answers[] = $answerXml;
+    }
+    return $answers;
+  }
+  
   public function getStatus(){
     $answers = $this->getAnswers();
     if(!$this->_applicationPage->isRequired() and count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){

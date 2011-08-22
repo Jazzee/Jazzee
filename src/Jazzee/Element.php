@@ -35,5 +35,13 @@ interface Element
    * @return mixed
    */
   function formValue(\Jazzee\Entity\Answer $answer);
+  
+  /**
+   * Get the raw value of the element
+   * 
+   * @param \Jazzee\Entity\Answer $answer
+   * @return mixed
+   */
+  function rawValue(\Jazzee\Entity\Answer $answer);
 }
 ?>

@@ -66,6 +66,14 @@ class PDFFileInput extends AbstractElement {
     return null;
   }
   
+  public function rawValue(\Jazzee\Entity\Answer $answer){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(isset($elementsAnswers[0])){
+      return base64_encode($elementsAnswers[0]->getEBlob());
+    }
+    return null;
+  }
+  
   public function formValue(\Jazzee\Entity\Answer $answer){
     return false;
   }
