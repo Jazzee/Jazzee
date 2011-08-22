@@ -217,7 +217,7 @@ class ManageScoresController extends \Jazzee\AdminController {
         $scores = $this->parseTOEFLVersion1($f);
         break;
       case 900:
-        $scores = $this->parseTOEFLVersion1($f);
+        $scores = $this->parseTOEFLVersion2($f);
         break;
       default:
         $this->addMessage('error', "Unrecognized TOEFL format:  ({$file['name']}) has " . strlen($f[0]) . ' characters per line.');
@@ -225,13 +225,16 @@ class ManageScoresController extends \Jazzee\AdminController {
     }
     
     $new = 0;
+    //we have to look for cases of the same score appearing twice in the same file
+    $used = array();
     foreach ($scores AS $arr){
       $parameters = array(
         'registrationNumber' => $arr['registrationNumber'],
         'testMonth' => $arr['testMonth'],
         'testYear' => $arr['testYear']
       );
-      if(!$score = $this->_em->getRepository('\Jazzee\Entity\TOEFLScore')->findOneBy($parameters)){
+      if(!$score = $this->_em->getRepository('\Jazzee\Entity\TOEFLScore')->findOneBy($parameters) and !in_array($arr['registrationNumber'] . $arr['testMonth'] . $arr['testYear'], $used)){
+        $used[] = $arr['registrationNumber'] . $arr['testMonth'] . $arr['testYear'];
         $score = new \Jazzee\Entity\TOEFLScore();
         $score->setRegistrationNumber($arr['registrationNumber'],$arr['testMonth'], $arr['testYear']);
         $score->setDepartmentCode($arr['departmentCode']);
@@ -277,7 +280,7 @@ class ManageScoresController extends \Jazzee\AdminController {
         $score = array();
         $score['registrationNumber'] = ltrim(substr($line, 26, 16), 0);
         $score['testMonth'] = date('n', strtotime(substr ($line, 542, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
-        $score['testYear'] = date('Y', strtotime(substr ($line, 5432, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
+        $score['testYear'] = date('Y', strtotime(substr ($line, 542, 2) . "/" . substr ($line, 544, 2) . "/" . substr ($line, 538, 4)));
         $score['departmentCode'] = substr($line, 9, 2);
         $score['firstName'] = substr($line, 72, 30);
         $score['middleName'] = substr($line, 102, 30);
