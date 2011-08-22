@@ -111,6 +111,26 @@ Applicant.prototype.displayActions = function(json){
     'Last Update: ' + json.updatedAt.date + '<br />' + 
     'Last Login: ' + json.lastLogin.date + '<br />'
   );
+  var text = json.deadlineExtension?json.deadlineExtension.date:'none';
+  $('#actions').append('Deadline Extension: ');
+  if(json.allowExtendDeadline){
+    var a = $('<a>').attr('href', this.baseUrl + '/extendDeadline').html(text);
+    a.click(function(e){
+      $.get($(e.target).attr('href'),function(json){
+        var obj = {
+          display: function(json){
+            self.displayActions(json.data.result.actions);
+          }
+        };
+        self.createForm(json.data.form, obj);
+      });
+      return false;
+    });
+    $('#actions').append(a);
+  } else {
+    $('#actions').append(text);
+  }
+  
 };
 
 

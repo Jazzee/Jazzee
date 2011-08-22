@@ -343,6 +343,13 @@ class Applicant{
   public function getDeadlineExtension(){
     return $this->deadlineExtension;
   }
+  
+  /**
+   * remove deadlineExtension
+   */
+  public function removeDeadlineExtension(){
+    $this->deadlineExtension = null;
+  }
 
   /**
    * Register a sucessfull login

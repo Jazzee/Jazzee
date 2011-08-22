@@ -103,7 +103,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $actions = array(
       'createdAt'=>$applicant->getCreatedAt(),
       'updatedAt'=>$applicant->getUpdatedAt(),
-      'lastLogin'=>$applicant->getLastLogin()
+      'lastLogin'=>$applicant->getLastLogin(),
+      'deadlineExtension'=>$applicant->getDeadlineExtension(),
+      'allowExtendDeadline' => $this->checkIsAllowed($this->controllerName, 'extendDeadline')
     );
     return $actions;
   }
@@ -525,6 +527,42 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->_em->persist($applicant);
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Extend Applicant Deadline
+   * @param integer $applicantId
+   */
+  public function actionExtendDeadline($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicantId}/extendDeadline"));
+    $field = $form->newField();
+    $field->setLegend('Extend deadline for ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+
+    $element = $field->newElement('DateInput', 'deadline');
+    $element->setLabel('New Deadline');
+    $element->setFormat('Leave blank to remove the extension');
+    if($applicant->getDeadlineExtension()) $element->setValue($applicant->getDeadlineExtension()->format('c'));
+    $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, $applicant->getApplication()->getClose()->format('c')));
+    $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'now'));
+    
+    $form->newButton('submit', 'Extend Deadline');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        if($input->get('deadline')){
+          $applicant->setDeadlineExtension($input->get('deadline'));
+        } else {
+          $applicant->removeDeadlineExtension();
+        }
+        $this->_em->persist($applicant);
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('result', array('actions'=> $this->getActions($applicant)));
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**

@@ -16,7 +16,8 @@ class ApplyStatusController extends \Jazzee\ApplyController {
   public function beforeAction(){
     parent::beforeAction();
     //if the applicant hasn't locked and the application isn't closed
-    if(!$this->_applicant->isLocked() AND $this->_application->getClose() > new DateTime('now')){
+    if(!$this->_applicant->isLocked() AND 
+      ($this->_application->getClose() > new DateTime('now') or ($this->_applicant->getDeadlineExtension() and $this->_applicant->getDeadlineExtension() > new \DateTime('now')))){
       $this->addMessage('notice', "You have not completed your application.");
       reset($this->_pages);
       $first = key($this->_pages);

@@ -6,9 +6,16 @@
  * @package jazzee
  * @subpackage apply
  */
+if($applicant->getDeadlineExtension() and $applicant->getDeadlineExtension() > $applicant->getApplication()->getClose()){
+  $deadline = $applicant->getDeadlineExtension();
+} else {
+  $deadline = $applicant->getApplication()->getClose();
+}
+
 $layoutContentTop = "<p class='deadline";
 if($applicant->getApplication()->getClose()->diff(new DateTime('today'))->days < 7){ $layoutContentTop .= ' approaching-deadline';}
-$layoutContentTop .= "'>Application Deadline: " . $applicant->getApplication()->getClose()->format('m/d/Y g:ia T') . '</p>';
+$layoutContentTop .= "'>Application Deadline: " . $deadline->format('m/d/Y g:ia T') . '</p>';
+
 $layoutContentTop .= '<p class="links"><a href="' . $this->path('apply/' . $applicant->getApplication()->getProgram()->getShortName() . '/' . $applicant->getApplication()->getCycle()->getName() . '/support') . '">Support</a>';
 if($count = $applicant->unreadMessageCount()) $layoutContentTop .= '<sup class="count">' . $count . '</sup>';
 $layoutContentTop .= '<a href="' . $this->path('apply/' . $applicant->getApplication()->getProgram()->getShortName() . '/' . $applicant->getApplication()->getCycle()->getName() . '/applicant/logout') . '">Log Out</a></p>';

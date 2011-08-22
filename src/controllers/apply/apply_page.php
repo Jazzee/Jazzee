@@ -31,7 +31,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
       $this->addMessage('error', "You are not authorized to view that page.");
       $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login");
     }
-    if($this->_applicant->isLocked() or $this->_application->getClose() < new DateTime('now')){
+    if($this->_applicant->isLocked() or ($this->_application->getClose() < new DateTime('now') and (!$this->_applicant->getDeadlineExtension() or $this->_applicant->getDeadlineExtension() < new \DateTime('now')))){
       $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
     }
     $this->addScript($this->path('resource/scripts/controllers/apply_page.controller.js'));
