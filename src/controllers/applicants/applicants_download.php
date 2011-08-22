@@ -32,7 +32,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
     $element->setLabel('Types of applicants');
     $element->newItem('unlocked', 'Incomplete');
     $element->newItem('locked', 'Locked');
-    $element->newItem('admitted', 'Admited');
+    $element->newItem('admitted', 'Admitted');
     $element->newItem('denied', 'Denied');
     $element->newItem('accepted', 'Accepted');
     $element->newItem('decined', 'Declined');
