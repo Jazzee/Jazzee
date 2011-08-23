@@ -80,6 +80,7 @@ class Standard extends AbstractPage {
         }
       }
       $this->getForm()->applyDefaultValues();
+      $this->getForm()->setAction($this->_controller->getActionPath());
       $this->_controller->getEntityManager()->persist($answer);
       $this->_controller->addMessage('success', 'Answer Updated Successfully');
     }
