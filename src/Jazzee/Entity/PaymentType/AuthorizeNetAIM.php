@@ -128,7 +128,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $aim->card_num = $input->get('cardNumber');
     $aim->exp_date = $input->get('expirationDate');
     $aim->card_code = $input->get('cardCode');
-    $aim->zip = $input->get('cardCode');
+    $aim->zip = $input->get('postalCode');
     $aim->description = $this->_paymentType->getVar('description');
     $config = new \Jazzee\Configuration();
     $aim->test_request = ($config->getStatus() == 'PRODUCTION')?0:1;
@@ -247,7 +247,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $field->setLegend('Refund Payment');
     $element = $field->newElement('Plaintext', 'details');
     $element->setLabel('Details');
-    $element->setValue('Refund $' . $payment->getAmmount() . ' to card ' . $response->xml->transaction->payment->creditCard->cardNumber);  
+    $element->setValue('Refund $' . $payment->getAmount() . ' to card ' . $response->xml->transaction->payment->creditCard->cardNumber);  
     
     $element = $field->newElement('Textarea','refundedReason');
     $element->setLabel('Reason displayed to Applicant');
