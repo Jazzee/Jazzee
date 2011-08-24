@@ -50,10 +50,24 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $this->redirectPath('setup/importapplication');
       }
       $preferences = $xml->xpath('/response/application/preferences');
+      $arr = array();
       foreach($preferences[0]->children() as $element){
-        $method = 'set' . ucfirst($element->getName());
-        $this->_application->$method((string)$element);
+        $arr[$element->getName()] = (string)$element;
       }
+      $this->_application->setContactName($arr['contactName']);
+      $this->_application->setContactEmail($arr['contactEmail']);
+      $this->_application->setWelcome(html_entity_decode($arr['welcome']));
+      $this->_application->setOpen($arr['open']);
+      $this->_application->setClose($arr['close']);
+      $this->_application->setBegin($arr['begin']);
+      $this->_application->setAdmitLetter($arr['admitletter']);
+      $this->_application->setDenyLetter($arr['denyletter']);
+      $this->_application->setStatusIncompleteText($arr['statusIncompleteText']);
+      $this->_application->setStatusNoDecisionText($arr['statusNoDecisionText']);
+      $this->_application->setStatusAdmitText($arr['statusAdmitText']);
+      $this->_application->setStatusDenyText($arr['statusDenyText']);
+      $this->_application->setStatusAcceptText($arr['statusAcceptText']);
+      $this->_application->setStatusDeclineText($arr['statusDeclineText']);
       foreach($xml->xpath('/response/application/pages/page') as $element) {
         $attributes = $element->attributes();
         $page = $this->addPageFromXml($element);
@@ -61,14 +75,14 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $applicationPage->setApplication($this->_application);
         $applicationPage->setPage($page);
         $applicationPage->setKind((string)$attributes['kind']);
-        $applicationPage->setTitle((string)$attributes['title']);
+        $applicationPage->setTitle(html_entity_decode((string)$attributes['title']));
         $applicationPage->setMin((string)$attributes['min']);
         $applicationPage->setMax((string)$attributes['max']);
         if((string)$attributes['required'])$applicationPage->required(); else $applicationPage->optional();
         if((string)$attributes['answerStatusDisplay'])$applicationPage->showAnswerStatus(); else $applicationPage->hideAnswerStatus();
-        $applicationPage->setInstructions((string)$attributes['instructions']);
-        $applicationPage->setLeadingText((string)$attributes['leadingText']);
-        $applicationPage->setTrailingText((string)$attributes['trailingText']);
+        $applicationPage->setInstructions(html_entity_decode((string)$attributes['instructions']));
+        $applicationPage->setLeadingText(html_entity_decode((string)$attributes['leadingText']));
+        $applicationPage->setTrailingText(html_entity_decode((string)$attributes['trailingText']));
         $applicationPage->setWeight((string)$attributes['weight']);
         $this->_em->persist($applicationPage);
       }
@@ -91,14 +105,14 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
     } else {
       $page = new \Jazzee\Entity\Page();
       $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->findOneBy(array('class'=>(string)$attributes['class'])));
-      $page->setTitle((string)$attributes['title']);
+      $page->setTitle(html_entity_decode((string)$attributes['title']));
       $page->setMin((string)$attributes['min']);
       $page->setMax((string)$attributes['max']);
       if((string)$attributes['required'])$page->required(); else $page->optional();
       if((string)$attributes['answerStatusDisplay'])$page->showAnswerStatus(); else $page->hideAnswerStatus();
-      $page->setInstructions((string)$attributes['instructions']);
-      $page->setLeadingText((string)$attributes['leadingText']);
-      $page->setTrailingText((string)$attributes['trailingText']);
+      $page->setInstructions(html_entity_decode((string)$attributes['instructions']));
+      $page->setLeadingText(html_entity_decode((string)$attributes['leadingText']));
+      $page->setTrailingText(html_entity_decode((string)$attributes['trailingText']));
       $page->notGlobal();
       $this->_em->persist($page);
       foreach($xml->xpath('elements/element') as $elementElement){
@@ -110,8 +124,8 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $element->setMin((string)$attributes['min']);
         $element->setMax((string)$attributes['max']);
         if((string)$attributes['required'])$element->required(); else $element->optional();
-        $element->setInstructions((string)$attributes['instructions']);
-        $element->setFormat((string)$attributes['format']);
+        $element->setInstructions(html_entity_decode((string)$attributes['instructions']));
+        $element->setFormat(html_entity_decode((string)$attributes['format']));
         $element->setWeight((string)$attributes['weight']);
         $page->addElement($element);
         foreach($elementElement->xpath('listitems/item') as $listElement){
