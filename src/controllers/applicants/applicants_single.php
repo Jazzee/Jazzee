@@ -22,6 +22,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_DELETEANSWER = 'Delete Answer';
   const ACTION_ADDANSWER = 'Add Answer';
   const ACTION_ATTACHANSWERPDF = 'Attach PDF to Answer';
+  const ACTION_DELETEANSWERPDF = 'Delete PDF attached to Answer';
   const ACTION_VERIFYANSWER = 'Verify Answer';
   const ACTION_NOMINATEADMIT = 'Nominate for Admission';
   const ACTION_NOMINATEDENY = 'Nominate for Deny';
@@ -632,6 +633,63 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity->getJazzeePage()->deleteAnswer($answerId);
     $this->setVar('result', true);
     $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Attach PDF to answer
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionAttachAnswerPdf($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicantId}/attachAnswerPdf/{$answerId}"));
+    $field = $form->newField();
+    $field->setLegend('Attach PDF');
+    
+    $element = $field->newElement('FileInput', 'pdf');
+    $element->setLabel('File');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\PDF($element));
+    $element->addFilter(new \Foundation\Form\Filter\Blob($element));
+        
+    $form->newButton('submit', 'Attach PDF to Answer');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $attachment = new \Jazzee\Entity\Attachment();
+        $attachment->setApplicant($applicant);
+        $attachment->setAnswer($answer);
+        $attachment->setAttachment($input->get('pdf'));
+        $this->_em->persist($attachment);
+        //persist the applicant and answer to catch the last update  
+        $this->_em->persist($applicant); 
+        $this->_em->persist($answer); 
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Delete PDF attached to answer
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionDeleteAnswerPdf($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    
+    if($attachment = $answer->getAttachment()){
+      $this->_em->remove($attachment);
+      $answer->markLastUpdate();
+      $this->_em->persist($answer);
+      $this->setLayoutVar('status', 'success');
+    }
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
   }
   
   /**
