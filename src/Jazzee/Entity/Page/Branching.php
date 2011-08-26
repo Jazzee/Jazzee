@@ -134,6 +134,9 @@ class Branching extends Standard
         if($value = $element->getJazzeeElement()->rawValue($child)) $eXml->appendChild($dom->createCDATASection($value));
         $answerXml->appendChild($eXml);
       }
+      $attachment = $dom->createElement('attachment');
+      if($answer->getAttachment()) $attachment->appendChild($dom->createCDATASection(base64_encode($answer->getAttachment()->getAttachment())));
+      $answerXml->appendChild($attachment);
       $answers[] = $answerXml;
     }
     return $answers;

@@ -186,6 +186,16 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
       $decision->appendChild($xml->createElement('declineOffer', ($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer())?$applicant->getDecision()->getDeclineOffer()->format('c'):''));
       $applicantXml->appendChild($decision);
       
+      $tags = $xml->createElement("tags");
+      foreach($applicant->getTags() as $tag){
+        $tagXml = $xml->createElement('tag');
+        $tagXml->setAttribute('tagId', $tag->getId());
+        $tagXml ->appendChild($xml->createCDATASection($tag->getTitle()));
+        $tags->appendChild($tagXml);
+      }
+      $applicantXml->appendChild($tags);
+      
+      
       $pages = $xml->createElement("pages");
       foreach($applicationPages as $applicationPage){
         $page = $xml->createElement("page");
