@@ -1,5 +1,6 @@
 <?php
 ini_set('memory_limit', '1g');
+set_time_limit('120');
 /**
  * Download Applicants in csv format
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -128,7 +129,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
         for($i=0;$i<$applicationPagesAnswerCount[$applicationPage->getPage()->getId()]; $i++){
           foreach($applicationPage->getPage()->getElements() as $element){
             if(isset($answers[$i])){
-              $arr[] = $element->getJazzeeElement()->rawValue($answers[$i]);
+              $arr[] = $element->getJazzeeElement()->displayValue($answers[$i]);
             } else {
               $arr[] = '';
             }
