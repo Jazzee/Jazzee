@@ -25,9 +25,10 @@ class Recommenders extends Standard {
   /**
    * Get the message
    * @param \Jazzee\Entity\Answer $answer
+   * @param string $link is different from admin and apply so it is sent as a parameter
    * @return \Foundation\Mail\Message
    */
-  protected function getMessage(\Jazzee\Entity\Answer $answer){
+  protected function getMessage(\Jazzee\Entity\Answer $answer, $link){
     $search = array(
      '%APPLICANT_NAME%',
      '%DEADLINE%',
@@ -47,7 +48,7 @@ class Recommenders extends Standard {
     $replace = array(
      $this->_applicant->getFullName(),
      $deadline->format('l F jS Y g:ia'),
-     $this->_controller->path('lor/' . $answer->getUniqueId())
+     $link
     );
     $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer);
     $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer);
@@ -75,7 +76,7 @@ class Recommenders extends Standard {
   public function sendEmail($answerId, $postData){
     if($answer = $this->_applicant->findAnswerById($answerId)){
       if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND $answer->getUpdatedAt()->diff(new \DateTime('now'))->days >= self::RECOMMENDATION_EMAIL_WAIT_DAYS)){
-        $message = $this->getMessage($answer);
+        $message = $this->getMessage($answer, $this->_controller->path('lor/' . $answer->getUniqueId()));
         $message->Send();
         $answer->lock();
         $answer->markLastUpdate();
@@ -91,12 +92,13 @@ class Recommenders extends Standard {
    * Send the invitaiton email
    * @param integer $answerID
    * @param array $postData
-   * @param bool $bool //thrid required argument for admin functions to be sure they aren't called from the applicant side
+   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
   public function sendAdminInvitation($answerId, $postData, $bool){
-    //need a check here or a way to be sure that applicanst can't access this or view link'
     if($answer = $this->_applicant->findAnswerById($answerId)){
-      $message = $this->getMessage($answer);
+      $path = $this->_controller->path('lor/' . $answer->getUniqueId());
+      $link = str_ireplace('admin/', '', $path);
+      $message = $this->getMessage($answer, $link);
       $form = new \Foundation\Form;
       $field = $form->newField();
       $field->setLegend('Send Invitation');
@@ -126,7 +128,7 @@ class Recommenders extends Standard {
    * Admin feature to display the link that recommenders are emailed
    * @param integer $answerID
    * @param array $postData
-   * @param bool $bool //third required argument for admin functions to be sure they aren't called from the applicant side
+   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
   public function viewLink($answerId, $postData, $bool){
     if($answer = $this->_applicant->findAnswerById($answerId)){
