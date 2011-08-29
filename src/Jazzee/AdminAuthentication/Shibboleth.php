@@ -52,6 +52,9 @@ class Shibboleth implements \Jazzee\AdminAuthentication{
   }
   
   public function loginUser(){
+    $this->_user = null;
+    $session = new \Foundation\Session();
+    $session->getStore('admin')->expire();
     $config = new \Jazzee\Configuration();
     header('Location: ' . $config->getShibbolethLoginUrl());
     die();
