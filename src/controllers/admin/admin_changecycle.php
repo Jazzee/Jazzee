@@ -9,8 +9,10 @@ class AdminChangecycleController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'Change Cycle';
   const PATH = 'changecycle';
-  const REQUIRE_AUTHORIZATION = false;
+  const REQUIRE_AUTHORIZATION = true;
   const REQUIRE_APPLICATION = false;
+  
+  const ACTION_INDEX = 'Change Cycle';
   
   /**
    * Display index

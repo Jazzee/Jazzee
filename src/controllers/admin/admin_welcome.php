@@ -16,8 +16,9 @@ class AdminWelcomeController extends \Jazzee\AdminController {
    * Display index
    */
   public function actionIndex(){
-    $this->setVar('firstName', $this->_user->getFirstName());
-    $this->setVar('lastName', $this->_user->getLastName());
+    if($this->_user){
+      $this->setVar('user', $this->_user);
+    }
   }
 
 }

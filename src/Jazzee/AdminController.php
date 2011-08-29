@@ -84,42 +84,30 @@ abstract class AdminController extends Controller{
     $this->_adminAuthentication = new $class($this->_em);
     if(!($this->_adminAuthentication instanceof AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthentication Interface.');
     
-    if(!$this->_adminAuthentication->isValidUser()){
-      //send a 401 not authorized error
-      $request = new \Lvc_Request();
-      $request->setControllerName('error');
-      $request->setActionName('index');
-      $request->setActionParams(array('error' => '401', 'message'=>'We were able to log you in successfully, however you do not have permission to access the system.'));
-    
-      // Get a new front controller without any routers, and have it process our handmade request.
-      $fc = new \Lvc_FrontController();
-      $fc->processRequest($request);
-      exit();
-    }
-    $this->_user = $this->_adminAuthentication->getUser();
     $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
-
+    if($this->_adminAuthentication->isValidUser()){
+      $this->_user = $this->_adminAuthentication->getUser();
+      $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findBestCycle();
+      
+      if($this->_user->getDefaultCycle()) $this->_cycle = $this->_user->getDefaultCycle();
+      if($this->_user->getDefaultProgram()) $this->_program = $this->_user->getDefaultProgram();
+      
+      if(isset($this->_store->currentProgramId)) $this->_program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($this->_store->currentProgramId);
+      if(isset($this->_store->currentCycleId)) $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($this->_store->currentCycleId);
+      
+      if($this->_cycle AND $this->_program){
+        if(!$this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->_program,$this->_cycle)){
+          $this->_application = null;
+        }
+      }
+    }
+    
     if($this->_config->getAdminSessionLifetime()){
       setcookie('JazzeeAdminLoginTimeout', time()+$this->_config->getAdminSessionLifetime(), 0, '/');
     } else {
       //if there is no seesion limiter then setup for 24 hours
       setcookie('JazzeeAdminLoginTimeout', time()+86400, 0, '/');
     }
-    
-    $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findBestCycle();
-    
-    if($this->_user->getDefaultCycle()) $this->_cycle = $this->_user->getDefaultCycle();
-    if($this->_user->getDefaultProgram()) $this->_program = $this->_user->getDefaultProgram();
-    
-    if(isset($this->_store->currentProgramId)) $this->_program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($this->_store->currentProgramId);
-    if(isset($this->_store->currentCycleId)) $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($this->_store->currentCycleId);
-    
-    if($this->_cycle AND $this->_program){
-      if(!$this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->_program,$this->_cycle)){
-        $this->_application = null;
-      }
-    } 
-    
   }
   /**
    * Check set the default page title and layout title
@@ -162,7 +150,7 @@ abstract class AdminController extends Controller{
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     $class = \Foundation\VC\Config::getControllerClassName($controller);
-    if(!$class::REQUIRE_AUTHORIZATION and $user) return true;
+    if(!$class::REQUIRE_AUTHORIZATION) return true;
     if($class::REQUIRE_APPLICATION and is_null($application)) return false;
     if($user)  return $user->isAllowed($controller, $action, $program);
     return false;
@@ -214,6 +202,11 @@ abstract class AdminController extends Controller{
     foreach($menus as $menu) $menu->sortLinks();
     if(empty($menus)) return false;  //if there are no controllers or no authorization there are no menus
     $this->_store->AdminControllerGetNavigation = $navigation;
+    if(!$this->_user){
+      $link = new \Foundation\Navigation\Link('Login');
+      $link->setHref($this->path('login'));
+      $navigation->addLink($link);
+    }
     return $navigation;
   }
   

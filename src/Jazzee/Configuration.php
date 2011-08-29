@@ -172,6 +172,11 @@ protected $_shibbolethEmailAddressAttribute;
 /**
  * @var string
  */
+protected $_shibbolethLoginUrl;
+
+/**
+ * @var string
+ */
 protected $_shibbolethLogoutUrl;
 
 /**
@@ -832,6 +837,22 @@ protected $_ldapSearchBase;
    */
   public function setShibbolethEmailAddressAttribute($shibbolethEmailAddressAttribute) {
     $this->_shibbolethEmailAddressAttribute = $shibbolethEmailAddressAttribute;
+  }  
+  
+  /**
+   * get shibbolethLoginUrl
+   * @return string
+   */
+  public function getShibbolethLoginUrl() {
+    return $this->_shibbolethLoginUrl;
+  }
+  
+  /**
+   * set shibbolethLoginUrl
+   * @var string $shibbolethLoginUrl
+   */
+  public function setShibbolethLoginUrl($shibbolethLoginUrl) {
+    $this->_shibbolethLoginUrl = $shibbolethLoginUrl;
   }  
   
   /**

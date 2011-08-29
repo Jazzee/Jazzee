@@ -53,6 +53,10 @@ class SimpleSAML implements \Jazzee\AdminAuthentication{
     return $this->_user;
   }
   
+  public function loginUser(){
+    return;
+  }
+  
   public function logoutUser(){
     $this->_as->logout();
   }

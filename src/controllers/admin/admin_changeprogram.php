@@ -9,8 +9,11 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
   const MENU = 'My Account';
   const TITLE = 'Change Program';
   const PATH = 'changeprogram';
-  const REQUIRE_AUTHORIZATION = false;
+  const REQUIRE_AUTHORIZATION = true;
   const REQUIRE_APPLICATION = false;
+  
+//  const ACTION_INDEX = 'Change to Authorized Program'; dont display this as a role option any user can do it
+  const ACTION_ANYPROGRAM = 'Change to any Program';
   
   /**
    * Display index
@@ -24,8 +27,9 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
     $element->setLabel('Program');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $programs = $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array('isExpired' => false), array('name' => 'ASC'));
+    $userPrograms = $this->_user->getPrograms();
     foreach($programs as $program){
-      $element->newItem($program->getId(), $program->getName());
+      if($this->checkIsAllowed($this->controllerName, 'anyProgram') or in_array($program->getId(), $userPrograms)) $element->newItem($program->getId(), $program->getName());
     }
     if($this->_program) $element->setValue($this->_program->getId());
     //only ask if the user already has a default cycle
@@ -53,6 +57,31 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
     }
     
     $this->setVar('form', $form);
+  }
+  
+  /**
+   * Change to any program
+   * This method doesn't actually do anything it is just here to trigger an authorization lookup
+   */
+  public function actionAnyProgram(){
+    throw new \Jazzee\Exception('adminChangeProgram::actionAnyProgram was called.  It should not have been.');
+  }
+  
+  /**
+   * Only allow change program if the user is in at least one program
+   * At this top level always return false so nothing is allowed by default
+   * @param string $controller
+   * @param string $action
+   * @param \Jazzee\Entity\User $user
+   * @param \Jazzee\Entity\Program $program
+   * @return bool
+   */
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
+    if($user and $action=='index'){
+      $userPrograms = $user->getPrograms();
+      return (parent::isAllowed($controller, 'anyProgram') or !empty($userPrograms));
+    }
+    return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }
 ?>

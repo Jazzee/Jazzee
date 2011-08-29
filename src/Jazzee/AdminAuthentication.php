@@ -24,6 +24,12 @@ interface AdminAuthentication
   function getUser();
   
   /**
+   * Login the user with the identity provider
+   * 
+   */
+  function loginUser();
+  
+  /**
    * Logout the user with the identity provider
    * 
    */

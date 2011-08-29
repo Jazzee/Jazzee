@@ -234,6 +234,19 @@ class User{
   }
   
   /**
+   * get an array of all the users program affiliations
+   * @return array
+   */
+  public function getPrograms(){
+    $programs = array();
+    foreach($this->roles as $role){
+      if($role->getProgram()) $programs[] = $role->getProgram()->getId();
+    }
+    array_unique($programs);
+    return $programs;
+  }
+  
+  /**
    * Check if a user is allowed to access a resource
    * 
    * @param string $controller

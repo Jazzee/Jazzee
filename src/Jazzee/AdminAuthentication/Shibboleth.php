@@ -23,21 +23,23 @@ class Shibboleth implements \Jazzee\AdminAuthentication{
    * @param \Doctrine\ORM\EntityManager
    */
   public function __construct(\Doctrine\ORM\EntityManager $em){
-    $config = new \Jazzee\Configuration();
-    
-    if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
-    
-    $uniqueName = $_SERVER[$config->getShibbolethUsernameAttribute()];
-    $firstName = $_SERVER[$config->getShibbolethFirstNameAttribute()];
-    $lastName = $_SERVER[$config->getShibbolethLastNameAttribute()];
-    $mail = $_SERVER[$config->getShibbolethEmailAddressAttribute()];
-    
-    $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName));
-    if($this->_user){
-      $this->_user->setFirstName($firstName);
-      $this->_user->setLastName($lastName);
-      $this->_user->setEmail($mail);
-      $em->persist($this->_user);
+    if(isset($_SERVER['Shib-Application-ID'])){
+      $config = new \Jazzee\Configuration();
+      
+      if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
+      
+      $uniqueName = $_SERVER[$config->getShibbolethUsernameAttribute()];
+      $firstName = $_SERVER[$config->getShibbolethFirstNameAttribute()];
+      $lastName = $_SERVER[$config->getShibbolethLastNameAttribute()];
+      $mail = $_SERVER[$config->getShibbolethEmailAddressAttribute()];
+      
+      $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName));
+      if($this->_user){
+        $this->_user->setFirstName($firstName);
+        $this->_user->setLastName($lastName);
+        $this->_user->setEmail($mail);
+        $em->persist($this->_user);
+      }
     }
   }
   
@@ -47,6 +49,12 @@ class Shibboleth implements \Jazzee\AdminAuthentication{
   
   public function getUser(){
     return $this->_user;
+  }
+  
+  public function loginUser(){
+    $config = new \Jazzee\Configuration();
+    header('Location: ' . $config->getShibbolethLoginUrl());
+    die();
   }
   
   public function logoutUser(){
