@@ -18,6 +18,10 @@ $this->renderElement('form', array('form'=>$form));?>
     <?php if($this->controller->checkIsAllowed('manage_users', 'refreshUser')): ?>
     (<a href='<?php print $this->path('manage/users/refreshUser/') . $user->getId()?>'>Refresh from Directory</a>)
     <?php endif;?>
+    API Key: <?php print $user->getApiKey(); ?> 
+    <?php if($this->controller->checkIsAllowed('manage_users', 'resetApiKey')): ?>
+    (<a href='<?php print $this->path('manage/users/resetApiKey/') . $user->getId()?>'>Reset API Key</a>)
+    <?php endif;?>
   </li>
   <?php endforeach;?>
   </ul>

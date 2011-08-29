@@ -14,6 +14,7 @@ class ManageUsersController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'Find User';
   const ACTION_EDIT = 'Edit User';
   const ACTION_REFRESHUSER = 'Refresh User Directory Information';
+  const ACTION_RESETAPIKEY = 'Reset API Key';
   const ACTION_SEARCH = 'Search Directory for users';
   const ACTION_NEW = 'New User';
   const REQUIRE_APPLICATION = false;
@@ -102,6 +103,22 @@ class ManageUsersController extends \Jazzee\AdminController {
       $user->setEmail($result[0]['emailAddress']);
       $this->_em->persist($user);
       $this->addMessage('success', "User Refreshed");
+      $this->redirectPath('manage/users');
+    } else {
+      $this->addMessage('error', "Error: User #{$userID} does not exist.");
+    }
+  }
+  
+  /**
+   * Setup API Key
+   * View and reset a users API Key
+   * @param integer $userID
+   */
+  public function actionResetApiKey($userID){ 
+    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
+      $user->generateApiKey();
+      $this->_em->persist($user);
+      $this->addMessage('success', "API Key Reset");
       $this->redirectPath('manage/users');
     } else {
       $this->addMessage('error', "Error: User #{$userID} does not exist.");

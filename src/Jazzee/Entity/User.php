@@ -33,6 +33,9 @@ class User{
   /** @Column(type="string", nullable="true") */
   private $lastName;
   
+  /** @Column(type="string", nullable="true") */
+  private $apiKey;
+  
   /** 
    * @ManyToOne(targetEntity="Program",cascade={"all"})
    * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
@@ -140,6 +143,22 @@ class User{
    */
   public function getLastName(){
     return $this->lastName;
+  }
+  
+  /**
+   * Generate apiKey
+   */
+  public function generateApiKey(){
+    //PHPs uniquid function is time based and therefor guessable
+    //So we get unique through uniquid and we get random by prefixing it with a part of an MD5
+    $this->apiKey = \uniqid(md5((mt_rand()*mt_rand()*$this->id) . $this->uniqueName . $this->lastName . $this->firstName));
+  }
+  
+  /**
+   * get apiKey
+   */
+  public function getApiKey(){
+    return $this->apiKey;
   }
 
   /**
