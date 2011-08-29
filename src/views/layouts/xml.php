@@ -22,10 +22,11 @@ foreach($messages as $message){
 }
 $response->appendChild($mxml);
 
-$body = new DOMDocument;
-$body->preserveWhiteSpace = true;
-$body->loadXML($layoutContent);
-$bodyNode = $xml->importNode($body->documentElement, true);
-$response->appendChild($bodyNode);
-
+if(!empty($layoutContent)){
+  $body = new DOMDocument;
+  $body->preserveWhiteSpace = true;
+  $body->loadXML($layoutContent);
+  $bodyNode = $xml->importNode($body->documentElement, true);
+  $response->appendChild($bodyNode);
+}
 echo $xml->saveXML();
