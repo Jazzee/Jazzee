@@ -7,8 +7,8 @@
  * @subpackage admin
  */
 class AdminLoginController extends \Jazzee\AdminController {
-  const MENU = '';
-  const TITLE = 'Login';
+  const MENU = 'My Account';
+  const TITLE = '';
   const PATH = 'login';
   const REQUIRE_AUTHORIZATION = false;
   const REQUIRE_APPLICATION = false;
