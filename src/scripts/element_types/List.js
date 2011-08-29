@@ -14,6 +14,16 @@ List.prototype.optionsBlock = function(){
   var optionsBlockDiv = JazzeeElement.prototype.optionsBlock.call(this);
   
   var div = $('<div>').addClass('listItems container').append($('<h5>').html('List Items'));
+  var sort = $('<a href="#">').html('Sort').bind('click', function(){
+    var ol = $('ol', $(this).parent());
+    $('li',ol).sort(function(a,b){  
+      return a.innerHTML.toUpperCase() > b.innerHTML.toUpperCase() ? 1 : -1;  
+    }).appendTo(ol);
+    ol.trigger('sortupdate');
+    return false;
+  });
+  
+  div.append(sort);
   var ol = $('<ol>');
   for(var i = 0; i<this.listItems.length; i++){
     ol.append(this.itemBlock(this.listItems[i]));
