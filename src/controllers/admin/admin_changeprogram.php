@@ -79,7 +79,7 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     if($user and $action=='index'){
       $userPrograms = $user->getPrograms();
-      return (parent::isAllowed($controller, 'anyProgram') or !empty($userPrograms));
+      return (parent::isAllowed($controller, 'anyprogram', $user) or !empty($userPrograms));
     }
     return parent::isAllowed($controller, $action, $user, $program, $application);
   }
