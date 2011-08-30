@@ -95,6 +95,36 @@ abstract class AbstractPage implements \Jazzee\Page {
   public function showReviewPage(){
     return true;
   }
+  
+  /**
+   * Convert an answer to an xml element
+   * @param \DomDocument $dom
+   * @param \Jazzee\Entity\Answer $answer
+   * @return \DomElement
+   */
+  protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer){
+    $answerXml = $dom->createElement('answer');
+    $answerXml->setAttribute('answerId', $answer->getId());
+    $answerXml->setAttribute('updatedAt', $answer->getUpdatedAt()->format('c'));
+    foreach($answer->getPage()->getElements() as $element){
+      $eXml = $dom->createElement('element');
+      $eXml->setAttribute('elementId', $element->getId());
+      $eXml->setAttribute('title', $element->getTitle());
+      $eXml->setAttribute('type', $element->getType()->getClass());
+      if($value = $element->getJazzeeElement()->rawValue($answer)) $eXml->appendChild($dom->createCDATASection($value));
+      $answerXml->appendChild($eXml);
+    }
+    $attachment = $dom->createElement('attachment');
+    if($answer->getAttachment()) $attachment->appendChild($dom->createCDATASection(base64_encode($answer->getAttachment()->getAttachment())));
+    $answerXml->appendChild($attachment);
+    
+    $children = $dom->createElement('children');
+    foreach($answer->getChildren() as $child){
+      $children->appendChild($this->xmlAnswer($dom, $child));
+    }
+    $answerXml->appendChild($children);
+    return $answerXml;
+  }
 }
 
 ?>

@@ -113,21 +113,7 @@ class Standard extends AbstractPage {
   public function getXmlAnswers(\DOMDocument $dom){
     $answers = array();
     foreach($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer){
-      $answerXml = $dom->createElement('answer');
-      $answerXml->setAttribute('answerId', $answer->getId());
-      $answerXml->setAttribute('updatedAt', $answer->getUpdatedAt()->format('c'));
-      foreach($this->_applicationPage->getPage()->getElements() as $element){
-        $eXml = $dom->createElement('element');
-        $eXml->setAttribute('elementId', $element->getId());
-        $eXml->setAttribute('title', $element->getTitle());
-        $eXml->setAttribute('type', $element->getType()->getClass());
-        if($value = $element->getJazzeeElement()->rawValue($answer)) $eXml->appendChild($dom->createCDATASection($value));
-        $answerXml->appendChild($eXml);
-      }
-      $attachment = $dom->createElement('attachment');
-      if($answer->getAttachment()) $attachment->appendChild($dom->createCDATASection(base64_encode($answer->getAttachment()->getAttachment())));
-      $answerXml->appendChild($attachment);
-      $answers[] = $answerXml;
+      $answers[] = $this->xmlAnswer($dom, $answer);
     }
     return $answers;
   }
