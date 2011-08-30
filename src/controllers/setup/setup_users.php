@@ -10,33 +10,43 @@ class SetupUsersController extends \Jazzee\AdminController {
   const TITLE = 'Program Users';
   const PATH = 'setup/users';
   
-  const ACTION_INDEX = 'Search Users';
-  const ACTION_PROGRAMROLES = 'Grant Permissions';
+  const ACTION_INDEX = 'View Users and Search Directory';
+  const ACTION_NEW = 'Add User to Program';
+  const ACTION_EDIT = 'Grant Permissions';
+  const ACTION_REMOVE = 'Remove User from program';
   const REQUIRE_APPLICATION = false;
   
   /**
-   * Search for a user to modify
+   * List users in the programa and earch for new users
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
-    $form->setAction($this->path('setup/users'));
+    $form->setAction($this->path("setup/users/index"));
     $field = $form->newField();
-    $field->setLegend('Search For New');
-    $element = $field->newElement('TextInput','firstName');
+    $field->setLegend('Find New Users');
+    $element = $field->newElement('TextInput','name');
     $element->setLabel('First Name');
 
     $element = $field->newElement('TextInput','lastName');
     $element->setLabel('Last Name');
     
+    $element = $field->newElement('TextInput','email');
+    $element->setLabel('Email Address');
+    
     $form->newButton('submit', 'Search');
     
     $results = array();  //array of all the users who match the search
     if($input = $form->processInput($this->post)){
-      $results = $this->_em->getRepository('\Jazzee\Entity\User')->findByName('%' . $input->get('firstName') . '%', '%' . $input->get('lastName') . '%');
+      $directory = $this->getAdminDirectory();
+      $attributes = array();
+      if($input->get('firstName')) $attributes[$this->_config->getLdapFirstNameAttribute()] = $input->get('firstName') . '*';
+      if($input->get('lastName')) $attributes[$this->_config->getLdapLastNameAttribute()] = $input->get('lastName') . '*';
+      if($input->get('email')) $attributes[$this->_config->getLdapEmailAddressAttribute()] = $input->get('email') . '*';
+      $results = $directory->search($attributes);
     }
-    
     $this->setVar('results', $results);
     $this->setVar('users', $this->_em->getRepository('\Jazzee\Entity\User')->findByProgram($this->_program));
+    $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findBy(array('program' => $this->_program->getId()), array('name'=>'asc')));
     $this->setVar('form', $form);
   }
   
@@ -44,10 +54,10 @@ class SetupUsersController extends \Jazzee\AdminController {
    * Edit a user
    * @param integer $userID
    */
-   public function actionProgramRoles($userID){ 
+   public function actionEdit($userID){ 
     if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
       $form = new \Foundation\Form();
-      $form->setAction($this->path('setup/users/programRoles/' . $userID));
+      $form->setAction($this->path('setup/users/edit/' . $userID));
       $field = $form->newField();
       $field->setLegend('Roles for ' . $user->getFirstName() . ' ' . $user->getLastName());
 
@@ -64,17 +74,59 @@ class SetupUsersController extends \Jazzee\AdminController {
       $form->newButton('submit', 'Save Changes');
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
-        //clear out all current global roles
+        //clear out all current program roles
         foreach($user->getRoles() as $role)if($role->getProgram() == $this->_program) $user->getRoles()->removeElement($role);            
-        
-        foreach($input->get('roles') as $roleID){
-          $role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program' => $this->_program->getId()));
-          $user->addRole($role);
+        $roles = $input->get('roles');
+        if(!empty($roles)){
+          foreach($input->get('roles') as $roleID){
+            if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program' => $this->_program->getId()))) $user->addRole($role);
+          }
         }
         $this->_em->persist($user);
         $this->addMessage('success', "Changes Saved Successfully");
         $this->redirectPath('setup/users');
       }
+    } else {
+      $this->addMessage('error', "Error: User #{$userID} does not exist.");
+    }
+  }
+  
+  /**
+   * Add a user to the program
+   * @param string $uniqueName
+   */
+  public function actionNew($uniqueName){
+    if(!$user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName))){
+      $directory = $this->getAdminDirectory();
+      $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $uniqueName));
+      if(!isset($result[0])){
+        $this->addMessage('error', "Unable to find entry in directory");
+        $this->redirectPath('setup/users');
+      }
+      $user = new \Jazzee\Entity\User();
+      $user->setUniqueName($result[0]['userName']);
+      $user->setFirstName($result[0]['firstName']);
+      $user->setLastName($result[0]['lastName']);
+      $user->setEmail($result[0]['emailAddress']);
+      $this->_em->persist($user);
+      $this->_em->flush();
+    }
+    $this->redirectPath('setup/users/edit/' . $user->getId());
+  }
+  
+  /**
+   * Remove a user from the program
+   * 
+   * just remove all the program roles
+   * @param integer $userID
+   */
+   public function actionRemove($userID){ 
+    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
+      //clear out all current program roles
+      foreach($user->getRoles() as $role)if($role->getProgram() == $this->_program) $user->getRoles()->removeElement($role);            
+      $this->_em->persist($user);
+      $this->addMessage('success', "User removed from program successfuly");
+      $this->redirectPath('setup/users');
     } else {
       $this->addMessage('error', "Error: User #{$userID} does not exist.");
     }

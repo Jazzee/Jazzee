@@ -303,7 +303,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository{
    * @return Doctrine\Common\Collections\Collection \Jazzee\Entity\User
    */
   public function findByProgram($program){
-    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u JOIN u.roles r WHERE r.program = :programId');
+    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u JOIN u.roles r WHERE r.program = :programId ORDER BY u.lastName, u.firstName');
     $query->setParameter('programId', $program->getId());
     return $query->getResult();
   }
