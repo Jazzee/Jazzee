@@ -1,4 +1,6 @@
 <?php
+ini_set('memory_limit', '1g');
+set_time_limit('120');
 /**
  * Data API
  * @author Jon Johnson <jon.johnson@ucsf.edu>
