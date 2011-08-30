@@ -34,5 +34,20 @@ class AdminLogoutController extends \Jazzee\AdminController {
   public function getNavigation(){
     return false;
   }
+  
+  /**
+   * Only for authenticated users
+   * @param string $controller
+   * @param string $action
+   * @param \Jazzee\Entity\User $user
+   * @param \Jazzee\Entity\Program $program
+   * @return bool
+   */
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
+    if($action=='index'){
+      return (bool)$user;
+    }
+    return parent::isAllowed($controller, $action, $user, $program, $application);
+  }
 }
 ?>

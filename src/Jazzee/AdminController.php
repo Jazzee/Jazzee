@@ -202,11 +202,6 @@ abstract class AdminController extends Controller{
     foreach($menus as $menu) $menu->sortLinks();
     if(empty($menus)) return false;  //if there are no controllers or no authorization there are no menus
     $this->_store->AdminControllerGetNavigation = $navigation;
-    if(!$this->_user){
-      $link = new \Foundation\Navigation\Link('Login');
-      $link->setHref($this->path('login'));
-      $navigation->addLink($link);
-    }
     return $navigation;
   }
   
