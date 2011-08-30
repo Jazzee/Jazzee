@@ -37,13 +37,13 @@ class User{
   private $apiKey;
   
   /** 
-   * @ManyToOne(targetEntity="Program",cascade={"all"})
+   * @ManyToOne(targetEntity="Program")
    * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   private $defaultProgram;
   
   /** 
-   * @ManyToOne(targetEntity="Cycle",cascade={"all"})
+   * @ManyToOne(targetEntity="Cycle")
    * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
    */
   private $defaultCycle;
@@ -216,6 +216,17 @@ class User{
   }
 
   /**
+   * Has role
+   * Check if a user has a role
+   * @param \Jazzee\Entity\Role $role
+   * @return boolean
+   */
+  public function hasRole(Role $role){
+    foreach($this->roles as $r) if($r == $role) return true;
+    return false;
+  }
+
+  /**
    * Add log
    *
    * @param Entity\Log $log
@@ -278,7 +289,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository{
    * @return Doctrine\Common\Collections\Collection \Jazzee\Entity\User
    */
   public function findByName($firstName, $lastName){
-    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u WHERE (u.firstName IS NULL OR u.firstName LIKE :firstName) AND (u.lastName IS NULL OR u.lastName LIKE :lastName)');
+    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u WHERE (u.firstName IS NULL OR u.firstName LIKE :firstName) AND (u.lastName IS NULL OR u.lastName LIKE :lastName) ORDER BY u.lastName, u.firstName');
     $query->setParameter('firstName', $firstName);
     $query->setParameter('lastName', $lastName);
     return $query->getResult();
