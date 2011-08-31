@@ -100,6 +100,9 @@ abstract class AdminController extends Controller{
           $this->_application = null;
         }
       }
+    } else {
+      //expire the store for non users - so there are no navigation or caching problems
+      $this->_store->expire();
     }
     
     if($this->_config->getAdminSessionLifetime()){
