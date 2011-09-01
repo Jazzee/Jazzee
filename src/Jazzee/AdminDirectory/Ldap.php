@@ -38,6 +38,7 @@ class Ldap implements \Jazzee\AdminDirectory{
   public function search(array $attributes){
     $result = array();
     $filters = array();
+    $filter = '';
     foreach($attributes as $key=>$value)$filters[] = "{$key}={$value}";
     if(count($filters) == 1){
       $filter = $filters[0];
