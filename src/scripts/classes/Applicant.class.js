@@ -181,6 +181,8 @@ Applicant.prototype.displayDecisions = function(json){
       {title: 'Undo Nomination', action: 'undoNominateDeny'}, 
       {title: 'Undo Decision', action: 'undoFinalAdmit'}, 
       {title: 'Undo Decision', action: 'undoFinalDeny'}, 
+      {title: 'Accept Offer', action: 'acceptOffer'}, 
+      {title: 'Decline Offer', action: 'declineOffer'},
       {title: 'Undo Offer Response', action: 'undoAcceptOffer'}, 
       {title: 'Undo Offer Response', action: 'undoDeclineOffer'}        
     ];

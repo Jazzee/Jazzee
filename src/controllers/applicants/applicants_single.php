@@ -32,6 +32,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_FINALDENY = 'Final Deny';
   const ACTION_UNDOFINALADMIT = 'Undo Final Admit';
   const ACTION_UNDOFINALDENY = 'Undo Final Deny';
+  const ACTION_ACCEPTOFFER = 'Accept Offer';
+  const ACTION_DECLINEOFFER = 'Decline Offer';
   const ACTION_UNDOACCEPTOFFER = 'Undo Accept Offer';
   const ACTION_UNDODECLINEOFFER = 'Undo Decline Offer';
   const ACTION_SETTLEPAYMENT = 'Settle Payment';
@@ -477,6 +479,30 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionUndoFinalDeny($applicantId){
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoFinalDeny();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Accept Offer
+   * @param integer $applicantId
+   */
+  public function actionAcceptOffer($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->acceptOffer();
+    $this->_em->persist($applicant);
+    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Decline Offer
+   * @param integer $applicantId
+   */
+  public function actionDeclineOffer($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->getDecision()->declineOffer();
     $this->_em->persist($applicant);
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
