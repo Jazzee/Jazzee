@@ -58,6 +58,9 @@ class AdminApiController extends \Jazzee\AdminController {
       case 'getapplicants':
         $this->getApplicants($dom, $this->post);
         break;
+      case 'listapplications':
+        $this->listApplications($dom, $this->post);
+        break;
       default: 
         $this->setLayoutVar('status', 'error');
         $this->addMessage('error', $this->post['type'] .' is not a recognized api request type');
@@ -101,6 +104,32 @@ class AdminApiController extends \Jazzee\AdminController {
         $applicantsXml->appendChild($this->singleApplicant($dom, $applicant, false));
     }
     $dom->appendChild($applicantsXml);
+  }
+  
+  /**
+   * List all the applications in the system where the user has access
+   * @param DOMDocument $dom
+   * @param array $post
+   */
+  protected function listApplications(DOMDocument $dom, array $post){
+    $applicationsXml = $dom->createElement("applications");
+    if($this->checkIsAllowed('admin_changeprogram', 'anyProgram')){
+      $programs = $this->_em->getRepository('\Jazzee\Entity\Program')->findAll();
+    } else {
+      $arr = $this->_user->getPrograms();
+      $programs = array();
+      foreach($arr as $id) $programs[] = $this->_em->getRepository('\Jazzee\Entity\Program')->find($id);
+    }
+    foreach($programs as $program){
+      foreach($this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($program) as $application){
+        $applicationXml = $dom->createElement('application',$application->getId());
+        $applicationXml->setAttribute('cycle', $application->getCycle()->getName());
+        $applicationXml->setAttribute('program', $application->getProgram()->getName());
+        
+        $applicationsXml->appendChild($applicationXml);
+      }
+    }
+    $dom->appendChild($applicationsXml);
   }
   
   /**
