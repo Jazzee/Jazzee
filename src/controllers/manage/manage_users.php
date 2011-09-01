@@ -27,7 +27,7 @@ class ManageUsersController extends \Jazzee\AdminController {
     $form->setAction($this->path("manage/users/index"));
     $field = $form->newField();
     $field->setLegend('Find New Users');
-    $element = $field->newElement('TextInput','name');
+    $element = $field->newElement('TextInput','firstName');
     $element->setLabel('First Name');
 
     $element = $field->newElement('TextInput','lastName');
