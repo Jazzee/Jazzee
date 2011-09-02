@@ -608,6 +608,30 @@ class GREScore{
   public function getProcessDate(){
     return $this->processDate;
   }
+  
+  /**
+   * Get all the fields of the score as an array
+   *
+   * @return array
+   */
+  public function getSummary(){
+    $arr = array(
+      'Registration Number' => $this->registrationNumber,
+      'Department Name' => $this->departmentName,
+      'First Name' => $this->firstName, 
+      'Middle Initial' => $this->middleInitial, 
+      'Last Name' => $this->lastName, 
+      'Birth Date' => $this->birthDate->format('m/d/Y'), 
+      'Gender' => $this->gender, 
+      'Test Date' => $this->testDate->format('m/d/Y'), 
+      'Test Name' => $this->testName, 
+      'Score 1' => $this->score1Type . ' ' . $this->score1Converted . ' ' . $this->score1Percentile .'%',
+      'Score 2' => $this->score2Type . ' ' . $this->score2Converted . ' ' . $this->score2Percentile .'%', 
+      'Score 3' => $this->score3Type . ' ' . $this->score3Converted . ' ' . $this->score3Percentile .'%', 
+      'Score 4' => $this->score4Type . ' ' . $this->score4Converted . ' ' . $this->score4Percentile .'%'
+    );
+    return $arr;
+  }
 }
 
 /**

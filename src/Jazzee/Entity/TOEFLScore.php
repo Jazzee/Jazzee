@@ -587,6 +587,43 @@ class TOEFLScore{
   public function getOffTopic(){
     return $this->offTopic;
   }
+  
+  /**
+   * Get all the fields of the score as an array
+   *
+   * @return array=
+   */
+  public function getSummary(){
+    $arr = array(
+      'Registration Number' => $this->registrationNumber,
+      'First Name' => $this->firstName, 
+      'Middle Name' => $this->middleName, 
+      'Last Name' => $this->lastName, 
+      'Birth Date' => $this->birthDate->format('m/d/Y'), 
+      'Gender' => $this->gender, 
+      'Native Country' => $this->nativeCountry, 
+      'Native Language' => $this->nativeLanguage, 
+      'Test Date' => $this->testDate->format('m/d/Y'), 
+      'Test Type' => $this->testType, 
+      'Listening Indicator' => $this->listeningIndicator, 
+      'Speaking Indicator' => $this->speakingIndicator, 
+      'IBT Listenting' => $this->IBTListening, 
+      'IBT Writing' => $this->IBTWriting, 
+      'IBT Speaking' => $this->IBTSpeaking, 
+      'IBT Reading' => $this->IBTReading, 
+      'IBT Total' => $this->IBTTotal, 
+      'TSE Score' => $this->TSEScore, 
+      'Listening' => $this->listening, 
+      'Writing' => $this->writing, 
+      'Reading' => $this->reading, 
+      'Essay' => $this->essay, 
+      'Total' => $this->total, 
+      'Times Taken' => $this->timesTaken, 
+      'Off Topic' => $this->offTopic
+    );
+    
+    return $arr;
+  }
 }
 
 /**
