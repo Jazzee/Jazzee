@@ -21,7 +21,7 @@ if(is_null($page->getMax())){
 }
 ?>
 <?php 
-if($completedAnswers < $page->getMin() and $completedAnswers < $totalAnswers) print '&nbsp;You must invite ' . ($page->getMin() - $completedAnswers) . ' more recommender(s) to complete this page.';
+if($completedAnswers < $page->getMin() and $completedAnswers < $totalAnswers) print '&nbsp;' . ($page->getMin() - $completedAnswers) . ' recommenders(s) still must be invited to submit their recommendations in order for your application to be complete.';
 else if($completedAnswers < $totalAnswers) print '&nbsp;You have not invited ' . ($totalAnswers - $completedAnswers) . ' of your recommenders.';
 ?>
 </p>
