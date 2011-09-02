@@ -17,7 +17,7 @@ if(is_null($page->getMax())){
 } else {
   if($page->getMax() - $totalAnswers == 0) print 'You cannot add any more recommenders to this page.';
   else if($totalAnswers >= $page->getMin()) print 'You may add an additional ' . ($page->getMax() - $totalAnswers) . ' recommenders on this page, but it is not required.';
-  else print 'You have added ' . $totalAnswers . ' of the ' . $page->getMin() . ' required recommendres on this page.';
+  else print 'You have added ' . $totalAnswers . ' of the ' . $page->getMin() . ' required recommenders on this page.';
 }
 ?>
 <?php 
