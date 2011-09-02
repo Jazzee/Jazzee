@@ -12,107 +12,125 @@ class AdminApiController extends \Jazzee\AdminController {
   const REQUIRE_AUTHORIZATION = false;
   const REQUIRE_APPLICATION = false;
   
-  public function actionIndex(){
+  /**
+   * Our DOM
+   * @var DOMDocument
+   */
+  protected $dom;
+  
+  /**
+   * API Version
+   * What XML version to return
+   * Not currently in use - but available for future use
+   * @var integer;
+   */
+  protected $version;
+  
+  /**
+   * If there is no application then create a new one to work with
+   */
+  protected function setUp(){
+    parent::setUp();
     $this->setLayout('xml');
     $this->setLayoutVar('filename', 'api.xml');
+    $this->dom = new DOMDocument();
+    $this->setVar('xml', $this->dom);
     
-    $dom = new DOMDocument();
-    $this->setVar('xml', $dom);
-    
-    if(empty($this->post['apiKey'])){
-      $this->setLayoutVar('status', 'error');
-      $this->addMessage('error', 'No "apiKey" parameter in request.');
-      return;
+    $versions = array(1);
+    if(empty($this->post['version']) or !in_array($this->post['version'], $versions)){
+        $this->setLayoutVar('status', 'error');
+        $this->addMessage('error', 'Invalid API Version');
+        $this->loadView('admin_api/index');
+        exit();
     }
-    if(!$this->_user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('apiKey'=>$this->post['apiKey']))){
-      $this->setLayoutVar('status', 'error');
-      $this->addMessage('error', 'Invalid api key.');
+    $this->version = $this->post['version'];
+    
+    if(empty($this->post['apiKey']) or !$this->_user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('apiKey'=>$this->post['apiKey']))){
       sleep(5);
-      return;
+      $this->setLayoutVar('status', 'error');
+      $this->addMessage('error', 'Invalid API Key');
+      $this->loadView('admin_api/index');
+      exit();
     }
-    
     if(!empty($this->post['applicationId'])){
       if(!$this->_application = $this->_em->getRepository('\Jazzee\Entity\Application')->find($this->post['applicationId'])){
         $this->setLayoutVar('status', 'error');
-        $this->addMessage('error', 'Invalid applicationId.');
-        return;
+        $this->addMessage('error', 'Invalid Application ID');
+        $this->loadView('admin_api/index');
+        exit();
       }
     }
-    
-    if(empty($this->post['type'])){
-      $this->setLayoutVar('status', 'error');
-      $this->addMessage('error', 'No "type" parameter in request.');
-      return;
-    }
-    
-    if(!$this->checkIsAllowed($this->controllerName, $this->post['type'])){
-      $this->setLayoutVar('status', 'error');
-      $this->addMessage('error', 'You do not have access to that.');
-      return;
-    }
-    
+  }
+  
+  public function actionIndex(){
     switch($this->post['type']){
       case 'listapplicants':
-        $this->listApplicants($dom, $this->post);
+        $this->listApplicants($this->post);
         break;
       case 'getapplicants':
-        $this->getApplicants($dom, $this->post);
+        $this->getApplicants($this->post);
         break;
       case 'listapplications':
-        $this->listApplications($dom, $this->post);
+        $this->listApplications($this->post);
         break;
       default: 
         $this->setLayoutVar('status', 'error');
         $this->addMessage('error', $this->post['type'] .' is not a recognized api request type');
     }
-   
-    
 	}
   
   /**
    * List all the applicants in a program
-   * @param DOMDocument $dom
    * @param array $post
    */
-  protected function listApplicants(DOMDocument $dom, array $post){
+  protected function listApplicants(array $post){
     if(!$this->_application){
       $this->setLayoutVar('status', 'error');
       $this->addMessage('error', 'This request requires an applicationId.');
       return;
     }
-    $applicantsXml = $dom->createElement("applicants");
-    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
-      $applicantsXml->appendChild($this->singleApplicant($dom, $applicant, true));
+    if(!$this->_user->isAllowed('applicants_list', 'index', $this->_application->getProgram())){
+      $this->setLayoutVar('status', 'error');
+      $this->addMessage('error', 'You do not have access to that.');
+      return;
     }
-    $dom->appendChild($applicantsXml);
+    
+    $applicantsXml = $this->dom->createElement("applicants");
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+      $applicantsXml->appendChild($this->singleApplicant($applicant, true));
+    }
+    $this->dom->appendChild($applicantsXml);
   }
   
   /**
    * Get details for individual applicants
-   * @param DOMDocument $dom
    * @param array $post
    */
-  protected function getApplicants(DOMDocument $dom, array $post){
+  protected function getApplicants(array $post){
     if(!$this->_application){
       $this->setLayoutVar('status', 'error');
       $this->addMessage('error', 'This request requires an applicationId.');
       return;
     }
-    $applicantsXml = $dom->createElement("applicants");
+    if(!$this->_user->isAllowed('applicants_single', 'index', $this->_application->getProgram())){
+      $this->setLayoutVar('status', 'error');
+      $this->addMessage('error', 'You do not have access to that.');
+      return;
+    }
+    $applicantsXml = $this->dom->createElement("applicants");
     foreach(explode(',',$post['list']) as $id){
       if($applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($id))
-        $applicantsXml->appendChild($this->singleApplicant($dom, $applicant, false));
+        $applicantsXml->appendChild($this->singleApplicant($applicant, false));
     }
-    $dom->appendChild($applicantsXml);
+    $this->dom->appendChild($applicantsXml);
   }
   
   /**
    * List all the applications in the system where the user has access
-   * @param DOMDocument $dom
    * @param array $post
    */
-  protected function listApplications(DOMDocument $dom, array $post){
-    $applicationsXml = $dom->createElement("applications");
+  protected function listApplications(array $post){
+    $applicationsXml = $this->dom->createElement("applications");
     if($this->checkIsAllowed('admin_changeprogram', 'anyProgram')){
       $programs = $this->_em->getRepository('\Jazzee\Entity\Program')->findAll();
     } else {
@@ -122,53 +140,52 @@ class AdminApiController extends \Jazzee\AdminController {
     }
     foreach($programs as $program){
       foreach($this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($program) as $application){
-        $applicationXml = $dom->createElement('application',$application->getId());
+        $applicationXml = $this->dom->createElement('application',$application->getId());
         $applicationXml->setAttribute('cycle', $application->getCycle()->getName());
-        $applicationXml->setAttribute('program', $application->getProgram()->getName());
+        $applicationXml->setAttribute('program', $application->getProgram()->getShortName());
         
         $applicationsXml->appendChild($applicationXml);
       }
     }
-    $dom->appendChild($applicationsXml);
+    $this->dom->appendChild($applicationsXml);
   }
   
   /**
    * Single applicants xml
-   * @param DomDocument $dom
    * @param \Jazzee\Entity\Applicant $applicant
    * @param boolean $partial - fetch only applicant not answers
    * @return DOMElement
    */
-  protected function singleApplicant(DOMDocument $dom, \Jazzee\Entity\Applicant $applicant, $partial = true){
-    $applicantXml = $dom->createElement("applicant");
-    $account = $dom->createElement("account");
-    $account->appendChild($dom->createElement('id', $applicant->getId()));
-    $account->appendChild($dom->createElement('firstName', $applicant->getFirstName()));
-    $account->appendChild($dom->createElement('middleName', $applicant->getMiddleName()));
-    $account->appendChild($dom->createElement('lastName', $applicant->getLastName()));
-    $account->appendChild($dom->createElement('suffix', $applicant->getSuffix()));
-    $account->appendChild($dom->createElement('email', $applicant->getEmail()));
-    $account->appendChild($dom->createElement('isLocked', $applicant->isLocked()?'yes':'no'));
-    $account->appendChild($dom->createElement('lastLogin', $applicant->getLastLogin()->format('c')));
-    $account->appendChild($dom->createElement('updatedAt', $applicant->getLastLogin()->format('c')));
-    $account->appendChild($dom->createElement('createdAt', $applicant->getLastLogin()->format('c')));
+  protected function singleApplicant(\Jazzee\Entity\Applicant $applicant, $partial = true){
+    $applicantXml = $this->dom->createElement("applicant");
+    $account = $this->dom->createElement("account");
+    $account->appendChild($this->dom->createElement('id', $applicant->getId()));
+    $account->appendChild($this->dom->createElement('firstName', $applicant->getFirstName()));
+    $account->appendChild($this->dom->createElement('middleName', $applicant->getMiddleName()));
+    $account->appendChild($this->dom->createElement('lastName', $applicant->getLastName()));
+    $account->appendChild($this->dom->createElement('suffix', $applicant->getSuffix()));
+    $account->appendChild($this->dom->createElement('email', $applicant->getEmail()));
+    $account->appendChild($this->dom->createElement('isLocked', $applicant->isLocked()?'yes':'no'));
+    $account->appendChild($this->dom->createElement('lastLogin', $applicant->getLastLogin()->format('c')));
+    $account->appendChild($this->dom->createElement('updatedAt', $applicant->getLastLogin()->format('c')));
+    $account->appendChild($this->dom->createElement('createdAt', $applicant->getLastLogin()->format('c')));
     $applicantXml->appendChild($account);
     
-    $decision = $dom->createElement("decision");
-    $decision->appendChild($dom->createElement('status', $applicant->getDecision()?$applicant->getDecision()->status():'none'));
-    $decision->appendChild($dom->createElement('nominateAdmit', ($applicant->getDecision() and $applicant->getDecision()->getNominateAdmit())?$applicant->getDecision()->getNominateAdmit()->format('c'):''));
-    $decision->appendChild($dom->createElement('nominateDeny', ($applicant->getDecision() and $applicant->getDecision()->getNominateDeny())?$applicant->getDecision()->getNominateDeny()->format('c'):''));
-    $decision->appendChild($dom->createElement('finalAdmit', ($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit())?$applicant->getDecision()->getFinalAdmit()->format('c'):''));
-    $decision->appendChild($dom->createElement('finalDeny', ($applicant->getDecision() and $applicant->getDecision()->getFinalDeny())?$applicant->getDecision()->getFinalDeny()->format('c'):''));
-    $decision->appendChild($dom->createElement('acceptOffer', ($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer())?$applicant->getDecision()->getAcceptOffer()->format('c'):''));
-    $decision->appendChild($dom->createElement('declineOffer', ($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer())?$applicant->getDecision()->getDeclineOffer()->format('c'):''));
+    $decision = $this->dom->createElement("decision");
+    $decision->appendChild($this->dom->createElement('status', $applicant->getDecision()?$applicant->getDecision()->status():'none'));
+    $decision->appendChild($this->dom->createElement('nominateAdmit', ($applicant->getDecision() and $applicant->getDecision()->getNominateAdmit())?$applicant->getDecision()->getNominateAdmit()->format('c'):''));
+    $decision->appendChild($this->dom->createElement('nominateDeny', ($applicant->getDecision() and $applicant->getDecision()->getNominateDeny())?$applicant->getDecision()->getNominateDeny()->format('c'):''));
+    $decision->appendChild($this->dom->createElement('finalAdmit', ($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit())?$applicant->getDecision()->getFinalAdmit()->format('c'):''));
+    $decision->appendChild($this->dom->createElement('finalDeny', ($applicant->getDecision() and $applicant->getDecision()->getFinalDeny())?$applicant->getDecision()->getFinalDeny()->format('c'):''));
+    $decision->appendChild($this->dom->createElement('acceptOffer', ($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer())?$applicant->getDecision()->getAcceptOffer()->format('c'):''));
+    $decision->appendChild($this->dom->createElement('declineOffer', ($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer())?$applicant->getDecision()->getDeclineOffer()->format('c'):''));
     $applicantXml->appendChild($decision);
     
-    $tags = $dom->createElement("tags");
+    $tags = $this->dom->createElement("tags");
     foreach($applicant->getTags() as $tag){
-      $tagXml = $dom->createElement('tag');
+      $tagXml = $this->dom->createElement('tag');
       $tagXml->setAttribute('tagId', $tag->getId());
-      $tagXml->appendChild($dom->createCDATASection($tag->getTitle()));
+      $tagXml->appendChild($this->dom->createCDATASection($tag->getTitle()));
       $tags->appendChild($tagXml);
     }
     $applicantXml->appendChild($tags);
@@ -176,14 +193,14 @@ class AdminApiController extends \Jazzee\AdminController {
     
     $applicationPages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));  
     
-    $pages = $dom->createElement("pages");
+    $pages = $this->dom->createElement("pages");
     foreach($applicationPages as $applicationPage){
-      $page = $dom->createElement("page");
+      $page = $this->dom->createElement("page");
       $page->setAttribute('title', htmlentities($applicationPage->getTitle()));
       $page->setAttribute('pageId', $applicationPage->getPage()->getId());
-      $answersXml = $dom->createElement('answers');
+      $answersXml = $this->dom->createElement('answers');
       $applicationPage->getJazzeePage()->setApplicant($applicant);
-      foreach($applicationPage->getJazzeePage()->getXmlAnswers($dom) as $answerXml){
+      foreach($applicationPage->getJazzeePage()->getXmlAnswers($this->dom) as $answerXml){
         $answersXml->appendChild($answerXml);
       }
       $page->appendChild($answersXml);
