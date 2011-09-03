@@ -89,11 +89,31 @@ abstract class AdminController extends Controller{
       $this->_user = $this->_adminAuthentication->getUser();
       $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findBestCycle();
       
-      if($this->_user->getDefaultCycle()) $this->_cycle = $this->_user->getDefaultCycle();
-      if($this->_user->getDefaultProgram()) $this->_program = $this->_user->getDefaultProgram();
+      if($this->_user->getDefaultCycle()){
+        $this->_cycle = $this->_user->getDefaultCycle();
+      } else {
+        if($cycles = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findAll()){
+           $cycle = array_pop($cycles);
+           $this->_cycle = $cycle;
+           $this->_user->setDefaultCycle($cycle);
+           $this->_em->persist($this->_user);
+        }
+      }
+      if($this->_user->getDefaultProgram()){
+        $this->_program = $this->_user->getDefaultProgram();
+      } else {
+        if($programs = $this->_user->getPrograms()){
+          $programId = array_pop($programs);
+          $program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($programId);
+          $this->_program = $program;
+          $this->_user->setDefaultProgram($program);
+          $this->_em->persist($this->_user);
+        }
+      }
       
       if(isset($this->_store->currentProgramId)) $this->_program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($this->_store->currentProgramId);
       if(isset($this->_store->currentCycleId)) $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($this->_store->currentCycleId);
+
       
       if($this->_cycle AND $this->_program){
         if(!$this->_application = $this->_em->getRepository('Jazzee\Entity\Application')->findOneByProgramAndCycle($this->_program,$this->_cycle)){
