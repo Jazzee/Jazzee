@@ -19,6 +19,7 @@ class AdminCronController extends \Jazzee\AdminController {
     if(!$this->semaphore()){
       throw new Exception('Cron tried to run, but the semephore was still set');
     }
+    
     foreach($this->listControllers() as $controller){
       \Foundation\VC\Config::includeController($controller);
       $class = \Foundation\VC\Config::getControllerClassName($controller);
@@ -26,6 +27,14 @@ class AdminCronController extends \Jazzee\AdminController {
         $class::runCron($this);
       }   
     }
+    
+    foreach($this->_em->getRepository('\Jazzee\Entity\PageType')->findAll() as $pageType){
+      $class = $pageType->getClass();
+      if(method_exists($class, 'runCron')){
+        $class::runCron($this);
+      }   
+    }
+    
     //clear the semephore
     $this->setVar('adminCronSemephore', false);
     //cron outputs nothing
