@@ -175,7 +175,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     // Get Transaction Details
     $transactionId = $payment->getVar('transactionId');
     $response = $td->getTransactionDetails($transactionId);
-    if($response->isError())
+    if(!$response->response or $response->isError())
       throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
     //has this transaction has been settled already
     if($response->xml->transaction->transactionStatus == 'settledSuccessfully'){
@@ -184,10 +184,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       return true;
     } else if($response->xml->transaction->transactionStatus == 'voided'){
       $payment->rejected();
-      if(isset($input->reason))
-        $payment->setVar('rejectedReason', $input->reason);
-      else
-        $payment->setVar('rejectedReason', 'This payment was voided.');
+      $payment->setVar('rejectedReason', 'This payment was voided.');
       return true;
     }
     return false;
@@ -274,5 +271,22 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       return true;
     }
     return false;
+  }
+  
+  /**
+   * Attempt to settle payments
+   * @param AdminCronController $cron
+   */
+  public static function runCron(\AdminCronController $cron){
+    $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class'=>'\Jazzee\Entity\PaymentType\AuthorizeNetAIM'));
+    $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type'=>$paymentType->getId(), 'status'=>\Jazzee\Entity\Payment::PENDING),array(), 100);
+    $class = new AuthorizeNetAIM($paymentType);
+    $fakeInput = new \Foundation\Form\Input(array());
+    foreach($payments as $payment){
+      if($class->settlePayment($payment, $fakeInput)){
+        $cron->getEntityManager()->persist($payment);
+        foreach($payment->getVariables() as $var) $cron->getEntityManager()->persist($var);
+      } 
+    }
   }
 }
