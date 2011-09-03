@@ -203,6 +203,8 @@ PHPDoc:
   phpdoc -t phpdocs/ -f AuthorizeNet.php -d lib
 
 Release Notes
+    Version 1.1.6
+    - Added the HTML version of the README to the distributed bundle. It was missing in version 1.1.5.
     Version 1.1.5
     - Added HTML version of README.
     Version 1.1.4
