@@ -821,6 +821,27 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->loadView($this->controllerName . '/form');
   }
   
+  /**
+   * Do something with a page
+   * Passes everything off to the page to perform a special action
+   * @param integer $applicantId
+   * @param string $what the special method name
+   * @param integer $pageId
+   */
+  public function actionPageDo($applicantId, $what, $pageId){
+    $applicant = $this->getApplicantById($applicantId);
+    $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
+    $pageEntity->getJazzeePage()->setApplicant($applicant);
+    $pageEntity->getJazzeePage()->setController($this);
+    if(method_exists($pageEntity->getJazzeePage(), $what)){
+      $form = $pageEntity->getJazzeePage()->$what($this->post, true);
+      $form->setAction($this->path("applicants/single/{$applicantId}/pageDo/{$what}/{$pageId}"));
+      $this->setVar('form', $form);
+      if(!empty($this->post)) $this->setLayoutVar('textarea', true);
+    }
+    $this->loadView($this->controllerName . '/form');
+  }
+  
   public function getActionPath(){
     return null;
   }
@@ -828,7 +849,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     //several views are controller by the complete action
     if(in_array($action, array('refresh', 'refreshPage'))) $action = 'index';
-    if(in_array($action, array('do'))) $action = 'editAnswer';
+    if(in_array($action, array('do', 'pageDo'))) $action = 'editAnswer';
     return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }

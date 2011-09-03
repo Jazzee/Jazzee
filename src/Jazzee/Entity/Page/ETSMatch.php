@@ -63,6 +63,64 @@ class ETSMatch extends Standard {
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
   }
   
+  /**
+   * Find Possible gre score matches
+   * @param integer $answerID
+   * @param array $postData
+   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
+   */
+  public function findScores($postData, $bool){
+    $form = new \Foundation\Form;
+    $field = $form->newField();
+    $field->setLegend('Find Matching Scores');
+    $element = $field->newElement('CheckboxList', 'greMatches');
+    $element->setLabel('Possible GRE');
+    foreach($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score){
+      $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleInitial() . ' ' . $score->getTestDate()->format('m/d/Y'));
+    }
+    
+    $element = $field->newElement('CheckboxList', 'toeflMatches');
+    $element->setLabel('Possible TOEFL');
+    foreach($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score){
+      $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleName() . ' ' . $score->getTestDate()->format('m/d/Y'));
+    }
+    $form->newButton('submit', 'Match Scores');
+    if(!empty($postData)){
+      //create a blank for so it can get values from parent::newAnswer
+      $this->_form = new \Foundation\Form();
+      if($input = $form->processInput($postData)){
+        if($input->get('greMatches')){
+          foreach($input->get('greMatches') as $scoreId){
+            $score = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->find($scoreId);
+            $arr = array(
+              'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getId() => $score->getRegistrationNumber(),
+              'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getId() => $score->getTestDate()->format('c'),
+              'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getId() => $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getItemByValue('GRE/GRE Subject')->getId()
+            );
+            $newInput = new \Foundation\Form\Input($arr);
+            $this->newAnswer($newInput);
+          }
+        }
+        if($input->get('toeflMatches')){
+          foreach($input->get('toeflMatches') as $scoreId){
+            $score = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->find($scoreId);
+            $arr = array(
+              'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getId() => $score->getRegistrationNumber(),
+              'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getId() => $score->getTestDate()->format('c'),
+              'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getId() => $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getItemByValue('TOEFL')->getId()
+            );
+            $newInput = new \Foundation\Form\Input($arr);
+            $this->newAnswer($newInput);
+          }
+        }
+        $this->_controller->setLayoutVar('status', 'success');
+      } else {
+        $this->_controller->setLayoutVar('status', 'error');
+      }
+    }
+    return $form;
+  }
+  
 /**
    * Create the ets match form
    * @param Entity\Page $page
