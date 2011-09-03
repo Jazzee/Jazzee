@@ -138,4 +138,17 @@ class Payment extends Standard {
       $this->_controller->getEntityManager()->persist($var);
     }    
   }
+  
+  /**
+   * Rus cron jobs for payments types
+   * @param AdminCronController $cron
+   */
+  public static function runCron(\AdminCronController $cron){
+    foreach($cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findAll() as $paymentType){
+      $class = $paymentType->getClass();
+      if(method_exists($class, 'runCron')){
+        $class::runCron($cron);
+      }
+    }
+  }
 }
