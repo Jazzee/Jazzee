@@ -36,6 +36,9 @@ class User{
   /** @Column(type="string", nullable="true") */
   private $apiKey;
   
+  /** @Column(type="boolean", nullable="false") */
+  private $isActive;
+  
   /** 
    * @ManyToOne(targetEntity="Program")
    * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
@@ -61,6 +64,7 @@ class User{
   
 
   public function __construct(){
+    $this->isActive = true;
     $this->roles = new \Doctrine\Common\Collections\ArrayCollection();
   }
   
@@ -160,7 +164,32 @@ class User{
   public function getApiKey(){
     return $this->apiKey;
   }
-
+  
+  /**
+   * Is the user active
+   * @return boolean
+   */
+  public function isActive(){
+    return $this->isActive;
+  }
+  
+  /**
+   * Active User
+   * 
+   */
+  public function activate(){
+    $this->isActive = true;
+  }
+  
+  /**
+   * Deactivate User
+   */
+  public function deActivate(){
+    $this->isActive = false;
+    $this->roles->clear();
+  }
+  
+  
   /**
    * Set defaultProgram
    *

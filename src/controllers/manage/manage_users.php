@@ -101,7 +101,8 @@ class ManageUsersController extends \Jazzee\AdminController {
    */
    public function actionRemove($userID){ 
     if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
-      $this->_em->remove($user);
+      $user->deactivate();
+      $this->_em->persist($user);
       $this->addMessage('success', "User Removed");
       $this->redirectPath('manage/users');
     } else {

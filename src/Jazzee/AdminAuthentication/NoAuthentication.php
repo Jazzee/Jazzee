@@ -28,7 +28,7 @@ class NoAuthentication implements \Jazzee\AdminAuthentication{
     
     $allowedIps = explode(',', $config->getNoAuthIpAddresses());
     if(in_array($_SERVER['REMOTE_ADDR'], $allowedIps)){
-      $this->_user = $em->getRepository('\Jazzee\Entity\User')->find($config->getNoAuthUserId());
+      $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('id'=>$config->getNoAuthUserId(), 'isActive'=>true));
     }
   }
   

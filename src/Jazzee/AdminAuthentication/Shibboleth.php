@@ -33,7 +33,7 @@ class Shibboleth implements \Jazzee\AdminAuthentication{
       $lastName = $_SERVER[$config->getShibbolethLastNameAttribute()];
       $mail = $_SERVER[$config->getShibbolethEmailAddressAttribute()];
       
-      $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName));
+      $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName, 'isActive'=>true));
       if($this->_user){
         $this->_user->setFirstName($firstName);
         $this->_user->setLastName($lastName);
