@@ -11,7 +11,7 @@ $this->renderElement('form', array('form'=>$form));?>
   <h5>Results</h5>
   <ul>
   <?php foreach($results as $result){ ?>
-  <li><?php print $result['lastName'] . ', ' . $result['firstName'] . ' (' . $result['emailAddress'] . ')' ?> 
+  <li><?php print $result['lastName'] . ', ' . $result['firstName'] . ' (' . ($result['emailAddress']?$result['emailAddress']:'no email') . ') (' . $result['userName'] . ')' ?> 
     <?php if($this->controller->checkIsAllowed('manage_users', 'new')){ ?>
     (<a href='<?php print $this->path('manage/users/new/') . $result['userName']?>'>Add User</a>)
     <?php }?>
