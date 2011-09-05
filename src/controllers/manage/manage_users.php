@@ -48,7 +48,7 @@ class ManageUsersController extends \Jazzee\AdminController {
       $results = $directory->search($attributes);
     }
     $this->setVar('results', $results);
-    $this->setVar('users', $this->_em->getRepository('\Jazzee\Entity\User')->findByName('%', '%'));
+    $this->setVar('users', $this->_em->getRepository('\Jazzee\Entity\User')->findBy(array('isActive'=>true), array('lastName'=>'asc', 'firstName'=>'asc')));
     $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findByIsGlobal(true));
     $this->setVar('form', $form);
   }
@@ -153,11 +153,15 @@ class ManageUsersController extends \Jazzee\AdminController {
   /**
    * Add a user
    * Add new user
-   * @param integer $uniqueName
+   * @param string $uniqueName
    */
   public function actionNew($uniqueName){
-    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->findBy(array('uniqueName'=>$uniqueName))){
-      $this->addMessage('error', "Error: User exists");
+    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName))){
+      if(!$user->isActive()){
+        $user->activate();
+        $this->_em->persist($user);
+        $this->addMessage('success', "User Account Activated");
+      }
     } else {
       $directory = $this->getAdminDirectory();
       $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $uniqueName));
@@ -171,10 +175,10 @@ class ManageUsersController extends \Jazzee\AdminController {
       $user->setLastName($result[0]['lastName']);
       $user->setEmail($result[0]['emailAddress']);
       $this->_em->persist($user);
-      $this->_em->flush();
-      $this->addMessage('success', "User Added");
-      $this->redirectPath('manage/users/edit/' . $user->getId());
+      $this->_em->flush(); //flush early to get the ID
+      $this->addMessage('success', "New User Account Created");
     }
+    $this->redirectPath('manage/users/edit/' . $user->getId());
   }
 }
 ?>

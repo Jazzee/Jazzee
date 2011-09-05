@@ -96,7 +96,13 @@ class SetupUsersController extends \Jazzee\AdminController {
    * @param string $uniqueName
    */
   public function actionNew($uniqueName){
-    if(!$user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName))){
+    if($user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName))){
+      if(!$user->isActive()){
+        $user->activate();
+        $this->_em->persist($user);
+        $this->addMessage('success', "User Account Activated");
+      }
+    } else {
       $directory = $this->getAdminDirectory();
       $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $uniqueName));
       if(!isset($result[0])){
