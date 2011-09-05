@@ -59,10 +59,18 @@ p.copy{
   background-image: url(resource/foundation/media/icons/page_copy.png);
 }
 
-span.deactivate{
-  background-image: url('resource/foundation/media/icons/bullet_delete.png);
+li.inactive span.listItemToggle{
+  background-image: url('resource/foundation/media/icons/bullet_add.png');
   padding-left: 16px;
   background-repeat: no-repeat;
+  text-indent: -9999px;
+}
+
+li.active span.listItemToggle{
+  background-image: url('resource/foundation/media/icons/bullet_delete.png');
+  padding-left: 16px;
+  background-repeat: no-repeat;
+  text-indent: -9999px;
 }
 
 div.listItems li.inactive{

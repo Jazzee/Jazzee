@@ -61,22 +61,29 @@ List.prototype.optionsBlock = function(){
  */
 List.prototype.itemBlock = function(item){
   var element = this;
-  var li = $('<li>').addClass((item.isActive)?'active':'inactive').data('item',item).html(item.value).bind('click', function(){
-  $(this).unbind('click');
+  var toggleSpan = $('<span>').addClass('listItemToggle');
+  toggleSpan.bind('click', function(){
+    item.isActive = !item.isActive;
+    element.isModified = true;
+    $(this).parent().replaceWith(element.itemBlock(item));
+  });
+  
+  var valueSpan = $('<span>').addClass('listItemValue').html(item.value);
+  valueSpan.bind('click', function(){
+    $(this).unbind('click');
     var field = $('<input>').attr('type', 'text').attr('value',item.value)
-    .bind('change', function(){
-      item.value = $(this).val();
-    }).bind('blur', function(){
-      $(this).parent().replaceWith(element.itemBlock(item));
-    });
+      .bind('change', function(){
+        item.value = $(this).val();
+      }).bind('blur', function(){
+        element.isModified = true;
+        $(this).parent().parent().replaceWith(element.itemBlock(item));
+      });
     $(this).empty().append(field);
     $(field).trigger('focus');
   });
-//  var span = $('<span>').html('&nbsp;').addClass('deactivate').bind('click', function(e){
-//    element.toggleItemActive(item);
-//    $(this).parent().removeClass('active').removeClass('inactive').addClass((item.active)?'active':'inactive');
-//  });
-//  li.prepend(span);
+  var li = $('<li>').addClass((item.isActive)?'active':'inactive').data('item',item);
+  li.append(toggleSpan);
+  li.append(valueSpan);
   return li;
 };
 
@@ -92,7 +99,6 @@ List.prototype.newListItem = function(value){
   return item;
 };
 
-
 /**
  * Add a new item to the list
  * @param {String} value the items text
@@ -101,3 +107,4 @@ List.prototype.addListItem = function(item){
   this.listItems.push(item);
   return item;
 };
+
