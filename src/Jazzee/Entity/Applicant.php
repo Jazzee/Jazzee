@@ -529,6 +529,15 @@ class Applicant{
     $this->attachments[] = $attachment;
     if($attachment->getApplicant() != $this) $attachment->setApplicant($this);
   }
+
+  /**
+   * Remove attachment
+   *
+   * @param \Jazzee\Entity\Attachment $attachment
+   */
+  public function removeAttachment(Attachment $attachment){
+    $this->attachments->removeElement($attachment);
+  }
   
   /**
    * Get attachments
@@ -536,7 +545,9 @@ class Applicant{
    * @return Doctrine\Common\Collections\Collection $attachments
    */
   public function getAttachments(){
-    return $this->attachments;
+    $attachments = array();
+    foreach($this->attachments as $attachment) if($attachment->getAnswer() == null) $attachments[] = $attachment;
+    return $attachments;
   }
 
   /**

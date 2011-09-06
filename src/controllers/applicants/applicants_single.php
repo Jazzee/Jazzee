@@ -795,7 +795,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     
     if($attachment = $this->_em->getRepository('\Jazzee\Entity\Attachment')->findOneBy(array('id'=>$attachmentId, 'applicant'=>$applicant->getId()))){
-      $applicant->getAttachments()->removeElement($attachment);
+      $applicant->removeAttachment($attachment);
       $this->_em->remove($attachment);
       $applicant->markLastUpdate();
       $this->_em->persist($applicant);
