@@ -18,6 +18,7 @@ class ETSMatch extends Standard {
    * @param \Jazzee\Entity\Answer
    */
   public function matchScore(\Jazzee\Entity\Answer $answer){
+    if($answer->getPageStatus() == self::SKIPPED) return;
     if(!is_null($answer->getGREScore()) and !is_null($answer->getTOEFLScore())) return; //we already have a match
     $testType = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer);
     $registrationNumber = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer);
