@@ -52,8 +52,13 @@ class PDFFileInput extends AbstractElement {
       $name = $this->_element->getTitle() . '_' . $elementsAnswers[0]->getId();
       
       $config = new \Jazzee\Configuration();
+      $path = $config->getVarPath()?$config->getVarPath():__DIR__ . '/../../../../var';
+      if(!$varPath = \realpath($path) or !\is_dir($varPath) or !\is_writable($varPath)){
+        if($varPath) $path = $varPath; //nicer error message if the path exists
+        throw new \Jazzee\Exception("{$path} is not readable by the webserver so we cannot use it for caching PDF files");
+      }
       $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $answer->getUpdatedAt()->format('c'));
-      $cachePath = $config->getVarPath() . '/cache/' . (sha1('applicant' . $answer->getApplicant()->getId() . 'answer' . $answer->getId() . 'element' . $this->_element->getId() . 'elementAnswer' . $elementsAnswers[0]->getId())) . '.pdfPreview.png';
+      $cachePath = $varPath . '/cache/' . (sha1('applicant' . $answer->getApplicant()->getId() . 'answer' . $answer->getId() . 'element' . $this->_element->getId() . 'elementAnswer' . $elementsAnswers[0]->getId())) . '.pdfPreview.png';
       $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0, $cachePath), $answer->getUpdatedAt()->format('c'));
 
       $session = new \Foundation\Session();

@@ -250,7 +250,7 @@ class JazzeePageController extends \Foundation\VC\Controller
    * @return string the contents of the preview
    */
   public function pdfThumbnail($uniqueName, $blob){
-    $cachePath = $this->_config->getVarPath() . '/cache/' . (sha1($uniqueName)) . '.pdfPreview.png';
+    $cachePath = $this->getVarPath() . '/cache/' . (sha1($uniqueName)) . '.pdfPreview.png';
     return \thumbnailPDF($blob, 100, 0, $cachePath);
   }
   
