@@ -13,6 +13,7 @@ Applicant.prototype.init = function(){
     self.workspace
       .append($('<div>').attr('id', 'bio'))
       .append($('<div>').attr('id', 'status'))
+      .append($('<div>').attr('id', 'threads').addClass('discussion'))
       .append($('<div>').attr('id', 'pages'))
       .append($('<div>').attr('id', 'attachments'));
     var statusTable = $('<table>').attr('id', 'statusTable');
@@ -20,6 +21,7 @@ Applicant.prototype.init = function(){
     statusTable.append($('<tbody>').append('<tr><td id="actions"></td><td id="decisions"></td><td id="tags"></td></tr>'));
     $('#status').html(statusTable);
     self.displayBio(json.data.result.bio);
+    self.displayThreads(json.data.result.threads);
     self.displayActions(json.data.result.actions);
     self.displayDecisions(json.data.result.decisions);
     self.displayTags(json.data.result.tags);
@@ -318,7 +320,7 @@ Applicant.prototype.catchPageLinks = function(pageId){
 };
 
 /**
- * Display PDFs
+ * Display Attachments
  * @param Object json
  */
 Applicant.prototype.displayAttachments = function(json){
@@ -353,6 +355,30 @@ Applicant.prototype.displayAttachments = function(json){
       return false;
     });
     $('#attachments').append(a);
+  }
+};
+
+
+/**
+ * Display Threads
+ * @param Object json
+ */
+Applicant.prototype.displayThreads = function(json){
+  $('#threads').empty();
+  if(json.allowed){
+    $('#threads').append($('<h4>').html('Applicant Messages'));
+    var self = this;
+    var table = $('<table>').append('<thead><tr><th></th><th>Sent</th><th>Subject</th></tr></thead>');
+    for(var i=0; i<json.threads.length; i++){
+      var tr = $('<tr>').attr('id','thread'+json.threads[i].id).data('threadId', json.threads[i].id);
+      tr.append($('<td>').addClass(json.threads[i].unreadMessages?'unread': 'read'));
+      tr.append($('<td>').html(json.threads[i].createdAt));
+      var a = $('<a>').html(json.threads[i].subject).attr('href', json.threads[i].link);
+      tr.append($('<td>').append(a));
+      $(table).append(tr);
+    }
+    $('#threads').append(table);
+    $('#threads').append($('<a>').html('New Message').attr('href', json.link));
   }
   
 };

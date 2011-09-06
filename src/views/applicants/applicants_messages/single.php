@@ -6,7 +6,8 @@ $count = 0;
 ?>
 <a href='<?php print $this->path('applicants/messages');?>'>Unread Messages</a><br />
 <a href='<?php print $this->path('applicants/messages/all');?>'>All Messages</a>
-<h1><?php print $thread->getSubject(); ?></h1>
+<h1><?php print $thread->getSubject();?></h1>
+<h3>Applicant: <a href='<?php print $this->controller->path('applicants/single/' . $thread->getApplicant()->getId());?>'><?php print $thread->getApplicant()->getFullName();?></a></h3>
 <div class='threaded'>
   <?php foreach($thread->getMessages() as $message){ ?>
     <div class='<?php print ($message->isRead(\Jazzee\Entity\Message::APPLICANT)?'read':'unread'); ?>'>

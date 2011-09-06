@@ -78,6 +78,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
      'decisions' => $this->getDecisions($applicant),
      'tags' => $this->getTags($applicant),
      'attachments' => $this->getAttachments($applicant),
+     'threads' => $this->getThreads($applicant),
      'pages' => $this->getPages($applicant)
     );
     $this->layout = 'json'; //set the layout back since getPages changes it
@@ -226,6 +227,29 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       );
     }
     return $attachments;
+  }
+  
+  /**
+   * Get an applicants threads
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  protected function getThreads(\Jazzee\Entity\Applicant $applicant){
+    $threads = array(
+      'threads'=>array(),
+      'link' => $this->path('applicants/messages/new/' . $applicant->getId()),
+      'allowed' => $this->checkIsAllowed('applicants_messages')
+    );
+    
+    foreach($applicant->getThreads() as $thread){
+      $threads['threads'][] = array(
+        'id' => $thread->getId(),
+        'createdAt' => $thread->getCreatedAt()->format('l F jS Y \a\t g:ia'),
+        'subject' => $thread->getSubject(),
+        'link' => $this->path('applicants/messages/single/' . $thread->getId()),
+        'unreadMessages' => $thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)
+      );
+    }
+    return $threads;
   }
   
   /**

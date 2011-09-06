@@ -94,6 +94,62 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   }
   
   /**
+   * New Message to applicant
+   * @param $applicantId
+   */
+  public function actionNew($applicantId = false) {
+    if($applicantId) $applicant = $this->getApplicantById($applicantId);
+    
+    $form = new \Foundation\Form();
+    $path = 'applicants/messages/new';
+    if($applicantId) $path .= '/' . $applicantId;
+    $form->setAction($this->path($path));
+    $field = $form->newField();
+    $field->setLegend('New Message');
+    
+    if($applicantId){
+      $element = $field->newElement('Plaintext', 'name');
+      $element->setLabel('To');
+      $element->setValue($applicant->getFullName());
+      
+      $element = $field->newElement('HiddenInput', 'to');
+      $element->setValue($applicant->getId());
+    } else {
+      $element = $field->newElement('SelectList', 'to');
+      $element->setLabel('To');
+      foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+        $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
+      }
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    }
+    $element = $field->newElement('TextInput', 'subject');
+    $element->setLabel('Subject');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $element = $field->newElement('Textarea', 'text');
+    $element->setLabel('Message');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $form->newButton('submit', 'Submit');
+    $this->setVar('form', $form);
+    
+    if($input = $form->processInput($this->post)){
+      $thread = new \Jazzee\Entity\Thread();
+      $thread->setSubject($input->get('subject'));
+      $applicant = $this->getApplicantById($input->get('to'));
+      $thread->setApplicant($applicant);
+      
+      $message = new \Jazzee\Entity\Message();
+      $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+      $message->setText($input->get('text'));
+      $thread->addMessage($message);
+      $this->_em->persist($thread);
+      $this->_em->persist($message);
+      $this->addMessage('success', 'Your message has been sent.');
+      $this->redirectPath('applicants/messages');
+    }
+  }
+  
+  /**
    * Check for new messages in each program and email the administrator
    * 
    * @param AdminCronController $cron
