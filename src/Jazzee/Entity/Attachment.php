@@ -50,6 +50,14 @@ class Attachment{
   }
   
   /**
+   * Get the Applicant
+   * @return Entity\Applicant $applicant
+   */
+  public function getApplicant(){
+    return $this->applicant;
+  }
+  
+  /**
    * Set the answer
    * @param Answer $answer
    */

@@ -24,6 +24,7 @@ Applicant.prototype.init = function(){
     self.displayDecisions(json.data.result.decisions);
     self.displayTags(json.data.result.tags);
     self.displayPages(json.data.result.pages);
+    self.displayAttachments(json.data.result.attachments);
   });
 };
 /**
@@ -316,3 +317,42 @@ Applicant.prototype.catchPageLinks = function(pageId){
   });
 };
 
+/**
+ * Display PDFs
+ * @param Object json
+ */
+Applicant.prototype.displayAttachments = function(json){
+  $('#attachments').empty();
+  var self = this;
+  for(var i=0; i<json.attachments.length; i++){
+    var div = $('<div>').attr('id','attachment'+json.attachments[i].id).data('attachmentId', json.attachments[i].id);
+    var a = $('<a>').attr('href', json.attachments[i].filePath);
+    a.append($('<img>').attr('src', json.attachments[i].previewPath));
+    div.append(a);
+    if(json.allowDelete){
+      div.append($('<a>').attr('href', this.baseUrl + '/deleteApplicantPdf/' + json.attachments[i].id).html('Delete PDF').click(function(e){
+        $.get($(e.target).attr('href'),function(json){
+          self.displayAttachments(json.data.result.attachments);
+        });
+        return false;
+      }));
+    }
+    $('#attachments').append(div);
+  }
+  if(json.allowAttach){
+    var a = $('<a>').attr('href', this.baseUrl + '/attachApplicantPdf').html('Attach Pdf');
+    a.click(function(e){
+      $.get($(e.target).attr('href'),function(json){
+        var obj = {
+          display: function(json){
+            self.displayAttachments(json.data.result.attachments);
+          }
+        };
+        self.createForm(json.data.form, obj);
+      });
+      return false;
+    });
+    $('#attachments').append(a);
+  }
+  
+};

@@ -18,6 +18,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_ADDTAG = 'Tag';
   const ACTION_REMOVETAG = 'Remove Tag';
   const ACTION_ATTACHAPPLICANTPDF = 'Attach PDF';
+  const ACTION_DELETEAPPLICANTPDF = 'Delete PDF';
   const ACTION_EDITANSWER = 'Edit Answer';
   const ACTION_DELETEANSWER = 'Delete Answer';
   const ACTION_ADDANSWER = 'Add Answer';
@@ -76,6 +77,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
      'actions' => $this->getActions($applicant),
      'decisions' => $this->getDecisions($applicant),
      'tags' => $this->getTags($applicant),
+     'attachments' => $this->getAttachments($applicant),
      'pages' => $this->getPages($applicant)
     );
     $this->layout = 'json'; //set the layout back since getPages changes it
@@ -192,6 +194,37 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $decisions['allowLock'] = $this->checkIsAllowed($this->controllerName, 'lock');
     $decisions['isLocked'] = $applicant->isLocked();
     return $decisions;
+  }
+  
+  /**
+   * Get an applicants pdfs
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  protected function getAttachments(\Jazzee\Entity\Applicant $applicant){
+    $attachments = array(
+      'attachments'=>array(),
+      'allowAttach' => $this->checkIsAllowed($this->controllerName, 'attachApplicantPdf'),
+      'allowDelete' => $this->checkIsAllowed($this->controllerName, 'deleteApplicantPdf')
+    );
+    foreach($applicant->getAttachments() as $attachment){
+      $blob = $attachment->getAttachment();
+      $name = $applicant->getFullName() . '_attachment_' . $attachment->getId();
+      $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $applicant->getUpdatedAt()->format('c'));
+      $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0), $applicant->getUpdatedAt()->format('c'));
+  
+      $session = new \Foundation\Session();
+      $store = $session->getStore('files', 900);
+      $pdfStoreName = md5($name . '.pdf');
+      $pngStoreName = md5($name . '.png');
+      $store->$pdfStoreName = $pdf; 
+      $store->$pngStoreName = $png;
+      $attachments['attachments'][] = array(
+        'id' => $attachment->getId(),
+        'filePath' => $this->path('file/' . \urlencode($name . '.pdf')),
+        'previewPath' => $this->path('file/' . \urlencode($name . '.png'))
+      );
+    }
+    return $attachments;
   }
   
   /**
@@ -716,6 +749,60 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     }
     $this->setVar('form', $form);
     $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Attach PDF to applicant
+   * @param integer $applicantId
+   */
+  public function actionAttachApplicantPdf($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicantId}/attachApplicantPdf"));
+    $field = $form->newField();
+    $field->setLegend('Attach PDF');
+    
+    $element = $field->newElement('FileInput', 'pdf');
+    $element->setLabel('File');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\PDF($element));
+    $element->addFilter(new \Foundation\Form\Filter\Blob($element));
+        
+    $form->newButton('submit', 'Attach PDF to Applicant');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $attachment = new \Jazzee\Entity\Attachment();
+        $attachment->setAttachment($input->get('pdf'));
+        $applicant->addAttachment($attachment);
+        $this->_em->persist($attachment);
+        //persist the applicant and answer to catch the last update  
+        $this->_em->persist($applicant);
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('result', array('attachments'=> $this->getAttachments($applicant)));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Delete PDF attached to applicant
+   * @param integer $applicantId
+   * @param integer $attachmentId
+   */
+  public function actionDeleteApplicantPdf($applicantId, $attachmentId){
+    $applicant = $this->getApplicantById($applicantId);
+    
+    if($attachment = $this->_em->getRepository('\Jazzee\Entity\Attachment')->findOneBy(array('id'=>$attachmentId, 'applicant'=>$applicant->getId()))){
+      $applicant->getAttachments()->removeElement($attachment);
+      $this->_em->remove($attachment);
+      $applicant->markLastUpdate();
+      $this->_em->persist($applicant);
+      $this->setLayoutVar('status', 'success');
+    }
+    $this->setVar('result', array('attachments'=>$this->getAttachments($applicant)));
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
