@@ -12,7 +12,7 @@
   <div class='discussion'>
     <h3>Your Messages</h3>
     <table>
-      <thead><tr><th></th><th>Sent</th><th>Subject</th></tr></thead>
+      <thead><tr><th></th><th>Sent</th><th>Subject</th><th>Reply</th></tr></thead>
       <tbody>
         <?php 
         foreach($threads as $thread){?>
@@ -24,6 +24,7 @@
             </td>
             <td><?php print $thread->getCreatedAt()->format('l F jS Y \a\t g:ia')?></td>
             <td><a href='<?php print $this->path($basePath . '/support/single/' . $thread->getId());?>'><?php print $thread->getSubject();?></a></td> 
+            <td><a href='<?php print $this->path($basePath . '/support/reply/' . $thread->getId());?>'>Reply</a></td> 
           </tr>
         <?php } //end foreach threads ?>
       </tbody>
