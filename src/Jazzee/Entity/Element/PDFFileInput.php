@@ -51,8 +51,10 @@ class PDFFileInput extends AbstractElement {
       $blob = $elementsAnswers[0]->getEBlob();
       $name = $this->_element->getTitle() . '_' . $elementsAnswers[0]->getId();
       
+      $config = new \Jazzee\Configuration();
       $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $answer->getUpdatedAt()->format('c'));
-      $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0), $answer->getUpdatedAt()->format('c'));
+      $cachePath = $config->getVarPath() . '/cache/' . (sha1('applicant' . $answer->getApplicant()->getId() . 'answer' . $answer->getId() . 'element' . $this->_element->getId() . 'elementAnswer' . $elementsAnswers[0]->getId())) . '.pdfPreview.png';
+      $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0, $cachePath), $answer->getUpdatedAt()->format('c'));
 
       $session = new \Foundation\Session();
       $store = $session->getStore('files', 900);

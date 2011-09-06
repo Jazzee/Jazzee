@@ -208,9 +208,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     );
     foreach($applicant->getAttachments() as $attachment){
       $blob = $attachment->getAttachment();
+     
       $name = $applicant->getFullName() . '_attachment_' . $attachment->getId();
       $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $applicant->getUpdatedAt()->format('c'));
-      $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0), $applicant->getUpdatedAt()->format('c'));
+      $png = new \Foundation\Virtual\VirtualFile($name . '.png', $this->pdfThumbnail('applicant' . $applicant->getId() . 'attachment' . $attachment->getId(), $blob), $applicant->getUpdatedAt()->format('c'));
   
       $session = new \Foundation\Session();
       $store = $session->getStore('files', 900);

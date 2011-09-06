@@ -26,8 +26,8 @@
     $blob = $attachment->getAttachment();
     $name = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId();
     $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $answer->getUpdatedAt()->format('c'));
-    $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0), $answer->getUpdatedAt()->format('c'));
-
+    $png = new \Foundation\Virtual\VirtualFile($name . '.png', $this->controller->pdfThumbnail('applicant' . $answer->getApplicant()->getId() . 'answer' . $answer->getId() . 'attachment' . $attachment->getId(), $blob), $answer->getUpdatedAt()->format('c'));
+  
     $session = new \Foundation\Session();
     $store = $session->getStore('files', 900);
     $pdfStoreName = md5($name . '.pdf');
