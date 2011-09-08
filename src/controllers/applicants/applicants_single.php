@@ -772,8 +772,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->_em->persist($answer);
       $this->setLayoutVar('status', 'success');
     }
-    $this->setVar('form', $form);
-    $this->loadView($this->controllerName . '/form');
+    $this->setVar('result', true);
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
