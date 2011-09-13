@@ -165,8 +165,8 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
       foreach($threads as $thread){
         if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM)){
           $lastUnreadMessageCreatedAt = $thread->getLastUnreadMessage(\Jazzee\Entity\Message::PROGRAM)->getCreatedAt();
-          //if created since our last run or remind every 7 days
-          if(($lastUnreadMessageCreatedAt > $lastRun) OR ($lastUnreadMessageCreatedAt->diff(new DateTime('now'))->days%7 == 0)){
+          //if created since our last run or remind every 7 days (only once if the hour it was sent is the same as the current hour)
+          if(($lastUnreadMessageCreatedAt > $lastRun) OR ($lastUnreadMessageCreatedAt->diff(new DateTime('now'))->days%7 == 0 AND $lastUnreadMessageCreatedAt->diff(new DateTime('now'))->h == 0)){
             if(!array_key_exists($thread->getApplicant()->getId(), $applicants)){
               $applicants[$thread->getApplicant()->getId()] = array(
                 'applicant' => $thread->getApplicant(),
@@ -189,7 +189,6 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
         $message->Send();
       }
     }
-    
     if(time() - (int)$cron->getVar('applicantsMessagesProgramsLastRun') > self::MIN_INTERVAL_PROGRAMS){
       $lastRun = new DateTime();
       $lastRun->setTimeStamp((int)$cron->getVar('applicantsMessagesProgramsLastRun'));
