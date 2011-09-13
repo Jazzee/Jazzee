@@ -12,7 +12,8 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   
   const ACTION_INDEX = 'View Messages';
   
-  const MIN_INTERVAL = 28800; //8 hours
+  const MIN_INTERVAL_APPLICANTS = 3500; //1 hour minus a bit
+  const MIN_INTERVAL_PROGRAMS = 86300; //24 hours minus a bit
   
   /**
    * List all unread messages
@@ -155,53 +156,67 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
    * @param AdminCronController $cron
    */
   public static function runCron(AdminCronController $cron){
-    if(time() - (int)$cron->getVar('applicantsMessagesLastRun') < self::MIN_INTERVAL) return false;
-    $cron->setVar('applicantsMessagesLastRun', time());
     $threads = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Thread')->findAll();
-    $applications = array();
-    $applicants = array();
-    foreach($threads as $thread){
-      if($thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)){
-        if(!array_key_exists($thread->getApplicant()->getApplication()->getId(), $applications)){
-          $applications[$thread->getApplicant()->getApplication()->getId()] = array(
-            'application' => $thread->getApplicant()->getApplication(),
-            'count' => 0
-          );
+    if(time() - (int)$cron->getVar('applicantsMessagesApplicantsLastRun') > self::MIN_INTERVAL_APPLICANTS){
+      $lastRun = new DateTime();
+      $lastRun->setTimeStamp((int)$cron->getVar('applicantsMessagesApplicantsLastRun'));
+      $cron->setVar('applicantsMessagesApplicantsLastRun', time());
+      $applicants = array();
+      foreach($threads as $thread){
+        if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM)){
+          $lastUnreadMessageCreatedAt = $thread->getLastUnreadMessage(\Jazzee\Entity\Message::PROGRAM)->getCreatedAt();
+          //if created since our last run or remind every 7 days
+          if(($lastUnreadMessageCreatedAt > $lastRun) OR ($lastUnreadMessageCreatedAt->diff(new DateTime('now'))->days%7 == 0)){
+            if(!array_key_exists($thread->getApplicant()->getId(), $applicants)){
+              $applicants[$thread->getApplicant()->getId()] = array(
+                'applicant' => $thread->getApplicant(),
+                'count' => 0
+              );
+            }
+            $applicants[$thread->getApplicant()->getId()]['count']++;
+          }
         }
-        $applications[$thread->getApplicant()->getApplication()->getId()]['count']++;
       }
-      //only send applicant reminders every 7 days
-      if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM) and ($thread->getLastUnreadMessage(\Jazzee\Entity\Message::PROGRAM)->getCreatedAt()->diff(new \DateTime('now'))->days%7 == 0)){
-        if(!array_key_exists($thread->getApplicant()->getId(), $applicants)){
-          $applicants[$thread->getApplicant()->getId()] = array(
-            'applicant' => $thread->getApplicant(),
-            'count' => 0
-          );
-        }
-        $applicants[$thread->getApplicant()->getId()]['count']++;
+      foreach($applicants as $arr){
+        $message = $cron->newMessage();
+        $message->AddAddress(
+          $arr['applicant']->getEmail(),
+          $arr['applicant']->getFullName());
+        $message->Subject = 'New Message from ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName();
+        $body = 'You have ' . $arr['count'] . ' unread message(s) from the ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName() . '.' .
+          "\nYou can review them by logging into the application at: " . $cron->applyPath('apply/' . $arr['applicant']->getApplication()->getProgram()->getShortName() . '/' . $arr['applicant']->getApplication()->getCycle()->getName() . '/applicant/login');
+        $message->Body = $body;
+        $message->Send();
       }
     }
-    foreach($applications as $arr){
-      $message = $cron->newMessage();
-      $message->AddAddress(
-        $arr['application']->getContactEmail(),
-        $arr['application']->getContactName());
-      $message->Subject = 'New Applicant Messages for ' . $arr['application']->getCycle()->getName() . ' ' . $arr['application']->getProgram()->getName();
-      $body = 'There are ' . $arr['count'] . ' unread messages for the ' . $arr['application']->getCycle()->getName() . ' ' . $arr['application']->getProgram()->getName() . ' program.' .
-        "\nYou can review them at: " . $cron->path('applicants/messages');
-      $message->Body = $body;
-      $message->Send();
-    }
-    foreach($applicants as $arr){
-      $message = $cron->newMessage();
-      $message->AddAddress(
-        $arr['applicant']->getEmail(),
-        $arr['applicant']->getFullName());
-      $message->Subject = 'New Message from ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName();
-      $body = 'You have ' . $arr['count'] . ' unread message(s) from the ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName() . '.' .
-        "\nYou can review them by logging into the application at: " . $cron->applyPath('apply/' . $arr['applicant']->getApplication()->getProgram()->getShortName() . '/' . $arr['applicant']->getApplication()->getCycle()->getName() . '/applicant/login');
-      $message->Body = $body;
-      $message->Send();
+    
+    if(time() - (int)$cron->getVar('applicantsMessagesProgramsLastRun') > self::MIN_INTERVAL_PROGRAMS){
+      $lastRun = new DateTime();
+      $lastRun->setTimeStamp((int)$cron->getVar('applicantsMessagesProgramsLastRun'));
+      $cron->setVar('applicantsMessagesProgramsLastRun', time());
+      $applications = array();
+      foreach($threads as $thread){
+        if($thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)){
+          if(!array_key_exists($thread->getApplicant()->getApplication()->getId(), $applications)){
+            $applications[$thread->getApplicant()->getApplication()->getId()] = array(
+              'application' => $thread->getApplicant()->getApplication(),
+              'count' => 0
+            );
+          }
+          $applications[$thread->getApplicant()->getApplication()->getId()]['count']++;
+        }
+      }
+      foreach($applications as $arr){
+        $message = $cron->newMessage();
+        $message->AddAddress(
+          $arr['application']->getContactEmail(),
+          $arr['application']->getContactName());
+        $message->Subject = 'New Applicant Messages for ' . $arr['application']->getCycle()->getName() . ' ' . $arr['application']->getProgram()->getName();
+        $body = 'There are ' . $arr['count'] . ' unread messages for the ' . $arr['application']->getCycle()->getName() . ' ' . $arr['application']->getProgram()->getName() . ' program.' .
+          "\nYou can review them at: " . $cron->path('applicants/messages');
+        $message->Body = $body;
+        $message->Send();
+      }
     }
   }
   
