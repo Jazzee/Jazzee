@@ -73,6 +73,9 @@ class AdminApiController extends \Jazzee\AdminController {
       case 'listapplications':
         $this->listApplications($this->post);
         break;
+      case 'getapplication':
+        $this->getApplication($this->post);
+        break;
       default: 
         $this->setLayoutVar('status', 'error');
         $this->addMessage('error', $this->post['type'] .' is not a recognized api request type');
@@ -151,6 +154,26 @@ class AdminApiController extends \Jazzee\AdminController {
   }
   
   /**
+   * Get application structure
+   * @param array $post
+   */
+  protected function getApplication(array $post){
+    if(!$this->_application){
+      $this->setLayoutVar('status', 'error');
+      $this->addMessage('error', 'This request requires an applicationId.');
+      return;
+    }
+    $app = $this->dom->createElement("application");
+    $applicationPages = $this->dom->createElement("pages");
+    $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId()));
+    foreach($pages as $page){
+      $applicationPages->appendChild($this->pageXml($page));
+    }
+    $app->appendChild($applicationPages);
+    $this->dom->appendChild($app);
+  }
+  
+  /**
    * Single applicants xml
    * @param \Jazzee\Entity\Applicant $applicant
    * @param boolean $partial - fetch only applicant not answers
@@ -197,6 +220,7 @@ class AdminApiController extends \Jazzee\AdminController {
     foreach($applicationPages as $applicationPage){
       $page = $this->dom->createElement("page");
       $page->setAttribute('title', htmlentities($applicationPage->getTitle()));
+      $page->setAttribute('type', htmlentities($applicationPage->getPage()->getType()->getClass()));
       $page->setAttribute('pageId', $applicationPage->getPage()->getId());
       $answersXml = $this->dom->createElement('answers');
       $applicationPage->getJazzeePage()->setApplicant($applicant);
@@ -209,6 +233,77 @@ class AdminApiController extends \Jazzee\AdminController {
     $applicantXml->appendChild($pages);
     
     return $applicantXml;
+  }
+  
+  
+  /**
+   * Page XML
+   * 
+   * Calls itself recursivly to capture all children
+   * @param DomDocument $dom
+   * @param \Jazzee\Entity\Page $page
+   */
+  protected function pageXml($page){
+    $pxml = $this->dom->createElement('page');
+    $pxml->setAttribute('id', $page->getId());
+    $pxml->setAttribute('title', htmlentities($page->getTitle()));
+    $pxml->setAttribute('min', $page->getMin());
+    $pxml->setAttribute('max', $page->getMax());
+    $pxml->setAttribute('required', $page->isRequired());
+    $pxml->setAttribute('answerStatusDisplay', $page->answerStatusDisplay());
+    $pxml->setAttribute('instructions', htmlentities($page->getInstructions()));
+    $pxml->setAttribute('leadingText', htmlentities($page->getLeadingText()));
+    $pxml->setAttribute('trailingText', htmlentities($page->getTrailingText()));
+    if($page instanceof \Jazzee\Entity\ApplicationPage){
+      $pxml->setAttribute('id', $page->getPage()->getId());
+      $pxml->setAttribute('weight', $page->getWeight());
+      $pxml->setAttribute('kind', $page->getKind());
+      $page = $page->getPage();
+      if($page->isGlobal()){
+        $pxml->setAttribute('globalPageUuid', $page->getUuid());
+        return $pxml;
+      }
+    }
+    $pxml->setAttribute('class', $page->getType()->getClass());
+    
+    $elements = $pxml->appendChild($this->dom->createElement('elements'));
+    foreach($page->getElements() as $element){
+      $exml = $this->dom->createElement('element');
+      $exml->setAttribute('id', $element->getId());
+      $exml->setAttribute('title', htmlentities($element->getTitle()));
+      $exml->setAttribute('class', $element->getType()->getClass());
+      $exml->setAttribute('fixedId', $element->getFixedId());
+      $exml->setAttribute('weight', $element->getWeight());
+      $exml->setAttribute('min', $element->getMin());
+      $exml->setAttribute('max', $element->getMax());
+      $exml->setAttribute('required', $element->isRequired());
+      $exml->setAttribute('instructions', htmlentities($element->getInstructions()));
+      $exml->setAttribute('format', htmlentities($element->getFormat()));
+      $exml->setAttribute('defaultValue', $element->getDefaultValue());
+      $listItems = $exml->appendChild($this->dom->createElement('listitems'));
+      foreach($element->getListItems() as $item){
+        //only export active items
+        if($item->isActive()){
+          $ixml = $this->dom->createElement('item');
+          $ixml->nodeValue = htmlentities($item->getValue());
+          $ixml->setAttribute('active', (integer)$item->isActive());
+          $ixml->setAttribute('weight', $item->getWeight());
+          $listItems->appendChild($ixml);
+          unset($ixml);
+        }
+      }
+      $elements->appendChild($exml);
+    }
+    $children = $pxml->appendChild($this->dom->createElement('children'));
+    foreach($page->getChildren() as $child) $children->appendChild($this->pageXml($child));
+    
+    $variables = $pxml->appendChild($this->dom->createElement('variables'));
+    foreach($page->getVariables() as $var){
+      $variable = $this->dom->createElement('variable', (string)$var->getValue());
+      $variable->setAttribute('name', $var->getName());
+      $variables->appendChild($variable);
+    } 
+    return $pxml;
   }
 }
 

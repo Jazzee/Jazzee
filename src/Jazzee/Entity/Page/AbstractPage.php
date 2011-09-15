@@ -109,8 +109,8 @@ abstract class AbstractPage implements \Jazzee\Page {
     foreach($answer->getPage()->getElements() as $element){
       $eXml = $dom->createElement('element');
       $eXml->setAttribute('elementId', $element->getId());
-      $eXml->setAttribute('title', $element->getTitle());
-      $eXml->setAttribute('type', $element->getType()->getClass());
+      $eXml->setAttribute('title', htmlentities($element->getTitle()));
+      $eXml->setAttribute('type', htmlentities($element->getType()->getClass()));
       if($value = $element->getJazzeeElement()->rawValue($answer)) $eXml->appendChild($dom->createCDATASection($value));
       $answerXml->appendChild($eXml);
     }
