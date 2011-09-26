@@ -343,6 +343,14 @@ class Answer{
   public function getPublicStatus(){
     return $this->publicStatus;
   }
+  
+  /**
+   * Clear Public Status
+   */
+  public function clearPublicStatus(){
+    $this->publicStatus = null;
+  }
+  
 
   /**
    * Set privateStatus
@@ -360,6 +368,13 @@ class Answer{
    */
   public function getPrivateStatus(){
     return $this->privateStatus;
+  }
+  
+  /**
+   * Clear Private Status
+   */
+  public function clearPrivateStatus(){
+    $this->privateStatus = null;
   }
   
   /**

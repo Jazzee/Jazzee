@@ -724,6 +724,54 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    * @param integer $applicantId
    * @param integer $answerId
    */
+  public function actionVerifyAnswer($applicantId, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicantId}/verifyAnswer/{$answerId}"));
+    $field = $form->newField();
+    $field->setLegend('Set Verification Status');
+    
+    $answerStatusTypes = array();
+    foreach($this->_em->getRepository('\Jazzee\Entity\AnswerStatusType')->findBy(array(),array('name'=>'ASC')) as $type){
+      $answerStatusTypes[$type->getId()] = $type;
+    }
+    $element = $field->newElement('SelectList', 'publicStatus');
+    $element->setLabel('Public Status');
+    $element->setFormat('Visible to applicants');
+    $element->newItem('', '');
+    foreach($answerStatusTypes as $id => $type) $element->newItem($id, $type->getName());
+    if($answer->getPublicStatus()) $element->setValue($answer->getPublicStatus()->getId());
+    
+    $element = $field->newElement('SelectList', 'privateStatus');
+    $element->setLabel('Private Status');
+    $element->setFormat('Only visible to program');
+    $element->newItem('', '');
+    foreach($answerStatusTypes as $id => $type) $element->newItem($id, $type->getName());
+    if($answer->getPrivateStatus()) $element->setValue($answer->getPrivateStatus()->getId());
+    
+    $form->newButton('submit', 'Verify Answer');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $answer->clearPublicStatus();
+        $answer->clearPrivateStatus();
+        if($input->get('publicStatus')) $answer->setPublicStatus($answerStatusTypes[$input->get('publicStatus')]);
+        if($input->get('privateStatus')) $answer->setPrivateStatus($answerStatusTypes[$input->get('privateStatus')]);
+        $this->_em->persist($applicant); 
+        $this->_em->persist($answer); 
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Attach PDF to answer
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
   public function actionAttachAnswerPdf($applicantId, $answerId){
     $applicant = $this->getApplicantById($applicantId);
     if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");

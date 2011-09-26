@@ -9,6 +9,9 @@
   <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
     <?php if($answer->getPublicStatus()){?><br />Public Status: <?php print $answer->getPublicStatus()->getName();}?>
     <?php if($answer->getPrivateStatus()){?><br />Private Status: <?php print $answer->getPrivateStatus()->getName();}?>
+    <?php if($this->controller->checkIsAllowed('applicants_single', 'verifyAnswer')){ ?>
+      <br /><a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/verifyAnswer/' . $answer->getId());?>' class='actionForm'>Set Verification Status</a>
+    <?php } ?>
 </td>
 <td>
 <?php if($attachment = $answer->getAttachment()){
