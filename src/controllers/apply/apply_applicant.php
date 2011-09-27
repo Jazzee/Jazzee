@@ -292,6 +292,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
     
     $link = new \Foundation\Navigation\Link('Start a New Application');
     $link->setHref($this->path($path . '/applicant/new'));
+    $link->addClass('highlight');
     $menu->addLink($link);
     
     $navigation->addMenu($menu);

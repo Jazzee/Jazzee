@@ -20,7 +20,7 @@ html {
 
 a, a:visited {color:#003366;}
 a:hover {color:#cc6600;}
-
+a.highlight {font-weight: bold;}
 	
 #main {
   border-left: 1px solid #003366;
@@ -110,7 +110,6 @@ div.h-navigation li:hover, div.h-navigation a:hover, div.h-navigation li:hover>a
 /***** SIDEBAR NAVIGATION *****/
 div.v-navigation li{
   list-style: none;
-  font-weight: bold;
 }
 
 div.v-navigation a {
