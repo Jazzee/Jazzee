@@ -105,7 +105,6 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->_vfs->addDirectory('scripts', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../scripts'));
     $this->_vfs->addDirectory('styles', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../styles'));
     
-    
     $virtualFoundation = new \Foundation\Virtual\VirtualDirectory();
     $virtualFoundation->addDirectory('javascript', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/src/javascript'));
     $media = new \Foundation\Virtual\VirtualDirectory();
@@ -129,6 +128,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $virtualFoundation->addDirectory('media',$media);
     $virtualFoundation->addDirectory('scripts',$scripts);
     $virtualFoundation->addDirectory('styles',$styles);
+    
     $this->_vfs->addDirectory('foundation', $virtualFoundation);
   }
   
@@ -145,7 +145,7 @@ class JazzeePageController extends \Foundation\VC\Controller
   protected function setupVarPath(){
     $var = $this->getVarPath();
     //check to see if all the directories exist and are writable
-    $varDirectories = array('log','session','tmp','uploads');
+    $varDirectories = array('log','session','cache','tmp','uploads','cache/public');
     foreach($varDirectories as $dir){
       $path = $var . '/' . $dir;
       if(!is_dir($path)){
@@ -344,5 +344,38 @@ class JazzeePageController extends \Foundation\VC\Controller
     $fc = new \Lvc_FrontController();
     $fc->processRequest($request);
     exit(1);
+  }
+  
+  /**
+   * 
+   * @see Foundation/VC/Foundation\VC.Controller::loadView()
+   */
+  public function loadView($controllerViewName){
+    if($this->_config->getStatus() == 'PRODUCTION'){
+        $fileName = $this->getVarPath() . '/cache/public/' . $this->getControllerName() . '.css';
+        if(!file_exists($fileName)){
+          $string = '';
+          foreach($this->getLayoutVar('requiredCss') as $path => $use){
+            $string .= file_get_contents($path);
+          }
+          /* remove comments */
+          $string = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $string);
+          /* remove tabs, spaces, newlines, etc. */
+          $string = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $string);
+          file_put_contents($fileName, $string);
+        }
+        $this->setLayoutVar('requiredCss', array($this->path('static/' . $this->getControllerName() . '.css') => true));
+        
+        $fileName = $this->getVarPath() . '/cache/public/' . $this->getControllerName() . '.js';
+        if(!file_exists($fileName)){
+          $string = '';
+          foreach($this->getLayoutVar('requiredJs') as $path => $use){
+            $string .= file_get_contents($path);
+          }
+          file_put_contents($fileName, $string);
+        }
+        $this->setLayoutVar('requiredJs', array($this->path('static/' . $this->getControllerName() . '.js') => true));
+    }
+    parent::loadView($controllerViewName);
   }
 }

@@ -39,6 +39,15 @@ $basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array(
     'name' => 1
   )
 ));
+  
+//static pulls physical files from the cache where they are created when first needed
+$basicRouter->addRoute('#^static/(.*)$#i', array( 
+  'controller' => 'static',
+  'action' => 'get',
+  'action_params' => array(
+    'fileName' => 1
+  )
+));
 
 //the apply page is the actual application
 $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(index|edit|delete)/([0-9]+)(/[0-9]+)?)?$#i', array(

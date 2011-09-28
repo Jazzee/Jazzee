@@ -33,6 +33,15 @@ $basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array(
     'name' => 1
   )
 ));
+  
+//static pulls physical files from the cache where they are created when first needed
+$basicRouter->addRoute('#^static/(.*)$#i', array( 
+  'controller' => 'static',
+  'action' => 'get',
+  'action_params' => array(
+    'fileName' => 1
+  )
+));
 
 //anything with a trailing slash gets redirected without it
 //this should be done with modrewrite so we get a permanent redirect, but it is here in case
