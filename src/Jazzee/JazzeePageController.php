@@ -351,30 +351,30 @@ class JazzeePageController extends \Foundation\VC\Controller
    * @see Foundation/VC/Foundation\VC.Controller::loadView()
    */
   public function loadView($controllerViewName){
-    if($this->_config->getStatus() == 'PRODUCTION'){
-        $fileName = $this->getVarPath() . '/cache/public/' . $this->getControllerName() . '.css';
-        if(!file_exists($fileName)){
-          $string = '';
-          foreach($this->getLayoutVar('requiredCss') as $path => $use){
-            $string .= file_get_contents($path);
-          }
-          /* remove comments */
-          $string = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $string);
-          /* remove tabs, spaces, newlines, etc. */
-          $string = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $string);
-          file_put_contents($fileName, $string);
+    if($this->_config->getStatus() != 'DEVELOPMENT' and ini_get('allow_url_fopen')){
+      $fileName = $this->getVarPath() . '/cache/public/' . $this->getControllerName() . '.css';
+      if(!file_exists($fileName)){
+        $string = '';
+        foreach($this->getLayoutVar('requiredCss') as $path => $use){
+          $string .= file_get_contents($path);
         }
-        $this->setLayoutVar('requiredCss', array($this->path('static/' . $this->getControllerName() . '.css') => true));
-        
-        $fileName = $this->getVarPath() . '/cache/public/' . $this->getControllerName() . '.js';
-        if(!file_exists($fileName)){
-          $string = '';
-          foreach($this->getLayoutVar('requiredJs') as $path => $use){
-            $string .= file_get_contents($path);
-          }
-          file_put_contents($fileName, $string);
+        /* remove comments */
+        $string = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $string);
+        /* remove tabs, spaces, newlines, etc. */
+        $string = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $string);
+        file_put_contents($fileName, $string);
+      }
+      $this->setLayoutVar('requiredCss', array($this->path('static/' . $this->getControllerName() . '.css') => true));
+      
+      $fileName = $this->getVarPath() . '/cache/public/' . $this->getControllerName() . '.js';
+      if(!file_exists($fileName)){
+        $string = '';
+        foreach($this->getLayoutVar('requiredJs') as $path => $use){
+          $string .= file_get_contents($path);
         }
-        $this->setLayoutVar('requiredJs', array($this->path('static/' . $this->getControllerName() . '.js') => true));
+        file_put_contents($fileName, $string);
+      }
+      $this->setLayoutVar('requiredJs', array($this->path('static/' . $this->getControllerName() . '.js') => true));
     }
     parent::loadView($controllerViewName);
   }
