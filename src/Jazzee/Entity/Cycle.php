@@ -27,6 +27,11 @@ class Cycle{
   /** @Column(type="datetime", nullable=true) */
   private $end;
   
+  /** 
+   * @OneToMany(targetEntity="Application", mappedBy="cycle")
+   */
+  protected $applications;
+  
   /**
    * Get the id
    * @return integer
@@ -94,12 +99,12 @@ class CycleRepository extends \Doctrine\ORM\EntityRepository{
    * find best current cycle
    * 
    * If a user doesn't have a cycle we need to search for an find the best current cycle for them
-   * 
+   * @param Program $program
    * @return Cycle
    */
-  public function findBestCycle(){
-    $query = $this->_em->createQuery('SELECT c FROM Jazzee\Entity\Cycle c WHERE :currentDate BETWEEN c.start and c.end order by c.start DESC');
-    $query->setParameter('currentDate', new \DateTime(), \Doctrine\DBAL\Types\Type::DATETIME);
+  public function findBestCycle(Program $program){
+    $query = $this->_em->createQuery('SELECT c FROM Jazzee\Entity\Cycle c JOIN c.applications a WHERE a.program = :program ORDER BY c.end DESC');
+    $query->setParameter('program', $program);
     $result = $query->getResult();
     if(count($result)) return $result[0];
     return false;

@@ -87,18 +87,7 @@ abstract class AdminController extends Controller{
     $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     if($this->_adminAuthentication->isValidUser()){
       $this->_user = $this->_adminAuthentication->getUser();
-      $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findBestCycle();
       
-      if($this->_user->getDefaultCycle()){
-        $this->_cycle = $this->_user->getDefaultCycle();
-      } else {
-        if($cycles = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findAll()){
-           $cycle = array_pop($cycles);
-           $this->_cycle = $cycle;
-           $this->_user->setDefaultCycle($cycle);
-           $this->_em->persist($this->_user);
-        }
-      }
       if($this->_user->getDefaultProgram()){
         $this->_program = $this->_user->getDefaultProgram();
       } else {
@@ -108,6 +97,15 @@ abstract class AdminController extends Controller{
           $this->_program = $program;
           $this->_user->setDefaultProgram($program);
           $this->_em->persist($this->_user);
+        }
+      }
+      if($this->_user->getDefaultCycle()){
+        $this->_cycle = $this->_user->getDefaultCycle();
+      } else {
+        if($cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findBestCycle($this->_program)){
+           $this->_cycle = $cycle;
+           $this->_user->setDefaultCycle($cycle);
+           $this->_em->persist($this->_user);
         }
       }
       
@@ -144,6 +142,9 @@ abstract class AdminController extends Controller{
       exit();
     }
     if($this->_cycle AND $this->_program){
+      if(!$this->checkIsAllowed('admin_changecycle')){
+        $this->_cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->findBestCycle($this->_program);
+      }
       $this->setLayoutVar('pageTitle', $this->_cycle->getName() . ' ' . $this->_program->getName());
       $this->setLayoutVar('layoutTitle', $this->_cycle->getName() . ' ' . $this->_program->getName());
     }
