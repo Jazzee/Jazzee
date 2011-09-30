@@ -123,7 +123,16 @@ class Branching extends Standard
     $answers = array();
     foreach($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer){
       $child = $answer->getChildren()->first();
-      $answers[] = $this->xmlAnswer($dom, $child);
+      $xmlAnswer = $this->xmlAnswer($dom, $child);
+      $eXml = $dom->createElement('element');
+      $eXml->setAttribute('elementId', 'branching');
+      
+      
+      $eXml->setAttribute('title', htmlentities($answer->getPage()->getVar('branchingElementLabel')));
+      $eXml->setAttribute('type', null);
+      $eXml->appendChild($dom->createCDATASection($child->getPage()->getTitle()));
+      $xmlAnswer->appendChild($eXml);
+      $answers[] = $xmlAnswer;
     }
     return $answers;
   }

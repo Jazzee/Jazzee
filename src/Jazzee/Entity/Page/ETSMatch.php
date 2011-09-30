@@ -177,6 +177,25 @@ class ETSMatch extends Standard {
   }
   
   /**
+   * Add Scores to the answer
+   * @see jazzee/src/Jazzee/Entity/Page/Jazzee\Entity\Page.AbstractPage::xmlAnswer()
+   */
+  protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer){
+    $xml = parent::xmlAnswer($dom, $answer);
+    if($answer->getMatchedScore()){
+      $scoreXml = $dom->createElement('score');
+      $element = $answer->getPage()->getElementByFixedId(self::FID_TEST_TYPE);
+      foreach($answer->getMatchedScore()->getSummary() as $name => $value){
+        $e = $dom->createElement('component', htmlentities($value));
+        $e->setAttribute('name', htmlentities($name));
+        $scoreXml->appendChild($e);
+      }
+      $xml->appendChild($scoreXml);
+    }
+    return $xml;
+  }
+  
+  /**
    * Match unmatched scores as a cron task
    * @todo eventually the 1000 limit is going to block on dead scores - find a way to eventually avoid those or to keep looping in 1000 increments
    * @param AdminCronController $cron
