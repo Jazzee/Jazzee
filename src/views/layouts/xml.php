@@ -7,7 +7,7 @@
  */
 header("Content-type: application/xml");
 header('Content-Disposition: attachment; filename='. $filename);
-$xml = new DOMDocument();
+$xml = new DOMDocument('1.0', 'UTF-8');
 $xml->formatOutput = true;
 
 $response = $xml->createElement("response");
