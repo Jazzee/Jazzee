@@ -26,7 +26,7 @@ class Application{
   private $program;
   
   /** 
-   * @ManyToOne(targetEntity="Cycle")
+   * @ManyToOne(targetEntity="Cycle", inversedBy="applications")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE")
    */
   private $cycle;
