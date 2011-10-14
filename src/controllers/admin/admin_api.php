@@ -1,6 +1,6 @@
 <?php
-ini_set('memory_limit', '1g');
-set_time_limit('120');
+ini_set('memory_limit', '512m');
+set_time_limit('240');
 /**
  * Data API
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -190,8 +190,8 @@ class AdminApiController extends \Jazzee\AdminController {
     $account->appendChild($this->dom->createElement('email', $applicant->getEmail()));
     $account->appendChild($this->dom->createElement('isLocked', $applicant->isLocked()?'yes':'no'));
     $account->appendChild($this->dom->createElement('lastLogin', $applicant->getLastLogin()->format('c')));
-    $account->appendChild($this->dom->createElement('updatedAt', $applicant->getLastLogin()->format('c')));
-    $account->appendChild($this->dom->createElement('createdAt', $applicant->getLastLogin()->format('c')));
+    $account->appendChild($this->dom->createElement('updatedAt', $applicant->getUpdatedAt()->format('c')));
+    $account->appendChild($this->dom->createElement('createdAt', $applicant->getCreatedAt()->format('c')));
     $applicantXml->appendChild($account);
     
     $decision = $this->dom->createElement("decision");
