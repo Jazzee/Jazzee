@@ -289,4 +289,8 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       } 
     }
   }
+  
+  public function getDetails(\Jazzee\Entity\Payment $payment){
+    return 'Transaction ID: ' . $payment->getVar('transactionId') . '<br />' . 'Authorization Code:' . $payment->getVar('authorizationCode');
+  }
 }

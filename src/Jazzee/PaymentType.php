@@ -86,4 +86,11 @@ interface PaymentType{
    * @param \Foundation\Form\Input $input
    */
   function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input);
+  
+  /**
+   * Get the details for a payment as text
+   * #param \Jazzee\Entity\Payment $payment
+   * @return string
+   */
+  function getDetails(\Jazzee\Entity\Payment $payment);
 }

@@ -38,5 +38,8 @@ abstract class AbstractPaymentType implements \Jazzee\PaymentType{
     return '';
   }
   
+  public function getDetails(\Jazzee\Entity\Payment $payment){
+    return '';
+  }
 }
 
