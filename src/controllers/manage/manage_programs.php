@@ -19,7 +19,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
    * List programs
    */
   public function actionIndex(){
-    $this->setVar('programs', $this->_em->getRepository('\Jazzee\Entity\Program')->findAll());
+    $this->setVar('programs', $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array(), array('name'=>'ASC')));
   }
   
   /**
@@ -52,7 +52,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
         $program->setShortName($input->get('shortName'));
         $this->addMessage('success', "Changes Saved");
         $this->_em->persist($program);
-        $this->redirect('manage/programs');
+        $this->redirectPath('manage/programs');
       }
     } else {
       $this->addMessage('error', "Error: Program #{$programID} does not exist.");
