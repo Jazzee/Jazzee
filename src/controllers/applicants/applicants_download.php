@@ -91,6 +91,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
     }
     $rows = array();
     $header = array(
+      'ID',
       'First Name',
       'Middle Name',
       'Last Name',
@@ -112,6 +113,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
     $rows[] = $header;
     foreach($applicants as $applicant){
       $arr = array(
+        $applicant->getId(),
         $applicant->getFirstName(),
         $applicant->getMiddleName(),
         $applicant->getLastName(),
@@ -165,6 +167,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
       $applicantXml = $xml->createElement("applicant");
       
       $account = $xml->createElement("account");
+      $account->appendChild($xml->createElement('id', $applicant->getId()));
       $account->appendChild($xml->createElement('firstName', $applicant->getFirstName()));
       $account->appendChild($xml->createElement('middleName', $applicant->getMiddleName()));
       $account->appendChild($xml->createElement('lastName', $applicant->getLastName()));
