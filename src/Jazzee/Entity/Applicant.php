@@ -661,11 +661,21 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
    * @param Application $application
    * @return Application
    */
-  public function findApplicantsByName($firstName, $lastName, Application $application){
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a.application = :applicationId AND a.firstName LIKE :firstName AND a.lastName LIKE :lastName order by a.lastName, a.firstName');
-    $query->setParameter('applicationId', $application->getId());
-    $query->setParameter('firstName', $firstName);
-    $query->setParameter('lastName', $lastName);
-    return $query->getResult();
+  public function findApplicantsByName($firstName, $lastName, Application $application = null){
+    $qb = $this->_em->createQueryBuilder();
+    $qb->add('select', 'a')
+     ->from('Jazzee\Entity\Applicant', 'a');
+    
+    if(!is_null($application)){
+      $qb->where('a.application = :applicationId');
+      $qb->setParameter('applicationId', $application->getId());
+    }
+    $qb->andWhere('a.firstName LIKE :firstName')
+     ->andWhere('a.lastName LIKE :lastName')
+     ->orderBy('a.lastName, a.firstName');
+    $qb->setParameter('firstName', $firstName);
+    $qb->setParameter('lastName', $lastName);
+    
+    return $qb->getQuery()->getResult();
   }
 }

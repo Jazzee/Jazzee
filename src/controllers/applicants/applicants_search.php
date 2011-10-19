@@ -26,6 +26,13 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
     $element->setLabel('Last Name');
     $element = $field->newElement('TextInput','applicantId');
     $element->setLabel('Applicant ID');
+    
+    $element = $field->newElement('RadioList','limitSearch');
+    $element->setLabel('Limit Search to this application?');
+    $element->newItem(0, 'No');
+    $element->newItem(1, 'Yes');
+    $element->setDefaultValue(1);
+
     $form->newButton('submit', 'Search');
     if($input = $form->processInput($this->post)){   
       $applicants = array();
@@ -33,10 +40,24 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
         $applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($input->get('applicantId'));
         if($applicant)  $applicants[] = $applicant;
       } else {
-        $applicants = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName($input->get('firstName') . '%', $input->get('lastName') . '%', $this->_application);        
+        if($input->get('limitSearch')){
+          $applicants = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName($input->get('firstName') . '%', $input->get('lastName') . '%', $this->_application); 
+        } else{
+          $all = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName($input->get('firstName') . '%', $input->get('lastName') . '%');  
+          $searchablePrograms = array();
+          
+          foreach($this->_em->getRepository('\Jazzee\Entity\Program')->findAll() as $program){
+            if($this->_user->isAllowed($this->controllerName, 'index', $program)) $searchablePrograms[] = $program->getId();
+          }
+          foreach($all as $applicant){
+            if(in_array($applicant->getApplication()->getProgram()->getId(), $searchablePrograms) AND $applicant->getApplication()->getCycle() == $this->_cycle) $applicants[] = $applicant;
+          }
+        }
+           
       }
       $this->setVar('applicants', $applicants);
     }
     $this->setVar('form', $form);
   }
+  
 }
