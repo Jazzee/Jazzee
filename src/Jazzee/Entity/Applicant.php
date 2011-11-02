@@ -706,4 +706,12 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
     $query = $this->_em->createQuery('UPDATE Jazzee\Entity\Applicant a SET a.failedLoginAttempts = 0 WHERE a.failedLoginAttempts > 0');
     $query->execute();
   }
+  
+  /**
+   * Reset all the unique ids
+   */
+  public function resetUniqueIds(){
+    $query = $this->_em->createQuery('UPDATE Jazzee\Entity\Applicant a SET a.uniqueId = null WHERE a.uniqueId IS NOT NULL');
+    $query->execute();
+  }
 }

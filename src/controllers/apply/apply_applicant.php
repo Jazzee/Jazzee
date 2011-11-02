@@ -314,9 +314,10 @@ class ApplyApplicantController extends \Jazzee\Controller {
    * @param AdminCronController $cron
    */
   public static function runCron(AdminCronController $cron){
-    if(time() - (int)$cron->getVar('applicantsMessagesApplicantsLastRun') > self::MIN_INTERVAL_APPLICANTS){
-      $cron->setVar('applicantsMessagesApplicantsLastRun', time());
+    if(time() - (int)$cron->getVar('applyApplicantLastRun') > self::MIN_INTERVAL_APPLICANTS){
+      $cron->setVar('applyApplicantLastRun', time());
       $cron->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->resetFailedLoginCounters();
+      $cron->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->resetUniqueIds();
     }
   }
 }
