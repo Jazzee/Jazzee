@@ -36,6 +36,11 @@ class Application{
    */
   private $applicants;
   
+  /** 
+   * @OneToMany(targetEntity="ApplicationPage", mappedBy="application")
+   */
+  private $applicationPages;
+  
   /** @Column(type="string", nullable=true) */
   private $contactName;
   
@@ -439,6 +444,18 @@ class Application{
    */
   public function getApplicants(){
     return $this->applicants;
+  }
+  
+  /**
+   * Get pages
+   * @param string $kind optionally only incude certain pages
+   * @return array \Jazzee\Entity\ApplicationPage
+   */
+  public function getApplicationPages($kind = null){
+    if(is_null($kind)) return $this->applicationPages->toArray();
+    $applicationPages = array();
+    foreach($this->applicationPages as $applicationPage) if($applicationPage->getKind() == $kind) $applicationPages[] = $applicationPage;
+    return $applicationPages;
   }
 }
 

@@ -62,6 +62,7 @@ class Lock extends Standard {
    * TextPages are always complete
    */
   public function getStatus(){
+    if($this->_applicant->isLocked()) return self::COMPLETE;
     return self::INCOMPLETE;
   }
   

@@ -74,6 +74,9 @@ class Applicant{
   /** @Column(type="datetime", nullable=true) */
   private $updatedAt;
   
+  /** @Column(type="float", nullable=true) */
+  private $percentComplete;
+  
   /** 
    * @OneToMany(targetEntity="Answer",mappedBy="applicant")
    */
@@ -439,6 +442,7 @@ class Applicant{
    */
   public function markLastUpdate(){
     if(!$this->updatedAtOveridden) $this->updatedAt = new \DateTime();
+    $this->percentComplete = null;
   }
 
   /**
@@ -627,6 +631,22 @@ class Applicant{
       foreach($thread->getMessages() as $message) 
         if(!$message->isRead(\Jazzee\Entity\Message::PROGRAM)) $count++;
     return $count;
+  }
+
+  /**
+   * Get the applicants percent complete
+   * If it isn't set then generate it
+   */
+  public function getPercentComplete(){
+    if(!is_null($this->percentComplete)) return $this->percentComplete;
+    $complete = 0;
+    $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
+    foreach($pages as $pageEntity){
+      $pageEntity->getJazzeePage()->setApplicant($this);
+      if($pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::COMPLETE OR $pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED) $complete++;
+    }
+    $this->percentComplete = round($complete/count($pages), 2);
+    return $this->percentComplete;
   }
 }
 

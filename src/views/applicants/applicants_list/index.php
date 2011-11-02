@@ -12,7 +12,7 @@
     <table id='<?php print strtolower(preg_replace('#[^a-z0-9]#i', '', $title)); ?>'>
     <caption><?php print $title; ?> (<?php print count($applicants); ?>)</caption>
       <thead>
-        <tr><th>View</th><th>Last Name</th><th>First Name</th><th>Last Update</th><th>Last Login</th><th>Account Created</th></tr>
+        <tr><th>View</th><th>Last Name</th><th>First Name</th><th>Last Update</th><th>Progress</th><th>Last Login</th><th>Account Created</th></tr>
       </thead>
       <tbody>
         <?php foreach($applicants as $applicant){?>
@@ -21,6 +21,7 @@
             <td><?php print $applicant->getLastName(); ?></td>
             <td><?php print $applicant->getFirstName(); ?></td>
             <td><?php print $applicant->getUpdatedAt()->format('m/d/y'); ?></td>
+            <td><?php print $applicant->getPercentComplete()*100; ?>%</td>
             <td><?php print $applicant->getLastLogin()->format('m/d/y'); ?></td>
             <td><?php print $applicant->getCreatedAt()->format('m/d/y'); ?></td>
           </tr>
