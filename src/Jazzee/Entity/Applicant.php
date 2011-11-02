@@ -678,4 +678,12 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
     
     return $qb->getQuery()->getResult();
   }
+  
+  /**
+   * Reset all the failed login counter for applicants
+   */
+  public function resetFailedLoginCounters(){
+    $query = $this->_em->createQuery('UPDATE Jazzee\Entity\Applicant a SET a.failedLoginAttempts = 0 WHERE a.failedLoginAttempts > 0');
+    $query->execute();
+  }
 }

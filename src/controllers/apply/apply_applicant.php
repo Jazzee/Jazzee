@@ -10,6 +10,12 @@ class ApplyApplicantController extends \Jazzee\Controller {
   const MAX_FAILED_LOGIN_ATTEMPTS = 5;
   
   /**
+   * Minimum interval between clearning bad login applicants in seconds
+   * @const ingeger
+   */
+  const MIN_INTERVAL_APPLICANTS = 7200;
+  
+  /**
    * The application
    * @var \Jazzee\Entity\Application
    */
@@ -81,8 +87,9 @@ class ApplyApplicantController extends \Jazzee\Controller {
       $message = '';
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
       if($applicant){
-        if($applicant->getFailedLoginAttempts() >= self::MAX_FAILED_LOGIN_ATTEMPTS){
-          $this->addMessage('error', 'Your account has been locked because an incorect password was entered too many times.  Please reset your password to unlock your account.');
+        if($applicant->getFailedLoginAttempts()+1 >= self::MAX_FAILED_LOGIN_ATTEMPTS){
+          $applicant->loginFail();
+          $this->addMessage('error', 'Your account has been locked because an incorect password was entered too many times.  You must reset your password to continue.');
           $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword');
         } else {
           if($applicant->checkPassword($input->get('password'))){
@@ -298,4 +305,18 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $navigation->addMenu($menu);
     return $navigation;
   } 
+  
+  
+  
+  /**
+   * Reset lockout and kill password reset keys
+   * 
+   * @param AdminCronController $cron
+   */
+  public static function runCron(AdminCronController $cron){
+    if(time() - (int)$cron->getVar('applicantsMessagesApplicantsLastRun') > self::MIN_INTERVAL_APPLICANTS){
+      $cron->setVar('applicantsMessagesApplicantsLastRun', time());
+      $cron->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->resetFailedLoginCounters();
+    }
+  }
 }

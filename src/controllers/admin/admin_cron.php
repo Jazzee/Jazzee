@@ -36,6 +36,10 @@ class AdminCronController extends \Jazzee\AdminController {
         $class::runCron($this);
       }   
     }
+    //Perform and applicant actions
+    \Foundation\VC\Config::includeController('apply_applicant');
+    ApplyApplicantController::runCron($this);
+
     
     //clear the semephore
     $this->setVar('adminCronSemephore', false);
