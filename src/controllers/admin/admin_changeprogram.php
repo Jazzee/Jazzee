@@ -60,6 +60,38 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
   }
   
   /**
+   * Get a list of the allowed programs in json
+   */
+  public function actionGetAllowedPrograms(){
+    $allPrograms = $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array('isExpired' => false), array('name' => 'ASC'));
+    $userPrograms = $this->_user->getPrograms();
+    $programList = array();
+    foreach($allPrograms as $program){
+      if($this->checkIsAllowed($this->controllerName, 'anyProgram') or in_array($program->getId(), $userPrograms)) $programList[] = array('id'=>$program->getId(), 'name'=>$program->getName());
+    }
+    $this->layout = 'json';
+    $this->setVar('result', $programList);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Change to a program
+   */
+  public function actionChangeTo(){
+    $programId = (int)$this->post['programId'];
+    $userPrograms = $this->_user->getPrograms();
+    if(!in_array($programId, $userPrograms) and !$this->checkIsAllowed($this->controllerName, 'anyProgram')){
+      throw new \Jazzee\Exception("User {$this->_user->getFirstName()} {$this->_user->getLastName()} #{$this->_user->getId()} attempted to change to program {$programId} which they do not have access to.");
+    }
+    $this->_program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($programId);
+    unset($this->_store->AdminControllerGetNavigation);
+    $this->layout = 'json';
+    $this->addMessage('success', 'Program changed to ' . $this->_program->getName());  
+    $this->setVar('result', array('programName'=>$this->_program->getName()));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
    * Change to any program
    * This method doesn't actually do anything it is just here to trigger an authorization lookup
    */
@@ -77,7 +109,9 @@ class AdminChangeprogramController extends \Jazzee\AdminController {
    * @return bool
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
-    if($user and $action=='index'){
+    //Several actions are allowed as long as the user is in at least one program
+    $specialActions = array('index', 'getAllowedPrograms', 'changeTo');
+    if($user and in_array($action, $specialActions)){
       $userPrograms = $user->getPrograms();
       return (parent::isAllowed($controller, 'anyprogram', $user) or !empty($userPrograms));
     }

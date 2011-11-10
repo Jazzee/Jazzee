@@ -15,6 +15,16 @@ class ManagePendingPaymentsController extends \Jazzee\AdminController {
   const REQUIRE_APPLICATION = false;
   
   /**
+   * Add the required JS
+   */
+  protected function setUp(){
+    parent::setUp();
+    $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/ChangeProgram.class.js'));
+    $this->addScript($this->path('resource/scripts/controllers/manage_pendingpayments.controller.js'));
+  }
+  
+  /**
    * List all the pending payments in the system
    */
   public function actionIndex(){
