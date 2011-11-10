@@ -12,6 +12,15 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
   
   const ACTION_INDEX = 'Search Applicants';
   
+    /**
+   * Add the required JS
+   */
+  protected function setUp(){
+    parent::setUp();
+    $this->addScript($this->path('resource/scripts/classes/ChangeProgram.class.js'));
+    $this->addScript($this->path('resource/scripts/controllers/applicants_search.controller.js'));
+  }
+  
   /**
    * Display a search form and links to views
    */

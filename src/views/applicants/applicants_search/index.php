@@ -16,7 +16,7 @@ if(isset($applicants)){?>
     <tbody>
       <?php foreach($applicants as $applicant){?>
         <tr>
-          <td><a href='<?php print $this->path('applicants/single/' . $applicant->getId());?>' title='<?php print $applicant->getFirstName() . ' ' . $applicant->getLastName();?>'>Application</a></td>
+          <td><a class='applicantLink' programId='<?php print $applicant->getApplication()->getProgram()->getId(); ?>' href='<?php print $this->path('applicants/single/' . $applicant->getId());?>' title='<?php print $applicant->getFirstName() . ' ' . $applicant->getLastName();?>'>Application</a></td>
           <td><?php print $applicant->getLastName(); ?></td>
           <td><?php print $applicant->getFirstName(); ?></td>
           <td><?php print $applicant->getApplication()->getProgram()->getName(); ?></td>
