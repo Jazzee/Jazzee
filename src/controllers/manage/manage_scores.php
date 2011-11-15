@@ -117,6 +117,7 @@ class ManageScoresController extends \Jazzee\AdminController {
       }
       $this->_em->persist($score);
     }
+    $this->_em->flush();
     $this->addMessage('success', count($scores) . " scores read from file, {$new} of them were new.");
     $this->redirectPath('manage/scores');
   }
