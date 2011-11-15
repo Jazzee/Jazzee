@@ -10,7 +10,7 @@
 <table>
   <thead>
     <tr>
-      <th>Recommenders</th>
+      <th>Recommender</th>
       <th>Status</th>
     </tr>
   </thead>
@@ -32,7 +32,9 @@ if($answers = $page->getJazzeePage()->getAnswers()){ ?>
       <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?>
       <?php if($answer->getUpdatedAt()->diff(new DateTime('now'))->days < \Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS){?> 
         You will be able to send the invitation to your recommender again in <?php print (\Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS - $answer->getUpdatedAt()->diff(new DateTime('now'))->days);?> days.
-      <?php }?>
+      <?php } else {?>
+        <br /><a class='invite' href='<?php print $this->controller->getActionPath();?>/do/sendEmail/<?php print $answer->getPage()->getId()?>/<?php print $answer->getId()?>'>Send Reminder Email</a>
+      <?php } ?>
     <?php }?>
     </td>
   </tr>

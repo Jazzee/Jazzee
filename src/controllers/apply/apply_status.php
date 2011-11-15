@@ -152,6 +152,27 @@ class ApplyStatusController extends \Jazzee\ApplyController {
   }
   
   /**
+   * Get the path to this page
+   * @return string
+   */
+  public function getActionPath(){
+    return $this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
+  }
+  
+  /**
+   * Perform a generic ApplyPage specific action
+   * Pass the input through to the apply page
+   */
+  public function actionDo() {
+    $what = $this->actionParams['what'];
+    $applicationPage = $this->_pages[$this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$this->actionParams['pageId'], 'application'=>$this->_application->getId()))->getId()];
+    if(method_exists($applicationPage->getJazzeePage(), $what)){
+      $applicationPage->getJazzeePage()->$what($this->actionParams['answerId'], $this->post);
+    }
+    $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
+  }
+  
+  /**
    * Navigation
    * @return Navigation
    */
