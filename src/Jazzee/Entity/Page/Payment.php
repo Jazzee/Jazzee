@@ -95,13 +95,7 @@ class Payment extends Standard {
   }
   
   public function getAnswers(){
-    $answers = array();
-    foreach($this->getAllAnswers() as $answer){
-      if($answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::PENDING or $answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::SETTLED){
-        $answers[] = $answer;
-      }
-    }
-    return $answers;
+    return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
   
   public function getXmlAnswers(\DOMDocument $dom){
@@ -119,10 +113,6 @@ class Payment extends Standard {
       $answers[] = $answerXml;
     }
     return $answers;
-  }
-  
-  public function getAllAnswers(){
-    return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
   
   /**

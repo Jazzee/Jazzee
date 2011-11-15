@@ -135,5 +135,14 @@ $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/resetpassword/([a-z0-9
   )
 ));
 
+//dynmaic files like applicant pdfs and previews stored in sessions
+$basicRouter->addRoute('#^transaction/(.*)$#i', array( 
+  'controller' => 'transaction',
+  'action' => 'post',
+  'action_params' => array(
+    'name' => 1
+  )
+));
+
 $fc->addRouter($basicRouter);
 $fc->processRequest(new Lvc_HttpRequest());

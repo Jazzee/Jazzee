@@ -16,7 +16,7 @@ $page->getJazzeePage()->setApplicant($applicant);
       </thead>
       <tbody>
       <?php 
-      foreach($page->getJazzeePage()->getAllAnswers() as $answer){
+      foreach($page->getJazzeePage()->getAnswers() as $answer){
         $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-applicants-single-answer');
         $this->renderElement($elementName, array('page'=>$page, 'answer'=>$answer));
       }?>
