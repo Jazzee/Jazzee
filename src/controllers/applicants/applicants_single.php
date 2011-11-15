@@ -892,10 +892,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
-        $payment->getType()->getJazzeePaymentType()->settlePayment($payment, $input);
-        $this->_em->persist($payment);
-        foreach($payment->getVariables() as $var) $this->_em->persist($var);
-        $this->setLayoutVar('status', 'success');
+        $result = $payment->getType()->getJazzeePaymentType()->settlePayment($payment, $input);
+        if($result === true){
+          $this->_em->persist($payment);
+          foreach($payment->getVariables() as $var) $this->_em->persist($var);
+          $this->setLayoutVar('status', 'success');
+        } else {
+          $fields = $form->getFields();
+          $elements = $fields[0]->getElements();
+          array_pop($elements)->addMessage($result);
+          $this->setLayoutVar('status', 'error');
+        }
       } else {
         $this->setLayoutVar('status', 'error');
       }
@@ -919,10 +926,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
-        $payment->getType()->getJazzeePaymentType()->refundPayment($payment, $input);
-        $this->_em->persist($payment);
-        foreach($payment->getVariables() as $var) $this->_em->persist($var);
-        $this->setLayoutVar('status', 'success');
+        $result = $payment->getType()->getJazzeePaymentType()->refundPayment($payment, $input);
+        if($result === true){
+          $this->_em->persist($payment);
+          foreach($payment->getVariables() as $var) $this->_em->persist($var);
+          $this->setLayoutVar('status', 'success');
+        } else {
+          $fields = $form->getFields();
+          $elements = $fields[0]->getElements();
+          array_pop($elements)->addMessage($result);
+          $this->setLayoutVar('status', 'error');
+        }
       } else {
         $this->setLayoutVar('status', 'error');
       }
@@ -946,10 +960,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
-        $payment->getType()->getJazzeePaymentType()->rejectPayment($payment, $input);
-        $this->_em->persist($payment);
-        foreach($payment->getVariables() as $var) $this->_em->persist($var);
-        $this->setLayoutVar('status', 'success');
+        $result = $payment->getType()->getJazzeePaymentType()->rejectPayment($payment, $input);
+        if($result === true){
+          $this->_em->persist($payment);
+          foreach($payment->getVariables() as $var) $this->_em->persist($var);
+          $this->setLayoutVar('status', 'success');
+        } else {
+          $fields = $form->getFields();
+          $elements = $fields[0]->getElements();
+          array_pop($elements)->addMessage($result);
+          $this->setLayoutVar('status', 'error');
+        }
       } else {
         $this->setLayoutVar('status', 'error');
       }

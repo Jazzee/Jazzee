@@ -187,7 +187,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       $payment->setVar('rejectedReason', 'This payment was voided.');
       return true;
     }
-    return false;
+    return "Unable to settle transaction #{$payment->getVar('transactionId')} authorize.net said: {$response->response_reason_text}";
   }
   
   /**
@@ -223,7 +223,10 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       return true;
     }
     //if we cant void we are probably already settled so try and settle the payment in our system
-    return $this->settlePayment($payment, $input);
+    $settled = $this->settlePayment($payment, $input);
+    if($settled === true) return 'Cannot void payment becuase it has already been settled.';
+    //otherwise return the original error
+    return "Unable to submit void for transaction #{$payment->getVar('transactionId')} authorize.net said: {$response->response_reason_text}";
   }
   
   /**
@@ -269,6 +272,8 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       $payment->refunded();
       $payment->setVar('refundedReason', $input->get('refundedReason'));
       return true;
+    } else {
+      return "Unable to submit refund for transaction #{$payment->getVar('transactionId')} authorize.net said: {$response->response_reason_text}";
     }
     return false;
   }
@@ -283,10 +288,11 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $class = new AuthorizeNetAIM($paymentType);
     $fakeInput = new \Foundation\Form\Input(array());
     foreach($payments as $payment){
-      if($class->settlePayment($payment, $fakeInput)){
+      $result = $class->settlePayment($payment, $fakeInput);
+      if($result === true){
         $cron->getEntityManager()->persist($payment);
         foreach($payment->getVariables() as $var) $cron->getEntityManager()->persist($var);
-      } 
+      }
     }
   }
   
