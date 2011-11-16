@@ -20,6 +20,7 @@ class PDFFileInput extends AbstractElement {
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
     }
+    $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
     
