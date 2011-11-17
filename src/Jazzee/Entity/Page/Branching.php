@@ -128,7 +128,7 @@ class Branching extends Standard
       $eXml->setAttribute('elementId', 'branching');
       
       
-      $eXml->setAttribute('title', htmlentities($answer->getPage()->getVar('branchingElementLabel')));
+      $eXml->setAttribute('title', htmlentities($answer->getPage()->getVar('branchingElementLabel'),ENT_COMPAT,'utf-8'));
       $eXml->setAttribute('type', null);
       $eXml->appendChild($dom->createCDATASection($child->getPage()->getTitle()));
       $xmlAnswer->appendChild($eXml);

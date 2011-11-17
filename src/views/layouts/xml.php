@@ -5,6 +5,7 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
+header('Content-Type:text/html; charset=UTF-8');
 header("Content-type: application/xml");
 header('Content-Disposition: attachment; filename='. $filename);
 $xml = new DOMDocument('1.0', 'UTF-8');

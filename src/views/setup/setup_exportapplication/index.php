@@ -10,7 +10,7 @@ $app = $xml->createElement("application");
 $preferences = $xml->createElement("preferences");
 $preferences->appendChild($xml->createElement('contactName', $application->getContactName()));
 $preferences->appendChild($xml->createElement('contactEmail', $application->getContactEmail()));
-$preferences->appendChild($xml->createElement('welcome', htmlentities($application->getWelcome())));
+$preferences->appendChild($xml->createElement('welcome', htmlentities($application->getWelcome(),ENT_COMPAT,'utf-8')));
 $preferences->appendChild($xml->createElement('open', $application->getOpen()->format('c')));
 $preferences->appendChild($xml->createElement('close', $application->getClose()->format('c')));
 $preferences->appendChild($xml->createElement('begin', $application->getBegin()->format('c')));

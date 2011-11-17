@@ -202,7 +202,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
       $pages = $xml->createElement("pages");
       foreach($applicationPages as $applicationPage){
         $page = $xml->createElement("page");
-        $page->setAttribute('title', htmlentities($applicationPage->getTitle()));
+        $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
         $page->setAttribute('pageId', $applicationPage->getPage()->getId());
         $answersXml = $xml->createElement('answers');
         $applicationPage->getJazzeePage()->setApplicant($applicant);

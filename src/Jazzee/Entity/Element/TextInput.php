@@ -35,7 +35,7 @@ class TextInput extends AbstractElement {
   public function displayValue(\Jazzee\Entity\Answer $answer){
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if(isset($elementsAnswers[0])){
-      return htmlentities($elementsAnswers[0]->getEShortString());
+      return htmlentities($elementsAnswers[0]->getEShortString(),ENT_COMPAT,'utf-8');
     }
     return null;
   }

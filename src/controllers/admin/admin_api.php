@@ -219,8 +219,8 @@ class AdminApiController extends \Jazzee\AdminController {
     $pages = $this->dom->createElement("pages");
     foreach($applicationPages as $applicationPage){
       $page = $this->dom->createElement("page");
-      $page->setAttribute('title', htmlentities($applicationPage->getTitle()));
-      $page->setAttribute('type', htmlentities($applicationPage->getPage()->getType()->getClass()));
+      $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
+      $page->setAttribute('type', htmlentities($applicationPage->getPage()->getType()->getClass(),ENT_COMPAT,'utf-8'));
       $page->setAttribute('pageId', $applicationPage->getPage()->getId());
       $answersXml = $this->dom->createElement('answers');
       $applicationPage->getJazzeePage()->setApplicant($applicant);
@@ -246,14 +246,14 @@ class AdminApiController extends \Jazzee\AdminController {
   protected function pageXml($page){
     $pxml = $this->dom->createElement('page');
     $pxml->setAttribute('id', $page->getId());
-    $pxml->setAttribute('title', htmlentities($page->getTitle()));
+    $pxml->setAttribute('title', htmlentities($page->getTitle(),ENT_COMPAT,'utf-8'));
     $pxml->setAttribute('min', $page->getMin());
     $pxml->setAttribute('max', $page->getMax());
     $pxml->setAttribute('required', $page->isRequired());
     $pxml->setAttribute('answerStatusDisplay', $page->answerStatusDisplay());
-    $pxml->setAttribute('instructions', htmlentities($page->getInstructions()));
-    $pxml->setAttribute('leadingText', htmlentities($page->getLeadingText()));
-    $pxml->setAttribute('trailingText', htmlentities($page->getTrailingText()));
+    $pxml->setAttribute('instructions', htmlentities($page->getInstructions(),ENT_COMPAT,'utf-8'));
+    $pxml->setAttribute('leadingText', htmlentities($page->getLeadingText(),ENT_COMPAT,'utf-8'));
+    $pxml->setAttribute('trailingText', htmlentities($page->getTrailingText(),ENT_COMPAT,'utf-8'));
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $pxml->setAttribute('id', $page->getPage()->getId());
       $pxml->setAttribute('weight', $page->getWeight());
@@ -270,22 +270,22 @@ class AdminApiController extends \Jazzee\AdminController {
     foreach($page->getElements() as $element){
       $exml = $this->dom->createElement('element');
       $exml->setAttribute('id', $element->getId());
-      $exml->setAttribute('title', htmlentities($element->getTitle()));
+      $exml->setAttribute('title', htmlentities($element->getTitle(),ENT_COMPAT,'utf-8'));
       $exml->setAttribute('class', $element->getType()->getClass());
       $exml->setAttribute('fixedId', $element->getFixedId());
       $exml->setAttribute('weight', $element->getWeight());
       $exml->setAttribute('min', $element->getMin());
       $exml->setAttribute('max', $element->getMax());
       $exml->setAttribute('required', $element->isRequired());
-      $exml->setAttribute('instructions', htmlentities($element->getInstructions()));
-      $exml->setAttribute('format', htmlentities($element->getFormat()));
+      $exml->setAttribute('instructions', htmlentities($element->getInstructions(),ENT_COMPAT,'utf-8'));
+      $exml->setAttribute('format', htmlentities($element->getFormat(),ENT_COMPAT,'utf-8'));
       $exml->setAttribute('defaultValue', $element->getDefaultValue());
       $listItems = $exml->appendChild($this->dom->createElement('listitems'));
       foreach($element->getListItems() as $item){
         //only export active items
         if($item->isActive()){
           $ixml = $this->dom->createElement('item');
-          $ixml->nodeValue = htmlentities($item->getValue());
+          $ixml->nodeValue = htmlentities($item->getValue(),ENT_COMPAT,'utf-8');
           $ixml->setAttribute('active', (integer)$item->isActive());
           $ixml->setAttribute('weight', $item->getWeight());
           $listItems->appendChild($ixml);

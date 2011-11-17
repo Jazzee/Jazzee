@@ -38,9 +38,11 @@ $connectionParams = array(
   'host' => $jazzeeConfiguration->getDbHost(),
   'port' => $jazzeeConfiguration->getDbPort(),
   'driver' => $jazzeeConfiguration->getDbDriver(),
+  'charset' => 'utf8'
 );
 
 $em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
+$em->getConnection()->setCharset('utf8');
 $helpers = array(
     'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($em->getConnection()),
     'em' => new \Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper($em)
