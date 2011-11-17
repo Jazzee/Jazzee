@@ -17,3 +17,10 @@ if(isset($form)){
 <tr><td>TOEFL</td><td><?php print $toeflCount ?></td><td><?php print $toeflMatchedCount ?></td><td><?php print $toeflUnmatchedCount ?></td></tr>
 </tbody>
 </table>
+
+<h4>List of GRE Cycles</h4>
+<ul>
+<?php foreach($greCycles as $cycle){?>
+  <li><?php print $cycle;?></li>
+<?php } ?>
+</ul>

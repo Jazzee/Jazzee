@@ -38,6 +38,7 @@ class ManageScoresController extends \Jazzee\AdminController {
     $this->setVar('form', $form);
     $greStats = $this->_em->getRepository('\Jazzee\Entity\GREScore')->getStatistics();
     $this->setVar('greCount', $greStats['total']);
+    $this->setVar('greCycles', $greStats['cycles']);
     $this->setVar('greMatchedCount','Not updated');
     $this->setVar('greUnmatchedCount','Not updated');
     

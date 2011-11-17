@@ -651,6 +651,13 @@ class GREScoreRepository extends \Doctrine\ORM\EntityRepository{
     $query = $this->_em->createQuery('SELECT count(g) as Total FROM Jazzee\Entity\GREScore g');
     $result = $query->getResult();
     $return['total'] = $result[0]['Total'];
+    
+    $query = $this->_em->createQuery("SELECT DISTINCT(CONCAT(CONCAT(g.testYear,'-'),g.cycleNumber) as Cycle FROM Jazzee\Entity\GREScore g ORDER BY Cycle DESC");
+
+    foreach($query->getResult() as $arr){
+      $return['cycles'][] = $arr['Cycle'];
+    }
+    
     return $return;
   }
   
