@@ -247,13 +247,14 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $field->setLegend('Refund Payment');
     $element = $field->newElement('Plaintext', 'details');
     $element->setLabel('Details');
-    $element->setValue('Refund $' . $payment->getAmount() . ' to card ' . $response->xml->transaction->payment->creditCard->cardNumber);  
+    $element->setValue('Refund $' . $payment->getAmount() . ' to card ' . $response->xml->transaction->payment->creditCard->cardNumber);
     
     $element = $field->newElement('Textarea','refundedReason');
     $element->setLabel('Reason displayed to Applicant');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newHiddenElement('cardNumber', substr($response->xml->transaction->payment->creditCard->cardNumber, strlen($response->xml->transaction->payment->creditCard->cardNumber)-4, 4));
+    $form->newHiddenElement('zip', (string)$response->xml->transaction->billTo->zip);
     $form->newButton('submit', 'Save');
     return $form;
   }
@@ -267,6 +268,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $aim->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     $config = new \Jazzee\Configuration();
     $aim->test_request = ($config->getStatus() == 'PRODUCTION')?0:1;
+    $aim->zip = $input->get('zip');
     $response = $aim->credit($payment->getVar('transactionId'), $payment->getAmount(), $input->get('cardNumber'));
     if($response->approved) {
       $payment->refunded();
