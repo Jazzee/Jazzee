@@ -237,7 +237,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $transactionId = $payment->getVar('transactionId');
     $response = $td->getTransactionDetails($transactionId);
     if(!$response->response or $response->isError())
-      throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
+      throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId} authorize.net said " . $response->getMessageText(), E_ERROR, 'There was a problem getting payment information.');
     //has this transaction has been settled already
     if($response->xml->transaction->transactionStatus == 'settledSuccessfully'){
       $payment->settled();
@@ -248,7 +248,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       $payment->setVar('rejectedReason', 'This payment was voided.');
       return true;
     }
-    return "Unable to settle transaction #{$payment->getVar('transactionId')} authorize.net said: {$response->response_reason_text}";
+    return "Unable to settle transaction #{$payment->getVar('transactionId')} authorize.net said: " . $response->getMessageText();
   }
   
   /**
@@ -287,7 +287,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $settled = $this->settlePayment($payment, $input);
     if($settled === true) return 'Cannot void payment becuase it has already been settled.';
     //otherwise return the original error
-    return "Unable to submit void for transaction #{$payment->getVar('transactionId')} authorize.net said: {$response->response_reason_text}";
+    return "Unable to submit void for transaction #{$payment->getVar('transactionId')} authorize.net said: " . $response->getMessageText();
   }
   
   /**
@@ -301,7 +301,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     $transactionId = $payment->getVar('transactionId');
     $response = $td->getTransactionDetails($transactionId);
     if($response->isError())
-      throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
+      throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}.  Authorize.net said ". $response->getMessageText(), E_ERROR, 'There was a problem getting payment information.');
      
     $form = new \Foundation\Form;
     $field = $form->newField();
@@ -336,7 +336,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       $payment->setVar('refundedReason', $input->get('refundedReason'));
       return true;
     } else {
-      return "Unable to submit refund for transaction #{$payment->getVar('transactionId')} authorize.net said: {$response->response_reason_text}";
+      return "Unable to submit refund for transaction #{$payment->getVar('transactionId')} authorize.net said: " . $response->getMessageText();
     }
     return false;
   }
