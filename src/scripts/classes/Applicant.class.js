@@ -275,7 +275,7 @@ Applicant.prototype.displayPages = function(json){
   var self = this;
   $('#pages').empty();
   for(var i=0; i<json.pages.length; i++){
-    var div = $('<div>').attr('id','page'+json.pages[i].id).data('pageId', json.pages[i].id);
+    var div = $('<div>').data('pageId', json.pages[i].id);
     div.html(json.pages[i].content);
     $('#pages').append(div);
     this.catchPageLinks(json.pages[i].id);
@@ -287,9 +287,13 @@ Applicant.prototype.displayPages = function(json){
  * @param Int pageId
  */
 Applicant.prototype.displayPage = function(pageId){
+  //overlay the page so you can tell it is reloading
+  $('#page'+pageId+' .answers').first().hide().html('<p>Loading your changes.<br /><img src="resource/foundation/media/ajax-bar.gif"></p>').fadeIn();
   var self = this;
   $.get(this.baseUrl + '/refreshPage/' + pageId,function(html){
-    $('#page'+pageId).html(html);
+    var div = $('<div>').data('pageId', pageId);
+    div.html(html);
+    $('#page'+pageId).replaceWith(div);
     self.catchPageLinks(pageId);
   });
 };
