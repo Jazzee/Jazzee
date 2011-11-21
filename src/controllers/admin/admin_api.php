@@ -192,6 +192,7 @@ class AdminApiController extends \Jazzee\AdminController {
     $account->appendChild($this->dom->createElement('lastLogin', $applicant->getLastLogin()->format('c')));
     $account->appendChild($this->dom->createElement('updatedAt', $applicant->getUpdatedAt()->format('c')));
     $account->appendChild($this->dom->createElement('createdAt', $applicant->getCreatedAt()->format('c')));
+    $account->appendChild($this->dom->createElement('percentComplete', $applicant->getPercentComplete()));
     $applicantXml->appendChild($account);
     
     $decision = $this->dom->createElement("decision");
