@@ -51,7 +51,12 @@ class Payment extends Standard {
     }
     //we are eithier processing a good choice of payment and amount or the input from an \Jazzee\Payment form
     //eithier way we need to create the apply payment form
-    $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType()->paymentForm($this->_applicant, $input['amount'], $this->_controller->getActionPath());
+    //admin pages get a different form
+    if(\get_class($this->_controller) == 'ApplicantsSingleController'){
+      $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType()->adminPaymentForm($this->_applicant, $input['amount'], $this->_controller->getActionPath());
+    } else {
+      $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType()->paymentForm($this->_applicant, $input['amount'], $this->_controller->getActionPath());
+    }
     $this->_form->newHiddenElement('level', 2);
     $this->_form->newHiddenElement('paymentType',$input['paymentType']);
     
@@ -68,7 +73,12 @@ class Payment extends Standard {
     $payment = new \Jazzee\Entity\Payment();
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
     $answer->setPayment($payment);
-    $result = $payment->getType()->getJazzeePaymentType()->pendingPayment($payment, $input);
+    //admin pages get a different payment page
+    if(\get_class($this->_controller) == 'ApplicantsSingleController'){
+      $result = $payment->getType()->getJazzeePaymentType()->adminPendingPayment($payment, $input);
+    } else {
+      $result = $payment->getType()->getJazzeePaymentType()->pendingPayment($payment, $input);
+    }
     if($result){
       $this->_controller->addMessage('success', 'Your payment has been recorded.');
       $this->_form = null;

@@ -13,6 +13,15 @@ interface PaymentType{
    * @return Form
    */
   function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath);
+
+  /**
+   * Get the form for new payments in the admin interface
+   * @param \Jazzee\Entity\Applicant $applicant
+   * @param float $amount
+   * @param string $actionPath where we are posting the form to
+   * @return Form
+   */
+  function adminPaymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath);
   
   /**
    * Applypage paymetn status text
@@ -35,6 +44,13 @@ interface PaymentType{
    * @param Input $input the input from the form
    */
   function setup(\Foundation\Form\Input $input);
+  
+  /**
+   * Record a payment as pending from the admin interface
+   * @param \Jazzee\Entity\Payment $payment
+   * @param \Foundation\Form\Input $input
+   */
+  function adminPendingPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input);
   
   /**
    * Record a payment as pending

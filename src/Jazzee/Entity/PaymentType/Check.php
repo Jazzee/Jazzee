@@ -40,6 +40,10 @@ class Check extends AbstractPaymentType{
     return $form;
   }
   
+  public function adminPaymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath) {
+    return $this->paymentForm($applicant, $amount, $actionPath);
+  }
+  
   public function getStatusText(\Jazzee\Entity\Payment $payment){
     $status = '<p><strong>Make Checks Payable to:</strong> ' . $this->_paymentType->getVar('payable') . '</p>';
     if($this->_paymentType->getVar('address')) $status .= '<p><h4>Mail Check to:</h4>' . nl2br($this->_paymentType->getVar('address')) . '</p>';
@@ -114,6 +118,10 @@ class Check extends AbstractPaymentType{
     $payment->setAmount($input->get('amount'));
     $payment->pending();
     return true;
+  }
+  
+  public function adminPendingPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
+    return $this->pendingPayment($payment, $input);
   }
   
   /**
