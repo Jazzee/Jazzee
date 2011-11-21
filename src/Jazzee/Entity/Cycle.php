@@ -77,7 +77,9 @@ class Cycle{
    * @param string $dateTime
    */
   public function setStart($dateTime){
-    $this->start = new \DateTime($dateTime);
+    $start = new \DateTime($dateTime);
+    if($this->end and $start > $this->end) throw new \Jazzee\Exception('Cycle start date must be before end date.');
+    $this->start = $start;
   }
   
   /**
@@ -85,7 +87,9 @@ class Cycle{
    * @param string $dateTime
    */
   public function setEnd($dateTime){
-    $this->end = new \DateTime($dateTime);
+    $end = new \DateTime($dateTime);
+    if($this->start and $end < $this->start) throw new \Jazzee\Exception('Cycle end date must be after start date.');
+    $this->end = $end;
   }
 }
 
