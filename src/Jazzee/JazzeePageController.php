@@ -250,22 +250,8 @@ class JazzeePageController extends \Foundation\VC\Controller
    * @return string the contents of the preview
    */
   public function pdfThumbnail($uniqueName, $blob){
-    //temporailry disable thumbnails
-    $tmpPdfCachePath = $this->getVarPath() . '/cache/tempPreview.pdfPreview.png';
-    if(is_readable($tmpPdfCachePath)){
-      return file_get_contents($tmpPdfCachePath);
-    }
-    $fakePdfPath = realpath(__DIR__ . '/../../lib/foundation/src/media/default_pdf_logo.png');
-    $im = new \imagick;
-    $im->readimage($fakePdfPath);
-    $im->scaleimage(100, 0);
-
-    $previewBlob = $im->getimageblob();
-    file_put_contents($tmpPdfCachePath, $previewBlob);
-    return $previewBlob;
-  
-//    $cachePath = $this->getVarPath() . '/cache/' . (sha1($uniqueName)) . '.pdfPreview.png';
-//    return \thumbnailPDF($blob, 100, 0, $cachePath);
+    $cachePath = $this->getVarPath() . '/cache/' . (sha1($uniqueName)) . '.pdfPreview.png';
+    return \thumbnailPDF($blob, 100, 0, $cachePath);
   }
   
   /**
