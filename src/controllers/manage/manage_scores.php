@@ -74,12 +74,23 @@ class ManageScoresController extends \Jazzee\AdminController {
         return false;
     }
     $new = 0;
+    $count = 0;
     foreach ($scores AS $arr){
+      $count++;
       $parameters = array(
         'registrationNumber' => $arr['registrationNumber'],
         'testMonth' => $arr['testMonth'],
         'testYear' => $arr['testYear']
       );
+      
+      //these fields should not be null, but sometimes ETS messes it up
+      $requiredFields = array('id', 'registrationNumber', 'testMonth', 'testYear', 'firstName', 'lastName', 'birthDate', 'testDate', 'testCode', 'testName', 'score1Type', 'score1Converted', 'score1Percentile', 'sequenceNumber', 'recordSerialNumber', 'cycleNumber', 'processDate');
+      foreach($arr as $name => $value){
+        if(in_array($name, $requiredFields) and is_null($value)){
+          $this->addMessage('error', "{$name} was not set on line {$count} for {$arr['firstName']} {$arr['lastName']}");
+          $this->redirectPath('manage/scores');
+        }
+      }
       if(!$score = $this->_em->getRepository('\Jazzee\Entity\GREScore')->findOneBy($parameters)){
         $score = new \Jazzee\Entity\GREScore();
         $score->setRegistrationNumber($arr['registrationNumber'], $arr['testMonth'], $arr['testYear']);
@@ -227,14 +238,26 @@ class ManageScoresController extends \Jazzee\AdminController {
     }
     
     $new = 0;
+    $count = 0;
     //we have to look for cases of the same score appearing twice in the same file
     $used = array();
     foreach ($scores AS $arr){
+      $count++;
       $parameters = array(
         'registrationNumber' => $arr['registrationNumber'],
         'testMonth' => $arr['testMonth'],
         'testYear' => $arr['testYear']
       );
+      
+      //these fields should not be null, but sometimes ETS messes it up
+      $requiredFields = array('id', 'registrationNumber', 'testMonth', 'testYear', 'lastName', 'birthDate', 'nativeCountry', 'nativeLanguage', 'testDate', 'testType');
+      foreach($arr as $name => $value){
+        if(in_array($name, $requiredFields) and is_null($value)){
+          $this->addMessage('error', "{$name} was not set on line {$count} for {$arr['firstName']} {$arr['lastName']}");
+          $this->redirectPath('manage/scores');
+        }
+      }
+      
       if(!$score = $this->_em->getRepository('\Jazzee\Entity\TOEFLScore')->findOneBy($parameters) and !in_array($arr['registrationNumber'] . $arr['testMonth'] . $arr['testYear'], $used)){
         $used[] = $arr['registrationNumber'] . $arr['testMonth'] . $arr['testYear'];
         $score = new \Jazzee\Entity\TOEFLScore();
