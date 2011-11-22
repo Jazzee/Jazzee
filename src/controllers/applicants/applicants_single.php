@@ -784,6 +784,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $element->setLabel('File');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
+    $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
         
     $form->newButton('submit', 'Attach PDF to Answer');
@@ -839,6 +840,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $element->setLabel('File');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
+    $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
         
     $form->newButton('submit', 'Attach PDF to Applicant');

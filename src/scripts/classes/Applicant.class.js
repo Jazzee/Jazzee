@@ -42,6 +42,8 @@ Applicant.prototype.createForm = function(json, callback){
 	var div = $('<div>');
     div.css("overflow-y", "auto");
     div.html(form.create(json));
+    var statusP = $('<p>').addClass('status').html('<img src="resource/foundation/media/ajax-bar.gif" />').hide();
+    div.prepend(statusP);
     div.dialog({
       modal: true,
       autoOpen: true,
@@ -57,6 +59,7 @@ Applicant.prototype.createForm = function(json, callback){
     });
     
     $('form', div).bind('submit',function(e){
+      $('p.status', div).fadeIn();
       //give our iframe a unique name from the timestamp
       var iFrameName = "iFrame" + (new Date().getTime());
       var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
