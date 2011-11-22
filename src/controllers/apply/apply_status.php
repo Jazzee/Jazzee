@@ -117,6 +117,9 @@ class ApplyStatusController extends \Jazzee\ApplyController {
    * Admit Letter
    */
   public function actionAdmitLetter(){
+    if(!$this->_applicant->getDecision()->getFinalAdmit()){
+      throw new \Jazzee\Exception("Applicant {$this->_applicant->getFullName()} tried to access final admit letter, but they are not admitted.", E_USER_ERROR, 'You do not have access to that page.');
+    }
     $text = $this->_application->getAdmitLetter();
     $search = array(
      '%Admit_Date%',
@@ -137,6 +140,9 @@ class ApplyStatusController extends \Jazzee\ApplyController {
    * Deny Letter
    */
   public function actionDenyLetter(){
+    if(!$this->_applicant->getDecision()->getFinalDeny()){
+      throw new \Jazzee\Exception("Applicant {$this->_applicant->getFullName()} tried to access final admit letter, but they are not admitted.", E_USER_ERROR, 'You do not have access to that page.');
+    }
     $text = $this->_application->getDenyLetter();
     $search = array(
      '%Deny_Date%',
