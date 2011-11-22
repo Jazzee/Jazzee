@@ -44,6 +44,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
     switch($data->status){
       case 'delete':
         if($applicationPage = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page' => $pageId, 'application'=>$this->_application->getId()))){
+          if(!$applicationPage->getPage()->isGlobal()) $this->_em->remove($applicationPage->getPage());
           $this->_em->remove($applicationPage);
         }
       break;
