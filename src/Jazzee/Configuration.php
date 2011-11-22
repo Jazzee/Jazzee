@@ -318,6 +318,7 @@ protected $_ldapSearchBase;
    * @var string mode
    */
   public function setMode($mode) {
+    if(!in_array($mode, array('LIVE', 'APPLY_MAINTENANCE', 'MAINTENANCE'))) throw new Exception("{$mode} is not a valid configuration setting for mode.");
     $this->_mode = $mode;
   }
   
@@ -366,6 +367,7 @@ protected $_ldapSearchBase;
    * @var string status
    */
   public function setStatus($status) {
+    if(!in_array($status, array('PRODUCTION', 'PREVIEW', 'DEVELOPMENT'))) throw new Exception("{$status} is not a valid configuration setting for status.");
     $this->_status = $status;
   }
   
