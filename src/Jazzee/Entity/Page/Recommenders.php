@@ -112,6 +112,7 @@ class Recommenders extends Standard {
           $message->Send();
           $answer->lock();
           $answer->markLastUpdate();
+          $this->_controller->getEntityManager()->persist($answer);
           $this->_controller->setLayoutVar('status', 'success');
         } else {
           $this->_controller->setLayoutVar('status', 'error');
