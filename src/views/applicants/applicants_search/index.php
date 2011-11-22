@@ -11,14 +11,14 @@ if(isset($applicants)){?>
   <table>
   <caption>Your search returned (<?php print count($applicants); ?>) results</caption>
     <thead>
-      <tr><th>View</th><th>Last Name</th><th>First Name</th><th>Last Update</th><th>Progress</th><th>Tags</th><th>Last Login</th><th>Account Created</th></tr>
+      <tr><th>View</th><th>Name</th><th>Program</th><th>Last Update</th><th>Progress</th><th>Tags</th><th>Last Login</th><th>Account Created</th></tr>
       </thead>
       <tbody>
         <?php foreach($applicants as $applicant){?>
           <tr>
             <td><a href='<?php print $this->path('applicants/single/' . $applicant->getId());?>' title='<?php print $applicant->getFirstName() . ' ' . $applicant->getLastName();?>'>Application</a></td>
-            <td><?php print $applicant->getLastName(); ?></td>
-            <td><?php print $applicant->getFirstName(); ?></td>
+            <td><?php print $applicant->getFullName(); ?></td>
+            <td><?php print $applicant->getApplication()->getProgram()->getName(); ?></td>
             <td><?php print $applicant->getUpdatedAt()->format('m/d/y'); ?></td>
             <td><?php print $applicant->getPercentComplete()*100; ?>%</td>
             <?php 
