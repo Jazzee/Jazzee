@@ -10,7 +10,8 @@ namespace Jazzee\Entity;
  *   uniqueConstraints={
  *     @UniqueConstraint(name="application_email", columns={"application_id", "email"}),
  *     @UniqueConstraint(name="applicant_uniqueId", columns={"uniqueId"})
- *   }
+ *   },
+ *   indexes={@index(name="applicant_email", columns={"email"})}
  * ) 
  * @package    jazzee
  * @subpackage orm
@@ -105,6 +106,11 @@ class Applicant{
   private $threads;
   
   /**
+   * @OneToMany(targetEntity="Duplicate", mappedBy="applicant")
+   */
+  private $duplicates;
+  
+  /**
    * If we set a manual update don't override it
    * @var boolean
    */
@@ -115,6 +121,7 @@ class Applicant{
     $this->attachments = new \Doctrine\Common\Collections\ArrayCollection();
     $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
     $this->threads = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->duplicates = new \Doctrine\Common\Collections\ArrayCollection();
     $this->createdAt = new \DateTime('now');
     $this->isLocked = false;
   }
@@ -621,6 +628,15 @@ class Applicant{
   }
 
   /**
+   * Get duplicates
+   *
+   * @return Doctrine\Common\Collections\Collection $duplicates
+   */
+  public function getDuplicates(){
+    return $this->duplicates;
+  }
+
+  /**
    * Unread Message Count
    *
    * @return integer
@@ -671,6 +687,33 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
     $result = $query->getResult();
     if(count($result)) return $result[0];
     return false;
+  }
+  
+  /**
+   * find applicants in a cycle
+   * 
+   * Search for an Applicant by cycle
+   * @param Cycle $cycle
+   * @return array
+   */
+  public function findByCycle(Cycle $cycle){
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a.application IN (SELECT app FROM Jazzee\Entity\Application app WHERE app.cycle = :cycleId)');
+    $query->setParameter('cycleId', $cycle->getId());
+    return $query->getResult();
+  }
+  
+  /**
+   * find duplicate applicants in the same cycle
+   * 
+   * @param Applicant $applicant
+   * @return array
+   */
+  public function findDuplicates(Applicant $applicant){
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a != :applicantId AND a.email = :email AND a.application IN (SELECT app FROM Jazzee\Entity\Application app WHERE app.cycle = :cycleId)');
+    $query->setParameter('applicantId', $applicant->getId());
+    $query->setParameter('cycleId', $applicant->getApplication()->getCycle()->getId());
+    $query->setParameter('email', $applicant->getEmail());
+    return $query->getResult();
   }
   
   /**
