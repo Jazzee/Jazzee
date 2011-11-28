@@ -38,6 +38,7 @@ class Application{
   
   /** 
    * @OneToMany(targetEntity="ApplicationPage", mappedBy="application")
+   * @OrderBy({"weight" = "ASC"})
    */
   private $applicationPages;
   

@@ -166,7 +166,7 @@ class AdminApiController extends \Jazzee\AdminController {
     $app = $this->dom->createElement("application");
     $applicationPages = $this->dom->createElement("pages");
     $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId()));
-    foreach($pages as $page){
+    foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page){
       $applicationPages->appendChild($this->pageXml($page));
     }
     $app->appendChild($applicationPages);

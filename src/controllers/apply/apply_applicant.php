@@ -98,7 +98,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
             $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
             $store->applicantID = $applicant->getId();
             $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-            $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+            $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
             $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $pages[0]->getId());
           }
           $applicant->loginFail();
@@ -268,7 +268,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
       $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
       $store->applicantID = $applicant->getId();
       $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-      $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
+      $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
       $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $pages[0]->getId());
     }
     $this->setVar('form', $form);

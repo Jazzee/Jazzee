@@ -27,8 +27,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
    */
   public function actionListPages(){
     $applicationPages = array();
-    $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
-    foreach($pages AS $applicationPage){
+    foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) AS $applicationPage){
       $applicationPages[] = $this->pageArray($applicationPage);
     }
     $this->setVar('result', $applicationPages);

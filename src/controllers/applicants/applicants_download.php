@@ -44,8 +44,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
       $filters = $input->get('filters');
       $applicationPages = array();
       $applicationPagesAnswerCount = array();
-      $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
-      foreach($pages as $pageEntity){
+      foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $pageEntity){
         $pageEntity->getJazzeePage()->setController($this);
         $applicationPages[$pageEntity->getId()] = $pageEntity;
       }
