@@ -43,6 +43,12 @@ class ApplicantPDF {
   protected $currentTable;
   
   /**
+   * The current table row
+   * @var integer
+   */
+  protected $tableRow;
+  
+  /**
    * Queue of binary PDFs which need to be appended
    * @var array
    */
@@ -62,10 +68,10 @@ class ApplicantPDF {
     
   /**
    * Constructor
-   * @param int $pageType the type and size of the output
    * @param string $key the PDFLib license key we are using
+   * @param int $pageType the type and size of the output
    */
-  public function __construct($pageType = self::USLETTER_PORTRAIT, $key = ''){
+  public function __construct($key,$pageType = self::USLETTER_PORTRAIT){
     $this->pdf = new \PDFlib();
     if($key){
       try{
@@ -98,17 +104,14 @@ class ApplicantPDF {
       default:
         throw new Jazzee_Exception('Invalid page type supplied for ApplicantPDF constructor');
     }
-    //default the current y with a 20 unit margin
-    $this->currentY = $this->pageHeight-20;
-    
-    $this->currentTable = array(
-      'table' => 0,
-      'currentrow' => 1,
-      'currentcolumn' => 1
-    );
     
     //  open new PDF file in memory
     $this->pdf->begin_document("", "");
+    
+    //add the first page
+    $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
+    $this->currentY = $this->pageHeight-20;
+    
     $this->pdf->set_info("Creator", "Jazzee");
     $this->pdf->set_info("Author", "Jazzee Open Applicatoin Platform");
     $this->currentText  = $this->pdf->create_textflow('', '');
@@ -121,33 +124,30 @@ class ApplicantPDF {
    */
   public function pdf(\Jazzee\Entity\Applicant $applicant){
     $this->pdf->set_info("Title", $applicant->getFullName() . ' Application');
-    
-    $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
     $this->setFont('p');
     $this->addText($applicant->getFullName() . "\n", 'h1');
     $this->addText('Email Address: ' . $applicant->getEmail() . "\n", 'p');
     
     
-    if($applicant->getDecision()){
-      $status = $applicant->getDecision()->status();
+    if($applicant->isLocked()){
+      switch($applicant->getDecision()->status()){
+        case 'finalDeny': $status = 'Denied'; break;
+        case 'finalAdmit': $status = 'Admited'; break;
+        case 'acceptOffer': $status = 'Accepted'; break;
+        case 'declineOffer': $status = 'Declined'; break;
+        default: $status = 'No Decision';
+      }
     } else {
-      $status = 'Under Review';
+      $status = 'Not Locked';
     }
     $this->addText("Admission Status: {$status}\n", 'p');
-    $this->writeTextFlow();
-    $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$applicant->getApplication()->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));
-    foreach($pages as $page){
+    $this->write();
+    foreach($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page){
       $page->getJazzeePage()->setApplicant($applicant);
-      $this->addText($page->getTitle(), 'h3');
-      if($answers = $page->getJazzeePage()->getAnswers()){
-        $this->addText('Page answers go here, but need to be rendered by page type', 'p');
-      } else {
-        $this->addText('Applicant has not answered this section', 'h3');
-      }
-      $this->writeTextFlow();
+      $page->getJazzeePage()->renderPdfSection($this);
     }
-    
     $this->pdf->end_page_ext("");
+    $this->attachPdfs();
     $this->pdf->end_document("");
     return $this->pdf->get_buffer();
   }
@@ -174,21 +174,19 @@ class ApplicantPDF {
    * @param string $text
    * @param string $type the font options to use
    */
-  protected function addText($text, $type){
+  public function addText($text, $type){
     $this->pdf->add_textflow($this->currentText, $text, $this->fontOptions($type));
   }
   
   /**
    * Write out the current text flow adding pages as necessary
    */
-  protected function writeTextFlow(){
+  public function write(){
     do{
       $continue = FALSE;
       $return = $this->pdf->fit_textflow($this->currentText,25,25,$this->pageWidth-20, $this->currentY, '');
       if($return == '_boxfull' || $return == '_nextpage'){
-        $this->pdf->end_page_ext("");
-        $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
-        $this->currentY = $this->pageHeight-20;
+        $this->newPage();
         $continue = TRUE;
       }
     } while ($continue);
@@ -196,6 +194,104 @@ class ApplicantPDF {
     $this->pdf->delete_textflow($this->currentText);
     $this->currentText = $this->pdf->create_textflow('', '');
   }
-
-} //end PDFGenerator class
-?>
+  
+  /**
+   * Add a PDF to the que
+   * @param string blob
+   */
+  public function addPdf($blob){
+    $this->appendQueue[] = $blob;
+  }
+  
+  /**
+   * Append all the extra PDFs
+   */
+  protected function attachPdfs(){
+    foreach($this->appendQueue as $blob){
+      $name = '/pvf/pdf/'. uniqid() . '.pdf';
+      $pvf = $this->pdf->create_pvf($name, $blob, '');
+      $doc = $this->pdf->open_pdi_document($name, '');
+      //loop through each page
+      for($i=1;$i<=$this->pdf->pcos_get_number($doc, "length:pages");$i++){
+        $page = $this->pdf->open_pdi_page($doc, $i, '');
+        $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
+        $this->pdf->fit_pdi_page($page, 0, 20, 'adjustpage');
+        $this->pdf->close_pdi_page($page);
+        $this->pdf->end_page_ext('');
+      }
+      $this->pdf->close_pdi_document($doc);
+      $this->pdf->delete_pvf($pvf);
+    }
+  }
+  
+  /**
+   * Start a new page
+   */
+  protected function newPage(){
+    $this->pdf->end_page_ext("");
+    $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
+    $this->currentY = $this->pageHeight-20;
+  }
+  /**
+   * Start a table
+   * 
+   */
+  public function startTable(){
+    $this->currentTable = array();
+    $this->tableRow = 0;
+  }
+  
+  /**
+   * Start a row in the current table
+   */
+  public function startTableRow(){
+    if(!is_array($this->currentTable)) throw new Exception('You must start a table before you start a row.');
+    $this->tableRow++;
+    $this->currentTable[$this->tableRow] = array();
+  }
+  
+  /**
+   * Add cell to the table row
+   * @param string $string
+   */
+  public function addTableCell($string){
+    $this->currentTable[$this->tableRow][] = $string;
+  }
+  
+  /**
+   * Write the current table
+   */
+  public function writeTable(){
+    $table = 0; //initialize table with 0
+    foreach($this->currentTable as $rowId => $columns){
+      foreach($columns as $columnId => $text){
+        $fontType = $rowId == 1?'th':'td';
+        $textFlow = $this->pdf->add_textflow(0, $text, $this->fontOptions($fontType));
+        $table = $this->pdf->add_table_cell($table,$columnId+1,$rowId,'',"rowheight={$this->fonts[$fontType]['rowheight']} fittextflow={verticalalign=top} textflow={$textFlow} margin=1");
+      }
+    }
+    if($table){
+      do{
+        $continue = FALSE;
+        //If we are closer that one header row from the bottom of the page then create a new page and then place the table
+        if($this->fonts['th']['rowheight'] > ($this->currentY-50)){
+          //TOO CLOSE
+          $this->newPage();
+        }
+        $return = $this->pdf->fit_table($table,25,25,$this->pageWidth-20,$this->currentY, 'stroke={{line=other}} vertshrinklimit=20%');
+        if($return == '_boxfull'){
+            $this->newPage();
+            $continue = TRUE;
+        }
+      } while ($continue);
+      $height = $this->pdf->info_table($table, 'height');
+      $this->currentY = $this->currentY - $height;
+      if($this->currentY < 25){
+          $this->newPage();
+      }
+      $this->pdf->delete_table($table, '');
+      $this->currentTable = array();
+      $this->tableRow = false;
+    }
+  }
+}

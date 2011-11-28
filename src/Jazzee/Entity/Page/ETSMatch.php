@@ -196,6 +196,35 @@ class ETSMatch extends Standard {
   }
   
   /**
+   * Create a table from answers
+   * and append any attached PDFs
+   * @param \Jazzee\ApplicantPDF $pdf 
+   */
+  public function renderPdfSection(\Jazzee\ApplicantPDF $pdf){
+    if($this->getAnswers()){
+      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
+      $pdf->write();
+      $pdf->startTable();
+      $pdf->startTableRow();
+      foreach($this->_applicationPage->getPage()->getElements() as $element)$pdf->addTableCell($element->getTitle());
+      $pdf->addTableCell('Score');
+      foreach($this->getAnswers() as $answer){
+        $pdf->startTableRow();
+        foreach($this->_applicationPage->getPage()->getElements() as $element)$pdf->addTableCell ($element->getJazzeeElement()->pdfValue($answer, $pdf));
+        if($answer->getMatchedScore()){
+          $string = '';
+          foreach($answer->getMatchedScore()->getSummary() as $key => $value) $string .= "{$key}: {$value}\n";
+          $pdf->addTableCell($string);
+        } else {
+         $pdf->addTableCell('This score has not been received from ETS.');
+        }
+        if($attachment = $answer->getAttachment()) $pdf->addPdf($attachment->getAttachment());
+      }
+      $pdf->writeTable();
+    }
+  }
+  
+  /**
    * Match unmatched scores as a cron task
    * @todo eventually the 1000 limit is going to block on dead scores - find a way to eventually avoid those or to keep looping in 1000 increments
    * @param AdminCronController $cron

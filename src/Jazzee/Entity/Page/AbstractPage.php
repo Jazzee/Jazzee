@@ -128,6 +128,27 @@ abstract class AbstractPage implements \Jazzee\Page {
     $answerXml->appendChild($children);
     return $answerXml;
   }
+  
+  /**
+   * Create a table from answers
+   * and append any attached PDFs
+   * @param \Jazzee\ApplicantPDF $pdf 
+   */
+  public function renderPdfSection(\Jazzee\ApplicantPDF $pdf){
+    if($this->getAnswers()){
+      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
+      $pdf->write();
+      $pdf->startTable();
+      $pdf->startTableRow();
+      foreach($this->_applicationPage->getPage()->getElements() as $element)$pdf->addTableCell($element->getTitle());
+      foreach($this->getAnswers() as $answer){
+        $pdf->startTableRow();
+        foreach($this->_applicationPage->getPage()->getElements() as $element)$pdf->addTableCell ($element->getJazzeeElement()->pdfValue($answer, $pdf));
+        if($attachment = $answer->getAttachment()) $pdf->addPdf($attachment->getAttachment());
+      }
+      $pdf->writeTable();
+    }
+  }
 }
 
 ?>

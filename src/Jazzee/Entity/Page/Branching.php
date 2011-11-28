@@ -149,4 +149,30 @@ class Branching extends Standard
       $this->_controller->getEntityManager()->persist($var);
     }    
   }
+  
+  /**
+   * Create a table from answers
+   * and append any attached PDFs
+   * @param \Jazzee\ApplicantPDF $pdf 
+   */
+  public function renderPdfSection(\Jazzee\ApplicantPDF $pdf){
+    if($this->getAnswers()){
+      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
+      $pdf->write();
+      $pdf->startTable();
+      $pdf->startTableRow();
+      $pdf->addTableCell($this->_applicationPage->getPage()->getVar('branchingElementLabel'));
+      $pdf->addTableCell('Answer');
+      foreach($this->getAnswers() as $answer){
+        $pdf->startTableRow();
+        $child = $answer->getChildren()->first();
+        $pdf->addTableCell($child->getPage()->getTitle());
+        $string = '';
+        foreach($child->getPage()->getElements() as $element)$string .= $element->getTitle() . ': ' . $element->getJazzeeElement()->pdfValue($child, $pdf) . "\n";
+        $pdf->addTableCell($string);
+        if($attachment = $answer->getAttachment()) $pdf->addPdf($attachment->getAttachment());
+      }
+      $pdf->writeTable();
+    }
+  }
 }

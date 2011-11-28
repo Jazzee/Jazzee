@@ -862,6 +862,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
+   * Create a pdf from applicant
+   * @param integer $applicantId
+   * @param string $layout the format for the pdf file
+   */
+  public function actionPdf($applicantId, $layout){
+    $applicant = $this->getApplicantById($applicantId);
+    $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), $layout == 'landscape'?\Jazzee\ApplicantPDF::USLETTER_LANDSCAPE:\Jazzee\ApplicantPDF::USLETTER_PORTRAIT);
+    $this->setVar('blob', $pdf->pdf($applicant));
+  }
+  
+  /**
    * Delete PDF attached to applicant
    * @param integer $applicantId
    * @param integer $attachmentId

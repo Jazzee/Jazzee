@@ -67,5 +67,9 @@ class EncryptedTextInput extends TextInput {
     }
     return null;
   }
+  
+  public function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf){
+    return $this->displayValue($answer);
+  }
 }
 ?>

@@ -237,4 +237,34 @@ class Recommenders extends Standard {
       return self::COMPLETE;
     }
   }
+  
+  /**
+   * Create a table from answers
+   * and append any attached PDFs
+   * @param \Jazzee\ApplicantPDF $pdf 
+   */
+  public function renderPdfSection(\Jazzee\ApplicantPDF $pdf){
+    if($this->getAnswers()){
+      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
+      $pdf->write();
+      $pdf->startTable();
+      $pdf->startTableRow();
+      $pdf->addTableCell('Recommender');
+      foreach($this->_applicationPage->getPage()->getChildren()->first()->getElements() as $element)$pdf->addTableCell($element->getTitle());
+      foreach($this->getAnswers() as $answer){
+        $pdf->startTableRow();
+        $string = $this->_applicationPage->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_FIRST_NAME)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
+        $string .= $this->_applicationPage->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_LAST_NAME)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
+        $string .= $this->_applicationPage->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_INSTITUTION)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
+        $string .= $this->_applicationPage->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_EMAIL)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
+        $string .= $this->_applicationPage->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_PHONE)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
+        $pdf->addTableCell($string);
+        if($child = $answer->getChildren()->first()){
+          foreach($this->_applicationPage->getPage()->getChildren()->first()->getElements() as $element)$pdf->addTableCell($element->getJazzeeElement()->pdfValue($child, $pdf));
+        }
+        if($attachment = $answer->getAttachment()) $pdf->addPdf($attachment->getAttachment());
+      }
+      $pdf->writeTable();
+    }
+  }
 }

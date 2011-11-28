@@ -21,7 +21,11 @@ abstract class AbstractElement implements \Jazzee\Element {
   }
   
   public function rawValue(\Jazzee\Entity\Answer $answer){
-    return $this->displayValue($answer);
+    return html_entity_decode($this->displayValue($answer));
+  }
+  
+  public function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf){
+    return $this->rawValue($answer);
   }
 }
 ?>

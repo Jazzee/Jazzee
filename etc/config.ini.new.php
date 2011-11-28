@@ -88,6 +88,10 @@ mailServerType=php
 ;recaptchaPrivateKey=
 ;recaptchaPublicKey=
 
+;PDFlib License Key - purchase at http://www.pdflib.com/
+;There is an education discount
+pdflibLicenseKey=
+
 maximumApplicantFileUploadSize=1m
 maximumAdminFileUploadSize=5m
 

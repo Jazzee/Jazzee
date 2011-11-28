@@ -129,5 +129,4 @@ class Standard extends AbstractPage {
       return self::COMPLETE;
     }
   }
-  
 }

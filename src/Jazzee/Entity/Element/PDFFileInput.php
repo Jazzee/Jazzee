@@ -82,6 +82,15 @@ class PDFFileInput extends AbstractElement {
     return null;
   }
   
+  public function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(isset($elementsAnswers[0])){
+      $pdf->addPdf($elementsAnswers[0]->getEBlob());
+      return 'Attached';
+    }
+    return null;
+  }
+  
   public function formValue(\Jazzee\Entity\Answer $answer){
     return false;
   }

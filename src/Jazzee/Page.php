@@ -102,4 +102,11 @@ interface Page
    * Eg - create a form with fixed ids
    */
   function setupNewPage();
+  
+  /**
+   * Build the pdf section for this page type
+   * 
+   * @param \Jazzee\ApplicantPDF
+   */
+  function renderPdfSection(\Jazzee\ApplicantPDF $pdf);
 }

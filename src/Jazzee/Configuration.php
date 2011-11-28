@@ -277,6 +277,11 @@ protected $_ldapEmailAddressAttribute;
  */
 protected $_ldapSearchBase;
 
+/**
+ *  @var string
+ */
+protected $_pdflibLicenseKey;
+
   /**
    * Construct
    * Load data from the ini file
@@ -1175,6 +1180,22 @@ protected $_ldapSearchBase;
    */
   public function setLdapSearchBase($ldapSearchBase) {
     $this->_ldapSearchBase = $ldapSearchBase;
+  }
+  
+  /**
+   * get pdflibLicenseKey
+   * @return string
+   */
+  public function getPdflibLicenseKey() {
+    return $this->_pdflibLicenseKey;
+  }
+  
+  /**
+   * set pdflibLIcenseKey
+   * @var string $pdflibLicenseKey
+   */
+  public function setPdflibLicenseKey($pdflibLicenseKey) {
+    $this->_pdflibLicenseKey = $pdflibLicenseKey;
   }
 
 }
