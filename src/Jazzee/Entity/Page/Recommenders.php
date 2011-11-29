@@ -151,6 +151,49 @@ class Recommenders extends Standard {
   }
   
   /**
+   * Edit a submitted recommendation
+   * Admin feature to edit a submitted recommendation
+   * @param integer $answerID
+   * @param array $postData
+   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
+   */
+  public function editLor($answerId, $postData, $bool){
+    if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
+      $lorPage = $child->getPage();
+      $form = new \Foundation\Form;
+      $field = $form->newField();
+      $field->setLegend($lorPage->getTitle());
+      $field->setInstructions($lorPage->getInstructions());
+      foreach($lorPage->getElements() as $element){
+        $element->getJazzeeElement()->addToField($field);
+        $value = $element->getJazzeeElement()->formValue($child);
+        if($value) $form->getElementByName('el' . $element->getId())->setValue($value);
+      }
+      $form->newButton('submit', 'Edit Recommendation');
+      $form->newButton('reset', 'Clear Form');
+      if(!empty($postData)){
+        if($input = $form->processInput($postData)){
+          foreach($child->getElementAnswers() as $ea){
+            $child->getElementAnswers()->removeElement($ea);
+            $this->_controller->getEntityManager()->remove($ea);
+          }
+          foreach($lorPage->getElements() as $element){
+            foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+              $child->addElementAnswer($elementAnswer);
+            }
+          }
+          $this->_controller->getEntityManager()->persist($child);
+          $this->_controller->setLayoutVar('status', 'success');
+        } else {
+          $this->_controller->setLayoutVar('status', 'error');
+        }
+      }
+      return $form;
+    }
+    $this->_controller->setLayoutVar('status', 'error');
+  }
+  
+  /**
    * Create the recommenders form
    */
   public function setupNewPage(){

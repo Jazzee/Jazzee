@@ -45,10 +45,14 @@
 </td>
   <td>
     <?php if($this->controller->checkIsAllowed('applicants_single', 'editAnswer')){ ?>
-      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='actionForm'>Edit</a><br />
-      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/sendAdminInvitation/' . $answer->getId());?>' class='actionForm'>Send Invitation</a><br />
-      <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/viewLink/' . $answer->getId());?>' class='actionForm'>View Link</a><br />
-    <?php } ?><?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')){ ?>
+      <?php if($answer->getChildren()->first()){?>
+        <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/editLor/' . $answer->getId());?>' class='actionForm'>Edit Recommendation</a><br />
+      <?php } else { ?>
+        <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId());?>' class='actionForm'>Edit Recommender Information</a><br />
+        <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/sendAdminInvitation/' . $answer->getId());?>' class='actionForm'>Send Invitation</a><br />
+        <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/viewLink/' . $answer->getId());?>' class='actionForm'>View Link</a><br />
+      <?php } ?>
+      <?php } ?><?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')){ ?>
       <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId());?>' class='action confirmDelete'>Delete</a><br />     
     <?php } ?>
   </td>
