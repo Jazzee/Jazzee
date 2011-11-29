@@ -98,7 +98,7 @@
       </tbody>
     </table>
   </div>
-  <?php if($this->controller->checkIsAllowed('applicants_messages') and $threads = $applicant->getThreads()){?>
+  <?php if($this->controller->checkIsAllowed('applicants_messages') and count($applicant->getThreads())){?>
     <div id="threads" class="discussion">
       <h4>Applicant Messages</h4>
       <table>
@@ -109,7 +109,7 @@
           </tr>
         </thead>
         <tbody>
-          <?php foreach($threads as $thread){?>
+          <?php foreach($applicant->getThreads() as $thread){?>
             <tr id='thread<?php print $thread->getId();?>'>
               <td class="<?php print $thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)?'unread':'read';?>"></td>
               <td><?php print $thread->getCreatedAt()->format('c');?></td>
