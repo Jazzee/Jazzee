@@ -347,14 +347,16 @@ class AuthorizeNetAIM extends AbstractPaymentType{
    */
   public static function runCron(\AdminCronController $cron){
     $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class'=>'\Jazzee\Entity\PaymentType\AuthorizeNetAIM'));
-    $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type'=>$paymentType->getId(), 'status'=>\Jazzee\Entity\Payment::PENDING),array(), 100);
-    $class = new AuthorizeNetAIM($paymentType);
-    $fakeInput = new \Foundation\Form\Input(array());
-    foreach($payments as $payment){
-      $result = $class->settlePayment($payment, $fakeInput);
-      if($result === true){
-        $cron->getEntityManager()->persist($payment);
-        foreach($payment->getVariables() as $var) $cron->getEntityManager()->persist($var);
+    if($paymentType){
+      $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type'=>$paymentType->getId(), 'status'=>\Jazzee\Entity\Payment::PENDING),array(), 100);
+      $class = new AuthorizeNetAIM($paymentType);
+      $fakeInput = new \Foundation\Form\Input(array());
+      foreach($payments as $payment){
+        $result = $class->settlePayment($payment, $fakeInput);
+        if($result === true){
+          $cron->getEntityManager()->persist($payment);
+          foreach($payment->getVariables() as $var) $cron->getEntityManager()->persist($var);
+        }
       }
     }
   }
