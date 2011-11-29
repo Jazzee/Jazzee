@@ -4,7 +4,7 @@ namespace Jazzee\Entity;
 /** 
  * Duplicate
  * Identify Duplicate applicants
- * @Entity(repositoryClass="\Jazzee\Entity\DuplicateRepository")
+ * @Entity
  * @Table(name="duplicates",
  *   uniqueConstraints={
  *     @UniqueConstraint(name="duplicate_applicant", columns={"applicant_id", "duplicate_id"})
