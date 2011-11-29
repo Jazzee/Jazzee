@@ -184,6 +184,16 @@ class Payment extends Standard {
     //probably better if we just do nothing for payment
   }
   
+  public function getStatus(){
+    $answers = $this->getAnswers();
+    //Only complete for pendign and settled payments
+    foreach($answers as $answer){
+      if($answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::SETTLED OR $answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::PENDING) return self::COMPLETE;
+    }
+    //if none of the payments are pending or settled we are incomplete
+    return self::INCOMPLETE;
+  }
+  
   /**
    * Rus cron jobs for payments types
    * @param AdminCronController $cron

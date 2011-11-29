@@ -106,6 +106,10 @@ class Standard extends AbstractPage {
     }
   }
   
+  /**
+   * Get all the answers for this page
+   * @return \Jazzee\Entity\Answer
+   */
   public function getAnswers(){
     return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
