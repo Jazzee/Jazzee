@@ -5,6 +5,6 @@
  * Create a blank canvas to draw the applicant on
  */
 header("Content-type: application/pdf");
-//header('Content-Disposition: attachment; filename='. $filename);
+header('Content-Disposition: attachment; filename='. $filename);
 print $blob;
 exit();

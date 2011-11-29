@@ -4,7 +4,7 @@
  */
 $page->getJazzeePage()->setApplicant($applicant);
 ?>
-<div id='page<?php print $page->getPage()->getId() ?>'>
+<div class='page' id='page<?php print $page->getPage()->getId() ?>'>
 <h4><?php print $page->getTitle(); ?></h4>
   <div class='answers'>
     <table class='answer'>

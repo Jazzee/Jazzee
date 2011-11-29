@@ -62,44 +62,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    * @param integer $id the applicants id
    */
   public function actionIndex($id){
-    $applicant = $this->getApplicantById($id);
     $this->layout = 'wide';
+    $applicant = $this->getApplicantById($id);
+    $this->setVar('applicant', $applicant);
   }
-  
-  /**
-   * Refresh evverything
-   * @param integer $applicantId
-   */
-  public function actionRefresh($applicantId){
-    $applicant = $this->getApplicantById($applicantId);
-    $result = array(
-     'bio' => $this->getBio($applicant),
-     'actions' => $this->getActions($applicant),
-     'decisions' => $this->getDecisions($applicant),
-     'tags' => $this->getTags($applicant),
-     'attachments' => $this->getAttachments($applicant),
-     'threads' => $this->getThreads($applicant),
-     'pages' => $this->getPages($applicant)
-    );
-    $this->layout = 'json'; //set the layout back since getPages changes it
-    $this->setVar('result', $result);
-    $this->loadView($this->controllerName . '/result');
-  }
-  
-  /**
-   * Get bio
-   * @param \Jazzee\Entity\Applicant $applicant
-   * @return array
-   */
-  protected function getBio(\Jazzee\Entity\Applicant $applicant){
-    $bio = array(
-     'name' => $applicant->getFullName(),
-     'email' => $applicant->getEmail(),
-     'allowEdit' => $this->checkIsAllowed($this->controllerName, 'updateBio')
-    );
-    return $bio;
-  }
-  
   
   /**
    * Get an applicants action status
@@ -230,29 +196,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
-   * Get an applicants threads
-   * @param \Jazzee\Entity\Applicant $applicant
-   */
-  protected function getThreads(\Jazzee\Entity\Applicant $applicant){
-    $threads = array(
-      'threads'=>array(),
-      'link' => $this->path('applicants/messages/new/' . $applicant->getId()),
-      'allowed' => $this->checkIsAllowed('applicants_messages')
-    );
-    
-    foreach($applicant->getThreads() as $thread){
-      $threads['threads'][] = array(
-        'id' => $thread->getId(),
-        'createdAt' => $thread->getCreatedAt()->format('l F jS Y \a\t g:ia'),
-        'subject' => $thread->getSubject(),
-        'link' => $this->path('applicants/messages/single/' . $thread->getId()),
-        'unreadMessages' => $thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)
-      );
-    }
-    return $threads;
-  }
-  
-  /**
    * Update Biography
    * @param integer $applicantId
    */
@@ -300,7 +243,13 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         
         $this->_em->persist($applicant);
         $this->setLayoutVar('status', 'success');
-        $this->setVar('result', array('bio'=> $this->getBio($applicant)));
+        $bio = array(
+         'name' => $applicant->getFullName(),
+         'email' => $applicant->getEmail(),
+         'allowEdit' => $this->checkIsAllowed($this->controllerName, 'updateBio')
+        );
+        return $bio;
+        $this->setVar('result', array('bio'=> $bio));
       }
     }
     $this->setVar('form', $form);
@@ -417,6 +366,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant->getDecision()->undoFinalAdmit();
     $this->_em->persist($applicant);
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * Tag an applicant
+   * @param integer $applicantID
+   */
+  public function actionRefreshTags($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $this->setVar('result', array('tags'=>$this->getTags($applicant)));
+    $this->setLayoutVar('status', 'success');
     $this->loadView($this->controllerName . '/result');
   }
   
@@ -799,6 +759,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         //persist the applicant and answer to catch the last update  
         $this->_em->persist($applicant); 
         $this->_em->persist($answer); 
+        $this->_em->flush();  //flush early so the attachment gets a good id for the preview
         $this->setLayoutVar('status', 'success');
       }
     }
@@ -853,6 +814,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         $this->_em->persist($attachment);
         //persist the applicant and answer to catch the last update  
         $this->_em->persist($applicant);
+        $this->_em->flush();  //flush early so the attachment gets a good id for the preview
         $this->setLayoutVar('status', 'success');
       }
     }
@@ -869,6 +831,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionPdf($applicantId, $layout){
     $applicant = $this->getApplicantById($applicantId);
     $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), $layout == 'landscape'?\Jazzee\ApplicantPDF::USLETTER_LANDSCAPE:\Jazzee\ApplicantPDF::USLETTER_PORTRAIT);
+    $this->setVar('filename', $applicant->getFullName() . '.pdf');
     $this->setVar('blob', $pdf->pdf($applicant));
   }
   
@@ -1042,7 +1005,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     //several views are controller by the complete action
-    if(in_array($action, array('refresh', 'refreshPage'))) $action = 'index';
+    if(in_array($action, array('refreshTags', 'refreshPage'))) $action = 'index';
     if(in_array($action, array('do', 'pageDo'))) $action = 'editAnswer';
     return parent::isAllowed($controller, $action, $user, $program, $application);
   }

@@ -9,25 +9,17 @@ function Applicant(workspace){
 
 Applicant.prototype.init = function(){
   var self = this;
-  $.get(this.baseUrl + '/refresh',function(json){
-    self.workspace
-      .append($('<div>').attr('id', 'bio'))
-      .append($('<div>').attr('id', 'status'))
-      .append($('<div>').attr('id', 'threads').addClass('discussion'))
-      .append($('<div>').attr('id', 'pages'))
-      .append($('<div>').attr('id', 'attachments'));
-    var statusTable = $('<table>').attr('id', 'statusTable');
-    statusTable.append($('<thead>').append('<tr><th>Actions</th><th>Admission Status</th><th>Tags</th></tr>'));
-    statusTable.append($('<tbody>').append('<tr><td id="actions"></td><td id="decisions"></td><td id="tags"></td></tr>'));
-    $('#status').html(statusTable);
-    self.displayBio(json.data.result.bio);
-    self.displayThreads(json.data.result.threads);
-    self.displayActions(json.data.result.actions);
-    self.displayDecisions(json.data.result.decisions);
-    self.displayTags(json.data.result.tags);
-    self.displayPages(json.data.result.pages);
-    self.displayAttachments(json.data.result.attachments);
+  this.parseBio();
+  this.parseActions();
+  this.parseDecisions();
+  $('#pages div.page').each(function(){
+    var id = $(this).attr('id').substr(4);
+    self.parsePage(id);
   });
+  $.get(this.baseUrl+'/refreshTags',function(json){
+    self.refreshTags(json.data.result.tags);
+  });
+  this.parseAttachments();
 };
 /**
  * Create a form from json and display it
@@ -78,38 +70,63 @@ Applicant.prototype.createForm = function(json, callback){
 };
 
 /**
+ *Parse the bio section and activate links
+ */
+Applicant.prototype.parseBio = function(){
+  var self = this;
+  $('#bio a').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      var obj = {
+        display: function(json){
+          self.refreshBio(json.data.result.bio);
+        }
+      };
+      self.createForm(json.data.form, obj);
+    });
+    return false;
+  });
+};
+
+/**
  * Display Biographic information
  * @param Object json
  */
-Applicant.prototype.displayBio = function(json){
+Applicant.prototype.refreshBio = function(json){
   $('#bio').empty().hide();
-  var self = this;
   var h1 = $('<h1>').html(json.name);
   if(json.allowEdit){
     var a = $('<a>').attr('href', this.baseUrl + '/updateBio').html(' (edit)');
-    a.click(function(e){
-      $.get($(e.target).attr('href'),function(json){
-        var obj = {
-          display: function(json){
-            self.displayBio(json.data.result.bio);
-          }
-        };
-        self.createForm(json.data.form, obj);
-      });
-      return false;
-    });
     h1.append(a);
   }
   $('#bio').append(h1);
   $('#bio').append($('<h4>').html(json.email));
+  this.parseBio();
   $('#bio').show();
+};
+
+/**
+ * Parse Actions
+ */
+Applicant.prototype.parseActions = function(){
+  var self = this;
+  $('#actions a').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      var obj = {
+        display: function(json){
+          self.refreshActions(json.data.result.actions);
+        }
+      };
+      self.createForm(json.data.form, obj);
+    });
+    return false;
+  });
 };
 
 /**
  * Display Actions
  * @param Object json
  */
-Applicant.prototype.displayActions = function(json){
+Applicant.prototype.refreshActions = function(json){
   $('#actions').empty();
   var self = this;
   $('#actions').html(
@@ -121,175 +138,130 @@ Applicant.prototype.displayActions = function(json){
   $('#actions').append('Deadline Extension: ');
   if(json.allowExtendDeadline){
     var a = $('<a>').attr('href', this.baseUrl + '/extendDeadline').html(text);
-    a.click(function(e){
-      $.get($(e.target).attr('href'),function(json){
-        var obj = {
-          display: function(json){
-            self.displayActions(json.data.result.actions);
-          }
-        };
-        self.createForm(json.data.form, obj);
-      });
-      return false;
-    });
     $('#actions').append(a);
   } else {
     $('#actions').append(text);
   }
-  
+  this.parseActions();
 };
 
 
 
 /**
- * Display Actions
+ * Parse Decisions
+ */
+Applicant.prototype.parseDecisions = function(){
+  var self = this;
+  $('#decisions a.actionForm').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      var obj = {
+        display: function(json){
+          self.refreshDecisions(json.data.result.decisions);
+        }
+      };
+      self.createForm(json.data.form, obj);
+    });
+    return false;
+  });
+    
+  $('#decisions a.action').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      self.refreshDecisions(json.data.result.decisions);
+    });
+    return false;
+  });
+};
+
+/**
+ * Refresh Decisions
  * @param Object json
  */
-Applicant.prototype.displayDecisions = function(json){
+Applicant.prototype.refreshDecisions = function(json){
   $('#decisions').empty();
   var self = this;
   if(json.isLocked){
     $('#decisions').html('Status: ' + json.status + '<br />');
-    if(json.allowfinalAdmit){
-      var a = $('<a>').attr('href', this.baseUrl + '/finalAdmit').html('Admit Applicant<br />');
-      a.click(function(e){
-        $.get($(e.target).attr('href'),function(json){
-          var obj = {
-            display: function(json){
-              self.displayDecisions(json.data.result.decisions);
-            }
-          };
-          self.createForm(json.data.form, obj);
-        });
-        return false;
-      });
-      $('#decisions').append(a);
-    }
-    if(json.allowfinalDeny){
-      var a = $('<a>').attr('href', this.baseUrl + '/finalDeny').html('Deny Applicant<br />');
-      a.click(function(e){
-        $.get($(e.target).attr('href'),function(json){
-          var obj = {
-            display: function(json){
-              self.displayDecisions(json.data.result.decisions);
-            }
-          };
-          self.createForm(json.data.form, obj);
-        });
-        return false;
-      });
-      $('#decisions').append(a);
-    }
     var types = [
-      {title: 'Nominate for Admission', action: 'nominateAdmit'},
-      {title: 'Undo Nomination', action: 'undoNominateAdmit'},
-      {title: 'Nominate for Deny', action: 'nominateDeny'}, 
-      {title: 'Undo Nomination', action: 'undoNominateDeny'}, 
-      {title: 'Undo Decision', action: 'undoFinalAdmit'}, 
-      {title: 'Undo Decision', action: 'undoFinalDeny'}, 
-      {title: 'Accept Offer', action: 'acceptOffer'}, 
-      {title: 'Decline Offer', action: 'declineOffer'},
-      {title: 'Undo Offer Response', action: 'undoAcceptOffer'}, 
-      {title: 'Undo Offer Response', action: 'undoDeclineOffer'}        
+      {title: 'Nominate for Admission', action: 'nominateAdmit', className: 'action'},
+      {title: 'Undo Nomination', action: 'undoNominateAdmit', className: 'action'},
+      {title: 'Nominate for Deny', action: 'nominateDeny', className: 'action'}, 
+      {title: 'Undo Nomination', action: 'undoNominateDeny', className: 'action'}, 
+      {title: 'Admit Applicant', action: 'finalAdmit', className: 'actionForm'}, 
+      {title: 'Undo Decision', action: 'undoFinalAdmit', className: 'action'}, 
+      {title: 'Deny Applicant', action: 'finalDeny', className: 'actionForm'}, 
+      {title: 'Undo Decision', action: 'undoFinalDeny', className: 'action'}, 
+      {title: 'Accept Offer', action: 'acceptOffer', className: 'action'}, 
+      {title: 'Decline Offer', action: 'declineOffer', className: 'action'},
+      {title: 'Undo Offer Response', action: 'undoAcceptOffer', className: 'action'}, 
+      {title: 'Undo Offer Response', action: 'undoDeclineOffer', className: 'action'}        
     ];
     for(var i = 0; i < types.length; i++){
       if(json['allow'+types[i].action]){
-        var a = $('<a>').attr('href', this.baseUrl + '/' + types[i].action).html(types[i].title +'<br />');
-        a.click(function(e){
-          $.get($(e.target).attr('href'),function(json){
-            self.displayDecisions(json.data.result.decisions);
-          });
-          return false;
-        });
+        var a = $('<a>').attr('href', this.baseUrl + '/' + types[i].action).addClass(types[i].className).html(types[i].title +'<br />');
         $('#decisions').append(a);
       }
     }
   } else {$('#decisions').html('Status: Not Complete<br />');}
   if(json.allowUnlock && json.isLocked){
-    var a = $('<a>').attr('href', this.baseUrl + '/unlock').html('Unlock Application <br />');
-    a.click(function(e){
-      $.get($(e.target).attr('href'),function(json){
-        self.displayDecisions(json.data.result.decisions);
-      });
-      return false;
-    });
+    var a = $('<a>').attr('href', this.baseUrl + '/unlock').addClass('action').html('Unlock Application <br />');
     $('#decisions').append(a);
   }
   if(json.allowLock && !json.isLocked){
-    var a = $('<a>').attr('href', this.baseUrl + '/lock').html('Lock Application <br />');
-    a.click(function(e){
-      $.get($(e.target).attr('href'),function(json){
-        self.displayDecisions(json.data.result.decisions);
-      });
-      return false;
-    });
+    var a = $('<a>').attr('href', this.baseUrl + '/lock').addClass('action').html('Lock Application <br />');
     $('#decisions').append(a);
   }
+  this.parseDecisions();
 };
 
 /**
  * Display Tags
  * @param Object tags
  */
-Applicant.prototype.displayTags = function(json){
+Applicant.prototype.refreshTags = function(json){
   var self = this;
   $('#tags').empty();
   var ul = $('<ul>');
   for(var i=0; i<json.tags.length; i++){
-    var li = $('<li>').html(json.tags[i].title).data('tagId', json.tags[i].id);
+    var li = $('<li>').html(json.tags[i].title).attr('id', 'tag'+json.tags[i].id);
     if(json.allowRemove){
-      li.prepend($('<img>').attr('src',self.baseUrl + '/resource/foundation/media/icons/delete.png').click(function(e){
-        $.post(self.baseUrl + '/removeTag',{tagId: $(e.target).parent().data('tagId')},function(json){
-          self.displayTags(json.data.result.tags);
-        });
-      })
-      );
+      li.prepend($('<img>').attr('src',self.baseUrl + '/resource/foundation/media/icons/delete.png').addClass('removeTag'));
     }
     ul.append(li);
   }
   $('#tags').append(ul);
-  if(json.allowAdd){
-    var input = $('<input name="tag" type="text" value="add tag">');
-    input.focus(function(e){
-      $(e.target).attr('value', '');
+  $('#tags li img.removeTag').click(function(e){
+    var tagId = $(e.target).parent().attr('id').substr(3);
+    $.post(self.baseUrl + '/removeTag',{tagId: tagId},function(json){
+      self.refreshTags(json.data.result.tags);
     });
-    input.blur(function(e){
-      $(e.target).attr('value', 'add tag');
-    });
-    input.autocomplete({source: json.allTags});
-    var form = $('<form>').append(input);
-    
-    form.submit(function(e){
-      var value = $('input', e.target).first().val();
-      $.post(self.baseUrl + '/addTag',{tagTitle: value},function(json){
-        self.displayTags(json.data.result.tags);
-      });
-      return false;
-    });
-    $('#tags').append(form);
-  }
-};
+    return false;  
+  });
 
-/**
- * Display Pages
- * @param Object json
- */
-Applicant.prototype.displayPages = function(json){
-  var self = this;
-  $('#pages').empty();
-  for(var i=0; i<json.pages.length; i++){
-    var div = $('<div>').data('pageId', json.pages[i].id);
-    div.html(json.pages[i].content);
-    $('#pages').append(div);
-    this.catchPageLinks(json.pages[i].id);
-  }
+  var input = $('<input name="tag" type="text" value="add tag">');
+  input.focus(function(e){
+    $(e.target).attr('value', '');
+  });
+  input.blur(function(e){
+    $(e.target).attr('value', 'add tag');
+  });
+  input.autocomplete({source: json.allTags});
+  var form = $('<form>').append(input);
+
+  form.submit(function(e){
+    var value = $('input', e.target).first().val();
+    $.post(self.baseUrl + '/addTag',{tagTitle: value},function(json){
+      self.refreshTags(json.data.result.tags);
+    });
+    return false;
+  });
+  $('#tags').append(form);
 };
 
 /**
  * Display Pages
  * @param Int pageId
  */
-Applicant.prototype.displayPage = function(pageId){
+Applicant.prototype.refreshPage = function(pageId){
   //overlay the page so you can tell it is reloading
   $('#page'+pageId+' .answers').first().hide().html('<p>Loading your changes.<br /><img src="resource/foundation/media/ajax-bar.gif"></p>').fadeIn();
   var self = this;
@@ -297,7 +269,7 @@ Applicant.prototype.displayPage = function(pageId){
     var div = $('<div>').data('pageId', pageId);
     div.html(html);
     $('#page'+pageId).replaceWith(div);
-    self.catchPageLinks(pageId);
+    self.parsePage(pageId);
   });
 };
 
@@ -305,13 +277,13 @@ Applicant.prototype.displayPage = function(pageId){
  * Catch the links on a page
  * @param Int pageId
  */
-Applicant.prototype.catchPageLinks = function(pageId){
+Applicant.prototype.parsePage = function(pageId){
   var self = this;
   $('#page'+pageId + ' a.actionForm').click(function(e){
     $.get($(e.target).attr('href'),function(json){
       var obj = {
         display: function(json){
-          self.displayPage(pageId);
+          self.refreshPage(pageId);
         }
       };
       self.createForm(json.data.form, obj);
@@ -320,72 +292,56 @@ Applicant.prototype.catchPageLinks = function(pageId){
   });
   $('#page'+pageId + ' a.action').click(function(e){
     $.get($(e.target).attr('href'),function(json){
-      self.displayPage(pageId);
+      self.refreshPage(pageId);
     });
     return false;
   });
 };
 
 /**
- * Display Attachments
+ * Refresh Attachments
  * @param Object json
  */
-Applicant.prototype.displayAttachments = function(json){
+Applicant.prototype.refreshAttachments = function(json){
   $('#attachments').empty();
-  var self = this;
   for(var i=0; i<json.attachments.length; i++){
     var div = $('<div>').attr('id','attachment'+json.attachments[i].id).data('attachmentId', json.attachments[i].id);
     var a = $('<a>').attr('href', json.attachments[i].filePath);
     a.append($('<img>').attr('src', json.attachments[i].previewPath));
     div.append(a);
     if(json.allowDelete){
-      div.append($('<a>').attr('href', this.baseUrl + '/deleteApplicantPdf/' + json.attachments[i].id).html('Delete PDF').click(function(e){
-        $.get($(e.target).attr('href'),function(json){
-          self.displayAttachments(json.data.result.attachments);
-        });
-        return false;
-      }));
+      div.append($('<a>').attr('href', this.baseUrl + '/deleteApplicantPdf/' + json.attachments[i].id).html('Delete PDF').addClass('delete'));
     }
     $('#attachments').append(div);
   }
   if(json.allowAttach){
-    var a = $('<a>').attr('href', this.baseUrl + '/attachApplicantPdf').html('Attach Pdf');
-    a.click(function(e){
-      $.get($(e.target).attr('href'),function(json){
-        var obj = {
-          display: function(json){
-            self.displayAttachments(json.data.result.attachments);
-          }
-        };
-        self.createForm(json.data.form, obj);
-      });
-      return false;
-    });
+    var a = $('<a>').attr('href', this.baseUrl + '/attachApplicantPdf').html('Attach Pdf').addClass('attach');
     $('#attachments').append(a);
   }
+  this.parseAttachments();  
 };
 
-
 /**
- * Display Threads
+ * Parse Attachments
  * @param Object json
  */
-Applicant.prototype.displayThreads = function(json){
-  $('#threads').empty();
-  if(json.allowed){
-    $('#threads').append($('<h4>').html('Applicant Messages'));
-    var self = this;
-    var table = $('<table>').append('<thead><tr><th></th><th>Sent</th><th>Subject</th></tr></thead>');
-    for(var i=0; i<json.threads.length; i++){
-      var tr = $('<tr>').attr('id','thread'+json.threads[i].id).data('threadId', json.threads[i].id);
-      tr.append($('<td>').addClass(json.threads[i].unreadMessages?'unread': 'read'));
-      tr.append($('<td>').html(json.threads[i].createdAt));
-      var a = $('<a>').html(json.threads[i].subject).attr('href', json.threads[i].link);
-      tr.append($('<td>').append(a));
-      $(table).append(tr);
-    }
-    $('#threads').append(table);
-    $('#threads').append($('<a>').html('New Message').attr('href', json.link));
-  }
-  
+Applicant.prototype.parseAttachments = function(){
+  var self = this;
+  $('#attachments div a.delete').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      self.refreshAttachments(json.data.result.attachments);
+    });
+    return false;
+  });
+  $('#attachments a.attach').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      var obj = {
+        display: function(json){
+          self.refreshAttachments(json.data.result.attachments);
+        }
+      };
+      self.createForm(json.data.form, obj);
+    });
+    return false;
+  });
 };
