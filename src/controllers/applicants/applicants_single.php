@@ -979,6 +979,27 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
+   * Do something with an answer not involving a form
+   * Passes everything off to the page to perform a special action
+   * @param integer $applicantId
+   * @param string $what the special method name
+   * @param integer $answerId
+   */
+  public function actionDoAction($applicantId, $what, $answerId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
+    $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
+    $pageEntity->getJazzeePage()->setApplicant($applicant);
+    $pageEntity->getJazzeePage()->setController($this);
+    if(method_exists($pageEntity->getJazzeePage(), $what)){
+      $pageEntity->getJazzeePage()->$what($answerId, $this->post, true);
+      $this->setLayoutVar('status', 'success');
+    }
+    $this->setVar('result', true);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
    * Do something with a page
    * Passes everything off to the page to perform a special action
    * @param integer $applicantId
@@ -999,6 +1020,26 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->loadView($this->controllerName . '/form');
   }
   
+  /**
+   * Do something with an page not involving a form
+   * Passes everything off to the page to perform a special action
+   * @param integer $applicantId
+   * @param string $what the special method name
+   * @param integer $pageId
+   */
+  public function actionDoPageAction($applicantId, $what, $pageId){
+    $applicant = $this->getApplicantById($applicantId);
+    $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
+    $pageEntity->getJazzeePage()->setApplicant($applicant);
+    $pageEntity->getJazzeePage()->setController($this);
+    if(method_exists($pageEntity->getJazzeePage(), $what)){
+      $pageEntity->getJazzeePage()->$what($this->post, true);
+      $this->setLayoutVar('status', 'success');
+    }
+    $this->setVar('result', true);
+    $this->loadView($this->controllerName . '/result');
+  }
+  
   public function getActionPath(){
     return null;
   }
@@ -1006,7 +1047,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     //several views are controller by the complete action
     if(in_array($action, array('refreshTags', 'refreshPage'))) $action = 'index';
-    if(in_array($action, array('do', 'pageDo'))) $action = 'editAnswer';
+    if(in_array($action, array('do', 'doAction', 'pageDo', 'doPageAction'))) $action = 'editAnswer';
     return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }
