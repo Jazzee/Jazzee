@@ -291,6 +291,9 @@ Applicant.prototype.parsePage = function(pageId){
     return false;
   });
   $('#page'+pageId + ' a.action').click(function(e){
+    if($(e.target).hasClass('confirmDelete')){
+      if(!confirm('Are you sure you want to delete?  This cannot be undone')) return false;
+    }
     $.get($(e.target).attr('href'),function(json){
       self.refreshPage(pageId);
     });
