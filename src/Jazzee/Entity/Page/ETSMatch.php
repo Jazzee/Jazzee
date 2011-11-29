@@ -226,15 +226,14 @@ class ETSMatch extends Standard {
   
   /**
    * Match unmatched scores as a cron task
-   * @todo eventually the 1000 limit is going to block on dead scores - find a way to eventually avoid those or to keep looping in 1000 increments
    * @param AdminCronController $cron
    */
   public static function runCron(\AdminCronController $cron){
     $pageType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PageType')->findOneBy(array('class'=>'\Jazzee\Entity\Page\ETSMatch'));
     $allETSMatchPages = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Page')->findBy(array('type'=>$pageType->getId()));
     foreach($allETSMatchPages as $page){
-      //get all the answers without a matching score.  Limit this to 1000 per cron run to avoid memory time issues run them reverse cronologically so hopefully we don't hit a block with unmatched scores
-      $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findBy(array('pageStatus'=>NULL,'page'=>$page->getId(), 'greScore'=>null, 'toeflScore'=>null),array('updatedAt'=>'desc'), 1000);
+      //get all the answers without a matching score.
+      $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findBy(array('pageStatus'=>NULL,'page'=>$page->getId(), 'greScore'=>null, 'toeflScore'=>null),array('updatedAt'=>'desc'));
       foreach($answers as $answer){
         if(is_null($answer->getGREScore()) and is_null($answer->getTOEFLScore())){
           $testType = $page->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer);

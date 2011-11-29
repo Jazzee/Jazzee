@@ -1,6 +1,6 @@
 <?php
-ini_set('memory_limit', '512M');
-set_time_limit('300');
+ini_set('memory_limit', '1G');
+set_time_limit('600');
 /**
  * Run admin cron tasks
  * @author Jon Johnson <jon.johnson@ucsf.edu>
