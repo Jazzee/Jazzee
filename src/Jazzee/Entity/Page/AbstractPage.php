@@ -105,6 +105,7 @@ abstract class AbstractPage implements \Jazzee\Page {
   protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer){
     $answerXml = $dom->createElement('answer');
     $answerXml->setAttribute('answerId', $answer->getId());
+    $answerXml->setAttribute('uniqueId', $answer->getUniqueId());
     $answerXml->setAttribute('updatedAt', $answer->getUpdatedAt()->format('c'));
     $answerXml->setAttribute('pageStatus', $answer->getPageStatus());
     $answerXml->setAttribute('publicStatus', ($answer->getPublicStatus()?$answer->getPublicStatus()->getName():''));
