@@ -8,6 +8,9 @@
          description="Clean up and create build directories">
   <delete dir="${build}/jazzee"/>
   <mkdir dir="${build}/jazzee"/>
+  <subant target="clean">
+      <fileset dir="lib/foundation" includes="build.xml" />
+    </subant>
   </target>
 
   <target name="src" description="Prepares a clean source tree">
