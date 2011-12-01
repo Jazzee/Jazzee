@@ -1,6 +1,6 @@
 <?php
 ini_set('memory_limit', '1G');
-ini_set('max_execution_time', 600);
+set_time_limit(600);
 /**
  * Run admin cron tasks
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -28,18 +28,21 @@ class AdminCronController extends \Jazzee\AdminController {
       if(method_exists($class, 'runCron')){
         $class::runCron($this);
       }   
+      //reset the max execution time and memory limit after every admin script is included because some override this
+      set_time_limit(600);
+      ini_set('memory_limit', '1G');
     }
     
     foreach($this->_em->getRepository('\Jazzee\Entity\PageType')->findAll() as $pageType){
       $class = $pageType->getClass();
       if(method_exists($class, 'runCron')){
         $class::runCron($this);
-      }   
+      }
     }
     //Perform and applicant actions
     \Foundation\VC\Config::includeController('apply_applicant');
     ApplyApplicantController::runCron($this);
-
+    
     
     //clear the semephore
     $this->setVar('adminCronSemephore', false);
