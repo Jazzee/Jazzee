@@ -202,7 +202,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionUpdateBio($applicantId){
     $applicant = $this->getApplicantById($applicantId);
     $form = new \Foundation\Form();
-    $form->setAction($this->path("applicants/single/{$applicantId}/updateBio"));
+    $form->setAction($this->path("applicants/single/{$applicant->getId()}/updateBio"));
     $field = $form->newField();
     $field->setLegend('Edit ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
     
@@ -248,7 +248,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
          'email' => $applicant->getEmail(),
          'allowEdit' => $this->checkIsAllowed($this->controllerName, 'updateBio')
         );
-        return $bio;
         $this->setVar('result', array('bio'=> $bio));
       }
     }
