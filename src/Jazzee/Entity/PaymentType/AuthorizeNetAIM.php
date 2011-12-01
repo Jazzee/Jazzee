@@ -10,6 +10,8 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   const REJECTED_TEXT = 'Rejected or Voided';
   const REFUNDED_TEXT = 'Refunded';
   
+  const MIN_CRON_INTERVAL = 86000; //24 hours minus a bit
+  
   /**
    * Credit card payment form
    * @param \Jazzee\Entity\Applicant $applicant
@@ -346,16 +348,19 @@ class AuthorizeNetAIM extends AbstractPaymentType{
    * @param AdminCronController $cron
    */
   public static function runCron(\AdminCronController $cron){
-    $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class'=>'\Jazzee\Entity\PaymentType\AuthorizeNetAIM'));
-    if($paymentType){
-      $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type'=>$paymentType->getId(), 'status'=>\Jazzee\Entity\Payment::PENDING),array(), 100);
-      $class = new AuthorizeNetAIM($paymentType);
-      $fakeInput = new \Foundation\Form\Input(array());
-      foreach($payments as $payment){
-        $result = $class->settlePayment($payment, $fakeInput);
-        if($result === true){
-          $cron->getEntityManager()->persist($payment);
-          foreach($payment->getVariables() as $var) $cron->getEntityManager()->persist($var);
+    if(time() - (int)$cron->getVar('authorizeNetAimPaymentLastRun') > self::MIN_CRON_INTERVAL){
+      $cron->setVar('authorizeNetAimPaymentLastRun', time());
+      $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class'=>'\Jazzee\Entity\PaymentType\AuthorizeNetAIM'));
+      if($paymentType){
+        $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type'=>$paymentType->getId(), 'status'=>\Jazzee\Entity\Payment::PENDING),array(), 100);
+        $class = new AuthorizeNetAIM($paymentType);
+        $fakeInput = new \Foundation\Form\Input(array());
+        foreach($payments as $payment){
+          $result = $class->settlePayment($payment, $fakeInput);
+          if($result === true){
+            $cron->getEntityManager()->persist($payment);
+            foreach($payment->getVariables() as $var) $cron->getEntityManager()->persist($var);
+          }
         }
       }
     }
