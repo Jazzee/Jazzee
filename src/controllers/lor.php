@@ -20,10 +20,11 @@ class LorController extends \Jazzee\JazzeeController{
       $this->loadView($this->controllerName . '/complete');
       exit;
     }
+    $this->setVar('answer', $answer);
     
     $page = $answer->getPage()->getChildren()->first();
     $this->setVar('page', $page);
-    
+
     $form = new \Foundation\Form;
     $form->setAction($this->path('lor/'.$urlKey));
     $field = $form->newField();
