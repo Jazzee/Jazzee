@@ -110,7 +110,7 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
     $payment = new \Jazzee\Entity\Payment();
     $payment->setType($transactionController->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($_POST['paymentType']));
     $answer->setPayment($payment);
-    $fakeInput = new \Foundation\Form\Input;
+    $fakeInput = new \Foundation\Form\Input(array());
     $result = $payment->getType()->getJazzeePaymentType()->pendingPayment($payment, $fakeInput);
     $transactionController->getEntityManager()->persist($applicant);
     $transactionController->getEntityManager()->persist($answer);
