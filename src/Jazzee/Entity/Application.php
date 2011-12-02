@@ -453,6 +453,7 @@ class Application{
    * @return array \Jazzee\Entity\ApplicationPage
    */
   public function getApplicationPages($kind = null){
+    if(!$this->applicationPages) return array();
     if(is_null($kind)) return $this->applicationPages->toArray();
     $applicationPages = array();
     foreach($this->applicationPages as $applicationPage) if($applicationPage->getKind() == $kind) $applicationPages[] = $applicationPage;
