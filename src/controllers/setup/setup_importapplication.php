@@ -43,7 +43,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $this->addMessage('error', 'This application is already published.  No changes can be made.');
         $this->redirectPath('setup/importapplication');
       }
-      $pages = $$this->_application->getApplicationPages();
+      $pages = $this->_application->getApplicationPages();
       if(count($pages)){
         $this->addMessage('error', 'This application already has pages.  You cannot import a configuration for an application with pages.');
         $this->redirectPath('setup/importapplication');
