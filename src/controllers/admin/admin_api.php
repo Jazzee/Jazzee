@@ -165,7 +165,6 @@ class AdminApiController extends \Jazzee\AdminController {
     }
     $app = $this->dom->createElement("application");
     $applicationPages = $this->dom->createElement("pages");
-    $pages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId()));
     foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page){
       $applicationPages->appendChild($this->pageXml($page));
     }
@@ -218,13 +217,14 @@ class AdminApiController extends \Jazzee\AdminController {
     $applicationPages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));  
     
     $pages = $this->dom->createElement("pages");
-    foreach($applicationPages as $applicationPage){
+    foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
       $page = $this->dom->createElement("page");
       $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
       $page->setAttribute('type', htmlentities($applicationPage->getPage()->getType()->getClass(),ENT_COMPAT,'utf-8'));
       $page->setAttribute('pageId', $applicationPage->getPage()->getId());
       $answersXml = $this->dom->createElement('answers');
       $applicationPage->getJazzeePage()->setApplicant($applicant);
+      $applicationPage->getJazzeePage()->setController($this);
       foreach($applicationPage->getJazzeePage()->getXmlAnswers($this->dom) as $answerXml){
         $answersXml->appendChild($answerXml);
       }
@@ -242,7 +242,7 @@ class AdminApiController extends \Jazzee\AdminController {
    * 
    * Calls itself recursivly to capture all children
    * @param DomDocument $dom
-   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Page or \Jazzee\Entity\Page $page
    */
   protected function pageXml($page){
     $pxml = $this->dom->createElement('page');
