@@ -1,5 +1,5 @@
 <?php
-ini_set('memory_limit', '512m');
+ini_set('memory_limit', '756M');
 set_time_limit('240');
 /**
  * Data API
@@ -33,7 +33,7 @@ class AdminApiController extends \Jazzee\AdminController {
     parent::setUp();
     $this->setLayout('xml');
     $this->setLayoutVar('filename', 'api.xml');
-    $this->dom = new DOMDocument();
+    $this->dom = new DOMDocument('1.0', 'UTF-8');
     $this->setVar('xml', $this->dom);
     
     $versions = array(1);
@@ -213,8 +213,6 @@ class AdminApiController extends \Jazzee\AdminController {
     }
     $applicantXml->appendChild($tags);
     if($partial) return $applicantXml;
-    
-    $applicationPages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));  
     
     $pages = $this->dom->createElement("pages");
     foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){

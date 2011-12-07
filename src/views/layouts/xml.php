@@ -5,8 +5,7 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-header('Content-Type:text/html; charset=UTF-8');
-header("Content-type: application/xml");
+header("Content-type: application/xml; charset=UTF-8");
 header('Content-Disposition: attachment; filename='. $filename);
 $xml = new DOMDocument('1.0', 'UTF-8');
 $xml->formatOutput = true;
@@ -24,7 +23,7 @@ foreach($messages as $message){
 $response->appendChild($mxml);
 
 if(!empty($layoutContent)){
-  $body = new DOMDocument;
+  $body = new DOMDocument('1.0', 'UTF-8');
   $body->preserveWhiteSpace = true;
   $body->loadXML($layoutContent);
   $bodyNode = $xml->importNode($body->documentElement, true);
