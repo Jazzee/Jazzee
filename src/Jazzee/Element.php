@@ -5,6 +5,21 @@ namespace Jazzee;
  */
 interface Element 
 {
+ 
+  /**
+   * Constructor 
+   * 
+   * @param \Jazzee\Entity\Element $element
+   */
+  function __construct(\Jazzee\Entity\Element $element);
+  
+  /**
+   * Set the controller
+   * 
+   * @param  \Jazzee\Controller $controller
+   */
+  function setController(\Jazzee\Controller $controller);
+  
   /**
    * Add a form element to the supplied field
    * @param \Foundation\Form\Field $field

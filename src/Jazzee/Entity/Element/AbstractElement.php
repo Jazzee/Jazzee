@@ -12,12 +12,17 @@ abstract class AbstractElement implements \Jazzee\Element {
  protected $_element;
  
  /**
-  * Contructor
-  * 
-  * @param \Jazzee\Entity\Element
+  * The controller that is using this
+  * @var \Jazzee\Controller
   */
+ protected $_controller;
+ 
   public function __construct(\Jazzee\Entity\Element $element){
     $this->_element = $element;
+  }
+  
+  public function setController(\Jazzee\Controller $controller){
+    $this->_controller = $controller;
   }
   
   public function rawValue(\Jazzee\Entity\Answer $answer){

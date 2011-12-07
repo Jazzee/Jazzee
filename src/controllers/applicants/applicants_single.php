@@ -174,22 +174,18 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       'allowDelete' => $this->checkIsAllowed($this->controllerName, 'deleteApplicantPdf')
     );
     foreach($applicant->getAttachments() as $attachment){
-      $blob = $attachment->getAttachment();
-     
-      $name = $applicant->getFullName() . '_attachment_' . $attachment->getId();
-      $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $applicant->getUpdatedAt()->format('c'));
-      $png = new \Foundation\Virtual\VirtualFile($name . '.png', $this->pdfThumbnail('applicant' . $applicant->getId() . 'attachment' . $attachment->getId(), $blob), $applicant->getUpdatedAt()->format('c'));
-  
-      $session = new \Foundation\Session();
-      $store = $session->getStore('files', 900);
-      $pdfStoreName = md5($name . '.pdf');
-      $pngStoreName = md5($name . '.png');
-      $store->$pdfStoreName = $pdf; 
-      $store->$pngStoreName = $png;
+      $pdfName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . '.pdf';
+      $pngName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
+      if(!$pdfFile = $this->getStoredFile($pdfName) or $pdfFile->getLastModified() < $applicant->getUpdatedAt()){
+        $this->storeFile($pdfName, $attachment->getAttachment());
+      }
+      if(!$pngFile = $this->getStoredFile($pngName) or $pngFile->getLastModified() < $applicant->getUpdatedAt()){
+        $this->storeFile($pngName, $attachment->getThumbnail());
+      }
       $attachments['attachments'][] = array(
         'id' => $attachment->getId(),
-        'filePath' => $this->path('file/' . \urlencode($name . '.pdf')),
-        'previewPath' => $this->path('file/' . \urlencode($name . '.png'))
+        'filePath' => $this->path('file/' . \urlencode($pdfName)),
+        'previewPath' => $this->path('file/' . \urlencode($pngName))
       );
     }
     return $attachments;
@@ -829,7 +825,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    */
   public function actionPdf($applicantId, $layout){
     $applicant = $this->getApplicantById($applicantId);
-    $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), $layout == 'landscape'?\Jazzee\ApplicantPDF::USLETTER_LANDSCAPE:\Jazzee\ApplicantPDF::USLETTER_PORTRAIT);
+    $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), $layout == 'landscape'?\Jazzee\ApplicantPDF::USLETTER_LANDSCAPE:\Jazzee\ApplicantPDF::USLETTER_PORTRAIT, $this);
     $this->setVar('filename', $applicant->getFullName() . '.pdf');
     $this->setVar('blob', $pdf->pdf($applicant));
   }

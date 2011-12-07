@@ -241,20 +241,6 @@ class JazzeePageController extends \Foundation\VC\Controller
   }
   
   /**
-   * Get a preview for a pdf
-   * Looks for file in the cache and generates a PNG preview if necessary
-   * 
-   * @param string $uniqueName 
-   * @param string $blob contents of the PDF
-   * 
-   * @return string the contents of the preview
-   */
-  public function pdfThumbnail($uniqueName, $blob){
-    $cachePath = $this->getVarPath() . '/cache/' . (sha1($uniqueName)) . '.pdfPreview.png';
-    return \thumbnailPDF($blob, 100, 0, $cachePath);
-  }
-  
-  /**
    * Handle PHP error
    * Takes input from PHPs built in error handler logs it  
    * throws a jazzee exception to handle if the error reporting level is high enough

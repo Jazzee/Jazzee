@@ -17,6 +17,7 @@ class Standard extends AbstractPage {
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
     foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
       $element->getJazzeeElement()->addToField($field);
     }
     $form->newButton('submit', 'Save');
@@ -56,6 +57,7 @@ class Standard extends AbstractPage {
       $answer->setPage($this->_applicationPage->getPage());
       $this->_applicant->addAnswer($answer);
       foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
         foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
           $answer->addElementAnswer($elementAnswer);
         }
@@ -75,6 +77,7 @@ class Standard extends AbstractPage {
         $this->_controller->getEntityManager()->remove($ea);
       }
       foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
         foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
           $answer->addElementAnswer($elementAnswer);
         }
@@ -99,6 +102,7 @@ class Standard extends AbstractPage {
   public function fill($answerId){
     if($answer = $this->_applicant->findAnswerById($answerId)){
       foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
         $value = $element->getJazzeeElement()->formValue($answer);
         if($value) $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
       }

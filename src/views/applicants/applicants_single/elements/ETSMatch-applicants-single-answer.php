@@ -4,7 +4,10 @@
  */
 ?>
 <tr id='answer<?print $answer->getId() ?>'>
-  <?php foreach($page->getPage()->getElements() as $element){?><td><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php }?>
+  <?php foreach($page->getPage()->getElements() as $element){
+    $element->getJazzeeElement()->setController($this->controller);?>
+    <td><?php print $element->getJazzeeElement()->displayValue($answer); ?></td>
+  <?php }?>
 <td>
   <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
     <?php if($answer->getPublicStatus()){?><br />Public Status: <?php print $answer->getPublicStatus()->getName();}?>
@@ -19,19 +22,16 @@
 </td>
 <td>
 <?php if($attachment = $answer->getAttachment()){
-    $blob = $attachment->getAttachment();
-    $name = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId();
-    $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $answer->getUpdatedAt()->format('c'));
-    $png = new \Foundation\Virtual\VirtualFile($name . '.png', $this->controller->pdfThumbnail('applicant' . $answer->getApplicant()->getId() . 'answer' . $answer->getId() . 'attachment' . $attachment->getId(), $blob), $answer->getUpdatedAt()->format('c'));
-  
-    $session = new \Foundation\Session();
-    $store = $session->getStore('files', 900);
-    $pdfStoreName = md5($name . '.pdf');
-    $pngStoreName = md5($name . '.png');
-    $store->$pdfStoreName = $pdf; 
-    $store->$pngStoreName = $png;
-    ?>
-    <a href="<?php print $this->path('file/' . \urlencode($name . '.pdf'));?>"><img src="<?php print $this->path('file/' . \urlencode($name . '.png'));?>" /></a>
+    $pdfName = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId() . '.pdf';
+    $pngName = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId() . 'preview.png';
+    if(!$pdfFile = $this->controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()){
+      $this->controller->storeFile($pdfName, $attachment->getAttachment());
+    }
+    if(!$pngFile = $this->controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()){
+      $this->controller->storeFile($pngName, $attachment->getThumbnail());
+    }
+  ?>
+    <a href="<?php print $this->path('file/' . \urlencode($pdfName));?>"><img src="<?php print $this->path('file/' . \urlencode($pngName));?>" /></a>
     <?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswerPdf')){ ?>
       <br /><a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswerPdf/' . $answer->getId());?>' class='action'>Delete PDF</a>
     <?php } ?>

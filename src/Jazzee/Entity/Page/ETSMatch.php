@@ -210,7 +210,10 @@ class ETSMatch extends Standard {
       $pdf->addTableCell('Score');
       foreach($this->getAnswers() as $answer){
         $pdf->startTableRow();
-        foreach($this->_applicationPage->getPage()->getElements() as $element)$pdf->addTableCell ($element->getJazzeeElement()->pdfValue($answer, $pdf));
+        foreach($this->_applicationPage->getPage()->getElements() as $element){
+          $element->getJazzeeElement()->setController($this->_controller);
+          $pdf->addTableCell ($element->getJazzeeElement()->pdfValue($answer, $pdf));
+        }
         if($answer->getMatchedScore()){
           $string = '';
           foreach($answer->getMatchedScore()->getSummary() as $key => $value) $string .= "{$key}: {$value}\n";

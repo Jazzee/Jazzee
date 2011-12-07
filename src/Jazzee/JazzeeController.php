@@ -195,4 +195,36 @@ class JazzeeController extends PageController
     $this->_session->setConfigVariable('cookie_domain', '');
     $this->_session->start();
   }
+  
+  /**
+   * Store a file
+   * 
+   * @param string $filename
+   * @param blob $blob
+   */
+  public function storeFile($filename, $blob){
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    $safeName = md5($filename);
+    file_put_contents($this->getVarPath() . '/tmp/' . $safeName . '.' . $ext, $blob);
+    $session = new \Foundation\Session();
+    $store = $session->getStore('files', 900);
+    $store->$safeName = $filename;
+  }
+  
+  /**
+   * Get a stored file
+   * 
+   * @param string $filename
+   * @return \Foundation\Virtual\RealFile
+   */
+  public function getStoredFile($filename){
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    $safeName = md5($filename);
+    $path = $this->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
+    $session = new \Foundation\Session();
+    $store = $session->getStore('files', 900);
+    if(is_readable($path) and isset($store->$safeName) and $store->$safeName == $filename) 
+            return new \Foundation\Virtual\RealFile($filename, $path);
+    return false;
+  }
 }

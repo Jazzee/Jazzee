@@ -111,6 +111,7 @@ abstract class AbstractPage implements \Jazzee\Page {
     $answerXml->setAttribute('publicStatus', ($answer->getPublicStatus()?$answer->getPublicStatus()->getName():''));
     $answerXml->setAttribute('privateStatus', ($answer->getPrivateStatus()?$answer->getPrivateStatus()->getName():''));
     foreach($answer->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
       $eXml = $dom->createElement('element');
       $eXml->setAttribute('elementId', $element->getId());
       $eXml->setAttribute('title', htmlentities($element->getTitle(),ENT_COMPAT,'utf-8'));
@@ -144,7 +145,10 @@ abstract class AbstractPage implements \Jazzee\Page {
       foreach($this->_applicationPage->getPage()->getElements() as $element)$pdf->addTableCell($element->getTitle());
       foreach($this->getAnswers() as $answer){
         $pdf->startTableRow();
-        foreach($this->_applicationPage->getPage()->getElements() as $element)$pdf->addTableCell ($element->getJazzeeElement()->pdfValue($answer, $pdf));
+        foreach($this->_applicationPage->getPage()->getElements() as $element){
+          $element->getJazzeeElement()->setController($this->_controller);
+          $pdf->addTableCell($element->getJazzeeElement()->pdfValue($answer, $pdf));
+        }
         if($attachment = $answer->getAttachment()) $pdf->addPdf($attachment->getAttachment());
       }
       $pdf->writeTable();

@@ -5,7 +5,7 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-class LorController extends \Jazzee\JazzeeController{  
+class LorController extends \Jazzee\Controller{  
   /**
    * The index page
    * If the recommendation hasn't been completed show the form
@@ -31,6 +31,7 @@ class LorController extends \Jazzee\JazzeeController{
     $field->setLegend($page->getTitle());
     $field->setInstructions($page->getInstructions());
     foreach($page->getElements() as $element){
+      $element->getJazzeeElement()->setController($this);
       $element->getJazzeeElement()->addToField($field);
     }
     $form->newButton('submit', 'Submit Recommendation');
@@ -42,6 +43,7 @@ class LorController extends \Jazzee\JazzeeController{
       $childAnswer->setApplicant($answer->getApplicant());
       $childAnswer->setPage($page);
       foreach($page->getElements() as $element){
+        $element->getJazzeeElement()->setController($this);
         foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
           $childAnswer->addElementAnswer($elementAnswer);
         }

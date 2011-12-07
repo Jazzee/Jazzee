@@ -11,12 +11,7 @@ class FileController extends \Jazzee\Controller{
    * @param string $name 
    */
   public function actionGet($name){
-    $store = $this->_session->getStore('files', 900);
-    $storeName = md5($name);
-    if(isset($store->$storeName)){
-      $store->$storeName->output();
-    }
-    
+    if($file = $this->getStoredFile($name)) $file->output();
     //send a 404
     $request = new Lvc_Request();
     $request->setControllerName('error');

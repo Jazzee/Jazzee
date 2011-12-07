@@ -9,7 +9,8 @@
   <h5>Saved Answer</h5>
   <?php 
   foreach($answer->getPage()->getElements() as $element){
-    $value = $element->getJazzeeElement()->displayValue($answer);
+      $element->getJazzeeElement()->setController($this->controller);
+      $value = $element->getJazzeeElement()->displayValue($answer);
     if($value){
       print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>'; 
     }

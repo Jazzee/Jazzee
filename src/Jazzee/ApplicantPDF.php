@@ -65,13 +65,19 @@ class ApplicantPDF {
    * @var float
    */
   protected $currentY;
-    
+  
+  /**
+   * The callign controller
+   * @var \Jazzee\Controller
+   */
+  protected $_controller;
+  
   /**
    * Constructor
    * @param string $key the PDFLib license key we are using
    * @param int $pageType the type and size of the output
    */
-  public function __construct($key,$pageType = self::USLETTER_PORTRAIT){
+  public function __construct($key,$pageType = self::USLETTER_PORTRAIT, \Jazzee\Controller $controller){
     $this->pdf = new \PDFlib();
     if($key){
       try{
@@ -115,6 +121,8 @@ class ApplicantPDF {
     $this->pdf->set_info("Creator", "Jazzee");
     $this->pdf->set_info("Author", "Jazzee Open Applicatoin Platform");
     $this->currentText  = $this->pdf->create_textflow('', '');
+    
+    $this->_controller = $controller;
   }
   
   /**
@@ -144,6 +152,7 @@ class ApplicantPDF {
     $this->write();
     foreach($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page){
       $page->getJazzeePage()->setApplicant($applicant);
+      $page->getJazzeePage()->setController($this->_controller);
       $page->getJazzeePage()->renderPdfSection($this);
     }
     $this->pdf->end_page_ext("");

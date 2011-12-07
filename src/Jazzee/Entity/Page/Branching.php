@@ -41,6 +41,7 @@ class Branching extends Standard
     $field->setInstructions($this->_applicationPage->getInstructions());
     
     foreach($page->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
       $element->getJazzeeElement()->addToField($field);
     }
     $form->newHiddenElement('level', 2);
@@ -112,6 +113,7 @@ class Branching extends Standard
       $child = $answer->getChildren()->first();
       $this->branchingForm($child->getPage()->getId());
       foreach($child->getPage()->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
         $value = $element->getJazzeeElement()->formValue($child);
         if($value) $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
       }
@@ -168,7 +170,10 @@ class Branching extends Standard
         $child = $answer->getChildren()->first();
         $pdf->addTableCell($child->getPage()->getTitle());
         $string = '';
-        foreach($child->getPage()->getElements() as $element)$string .= $element->getTitle() . ': ' . $element->getJazzeeElement()->pdfValue($child, $pdf) . "\n";
+        foreach($child->getPage()->getElements() as $element){
+          $element->getJazzeeElement()->setController($this->_controller);
+          $string .= $element->getTitle() . ': ' . $element->getJazzeeElement()->pdfValue($child, $pdf) . "\n";
+        }
         $pdf->addTableCell($string);
         if($attachment = $answer->getAttachment()) $pdf->addPdf($attachment->getAttachment());
       }

@@ -133,22 +133,18 @@
   </div>
   <div id="attachments">
     <?php foreach($applicant->getAttachments() as $attachment){
-      $blob = $attachment->getAttachment();
-     
-      $name = $applicant->getFullName() . '_attachment_' . $attachment->getId();
-      $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $applicant->getUpdatedAt()->format('c'));
-      $png = new \Foundation\Virtual\VirtualFile($name . '.png', $this->controller->pdfThumbnail('applicant' . $applicant->getId() . 'attachment' . $attachment->getId(), $blob), $applicant->getUpdatedAt()->format('c'));
-  
-      $session = new \Foundation\Session();
-      $store = $session->getStore('files', 900);
-      $pdfStoreName = md5($name . '.pdf');
-      $pngStoreName = md5($name . '.png');
-      $store->$pdfStoreName = $pdf; 
-      $store->$pngStoreName = $png;
+      $pdfName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . '.pdf';
+      $pngName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
+      if(!$pdfFile = $this->controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $applicant->getUpdatedAt()){
+        $this->controller->storeFile($pdfName, $attachment->getAttachment());
+      }
+      if(!$pngFile = $this->controller->getStoredFile($pngName) or $pngFile->getLastModified() < $applicant->getUpdatedAt()){
+        $this->controller->storeFile($pngName, $attachment->getThumbnail());
+      }
       ?>
       <div id='attachment<?php print $attachment->getId();?>'>
-        <a href='<?php print $this->path('file/' . \urlencode($name . '.pdf'));?>'>
-          <img src='<?php print $this->path('file/' . \urlencode($name . '.png'));?>' /></a>
+        <a href='<?php print $this->path('file/' . \urlencode($pdfName));?>'>
+          <img src='<?php print $this->path('file/' . \urlencode($pngName));?>' /></a>
         <?php if($this->controller->checkIsAllowed('applicants_single', 'deleteApplicantPdf')){?>
           <a class='delete' href="<?php print $this->path("applicants/single/{$applicant->getId()}/deleteApplicantPdf/{$attachment->getId()}");?>">Delete PDF</a>
         <?php } ?>

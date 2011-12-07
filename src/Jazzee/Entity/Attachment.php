@@ -29,8 +29,11 @@ class Attachment{
    */
   private $applicant;
   
-  /** @Column(type="text", nullable=true) */
+  /** @Column(type="text") */
   private $attachment;
+  
+  /** @Column(type="text") */
+  private $thumbnail;
   
 /**
    * Get id
@@ -80,6 +83,18 @@ class Attachment{
    */
   public function setAttachment($blob){
     $this->attachment = base64_encode($blob);
+    try{
+      $im = new \imagick;
+      $im->readimageblob($blob);
+      $im->setiteratorindex(0);
+      $im->setImageFormat("png");
+      $im->scaleimage(100, 0);
+    } catch (\ImagickException $e){
+      $im = new \imagick;
+      $im->readimage(realpath(__DIR__ . '/../../../lib/foundation/src/media/default_pdf_logo.png'));
+      $im->scaleimage(100, 0);
+    }
+    $this->thumbnail = base64_encode($im->getimageblob());
   }
 
   /**
@@ -89,6 +104,16 @@ class Attachment{
    */
   public function getAttachment(){
     return base64_decode($this->attachment);
+  }
+
+  /**
+   * Get thumbnail
+   *
+   * @return blob $thumbnail
+   */
+  public function getThumbnail(){
+    if($this->thumbnail) return base64_decode($this->thumbnail);
+    return false;
   }
   
   /**

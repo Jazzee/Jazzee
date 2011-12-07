@@ -165,6 +165,7 @@ class Recommenders extends Standard {
       $field->setLegend($lorPage->getTitle());
       $field->setInstructions($lorPage->getInstructions());
       foreach($lorPage->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
         $element->getJazzeeElement()->addToField($field);
         $value = $element->getJazzeeElement()->formValue($child);
         if($value) $form->getElementByName('el' . $element->getId())->setValue($value);
@@ -303,7 +304,10 @@ class Recommenders extends Standard {
         $string .= $this->_applicationPage->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_PHONE)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
         $pdf->addTableCell($string);
         if($child = $answer->getChildren()->first()){
-          foreach($this->_applicationPage->getPage()->getChildren()->first()->getElements() as $element)$pdf->addTableCell($element->getJazzeeElement()->pdfValue($child, $pdf));
+          foreach($this->_applicationPage->getPage()->getChildren()->first()->getElements() as $element){
+            $element->getJazzeeElement()->setController($this->_controller);
+            $pdf->addTableCell($element->getJazzeeElement()->pdfValue($child, $pdf));
+          }
         }
         if($attachment = $answer->getAttachment()) $pdf->addPdf($attachment->getAttachment());
       }

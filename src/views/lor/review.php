@@ -17,6 +17,7 @@
     <p>
     <?php 
     foreach($answer->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->controller);
       $value = $element->getJazzeeElement()->displayValue($answer);
       if($value){
         print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>'; 

@@ -129,6 +129,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
         $answers = $applicant->findAnswersByPage($applicationPage->getPage());
         for($i=0;$i<$applicationPagesAnswerCount[$applicationPage->getPage()->getId()]; $i++){
           foreach($applicationPage->getPage()->getElements() as $element){
+            $element->getJazzeeElement()->setController($this);
             if(isset($answers[$i])){
               $arr[] = $element->getJazzeeElement()->displayValue($answers[$i]);
             } else {

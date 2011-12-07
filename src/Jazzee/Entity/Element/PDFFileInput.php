@@ -42,34 +42,41 @@ class PDFFileInput extends AbstractElement {
       $elementAnswer->setPosition(0);
       $elementAnswer->setEBlob($input);
       $elementAnswers[] = $elementAnswer;
+      
+      //create the preview image
+      try{
+        $im = new \imagick;
+        $im->readimageblob($input);
+        $im->setiteratorindex(0);
+        $im->setImageFormat("png");
+        $im->scaleimage(100, 0);
+      } catch (ImagickException $e){
+        $im = new \imagick;
+        $im->readimage(realpath(__DIR__ . '/../../../../lib/foundation/src/media/default_pdf_logo.png'));
+        $im->scaleimage(100, 0);
+      }
+      $elementAnswer = new \Jazzee\Entity\ElementAnswer;
+      $elementAnswer->setElement($this->_element);
+      $elementAnswer->setPosition(1);
+      $elementAnswer->setEBlob($im->getimageblob());
+      $elementAnswers[] = $elementAnswer;
     }
     return $elementAnswers;
   }
   
   public function displayValue(\Jazzee\Entity\Answer $answer){
-    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
-    if(isset($elementsAnswers[0])){
-      $blob = $elementsAnswers[0]->getEBlob();
-      $name = $this->_element->getTitle() . '_' . $elementsAnswers[0]->getId();
-      
-      $config = new \Jazzee\Configuration();
-      $path = $config->getVarPath()?$config->getVarPath():__DIR__ . '/../../../../var';
-      if(!$varPath = \realpath($path) or !\is_dir($varPath) or !\is_writable($varPath)){
-        if($varPath) $path = $varPath; //nicer error message if the path exists
-        throw new \Jazzee\Exception("{$path} is not readable by the webserver so we cannot use it for caching PDF files");
+    $elementAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(isset($elementAnswers[0])){
+      $base = $answer->getApplicant()->getFullName() . ' ' . $this->_element->getTitle() . '_' . $answer->getApplicant()->getId() . $elementAnswers[0]->getId();
+      $pdfName =  $base . '.pdf';
+      $pngName = $base . 'preview.png';
+      if(!$pdfFile = $this->_controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()){
+        $this->_controller->storeFile($pdfName, $elementAnswers[0]->getEBlob());
       }
-      $pdf = new \Foundation\Virtual\VirtualFile($name . '.pdf', $blob, $answer->getUpdatedAt()->format('c'));
-      $cachePath = $varPath . '/cache/' . (sha1('applicant' . $answer->getApplicant()->getId() . 'answer' . $answer->getId() . 'element' . $this->_element->getId() . 'elementAnswer' . $elementsAnswers[0]->getId())) . '.pdfPreview.png';
-      $png = new \Foundation\Virtual\VirtualFile($name . '.png', \thumbnailPDF($blob, 100, 0, $cachePath), $answer->getUpdatedAt()->format('c'));
-
-      $session = new \Foundation\Session();
-      $store = $session->getStore('files', 900);
-      $pdfStoreName = md5($name . '.pdf');
-      $pngStoreName = md5($name . '.png');
-      $store->$pdfStoreName = $pdf; 
-      $store->$pngStoreName = $png;
-      
-      return '<a href="index.php?url=file/' . \urlencode($name . '.pdf') . '"><img src="index.php?url=file/' . urlencode($name . '.png') . '" /></a>';
+      if(!$pngFile = $this->_controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()){
+        $this->_controller->storeFile($pngName, $elementAnswers[1]->getEBlob());
+      }
+      return '<a href="' . $this->_controller->path('file/' . \urlencode($pdfName)) . '"><img src="' . $this->_controller->path('file/' . \urlencode($pngName)) . '" /></a>';
     }
     return null;
   }
