@@ -17,6 +17,7 @@ class Textarea extends AbstractElement {
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
     }
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     return $element;
   }
   
