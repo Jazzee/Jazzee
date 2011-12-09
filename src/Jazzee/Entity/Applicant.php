@@ -75,7 +75,7 @@ class Applicant{
   /** @Column(type="datetime", nullable=true) */
   private $updatedAt;
   
-  /** @Column(type="float", nullable=true) */
+  /** @Column(type="float") */
   private $percentComplete;
   
   /** 
@@ -124,6 +124,7 @@ class Applicant{
     $this->duplicates = new \Doctrine\Common\Collections\ArrayCollection();
     $this->createdAt = new \DateTime('now');
     $this->isLocked = false;
+    $this->percentComplete = 0;
   }
   
   /**
@@ -449,7 +450,7 @@ class Applicant{
    */
   public function markLastUpdate(){
     if(!$this->updatedAtOveridden) $this->updatedAt = new \DateTime();
-    $this->percentComplete = null;
+    $this->percentComplete = $this->calculatePercentComplete();
   }
 
   /**
@@ -654,15 +655,20 @@ class Applicant{
    * If it isn't set then generate it
    */
   public function getPercentComplete(){
-    if(!is_null($this->percentComplete)) return $this->percentComplete;
+    return $this->percentComplete;
+  }
+  
+  protected function calculatePercentComplete(){
     $complete = 0;
     $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
     foreach($pages as $pageEntity){
       $pageEntity->getJazzeePage()->setApplicant($this);
       if($pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::COMPLETE OR $pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED) $complete++;
     }
-    $this->percentComplete = round($complete/count($pages), 2);
-    return $this->percentComplete;
+    //avoid division by 0 and dividing 0 by something
+    if($complete == 0 or count($pages) == 0) return 0;
+    
+    return round($complete/count($pages), 2);
   }
 }
 
