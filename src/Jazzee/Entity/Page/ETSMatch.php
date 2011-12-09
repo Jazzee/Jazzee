@@ -186,8 +186,9 @@ class ETSMatch extends Standard {
       $scoreXml = $dom->createElement('score');
       $element = $answer->getPage()->getElementByFixedId(self::FID_TEST_TYPE);
       foreach($answer->getMatchedScore()->getSummary() as $name => $value){
-        $e = $dom->createElement('component', htmlentities($value,ENT_COMPAT,'utf-8'));
+        $e = $dom->createElement('component');
         $e->setAttribute('name', htmlentities($name,ENT_COMPAT,'utf-8'));
+        $e->appendChild($dom->createCDATASection($value));
         $scoreXml->appendChild($e);
       }
       $xml->appendChild($scoreXml);
