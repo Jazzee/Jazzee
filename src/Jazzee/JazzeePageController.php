@@ -214,6 +214,14 @@ class JazzeePageController extends \Foundation\VC\Controller
   }
   
   /**
+   * Get the current configuration
+   * @return \Jazzee\Configuration
+   */
+  public function getConfig(){
+    return $this->_config;
+  }
+  
+  /**
    * Setup logging
    */
   protected function setupLogging(){

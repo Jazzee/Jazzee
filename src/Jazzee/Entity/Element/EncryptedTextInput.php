@@ -15,14 +15,8 @@ class EncryptedTextInput extends TextInput {
    */
   private $_pki;
   
-  /**
-   * Constructor
-   * Establish the Foundation PKI class
-   * @param \Jazzee\Entity\Element $element
-   */
-  public function __construct(\Jazzee\Entity\Element $element){
-    parent::__construct($element);
-    $config = new \Jazzee\Configuration();
+  protected function setupPki(){
+    $config = $this->_controller->getConfig();
     if(!is_readable($config->getPublicKeyCertificatePath())){
       throw new \Jazzee\Exception('Unable to read public key for EncryptedInput: ' . $config->getPublicKeyCertificatePath());
     }
@@ -31,6 +25,7 @@ class EncryptedTextInput extends TextInput {
   }
   
   public function addToField(\Foundation\Form\Field $field){
+    $this->setupPki();
     $element = parent::addToField($field);
     $filter = new \Foundation\Form\Filter\Encrypt($element, $this->_pki);
     $element->addFilter($filter);

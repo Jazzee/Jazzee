@@ -24,7 +24,7 @@ class PDFFileInput extends AbstractElement {
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
     
-    $config = new \Jazzee\Configuration();
+    $config = $this->_controller->getConfig();
     if($config->getMaximumApplicantFileUploadSize()) $max = $config->getMaximumApplicantFileUploadSize();
     else $max = \convertIniShorthandValue(\ini_get('upload_max_filesize'));
     if($this->_element->getMax() and \convertIniShorthandValue($this->_element->getMax()) < $max) $max = $this->_element->getMax();
