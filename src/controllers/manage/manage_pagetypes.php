@@ -35,6 +35,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
       $element = $field->newElement('TextInput','name');
       $element->setLabel('Name');
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
       $element->setValue($pageType->getName());
   
       $form->newButton('submit', 'Save Changes');
@@ -60,6 +61,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
     $field->setLegend('New page type');
     $element = $field->newElement('TextInput','name');
     $element->setLabel('Name');
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $element = $field->newElement('TextInput','class');

@@ -35,6 +35,13 @@ abstract class PageBuilder extends AdminController{
     $this->addScript($this->path('resource/scripts/classes/PageStore.class.js'));
     $this->addCss($this->path('resource/styles/pages.css'));
     
+    
+    require_once 'HTMLPurifier.includes.php';
+    require_once 'HTMLPurifier.autoload.php';
+    if(!class_exists('HTMLPurifier')){
+      throw new \Foundation\Exception('HTML Purifier is required for building pages and it is not available.');
+    }
+    
   }
   
   /**
@@ -197,14 +204,16 @@ abstract class PageBuilder extends AdminController{
    * @param \Jazzee\Entity\Page $page
    */
   public function savePage($page, $data){
-    $page->setTitle($data->title);
+    $htmlPurifier = new \HTMLPurifier();
+    
+    $page->setTitle($htmlPurifier->purify($data->title));
     $page->setMin(empty($data->min)?null:$data->min);
     $page->setMax(empty($data->max)?null:$data->max);
     if($data->isRequired) $page->required(); else $page->optional();
     if($data->answerStatusDisplay) $page->showAnswerStatus(); else $page->hideAnswerStatus();
-    $page->setInstructions(empty($data->instructions)?null:$data->instructions);
-    $page->setLeadingText(empty($data->leadingText)?null:$data->leadingText);
-    $page->setTrailingText(empty($data->trailingText)?null:$data->trailingText);
+    $page->setInstructions(empty($data->instructions)?null:$htmlPurifier->purify($data->instructions));
+    $page->setLeadingText(empty($data->leadingText)?null:$htmlPurifier->purify($data->leadingText));
+    $page->setTrailingText(empty($data->trailingText)?null:$htmlPurifier->purify($data->trailingText));
     
     $this->_em->persist($page);
     
@@ -249,6 +258,7 @@ abstract class PageBuilder extends AdminController{
    * @param array $elements
    */
   protected function savePageElements(\Jazzee\Entity\Page $page, array $elements){
+    $htmlPurifier = new \HTMLPurifier();
     foreach($elements as $e){
       switch($e->status){
         case 'delete':
@@ -265,10 +275,10 @@ abstract class PageBuilder extends AdminController{
         default:
           if(!isset($element)) $element = $page->getElementByID($e->id);
           $element->setWeight($e->weight);
-          $element->setTitle($e->title);
-          $element->setFormat(empty($e->format)?null:$e->format);
-          $element->setInstructions(empty($e->instructions)?null:$e->instructions);
-          $element->setDefaultValue(empty($e->defaultValue)?null:$e->defaultValue);
+          $element->setTitle($htmlPurifier->purify($e->title));
+          $element->setFormat(empty($e->format)?null:$htmlPurifier->purify($e->format));
+          $element->setInstructions(empty($e->instructions)?null:$htmlPurifier->purify($e->instructions));
+          $element->setDefaultValue(empty($e->defaultValue)?null:$htmlPurifier->purify($e->defaultValue));
           if($e->isRequired) $element->required(); else $element->optional();
           $element->setMin(empty($e->min)?null:$e->min);
           $element->setMax(empty($e->max)?null:$e->max);
@@ -277,7 +287,7 @@ abstract class PageBuilder extends AdminController{
               $item = new \Jazzee\Entity\ElementListItem();
               $element->addItem($item);
             }
-            $item->setValue($i->value);
+            $item->setValue($htmlPurifier->purify($i->value));
             $item->setWeight($i->weight);
             if($i->isActive) $item->activate(); else $item->deActivate();
             $this->_em->persist($item);

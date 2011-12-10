@@ -39,17 +39,19 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element->setLabel('Contact Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->setValue($this->_application->getContactName());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('TextInput','contactEmail');
     $element->setLabel('Contact Email');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\EmailAddress($element));
     $element->setValue($this->_application->getContactEmail());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('Textarea','welcome');
     $element->setLabel('Welcome Message');
     $element->setValue($this->_application->getWelcome());
-    
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $search = array(
      '%Applicant_Name%',
@@ -70,50 +72,60 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element->setLabel('Message for applicants who missed the deadline.');
     $element->setInstructions($instructions);
     $element->setValue($this->_application->getStatusIncompleteText());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('Textarea','statusNoDecisionText');
     $element->setLabel('Message for locked applicants with no decision');
     $element->setInstructions($instructions);
     $element->setValue($this->_application->getStatusNoDecisionText());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('Textarea','statusAdmitText');
     $element->setLabel('Message for admitted applicants');
     $element->setInstructions($instructions);
     $element->setValue($this->_application->getStatusAdmitText());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('Textarea','statusDenyText');
     $element->setLabel('Message for denied applicants');
     $element->setInstructions($instructions);
     $element->setValue($this->_application->getStatusDenyText());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('Textarea','statusAcceptText');
     $element->setLabel('Message for applicants who accept their offer.');
     $element->setInstructions($instructions);
     $element->setValue($this->_application->getStatusAcceptText());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('Textarea','statusDeclineText');
     $element->setLabel('Message for applicants who decline their offer');
     $element->setInstructions($instructions);
     $element->setValue($this->_application->getStatusDeclineText());
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('DateInput','open');
     $element->setLabel('Application Open');
     $element->addValidator(new \Foundation\Form\Validator\DateBeforeElement($element, 'close'));
     if($this->_application->getOpen()) $element->setValue($this->_application->getOpen()->format('c'));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('DateInput','close');
     $element->setLabel('Application close');
     if($this->_application->getClose()) $element->setValue($this->_application->getClose()->format('c'));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
 
     $element = $field->newElement('DateInput','begin');
     $element->setLabel('Program Start Date');
     if($this->_application->getOpen()) $element->setValue($this->_application->getBegin()->format('c'));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('RadioList','visible');
     $element->setLabel('Visible');
     $element->newItem(0, 'No');
     $element->newItem(1, 'Yes');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     $element->setValue($this->_application->isVisible());
     
     $element = $field->newElement('RadioList','published');
@@ -121,6 +133,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element->newItem(0, 'No');
     $element->newItem(1, 'Yes');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     $element->setValue($this->_application->isPublished());
 
     $form->newButton('submit', 'Save');

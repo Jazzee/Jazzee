@@ -66,6 +66,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
     $element->setLabel('Content');
     $element->setValue($this->_application->getAdmitLetter());
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $form->newButton('submit', 'Save');
     
@@ -94,6 +95,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
     $element->setLabel('Content');
     $element->setValue($this->_application->getDenyLetter());
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $form->newButton('submit', 'Save');
     

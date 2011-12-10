@@ -37,6 +37,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
       $element = $field->newElement('TextInput','name');
       $element->setLabel('File Name');
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
       $element->setValue($file->getName());
       
       $element = $field->newElement('FileInput','contents');
@@ -72,6 +73,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
     $element->setLabel('File Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('FileInput','contents');
     $element->setLabel('File');

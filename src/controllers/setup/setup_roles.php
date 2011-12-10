@@ -36,6 +36,7 @@ class SetupRolesController extends \Jazzee\AdminController {
       $element->setLabel('Role Name');
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
       $element->setValue($role->getName());
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
       $menus = $this->getControllerActions();
       ksort($menus);
       foreach($menus as $menu => $list){
@@ -101,6 +102,7 @@ class SetupRolesController extends \Jazzee\AdminController {
     $element = $field->newElement('TextInput','name');
     $element->setLabel('Role Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
 
     $form->newButton('submit', 'Add Role');
     $this->setVar('form', $form); 

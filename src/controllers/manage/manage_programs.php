@@ -35,6 +35,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
       $field->setLegend('Edit ' . $program->getName() . ' program');
       $element = $field->newElement('TextInput','name');
       $element->setLabel('Program Name');
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
       $element->setValue($program->getName());
       
@@ -43,6 +44,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
       $element->setInstructions('Forms the URL for accessing this program, must be unique');
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
       $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
       $element->setValue($program->getShortName());
   
       $form->newButton('submit', 'Save Changes');
@@ -70,12 +72,14 @@ class ManageProgramsController extends \Jazzee\AdminController {
     $element = $field->newElement('TextInput','name');
     $element->setLabel('Program Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('TextInput','shortName');
     $element->setLabel('Short Name');
     $element->setInstructions('Forms the URL for accessing this program, must be unique');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
 
     $form->newButton('submit', 'Save Changes');
     $this->setVar('form', $form); 

@@ -35,6 +35,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
       $element = $field->newElement('TextInput','name');
       $element->setLabel('Name');
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
       $element->setValue($elementType->getName());
   
       $form->newButton('submit', 'Save Changes');
@@ -61,6 +62,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
     $element = $field->newElement('TextInput','name');
     $element->setLabel('Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('TextInput','class');
     $element->setLabel('Class');

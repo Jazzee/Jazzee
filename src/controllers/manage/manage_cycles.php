@@ -37,6 +37,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
       $element->setLabel('Cycle Name');
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
       $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
       $element->setValue($cycle->getName());
       
       $element = $field->newElement('DateInput','start');
@@ -78,6 +79,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
     $element->setLabel('Cycle Name');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addFilter(new \Foundation\Form\Filter\UrlSafe($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('DateInput','start');
     $element->setLabel('Start Date');
