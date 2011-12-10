@@ -45,11 +45,13 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
       if($applicant){
         if($applicant->getFailedLoginAttempts()+1 >= self::MAX_FAILED_LOGIN_ATTEMPTS){
           $applicant->loginFail();
+          $this->_authLog->log('Too many attempts for applicant ' . $applicant->getId() . ' from ' . $_SERVER['REMOTE_ADDR'] . '. ' . $applicant->getFailedLoginAttempts() . ' attempts.', PEAR_LOG_INFO);
           $this->addMessage('error', 'Your account has been locked because an incorect password was entered too many times.  You must reset your password to continue.');
           $this->redirectApplyPath('applicant/forgotpassword');
         } else {
           if($applicant->checkPassword($input->get('password'))){
             $applicant->login();
+            $this->_authLog->log('Successfull login for applicant ' . $applicant->getId() . ' from ' . $_SERVER['REMOTE_ADDR'], PEAR_LOG_INFO);
             $this->_store->expire();
             $this->_store->touchAuthentication();
             $this->_store->applicantID = $applicant->getId();
@@ -57,6 +59,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
             $this->redirectApplyFirstPage();
           }
           $applicant->loginFail();
+          $this->_authLog->log('Incorrect Password for applicant ' . $applicant->getId() . ' from ' . $_SERVER['REMOTE_ADDR'] . '. ' . $applicant->getFailedLoginAttempts() . ' attempts.', PEAR_LOG_INFO);
         }
       }
       $this->addMessage('error', 'Incorrect username or password.  After ' . self::MAX_FAILED_LOGIN_ATTEMPTS . ' failed login attempts your account will be locked and you will need to reset your password to gain access.');
@@ -220,6 +223,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
       $this->_store->expire();
       $this->_store->touchAuthentication();
       $this->_store->applicantID = $applicant->getId();
+      $this->_authLog->log('New account login for applicant ' . $applicant->getId() . ' from ' . $_SERVER['REMOTE_ADDR'], PEAR_LOG_INFO);
       $this->addMessage('success', 'Welcome to the ' . $this->_application->getProgram()->getName() . ' application.');
       $this->redirectApplyFirstPage();
     }

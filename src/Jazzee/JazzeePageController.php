@@ -31,6 +31,18 @@ class JazzeePageController extends \Foundation\VC\Controller
   protected $_serverPath;
   
   /**
+   * Pear log instance for error logging
+   * @var \Log
+   */
+  protected $_errorLog;
+  
+  /**
+   * Pear log instance for authentication logging
+   * @var \Log
+   */
+  protected $_authLog;
+  
+  /**
    * Virtual File system root directory
    * @var \Foundation\Virtual\Directory
    */
@@ -243,14 +255,16 @@ class JazzeePageController extends \Foundation\VC\Controller
       '[' . (!empty($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:'-') . ']';
     $accessLog->log($accessMessage, PEAR_LOG_INFO);
     
+    //create an authenticationLog
+    $this->_authLog = \Log::singleton('file', $path . '/authentication_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
     
     $log = \Log::singleton('file', $path . '/error_log', '',array(), PEAR_LOG_ERR);
     $strict = \Log::singleton('file', $path . '/strict_log');
     $php = \Log::singleton('error_log', PEAR_LOG_TYPE_SYSTEM, 'Jazzee Error');
-    $this->_log = \Log::singleton('composite');
-    $this->_log->addChild($log);
-    $this->_log->addChild($strict);
-    $this->_log->addChild($php);
+    $this->_errorLog = \Log::singleton('composite');
+    $this->_errorLog->addChild($log);
+    $this->_errorLog->addChild($strict);
+    $this->_errorLog->addChild($php);
     
     //Handle PHP errors with out logs
     set_error_handler(array($this, 'handleError'));
@@ -287,10 +301,10 @@ class JazzeePageController extends \Foundation\VC\Controller
         $priority = PEAR_LOG_INFO;
     }
     if(error_reporting() === 0){// Error reporting is currently turned off or suppressed with @
-      $this->_log->log('Supressed error: ' . $message . ' in ' . $file . ' at line ' . $line, PEAR_LOG_INFO);
+      $this->_errorLog->log('Supressed error: ' . $message . ' in ' . $file . ' at line ' . $line, PEAR_LOG_INFO);
       return false;
     }
-    $this->_log->log($message . ' in ' . $file . ' at line ' . $line, $priority);
+    $this->_errorLog->log($message . ' in ' . $file . ' at line ' . $line, $priority);
     throw new \Exception('Jazzee caught a PHP error');
   }
   
@@ -336,7 +350,7 @@ class JazzeePageController extends \Foundation\VC\Controller
       default:
         $priority = PEAR_LOG_INFO;
     }
-    $this->_log->log($message, $priority);
+    $this->_errorLog->log($message, $priority);
     
     // Get a request for the error page
     $request = new \Lvc_Request();
