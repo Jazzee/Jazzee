@@ -665,15 +665,19 @@ class Applicant{
   
   protected function calculatePercentComplete(){
     $complete = 0;
+    $total = 0;
     $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
     foreach($pages as $pageEntity){
-      $pageEntity->getJazzeePage()->setApplicant($this);
-      if($pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::COMPLETE OR $pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED) $complete++;
+      if($pageEntity->getJazzeePage()->showReviewPage()){
+        $total++;
+        $pageEntity->getJazzeePage()->setApplicant($this);
+        if($pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::COMPLETE OR $pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED) $complete++;
+      }
     }
     //avoid division by 0 and dividing 0 by something
-    if($complete == 0 or count($pages) == 0) return 0;
+    if($complete == 0 or $total == 0) return 0;
     
-    return round($complete/count($pages), 2);
+    return round($complete/$total, 2);
   }
 }
 
