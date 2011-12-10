@@ -53,9 +53,13 @@ class AdminApiController extends \Jazzee\AdminController {
       exit();
     }
     if(!empty($this->post['applicationId'])){
-      if(!$this->_application = $this->_em->getRepository('\Jazzee\Entity\Application')->find($this->post['applicationId'])){
+      $userPrograms = $this->_user->getPrograms();
+      if(
+          !$this->_application = $this->_em->getRepository('\Jazzee\Entity\Application')->find($this->post['applicationId'])
+          OR (!$this->checkIsAllowed('admin_changeprogram', 'anyProgram') and !in_array($this->_application->getProgram()->getId(), $userPrograms))
+      ){
         $this->setLayoutVar('status', 'error');
-        $this->addMessage('error', 'Invalid Application ID');
+        $this->addMessage('error', 'Invalid Application ID or you do not have access to that application');
         $this->loadView('admin_api/index');
         exit();
       }
