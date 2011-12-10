@@ -1,8 +1,12 @@
 <IfModule mod_rewrite.c>
   RewriteEngine on
   
+  #Jazzee Expects to be at the root of your webserver
+  #If it isn't then adjust the Rewrite base accoringly
+  #eg RewriteBase /jazzee
+  RewriteBase /
   # remove any trailing slash components
-  RewriteRule ^(.+)/$  /$1 [R=301,L]
+  RewriteRule ^(.+)/$  $1 [R=301,L]
   
   # Rewrite URLs of the form 'index.php?url=x':
   RewriteCond %{REQUEST_FILENAME} !-f
