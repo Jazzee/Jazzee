@@ -68,9 +68,9 @@ class ETSMatch extends Standard {
    * Find Possible gre score matches
    * @param integer $answerID
    * @param array $postData
-   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
-  public function findScores($postData, $bool){
+  public function do_findScores($postData){
+    $this->checkIsAdmin();
     $form = new \Foundation\Form;
     $field = $form->newField();
     $field->setLegend('Find Matching Scores');

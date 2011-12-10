@@ -73,7 +73,7 @@ class Recommenders extends Standard {
    * @param integer $answerID
    * @param array $postData
    */
-  public function sendEmail($answerId, $postData){
+  public function do_sendEmail($answerId, $postData){
     if($answer = $this->_applicant->findAnswerById($answerId)){
       if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND $answer->getUpdatedAt()->diff(new \DateTime('now'))->days >= self::RECOMMENDATION_EMAIL_WAIT_DAYS)){
         $message = $this->getMessage($answer, $this->_controller->path('lor/' . $answer->getUniqueId()));
@@ -92,9 +92,9 @@ class Recommenders extends Standard {
    * Send the invitaiton email
    * @param integer $answerID
    * @param array $postData
-   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
-  public function sendAdminInvitation($answerId, $postData, $bool){
+  public function do_sendAdminInvitation($answerId, $postData){
+    $this->checkIsAdmin();
     if($answer = $this->_applicant->findAnswerById($answerId)){
       $path = $this->_controller->path('lor/' . $answer->getUniqueId());
       $link = str_ireplace('admin/', '', $path);
@@ -129,9 +129,9 @@ class Recommenders extends Standard {
    * Admin feature to display the link that recommenders are emailed
    * @param integer $answerID
    * @param array $postData
-   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
-  public function viewLink($answerId, $postData, $bool){
+  public function do_viewLink($answerId, $postData){
+    $this->checkIsAdmin();
     if($answer = $this->_applicant->findAnswerById($answerId)){
       $form = new \Foundation\Form;
       $field = $form->newField();
@@ -155,10 +155,10 @@ class Recommenders extends Standard {
    * Admin feature to edit a submitted recommendation
    * @param integer $answerID
    * @param array $postData
-   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
-  public function editLor($answerId, $postData, $bool){
-    if($bool === true and $child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
+  public function do_editLor($answerId, $postData){
+    $this->checkIsAdmin();
+    if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
       $lorPage = $child->getPage();
       $form = new \Foundation\Form;
       $field = $form->newField();
@@ -199,10 +199,10 @@ class Recommenders extends Standard {
    * Admin feature to complete a recommendation
    * @param integer $answerID
    * @param array $postData
-   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
-  public function completeLor($answerId, $postData, $bool){
-    if($bool === true and $answer = $this->_applicant->findAnswerById($answerId) and $answer->getChildren()->count() == 0){
+  public function do_completeLor($answerId, $postData){
+    $this->checkIsAdmin();
+    if($answer = $this->_applicant->findAnswerById($answerId) and $answer->getChildren()->count() == 0){
       $lorPage = $answer->getPage()->getChildren()->first();
       $form = new \Foundation\Form;
       $field = $form->newField();
@@ -242,10 +242,10 @@ class Recommenders extends Standard {
    * Delete a submitted recommendation
    * Admin feature to delete a submitted recommendation
    * @param integer $answerID
-   * @param bool $bool second required argument for admin functions to be sure they aren't called from the applicant side
    */
-  public function deleteLor($answerId, $bool){
-    if($bool === true and $child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
+  public function do_deleteLor($answerId){
+    $this->checkIsAdmin();
+    if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
       $this->_controller->getEntityManager()->remove($child);
       $this->_controller->setLayoutVar('status', 'success');
     } else {

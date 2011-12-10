@@ -154,6 +154,15 @@ abstract class AbstractPage implements \Jazzee\Page {
       $pdf->writeTable();
     }
   }
+  
+  /**
+   * Check if the current controller is an admin controller
+   * @throws \Jazzee\Exception if it isn't
+   */
+  protected function checkIsAdmin(){
+    if($this->_controller instanceof \Jazzee\AdminController) return true;
+    throw new \Jazzee\Exception('Admin only action was called from a non admin controller');
+  }
 }
 
 ?>

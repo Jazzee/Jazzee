@@ -989,8 +989,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
     $pageEntity->getJazzeePage()->setApplicant($applicant);
     $pageEntity->getJazzeePage()->setController($this);
-    if(method_exists($pageEntity->getJazzeePage(), $what)){
-      $form = $pageEntity->getJazzeePage()->$what($answerId, $this->post, true);
+    $method = 'do_' . $what;
+    if(method_exists($pageEntity->getJazzeePage(), $method)){
+      $form = $pageEntity->getJazzeePage()->$method($answerId, $this->post);
       $form->setAction($this->path("applicants/single/{$applicantId}/do/{$what}/{$answerId}"));
       $this->setVar('form', $form);
       if(!empty($this->post)){
@@ -1014,8 +1015,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$answer->getPage()->getId(), 'application'=>$this->_application->getId()));
     $pageEntity->getJazzeePage()->setApplicant($applicant);
     $pageEntity->getJazzeePage()->setController($this);
-    if(method_exists($pageEntity->getJazzeePage(), $what)){
-      $pageEntity->getJazzeePage()->$what($answerId, true);
+    $method = 'do_' . $what;
+    if(method_exists($pageEntity->getJazzeePage(), $method)){
+      $pageEntity->getJazzeePage()->$method($answerId);
       $this->auditLog($applicant, 'Answer action ' . $what . ' on answer '. $answerId);
       $this->setLayoutVar('status', 'success');
     }
@@ -1035,8 +1037,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
     $pageEntity->getJazzeePage()->setApplicant($applicant);
     $pageEntity->getJazzeePage()->setController($this);
-    if(method_exists($pageEntity->getJazzeePage(), $what)){
-      $form = $pageEntity->getJazzeePage()->$what($this->post, true);
+    $method = 'do_' . $what;
+    if(method_exists($pageEntity->getJazzeePage(), $method)){
+      $form = $pageEntity->getJazzeePage()->$method($this->post);
       $form->setAction($this->path("applicants/single/{$applicantId}/pageDo/{$what}/{$pageId}"));
       $this->setVar('form', $form);
       if(!empty($this->post)){
@@ -1059,8 +1062,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
     $pageEntity->getJazzeePage()->setApplicant($applicant);
     $pageEntity->getJazzeePage()->setController($this);
-    if(method_exists($pageEntity->getJazzeePage(), $what)){
-      $pageEntity->getJazzeePage()->$what(true);
+    $method = 'do_' . $what;
+    if(method_exists($pageEntity->getJazzeePage(), $method)){
+      $pageEntity->getJazzeePage()->$method();
       $this->setLayoutVar('status', 'success');
       $this->auditLog($applicant, 'Page action ' . $what . ' on page '. $pageEntity->getTitle());
     }

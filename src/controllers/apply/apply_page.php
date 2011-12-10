@@ -61,10 +61,12 @@ class ApplyPageController extends \Jazzee\AuthenticatedApplyController {
    * Pass the input through to the apply page
    */
   public function actionDo() {
-    $what = $this->actionParams['what'];
+    $what = 'do_' . $this->actionParams['what'];
     if(method_exists($this->_page->getJazzeePage(), $what)){
       $this->_page->getJazzeePage()->$what($this->actionParams['answerID'], $this->post);
       $this->setVar('currentAnswerID', $this->actionParams['answerID']);
+    } else {
+      throw new \Jazzee\Exception("Applicant {$this->_applicant->getId()} tried to call doSomething {$this->actionParams['what']} ");
     }
     $this->loadView($this->controllerName . '/index');
   }

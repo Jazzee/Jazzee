@@ -29,7 +29,7 @@ class Standard extends AbstractPage {
    * Skip an optional page
    * 
    */
-  public function skip(){
+  public function do_skip(){
     if(count($this->getAnswers())){
       $this->_controller->addMessage('error', 'You must delete your existing answers before you can skip this page.');
       return false;
@@ -43,7 +43,7 @@ class Standard extends AbstractPage {
     }
   }
   
-  public function unskip(){
+  public function do_unskip(){
     $answers = $this->getAnswers();
     if(count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){
       $this->_applicant->getAnswers()->removeElement($answers[0]);
