@@ -89,6 +89,16 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->afterAction();
     exit(0);
   }
+
+  /**
+   * Call any after action properties, redirect, and exit
+   * @param string $url
+   */
+  public function redirectUrl($url){
+    $this->redirect($url);
+    $this->afterAction();
+    exit(0);
+  }
   
   /**
    * No messages
