@@ -367,7 +367,7 @@ JazzeePage.prototype.selectListVariableBlock = function(variableName, descriptio
 	}
   }
   var pageClass = this;
-  var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(options[choice]).bind('click',function(e){
+  var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(choice).bind('click',function(e){
     $(this).unbind('click');
     var select = $('<select>');
     $.each(options,function(value, text){
