@@ -1015,7 +1015,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity->getJazzeePage()->setApplicant($applicant);
     $pageEntity->getJazzeePage()->setController($this);
     if(method_exists($pageEntity->getJazzeePage(), $what)){
-      $pageEntity->getJazzeePage()->$what($answerId, $this->post, true);
+      $pageEntity->getJazzeePage()->$what($answerId, true);
       $this->auditLog($applicant, 'Answer action ' . $what . ' on answer '. $answerId);
       $this->setLayoutVar('status', 'success');
     }
@@ -1060,7 +1060,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity->getJazzeePage()->setApplicant($applicant);
     $pageEntity->getJazzeePage()->setController($this);
     if(method_exists($pageEntity->getJazzeePage(), $what)){
-      $pageEntity->getJazzeePage()->$what($this->post, true);
+      $pageEntity->getJazzeePage()->$what(true);
       $this->setLayoutVar('status', 'success');
       $this->auditLog($applicant, 'Page action ' . $what . ' on page '. $pageEntity->getTitle());
     }
