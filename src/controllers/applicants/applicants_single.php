@@ -238,6 +238,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         $applicant->setEmail($input->get('email'));
         
         $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Updated Bio');
         $this->setLayoutVar('status', 'success');
         $bio = array(
          'name' => $applicant->getFullName(),
@@ -275,6 +276,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!$applicant->isLocked()) throw new \Jazzee\Exception('Tried to nominate an applicant that was not locked');
     $applicant->getDecision()->nominateAdmit();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Nominated for Admission');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -287,6 +289,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoNominateAdmit();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Undo Nominate Admit');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -344,6 +347,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
           $this->_em->persist($message);
         }
         $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Final Admit');
         $this->setLayoutVar('status', 'success');
       }
     }
@@ -360,6 +364,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoFinalAdmit();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Undo Final Admit');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -416,6 +421,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!$applicant->isLocked()) throw new \Jazzee\Exception('Tried to nominate an applicant that was not locked');
     $applicant->getDecision()->nominateDeny();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Nominate Deny');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -428,6 +434,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoNominateDeny();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Undo Nominate Deny');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -477,6 +484,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
           $this->_em->persist($message);
         }
         $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Final Deny');
         $this->setLayoutVar('status', 'success');
       }
     }
@@ -493,6 +501,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoFinalDeny();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Undo Final Deny');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -505,6 +514,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->acceptOffer();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Accept Offer');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -517,6 +527,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->declineOffer();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Decline Offer');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -529,6 +540,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoAcceptOffer();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Undo Accept Offer');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -541,6 +553,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoDeclineOffer();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Undo Decline Offer');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -553,6 +566,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->unlock();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Unlock Application');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -565,6 +579,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $applicant->lock();
     $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Lock Application');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
     $this->loadView($this->controllerName . '/result');
   }
@@ -593,8 +608,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       if($input = $form->processInput($this->post)){
         if($input->get('deadline')){
           $applicant->setDeadlineExtension($input->get('deadline'));
+          $this->auditLog($applicant, 'Extend Deadline to ' . $applicant->getDeadlineExtension()->format('c'));
         } else {
           $applicant->removeDeadlineExtension();
+          $this->auditLog($applicant, 'Remove Deadline Extension');
         }
         $this->_em->persist($applicant);
         $this->setLayoutVar('status', 'success');
@@ -620,6 +637,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       if($input = $pageEntity->getJazzeePage()->validateInput($this->post)){
         $pageEntity->getJazzeePage()->newAnswer($input);
         $this->setLayoutVar('status', 'success');
+        $this->auditLog($applicant, 'Added Aswer to page' . $pageEntity->getTitle());
       } else {
         $this->setLayoutVar('status', 'error');
       }
@@ -647,6 +665,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       if($input = $pageEntity->getJazzeePage()->validateInput($this->post)){
         $pageEntity->getJazzeePage()->updateAnswer($input, $answerId);
         $this->setLayoutVar('status', 'success');
+        $this->auditLog($applicant, 'Edited answer ' . $answer->getId() . ' on page '. $pageEntity->getTitle());
       } else {
         $this->setLayoutVar('status', 'error');
       }
@@ -670,6 +689,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity->getJazzeePage()->setController($this);
     $pageEntity->getJazzeePage()->fill($answerId);
     $pageEntity->getJazzeePage()->deleteAnswer($answerId);
+    $this->auditLog($applicant, 'Delted answer from page ' . $pageEntity->getTitle());
     $this->setVar('result', true);
     $this->loadView($this->controllerName . '/result');
   }
@@ -775,6 +795,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->_em->remove($attachment);
       $answer->markLastUpdate();
       $this->_em->persist($answer);
+      $this->auditLog($applicant, 'Deleted PDF from answer ' . $answer->getId());
       $this->setLayoutVar('status', 'success');
     }
     $this->setVar('result', true);
@@ -843,6 +864,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->_em->remove($attachment);
       $applicant->markLastUpdate();
       $this->_em->persist($applicant);
+      $this->auditLog($applicant, 'Deleted applicant PDF');
       $this->setLayoutVar('status', 'success');
     }
     $this->setVar('result', array('attachments'=>$this->getAttachments($applicant)));
@@ -867,6 +889,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         if($result === true){
           $this->_em->persist($payment);
           foreach($payment->getVariables() as $var) $this->_em->persist($var);
+          $this->auditLog($applicant, 'Settled Payment ' . $payment->getId());
           $this->setLayoutVar('status', 'success');
         } else {
           $fields = $form->getFields();
@@ -901,6 +924,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
         if($result === true){
           $this->_em->persist($payment);
           foreach($payment->getVariables() as $var) $this->_em->persist($var);
+          $this->auditLog($applicant, 'Refunded Payment ' . $payment->getId());
           $this->setLayoutVar('status', 'success');
         } else {
           $fields = $form->getFields();
@@ -936,6 +960,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
           $this->_em->persist($payment);
           foreach($payment->getVariables() as $var) $this->_em->persist($var);
           $this->setLayoutVar('status', 'success');
+          $this->auditLog($applicant, 'Rejected Payment ' . $payment->getId());
         } else {
           $fields = $form->getFields();
           $elements = $fields[0]->getElements();
@@ -968,7 +993,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $form = $pageEntity->getJazzeePage()->$what($answerId, $this->post, true);
       $form->setAction($this->path("applicants/single/{$applicantId}/do/{$what}/{$answerId}"));
       $this->setVar('form', $form);
-      if(!empty($this->post)) $this->setLayoutVar('textarea', true);
+      if(!empty($this->post)){
+        $this->setLayoutVar('textarea', true);
+        $this->auditLog($applicant, 'Answer action ' . $what . ' on answer '. $answerId);
+      }
     }
     $this->loadView($this->controllerName . '/form');
   }
@@ -988,6 +1016,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $pageEntity->getJazzeePage()->setController($this);
     if(method_exists($pageEntity->getJazzeePage(), $what)){
       $pageEntity->getJazzeePage()->$what($answerId, $this->post, true);
+      $this->auditLog($applicant, 'Answer action ' . $what . ' on answer '. $answerId);
       $this->setLayoutVar('status', 'success');
     }
     $this->setVar('result', true);
@@ -1010,7 +1039,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $form = $pageEntity->getJazzeePage()->$what($this->post, true);
       $form->setAction($this->path("applicants/single/{$applicantId}/pageDo/{$what}/{$pageId}"));
       $this->setVar('form', $form);
-      if(!empty($this->post)) $this->setLayoutVar('textarea', true);
+      if(!empty($this->post)){
+        $this->setLayoutVar('textarea', true);
+        $this->auditLog($applicant, 'Page action ' . $what . ' on page '. $pageEntity->getTitle());
+      }
     }
     $this->loadView($this->controllerName . '/form');
   }
@@ -1030,6 +1062,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(method_exists($pageEntity->getJazzeePage(), $what)){
       $pageEntity->getJazzeePage()->$what($this->post, true);
       $this->setLayoutVar('status', 'success');
+      $this->auditLog($applicant, 'Page action ' . $what . ' on page '. $pageEntity->getTitle());
     }
     $this->setVar('result', true);
     $this->loadView($this->controllerName . '/result');
@@ -1037,6 +1070,16 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   
   public function getActionPath(){
     return null;
+  }
+  
+  /**
+   * Log something in the audit log
+   * @param \Jazzee\Entity\Applicant $applicant
+   * @param type $string 
+   */
+  protected function auditLog(\Jazzee\Entity\Applicant $applicant, $text){
+    $auditLog = new \Jazzee\Entity\AuditLog($this->_user, $applicant, $text);
+    $this->_em->persist($auditLog);
   }
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){

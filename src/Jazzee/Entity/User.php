@@ -60,7 +60,7 @@ class User{
   /** 
    * @OneToMany(targetEntity="AuditLog", mappedBy="user")
    */
-  protected $logs;
+  protected $audiLogs;
   
 
   public function __construct(){

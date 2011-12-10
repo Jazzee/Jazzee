@@ -110,6 +110,11 @@ class Applicant{
    */
   private $duplicates;
   
+  /** 
+   * @OneToMany(targetEntity="AuditLog", mappedBy="applicant")
+   */
+  protected $audiLogs;
+  
   /**
    * If we set a manual update don't override it
    * @var boolean

@@ -3,7 +3,8 @@ namespace Jazzee\Entity;
 
 /** 
  * AuditLog
- * AuditLog entries record critical user actions
+ * AuditLog entries record critical user actions against applicants
+ * Liked editing or deleting answers
  * @Entity
  * @Table(name="audit_log")
  * @package    jazzee
@@ -25,13 +26,29 @@ class AuditLog{
   private $text;
   
   /** 
-   * @ManyToOne(targetEntity="User",inversedBy="logs")
+   * @ManyToOne(targetEntity="User",inversedBy="auditLogs")
    * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
    */
   protected $user;
   
-  public function __construct(){
+  /** 
+   * @ManyToOne(targetEntity="Applicant",inversedBy="auditLogs")
+   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   */
+  protected $applicant;
+  
+  /**
+   * Constructor 
+   * Everythign is specified here and can't be set any other way
+   * @param User $user
+   * @param Applicant $applicant
+   * @param strig $text
+   */
+  public function __construct(User $user, Applicant $applicant, $text){
     $this->createdAt = new \DateTime('now');
+    $this->user = $user;
+    $this->applicant = $applicant;
+    $this->text = $text;
   }
   
   /**
@@ -44,30 +61,12 @@ class AuditLog{
   }
 
   /**
-   * Set createdAt
-   *
-   * @param string $createdAt
-   */
-  public function setCreatedAt($createdAt){
-    $this->createdAt = new \DateTime($createdAt);
-  }
-
-  /**
    * Get createdAt
    *
    * @return \DateTime $createdAt
    */
   public function getCreatedAt(){
     return $this->createdAt;
-  }
-
-  /**
-   * Set user
-   *
-   * @param Entity\User $user
-   */
-  public function setUser(User $user){
-    $this->user = $user;
   }
 
   /**
@@ -80,12 +79,12 @@ class AuditLog{
   }
 
   /**
-   * Set text
+   * Get applicant
    *
-   * @param string $text
+   * @return Applicant $applicant
    */
-  public function setText($text){
-    $this->text = $text;
+  public function getApplicant(){
+    return $this->applicant;
   }
 
   /**
