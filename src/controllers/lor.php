@@ -24,6 +24,18 @@ class LorController extends \Jazzee\Controller{
     
     $page = $answer->getPage()->getChildren()->first();
     $this->setVar('page', $page);
+    
+    
+    if(!$deadline = $page->getParent()->getVar('lorDeadline')){
+      $deadline = $answer->getApplicant()->getApplication()->getClose()->format('c');
+    }
+    $deadline = new \DateTime($deadline);
+    $this->setVar('deadline', $deadline->format('m/d/Y g:ia T'));
+    if($page->getParent()->getVar('lorDeadlineEnforced') and $deadline < new \DateTime('now')){
+      $this->loadView($this->controllerName . '/missed_deadline');
+      exit;
+    }
+    
 
     $form = new \Foundation\Form;
     $form->setAction($this->path('lor/'.$urlKey));
@@ -58,11 +70,6 @@ class LorController extends \Jazzee\Controller{
       exit();
     }
     $this->setVar('form', $form);
-    if(!$deadline = $page->getParent()->getVar('lorDeadline')){
-      $deadline = $answer->getApplicant()->getApplication()->getClose()->format('c');
-    }
-    $deadline = new \DateTime($deadline);
-    $this->setVar('deadline', $deadline->format('m/d/Y g:ia T'));
     $this->setVar('applicantName', $answer->getApplicant()->getFullName());
     $this->setLayoutVar('layoutTitle', $answer->getApplicant()->getApplication()->getCycle()->getName() . ' ' . $answer->getApplicant()->getApplication()->getProgram()->getName() . ' Recommendation');
     
