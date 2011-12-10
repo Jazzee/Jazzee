@@ -50,7 +50,6 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
         } else {
           if($applicant->checkPassword($input->get('password'))){
             $applicant->login();
-            session_regenerate_id();
             $this->_store->expire();
             $this->_store->touchAuthentication();
             $this->_store->applicantID = $applicant->getId();
@@ -218,7 +217,6 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
       $this->_em->persist($applicant);
       //flush here to get the ID
       $this->_em->flush();
-      session_regenerate_id();
       $this->_store->expire();
       $this->_store->touchAuthentication();
       $this->_store->applicantID = $applicant->getId();
