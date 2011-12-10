@@ -2,7 +2,7 @@
 /**
  * Authentication and Creation of applicants
  */
-class ApplyApplicantController extends \Jazzee\Controller {
+class ApplyApplicantController extends \Jazzee\ApplyController {
   /**
    * Maximum number of times an applicant is allowed to fail
    * @var integer
@@ -16,54 +16,11 @@ class ApplyApplicantController extends \Jazzee\Controller {
   const MIN_INTERVAL_APPLICANTS = 7200;
   
   /**
-   * The application
-   * @var \Jazzee\Entity\Application
-   */
-  protected $application;
-  
- /**
-   * Constructor
-   * Check for maintenance mode
-   */
-  public function __construct(){
-    parent::__construct();
-    if($this->_config->getMode() == 'APPLY_MAINTENANCE'){
-      $request = new \Lvc_Request();
-      $request->setControllerName('error');
-      $request->setActionName('index');
-      if(!$message = $this->_config->getMaintenanceModeMessage()) $message = 'The application is currently down for maintenance';
-      $request->setActionParams(array('error' => '503', 'message'=>$message));
-    
-      // Get a new front controller without any routers, and have it process our handmade request.
-      $fc = new \Lvc_FrontController();
-      $fc->processRequest($request);
-      exit();
-    }
-  }
-  
-  /**
-   * Before any action do some setup
-   * If we know the program and cycle load the applicant var
-   * If we only know the program fill that in
-   * @return null
-   */
-  protected function beforeAction(){
-    parent::beforeAction();
-    $this->application = $this->_em->getRepository('Jazzee\Entity\Application')->findEasy($this->actionParams['programShortName'],$this->actionParams['cycleName']);
-    if(!$this->application) throw new \Jazzee\Exception("Unable to load {$this->actionParams['programShortName']} {$this->actionParams['cycleName']} application", E_USER_NOTICE, 'That is not a valid application');
-    if(!$this->application->isPublished() or $this->application->getOpen() > new DateTime('now')){
-      $this->addMessage('error', $this->application->getCycle()->getName() . ' ' . $this->application->getProgram()->getName() . ' is not open for applicants');
-      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName());
-    }
-    $this->setLayoutVar('layoutTitle', $this->application->getCycle()->getName() . ' ' . $this->application->getProgram()->getName() . ' Application');
-  }
-  
-  /**
    * Authenticate applicants
    */
   public function actionLogin() {
     $form = new \Foundation\Form();
-    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login'));
+    $form->setAction($this->applyPath('applicant/login'));
     $field = new \Foundation\Form\Field($form);
     $field->setLegend('Login');
     $form->addField($field);
@@ -78,34 +35,32 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $element = $field->newElement('Plaintext','forgotlink');
-    $element->setValue('<a href="' . $this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword') . '">Forgot your password?</a>');
+    $element->setValue('<a href="' . $this->applyPath('applicant/forgotpassword') . '">Forgot your password?</a>');
     
     
     $form->newButton('submit', 'Login');
     
     if($input = $form->processInput($this->post)){
-      $message = '';
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->_application);
       if($applicant){
         if($applicant->getFailedLoginAttempts()+1 >= self::MAX_FAILED_LOGIN_ATTEMPTS){
           $applicant->loginFail();
           $this->addMessage('error', 'Your account has been locked because an incorect password was entered too many times.  You must reset your password to continue.');
-          $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword');
+          $this->redirectApplyPath('applicant/forgotpassword');
         } else {
           if($applicant->checkPassword($input->get('password'))){
             $applicant->login();
-            
-            $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
-            $store->applicantID = $applicant->getId();
-            $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-            $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
-            $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $pages[0]->getId());
+            session_regenerate_id();
+            $this->_store->expire();
+            $this->_store->touchAuthentication();
+            $this->_store->applicantID = $applicant->getId();
+            $this->addMessage('success', 'Welcome to the ' . $this->_application->getProgram()->getName() . ' application.');
+            $this->redirectApplyFirstPage();
           }
           $applicant->loginFail();
-          $message = ' After ' . self::MAX_FAILED_LOGIN_ATTEMPTS . ' failed login attempts your account will be locked and you will need to reset your password to gain access.  You have ' . (string)(self::MAX_FAILED_LOGIN_ATTEMPTS - $applicant->getFailedLoginAttempts()) . ' more attempts.';
         }
       }
-      $this->addMessage('error', 'Incorrect username or password.' . $message);
+      $this->addMessage('error', 'Incorrect username or password.  After ' . self::MAX_FAILED_LOGIN_ATTEMPTS . ' failed login attempts your account will be locked and you will need to reset your password to gain access.');
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
     }
     $this->setVar('form', $form);
@@ -116,7 +71,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
    */
   public function actionForgotpassword() {
     $form = new \Foundation\Form();
-    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword'));
+    $form->setAction($this->applyPath('applicant/forgotpassword'));
     $field = new \Foundation\Form\Field($form);
     $field->setLegend('Forgot Password');
     $form->addField($field);
@@ -129,24 +84,23 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $form->newButton('submit', 'Submit');
     
     if($input = $form->processInput($this->post)){
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->_application);
       if($applicant){
         $applicant->generateUniqueId();
         $body = "We have received a request to reset your password.  In order to reset your password you will need to click on the link at the bottom of this email.  This will take you back to the secure website were you will be ale to enter a new password. \n \n"
       . "If you cannot click on the link you should copy and paste it into your browser. \n"
       . "For your protection this link will only be valid for a limited time. \n \n"
-      . $this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/resetpassword/' . $applicant->getUniqueId());
+      . $this->applyPath('applicant/resetpassword/' . $applicant->getUniqueId());
         $message = $this->newMessage();
         $message->AddAddress($applicant->getEmail(), $applicant->getFullName());
         $message->Subject = 'Password Reset Request';
         $message->Body = $body;
         $message->Send();
         $this->_em->persist($applicant);
-        $this->addMessage('success', 'Instructions for reseting your password have been sent to your email address.');
-        $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login');
       }
-      $this->addMessage('error', 'Invalid email address.');
+      $this->addMessage('success', 'If your email address is in our system we will send instructions for resetting your password immediately.');
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
+      $this->redirectApplyPath('applicant/login');
     }
     $this->setVar('form', $form);
   }
@@ -160,13 +114,11 @@ class ApplyApplicantController extends \Jazzee\Controller {
     $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneBy(array('uniqueId'=>$this->actionParams['uniqueId']));
     if(!$applicant){
       sleep(3);
-      throw new \Jazzee\Exception(
-      'Bad uniqueId in applicant password reset request', E_STRICT, 
-      'We were not able to find your password reset request.  It may have expired. ' .
-      'You can <a href="' . $this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/forgotpassword/') . '">Try your request again.</a>');
+      $this->addMessage('error','We were not able to find your password reset request.  It may have expired.  You can try your request again.');
+      $this->redirectApplyPath('applicant/resetpassword');
     }
     $form = new \Foundation\Form();
-    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/resetpassword/' . $this->actionParams['uniqueId']));
+    $form->setAction($this->applyPath('applicant/resetpassword/' . $applicant->getUniqueId()));
     $field = new \Foundation\Form\Field($form);
     $field->setLegend('Reset Password');
     $form->addField($field);
@@ -192,7 +144,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
       $applicant->setUniqueId(null);
       $this->_em->persist($applicant);
       $this->addMessage('success', 'Your password was reset successfully.');
-      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login');
+      $this->redirectApplyPath('applicant/login');
     }
     $this->setVar('form', $form);
   }
@@ -205,7 +157,7 @@ class ApplyApplicantController extends \Jazzee\Controller {
    */
   public function actionNew($programShortName, $cycleName) {
     $form = new \Foundation\Form;
-    $form->setAction($this->path('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/new'));
+    $form->setAction($this->applyPath('applicant/new'));
     
     $field = new \Foundation\Form\Field($form);
     $field->setLegend('Create New Application');
@@ -248,13 +200,13 @@ class ApplyApplicantController extends \Jazzee\Controller {
     }
     $form->newButton('submit', 'Create Account');
     if($input = $form->processInput($this->post)){
-      $duplicate = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->application);
+      $duplicate = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->_application);
       if($duplicate){
-        $this->addMessage('error', 'You have already started a ' . $this->application->getProgram()->getName() . ' application.  Please login to retrieve it.');
-        $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/applicant/login');
+        $this->addMessage('error', 'You have already started a ' . $this->_application->getProgram()->getName() . ' application.  Please login to retrieve it.');
+        $this->redirectApplyPath('applicant/login');
       }
       $applicant = new \Jazzee\Entity\Applicant;
-      $applicant->setApplication($this->application);
+      $applicant->setApplication($this->_application);
       $applicant->setEmail($input->get('email'));
       $applicant->setPassword($input->get('password'));
       $applicant->setFirstName($input->get('first'));
@@ -264,18 +216,20 @@ class ApplyApplicantController extends \Jazzee\Controller {
       
       $applicant->login();
       $this->_em->persist($applicant);
+      //flush here to get the ID
       $this->_em->flush();
-      $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
-      $store->applicantID = $applicant->getId();
-      $this->addMessage('success', 'Welcome to the ' . $this->application->getProgram()->getName() . ' application.');
-      $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
-      $this->redirectPath('apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName() . '/page/' . $pages[0]->getId());
+      session_regenerate_id();
+      $this->_store->expire();
+      $this->_store->touchAuthentication();
+      $this->_store->applicantID = $applicant->getId();
+      $this->addMessage('success', 'Welcome to the ' . $this->_application->getProgram()->getName() . ' application.');
+      $this->redirectApplyFirstPage();
     }
     $this->setVar('form', $form);
   }
   
   public function actionLogout($programShortName,$cycleName){
-    $this->_session->getStore('apply')->expire();
+    $this->_store->expire();
   }
   
   public function getNavigation(){
@@ -284,21 +238,20 @@ class ApplyApplicantController extends \Jazzee\Controller {
     
     $menu->setTitle('Navigation');
 
-    $path = 'apply/' . $this->application->getProgram()->getShortName() . '/' . $this->application->getCycle()->getName();
     $link = new \Foundation\Navigation\Link('Welcome');
-    $link->setHref($this->path($path));
+    $link->setHref($this->applyPath(''));
     $menu->addLink($link); 
     
     $link = new \Foundation\Navigation\Link('Other Cycles');
-    $link->setHref($this->path('apply/' . $this->application->getProgram()->getShortName()));
+    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName()));
     $menu->addLink($link);
     
     $link = new \Foundation\Navigation\Link('Returning Applicants');
-    $link->setHref($this->path($path . '/applicant/login'));
+    $link->setHref($this->applyPath('applicant/login'));
     $menu->addLink($link);
     
     $link = new \Foundation\Navigation\Link('Start a New Application');
-    $link->setHref($this->path($path . '/applicant/new'));
+    $link->setHref($this->applyPath('applicant/new'));
     $link->addClass('highlight');
     $menu->addLink($link);
     

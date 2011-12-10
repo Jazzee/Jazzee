@@ -5,7 +5,7 @@
  * @package jazzee
  * @subpackage apply
  */
-class ApplySupportController extends \Jazzee\ApplyController {  
+class ApplySupportController extends \Jazzee\AuthenticatedApplyController {  
   
   /**
    * Display the page
@@ -19,7 +19,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
    */
   public function actionNew() {
     $form = new \Foundation\Form();
-    $form->setAction($this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/new'));
+    $form->setAction($this->applyPath('support/new'));
     $field = $form->newField();
     $field->setLegend('Ask a question');
     
@@ -45,7 +45,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
       $this->_em->persist($thread);
       $this->_em->persist($message);
       $this->addMessage('success', 'Your message has been sent.');
-      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
+      $this->redirectApplyPath('support');
     }
   }
   
@@ -59,7 +59,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
     $message->unRead();
     $this->_em->persist($message);
     $this->addMessage('success', 'Message marked as unread');
-    $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
+    $this->redirectApplyPath('support');
   }
   
   /**
@@ -71,7 +71,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
     $this->setVar('thread', $thread);
     
     $form = new \Foundation\Form();
-    $form->setAction($this->path('apply/' .$this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support/reply/' . $thread->getId()));
+    $form->setAction($this->applyPath('support/reply/' . $thread->getId()));
     
     $field = $form->newField();
     $field->setLegend('Reply to message');
@@ -89,7 +89,7 @@ class ApplySupportController extends \Jazzee\ApplyController {
       $thread->addMessage($reply);
       $this->_em->persist($reply);
       $this->addMessage('success', 'Your reply has been sent.');
-      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/support');
+      $this->redirectApplyPath('support');
     }
   }
   
@@ -112,14 +112,13 @@ class ApplySupportController extends \Jazzee\ApplyController {
     $menu = new \Foundation\Navigation\Menu();
     
     $menu->setTitle('Navigation');
-    $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName();
     $link = new \Foundation\Navigation\Link('Back to Application');
     reset($this->_pages);
     $first = key($this->_pages);
-    $link->setHref($this->path($path . '/page/' . $first));
+    $link->setHref($this->applyPath('page/' . $first));
     $menu->addLink($link); 
     $link = new \Foundation\Navigation\Link('Logout');
-    $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/applicant/logout'));
+    $link->setHref($this->applyPath('applicant/logout'));
     $menu->addLink($link);
     
     $navigation->addMenu($menu);

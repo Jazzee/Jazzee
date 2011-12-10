@@ -36,7 +36,7 @@ class Lock extends Standard {
       return false;
     }
     $error = false;
-    foreach($this->_controller->getPages() as $page){
+    foreach($this->_applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page){
       if($page != $this->_applicationPage){ //dont check the lock page (this page), it will never be complete
         if($page->getJazzeePage()->getStatus() == self::INCOMPLETE){
           $error = true;
@@ -51,7 +51,8 @@ class Lock extends Standard {
     $this->_applicant->lock();
     $this->_controller->getEntityManager()->persist($this->_applicant);
     $this->_controller->addMessage('success', 'Your application has been submitted.');
-    $this->_controller->redirectPath($this->_controller->getPath());
+    $this->_controller->redirectUrl($this->_controller->getActionPath());
+    
   }  
   
   public function showReviewPage(){

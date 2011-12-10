@@ -6,7 +6,7 @@
  */
 ?>
 <h1>Applicant Support</h1>
-<a href='support/new'>New Message</a>
+<a href='<?php print $this->controller->applyPath('support/new');?>'>New Message</a>
 
 <?php if(count($threads)){ ?>
   <div class='discussion'>
@@ -23,8 +23,8 @@
             ?>'>
             </td>
             <td><?php print $thread->getCreatedAt()->format('l F jS Y \a\t g:ia')?></td>
-            <td><a href='<?php print $this->path($basePath . '/support/single/' . $thread->getId());?>'><?php print $thread->getSubject();?></a></td> 
-            <td><a href='<?php print $this->path($basePath . '/support/reply/' . $thread->getId());?>'>Reply</a></td> 
+            <td><a href='<?php print $this->controller->applyPath('/support/single/' . $thread->getId());?>'><?php print $thread->getSubject();?></a></td> 
+            <td><a href='<?php print $this->controller->applyPath('/support/reply/' . $thread->getId());?>'>Reply</a></td> 
           </tr>
         <?php } //end foreach threads ?>
       </tbody>

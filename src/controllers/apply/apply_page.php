@@ -7,13 +7,7 @@
  * @subpackage apply
  */
  
-class ApplyPageController extends \Jazzee\ApplyController {  
-  /**
-   * Convienece string holding the path to this page
-   * @var  string    
-   */
-  protected $_path;
-  
+class ApplyPageController extends \Jazzee\AuthenticatedApplyController {  
   /**
    * Convience access to $this->pages[$pageId]
    * @var \Jazzee\Page
@@ -29,17 +23,15 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $pageID = $this->actionParams['pageID'];
     if(!array_key_exists($pageID,$this->_pages)){
       $this->addMessage('error', "You are not authorized to view that page.");
-      $this->redirectPath("apply/{$this->actionParams['programShortName']}/{$this->actionParams['cycleName']}/applicant/login");
+      $this->redirectApplyFirstPage();
     }
     if($this->_applicant->isLocked() or ($this->_application->getClose() < new DateTime('now') and (!$this->_applicant->getDeadlineExtension() or $this->_applicant->getDeadlineExtension() < new \DateTime('now')))){
-      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
+      $this->redirectApplyPath('status');
     }
     $this->addScript($this->path('resource/scripts/controllers/apply_page.controller.js'));
     $this->_page = $this->_pages[$pageID];
-    $this->_path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $this->_page->getId();
     $this->setVar('page', $this->_page);
     $this->setVar('currentAnswerID', false);
-    $this->setVar('applicant', $this->_applicant);
   }
   
   /**
@@ -49,17 +41,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
    * @return string
    */
   public function getActionPath(){
-    return $this->path($this->_path);
-  }
-  
-  /**
-   * Get path
-   * 
-   * Page path
-   * @return string
-   */
-  public function getPath(){
-    return $this->_path;
+    return $this->applyPath('page/' . $this->_page->getId());
   }
   
   /**
@@ -125,7 +107,7 @@ class ApplyPageController extends \Jazzee\ApplyController {
     $menu->setTitle('Application Pages');
     foreach($this->_pages as $page){
       $link = new \Foundation\Navigation\Link($page->getTitle());
-      $link->setHref($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $page->getId()));
+      $link->setHref($this->applyPath('page/' . $page->getId()));
       if($this->_page->getId() == $page->getId()){
         $link->setCurrent(true);
       }
@@ -144,15 +126,6 @@ class ApplyPageController extends \Jazzee\ApplyController {
     }
     
     return $navigation;
-  }
-  
-  /**
-   * Get all pages
-   * 
-   * @return array of \Jazzee\Entity\ApplicationPage
-   */
-  public function getPages(){
-    return $this->_pages;
   }
 }
 ?>

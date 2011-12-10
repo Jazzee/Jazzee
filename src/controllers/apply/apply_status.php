@@ -6,7 +6,7 @@
  * @subpackage apply
  */
  
-class ApplyStatusController extends \Jazzee\ApplyController {  
+class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {  
   /**
    * Status array
    * @var array
@@ -19,12 +19,8 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     if(!$this->_applicant->isLocked() AND 
       ($this->_application->getClose() > new DateTime('now') or ($this->_applicant->getDeadlineExtension() and $this->_applicant->getDeadlineExtension() > new \DateTime('now')))){
       $this->addMessage('notice', "You have not completed your application.");
-      reset($this->_pages);
-      $first = key($this->_pages);
-    
-      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $first);
+      $this->redirectApplyFirstPage();
     }
-    $this->setVar('applicant', $this->_applicant);
   }
   
   /**
@@ -54,13 +50,12 @@ class ApplyStatusController extends \Jazzee\ApplyController {
      '%Accept_Date%',
      '%Decline_Date%'
     );
-    $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status';
     $replace = array(
      $this->_applicant->getFullName(),
      $this->_application->getClose()->format('l F jS Y g:ia'),
-     $this->path($path . '/sir'),
-     $this->path($path . '/admitLetter'),
-     $this->path($path . '/denyLetter')
+     $this->applyPath('status/sir'),
+     $this->applyPath('status/admitLetter'),
+     $this->applyPath('status/denyLetter')
     );
     if($this->_applicant->getDecision()){
       $replace[] = ($this->_applicant->getDecision()->getOfferResponseDeadline())?$this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia'):null;
@@ -88,7 +83,7 @@ class ApplyStatusController extends \Jazzee\ApplyController {
   public function actionSir(){
     if($this->_applicant->getDecision()->status() != 'finalAdmit') throw new \Jazzee\Exception('Applicant is not in the status finalAdmit');
     $form = new \Foundation\Form();
-    $form->setAction($this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status/sir'));
+    $form->setAction($this->applyPath('status/sir'));
     $field = $form->newField();
     $field->setLegend('Confirm Enrolment');
     $field->setInstructions('You must confirm your enrollment by <strong><em>' . $this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia') . '</em></strong>. If you do not confirm your enrollment your space may be released to another applicant.');
@@ -107,7 +102,7 @@ class ApplyStatusController extends \Jazzee\ApplyController {
       }
       $this->_em->persist($this->_applicant);
       $this->addMessage('success', 'Your intent was recorded.');
-      $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
+      $this->redirectApplyPath('status');
     }
   }
   
@@ -162,7 +157,7 @@ class ApplyStatusController extends \Jazzee\ApplyController {
    * @return string
    */
   public function getActionPath(){
-    return $this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
+    return $this->ApplyPath('status');
   }
   
   /**
@@ -175,7 +170,7 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     if(method_exists($applicationPage->getJazzeePage(), $what)){
       $applicationPage->getJazzeePage()->$what($this->actionParams['answerId'], $this->post);
     }
-    $this->redirectPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status');
+    $this->redirectApplyPath('status');
   }
   
   /**
@@ -187,24 +182,23 @@ class ApplyStatusController extends \Jazzee\ApplyController {
     $menu = new \Foundation\Navigation\Menu();
     
     $menu->setTitle('Navigation');
-
-    $path = 'apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/status';
+    
     $link = new \Foundation\Navigation\Link('Your Status');
-    $link->setHref($this->path($path));
+    $link->setHref($this->applyPath('status'));
     $menu->addLink($link); 
     if($this->_applicant->getDecision() and $this->_applicant->getDecision()->status() == 'finalAdmit'){
       $link = new \Foundation\Navigation\Link('Confirm Enrolment');
-      $link->setHref($this->path($path . '/sir'));
+      $link->setHref($this->applyPath('status/sir'));
       $menu->addLink($link); 
     }
     if($this->_applicant->getDecision() and $this->_applicant->getDecision()->getFinalAdmit()){
       $link = new \Foundation\Navigation\Link('View Decision Letter');
-      $link->setHref($this->path($path . '/admitLetter'));
+      $link->setHref($this->applyPath('status/admitLetter'));
       $menu->addLink($link); 
     }
     if($this->_applicant->getDecision() and $this->_applicant->getDecision()->getFinalDeny()){
       $link = new \Foundation\Navigation\Link('View Decision Letter');
-      $link->setHref($this->path($path . '/denyLetter'));
+      $link->setHref($this->applyPath('status/denyLetter'));
       $menu->addLink($link); 
     }
     

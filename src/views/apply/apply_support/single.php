@@ -4,7 +4,7 @@
  */
 $count = 0;
 ?>
-<a href='<?php print $this->path($basePath . '/support');?>'>All Messages</a>
+<a href='<?php print $this->controller->applyPath('support');?>'>All Messages</a>
 <h1><?php print $thread->getSubject();?></h1>
 <div class='threaded'>
   <?php foreach($thread->getMessages() as $message){ ?>
@@ -20,11 +20,11 @@ $count = 0;
       <p><?php print $message->getText();?></p>
       <p class='footer'>
           <?php if($message->getSender() == \Jazzee\Entity\Message::PROGRAM) {?>
-            <a href='<?php print $this->path($basePath . '/support/markUnread/' .$message->getId());?>'>Mark as Unread</a>
+            <a href='<?php print $this->controller->applyPath('support/markUnread/' .$message->getId());?>'>Mark as Unread</a>
           <?php }?>
       </p>
   <?php $count++; ?>
   <?php } ?>
   <?php for($i = 0; $i<$count; $i++) print '</div>';?>
 </div>
-<a href='<?php print $this->path($basePath . '/support/reply/' . $thread->getId());?>'>Reply</a>
+<a href='<?php print $this->controller->applyPath('support/reply/' . $thread->getId());?>'>Reply</a>
