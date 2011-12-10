@@ -158,7 +158,7 @@ class Recommenders extends Standard {
    * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
    */
   public function editLor($answerId, $postData, $bool){
-    if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
+    if($bool === true and $child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
       $lorPage = $child->getPage();
       $form = new \Foundation\Form;
       $field = $form->newField();
@@ -192,6 +192,65 @@ class Recommenders extends Standard {
       return $form;
     }
     $this->_controller->setLayoutVar('status', 'error');
+  }
+  
+  /**
+   * Complete the recommendation
+   * Admin feature to complete a recommendation
+   * @param integer $answerID
+   * @param array $postData
+   * @param bool $bool third required argument for admin functions to be sure they aren't called from the applicant side
+   */
+  public function completeLor($answerId, $postData, $bool){
+    if($bool === true and $answer = $this->_applicant->findAnswerById($answerId) and $answer->getChildren()->count() == 0){
+      $lorPage = $answer->getPage()->getChildren()->first();
+      $form = new \Foundation\Form;
+      $field = $form->newField();
+      $field->setLegend($lorPage->getTitle());
+      $field->setInstructions($lorPage->getInstructions());
+      foreach($lorPage->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
+        $element->getJazzeeElement()->addToField($field);
+      }
+      $form->newButton('submit', 'Submit Recommendation');
+      $form->newButton('reset', 'Clear Form');
+      if(!empty($postData)){
+        if($input = $form->processInput($postData)){
+          $answer->lock();
+          $this->_controller->getEntityManager()->persist($answer);
+          $child = new \Jazzee\Entity\Answer;
+          $child->setApplicant($answer->getApplicant());
+          $child->setParent($answer);
+          $child->setPage($lorPage);
+          foreach($lorPage->getElements() as $element){
+            foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+              $child->addElementAnswer($elementAnswer);
+            }
+          }
+          $this->_controller->getEntityManager()->persist($child);
+          $this->_controller->setLayoutVar('status', 'success');
+        } else {
+          $this->_controller->setLayoutVar('status', 'error');
+        }
+      }
+      return $form;
+    }
+    $this->_controller->setLayoutVar('status', 'error');
+  }
+  
+  /**
+   * Delete a submitted recommendation
+   * Admin feature to delete a submitted recommendation
+   * @param integer $answerID
+   * @param bool $bool second required argument for admin functions to be sure they aren't called from the applicant side
+   */
+  public function deleteLor($answerId, $bool){
+    if($bool === true and $child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
+      $this->_controller->getEntityManager()->remove($child);
+      $this->_controller->setLayoutVar('status', 'success');
+    } else {
+      $this->_controller->setLayoutVar('status', 'error');
+    }
   }
   
   /**
