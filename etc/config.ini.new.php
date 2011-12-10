@@ -99,6 +99,11 @@ maximumAdminFileUploadSize=5m
 ;#For security only the public key should be stored on the Jazzee System and decryption should happen offline
 ;publicKeyCertificatePath=
 
+;#Cron allowed ip - you can restrict the ip addresses that are allowed to access admin/cron
+;#If you leave it blank anyone can run cron - this isn't necessarily a bad thing but could lead to issues
+;#coma seperated list of ip addresses or hostnames
+adminCronAllowed=localhost
+
 ;#Mode is used to controll access to a production jazzee installation
 ;#There are three possible levels
 ;#LIVE - No access Controll

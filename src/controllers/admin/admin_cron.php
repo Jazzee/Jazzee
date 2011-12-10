@@ -16,6 +16,25 @@ class AdminCronController extends \Jazzee\AdminController {
   const REQUIRE_AUTHORIZATION = false;
   const REQUIRE_APPLICATION = false;
   
+  /**
+   * Check to see if this host is allowed to run cron
+   */
+  protected function setUp() {
+    if($this->_config->getAdminCronAllowed()){
+      $allowedIps = array();
+      foreach(\explode(',',$this->_config->getAdminCronAllowed()) as $value){
+        if(!empty($value) AND $resolvedIps = \gethostbynamel($value)) 
+          $allowedIps = array_merge($allowedIps, \gethostbynamel($value));
+      }
+      $hostname = \gethostbyaddr($_SERVER['REMOTE_ADDR']);
+      $allowed = false;
+      foreach(\gethostbynamel($hostname) as $ip){
+        if(in_array($ip, $allowedIps)) $allowed = true;
+      }
+      if(!$allowed) throw new \Jazzee\Exception('Client ' . $hostname . ' resolved to ips ' . implode(',', \gethostbynamel($hostname)) . ' which are not allowed to access cron.');
+    }
+  }
+  
   public function actionIndex(){
     $startTime = time();
     if(!$this->semaphore()){

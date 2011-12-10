@@ -282,6 +282,11 @@ protected $_ldapSearchBase;
  */
 protected $_pdflibLicenseKey;
 
+/**
+ *  @var array
+ */
+protected $_adminCronAllowed;
+
   /**
    * Construct
    * Load data from the ini file
@@ -1197,5 +1202,22 @@ protected $_pdflibLicenseKey;
   public function setPdflibLicenseKey($pdflibLicenseKey) {
     $this->_pdflibLicenseKey = $pdflibLicenseKey;
   }
+  
+  /**
+   * get adminCronAllowed
+   * @return string
+   */
+  public function getAdminCronAllowed() {
+    return $this->_adminCronAllowed;
+  }
+  
+  /**
+   * set adminCronAllowed
+   * @var string $adminCronAllowed
+   */
+  public function setAdminCronAllowed($adminCronAllowed) {
+    $this->_adminCronAllowed = $adminCronAllowed;
+  }
+  
 
 }
