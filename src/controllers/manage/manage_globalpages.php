@@ -65,4 +65,9 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
         $this->savePage($page, $data);
     }
   }
+  
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
+    //all action authorizations are controlled by the index action
+    return parent::isAllowed($controller, 'index', $user, $program, $application);
+  }
 }

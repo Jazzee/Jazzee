@@ -12,14 +12,20 @@ class SetupPagesController extends \Jazzee\PageBuilder {
   const PATH = 'setup/pages';
   
   const ACTION_INDEX = 'Edit Program Pages';
+  const ACTION_LIVEINDEX = 'Edit Published Application Program Pages';
   
-
+  /**
+   * DUmmy function to provide authorization call
+   */
+  public function actionLiveIndex(){}
+  
   /**
    * Add the required JS
    */
   public function setUp(){
     parent::setUp();
     $this->addScript($this->path('resource/scripts/controllers/setup_pages.controller.js'));
+    $this->setVar('published', $this->_application->isPublished());
   }
   
   /**
@@ -90,5 +96,12 @@ class SetupPagesController extends \Jazzee\PageBuilder {
     }
     $this->setVar('result', $pages);
     $this->loadView($this->controllerName . '/result');
+  }
+  
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
+    if($application->isPublished()) $action = 'liveIndex';
+    else $action = 'index';
+    //all action authorizations are controlled by the index action
+    return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }
