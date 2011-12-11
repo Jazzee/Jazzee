@@ -97,12 +97,12 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
    */
   public static function transaction($transactionController){
     $applicant = $transactionController->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->find($_POST['x_cust_id']);
-    if(!$applicant) throw new Jazzee\Exception("{$_POST['x_cust_id']} is not a valid applicant id");
+    if(!$applicant) throw new \Jazzee\Exception("{$_POST['x_cust_id']} is not a valid applicant id.  Anet post: " . var_export($_POST, true));
     $matches = array();
     preg_match('#page/(\d{1,})/?#', $_POST['redirect_url'], $matches);
     if(!isset($matches[1])) throw new \Jazzee\Exception("No page id match found in redirect_url: '{$_POST['redirect_url']}");
     $applicationPage = $transactionController->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->find($matches[1]);
-    if(!$applicationPage) throw new Jazzee\Exception("{$matches[1]} is not a valid applicationPage id");
+    if(!$applicationPage) throw new \Jazzee\Exception("{$matches[1]} is not a valid applicationPage id");
     $answer = new \Jazzee\Entity\Answer();
     $answer->setPage($applicationPage->getPage());
     $applicant->addAnswer($answer);
