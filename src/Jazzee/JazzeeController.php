@@ -128,7 +128,6 @@ class JazzeeController extends PageController
   protected function setupDoctrine(){
     //setup doctrine
     $doctrineConfig = new \Doctrine\ORM\Configuration();
-
     //We use different caching and proxy settings in Development status
     if($this->_config->getStatus() == 'DEVELOPMENT'){
       $doctrineConfig->setAutoGenerateProxyClasses(true);
@@ -139,6 +138,8 @@ class JazzeeController extends PageController
       $doctrineConfig->setProxyDir(__DIR__ . '/Entity/Proxy');
       if(!extension_loaded('apc')) throw new Exception('APC cache is required, but was not available.');
       $cache = new \Doctrine\Common\Cache\ApcCache;
+      //use the path as a namespace so multiple installs on the same system dont conflict
+      $cache->setNamespace('JAZZEE-' . str_ireplace(array('/',' '),'', __DIR__));
     }
     $driver = $doctrineConfig->newDefaultAnnotationDriver(array(__DIR__."/Entity"));
     $doctrineConfig->setMetadataDriverImpl($driver);
