@@ -156,6 +156,7 @@ class ApplicantPDF {
       $page->getJazzeePage()->renderPdfSection($this);
     }
     $this->pdf->end_page_ext("");
+    foreach($applicant->getAttachments() as $attachment) $this->addPdf ($attachment->getAttachment());
     $this->attachPdfs();
     $this->pdf->end_document("");
     return $this->pdf->get_buffer();
