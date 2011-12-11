@@ -14,6 +14,9 @@ if($roles): ?>
     <?php if($this->controller->checkIsAllowed('manage_roles', 'edit')): ?>
       (<a href='<?php print $this->path('manage/roles/edit/') . $role->getId()?>'>Edit</a>)
     <?php endif;?>
+    <?php if($this->controller->checkIsAllowed('manage_roles', 'applytemplate')): ?>
+      (<a href='<?php print $this->path('manage/roles/applytemplate/') . $role->getId()?>'>Use as template</a>)
+    <?php endif;?>
     
   </li>
   <?php endforeach;?>

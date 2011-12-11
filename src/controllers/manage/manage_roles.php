@@ -13,6 +13,7 @@ class ManageRolesController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View Roles';
   const ACTION_EDIT = 'Edit Role';
   const ACTION_NEW = 'New Role';
+  const ACTION_APPLYTEMPLATE = 'Apply a role to program roles';
   const REQUIRE_APPLICATION = false;
   
   /**
@@ -108,6 +109,66 @@ class ManageRolesController extends \Jazzee\AdminController {
       $this->_em->persist($role);
       $this->addMessage('success', "Role Saved Successfully");
       $this->redirectPath('manage/roles');
+    }
+  }
+   
+  /**
+   * Apply a role template
+   * Use a global role as a template to apply accross multipe programs
+   * @param integer $roleId
+   */
+   public function actionApplyTemplate($roleId){
+    if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleId, 'isGlobal'=>true))){
+      $form = new \Foundation\Form;
+      $form->setAction($this->path('manage/roles/applytemplate/' . $role->getId()));
+      $field = $form->newField();
+      $field->setLegend('Apply ' . $role->getName() . ' to program roles');
+      $programs = $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array('isExpired' => false), array('name' => 'ASC'));
+      $userPrograms = $this->_user->getPrograms();
+      //keep a list to use if we post data
+      $list = array();
+      foreach($programs as $program){
+        $list['program'.$program->getId()] = array();
+        $element = $field->newElement('CheckboxList','program'.$program->getId());
+        $element->setLabel($program->getName() . ' roles');
+        if($this->checkIsAllowed('admin_changeprogram', 'anyProgram') or in_array($program->getId(), $userPrograms)){
+          $programRoles = $this->_em->getRepository('\Jazzee\Entity\Role')->findBy(array('isGlobal' => false, 'program'=>$program->getId()), array('name'=>'ASC'));
+          foreach($programRoles as $programRole){
+            $element->newItem('programrole'.$programRole->getId(), $programRole->getName());
+            $list['program'.$program->getId()]['programrole'.$programRole->getId()] = $programRole->getId();
+          }
+        }
+      }
+      $form->newButton('submit', 'Apply Templates');
+      $this->setVar('form', $form);
+      if($input = $form->processInput($this->post)){
+        foreach($role->getActions() as $action){
+          foreach($list as $programElementId => $programArr){
+            foreach($programArr as $programRoleElementId => $roleId){
+              $setRoles = $input->get($programElementId);
+              if(!is_null($setRoles) and in_array($programRoleElementId, $setRoles)){
+                $programRole = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id'=>$roleId, 'isGlobal'=>false, 'program'=>substr($programElementId, 7)));
+                if(!$programRole) throw new \Jazzee\Exception('Bad role or program');
+                foreach($programRole->getActions() as $action){
+                  $this->_em->remove($action);
+                  $programRole->getActions()->removeElement($action);
+                }
+                foreach($role->getActions() as $globalAction){
+                  $programAction = new \Jazzee\Entity\RoleAction;
+                  $programAction->setController($globalAction->getController());
+                  $programAction->setAction($globalAction->getAction());
+                  $programAction->setRole($programRole);
+                  $this->_em->persist($programAction);
+                }
+              }
+            }
+          }
+        }
+        $this->addMessage('success', "Template Applied Successfully");
+        $this->redirectPath('manage/roles');
+      }
+    } else {
+      $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
     }
   }
   
