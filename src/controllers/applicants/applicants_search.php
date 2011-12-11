@@ -40,7 +40,7 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
     $element->setLabel('Limit Search to this application?');
     $element->newItem(0, 'No');
     $element->newItem(1, 'Yes');
-    $element->setDefaultValue(1);
+    $element->setDefaultValue(0);
 
     $form->newButton('submit', 'Search');
     if($input = $form->processInput($this->post)){   
