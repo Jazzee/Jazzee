@@ -11,6 +11,7 @@
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_INSTITUTION)->getJazzeeElement()->displayValue($answer); ?><br />
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_EMAIL)->getJazzeeElement()->displayValue($answer); ?><br />
     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_PHONE)->getJazzeeElement()->displayValue($answer); ?><br />
+    Has <?php if($page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer) == 'No')print '<strong>not </strong>'; ?> waived right to view<br />
   </td>
   <?php foreach($page->getPage()->getChildren()->first()->getElements() as $element){
     $element->getJazzeeElement()->setController($this->controller);?>
