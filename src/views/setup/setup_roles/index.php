@@ -14,6 +14,9 @@ if($roles): ?>
     <?php if($this->controller->checkIsAllowed('setup_roles', 'edit')): ?>
       (<a href='<?php print $this->path('setup/roles/edit/') . $role->getId()?>'>Edit</a>)
     <?php endif;?>
+    <?php if($this->controller->checkIsAllowed('setup_roles', 'copy')): ?>
+      (<a href='<?php print $this->path('setup/roles/copy/') . $role->getId()?>'>Copy</a>)
+    <?php endif;?>
     
   </li>
   <?php endforeach;?>

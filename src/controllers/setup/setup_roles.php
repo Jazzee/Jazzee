@@ -12,6 +12,7 @@ class SetupRolesController extends \Jazzee\AdminController {
   
   const ACTION_INDEX = 'View';
   const ACTION_EDIT = 'Edit';
+  const ACTION_COPY = 'Copy';
   const ACTION_NEW = 'New';
   const REQUIRE_APPLICATION = false;
   
@@ -88,6 +89,68 @@ class SetupRolesController extends \Jazzee\AdminController {
       }
     } else {
       $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
+    }
+  }
+  
+  /**
+   * Copy a role
+   * @param integer $oldRoleID
+   */
+   public function actionCopy($oldRoleID){ 
+    if($oldRole = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $oldRoleID, 'program'=>$this->_program->getId()))){
+      $form = new \Foundation\Form;
+      $form->setAction($this->path('setup/roles/copy/' . $oldRole->getId()));
+      $field = $form->newField();
+      $field->setLegend('Copy ' . $oldRole->getName() . ' role');
+      $element = $field->newElement('TextInput','name');
+      $element->setLabel('New Role Name');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+      $element->setValue($oldRole->getName());
+      $menus = $this->getControllerActions();
+      ksort($menus);
+      foreach($menus as $menu => $list){
+        foreach($list as $controller){
+          $element = $field->newElement('CheckboxList',$controller['name']);
+          $element->setLabel($menu . ' ' . $controller['title'] . ' actions');
+          foreach($controller['actions'] as $actionName => $actionTitle){
+            $element->newItem($actionName, $actionTitle);
+          }
+          $values = array();
+          foreach($oldRole->getActions() as $action){
+            if($action->getController() == $controller['name'])
+              $values[] = $action->getAction();
+          }
+          $element->setValue($values);
+        }
+      }
+      $form->newButton('submit', 'Copy Role');
+      $this->setVar('form', $form);
+      if($input = $form->processInput($this->post)){
+        $newRole = new \Jazzee\Entity\Role;
+        $newRole->notGlobal();
+        $newRole->setProgram($this->_program);
+        $newRole->setName($input->get('name'));
+        foreach($menus as $menu => $list){
+          foreach($list as $controller){
+            $actions = $input->get($controller['name']);
+            if(!empty($actions)){
+              foreach($actions as $actionName){
+                $action = new \Jazzee\Entity\RoleAction;
+                $action->setController($controller['name']);
+                $action->setAction($actionName);
+                $action->setRole($newRole);
+                $this->_em->persist($action);
+              }
+            }
+          }
+        }
+        $this->_em->persist($newRole);
+        $this->addMessage('success', "Role Copied Successfully");
+        $this->redirectPath('setup/roles');
+      }
+    } else {
+      $this->addMessage('error', "Error: Role #{$oldRoleID} does not exist.");
     }
   }
    
