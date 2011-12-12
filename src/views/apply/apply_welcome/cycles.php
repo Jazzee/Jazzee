@@ -13,7 +13,7 @@ $dateFormat = 'm/d/Y';
 ?>
 <fieldset>
 	<legend>Select the cycle you are applying to:</legend>
-	<ul>
+	<ul class='nobullets'>
   <?php
   foreach($applications AS $application){
     if($application->isVisible()){

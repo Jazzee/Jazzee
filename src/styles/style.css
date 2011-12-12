@@ -249,3 +249,7 @@ fieldset {
 legend {
 	font-weight: bold;
 }
+
+ul.nobullets, ol.nobullets, .nobullets li{
+  list-style: none;
+}
