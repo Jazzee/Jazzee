@@ -7,6 +7,7 @@
  */
 header("Content-type: application/xml; charset=UTF-8");
 header('Content-Disposition: attachment; filename='. $filename);
+header('X-FRAME-OPTIONS: SAMEORIGIN');
 $xml = new DOMDocument('1.0', 'UTF-8');
 $xml->formatOutput = true;
 
