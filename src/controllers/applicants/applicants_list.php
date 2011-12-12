@@ -29,12 +29,14 @@ class ApplicantsListController extends \Jazzee\AdminController {
     $tags['Denied'] = array();
     $tags['Declined'] = array();
     $tags['Locked'] = array();
+    $tags['Paid'] = array();
     $tags['Not Locked'] = array();
     $tags['All Applicants'] = array();
     foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
       $tags['All Applicants'][] = $applicant;
       if($applicant->isLocked()) $tags['Locked'][] = $applicant;
       else $tags['Not Locked'][] = $applicant;
+      if($applicant->hasPaid()) $tags['Paid'][] = $applicant;
       if($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer()) $tags['Accepted'][] = $applicant;
       if($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit()) $tags['Admitted'][] = $applicant;
       if($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer()) $tags['Declined'][] = $applicant;

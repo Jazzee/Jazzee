@@ -78,6 +78,9 @@ class Applicant{
   /** @Column(type="float") */
   private $percentComplete;
   
+  /** @Column(type="boolean") */
+  private $hasPaid;
+  
   /** 
    * @OneToMany(targetEntity="Answer",mappedBy="applicant")
    */
@@ -130,6 +133,7 @@ class Applicant{
     $this->createdAt = new \DateTime('now');
     $this->isLocked = false;
     $this->percentComplete = 0;
+    $this->hasPaid = false;
   }
   
   /**
@@ -456,6 +460,7 @@ class Applicant{
   public function markLastUpdate(){
     if(!$this->updatedAtOveridden) $this->updatedAt = new \DateTime();
     $this->percentComplete = $this->calculatePercentComplete();
+    $this->hasPaid = $this->checkIfPaid();
   }
 
   /**
@@ -678,6 +683,23 @@ class Applicant{
     if($complete == 0 or $total == 0) return 0;
     
     return round($complete/$total, 2);
+  }
+  
+  protected function checkIfPaid(){
+    foreach($this->answers as $answer)
+      if($payment = $answer->getPayment())
+        if($payment->getStatus() == \Jazzee\Entity\Payment::SETTLED)
+          return true;
+        
+    return false;
+  }
+  
+  /**
+   * Check if an applicant has at least one settled payment
+   * @return boolean
+   */
+  public function hasPaid(){
+    return $this->hasPaid;
   }
 }
 

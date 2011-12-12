@@ -28,6 +28,7 @@
                 $tags[] = $tag->getTitle();
               }
               if($applicant->isLocked()) $tags[] = 'Locked';
+              if($applicant->hasPaid()) $tags[] = 'Paid';
               if($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer()) $tags[] = 'Accepted';
               if($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit()) $tags[] = 'Admitted';
               if($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer()) $tags[] = 'Declined';
