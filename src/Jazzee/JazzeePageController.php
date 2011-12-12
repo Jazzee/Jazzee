@@ -43,6 +43,12 @@ class JazzeePageController extends \Foundation\VC\Controller
   protected $_authLog;
   
   /**
+   * Pear log instance for message logging
+   * @var \Log
+   */
+  protected $_messageLog;
+  
+  /**
    * Virtual File system root directory
    * @var \Foundation\Virtual\Directory
    */
@@ -258,6 +264,9 @@ class JazzeePageController extends \Foundation\VC\Controller
     //create an authenticationLog
     $this->_authLog = \Log::singleton('file', $path . '/authentication_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
     
+    //create a messgage log
+    $this->_messageLog = \Log::singleton('file', $path . '/messages_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
+    
     $log = \Log::singleton('file', $path . '/error_log', '',array(), PEAR_LOG_ERR);
     $strict = \Log::singleton('file', $path . '/strict_log');
     $php = \Log::singleton('error_log', PEAR_LOG_TYPE_SYSTEM, 'Jazzee Error');
@@ -270,6 +279,14 @@ class JazzeePageController extends \Foundation\VC\Controller
     set_error_handler(array($this, 'handleError'));
     //catch any excpetions
     set_exception_handler(array($this, 'handleException'));
+  }
+  
+  /**
+   * Log something
+   * @param type $string 
+   */
+  public function log($string){
+    $this->_messageLog->log($string, PEAR_LOG_INFO);
   }
   
   /**
