@@ -8,6 +8,8 @@
 header("Content-type: application/xml; charset=UTF-8");
 header('Content-Disposition: attachment; filename='. $filename);
 header('X-FRAME-OPTIONS: SAMEORIGIN');
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 $xml = new DOMDocument('1.0', 'UTF-8');
 $xml->formatOutput = true;
 

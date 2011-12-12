@@ -5,7 +5,8 @@
  * @license http://jazzee.org/license.txt
  * @package jazzee
  */
-
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 //form uploads with files require a text area to wrap their response
 if(isset($textarea) and $textarea):?>
 <textarea>

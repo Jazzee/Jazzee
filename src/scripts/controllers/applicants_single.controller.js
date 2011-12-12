@@ -2,6 +2,9 @@
  * Javascript for the setup_pages controller
  */
 $(document).ready(function(){
+  //force the browser to not cache results
+  $.ajaxSetup({ cache: false });
+  
   var timeout = new AuthenticationTimeout('JazzeeAdminLoginTimeout');
   timeout.start();
   
