@@ -93,7 +93,7 @@ List.prototype.itemBlock = function(item){
  */
 List.prototype.newListItem = function(value){
   var itemId = 'new-list-item' + this.page.pageStore.getUniqueId();
-  var item = {id: itemId, value: value, isActive: true};
+  var item = {id: itemId, value: value, isActive: true, weight: this.listItems.length+1};
   this.listItems.push(item);
   this.isModified = true;
   return item;
