@@ -116,7 +116,7 @@ class Applicant{
   /** 
    * @OneToMany(targetEntity="AuditLog", mappedBy="applicant")
    */
-  protected $audiLogs;
+  protected $auditLogs;
   
   /**
    * If we set a manual update don't override it
