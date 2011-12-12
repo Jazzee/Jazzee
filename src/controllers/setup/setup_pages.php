@@ -99,7 +99,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
   }
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
-    if($application->isPublished()) $action = 'liveIndex';
+    if($application and $application->isPublished()) $action = 'liveIndex';
     else $action = 'index';
     //all action authorizations are controlled by the index action
     return parent::isAllowed($controller, $action, $user, $program, $application);
