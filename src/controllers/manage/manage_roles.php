@@ -31,6 +31,7 @@ class ManageRolesController extends \Jazzee\AdminController {
    public function actionEdit($roleID){ 
     if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'isGlobal'=>true))){
       $form = new \Foundation\Form;
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path('manage/roles/edit/' . $role->getId()));
       $field = $form->newField();
       $field->setLegend('Edit ' . $role->getName() . ' role');
@@ -96,6 +97,7 @@ class ManageRolesController extends \Jazzee\AdminController {
    public function actionCopy($oldRoleID){ 
     if($oldRole = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $oldRoleID, 'isGlobal'=>true))){
       $form = new \Foundation\Form;
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path('manage/roles/copy/' . $oldRole->getId()));
       $field = $form->newField();
       $field->setLegend('COpy ' . $oldRole->getName() . ' role');
@@ -155,6 +157,7 @@ class ManageRolesController extends \Jazzee\AdminController {
    */
    public function actionNew(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("manage/roles/new"));
     $field = $form->newField();
     $field->setLegend('New Global Role');
@@ -182,6 +185,7 @@ class ManageRolesController extends \Jazzee\AdminController {
    public function actionApplyTemplate($roleId){
     if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleId, 'isGlobal'=>true))){
       $form = new \Foundation\Form;
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path('manage/roles/applytemplate/' . $role->getId()));
       $field = $form->newField();
       $field->setLegend('Apply ' . $role->getName() . ' to program roles');

@@ -56,6 +56,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
    */
   public function actionEditAdmitLetter(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("setup/decisionletters/editAdmitLetter"));
     $field = $form->newField();
     $field->setLegend('Edit Admit Letter');
@@ -85,6 +86,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
    */
   public function actionEditDenyLetter(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("setup/decisionletters/editDenyLetter"));
     $field = $form->newField();
     $field->setLegend('Edit Deny Letter');

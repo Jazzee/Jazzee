@@ -29,6 +29,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
    public function actionEdit($elementTypeID){ 
     if($elementType =$this->_em->getRepository('\Jazzee\Entity\ElementType')->find($elementTypeID)){
       $form = new \Foundation\Form();
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path("manage/elementtypes/edit/{$elementTypeID}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $elementType->getName() . ' element type');
@@ -56,6 +57,7 @@ class ManageElementtypesController extends \Jazzee\AdminController {
    */
   public function actionNew(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("manage/elementtypes/new"));
     $field = $form->newField();
     $field->setLegend('New element type');

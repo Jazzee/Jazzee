@@ -26,6 +26,7 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('applicants/search'));
     $field = $form->newField();
     $field->setLegend('Search Applicants');

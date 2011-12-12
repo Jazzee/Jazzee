@@ -18,6 +18,7 @@ class ScoresToeflController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('scores/toefl'));
     $field = $form->newField();
     $field->setLegend('Search TOEFL Scores');

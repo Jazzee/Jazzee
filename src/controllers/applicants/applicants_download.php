@@ -19,6 +19,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('applicants/download'));
     $field = $form->newField();
     $field->setLegend('Download Applicants');

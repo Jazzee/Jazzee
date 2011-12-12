@@ -21,6 +21,7 @@ class SetupUsersController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("setup/users/index"));
     $field = $form->newField();
     $field->setLegend('Find New Users');
@@ -57,6 +58,7 @@ class SetupUsersController extends \Jazzee\AdminController {
    public function actionEdit($userID){ 
     if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
       $form = new \Foundation\Form();
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path('setup/users/edit/' . $userID));
       $field = $form->newField();
       $field->setLegend('Roles for ' . $user->getFirstName() . ' ' . $user->getLastName());

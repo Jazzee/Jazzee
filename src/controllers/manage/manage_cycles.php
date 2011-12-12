@@ -29,7 +29,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
    public function actionEdit($cycleID){ 
     if($cycle = $this->_em->getRepository('\Jazzee\Entity\Cycle')->find($cycleID)){
       $form = new \Foundation\Form;
-      
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path("manage/cycles/edit/{$cycleID}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $cycle->getName() . ' cycle');
@@ -71,7 +71,7 @@ class ManageCyclesController extends \Jazzee\AdminController {
    */
   public function actionNew(){
     $form = new \Foundation\Form;
-      
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("manage/cycles/new"));
     $field = $form->newField();
     $field->setLegend('New cycle');

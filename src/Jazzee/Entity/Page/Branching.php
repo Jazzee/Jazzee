@@ -14,6 +14,7 @@ class Branching extends Standard
    */
   protected function makeForm(){
     $form = new \Foundation\Form;
+    $form->setCSRFToken($this->_controller->getCSRFToken());
     $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());

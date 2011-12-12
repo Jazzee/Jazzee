@@ -20,6 +20,7 @@ class AdminChangecycleController extends \Jazzee\AdminController {
   public function actionIndex(){
     $form = new \Foundation\Form();
     $form->setAction($this->path('changecycle'));
+    $form->setCSRFToken($this->getCSRFToken());
     $field = $form->newField();
     $field->setLegend('Select Cycle');
     $element = $field->newElement('SelectList','cycle');

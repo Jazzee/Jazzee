@@ -32,6 +32,7 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
     if($paymentType = $this->_em->getRepository('\Jazzee\Entity\PaymentType')->find($paymentTypeId)){
       
       $form = $paymentType->getJazzeePaymentType()->getSetupForm();
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path("manage/paymenttypes/edit/{$paymentTypeId}"));
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
@@ -81,6 +82,7 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
    */
   public function actionNew(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("manage/paymenttypes/new"));
     $field = $form->newField();
     $element = $field->newElement('TextInput','className');

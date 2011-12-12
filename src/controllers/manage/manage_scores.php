@@ -20,6 +20,7 @@ class ManageScoresController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('manage/scores'));
     $field = $form->newField();
     $field->setLegend('Import Scores');

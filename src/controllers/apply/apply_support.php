@@ -19,6 +19,7 @@ class ApplySupportController extends \Jazzee\AuthenticatedApplyController {
    */
   public function actionNew() {
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('support/new'));
     $field = $form->newField();
     $field->setLegend('Ask a question');
@@ -71,6 +72,7 @@ class ApplySupportController extends \Jazzee\AuthenticatedApplyController {
     $this->setVar('thread', $thread);
     
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('support/reply/' . $thread->getId()));
     
     $field = $form->newField();

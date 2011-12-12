@@ -19,6 +19,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("setup/importapplication"));
     $field = $form->newField();
     $field->setLegend('Import Application');

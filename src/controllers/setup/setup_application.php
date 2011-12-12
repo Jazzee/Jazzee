@@ -31,6 +31,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("setup/application"));
     $field = $form->newField();
     $field->setLegend('Setup Applicant');

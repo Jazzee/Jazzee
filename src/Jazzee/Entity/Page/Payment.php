@@ -14,6 +14,7 @@ class Payment extends Standard {
   protected function makeForm(){
     $form = new \Foundation\Form;
     $form->setAction($this->_controller->getActionPath());
+    $form->setCSRFToken($this->_controller->getCSRFToken());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
@@ -57,6 +58,7 @@ class Payment extends Standard {
     } else {
       $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType()->paymentForm($this->_applicant, $input['amount'], $this->_controller->getActionPath());
     }
+    $this->_form->setCSRFToken($this->_controller->getCSRFToken());
     $this->_form->newHiddenElement('level', 2);
     $this->_form->newHiddenElement('paymentType',$input['paymentType']);
     

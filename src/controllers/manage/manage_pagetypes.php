@@ -29,6 +29,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
    public function actionEdit($pageTypeId){ 
     if($pageType =$this->_em->getRepository('\Jazzee\Entity\PageType')->find($pageTypeId)){
       $form = new \Foundation\Form();
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path("manage/pagetypes/edit/{$pageTypeId}"));
       $field = $form->newField();
       $field->setLegend('Edit ' . $pageType->getName() . ' page type');
@@ -56,6 +57,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
    */
   public function actionNew(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("manage/pagetypes/new"));
     $field = $form->newField();
     $field->setLegend('New page type');

@@ -20,6 +20,7 @@ class Standard extends AbstractPage {
       $element->getJazzeeElement()->setController($this->_controller);
       $element->getJazzeeElement()->addToField($field);
     }
+    $form->setCSRFToken($this->_controller->getCSRFToken());
     $form->newButton('submit', 'Save');
     $form->newButton('reset', 'Clear Form');
     return $form;

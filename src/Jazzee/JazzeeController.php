@@ -228,4 +228,14 @@ class JazzeeController extends PageController
             return new \Foundation\Virtual\RealFile($filename, $path);
     return false;
   }
+  
+  /**
+   * Get a secret key for csrf validation
+   * @return string
+   */
+  public function getCSRFToken(){
+    $store = $this->_session->getStore('csrf', 900);
+    if(!isset($store->token)) $store->token = md5(uniqid('csrftoken'. rand(), true) . session_id());
+    return $store->token;
+  }
 }

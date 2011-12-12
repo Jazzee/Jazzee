@@ -30,7 +30,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
    public function actionEdit($fileId){ 
     if($file = $this->_em->getRepository('\Jazzee\Entity\VirtualFile')->find($fileId)){
       $form = new \Foundation\Form;
-      
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path("manage/virtualfiles/edit/" . $file->getId()));
       $field = $form->newField();
       $field->setLegend('Edit Virtual File: ' . $file->getName());
@@ -81,6 +81,7 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
     $form = new \Foundation\Form;
       
     $form->setAction($this->path("manage/virtualfiles/new"));
+    $form->setCSRFToken($this->getCSRFToken());
     $field = $form->newField();
     $field->setLegend('New Virtual File');
     $element = $field->newElement('TextInput','name');

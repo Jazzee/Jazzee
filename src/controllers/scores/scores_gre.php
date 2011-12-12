@@ -18,6 +18,7 @@ class ScoresGreController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('scores/gre'));
     $field = $form->newField();
     $field->setLegend('Search GRE Scores');

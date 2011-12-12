@@ -31,6 +31,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
       $form = new \Foundation\Form();
       
       $form->setAction($this->path("manage/programs/edit/{$programID}"));
+      $form->setCSRFToken($this->getCSRFToken());
       $field = $form->newField();
       $field->setLegend('Edit ' . $program->getName() . ' program');
       $element = $field->newElement('TextInput','name');
@@ -66,6 +67,7 @@ class ManageProgramsController extends \Jazzee\AdminController {
    */
    public function actionNew(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("manage/programs/new"));
     $field = $form->newField();
     $field->setLegend('New Program');

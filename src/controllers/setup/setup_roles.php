@@ -30,6 +30,7 @@ class SetupRolesController extends \Jazzee\AdminController {
    public function actionEdit($roleID){ 
     if($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program'=>$this->_program->getId()))){
       $form = new \Foundation\Form;
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path('setup/roles/edit/' . $role->getId()));
       $field = $form->newField();
       $field->setLegend('Edit ' . $role->getName() . ' role');
@@ -99,6 +100,7 @@ class SetupRolesController extends \Jazzee\AdminController {
    public function actionCopy($oldRoleID){ 
     if($oldRole = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $oldRoleID, 'program'=>$this->_program->getId()))){
       $form = new \Foundation\Form;
+      $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path('setup/roles/copy/' . $oldRole->getId()));
       $field = $form->newField();
       $field->setLegend('Copy ' . $oldRole->getName() . ' role');
@@ -159,6 +161,7 @@ class SetupRolesController extends \Jazzee\AdminController {
    */
    public function actionNew(){
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('setup/roles/new'));
     $field = $form->newField();
     $field->setLegend('New program role');

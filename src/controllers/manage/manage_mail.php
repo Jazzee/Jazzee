@@ -28,6 +28,7 @@ class ManageMailController extends \Jazzee\AdminController {
    */
   public function actionTest(){
     $form = new \Foundation\Form;
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('manage/mail/test'));
     $field = $form->newField();
     $field->setLegend('Send Test Email');

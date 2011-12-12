@@ -38,6 +38,7 @@ class LorController extends \Jazzee\Controller{
     
 
     $form = new \Foundation\Form;
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path('lor/'.$urlKey));
     $field = $form->newField();
     $field->setLegend($page->getTitle());

@@ -20,6 +20,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
    */
   public function actionLogin() {
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('applicant/login'));
     $field = new \Foundation\Form\Field($form);
     $field->setLegend('Login');
@@ -73,6 +74,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
    */
   public function actionForgotpassword() {
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('applicant/forgotpassword'));
     $field = new \Foundation\Form\Field($form);
     $field->setLegend('Forgot Password');
@@ -120,6 +122,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
       $this->redirectApplyPath('applicant/resetpassword');
     }
     $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('applicant/resetpassword/' . $applicant->getUniqueId()));
     $field = new \Foundation\Form\Field($form);
     $field->setLegend('Reset Password');
@@ -159,6 +162,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
    */
   public function actionNew($programShortName, $cycleName) {
     $form = new \Foundation\Form;
+    $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('applicant/new'));
     
     $field = new \Foundation\Form\Field($form);
