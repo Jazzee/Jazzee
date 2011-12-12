@@ -11,8 +11,8 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
   const PATH = 'manage/virtualfiles';
   
   const ACTION_INDEX = 'View Files';
-  const ACTION_EDIT = 'New File';
-  const ACTION_NEW = 'Replace File';
+  const ACTION_NEW = 'New File';
+  const ACTION_EDIT = 'Replace File';
   const ACTION_DELETE = 'Delete File';
   const REQUIRE_APPLICATION = false;
   
@@ -58,6 +58,20 @@ class ManageVirtualfilesController extends \Jazzee\AdminController {
     } else {
       $this->addMessage('error', "Error: File #{$fileId} does not exist.");
     }
+  }
+  
+  /**
+   * Delete a file
+   * @param integer $filId
+   */
+   public function actionDelete($fileId){ 
+    if($file = $this->_em->getRepository('\Jazzee\Entity\VirtualFile')->find($fileId)){
+      $this->_em->remove($file);
+      $this->addMessage('success', "File Removed Successfully");
+    } else {
+      $this->addMessage('error', "Error: File #{$fileId} does not exist.");
+    }
+    $this->redirectPath('manage/virtualfiles');
   }
    
   /**

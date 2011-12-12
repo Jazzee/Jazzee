@@ -15,6 +15,9 @@ if($files): ?>
     <?php if($this->controller->checkIsAllowed('manage_virtualfiles', 'edit')): ?>
     (<a href='<?php print $this->path('manage/virtualfiles/edit/') . $file->getId()?>'>Edit</a>)
     <?php endif;?>
+    <?php if($this->controller->checkIsAllowed('manage_virtualfiles', 'delete')): ?>
+    (<a href='<?php print $this->path('manage/virtualfiles/delete/') . $file->getId()?>'>Delete</a>)
+    <?php endif;?>
   </li>
   <?php endforeach;?>
   </ul>
