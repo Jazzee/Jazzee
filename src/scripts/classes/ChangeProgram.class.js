@@ -2,23 +2,26 @@
  * Allow users to change programs seemlessly
  * @param String path to the change program controller
  */
-function ChangeProgram(changeProgramPath){
-  this.changeProgramPath = changeProgramPath;
+function ChangeProgram(){
+  this.services = new Services;
   this.allowedPrograms = {};
+  this.changeProgramPath = this.services.getControllerPath('admin_changeprogram');
 };
 
 ChangeProgram.prototype.init = function(){
   var self = this;
-  $.ajax({
-    type: 'GET',
-    url: this.changeProgramPath + '/getAllowedPrograms',
-    async: false,
-    success: function(json){
-      for(var i=0; i<json.data.result.length; i++){
-        self.allowedPrograms[json.data.result[i].id] = json.data.result[i].name;
+  if(this.services.checkIsAllowed('admin_changeprogram', 'getAllowedPrograms')){
+    $.ajax({
+      type: 'GET',
+      url: this.changeProgramPath + '/getAllowedPrograms',
+      async: false,
+      success: function(json){
+        for(var i=0; i<json.data.result.length; i++){
+          self.allowedPrograms[json.data.result[i].id] = json.data.result[i].name;
+        }
       }
-    }
-  });
+    });
+  }
 };
 
 /**

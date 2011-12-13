@@ -3,7 +3,7 @@
  * Everything in hear needs to be value added so JS isn't necessary for applicants
  */
 $(document).ready(function(){
-  var changeProgram = new ChangeProgram(document.location.href + '/../../changeprogram');
+  var changeProgram = new ChangeProgram();
   changeProgram.init();
   
   $('a.applicantLink').each(function(i){

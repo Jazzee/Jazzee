@@ -25,6 +25,10 @@ print '<?xml version="1.0" encoding="UTF-8"?>' ?>
     if($use) print '<script type="text/javascript" src="' . $link . '"></script>' . "\n";
   }
   ?>
+  <!-- Inject the absolute path in the Services prototype so it can be available to other javascript classes  -->
+  <script type='text/javascript'>
+    Services.prototype.absoluteBasePath = '<?php print $this->path(''); ?>';
+  </script>
   </head>
   <body>
     <div id='doc3'>

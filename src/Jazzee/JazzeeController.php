@@ -77,6 +77,8 @@ class JazzeeController extends PageController
     $this->addScript($this->path('resource/foundation/scripts/jquery.json.js'));
     $this->addScript($this->path('resource/foundation/scripts/jquery.cookie.js'));
     
+    //add the Services javascript class
+    $this->addScript($this->path('resource/scripts/classes/Services.class.js'));
     
     if($this->_config->getBroadcastMessage()) $this->addMessage('info', $this->_config->getBroadcastMessage());
   }
