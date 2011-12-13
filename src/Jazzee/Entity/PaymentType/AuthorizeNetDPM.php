@@ -128,6 +128,7 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
     if(time() - (int)$cron->getVar('authorizeNetDpmPaymentLastRun') > self::MIN_CRON_INTERVAL){
       $cron->setVar('authorizeNetDpmPaymentLastRun', time());
       $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class'=>'\Jazzee\Entity\PaymentType\AuthorizeNetDPM'));
+      $count = 0;
       if($paymentType){
         $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type'=>$paymentType->getId(), 'status'=>\Jazzee\Entity\Payment::PENDING),array(), 100);
         $class = new AuthorizeNetAIM($paymentType);
@@ -135,11 +136,13 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
         foreach($payments as $payment){
           $result = $class->settlePayment($payment, $fakeInput);
           if($result === true){
+            $count++;
             $cron->getEntityManager()->persist($payment);
             foreach($payment->getVariables() as $var) $cron->getEntityManager()->persist($var);
           }
         }
       }
+      if($count) $cron->log("Settled {$count} AuthorizeNetDpm Payments.");
     }
   }
 }

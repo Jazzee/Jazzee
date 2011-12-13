@@ -188,6 +188,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
         $message->Body = $body;
         $message->Send();
       }
+      if($count = count($applicants)) $cron->log("Sent {$count} reminder messages to applicants.");
     }
     if(time() - (int)$cron->getVar('applicantsMessagesProgramsLastRun') > self::MIN_INTERVAL_PROGRAMS){
       $lastRun = new DateTime();
@@ -216,6 +217,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
         $message->Body = $body;
         $message->Send();
       }
+      if($count = count($applications)) $cron->log("Sent {$count} reminder messages to programs.");
     }
   }
   

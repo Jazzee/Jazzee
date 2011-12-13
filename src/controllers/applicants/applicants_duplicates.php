@@ -34,11 +34,12 @@ class ApplicantsDuplicatesController extends \Jazzee\AdminController {
   public static function runCron(AdminCronController $cron){
     if(time() - (int)$cron->getVar('applicantsDuplicatesLastRun') > self::MIN_INTERVAL){
       $cron->setVar('applicantsDuplicatesLastRun', time());
-      $applicantsWithDuplicates = array();
+      $duplicates = 0;
       foreach($cron->getEntityManager()->getRepository('\Jazzee\Entity\Cycle')->findAll() as $cycle){
         foreach($cron->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->findByCycle($cycle) as $applicant){
           foreach($cron->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->findDuplicates($applicant) as $duplicateApplicant){
             if(!$cron->getEntityManager()->getRepository('\Jazzee\Entity\Duplicate')->findBy(array('applicant'=>$applicant->getId(), 'duplicate'=>$duplicateApplicant->getId()))){
+              $duplicates++;
               $duplicate = new \Jazzee\Entity\Duplicate;
               $duplicate->setApplicant($applicant);
               $duplicate->setDuplicate($duplicateApplicant);
@@ -48,6 +49,7 @@ class ApplicantsDuplicatesController extends \Jazzee\AdminController {
         }
       }
       $cron->getEntityManager()->flush();
+      if($duplicates) $cron->log("Found {$duplicates} new duplicate applicants");
     }
   }
 }

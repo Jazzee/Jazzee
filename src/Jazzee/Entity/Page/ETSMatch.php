@@ -235,6 +235,8 @@ class ETSMatch extends Standard {
   public static function runCron(\AdminCronController $cron){
     $pageType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PageType')->findOneBy(array('class'=>'\Jazzee\Entity\Page\ETSMatch'));
     $allETSMatchPages = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Page')->findBy(array('type'=>$pageType->getId()));
+    $countGre = 0;
+    $countToefl = 0;
     foreach($allETSMatchPages as $page){
       //get all the answers without a matching score.
       $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findBy(array('pageStatus'=>NULL,'page'=>$page->getId(), 'greScore'=>null, 'toeflScore'=>null),array('updatedAt'=>'desc'));
@@ -254,13 +256,19 @@ class ETSMatch extends Standard {
           switch($testType){
             case 'GRE/GRE Subject':
                 $score = $cron->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findOneBy($parameters);
-                if($score) $answer->setGreScore($score);
-                $cron->getEntityManager()->persist($answer);
+                if($score){
+                  $countGre++;
+                  $answer->setGreScore($score);
+                  $cron->getEntityManager()->persist($answer);
+                }
               break;
             case 'TOEFL':
                 $score = $cron->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findOneBy($parameters);
-                if($score) $answer->setTOEFLScore($score);
-                $cron->getEntityManager()->persist($answer);
+                if($score){
+                  $countToefl++;
+                  $answer->setTOEFLScore($score);
+                  $cron->getEntityManager()->persist($answer);
+                }
               break;
             default:
               throw new \Jazzee\Exception("Unknown test type: {$testType} when trying to match a score");
@@ -268,5 +276,7 @@ class ETSMatch extends Standard {
         }
       }
     }
+    if($countGre) $cron->log("Found {$countGre} new GRE score matches");
+    if($countToefl) $cron->log("Found {$countToefl} new TOEFL score matches");
   }
 }

@@ -40,7 +40,7 @@ class AdminCronController extends \Jazzee\AdminController {
     if(!$this->semaphore()){
       throw new Exception('Cron tried to run, but the semephore was still set');
     }
-    
+    $this->log('Cron run started');
     foreach($this->listControllers() as $controller){
       \Foundation\VC\Config::includeController($controller);
       $class = \Foundation\VC\Config::getControllerClassName($controller);
@@ -67,8 +67,9 @@ class AdminCronController extends \Jazzee\AdminController {
     $this->setVar('adminCronSemephore', false);
     //cron outputs nothing
     $this->_em->flush();
+    $this->log('Cron run finished');
     exit(0);
-	}
+  }
   
 /**
    * Get value from the cron store
