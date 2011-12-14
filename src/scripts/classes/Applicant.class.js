@@ -12,6 +12,12 @@ Applicant.prototype.init = function(){
   this.parseBio();
   this.parseActions();
   this.parseDecisions();
+  $('a#actas').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      window.open(json.data.result.link);
+    });
+    return false;
+  });
   $('#pages div.page').each(function(){
     var id = $(this).attr('id').substr(4);
     self.parsePage(id);
@@ -74,7 +80,7 @@ Applicant.prototype.createForm = function(json, callback){
  */
 Applicant.prototype.parseBio = function(){
   var self = this;
-  $('#bio a').click(function(e){
+  $('#bio #updateBio').click(function(e){
     $.get($(e.target).attr('href'),function(json){
       var obj = {
         display: function(json){

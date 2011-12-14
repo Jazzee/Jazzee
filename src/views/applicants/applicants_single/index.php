@@ -12,7 +12,7 @@
     <h1>
       <?php print $applicant->getFullName(); ?>
       <?php if($this->controller->checkIsAllowed('applicants_single', 'updateBio')){ ?>
-        <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/updateBio");?>">(edit)</a>
+        <a id='updateBio' href="<?php print $this->path("applicants/single/{$applicant->getId()}/updateBio");?>">(edit)</a>
       <?php } ?>
     </h1>
     <h4><?php print $applicant->getEmail();?></h4>
@@ -34,7 +34,10 @@
           <?php if($this->controller->checkIsAllowed('applicants_single', 'pdf')){ ?>
             <td>
               <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/portrait");?>">Portrait</a><br />
-              <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/landscape");?>">Landscape</a>
+              <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/landscape");?>">Landscape</a>            
+              <?php if($this->controller->checkIsAllowed('applicants_single', 'actas')){ ?>
+                <br /><a id='actas' href="<?php print $this->path("applicants/single/{$applicant->getId()}/actas");?>">Become this applicant</a>
+              <?php } ?>
             </td>
           <?php }?>
           <td id="actions">

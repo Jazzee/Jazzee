@@ -12,6 +12,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_INDEX = 'View';
   const ACTION_PDF = 'Print as PDF';
   const ACTION_UPDATEBIO = 'Edit Account';
+  const ACTION_ACTAS = 'Act as an applicant';
   const ACTION_EXTENDDEADLINE = 'Extend Deadline';
   const ACTION_LOCK = 'Lock';
   const ACTION_UNLOCK = 'UnLock';
@@ -250,6 +251,22 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     }
     $this->setVar('form', $form);
     $this->loadView('applicants_single/form');
+  }
+  
+  /**
+   * Act as an applicant
+   * Sets a session up as the applicant and opens a new window as that applicant
+   * @param integer $applicantId
+   */
+  public function actionActas($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
+    $store->applicantID = $applicant->getId();
+    $pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
+    $link = $this->applyPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $pages[0]->getId());
+    $this->setVar('result', array('link'=> $link));
+    $this->setLayoutVar('status', 'success');
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**
