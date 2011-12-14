@@ -36,7 +36,7 @@
       <a class='edit' href='<?php print $this->controller->getActionPath();?>/edit/<?php print $answer->getId()?>'>Edit</a>
       <a class='delete' href='<?php print $this->controller->getActionPath();?>/delete/<?php print $answer->getId()?>'>Delete</a>
       <a class='invite' href='<?php print $this->controller->getActionPath();?>/do/sendEmail/<?php print $answer->getId()?>'>Send Invitation Email</a>
-    <?php } else if($answer->getUpdatedAt()->diff(new DateTime('now'))->days >= \Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS){ ?>
+    <?php } else if(!$answer->getChildren()->first() and $answer->getUpdatedAt()->diff(new DateTime('now'))->days >= \Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS){ ?>
       <a class='invite' href='<?php print $this->controller->getActionPath();?>/do/sendEmail/<?php print $answer->getId()?>'>Send Reminder Email</a>
     <?php }?>
   </p>
