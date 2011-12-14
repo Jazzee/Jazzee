@@ -39,9 +39,9 @@ $basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array(
     'name' => 1
   )
 ));
-  
+
 //static pulls physical files from the cache where they are created when first needed
-$basicRouter->addRoute('#^static/(.*)$#i', array( 
+$basicRouter->addRoute('#^(?:admin/)?static/(.*)$#i', array( 
   'controller' => 'static',
   'action' => 'get',
   'action_params' => array(
