@@ -40,7 +40,7 @@ class PaymentVariable{
   
   /**
    * Mark the lastUpdate automatically
-   * @PrePersist
+   * @PrePersist @PreUpdate
    */
   public function markLastUpdate(){
       $this->payment->markLastUpdate();

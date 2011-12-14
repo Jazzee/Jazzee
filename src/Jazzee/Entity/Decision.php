@@ -62,7 +62,7 @@ class Decision{
   
   /**
    * Mark the lastUpdate automatically
-   * @PreUpdate
+   * @PreUpdate @PreUpdate
    */
   public function markLastUpdate(){
       $this->applicant->markLastUpdate();

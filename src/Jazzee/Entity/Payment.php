@@ -63,7 +63,7 @@ class Payment{
   
   /**
    * Mark the lastUpdate automatically
-   * @PrePersist
+   * @PrePersist @PreUpdate
    */
   public function markLastUpdate(){
       $this->answer->markLastUpdate();

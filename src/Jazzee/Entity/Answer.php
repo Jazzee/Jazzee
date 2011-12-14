@@ -379,7 +379,7 @@ class Answer{
   
   /**
    * Mark the lastUpdate automatically 
-   * @PrePersist
+   * @PrePersist @PreUpdate @PreRemove
    */
   public function markLastUpdate(){
       if(!$this->updatedAtOveridden) $this->updatedAt = new \DateTime();

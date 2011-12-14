@@ -118,7 +118,7 @@ class Attachment{
   
   /**
    * Mark the lastUpdate automatically 
-   * @PrePersist
+   * @PrePersist @PreUpdate
    */
   public function markLastUpdate(){
       $this->applicant->markLastUpdate();

@@ -4,8 +4,8 @@ namespace Jazzee\Entity;
 /** 
  * Applicant
  * Individual applicants are tied to an Application - but a single person can be multiple Applicants
- * @Entity(repositoryClass="\Jazzee\Entity\ApplicantRepository")
  * @HasLifecycleCallbacks 
+ * @Entity(repositoryClass="\Jazzee\Entity\ApplicantRepository")
  * @Table(name="applicants",
  *   uniqueConstraints={
  *     @UniqueConstraint(name="application_email", columns={"application_id", "email"}),
@@ -455,7 +455,7 @@ class Applicant{
   
   /**
    * Mark the lastUpdate automatically
-   * @PrePersist
+   * @PrePersist @PreUpdate
    */
   public function markLastUpdate(){
     if(!$this->updatedAtOveridden) $this->updatedAt = new \DateTime();
