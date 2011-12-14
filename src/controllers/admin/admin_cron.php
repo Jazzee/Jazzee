@@ -36,38 +36,36 @@ class AdminCronController extends \Jazzee\AdminController {
   }
   
   public function actionIndex(){
-    $startTime = time();
-    if(!$this->semaphore()){
-      throw new Exception('Cron tried to run, but the semephore was still set');
-    }
-    $this->log('Cron run started');
-    foreach($this->listControllers() as $controller){
-      \Foundation\VC\Config::includeController($controller);
-      $class = \Foundation\VC\Config::getControllerClassName($controller);
-      if(method_exists($class, 'runCron')){
-        $class::runCron($this);
-      }   
-      //reset the max execution time and memory limit after every admin script is included because some override this
-      set_time_limit(600);
-      ini_set('memory_limit', '1G');
-    }
-    
-    foreach($this->_em->getRepository('\Jazzee\Entity\PageType')->findAll() as $pageType){
-      $class = $pageType->getClass();
-      if(method_exists($class, 'runCron')){
-        $class::runCron($this);
+    if($this->semaphore()){
+      $this->log('Cron run started');
+      foreach($this->listControllers() as $controller){
+        \Foundation\VC\Config::includeController($controller);
+        $class = \Foundation\VC\Config::getControllerClassName($controller);
+        if(method_exists($class, 'runCron')){
+          $class::runCron($this);
+        }   
+        //reset the max execution time and memory limit after every admin script is included because some override this
+        set_time_limit(600);
+        ini_set('memory_limit', '1G');
       }
+
+      foreach($this->_em->getRepository('\Jazzee\Entity\PageType')->findAll() as $pageType){
+        $class = $pageType->getClass();
+        if(method_exists($class, 'runCron')){
+          $class::runCron($this);
+        }
+      }
+      //Perform and applicant actions
+      \Foundation\VC\Config::includeController('apply_applicant');
+      ApplyApplicantController::runCron($this);
+
+
+      //clear the semephore
+      $this->setVar('adminCronSemephore', false);
+      $this->log('Cron run finished');
     }
-    //Perform and applicant actions
-    \Foundation\VC\Config::includeController('apply_applicant');
-    ApplyApplicantController::runCron($this);
-    
-    
-    //clear the semephore
-    $this->setVar('adminCronSemephore', false);
     //cron outputs nothing
     $this->_em->flush();
-    $this->log('Cron run finished');
     exit(0);
   }
   
@@ -105,11 +103,13 @@ class AdminCronController extends \Jazzee\AdminController {
     $lastRun = $this->getVar('adminCronLastRun');
     if(!empty($semephore)){
       //attempting to run cron again too soon
-      if(time() - (int)$lastRun < self::MAX_INTERVAL) return false;
-      
+      if(time() - (int)$lastRun < self::MAX_INTERVAL){
+        $this->_errorLog->log('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' and cron is being run again at ' . date('r') . '.', PEAR_LOG_ERR);
+        return false;
+      }
       //This semephore has been around for too long delete it and throw an exception so the next run can proceed normally
       $this->setVar('adminCronSemephore', false);
-      trigger_error('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' which was more than ' . self::MAX_INTERVAL . ' seconds ago.  This can indicate a broken cron process.', E_USER_NOTICE);
+      $this->_errorLog->log('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' which was more than ' . self::MAX_INTERVAL . ' seconds ago.  This can indicate a broken cron process.  The semaphore has been reset so cron can run again.', PEAR_LOG_ERR);
     }
     $this->setVar('adminCronSemephore', true);
     $this->setVar('adminCronLastRun', time());
