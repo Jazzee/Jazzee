@@ -148,7 +148,22 @@ $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/resetpassword/([a-z0-9
   )
 ));
 
-//dynmaic files like applicant pdfs and previews stored in sessions
+//default controller
+$basicRouter->addRoute('#^admin$#i', array(
+  'redirect' => 'admin/welcome'
+));
+
+//single applicant view
+$basicRouter->addRoute('#^admin/applicants/single/([0-9]+)/?([^/]+)?/?(.*)$#i', array(
+  'controller' => 'applicants_single',
+  'action' => 2,
+  'action_params' => array(
+    'applicantId' => 1
+  ),
+  'additional_params' => 3
+));
+
+//transactions come as posts from outside sources
 $basicRouter->addRoute('#^transaction/(.*)$#i', array( 
   'controller' => 'transaction',
   'action' => 'post',
@@ -158,4 +173,21 @@ $basicRouter->addRoute('#^transaction/(.*)$#i', array(
 ));
 
 $fc->addRouter($basicRouter);
+
+//We use preg replace in the admin routers to cleanly group the administrative responsiblities in the URL
+$advancedRouter = new \Foundation\VC\FullRegexRewriteRouter();
+
+$advancedRouter->addRoute('#^admin/(manage|setup|applicants|scores)/([^/]+)/?([^/]*)/?(.*)$#i', array(
+  'controller' => '$1_$2',
+  'action' => '$3',
+  'additional_params' => '$4'
+));
+
+$advancedRouter->addRoute('#^admin/([^/]+)/?([^/]+)?$#i', array(
+  'controller' => 'admin_$1',
+  'action' => '$2'
+));
+
+$fc->addRouter($advancedRouter);
+
 $fc->processRequest(new Lvc_HttpRequest());
