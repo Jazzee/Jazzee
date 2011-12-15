@@ -22,9 +22,9 @@
       <thead>
         <tr>
           <?php if($this->controller->checkIsAllowed('applicants_single', 'pdf')){ ?>
-            <th>Print PDF</th>
+            <th>Actions</th>
           <?php }?>
-          <th>Actions</th>
+          <th>Account</th>
           <th>Admission Status</th>
           <th>Tags</th>
         </tr>
@@ -38,7 +38,11 @@
               <?php if($this->controller->checkIsAllowed('applicants_single', 'actas')){ ?>
                 <br /><a id='actas' href="<?php print $this->path("applicants/single/{$applicant->getId()}/actas");?>">Become this applicant</a>
               <?php } ?>
+                <?php if($this->controller->checkIsAllowed('applicants_single', 'move')){ ?>
+                <br /><a id='move' href="<?php print $this->path("applicants/single/{$applicant->getId()}/move");?>">Move applicant</a>
+              <?php } ?>
             </td>
+            
           <?php }?>
           <td id="actions">
             Account Created: <?php print $applicant->getCreatedAt()->format('c');?><br />

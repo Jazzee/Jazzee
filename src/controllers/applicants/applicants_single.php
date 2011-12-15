@@ -13,6 +13,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_PDF = 'Print as PDF';
   const ACTION_UPDATEBIO = 'Edit Account';
   const ACTION_ACTAS = 'Act as an applicant';
+  const ACTION_MOVE = 'Move to another program';
   const ACTION_EXTENDDEADLINE = 'Extend Deadline';
   const ACTION_LOCK = 'Lock';
   const ACTION_UNLOCK = 'UnLock';
@@ -267,6 +268,45 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->setVar('result', array('link'=> $link));
     $this->setLayoutVar('status', 'success');
     $this->loadView($this->controllerName . '/result');
+  }
+  
+  /**
+   * move applicant
+   * @param integer $applicantId
+   */
+  public function actionMove($applicantId){
+    $applicant = $this->getApplicantById($applicantId);
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicant->getId()}/move"));
+    $field = $form->newField();
+    $field->setLegend('Move ' . $applicant->getFullName());
+    
+    $element = $field->newElement('SelectList', 'program');
+    $element->setLabel('Program');
+    $programs = $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array('isExpired' => false), array('name' => 'ASC'));
+    $applications = array();
+    foreach($programs as $program){
+      $application = $this->_em->getRepository('\Jazzee\Entity\Application')->findOneBy(array('program'=>$program->getId(), 'cycle'=>$this->_cycle->getId()));
+      if($application != $this->_application and self::isAllowed($this->controllerName, 'move', $this->_user, $program, $application)){
+        $applications[$this->_cycle->getName()][$program->getId()] = $application;
+        $element->newItem($program->getId(), $program->getName());
+      }
+    }
+    $element->setValue($this->_program->getId());
+    
+    $form->newButton('submit', 'Move Applicant');
+    if(!empty($this->post)){
+      $this->setLayoutVar('textarea', true);
+      if($input = $form->processInput($this->post)){
+        $newApplication = $applications[$this->_cycle->getName()][$input->get('program')];
+        $applicant->setApplication($newApplication);
+        $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Moved from ' . $this->_program->getName() . ' to ' . $newApplication->getProgram()->getName());
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
   
   /**

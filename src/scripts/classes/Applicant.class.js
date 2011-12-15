@@ -18,6 +18,18 @@ Applicant.prototype.init = function(){
     });
     return false;
   });
+  $('a#move').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      var obj = {
+        display: function(json){
+          alert('Applicant moved successfully');
+          window.location.reload();
+        }
+      };
+      self.createForm(json.data.form, obj);
+    });
+    return false;
+  });
   $('#pages div.page').each(function(){
     var id = $(this).attr('id').substr(4);
     self.parsePage(id);
