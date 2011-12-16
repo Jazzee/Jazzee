@@ -267,6 +267,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $link = $this->applyPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $pages[0]->getId());
     $this->setVar('result', array('link'=> $link));
     $this->setLayoutVar('status', 'success');
+    $this->auditLog($applicant, 'Became applicant');
     $this->loadView($this->controllerName . '/result');
   }
   
