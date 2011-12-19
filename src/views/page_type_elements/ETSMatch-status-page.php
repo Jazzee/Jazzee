@@ -20,9 +20,9 @@ if($answers = $page->getJazzeePage()->getAnswers()){ ?>
   <?php foreach($answers as $answer){?>
     <tr>
     <td>
-     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\ETSMatch::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer);?><br />
-     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\ETSMatch::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer);?><br />
-     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\ETSMatch::FID_TEST_DATE)->getJazzeeElement()->displayValue($answer);?>
+     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Page\ETSMatch::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer);?><br />
+     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Page\ETSMatch::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer);?><br />
+     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Page\ETSMatch::FID_TEST_DATE)->getJazzeeElement()->displayValue($answer);?>
     </td>
     <td>
     <?php if($answer->getPublicStatus()){?><br />Status: <?php print $answer->getPublicStatus()->getName();?> <br /> <?php }?>

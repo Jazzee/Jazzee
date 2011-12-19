@@ -20,10 +20,10 @@ if($answers = $page->getJazzeePage()->getAnswers()){ ?>
   <?php foreach($answers as $answer){?>
     <tr>
     <td>
-     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer);?>
-     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer);?><br />
-     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_INSTITUTION)->getJazzeeElement()->displayValue($answer);?><br />
-     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Entity\Page\Recommenders::FID_EMAIL)->getJazzeeElement()->displayValue($answer);?>    
+     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Page\Recommenders::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer);?>
+     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Page\Recommenders::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer);?><br />
+     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Page\Recommenders::FID_INSTITUTION)->getJazzeeElement()->displayValue($answer);?><br />
+     <?php print $page->getPage()->getElementByFixedId(\Jazzee\Page\Recommenders::FID_EMAIL)->getJazzeeElement()->displayValue($answer);?>    
     </td>
     <td>
     <?php if($child = $answer->getChildren()->first()){?>
@@ -31,8 +31,8 @@ if($answers = $page->getJazzeePage()->getAnswers()){ ?>
     } else if($answer->isLocked()){?>
       <strong>Status:</strong> This recommendation had not been received.<br />
       <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?>
-      <?php if($answer->getUpdatedAt()->diff(new DateTime('now'))->days < \Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS){?> 
-        You will be able to send the invitation to your recommender again in <?php print (\Jazzee\Entity\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS - $answer->getUpdatedAt()->diff(new DateTime('now'))->days);?> days.
+      <?php if($answer->getUpdatedAt()->diff(new DateTime('now'))->days < \Jazzee\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS){?> 
+        You will be able to send the invitation to your recommender again in <?php print (\Jazzee\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS - $answer->getUpdatedAt()->diff(new DateTime('now'))->days);?> days.
       <?php } else {?>
         <br /><a class='invite' href='<?php print $this->controller->getActionPath();?>/do/sendEmail/<?php print $answer->getPage()->getId()?>/<?php print $answer->getId()?>'>Send Reminder Email</a>
       <?php } ?>

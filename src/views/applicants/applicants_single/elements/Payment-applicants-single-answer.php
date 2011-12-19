@@ -17,20 +17,20 @@
     switch($payment->getStatus()){
       case \Jazzee\Entity\Payment::PENDING:
         $applicantStatus = $class::PENDING_TEXT;
-        $status = \Jazzee\Entity\PaymentType\AbstractPaymentType::PENDING_TEXT;
+        $status = \Jazzee\PaymentType\AbstractPaymentType::PENDING_TEXT;
         break;
       case \Jazzee\Entity\Payment::SETTLED:
         $applicantStatus = $class::SETTLED_TEXT;
-        $status = \Jazzee\Entity\PaymentType\AbstractPaymentType::SETTLED_TEXT;
+        $status = \Jazzee\PaymentType\AbstractPaymentType::SETTLED_TEXT;
         break;
       case \Jazzee\Entity\Payment::REJECTED:
         $applicantStatus = $class::REJECTED_TEXT;
-        $status = \Jazzee\Entity\PaymentType\AbstractPaymentType::REJECTED_TEXT;
+        $status = \Jazzee\PaymentType\AbstractPaymentType::REJECTED_TEXT;
         $status .= '<br />Reason: ' . $payment->getVar('rejectedReason');
         break;
       case \Jazzee\Entity\Payment::REFUNDED:
         $applicantStatus = $class::REFUNDED_TEXT;
-        $status = \Jazzee\Entity\PaymentType\AbstractPaymentType::REFUNDED_TEXT;
+        $status = \Jazzee\PaymentType\AbstractPaymentType::REFUNDED_TEXT;
         break;
     }
   ?>

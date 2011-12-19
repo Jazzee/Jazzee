@@ -244,7 +244,7 @@ class AdminApiController extends \Jazzee\AdminController {
    * 
    * Calls itself recursivly to capture all children
    * @param DomDocument $dom
-   * @param \Jazzee\Entity\Page or \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\ApplicationPage or \Jazzee\Entity\Page $page
    */
   protected function pageXml($page){
     $pxml = $this->dom->createElement('page');
