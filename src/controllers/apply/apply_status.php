@@ -165,7 +165,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
    * Pass the input through to the apply page
    */
   public function actionDo() {
-    $what = $this->actionParams['what'];
+    $what = 'do_' . $this->actionParams['what'];
     $applicationPage = $this->_pages[$this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$this->actionParams['pageId'], 'application'=>$this->_application->getId()))->getId()];
     if(method_exists($applicationPage->getJazzeePage(), $what)){
       $applicationPage->getJazzeePage()->$what($this->actionParams['answerId'], $this->post);
