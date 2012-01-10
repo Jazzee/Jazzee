@@ -33,8 +33,8 @@
         <tr>
           <?php if($this->controller->checkIsAllowed('applicants_single', 'pdf')){ ?>
             <td>
-              <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/portrait");?>">Portrait</a><br />
-              <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/landscape");?>">Landscape</a>            
+              <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/portrait");?>">Print Portrait PDF</a><br />
+              <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/landscape");?>">Print Landscape PDF</a>            
               <?php if($this->controller->checkIsAllowed('applicants_single', 'actas')){ ?>
                 <br /><a id='actas' href="<?php print $this->path("applicants/single/{$applicant->getId()}/actas");?>">Become this applicant</a>
               <?php } ?>
