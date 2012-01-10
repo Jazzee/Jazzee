@@ -208,24 +208,22 @@ class ManageRolesController extends \Jazzee\AdminController {
       $form->newButton('submit', 'Apply Templates');
       $this->setVar('form', $form);
       if($input = $form->processInput($this->post)){
-        foreach($role->getActions() as $action){
-          foreach($list as $programElementId => $programArr){
-            foreach($programArr as $programRoleElementId => $roleId){
-              $setRoles = $input->get($programElementId);
-              if(!is_null($setRoles) and in_array($programRoleElementId, $setRoles)){
-                $programRole = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id'=>$roleId, 'isGlobal'=>false, 'program'=>substr($programElementId, 7)));
-                if(!$programRole) throw new \Jazzee\Exception('Bad role or program');
-                foreach($programRole->getActions() as $action){
-                  $this->_em->remove($action);
-                  $programRole->getActions()->removeElement($action);
-                }
-                foreach($role->getActions() as $globalAction){
-                  $programAction = new \Jazzee\Entity\RoleAction;
-                  $programAction->setController($globalAction->getController());
-                  $programAction->setAction($globalAction->getAction());
-                  $programAction->setRole($programRole);
-                  $this->_em->persist($programAction);
-                }
+        foreach($list as $programElementId => $programArr){
+          foreach($programArr as $programRoleElementId => $roleId){
+            $setRoles = $input->get($programElementId);
+            if(!is_null($setRoles) and in_array($programRoleElementId, $setRoles)){
+              $programRole = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id'=>$roleId, 'isGlobal'=>false, 'program'=>substr($programElementId, 7)));
+              if(!$programRole) throw new \Jazzee\Exception('Bad role or program');
+              foreach($programRole->getActions() as $action){
+                $this->_em->remove($action);
+                $programRole->getActions()->removeElement($action);
+              }
+              foreach($role->getActions() as $globalAction){
+                $programAction = new \Jazzee\Entity\RoleAction;
+                $programAction->setController($globalAction->getController());
+                $programAction->setAction($globalAction->getAction());
+                $programAction->setRole($programRole);
+                $this->_em->persist($programAction);
               }
             }
           }
