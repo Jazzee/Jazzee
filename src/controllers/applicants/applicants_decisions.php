@@ -11,27 +11,23 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
   const PATH = 'applicants/decisions';
   
   const ACTION_INDEX = 'List applicant admission status';
-  
-  /**
-   * @const string format for dates in display
-   */
-  const LONG_DATE_FORMAT = 'm/d/Y';
+  const ACTION_NOMINATEADMIT = 'Nominate for Admission';
+  const ACTION_NOMINATEDENY = 'Nominate for Deny';
+  const ACTION_FINALADMIT = 'Final Admit';
+  const ACTION_FINALDENY = 'Final Deny';
   
   /**
    * Add the required JS
    */
   protected function setUp(){
     parent::setUp();
-    $this->layout = 'json';
-    $this->addScript($this->path('resource/scripts/status.js'));
-    $this->addScript($this->path('resource/scripts/decisions.js'));
+    $this->addScript($this->path('resource/scripts/controllers/applicants_decisions.controller.js'));
   }
   
   /**
    * Build the blank page
    */
   public function actionIndex(){
-    
     $list = array(
       'noDecision' => array(),
       'finalDeny' => array(),
@@ -39,7 +35,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
       'nominateDeny' => array(),
       'nominateAdmit' => array()
     );
-    foreach($this->_application->getApplicants() AS $applicant){
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
       if($applicant->isLocked()){
         if($applicant->getDecision()->getFinalDeny()){
           $list['finalDeny'][] = $applicant;
@@ -47,7 +43,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
           $list['finalAdmit'][] = $applicant;
         } else if($applicant->getDecision()->getNominateDeny()){
           $list['nominateDeny'][] = $applicant;
-        } else if($applicant->getDecision()->geNominateAdmit()){
+        } else if($applicant->getDecision()->getNominateAdmit()){
           $list['nominateAdmit'][] = $applicant;
         } else {
           $list['noDecision'][] = $applicant;
@@ -55,109 +51,190 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
       }
     }
     $this->setVar('list', $list);
-    $this->layout = 'wide';
   }
   
   /**
    * Nominate an applicant for admission
    */
-  public function actionPreliminaryDecision(){
-    $count = array('admit'=>0, 'deny'=>0);
-    foreach($this->post['deny'] as $id){
-      $applicant = $this->getApplicantById($id);
-      $count['deny']++;
-      $applicant->Decision->nominateDeny();
-      $applicant->save();
+  public function actionNominateAdmit(){
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('applicants/decisions/nominateAdmit'));
+    $field = $form->newField();
+    $field->setLegend('Nominate Applicants for admission');
+    
+    $element = $field->newElement('CheckboxList','applicants');
+    $element->setLabel('Select applicants to nominate');
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+      if($applicant->isLocked() AND $applicant->getDecision()->can('nominateAdmit')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
     }
-    foreach($this->post['admit'] as $id){
-      $applicant = $this->getApplicantById($id);
-      $count['admit']++;
-      $applicant->Decision->nominateAdmit();
-      $applicant->save();
-    }
-    $message = '';
-    if($count['admit']) $message .= "{$count['admit']} applicant(s) nominated for admit.  ";
-    if($count['deny']) $message .= "{$count['deny']} applicant(s) nominated for deny.";
-    if($message)  $this->addMessage('success', $message);
-    $this->redirect($this->path('applicants/decisions'));
-    exit();
-  }
 
-  /**
-   * Final Deny and applicant or undo a preliminary decision
-   */
-  public function actionFinalDeny(){
-    $count = array('undo'=>0, 'deny'=>0);
-    foreach($this->post['undo'] as $id){
-      $applicant = $this->getApplicantById($id);
-      $count['undo']++;
-      $applicant->Decision->undoNominateDeny();
-      $applicant->save();
+    $form->newButton('submit', 'Submit');
+    if($input = $form->processInput($this->post)){   
+      foreach($input->get('applicants') as $id){
+        $applicant = $this->getApplicantById($id);
+        $applicant->getDecision()->nominateAdmit();
+        $this->_em->persist($applicant);
+      }
+      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) nominated for admit.');
+      $this->redirectPath('applicants/decisions');
     }
-    foreach($this->post['deny'] as $id){
-      $applicant = $this->getApplicantById($id);
-      $count['deny']++;
-      $applicant->Decision->finalDeny();
-      $this->notifyApplicantStatusUpdate($applicant);
-      $applicant->save();
-    }
-    $message = '';
-    if($count['undo']) $message .= "{$count['undo']} applicant(s) changed to no decision.  ";
-    if($count['deny']) $message .= "{$count['deny']} applicant(s) denied.";
-    if($message)  $this->addMessage('success', $message);
-    $this->redirect($this->path('applicants/decisions'));
-    exit();
+    $this->setVar('form', $form);
+    $this->loadView('applicants_decisions/form');
   }
   
-
   /**
-   * Final Admit and applicant or undo a preliminary decision
+   * Nominate an applicant for deny
+   */
+  public function actionNominateDeny(){
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('applicants/decisions/nominateDeny'));
+    $field = $form->newField();
+    $field->setLegend('Nominate Applicants for deny');
+    
+    $element = $field->newElement('CheckboxList','applicants');
+    $element->setLabel('Select applicants to nominate');
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+      if($applicant->isLocked() AND $applicant->getDecision()->can('nominateDeny')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
+    }
+
+    $form->newButton('submit', 'Submit');
+    if($input = $form->processInput($this->post)){   
+      foreach($input->get('applicants') as $id){
+        $applicant = $this->getApplicantById($id);
+        $applicant->getDecision()->nominateDeny();
+        $this->_em->persist($applicant);
+      }
+      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) nominated for deny.');
+      $this->redirectPath('applicants/decisions');
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_decisions/form');
+  }
+  
+  /**
+   * Admit Applicants
    */
   public function actionFinalAdmit(){
-    $count = array('undo'=>0, 'admit'=>0);
-    foreach($this->post['undo'] as $id){
-      $applicant = $this->getApplicantById($id);
-      $count['undo']++;
-      $applicant->Decision->undoNominateAdmit();
-      $applicant->save();
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('applicants/decisions/finalAdmit'));
+    $field = $form->newField();
+    $field->setLegend('Admit Applicants');
+    
+    $element = $field->newElement('CheckboxList','applicants');
+    $element->setLabel('Select applicants to admit');
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+      if($applicant->isLocked() AND $applicant->getDecision()->can('finalAdmit')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
     }
-    if(!empty($this->post['admit'])){
-      if(!isset($this->post['sirdeadline']) OR empty($this->post['sirdeadline'])){
-        $this->addMessage('error', 'You must specify a SIR deadline if you are admiting applicants.');
-        $this->redirect($this->path('applicants/decisions'));
-        exit();
-      }
-      if(!$timestamp = strtotime($this->post['sirdeadline']) OR $timestamp <= time()){
-        $this->addMessage('error', 'You must specify a valid future date for the SIR deadline if you are admiting applicants.');
-        $this->redirect($this->path('applicants/decisions'));
-        exit();
-      }
-      $sirDeadline = date('Y-m-d H:i:s', $timestamp);
-      foreach($this->post['admit'] as $id){
+    
+    $element = $field->newElement('DateInput', 'offerResponseDeadline');
+    $element->setLabel('Offer Response Deadline');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'today'));
+    
+    $element = $field->newElement('RadioList', 'sendMessage');
+    $element->setLabel('Send the applicant a notification?');
+    $element->newItem(0, 'No');
+    $element->newItem(1, 'Yes');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $form->newButton('submit', 'Submit');
+    if($input = $form->processInput($this->post)){   
+      foreach($input->get('applicants') as $id){
         $applicant = $this->getApplicantById($id);
-        $count['admit']++;
-        $applicant->Decision->finalAdmit();
-        $applicant->Decision->offerResponseDeadline = $sirDeadline;
-        $this->notifyApplicantStatusUpdate($applicant);
-        $applicant->Decision->decisionLetterSent();
-        $applicant->save();
+        $applicant->getDecision()->finalAdmit();
+        $applicant->getDecision()->setOfferResponseDeadline($input->get('sirDeadline'));
+        if($input->get('sendMessage')){
+          $thread = new \Jazzee\Entity\Thread();
+          $thread->setSubject('Admission Decision');
+          $thread->setApplicant($applicant);
+          
+          $message = new \Jazzee\Entity\Message();
+          $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+          $text = $this->_application->getAdmitLetter();
+          $search = array(
+           '%Admit_Date%',
+           '%Applicant_Name%',
+           '%Offer_Response_Deadline%'
+          );
+          $replace = array();
+          $replace[] = $applicant->getDecision()->getFinalAdmit()->format('F jS Y');
+          $replace[] = $applicant->getFullName();
+          $replace[] = $applicant->getDecision()->getOfferResponseDeadline()->format('F jS Y g:ia');
+          $text = str_ireplace($search, $replace, $text);
+          $text = nl2br($text);
+          $message->setText($text);
+          $thread->addMessage($message);
+          $this->_em->persist($thread);
+          $this->_em->persist($message);
+        }
+        $this->_em->persist($applicant);
       }
+      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) admited.');
+      $this->redirectPath('applicants/decisions');
     }
-    $message = '';
-    if($count['undo']) $message .= "{$count['undo']} applicant(s) changed to no decision.  ";
-    if($count['admit']) $message .= "{$count['admit']} applicant(s) admitted.";
-    if($message)  $this->addMessage('success', $message);
-    $this->redirect($this->path('applicants/decisions'));
-    exit();
+    $this->setVar('form', $form);
+    $this->loadView('applicants_decisions/form');
   }
   
-  public static function getControllerAuth(){
-    $auth = new ControllerAuth;
-    $auth->name = 'Admission Decisions';
-    $auth->addAction('index', new ActionAuth('List Applicants and their admission status'));
-    $auth->addAction('preliminaryDecision', new ActionAuth('Make preliminary Admit/Deny Decisions'));
-    $auth->addAction('finalDeny', new ActionAuth('Make Final Decision to Deny Applicant'));
-    $auth->addAction('finalAdmit', new ActionAuth('Make Final Decision to Admit Applicant'));
-    return $auth;
+  /**
+   * Deny Applicants
+   */
+  public function actionFinalDeny(){
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('applicants/decisions/finalDeny'));
+    $field = $form->newField();
+    $field->setLegend('Deny Applicants');
+    
+    $element = $field->newElement('CheckboxList','applicants');
+    $element->setLabel('Select applicants to deny');
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+      if($applicant->isLocked() AND $applicant->getDecision()->can('finalAdmit')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
+    }
+    
+    $element = $field->newElement('RadioList', 'sendMessage');
+    $element->setLabel('Send the applicant a notification?');
+    $element->newItem(0, 'No');
+    $element->newItem(1, 'Yes');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
+    $form->newButton('submit', 'Submit');
+    if($input = $form->processInput($this->post)){   
+      foreach($input->get('applicants') as $id){
+        $applicant = $this->getApplicantById($id);
+        $applicant->getDecision()->finalAdmit();
+        $applicant->getDecision()->setOfferResponseDeadline($input->get('sirDeadline'));
+        if($input->get('sendMessage')){
+          $thread = new \Jazzee\Entity\Thread();
+          $thread->setSubject('Admission Decision');
+          $thread->setApplicant($applicant);
+          
+          $message = new \Jazzee\Entity\Message();
+          $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+          $text = $this->_application->getDenyLetter();
+          $search = array(
+           '%Deny_Date%',
+           '%Applicant_Name%'
+          );
+          $replace = array();
+          $replace[] = $applicant->getDecision()->getFinalDeny()->format('F jS Y');
+          $replace[] = $applicant->getFullName();
+          $text = str_ireplace($search, $replace, $text);
+          $text = nl2br($text);
+          $message->setText($text);
+          $thread->addMessage($message);
+          $this->_em->persist($thread);
+          $this->_em->persist($message);
+        }
+        $this->_em->persist($applicant);
+      }
+      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) admited.');
+      $this->redirectPath('applicants/decisions');
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_decisions/form');
   }
 }

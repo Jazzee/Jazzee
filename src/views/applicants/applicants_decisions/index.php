@@ -6,125 +6,47 @@
  * @subpackage admin
  * @subpackage applicants
  */
-?>
-<?php if(!empty($list['noDecision'])):?>
-<div class ='form' id='noDecision'>
-  <h4>Applicants With No Decision</h4>
-  <form method='post' action='<?php print $this->controller->path("applicants/decisions/preliminaryDecision"); ?>'>
-  <table>
-		<thead>
-		  <tr>
-		  	<th>Name</th><th>Admit<br /><input id='preliminaryAdmitAll' type='checkbox' /></th><th>Deny<br /><input id='preliminaryDenyAll' type='checkbox' /></th></tr>
-		</thead>
-		<tbody>
-		<?php foreach($list['noDecision'] as $applicant):?>
-		<tr>
-		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
-		  <td><input type='checkbox' name='admit[]' value='<?php print $applicant->getId() ?>' class='preliminaryAdmit' /></td>
-		  <td><input type='checkbox' name='deny[]' value='<?php print $applicant->getId() ?>' class='preliminaryDeny' /></td>
-		<?php endforeach;?>
-		</tbody>
-	</table>
-	<input type='submit' value='Save' />
-	</form>
-</div>
-<?php endif; ?>
+if(!empty($list['noDecision'])){?>
+  <div>
+    <h4>No Decision<h4>
+      <?php if($this->controller->checkIsAllowed('applicants_decisions', 'nominateAdmit')){?>
+        <p><a href='<?php print $this->path('applicants/decisions/nominateAdmit');?>'>Nominate applicants for admission</a></p>
+      <?php }?>
+      <?php if($this->controller->checkIsAllowed('applicants_decisions', 'nominateDeny')){?>
+        <p><a href='<?php print $this->path('applicants/decisions/nominateDeny');?>'>Nominate applicants for deny</a></p>
+      <?php }?>
+    <ul>
+     <?php foreach($list['noDecision'] as $applicant){?>
+        <li><?php print $applicant->getLastName() . ', ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></li>
+     <?php } ?>
+    </ul>
+  </div>
+<?php } ?>
 
-<?php if(!empty($list['nominateDeny'])):?>
-<div class ='form' id='nominateDeny'>
-<h4>Applicants Nominated for Deny</h4>
-  <form method='post' action='<?php print $this->controller->path("applicants/decisions/finalDeny"); ?>'>
-  <table>
-		<thead>
-		  <tr>
-		  	<th>Name</th><th>Undo Decision<br /><input id='undoPreliminaryDenyAll' type='checkbox' /></th><th>Final Deny<br /><input id='finalDenyAll' type='checkbox' /></th></tr>
-		</thead>
-		<tbody>
-		<?php foreach($list['nominateDeny'] as $applicant):?>
-		<tr>
-		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
-		  <td><input type='checkbox' name='undo[]' value='<?php print $applicant->getId() ?>' class='undoPreliminaryDeny' /></td>
-		  <td><input type='checkbox' name='deny[]' value='<?php print $applicant->getId() ?>' class='finalDeny' /></td>
-		  </tr>
-		<?php endforeach;?>
-		</tbody>
-	</table>
-	<input type='submit' value='Save' />
-	</form>
-</div>
-<?php endif; ?>
+<?php if(!empty($list['nominateAdmit'])){?>
+  <div>
+    <h4>Nominated for Admission<h4>
+      <?php if($this->controller->checkIsAllowed('applicants_decisions', 'finalAdmit')){?>
+        <p><a href='<?php print $this->path('applicants/decisions/finalAdmit');?>'>Admit Applicants</a></p>
+      <?php }?>
+    <ul>
+     <?php foreach($list['nominateAdmit'] as $applicant){?>
+        <li><?php print $applicant->getLastName() . ', ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></li>
+     <?php } ?>
+    </ul>
+  </div>
+<?php } ?>
 
-<?php if(!empty($list['nominateAdmit'])):?>
-<div class ='form' id='nominateAdmit'>
-<h4>Applicants Nominated for Admit</h4>
-  <form method='post' action='<?php print $this->controller->path("applicants/decisions/finalAdmit"); ?>'>
-  <table>
-		<thead>
-		  <tr>
-		  	<th>Name</th><th>Undo Decision<br /><input id='undoPreliminaryAdmitAll' type='checkbox' /></th><th>Final Admit<br /><input id='finalAdmitAll' type='checkbox' /></th></tr>
-		</thead>
-		<tbody>
-		<?php foreach($list['nominateAdmit'] as $applicant):?>
-		<tr>
-		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
-		  <td><input type='checkbox' name='undo[]' value='<?php print $applicant->getId() ?>' class='undoPreliminaryAdmit' /></td>
-		  <td><input type='checkbox' name='admit[]' value='<?php print $applicant->getId() ?>' class='finalAdmit' /></td>
-		</tr>
-		<?php endforeach;?>
-		</tbody>
-	</table>
-	<label for='sirdeadline' class='required'>SIR Deadline:</label><input id='sirdeadline' type='text' name='sirdeadline' /><br />
-	<input type='submit' value='Save' />
-	</form>
-</div>
-<?php endif; ?>
-
-
-<?php if(!empty($list['finalAdmit'])):?>
-<div id='finalAdmit'>
-<h4>Admitted Applicants</h4>
-  <table>
-		<thead>
-		  <tr>
-		  	<th>Name</th><th>Offer Deadline</th><th>Decision Letter</th><th>Offer Status</th></tr>
-		</thead>
-		<tbody>
-		<?php foreach($list['finalAdmit'] as $applicant):?>
-		<tr>
-		  <td><?php print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></td>
-		  <td><?php $applicant->getDecision()->getOfferResponseDeadline()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT) ?></td>
-		  <td>
-		  <?php if($applicant->getDecision()->getDecisionLetterViewed()){
-		    print 'Viewed: '; $applicant->getDecision()->getDecisionLetterViewed()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
-		  } else if($applicant->getDecision()->getDecisionLetterSent()){
-		    print 'Sent: '; $applicant->getDecision()->getDecisionLetterSent()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
-		  }
-		  ?>
-		  </td>
-		  <td>
-		  <?php if($applicant->getDecision()->getAcceptOffer()){
-		    print 'Accepted Offer  '; $applicant->getDecision()->getAcceptOffer()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
-		  } else if($applicant->getDecision()->getDeclineOffer()){
-		    print 'Declined Offer '; $applicant->getDecision()->getDeclineOffer()->format(ApplicantsDecisionsController::LONG_DATE_FORMAT);
-		  } else {
-		    print "No Decision";
-		  } 
-		  ?>
-		  </td>
-		</tr>
-		<?php endforeach;?>
-		</tbody>
-	</table>
-</div>
-<?php endif; ?>
-
-<?php if(!empty($list['finalDeny'])):?>
-<div id='finalDeny'>
-<h4>Denied Applicants</h4>
-  <ul>
-  	<?php foreach($list['finalDeny'] as $applicant):?>
-  	<li><?php print print $applicant->getLastName() . ' , ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName(); ?></li>
-		<?php endforeach;?>
-	</ul>
-</div>
-<?php endif; ?>
+<?php if(!empty($list['nominateDeny'])){?>
+  <div>
+    <h4>Nominated for Deny<h4>
+      <?php if($this->controller->checkIsAllowed('applicants_decisions', 'finalDeny')){?>
+        <p><a href='<?php print $this->path('applicants/decisions/finalDeny');?>'>Deny Applicants</a></p>
+      <?php }?>
+    <ul>
+     <?php foreach($list['nominateDeny'] as $applicant){?>
+        <li><?php print $applicant->getLastName() . ', ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></li>
+     <?php } ?>
+    </ul>
+  </div>
+<?php } ?>
