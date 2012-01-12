@@ -1,4 +1,6 @@
 <?php
+ini_set('memory_limit', '1g');
+set_time_limit('120');
 /**
  * Decide on applicants
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -192,7 +194,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     $element = $field->newElement('CheckboxList','applicants');
     $element->setLabel('Select applicants to deny');
     foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
-      if($applicant->isLocked() AND $applicant->getDecision()->can('finalAdmit')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
+      if($applicant->isLocked() AND $applicant->getDecision()->can('finalDeny')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
     }
     
     $element = $field->newElement('RadioList', 'sendMessage');
@@ -205,8 +207,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     if($input = $form->processInput($this->post)){   
       foreach($input->get('applicants') as $id){
         $applicant = $this->getApplicantById($id);
-        $applicant->getDecision()->finalAdmit();
-        $applicant->getDecision()->setOfferResponseDeadline($input->get('sirDeadline'));
+        $applicant->getDecision()->finalDeny();
         if($input->get('sendMessage')){
           $thread = new \Jazzee\Entity\Thread();
           $thread->setSubject('Admission Decision');
@@ -231,7 +232,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
         }
         $this->_em->persist($applicant);
       }
-      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) admited.');
+      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) denied.');
       $this->redirectPath('applicants/decisions');
     }
     $this->setVar('form', $form);
