@@ -236,7 +236,7 @@ class JazzeeController extends PageController
    * @return string
    */
   public function getCSRFToken(){
-    $store = $this->_session->getStore('csrf', 900);
+    $store = $this->_session->getStore('csrf');
     if(!isset($store->token)) $store->token = md5(uniqid('csrftoken'. rand(), true) . session_id());
     return $store->token;
   }
