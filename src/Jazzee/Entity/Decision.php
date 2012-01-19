@@ -129,7 +129,7 @@ class Decision{
       throw new \Jazzee\Exception('Cannot record two final decisions');
     }
     //if we don't have a preliminary decision record it now
-    if(is_null($this->nominateDeny)) $this->nominateDeny = $this->decisionStamp($dateString);
+    if(is_null($this->nominateDeny))  $this->nominateDeny($dateString);
     if(is_null($this->finalDeny)) $this->finalDeny = $this->decisionStamp($dateString);
   }
   
@@ -165,7 +165,7 @@ class Decision{
       throw new \Jazzee\Exception('Cannot record two final decisions');
     }
     //if we don't have a preliminary decision record it now
-    if(is_null($this->nominateAdmit)) $this->nominateAdmit = $this->decisionStamp($dateString);
+    if(is_null($this->nominateAdmit)) $this->nominateAdmit($dateString);
     if(is_null($this->finalAdmit)) $this->finalAdmit = $this->decisionStamp($dateString);
   }
   
