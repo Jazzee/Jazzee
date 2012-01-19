@@ -104,6 +104,15 @@ interface Page
   function setupNewPage();
   
   /**
+   * Set a page variable 
+   * Do this here so we can check that the value is good
+   * @param string $name
+   * @param string $value
+   * @throws \Jazzee\Exception
+   */
+  public function setVar($name, $value);
+  
+  /**
    * Build the pdf section for this page type
    * 
    * @param \Jazzee\ApplicantPDF

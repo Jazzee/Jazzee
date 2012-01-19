@@ -228,8 +228,9 @@ abstract class PageBuilder extends AdminController{
       $page = $page->getPage();
     }
     foreach($data->variables as $v){
-      $var = $page->setVar($v->name, $v->value);
-      $this->_em->persist($var);
+      $jazzeePage = $page->getApplicationPageJazzeePage();
+      $jazzeePage->setController($this);
+      $jazzeePage->setVar($v->name, $v->value);
     }
     $this->savePageElements($page, $data->elements);
     foreach($data->children as $child){

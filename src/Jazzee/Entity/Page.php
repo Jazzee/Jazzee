@@ -460,4 +460,14 @@ class Page{
     foreach($this->elements as $element) if($element->getFixedId() == $id) return $element;
     return false;
   }
+  
+  /**
+   * Create a temporary application page and return a created Jazzee page
+   * @return \Jazzee\Page 
+   */
+  public function getApplicationPageJazzeePage(){
+    $ap = new ApplicationPage;
+    $ap->setPage($this);
+    return $ap->getJazzeePage();
+  }
 }

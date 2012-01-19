@@ -156,6 +156,16 @@ abstract class AbstractPage implements \Jazzee\Page {
   }
   
   /**
+   * By default just set the varialbe dont check it
+   * @param string $name
+   * @param string $value 
+   */
+  public function setVar($name, $value){
+    $var = $this->_applicationPage->getPage()->setVar($name, $value);
+    $this->_controller->getEntityManager()->persist($var);
+  }
+  
+  /**
    * Check if the current controller is an admin controller
    * @throws \Jazzee\Exception if it isn't
    */
