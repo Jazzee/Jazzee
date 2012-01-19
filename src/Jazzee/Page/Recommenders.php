@@ -373,4 +373,30 @@ class Recommenders extends Standard {
       $pdf->writeTable();
     }
   }
+  
+  /**
+   * Check variables before they are set
+   * @param string $name
+   * @param string $value
+   * @throws \Jazzee\Exception 
+   */
+  public function setVar($name, $value){
+    switch($name){
+      case 'lorDeadline':
+          if(!empty($value)){
+            if(!$value = \strtotime($value)){
+              throw new \Jazzee\Exception("{$value} is not a valid date for lorDeadline");
+            }
+            $value = \date('c', $value);
+          }
+        break;
+      case 'lorDeadlineEnforced':
+        break;
+      case 'recommenderEmailText':
+        break;
+      default:
+        throw new \Jazzee\Exception($name . ' is not a valid variable on this page.');
+    }
+    parent::setVar($name, $value);
+  }
 }

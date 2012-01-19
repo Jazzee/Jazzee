@@ -351,6 +351,37 @@ JazzeePage.prototype.textInputVariableBlock = function(variableName, title, valu
 };
 
 /**
+ * A generic text input block for editing variables
+ * @param {String} variableName
+ * @para, {String} valueIfBlank what do display if the property isn't set
+ * @return {jQuery}
+ */
+JazzeePage.prototype.dateVariableBlock = function(variableName, title, valueIfBlank){
+  var pageClass = this;
+  var value = (this.getVariable(variableName) == null || this.getVariable(variableName) == '')?valueIfBlank:this.getVariable(variableName);
+  var span = $('<span>').html(value);
+  var picker = $('<input>').hide();
+  var clear = $('<img>').attr('src', 'resource/foundation/media/icons/bullet_delete.png').bind('click', function(){
+    pageClass.setVariable(variableName, null);
+    span.html(valueIfBlank);
+  });
+  var p = $('<p>').addClass('edit').addClass(variableName).html(title).append(span).append(clear).append(picker);
+  $('input', p).datepicker({
+    showOn: "button",
+    buttonImage: "resource/foundation/media/icons/calendar_edit.png",
+    buttonImageOnly: true,
+    showButtonPanel: true,
+    changeMonth: true,
+    changeYear: true,
+    onSelect: function(dateText, inst){
+      pageClass.setVariable(variableName, dateText);
+      span.html(dateText);
+    }
+  });
+  return $('<div>').append(p);
+};
+
+/**
  * A generic block for editng variables using a dropdown
  * @param {String} variableName
  * @param {String} description
