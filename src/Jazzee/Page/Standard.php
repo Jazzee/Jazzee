@@ -132,10 +132,9 @@ class Standard extends AbstractPage {
     if(!$this->_applicationPage->isRequired() and count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){
       return self::SKIPPED;
     }
-    if(is_null($this->_applicationPage->getMin()) or count($this->getAnswers()) < $this->_applicationPage->getMin()){
-      return self::INCOMPLETE;
-    } else {
-      return self::COMPLETE;
-    }
+    if(is_null($this->_applicationPage->getMin()) and count($answers)) return self::COMPLETE;
+    if(!is_null($this->_applicationPage->getMin()) and count($answers) >= $this->_applicationPage->getMin()) return self::COMPLETE;
+    
+    return self::INCOMPLETE;
   }
 }
