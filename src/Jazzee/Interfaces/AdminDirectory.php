@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee;
+namespace Jazzee\Interfaces;
 /**
  * AdminDirectory interface
  * Allows differnt user directory systems to be plugged in

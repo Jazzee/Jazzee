@@ -8,7 +8,7 @@
  * 
  */
 namespace Jazzee\AdminAuthentication;
-class Shibboleth implements \Jazzee\AdminAuthentication{
+class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
   /**
    * Our authenticated user
    * @var \Jazzee\Entity\User

@@ -407,7 +407,7 @@ abstract class PageBuilder extends AdminController{
   }
   
   /**
-   * Fake get action path so \Jazzee\Pages have somethign to call
+   * Fake get action path so \Jazzee\Interfaces\Pages have somethign to call
    * 
    */
   public function getActionPath(){

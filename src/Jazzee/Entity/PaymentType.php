@@ -154,7 +154,7 @@ class PaymentType{
   public function getJazzeePaymentType(){
     if(is_null($this->jazzeePaymentType)){
       $class = new $this->class($this);
-      if(!($class instanceof \Jazzee\PaymentType)) throw new \Jazzee\Exception($this->name . ' has class ' . $this->class . ' that does not implement \Jazzee\PaymentType interface');
+      if(!($class instanceof \Jazzee\Interfaces\PaymentType)) throw new \Jazzee\Exception($this->name . ' has class ' . $this->class . ' that does not implement \Jazzee\PaymentType interface');
       $this->jazzeePaymentType = $class;
     }
     return $this->jazzeePaymentType;

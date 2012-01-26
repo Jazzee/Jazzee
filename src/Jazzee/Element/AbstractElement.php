@@ -3,7 +3,7 @@ namespace Jazzee\Element;
 /**
  * The Abstract Application Elements
  */
-abstract class AbstractElement implements \Jazzee\Element {
+abstract class AbstractElement implements \Jazzee\Interfaces\Element {
  
  /**
   * The Element entity

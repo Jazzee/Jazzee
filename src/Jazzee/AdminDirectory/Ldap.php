@@ -6,7 +6,7 @@
  * 
  */
 namespace Jazzee\AdminDirectory;
-class Ldap implements \Jazzee\AdminDirectory{
+class Ldap implements \Jazzee\Interfaces\AdminDirectory{
   /**
    * Our directory Server resource
    * @var resource

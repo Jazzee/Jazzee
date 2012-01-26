@@ -7,7 +7,7 @@
  * 
  */
 namespace Jazzee\AdminAuthentication;
-class NoAuthentication implements \Jazzee\AdminAuthentication{
+class NoAuthentication implements \Jazzee\Interfaces\AdminAuthentication{
   /**
    * Our user
    * @var \Jazzee\Entity\User

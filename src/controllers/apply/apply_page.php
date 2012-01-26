@@ -10,7 +10,7 @@
 class ApplyPageController extends \Jazzee\AuthenticatedApplyController {  
   /**
    * Convience access to $this->pages[$pageId]
-   * @var \Jazzee\Page
+   * @var \Jazzee\Interfaces\Page
    */
   protected $_page;
   
@@ -114,13 +114,13 @@ class ApplyPageController extends \Jazzee\AuthenticatedApplyController {
         $link->setCurrent(true);
       }
       switch($page->getJazzeePage()->getStatus()){
-        case \Jazzee\Page::INCOMPLETE:
+        case \Jazzee\Interfaces\Page::INCOMPLETE:
           $link->addClass('incomplete');
           break;
-        case \Jazzee\Page::COMPLETE:
+        case \Jazzee\Interfaces\Page::COMPLETE:
           $link->addClass('complete');
           break;
-        case \Jazzee\Page::SKIPPED:
+        case \Jazzee\Interfaces\Page::SKIPPED:
           $link->addClass('skipped');
           break;
       }

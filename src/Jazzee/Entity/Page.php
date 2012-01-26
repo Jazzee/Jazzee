@@ -463,7 +463,7 @@ class Page{
   
   /**
    * Create a temporary application page and return a created Jazzee page
-   * @return \Jazzee\Page 
+   * @return \Jazzee\Interfaces\Page 
    */
   public function getApplicationPageJazzeePage(){
     $ap = new ApplicationPage;

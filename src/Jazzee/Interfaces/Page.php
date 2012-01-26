@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee;
+namespace Jazzee\Interfaces;
 /**
  * Page interface
  * Allows us to impelement a strategy pattern to load page types with thier Entities

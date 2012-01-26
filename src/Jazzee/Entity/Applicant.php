@@ -676,7 +676,7 @@ class Applicant{
       if($pageEntity->getJazzeePage()->showReviewPage()){
         $total++;
         $pageEntity->getJazzeePage()->setApplicant($this);
-        if($pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::COMPLETE OR $pageEntity->getJazzeePage()->getStatus() == \Jazzee\Page::SKIPPED) $complete++;
+        if($pageEntity->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::COMPLETE OR $pageEntity->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) $complete++;
       }
     }
     //avoid division by 0 and dividing 0 by something

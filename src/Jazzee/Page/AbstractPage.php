@@ -3,7 +3,7 @@ namespace Jazzee\Page;
 /**
  * AbstractPage
  */
-abstract class AbstractPage implements \Jazzee\Page {
+abstract class AbstractPage implements \Jazzee\Interfaces\Page {
   const ERROR_MESSAGE = 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.';
  /**
   * The ApplicationPage Entity

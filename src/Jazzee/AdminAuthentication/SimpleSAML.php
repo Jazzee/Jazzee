@@ -8,7 +8,7 @@
  * 
  */
 namespace Jazzee\AdminAuthentication;
-class SimpleSAML implements \Jazzee\AdminAuthentication{
+class SimpleSAML implements \Jazzee\Interfaces\AdminAuthentication{
   /**
    * Our authenticated user
    * @var \Jazzee\Entity\User

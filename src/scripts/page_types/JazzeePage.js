@@ -1,5 +1,5 @@
 /**
- * Initialize the \\Jazzee\Page Abstract Type
+ * Initialize the \\Jazzee\Interfaces\Page Abstract Type
   @class The base class for all page types
   @property {String} status the pages status This is sent to the server so we can decide to create a new page or modify an existing one
   @property {boolean} isModified Is the page modified or new Pages will only be saved back to the server if this is true

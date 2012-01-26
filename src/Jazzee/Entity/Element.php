@@ -64,7 +64,7 @@ class Element{
   private $listItems;
   
   /**
-   * @var \Jazzee\Element
+   * @var \Jazzee\Interfaces\Element
    */
   private $jazzeeElement;
   
@@ -353,13 +353,13 @@ class Element{
   /**
    * Get the jazzeeElement
    * 
-   * @return \Jazzee\Element
+   * @return \Jazzee\Interfaces\Element
    */
   public function getJazzeeElement(){
     if(is_null($this->jazzeeElement)){
       $className = $this->type->getClass();
       $this->jazzeeElement = new $className($this);
-      if(!($this->jazzeeElement instanceof \Jazzee\Element)) throw new \Jazzee\Exception($this->type>getName() . ' has class ' . $className . ' that does not implement \Jazzee\Element interface');
+      if(!($this->jazzeeElement instanceof \Jazzee\Interfaces\Element)) throw new \Jazzee\Exception($this->type>getName() . ' has class ' . $className . ' that does not implement \Jazzee\Interfaces\Element interface');
     }
     return $this->jazzeeElement;
   }

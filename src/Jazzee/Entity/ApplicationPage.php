@@ -77,7 +77,7 @@ class ApplicationPage
   
   /**
    * The Jazzee Page instance
-   * @var \Jazzee\Page
+   * @var \Jazzee\Interfaces\Page
    */
   private $jazzeePage;
   
@@ -325,13 +325,13 @@ class ApplicationPage
   /**
    * Get the jazzeePage
    * 
-   * @return \Jazzee\Page
+   * @return \Jazzee\Interfaces\Page
    */
   public function getJazzeePage(){
     if(is_null($this->jazzeePage)){
       $className = $this->page->getType()->getClass();
       $class = new $className($this);
-      if(!($class instanceof \Jazzee\Page)) throw new \Jazzee\Exception($this->page->getType()->getName() . ' has class ' . $class . ' that does not implement \Jazzee\Page interface');
+      if(!($class instanceof \Jazzee\Interfaces\Page)) throw new \Jazzee\Exception($this->page->getType()->getName() . ' has class ' . $class . ' that does not implement \Jazzee\Interfaces\Page interface');
       $this->jazzeePage = $class;
     }
     return $this->jazzeePage;

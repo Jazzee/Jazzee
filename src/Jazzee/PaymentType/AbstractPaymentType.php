@@ -4,7 +4,7 @@ namespace Jazzee\PaymentType;
  * Abstract PaymeType Class
  *
  */
-abstract class AbstractPaymentType implements \Jazzee\PaymentType{
+abstract class AbstractPaymentType implements \Jazzee\Interfaces\PaymentType{
   /**
    * Status text constants
    */

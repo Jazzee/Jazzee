@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee;
+namespace Jazzee\Interfaces;
 /**
  * AdminAuthentication interface
  * Allows differnt authentication systems to be plugged in

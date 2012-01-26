@@ -82,7 +82,7 @@ abstract class AdminController extends Controller{
     $this->layout = 'wide';
     $class = $this->_config->getAdminAuthenticationClass();
     $this->_adminAuthentication = new $class($this->_em);
-    if(!($this->_adminAuthentication instanceof AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthentication Interface.');
+    if(!($this->_adminAuthentication instanceof Interfaces\AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthentication Interface.');
     
     $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     if($this->_adminAuthentication->isValidUser()){
@@ -309,7 +309,7 @@ abstract class AdminController extends Controller{
     if(!$this->_adminDirectory){
       $class = $this->_config->getAdminDirectoryClass();
       $this->_adminDirectory = new $class($this->_em);
-      if(!($this->_adminDirectory instanceof AdminDirectory)) throw new Exception($this->_config->getAdminDirectoryClass() . ' does not implement AdminDirectory Interface.');
+      if(!($this->_adminDirectory instanceof Interfaces\AdminDirectory)) throw new Exception($this->_config->getAdminDirectoryClass() . ' does not implement AdminDirectory Interface.');
     }
     return $this->_adminDirectory;
   }

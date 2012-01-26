@@ -1,5 +1,5 @@
 <?php
-namespace Jazzee;
+namespace Jazzee\Interfaces;
 /**
  * Interface for PaymentTypes
  */
