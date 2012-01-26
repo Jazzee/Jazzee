@@ -14,6 +14,27 @@ interface Page
   const SKIPPED = 2;
   
   /**
+   * Page Element constants 
+   */
+  
+  /**
+   * The element to load for apply_page view 
+   */
+  const APPLY_PAGE_ELEMENT = '';
+  
+  
+  /**
+   * The element to load for applicants_singe view 
+   */
+  const APPLICANTS_SINGLE_ELEMENT = '';
+  
+  
+  /**
+   * The element to load for apply_status view 
+   */
+  const APPLY_STATUS_ELEMENT = '';
+  
+  /**
    * Set the controller
    * 
    * @param \Jazzee\Controller $controller

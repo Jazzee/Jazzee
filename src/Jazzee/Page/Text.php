@@ -4,6 +4,9 @@ namespace Jazzee\Page;
  * A page with no form just text
  */
 class Text extends Standard {
+  const APPLY_PAGE_ELEMENT = 'Text-apply_page';
+  const APPLICANTS_SINGLE_ELEMENT = '';
+  const APPLY_STATUS_ELEMENT = '';
   
   /**
    * (non-PHPdoc)

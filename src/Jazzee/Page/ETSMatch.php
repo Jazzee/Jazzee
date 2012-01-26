@@ -4,6 +4,9 @@ namespace Jazzee\Page;
  * The ETSMatch Application Page
  */
 class ETSMatch extends Standard {
+  const APPLY_PAGE_ELEMENT = 'ETSMatch-apply_page';
+  const APPLICANTS_SINGLE_ELEMENT = 'ETSMatch-applicants_single';
+  const APPLY_STATUS_ELEMENT = 'ETSMatch-apply_status';
   /**
    * These fixedIDs make it easy to find the element we are looking for
    * @const integer

@@ -8,6 +8,9 @@ namespace Jazzee\Page;
  */
 class Branching extends Standard 
 {
+  
+  const APPLY_PAGE_ELEMENT = 'Branching-apply_page';
+  const APPLICANTS_SINGLE_ELEMENT = 'Branching-applicants_single';
   /**
    * 
    * Enter description here ...

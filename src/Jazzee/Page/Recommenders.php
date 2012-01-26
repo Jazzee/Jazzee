@@ -4,6 +4,9 @@ namespace Jazzee\Page;
  * Get recommender information from applicnats and send out invitations
  */
 class Recommenders extends Standard {
+  const APPLY_PAGE_ELEMENT = 'Recommenders-apply_page';
+  const APPLICANTS_SINGLE_ELEMENT = 'Recommenders-applicants_single';
+  const APPLY_STATUS_ELEMENT = 'Recommenders-apply_status';
   
   /**
    * The time to wait between sending emails to recommenders in days

@@ -16,7 +16,7 @@ $this->controller->setLayoutVar('layoutContentTop', $layoutContentTop);
 <?php 
 if($applicant->isLocked()){
   foreach($pages as $page){
-    $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-status-page');
-    $this->renderElement($elementName, array('page'=>$page));
+    $class = $page->getPage()->getType()->getClass();
+    $this->renderElement($class::APPLY_STATUS_ELEMENT, array('page'=>$page));
   }
 }

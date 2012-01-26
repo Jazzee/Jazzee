@@ -132,8 +132,8 @@
     <?php 
     foreach($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
       if($applicationPage->getJazzeePage()->showReviewPage()){
-        $elementName = \Foundation\VC\Config::findElementCacading($applicationPage->getPage()->getType()->getClass(), '', '-applicants-single-page');
-        $this->renderElement($elementName, array('page'=>$applicationPage,'applicant'=>$applicant));
+        $class = $applicationPage->getPage()->getType()->getClass();
+        $this->renderElement($class::APPLICANTS_SINGLE_ELEMENT, array('page'=>$applicationPage, 'applicant'=>$applicant));
       }
     }
     ?>

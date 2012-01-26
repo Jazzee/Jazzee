@@ -6,6 +6,10 @@ namespace Jazzee\Page;
  * Unless special functionaility is required all pages are of this type
  */
 class Standard extends AbstractPage {
+  const APPLY_PAGE_ELEMENT = 'Standard-apply_page';
+  const APPLICANTS_SINGLE_ELEMENT = 'Standard-applicants_single';
+  const APPLY_STATUS_ELEMENT = 'Standard-apply_status';
+  
   /**
    * 
    * @see Jazzee\Page.AbstractPage::makeForm()

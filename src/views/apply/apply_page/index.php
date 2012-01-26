@@ -19,6 +19,6 @@ $layoutContentTop .= "'>Application Deadline: " . $deadline->format('m/d/Y g:ia 
 $layoutContentTop .= '<p class="links"><a href="' . $this->controller->applyPath('support') . '">Support</a>';
 if($count = $applicant->unreadMessageCount()) $layoutContentTop .= '<sup class="count">' . $count . '</sup>';
 $layoutContentTop .= '<a href="' . $this->controller->applyPath('/applicant/logout') . '">Log Out</a></p>';
-$this->controller->setLayoutVar('layoutContentTop', $layoutContentTop);    
-$elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-page');
-$this->renderElement($elementName, array('page'=>$page, 'currentAnswerID'=>$currentAnswerID, 'applicant'=>$applicant));
+$this->controller->setLayoutVar('layoutContentTop', $layoutContentTop);
+$class = $page->getPage()->getType()->getClass();
+$this->renderElement($class::APPLY_PAGE_ELEMENT, array('page'=>$page, 'currentAnswerID'=>$currentAnswerID, 'applicant'=>$applicant));
