@@ -319,8 +319,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $applicant = $this->getApplicantById($applicantId);
     $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
     $this->setVar('variables', array('page'=>$page,'applicant'=>$applicant));
-    $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-applicants-single-page');
-    $this->setVar('element', $elementName);
+    $class = $page->getPage()->getType()->getClass();
+    $this->setVar('element', $class::APPLICANTS_SINGLE_ELEMENT);
     $this->loadView($this->controllerName . '/element');
   }
   
