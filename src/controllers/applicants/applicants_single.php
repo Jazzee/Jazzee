@@ -56,7 +56,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->addScript($this->path('resource/scripts/classes/AuthenticationTimeout.class.js'));
     $this->addScript($this->path('resource/scripts/classes/Applicant.class.js'));
     $this->addScript($this->path('resource/scripts/controllers/applicants_single.controller.js'));
-    \Foundation\VC\Config::addElementViewPath(__DIR__ . '/../../views/applicants/applicants_single/elements/');
   }
   
   /**

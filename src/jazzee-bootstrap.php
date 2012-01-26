@@ -19,7 +19,6 @@ $classLoader->register();
 \Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/');
 \Foundation\VC\Config::addLayoutViewPath(__DIR__ . '/views/layouts/');
 \Foundation\VC\Config::addElementViewPath(__DIR__ . '/views/elements/');
-\Foundation\VC\Config::addElementViewPath(__DIR__ . '/views/page_type_elements/');
 
 \Foundation\VC\Config::addElementViewPath(__DIR__ . '/../lib/foundation/src/elements/');
 
