@@ -16,29 +16,34 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
   private $_user;
   
   /**
+   * Config instance
+   * @var \Jazzee\Configuration 
+   */
+  private $_config;
+  
+  /**
    * Constructor
    * 
    * Require authentication and setup the user if a valid session is detected
    * 
    * @param \Doctrine\ORM\EntityManager
    */
-  public function __construct(\Doctrine\ORM\EntityManager $em){
+  public function __construct(\Jazzee\AdminController $controller){
+    $this->_config = $controller->getConfig();
     if(isset($_SERVER['Shib-Application-ID'])){
-      $config = new \Jazzee\Configuration();
+      if (!isset($_SERVER[$this->_config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($this->_config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
       
-      if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
+      $uniqueName = $_SERVER[$this->_config->getShibbolethUsernameAttribute()];
+      $firstName = $_SERVER[$this->_config->getShibbolethFirstNameAttribute()];
+      $lastName = $_SERVER[$this->_config->getShibbolethLastNameAttribute()];
+      $mail = $_SERVER[$this->_config->getShibbolethEmailAddressAttribute()];
       
-      $uniqueName = $_SERVER[$config->getShibbolethUsernameAttribute()];
-      $firstName = $_SERVER[$config->getShibbolethFirstNameAttribute()];
-      $lastName = $_SERVER[$config->getShibbolethLastNameAttribute()];
-      $mail = $_SERVER[$config->getShibbolethEmailAddressAttribute()];
-      
-      $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName, 'isActive'=>true));
+      $this->_user = $controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName, 'isActive'=>true));
       if($this->_user){
         $this->_user->setFirstName($firstName);
         $this->_user->setLastName($lastName);
         $this->_user->setEmail($mail);
-        $em->persist($this->_user);
+        $controller->getEntityManager()->persist($this->_user);
       }
     }
   }
@@ -55,8 +60,7 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
     $this->_user = null;
     $session = new \Foundation\Session();
     $session->getStore('admin')->expire();
-    $config = new \Jazzee\Configuration();
-    header('Location: ' . $config->getShibbolethLoginUrl());
+    header('Location: ' . $this->_config->getShibbolethLoginUrl());
     die();
   }
   
@@ -64,8 +68,7 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
     $this->_user = null;
     $session = new \Foundation\Session();
     $session->getStore('admin')->expire();
-    $config = new \Jazzee\Configuration();
-    header('Location: ' . $config->getShibbolethLogoutUrl());
+    header('Location: ' . $this->_config->getShibbolethLogoutUrl());
     die();
   }
 }

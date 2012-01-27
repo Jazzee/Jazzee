@@ -81,7 +81,7 @@ abstract class AdminController extends Controller{
     parent::__construct();
     $this->layout = 'wide';
     $class = $this->_config->getAdminAuthenticationClass();
-    $this->_adminAuthentication = new $class($this->_em);
+    $this->_adminAuthentication = new $class($this);
     if(!($this->_adminAuthentication instanceof Interfaces\AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthentication Interface.');
     
     $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());

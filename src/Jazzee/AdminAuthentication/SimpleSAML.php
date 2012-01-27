@@ -28,15 +28,15 @@ class SimpleSAML implements \Jazzee\Interfaces\AdminAuthentication{
    * 
    * @param \Doctrine\ORM\EntityManager
    */
-  public function __construct(\Doctrine\ORM\EntityManager $em){
-    $config = new \Jazzee\Configuration();
+  public function __construct(\Jazzee\AdminController $controller){
+    $config = $controller->getConfig();
     require_once($config->getSimpleSAMLIncludePath());
     
     $this->_as = new \SimpleSAML_Auth_Simple($config->getSimpleSAMLAuthenticationSource());
     $this->_as->requireAuth();
     $attrs = $this->_as->getAttributes();
     if (!isset($attrs[$config->getSimpleSAMLUsernameAttribute()][0])) throw new Exception($config->getSimpleSAMLUsernameAttribute() . ' attribute is missing from authentication source.');
-    $this->_user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$attrs[$config->getSimpleSAMLUsernameAttribute()][0], 'isActive'=>true));
+    $this->_user = $controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$attrs[$config->getSimpleSAMLUsernameAttribute()][0], 'isActive'=>true));
     if($this->_user){
       $this->_user->setFirstName($attrs[$config->getSimpleSAMLFirstNameAttribute()][0]);
       $this->_user->setLastName($attrs[$config->getSimpleSAMLLastNameAttribute()][0]);
