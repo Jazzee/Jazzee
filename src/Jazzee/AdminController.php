@@ -308,7 +308,7 @@ abstract class AdminController extends Controller{
   protected function getAdminDirectory(){
     if(!$this->_adminDirectory){
       $class = $this->_config->getAdminDirectoryClass();
-      $this->_adminDirectory = new $class($this->_em);
+      $this->_adminDirectory = new $class($this);
       if(!($this->_adminDirectory instanceof Interfaces\AdminDirectory)) throw new Exception($this->_config->getAdminDirectoryClass() . ' does not implement AdminDirectory Interface.');
     }
     return $this->_adminDirectory;

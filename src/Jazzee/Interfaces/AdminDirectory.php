@@ -9,6 +9,13 @@ interface AdminDirectory
 {
   
   /**
+   * Constructor
+   * Pass the controller so we can access configuration and entity manager
+   * @param \Jazzee\AdminController 
+   */
+  public function __construct(\Jazzee\AdminController $controller);
+  
+  /**
    * Search for a user
    * 
    * @param array $attributes
