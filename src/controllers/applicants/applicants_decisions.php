@@ -147,7 +147,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
       foreach($input->get('applicants') as $id){
         $applicant = $this->getApplicantById($id);
         $applicant->getDecision()->finalAdmit();
-        $applicant->getDecision()->setOfferResponseDeadline($input->get('sirDeadline'));
+        $applicant->getDecision()->setOfferResponseDeadline($input->get('offerResponseDeadline'));
         if($input->get('sendMessage')){
           $thread = new \Jazzee\Entity\Thread();
           $thread->setSubject('Admission Decision');
