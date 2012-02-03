@@ -165,8 +165,8 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
       foreach($threads as $thread){
         if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM)){
           $lastUnreadMessageCreatedAt = $thread->getLastUnreadMessage(\Jazzee\Entity\Message::PROGRAM)->getCreatedAt();
-          //if created since our last run or remind every 7 days (only once if the hour it was sent is the same as the current hour)
-          if(($lastUnreadMessageCreatedAt > $lastRun) OR ($lastUnreadMessageCreatedAt->diff(new DateTime('now'))->days%7 == 0 AND $lastUnreadMessageCreatedAt->diff(new DateTime('now'))->h == 0)){
+          //if created since our last run
+          if($lastUnreadMessageCreatedAt > $lastRun){
             if(!array_key_exists($thread->getApplicant()->getId(), $applicants)){
               $applicants[$thread->getApplicant()->getId()] = array(
                 'applicant' => $thread->getApplicant(),
@@ -183,8 +183,9 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
           $arr['applicant']->getEmail(),
           $arr['applicant']->getFullName());
         $message->Subject = 'New Message from ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName();
-        $body = 'You have ' . $arr['count'] . ' unread message(s) from the ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName() . '.' .
-          "\nYou can review them by logging into the application at: " . $cron->applyPath('apply/' . $arr['applicant']->getApplication()->getProgram()->getShortName() . '/' . $arr['applicant']->getApplication()->getCycle()->getName() . '/applicant/login');
+        $body = 'You have ' . $arr['count'] . ' unread message(s) from the ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName() . ' program.' .
+          "\nYou can review your message(s) by logging into the application at: " . $cron->applyPath('apply/' . $arr['applicant']->getApplication()->getProgram()->getShortName() . '/' . $arr['applicant']->getApplication()->getCycle()->getName() . '/applicant/login');
+        $body .= "\nOnce you have logged into the application choose support in the upper right hand corner of the screen.";
         $message->Body = $body;
         $message->Send();
       }
