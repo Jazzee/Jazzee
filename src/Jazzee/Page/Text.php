@@ -7,6 +7,7 @@ class Text extends Standard {
   const APPLY_PAGE_ELEMENT = 'Text-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = '';
   const APPLY_STATUS_ELEMENT = '';
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageText.js';
   
   /**
    * (non-PHPdoc)

@@ -34,6 +34,12 @@ interface Page
    */
   const APPLY_STATUS_ELEMENT = '';
   
+  
+  /**
+   * The path to the pagebuilder javascript
+   */
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePage.js';
+  
   /**
    * Set the controller
    * 

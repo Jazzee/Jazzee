@@ -7,6 +7,7 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class Phonenumber extends TextInput {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementPhonenumber.js';
   public function addToField(\Foundation\Form\Field $field){
     $element = parent::addToField($field);
     

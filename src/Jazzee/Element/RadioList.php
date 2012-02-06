@@ -7,6 +7,7 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class RadioList extends AbstractElement {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementRadioList.js';
   
   public function addToField(\Foundation\Form\Field $field){
     $element = $field->newElement('RadioList', 'el' . $this->_element->getId());

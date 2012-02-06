@@ -7,6 +7,8 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class Textarea extends AbstractElement {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementTextarea.js';
+  
   public function addToField(\Foundation\Form\Field $field){
     $element = $field->newElement('Textarea', 'el' . $this->_element->getId());
     $element->setLabel($this->_element->getTitle());

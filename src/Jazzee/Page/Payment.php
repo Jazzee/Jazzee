@@ -8,6 +8,7 @@ namespace Jazzee\Page;
 class Payment extends Standard {
   const APPLY_PAGE_ELEMENT = 'Payment-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = 'Payment-applicants_single';
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePagePayment.js';
   /**
    * The payment type and the amount are selected first
    * then we display the form for the payment type

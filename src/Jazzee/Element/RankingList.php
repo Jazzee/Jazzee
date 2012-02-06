@@ -7,6 +7,7 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class RankingList extends AbstractElement {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementRankingList.js';
   
   public function addToField(\Foundation\Form\Field $field){
     $element = $field->newElement('RankingList', 'el' . $this->_element->getId());

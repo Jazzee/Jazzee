@@ -7,6 +7,7 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class SelectList extends AbstractElement {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementSelectList.js';
   
   public function addToField(\Foundation\Form\Field $field){
     $element = $field->newElement('SelectList', 'el' . $this->_element->getId());

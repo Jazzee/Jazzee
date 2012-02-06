@@ -8,6 +8,7 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class EncryptedTextInput extends TextInput {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementEncryptedTextInput.js';
   /**
    * 
    * Foundation PKI class

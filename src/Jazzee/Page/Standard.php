@@ -9,6 +9,7 @@ class Standard extends AbstractPage {
   const APPLY_PAGE_ELEMENT = 'Standard-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = 'Standard-applicants_single';
   const APPLY_STATUS_ELEMENT = 'Standard-apply_status';
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageStandard.js';
   
   /**
    * 

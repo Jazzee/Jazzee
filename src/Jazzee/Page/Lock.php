@@ -5,6 +5,8 @@ namespace Jazzee\Page;
  */
 class Lock extends Standard {
   
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageLock.js';
+  
   protected function makeForm(){
     $form = new \Foundation\Form;
     $form->setCSRFToken($this->_controller->getCSRFToken());

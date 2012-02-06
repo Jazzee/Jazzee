@@ -7,6 +7,7 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class Date extends AbstractElement {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementDate.js';
   public function addToField(\Foundation\Form\Field $field){
     $element = $field->newElement('DateInput', 'el' . $this->_element->getId());
     $element->setLabel($this->_element->getTitle());

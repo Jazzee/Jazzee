@@ -11,6 +11,7 @@ class Branching extends Standard
   
   const APPLY_PAGE_ELEMENT = 'Branching-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = 'Branching-applicants_single';
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageBranching.js';
   /**
    * 
    * Enter description here ...

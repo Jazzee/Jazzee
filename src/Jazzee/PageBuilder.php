@@ -20,18 +20,29 @@ abstract class PageBuilder extends AdminController{
     $this->addScript($this->path('resource/scripts/page_types/JazzeePage.js'));
     
     $types = $this->_em->getRepository('\Jazzee\Entity\PageType')->findAll();
+    $scripts = array();
+    $scripts[] = $this->path(\Jazzee\Interfaces\Page::PAGEBUILDER_SCRIPT);
     foreach($types as $type){
-      $this->addScript($this->path('resource/scripts/page_types/' . $this->getClassName($type->getClass()) . '.js'));
+      $class = $type->getClass();
+      $scripts[] = $this->path($class::PAGEBUILDER_SCRIPT);
     }
+    $scripts = array_unique($scripts);
+    foreach($scripts as $path) $this->addScript($path);
     
     $this->addScript($this->path('resource/scripts/element_types/JazzeeElement.js'));
-    $this->addScript($this->path('resource/scripts/element_types/List.js'));
-    $this->addScript($this->path('resource/scripts/element_types/FileInput.js'));
     
     $types = $this->_em->getRepository('\Jazzee\Entity\ElementType')->findAll();
+    $scripts = array();
+    $scripts[] = $this->path(\Jazzee\Interfaces\Element::PAGEBUILDER_SCRIPT);
+    $scripts[] = $this->path('resource/scripts/element_types/List.js');
+    $scripts[] = $this->path('resource/scripts/element_types/FileInput.js');
     foreach($types as $type){
-      $this->addScript($this->path('resource/scripts/element_types/' . $this->getClassName($type->getClass()) . '.js'));
+      $class = $type->getClass();
+      $scripts[] = $this->path($class::PAGEBUILDER_SCRIPT);
     }
+    $scripts = array_unique($scripts);
+    foreach($scripts as $path) $this->addScript($path);
+    
     $this->addScript($this->path('resource/scripts/classes/PageStore.class.js'));
     $this->addCss($this->path('resource/styles/pages.css'));
     

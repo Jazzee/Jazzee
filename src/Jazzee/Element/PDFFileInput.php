@@ -7,6 +7,7 @@ namespace Jazzee\Element;
  * @package jazzee
  */
 class PDFFileInput extends AbstractElement {
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementPDFFileInput.js';
   public function addToField(\Foundation\Form\Field $field){
     if(!ini_get('file_uploads')){
       throw new \Jazzee\Exception('File uploads are not turned on for this system and a PDFFileInputElement is being created', E_ERROR);

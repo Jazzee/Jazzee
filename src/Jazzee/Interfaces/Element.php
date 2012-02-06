@@ -5,7 +5,12 @@ namespace Jazzee\Interfaces;
  */
 interface Element 
 {
- 
+  
+  /**
+   * The path to the pagebuilder javascript
+   */
+  const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElement.js';
+  
   /**
    * Constructor 
    * 
