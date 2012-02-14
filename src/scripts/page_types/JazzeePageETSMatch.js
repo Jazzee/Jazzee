@@ -11,17 +11,46 @@ JazzeePageETSMatch.prototype.constructor = JazzeePageETSMatch;
  */
 JazzeePageETSMatch.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
-  $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
-  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {1:'Required',0:'Optional'}));
+  $('#pageToolbar').append(this.pagePropertiesButton());
+};
+
+/**
+ * Create the page properties dropdown
+*/
+JazzeePageETSMatch.prototype.pageProperties = function(){
+  var pageClass = this;
   
-  var min = {0: 'No Minimum'};
-  for(var i = 1; i<=50;i++){
-    min[i] = i;
-  }
-  $('#workspace-right-top').append(this.selectListBlock('min','Minimum Scores Required:', min));
-  var max = {0: 'No Maximum'};
-  for(var i = 1; i<=50;i++){
-    max[i] = i;
-  }
-  $('#workspace-right-top').append(this.selectListBlock('max','Maximum Scores Allowed:', max));
+  var div = $('<div>');
+  div.append(this.isRequiredButton());
+  div.append(this.showAnswerStatusButton());
+ 
+  var slider = $('<div>');
+  slider.slider({
+    value: this.min,
+    min: 0,
+    max: 20,
+    step: 1,
+    slide: function( event, ui ) {
+      pageClass.setProperty('min', ui.value);
+      $('#minValue').html(pageClass.min == 0?'No Minimum':pageClass.min);
+    }
+  });
+  div.append($('<p>').html('Minimum Scores Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
+  div.append(slider);
+   
+  var slider = $('<div>');
+  slider.slider({
+    value: this.max,
+    min: 0,
+    max: 20,
+    step: 1,
+    slide: function( event, ui ) {
+      pageClass.setProperty('max', ui.value);
+      $('#maxValue').html(pageClass.max == 0?'No Maximum':pageClass.max);
+    }
+  });
+  div.append($('<p>').html('Maximum Scores Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
+  div.append(slider);
+  
+  return div;
 };

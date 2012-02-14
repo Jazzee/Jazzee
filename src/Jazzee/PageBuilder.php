@@ -43,7 +43,7 @@ abstract class PageBuilder extends AdminController{
     $scripts = array_unique($scripts);
     foreach($scripts as $path) $this->addScript($path);
     
-    $this->addScript($this->path('resource/scripts/classes/PageStore.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/PageBuilder.class.js'));
     $this->addCss($this->path('resource/styles/pages.css'));
     
     
@@ -86,19 +86,34 @@ abstract class PageBuilder extends AdminController{
       'max' => is_null($page->getMax())?0:$page->getMax(),
       'isRequired' => (int)$page->isRequired(),
       'answerStatusDisplay' => $page->answerStatusDisplay()?1:0,
+      'isGlobal' => $page->isGlobal()?1:0,
       'instructions' => $page->getInstructions(),
       'leadingText' => $page->getLeadingText(),
-      'trailingText' => $page->getTrailingText(),
+      'trailingText' => $page->getTrailingText()
     );
     
     //now that we have completed the general setup replace $applicationPage with $page
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $arr['weight'] = $page->getWeight();
       $page = $page->getPage();
+      //for global pages also pass the global page info for reference
+      if($page->isGlobal()){
+        $arr['globalPage'] = array(
+          'title' => $page->getTitle(),
+          'min' => is_null($page->getMin())?0:$page->getMin(),
+          'max' => is_null($page->getMax())?0:$page->getMax(),
+          'isRequired' => (int)$page->isRequired(),
+          'answerStatusDisplay' => $page->answerStatusDisplay()?1:0,
+          'instructions' => $page->getInstructions(),
+          'leadingText' => $page->getLeadingText(),
+          'trailingText' => $page->getTrailingText()
+        );
+      }
     } 
     $arr['id'] = $page->getId();
-    $arr['className'] = $this->getClassName($page->getType()->getClass());
-    $arr['classId'] = $page->getType()->getId();
+    $arr['typeClass'] = $this->getClassName($page->getType()->getClass());
+    $arr['typeName'] = $this->getClassName($page->getType()->getName());
+    $arr['typeId'] = $page->getType()->getId();
     $arr['elements'] = array();
     foreach($page->getElements() as $element){
       $e = array(
@@ -112,8 +127,9 @@ abstract class PageBuilder extends AdminController{
         'instructions' => $element->getInstructions(),
         'defaultValue' => $element->getDefaultValue()
       );
-      $e['className'] = $this->getClassName($element->getType()->getClass());
-      $e['classId'] = $element->getType()->getId();
+      $e['typeClass'] = $this->getClassName($element->getType()->getClass());
+      $e['typeName'] = $this->getClassName($element->getType()->getName());
+      $e['typeId'] = $element->getType()->getId();
       $e['list'] = array();
       foreach($element->getListItems() as $item){
         $e['list'][] = array(
@@ -155,8 +171,8 @@ abstract class PageBuilder extends AdminController{
     foreach($pages as $id){
       $arr[] = array(
         'id' => $id,
-        'name' => $pageTypes[$id]->getName(),
-        'className' => $this->getClassName($pageTypes[$id]->getClass()),
+        'typeClass' => $this->getClassName($pageTypes[$id]->getClass()),
+        'typeName' => $this->getClassName($pageTypes[$id]->getName())
       );
     }
     $this->setVar('result', $arr);
@@ -178,9 +194,9 @@ abstract class PageBuilder extends AdminController{
     $arr = array();
     foreach($elements as $id){
       $arr[] = array(
-        'id' => $id,
-        'name' => $elementTypes[$id]->getName(),
-        'className' => $this->getClassName($elementTypes[$id]->getClass()),
+        'typeId' => $id,
+        'typeName' => $elementTypes[$id]->getName(),
+        'typeClass' => $this->getClassName($elementTypes[$id]->getClass()),
       );
     }
     $this->setVar('result', $arr);
@@ -247,14 +263,16 @@ abstract class PageBuilder extends AdminController{
     foreach($data->children as $child){
       switch($child->status){
         case 'delete':
-          $this->_em->delete($page->getChildById($child->id));
-          $page->getChildren()->remove($child->id);
+          $childPage = $page->getChildById($child->id);
+          $this->_em->remove($childPage);
+          $page->getChildren()->removeElement($childPage);
+          $this->addMessage('success',$childPage->getTitle() . ' deleted.');
         break;
         case 'new':
           $childPage = new \Jazzee\Entity\Page();
           $childPage->setParent($page);
           $childPage->notGlobal();
-          $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->classId));
+          $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->typeId));
         default:
           if(!isset($childPage)) $childPage = $page->getChildById($child->id);
           $this->savePage($childPage, $child);
@@ -262,6 +280,7 @@ abstract class PageBuilder extends AdminController{
       }
       unset($childPage);
     }
+    $this->addMessage('success',$page->getTitle() . ' saved.');
   }
   
   /**
@@ -283,7 +302,7 @@ abstract class PageBuilder extends AdminController{
         case 'new':
             $element = new \Jazzee\Entity\Element();
             $page->addElement($element);
-            $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($e->classId));
+            $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($e->typeId));
         default:
           if(!isset($element)) $element = $page->getElementByID($e->id);
           $element->setWeight($e->weight);
@@ -326,6 +345,7 @@ abstract class PageBuilder extends AdminController{
     $applicant->setMiddleName('T');
     $applicant->setSuffix('Jr.');
     $applicant->setEmail('jtSmith@example.com');
+    $applicant->setApplication($this->_application);
     $ap = new \Jazzee\Entity\ApplicationPage();
     $ap->setPage($page);
     $ap->setApplication($this->_application);
@@ -343,7 +363,7 @@ abstract class PageBuilder extends AdminController{
   protected function genericPage(\Jazzee\Entity\Page $page, \stdClass $data){
     $page->tempId();
     $page->notGlobal();
-    $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->classId));
+    $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
     //create a temporary application page so we can access the JazzeePage and do setup
     if($data->status == 'new'){
       $ap = new \Jazzee\Entity\ApplicationPage();
@@ -389,7 +409,7 @@ abstract class PageBuilder extends AdminController{
    */
   protected function genericElement(\Jazzee\Entity\Element $element, \stdClass $e){
     $element->tempId();
-    $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($e->classId));
+    $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($e->typeId));
     $element->setTitle($e->title);
     $element->setTitle($e->title);
     $element->setFormat(empty($e->format)?null:$e->format);

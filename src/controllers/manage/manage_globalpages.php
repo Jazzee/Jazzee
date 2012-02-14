@@ -47,6 +47,7 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
             $this->setLayoutVar('status', 'error');
             $this->addMessage('error',$page->getTitle() . ' could not be deleted becuase it is part of at least one application');
           } else {
+            $this->addMessage('success',$page->getTitle() . ' deleted');
             $this->_em->remove($page);
           }
         }
@@ -54,11 +55,13 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
       case 'new':
         $page = new \Jazzee\Entity\Page();
         $page->makeGlobal();
-        $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->classId));
+        $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
         //create a fake application page to work with so we can run setupNewPage
         $ap = new \Jazzee\Entity\ApplicationPage();
         $ap->setPage($page);
+        $ap->getJazzeePage()->setController($this);
         $ap->getJazzeePage()->setupNewPage();
+        $this->addMessage('success',$data->title . ' created.');
         unset($ap);
       default:
         if(!isset($page)) $page = $this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('id'=>$pageId, 'isGlobal'=>true));

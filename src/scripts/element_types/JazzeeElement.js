@@ -7,8 +7,9 @@
 function JazzeeElement(){
   this.page;
   this.id;
-  this.classId;
-  this.className;
+  this.typeId;
+  this.typeName;
+  this.typeClass;
   this.title;
   this.format;
   this.instructions;
@@ -31,8 +32,9 @@ function JazzeeElement(){
 JazzeeElement.prototype.init = function(obj, page){
   this.page = page;
   this.id = obj.id;
-  this.classId = obj.classId;
-  this.className = obj.className;
+  this.typeId = obj.typeId;
+  this.typeName = obj.typeName;
+  this.typeClass = obj.typeClass;
   this.title = obj.title;
   this.instructions = obj.instructions;
   this.format = obj.format;
@@ -50,26 +52,33 @@ JazzeeElement.prototype.init = function(obj, page){
 /**
  * Create a new element object with good default values
  * @param {String} id the id to use
+ * @param {String} title the title to use
+ * @param {Integer} typeId the database id for the type
+ * @param {String} typeName nice name for the type
+ * @param {String} typeClass the name of the class
+ * @param {String} status the elements status
+ * @param {JazzeePage} page the JazzeePage we belong to
  * @returns {JazzeeElement}
  */
-JazzeeElement.prototype.newElement = function(id,title,classId,className,status,page){
+JazzeeElement.prototype.newElement = function(id,title,typeId,typeName,typeClass,status,page){
   var obj = {
     id: id,
     title: title,
-    classId: classId,
-    className: className,
-    format: '',
-    instructions: '',
+    typeId: typeId,
+    typeName: typeName,
+    typeClass: typeClass,
+    format: null,
+    instructions: null,
     defaultValue: '',
     isRequired: 1,
     min: null,
     max: null,
     weight: null
   };
-  var element = new window[className]();
+  var element = new window[typeClass]();
   element.init(obj, page);
   element.status = status;
-  element.isModified = true;
+  element.markModified();
   return element;
 };
 
@@ -77,8 +86,16 @@ JazzeeElement.prototype.newElement = function(id,title,classId,className,status,
  * Check to see if the JazzeeElement has been modified
  * @returns {Boolean}
  */
-JazzeeElement.prototype.checkModified = function(){
+JazzeeElement.prototype.checkIsModified = function(){
   return this.isModified;
+};
+
+/**
+ * Mark this element as modified
+ */
+JazzeeElement.prototype.markModified = function(){
+  this.isModified = true;
+  this.page.markModified();
 };
 
 /**
@@ -90,82 +107,9 @@ JazzeeElement.prototype.checkModified = function(){
 JazzeeElement.prototype.setProperty = function(name, value){
   if(typeof this[name] == 'undefined' || this[name] !== value){
     this[name] = value;
-    this.isModified = true;
+    this.markModified();
   }
   return this[name];
-};
-
-/**
- * A generic text input block for editing properties
- * @param {String} propertyName
- * @para, {String} valueIfBlank what do display if the property isn't set
- * @return {jQuery}
- */
-JazzeeElement.prototype.textInputBlock = function(propertyName, valueIfBlank){
-  var elementClass = this;
-  var field = $('<input>').attr('value',(this[propertyName]))
-  .bind('change',function(){
-    elementClass.setProperty(propertyName, $(this).val());
-  })
-  .bind('blur', function(){
-    $(this).parent().replaceWith(elementClass.textInputBlock(propertyName, valueIfBlank));
-  }).hide();
-  var p = $('<p>').addClass('edit').addClass(propertyName).html(((this[propertyName] == '')?valueIfBlank:this[propertyName])).bind('click', function(){
-    $(this).hide();
-    $(this).parent().children('input').eq(0).show().focus();
-  });
-  return $('<div>').append(p).append(field);
-};
-
-/**
- * A generic block for editng properties using a dropdown
- * @param {String} propertyName
- * @param {String} description
- * @param {Object} options
- * @returns {jQuery}
- */
-JazzeeElement.prototype.selectListBlock = function(propertyName, description, options){
-  var elementClass = this;
-  var p = $('<p>').addClass('edit').html(description + ' ').append($('<span>').html(options[this[propertyName]]).bind('click',function(e){
-    $(this).unbind('click');
-    var select = $('<select>');
-    $.each(options,function(value, text){
-      var option = $('<option>').attr('value', value).html(text);
-      if(elementClass[propertyName] == value) option.attr('selected', true);
-      select.append(option);
-    });
-    select.bind('change', function(e){
-      elementClass.setProperty(propertyName, $(this).val());
-    });
-    select.bind('blur', function(e){
-      $(this).parent().parent().replaceWith(elementClass.selectListBlock(propertyName,description, options));
-    });
-    $(this).empty().append(select);
-  }));
-  return p;
-};
-
-/**
- * Block for editing the element title
- * @param {String} title
- * @param {String} propertyName
- * @return {jQuery}
- */
-JazzeeElement.prototype.editTitleBlock = function(){
-  var elementClass = this;
-  var field = $('<input>').attr('value', this.title).attr('type', 'text')
-    .bind('change',function(){
-      elementClass.setProperty('title', $(this).val());
-    })
-    .bind('blur', function(){
-      $(this).parent().replaceWith(elementClass.editTitleBlock());
-    }).hide();
-  
-  var p = $('<p>').addClass('edit').html('<legend>' + ((this.title == '')?'click to edit':this.title) + ':</legend>').bind('click', function(){
-    $(this).hide();
-    $(this).parent().children('input').eq(0).show().focus();
-  });
-  return $('<div>').addClass('yui-u first').append(p).append(field);
 };
 
 /**
@@ -175,8 +119,9 @@ JazzeeElement.prototype.editTitleBlock = function(){
 JazzeeElement.prototype.getDataObject = function(){
   var obj = {
     id: this.id,
-    classId: this.classId,
-    className: this.className,
+    typeId: this.typeId,
+    typeName: this.typeName,
+    typeClass: this.typeClass,
     status: this.status,
     title: this.title,
     format: this.format,
@@ -195,53 +140,221 @@ JazzeeElement.prototype.getDataObject = function(){
 };
 
 /**
+ * Button for setting the isRequired property
+ * @return {jQuery}
+ */
+JazzeeElement.prototype.isRequiredButton = function(){
+  var elementClass = this;
+  var span = $('<span>');
+  span.append($('<input>').attr('type', 'radio').attr('name', 'isRequired').attr('id', 'required').attr('value', '1').attr('checked', this.isRequired==1)).append($('<label>').html('Required').attr('for', 'required'));
+  span.append($('<input>').attr('type', 'radio').attr('name', 'isRequired').attr('id', 'optional').attr('value', '0').attr('checked', this.isRequired==0)).append($('<label>').html('Optional').attr('for', 'optional'));
+  span.buttonset();
+  
+  $('input', span).bind('change', function(e){
+    elementClass.setProperty('isRequired', $(e.target).val());
+    $('.qtip').qtip('api').hide();
+    elementClass.workspace();
+  });
+  
+  return span;
+};
+
+/**
+ * Title editing button
+ * @return {jQuery}
+ */
+JazzeeElement.prototype.editTitleButton = function(){
+  var elementClass = this;
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Element Title'});
+  var element = field.newElement('TextInput', 'title');
+  element.label = 'Element Title';
+  element.required = true;
+  element.value = this.title;
+  var dialog = this.page.displayForm(obj);
+  $('form', dialog).bind('submit',function(e){
+    elementClass.setProperty('title', $('input[name="title"]', this).val());
+    elementClass.workspace();
+    dialog.dialog("destroy").remove();
+    return false;
+  });//end submit
+  var button = $('<button>').html('Edit Title').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    dialog.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-pencil'
+    }
+  });
+  return button;
+};
+
+/**
+ * Instructions editign button
+ * @return {jQuery}
+ */
+JazzeeElement.prototype.editInstructionsButton = function(){
+  var elementClass = this;
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Element Instructions'});
+  var element = field.newElement('Textarea', 'text');
+  element.label = 'Element Instructions';
+  element.value = this.instructions;
+  var dialog = this.page.displayForm(obj);
+  $('form', dialog).bind('submit',function(e){
+    var value = $('textarea[name="text"]', this).val()==''?null:$('textarea[name="text"]', this).val();
+    elementClass.setProperty('instructions', value);
+    dialog.dialog("destroy").remove();
+    elementClass.workspace();
+    return false;
+  });//end submit
+  var button = $('<button>').html('Edit Element Instructions').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    dialog.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-pencil'
+    }
+  });
+  return button;
+};
+
+/**
+ * Format display and editing workspace
+ * @return {jQuery}
+ */
+JazzeeElement.prototype.editFormatButton = function(){
+  var elementClass = this;
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Element Format'});
+  var element = field.newElement('Textarea', 'text');
+  element.label = 'Element Format';
+  element.value = this.format;
+  var dialog = this.page.displayForm(obj);
+  $('form', dialog).bind('submit',function(e){
+    var value = $('textarea[name="text"]', this).val()==''?null:$('textarea[name="text"]', this).val();
+    elementClass.setProperty('format', value);
+    elementClass.workspace();
+    dialog.dialog("destroy").remove();
+    return false;
+  });//end submit
+  var button = $('<button>').html('Edit Element Format').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    dialog.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-pencil'
+    }
+  });
+  return button;
+};
+
+
+/**
  * Create the element workspace
  */
 JazzeeElement.prototype.workspace = function(){
   var elementClass = this;
-  var field = $('#element-'+this.id);
-  if(field.length == 0){
-    $('#workspace-left-middle-left').append($('<div>').attr('id','element-'+this.id).addClass('field'));
-    var field = $('#element-'+this.id);
-    field.data('element', this);
+  var div = $('#element-'+this.id);
+  if(div.length == 0){
+    $('#elements').append($('<div>').attr('id','element-'+this.id).addClass('elements yui-g'));
+    var div = $('#element-'+this.id);
+    div.data('element', this);
+    div.append($('<div>').addClass('yui-u first field'));
+    div.append($('<div>').addClass('yui-u options'));
   }
+  var field = $('.field', div);
   field.empty();
-  field.append(this.textInputBlock('instructions', 'click to edit'));
-  var element = $('<div>').addClass('element yui-gf');
-  element.append(this.editTitleBlock());
-  var control = $('<div>').addClass('yui-u control').append(this.avatar());
-  control.append(this.textInputBlock('format', 'click to edit'));
+  if(this.instructions != null){
+    field.append($('<div>').append($('<p>').html(this.instructions).addClass('instructions')));
+  }
+  var element = $('<div>').addClass('element');
+  var label = $('<div>').addClass('yui-u first label').append($('<label>').html(this.title + ':'));
+  if(this.isRequired == 1) label.addClass('required');
+  element.append(label);
+  
+  var control = $('<div>').addClass('control').append(this.avatar());
+  if(this.format != null){
+    control.append($('<div>').append($('<p>').html(this.format).addClass('format')));
+  }
   element.append(control);
   field.append(element);
-  field.data('options', this.optionsBlock());
+  
+  var toolbar = $('<span>').addClass('ui-widget-header ui-corner-all toolbar');
+  var button = $('<button>').bind('click', function(e){
+    $('.qtip').qtip('api').hide();
+    $('#element-' + elementClass.id).effect('explode',500);
+    elementClass.status = 'delete';
+    elementClass.page.deleteElement(elementClass);
+    elementClass.markModified();
+  });
+  button.button({
+    text: false,
+    label: 'Delete Element',
+    icons: {
+      primary: 'ui-icon-trash'
+    }
+  });
+  toolbar.append(button);
+  
+  var button = $('<button>').bind('click', function(e){
+    $('.qtip').qtip('api').hide();
+    elementClass.page.copyElement(elementClass);
+  });
+  button.button({
+    text: false,
+    label: 'Copy Element',
+    icons: {
+      primary: 'ui-icon-copy'
+    }
+  });
+  toolbar.append(button);
+  
+  var button = $('<button>');
+  button.button({
+    text: false,
+    label: 'Element Properties',
+    icons: {
+      primary: 'ui-icon-gear',
+      secondary: 'ui-icon-carat-1-s'
+    }
+  });
+    button.qtip({
+    position: {
+      my: 'top-left',
+      at: 'bottom-left'
+    },
+    show: {
+      event: 'click'
+    },
+    hide: {
+      event: 'unfocus click mouseleave',
+      delay: 500,
+      fixed: true
+    },
+    content: {
+      text: this.elementProperties(),
+      title: {
+        text: 'Edit Element Properties',
+        button: true
+      }
+    }
+  });
+  toolbar.append(button);
+  
+  $('.options', div).html(toolbar);
 };
 
 /**
- * Create the options workspace for the element
+ * Properties dialog
+ * @return {jQuery}
  */
-JazzeeElement.prototype.optionsBlock = function(){
-  var elementClass = this;
-  var div = $('#element-options-'+this.id);
-  if(div.length == 0){
-    $('#workspace-left-middle-right').append($('<div>').attr('id', 'element-options-'+this.id));
-    div = $('#element-options-'+this.id);
-  }
-  div.empty();
-  var p = $('<p>Copy this element</p>').addClass('copy').bind('click', function(e){
-    elementClass.page.copyElement(elementClass);
-  });
-  div.append(p);
-  var p = $('<p>Delete this element</p>').addClass('delete').bind('click', function(e){
-    elementClass.isModified = true;
-    elementClass.status = 'delete';
-    elementClass.page.deleteElement(elementClass);
-    $('#element-options-'+elementClass.id).remove();
-    $('#element-'+elementClass.id).effect('explode',500);
-    $('#workspace-left-middle-left div.field:first').trigger('click');
-  });
-  div.append(p);
-  div.append(this.selectListBlock('isRequired', 'This element is', {0:'Optional',1:'Required'}));
-  div.hide();
+JazzeeElement.prototype.elementProperties = function(){
+  var div = $('<div>').attr('id', 'element-properties-'+this.id).addClass('dropdown');
+  div.append(this.editTitleButton());
+  div.append(this.editInstructionsButton());
+  div.append(this.editFormatButton());
+  div.append(this.isRequiredButton());
   return div;
 };
 
@@ -252,15 +365,4 @@ JazzeeElement.prototype.optionsBlock = function(){
  */
 JazzeeElement.prototype.avatar = function(){
   return $('<span>').html('default avatar');
-};
-
-/**
- * Replacement Text
- * Get a string representation of the element which can be used to represent the element
- * @returns {String}
- */
-JazzeeElement.prototype.replacementTitle = function(){
-  var text = this.title.replace(/\s+/, '_');
-  text = '%' + text.toUpperCase() + '%';
-  return text;
 };

@@ -11,85 +11,168 @@ JazzeePagePayment.prototype.constructor = JazzeePagePayment;
  * @param {String} id the id to use
  * @returns {PaymentPage}
  */
-JazzeePagePayment.prototype.newPage = function(id,title,classId,className,status,pageStore){
-  var page = JazzeePage.prototype.newPage.call(this, id,title,classId,className,status,pageStore);
+JazzeePagePayment.prototype.newPage = function(id,title,typeId,typeName,typeClass,status,pageBuilder){
+  var page = JazzeePage.prototype.newPage.call(this, id,title,typeId,typeName,typeClass,status,pageBuilder);
   page.setVariable('amounts', 0);
   page.setVariable('allowedPaymentTypes', '');
   return page;
 };
 
 /**
- * Create the PaymentPage workspace
+ * Create the JazzeePagePayment workspace
  */
 JazzeePagePayment.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
-  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {1:'Required',0:'Optional'}));
-  $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
-  
   var pageClass = this;
-  $.get(pageClass.pageStore.baseUrl + '/listPaymentTypes',function(json){
-    var types = pageClass.getVariable('allowedPaymentTypes').split(',');
-    var div = $('<div>').append($('<h5>').html('Accepted Payment Types')).append($('<p>').html('These are the types visible to applicants.  All active types are available to administrators.'));
-    var ol = $('<ol>').addClass('payment-type-list');
-    $(json.data.result).each(function(i){
-      var paymentType = this;
-      var box = $('<input type="checkbox">').data('paymentTypeId', paymentType.id);
-      if($.inArray(paymentType.id, types) != -1) box.attr('checked', true);
-      $(box).click(function(e){
-        var types = [];
-        $('input:checkbox', $(this).parent().parent()).filter(":checked").each(function(i){
-          types.push($(this).data('paymentTypeId'));
-        });
-        pageClass.setVariable('allowedPaymentTypes', types.join(','));
-      });
-      ol.append($('<li>').html(paymentType.name).prepend(box));
-    });
-    div.append(ol);
-    $('#workspace-left-middle-left').append(div);
-    $('#workspace-left-middle-left').append(pageClass.paymentAmountsBlock());
-  });
+  $('#pageToolbar').append(this.pagePropertiesButton());
 };
 
-JazzeePagePayment.prototype.paymentAmountsBlock = function(){
+/**
+ * Create the page properties dropdown
+*/
+JazzeePagePayment.prototype.pageProperties = function(){
   var pageClass = this;
-  var div = $('<div>').append($('<h5>').html('Payment Amounts and Descriptions'));
-  var amounts = this.getVariable('amounts');
-  var table = $('<table>').attr('id','paymentPageAmounts').append('<tr><th>Amount</th><th>Description</th></tr>');
-  div.append(table);
-  if(amounts > 0){
-    for(var i=1;i<=amounts;i++){
-      var amount = this.getVariable('amount'+i);
-      var description = this.getVariable('description'+i);
-      table.append(this.amountRow(amount, description));
-    }
-    this.trackPaymentUpdates(table);
-  }
-  var p = $('<p>').addClass('add').html('New payment amount').bind('click', function(e){
-    table.append(pageClass.amountRow('0', 'blank'));
-    pageClass.trackPaymentUpdates(table);
-  });
-  
-  div.append(p);
+  var div = $('<div>');
+  div.append(this.isRequiredButton());
+  div.append(this.showAnswerStatusButton());
+  div.append(this.acceptedPaymentTypesButton());
+  div.append(this.editPaymentAmountButton());
+  div.append(this.newPaymentAmountButton());
   return div;
 };
 
-JazzeePagePayment.prototype.amountRow = function(amount, description){
-  var tr = $('<tr class="amount">');
-  tr.append($('<td>').append($('<input type="text" class="paymentAmount">').val(amount)));
-  tr.append($('<td>').append($('<input type="text" class="paymentDescription">').val(description)));
-  return tr;
+/**
+ * Accepted Payment types button
+ * @return {jQuery}
+ */
+JazzeePagePayment.prototype.acceptedPaymentTypesButton = function(){
+  var pageClass = this;
+  var button = $('<button>').html('Set Accepted Payment Types').bind('click', function(e){
+    $('.qtip').qtip('api').hide();
+
+    var obj = new FormObject();
+    var field = obj.newField({name: 'legend', value: 'Payment Types'});
+    field.instructions = 'These are the types visible to applicants.  All active types are available to administrators.';
+    var element = field.newElement('CheckboxList', 'types');
+    element.label = 'Accepted Payment Types';
+    element.required = true;
+    var allowedPaymentTypes = pageClass.getVariable('allowedPaymentTypes');
+    element.value = allowedPaymentTypes == null?[]:allowedPaymentTypes.split(',');
+    for(var i = 0; i < pageClass.pageBuilder.paymentTypes.length; i++){
+      var paymentType = pageClass.pageBuilder.paymentTypes[i];
+      element.addItem(paymentType.name, paymentType.id);
+    }
+    var dialog = pageClass.displayForm(obj);
+    $('form', dialog).bind('submit',function(e){
+      var types = [];
+      $('input:checked', $(this)).each(function(i){
+        types.push($(this).val());
+      });
+      pageClass.setVariable('allowedPaymentTypes', types.join(','));
+      dialog.dialog("destroy").remove();
+      return false;
+    });//end submit
+    dialog.dialog('open');
+  }).button();
+  
+  return button;
 };
 
-JazzeePagePayment.prototype.trackPaymentUpdates = function(table){
+/**
+ * Edit Payment Aomunt button
+ * @return {jQuery}
+ */
+JazzeePagePayment.prototype.editPaymentAmountButton = function(){
   var pageClass = this;
-  $('input', table).unbind('change');
-  $('input', table).bind('change', function(e){
-    var count;
-    $('tr.amount', table).each(function(i){
-      pageClass.setVariable('amount'+(i+1), $('.paymentAmount', this).eq(0).val());
-      pageClass.setVariable('description'+(i+1), $('.paymentDescription', this).eq(0).val());
-      count = i+1;
+  var ul = $('<ul>');
+  for(var i = 1; i <= this.getVariable('amounts'); i++){
+    var a = $('<a>').attr('href','#').html(this.getVariable('description'+i) + ' $' + this.getVariable('amount'+i)).data('amountid', i).bind('click', function(e){
+      $('.qtip').qtip('api').hide();
+      var id = $(this).data('amountid');
+      var obj = new FormObject();
+      var field = obj.newField({name: 'legend', value: 'Edit Amount'});
+      var element = field.newElement('TextInput', 'description');
+      element.label = 'Description';
+      element.required = true;
+      element.value = pageClass.getVariable('description'+id);
+      var element = field.newElement('TextInput', 'amount');
+      element.label = 'Amount';
+      element.required = true;
+      element.value = pageClass.getVariable('amount'+id);
+      var dialog = pageClass.displayForm(obj);
+      $('form', dialog).bind('submit',function(e){
+        pageClass.setVariable('description'+id,$('input[name="description"]', this).val());
+        pageClass.setVariable('amount'+id,$('input[name="amount"]', this).val());
+        dialog.dialog("destroy").remove();
+        return false;
+      });//end submit
+      dialog.dialog('open');
+      return false;
     });
-    pageClass.setVariable('amounts', count);
+    ul.append($('<li>').append(a));
+
+  }
+  var button = $('<button>').html('Edit Payment Amount');
+  button.button({
+    icons: {
+      primary: 'ui-icon-pencil',
+      secondary: 'ui-icon-carat-1-s'
+    }
   });
+    button.qtip({
+    position: {
+      my: 'top-left',
+      at: 'bottom-left'
+    },
+    show: {
+      event: 'click'
+    },
+    hide: {
+      event: 'unfocus click mouseleave',
+      delay: 500,
+      fixed: true
+    },
+    content: {
+      text: ul,
+      title: {
+        text: 'Choose an item to edit',
+        button: true
+      }
+    }
+  });
+  return button;
+};
+
+/**
+ * Add new payment amount button
+ * @return {jQuery}
+ */
+JazzeePagePayment.prototype.newPaymentAmountButton = function(){
+  var pageClass = this;
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'New Payment Amount'});
+  var element = field.newElement('TextInput', 'description');
+  element.label = 'Description';
+  element.required = true;
+  var element = field.newElement('TextInput', 'amount');
+  element.label = 'Amount';
+  element.required = true;
+  var dialog = this.displayForm(obj);
+  $('form', dialog).bind('submit',function(e){
+    var id = parseInt(pageClass.getVariable('amounts'))+1;
+    pageClass.setVariable('amounts', id);
+    pageClass.setVariable('description'+id,$('input[name="description"]', this).val());
+    pageClass.setVariable('amount'+id,$('input[name="amount"]', this).val());
+    dialog.dialog("destroy").remove();
+    return false;
+  });//end submit
+  var button = $('<button>').html('New Payment Amount').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    dialog.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-plus'
+    }
+  });
+  return button;
 };

@@ -24,23 +24,75 @@ $(document).ready(function(){
   }).ajaxStop(function(){
     status.end();
   });
-  var baseUrl = document.location.href;
-  var pageStore = new PageStore(baseUrl, $('#pages'));
-  $('#save-pages').bind('click', function(){
-    pageStore.save();
-  });
-  $.get(baseUrl + '/listPageTypes',function(json){  
-    var ol = $('<ol>').addClass('add-list');
-    $(json.data.result).each(function(i){
-      var pageType = this;
-      pageStore.addPageType(pageType);
-      var li = $('<li>').html(pageType.name);
-      li.bind('click', function(){
-        var page = new window[pageType.className].prototype.newPage('newpage' + pageStore.getUniqueId(),'New ' + pageType.name + ' Page',pageType.id,pageType.className,'new',pageStore);
-        pageStore.addPage(page);
-      });
-      ol.append(li);
-    });
-    $('#new-pages').append(ol);
-  });
+  var pageBuilder = new GlobalPageBuilder($('#canvas'));
+  pageBuilder.setup();
 });
+
+/**
+ * The GlobalPageBuilder class
+  @extends PageBuilder
+ */
+function GlobalPageBuilder(canvas){
+  PageBuilder.call(this, canvas);
+  this.controllerPath = this.services.getControllerPath('manage_globalpages');
+  this.editGlobal = true;
+}
+
+GlobalPageBuilder.prototype = new PageBuilder();
+GlobalPageBuilder.prototype.constructor = GlobalPageBuilder;
+
+
+GlobalPageBuilder.prototype.setup = function(){
+  PageBuilder.prototype.setup.call(this);
+  var pageBuilder = this;
+  this.refreshPages();
+};
+
+GlobalPageBuilder.prototype.synchronizePageList = function(){
+  var div = $('#pages', this.canvas);
+  div.empty();
+  div.append($('<h5>').html('Global Pages'));
+  div.append(this.getPagesList());
+  div.append(this.addNewPageControl());
+};
+
+/**
+ * Create a control for adding new page
+ * @return {jQuery}
+ */
+GlobalPageBuilder.prototype.addNewPageControl = function(){
+  var pageBuilder = this;
+  var dropdown = $('<ul>');
+  for(var i = 0; i < this.pageTypes.length; i++){
+    var item = $('<a>').html(this.pageTypes[i].typeName).attr('href', '#').data('pageType', this.pageTypes[i]);
+    item.bind('click', function(e){
+      var pageType = $(e.target).data('pageType');
+      var page = new window[pageType.typeClass].prototype.newPage('newpage' + pageBuilder.getUniqueId(),'New ' + pageType.typeName + ' Page',pageType.id,pageType.typeName,pageType.typeClass,'new',pageBuilder);
+      pageBuilder.addPage(page);
+      return false;
+    });
+    dropdown.append($('<li>').append(item));
+  }
+  var button = $('<button>').html('New Page').button();
+  button.qtip({
+    position: {
+      my: 'bottom-left',
+      at: 'bottom-right'
+    },
+    show: {
+      event: 'click'
+    },
+    hide: {
+      event: 'unfocus click',
+      fixed: true
+    },
+    content: {
+      text: dropdown,
+      title: {
+        text: 'Choose a page type',
+        button: true
+      }
+    }
+  });
+  return button;
+}

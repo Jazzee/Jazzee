@@ -6,8 +6,6 @@
  * @subpackage admin
  * @subpackage setup
  */
-if($page){
-  $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-form');
-  $this->renderElement($elementName, array('page'=>$page));
-}
+$class = $page->getPage()->getType()->getClass();
+$this->renderElement($class::APPLY_PAGE_ELEMENT, array('page'=>$page, 'currentAnswerID'=>false, 'applicant'=>$applicant));
 ?>

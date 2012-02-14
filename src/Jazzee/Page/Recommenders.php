@@ -391,7 +391,7 @@ class Recommenders extends Standard {
             if(!$value = \strtotime($value)){
               throw new \Jazzee\Exception("{$value} is not a valid date for lorDeadline");
             }
-            $value = \date('c', $value);
+            $value = \date('Y-m-d H:i:s', $value);
           }
         break;
       case 'lorDeadlineEnforced':

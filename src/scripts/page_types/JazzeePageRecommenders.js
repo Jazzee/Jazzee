@@ -11,119 +11,288 @@ JazzeePageRecommenders.prototype.constructor = JazzeePageRecommenders;
  * @param {String} id the id to use
  * @returns {RecommendersPage}
  */
-JazzeePageRecommenders.prototype.newPage = function(id,title,classId,className,status,pageStore){
-  var standardPageTypeId = pageStore.getPageType('JazzeePageStandard');
-  var page = JazzeePage.prototype.newPage.call(this, id,title,classId,className,status,pageStore);
-  page.setVariable('lorDeadline', null);
+JazzeePageRecommenders.prototype.newPage = function(id,title,typeId,typeName,typeClass,status,pageBuilder){
+  var page = JazzeePage.prototype.newPage.call(this, id,title,typeId,typeName,typeClass,status,pageBuilder);
+  page.setVariable('lorDeadline', '');
   page.setVariable('lorDeadlineEnforced', 0);
   page.setVariable('recommenderEmailText', "Dear %RECOMMENDER_FIRST_NAME% %RECOMMENDER_LAST_NAME%,\n"
       + "%APPLICANT_NAME% has requested a letter of recommendation from you in support of their application for admission to our program. \n"
       + "We use an online system to collect letters of recommendation.  You have been assigned a unique URL for accessing this system.  Please save this email so that you can return to your letter at a later date. \n"
       + "Click the following link to access the online system; or, you may need to copy and paste this link into your browser. \n"
       + "%LINK% \n");
-  var recommendation = new JazzeePageStandard.prototype.newPage('newchildpage' + pageStore.getUniqueId(),'Recommendation',standardPageTypeId,'JazzeePageStandard','new',pageStore);
-  page.addChild(recommendation);
   return page;
 };
 
 JazzeePageRecommenders.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
   var pageClass = this;
-  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {0:'Optional',1:'Required'}));
-  $('#workspace-right-top').append(this.selectListBlock('answerStatusDisplay', 'Answer Status is', {0:'Not Shown',1:'Shown'}));
+  $('#pageToolbar').append(this.pagePropertiesButton());
+
+  $('#workspace').append(this.editLorPage());
+};
+
+/**
+ * Create the page properties dropdown
+*/
+JazzeePageRecommenders.prototype.pageProperties = function(){
+  var pageClass = this;
   
-  var min = {0: 'No Minimum'};
-  for(var i = 1; i<=20;i++){
-    min[i] = i;
-  }
-  $('#workspace-right-top').append(this.selectListBlock('min','Minimum Recommenders Required:', min));
-  var max = {0: 'No Maximum'};
-  for(var i = 1; i<=20;i++){
-    max[i] = i;
-  }
-  $('#workspace-right-top').append(this.selectListBlock('max','Maximum Recommenders Allows:', max));
+  var div = $('<div>');
+  div.append(this.isRequiredButton());
+  div.append(this.showAnswerStatusButton());
   
-  $('#workspace-right-top').append(this.dateVariableBlock('lorDeadline', 'The deadine for submitting recommendations is ', 'the same as the application'));
-    
-  $('#workspace-right-top').append(this.selectListVariableBlock('lorDeadlineEnforced', 'The deadine for recommender is', {0:'Not Enforced',1:'Enforced'}));
-  $('#workspace-right-top').append(this.recommendationPageBlock());
-  $('#workspace-right-top').append(this.recommenderEmailBlock());
+  var slider = $('<div>');
+  slider.slider({
+    value: this.min,
+    min: 0,
+    max: 20,
+    step: 1,
+    slide: function( event, ui ) {
+      pageClass.setProperty('min', ui.value);
+      $('#minValue').html(pageClass.min == 0?'No Minimum':pageClass.min);
+    }
+  });
+  div.append($('<p>').html('Minimum Recommendations Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
+  div.append(slider);
+  
+  
+  var slider = $('<div>');
+  slider.slider({
+    value: this.max,
+    min: 0,
+    max: 20,
+    step: 1,
+    slide: function( event, ui ) {
+      pageClass.setProperty('max', ui.value);
+      $('#maxValue').html(pageClass.max == 0?'No Maximum':pageClass.max);
+    }
+  });
+  div.append($('<p>').html('Maximum Recommendations Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
+  div.append(slider);
+  
+  div.append(this.editLOREmailButton());
+  div.append(this.deadlineEnforcedButton());
+  div.append(this.deadlineButton());
+  return div;
+};
+
+/**
+ * Edit the recommender email
+ * @return {jQuery}
+ */
+JazzeePageRecommenders.prototype.editLOREmailButton = function(){
+  var pageClass = this;
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Edit Email to Recommenders'});
+  var replace = [
+    {title: 'Applicant Name', replacement: '%APPLICANT_NAME%'},
+    {title: 'Recommendation Dealine', replacement:'%DEADLINE%'},
+    {title: 'Link to the Recommendation', replacement:'%LINK%'},
+    {title: 'Recommender First Name', replacement:'%RECOMMENDER_FIRST_NAME%'},
+    {title: 'Recommender Last Name', replacement:'%RECOMMENDER_LAST_NAME%'},
+    {title: 'Recommender Institution', replacement:'%RECOMMENDER_INSTITUTION%'},
+    {title: 'Recommender Phone', replacement:'%RECOMMENDER_EMAIL%'},
+    {title: 'Recommender Email', replacement:'%RECOMMENDER_PHONE%'}
+  ];
+  field.instructions = 'The following will be replaced with the applicant input for this recommender: ';
+  for(var i in replace){
+    field.instructions += '<br />' + replace[i].replacement + ': ' + replace[i].title;
+  }
+  
+  var element = field.newElement('Textarea', 'recommenderEmailText');
+  element.label = 'Email Text';
+  element.required = true;
+  element.value = this.getVariable('recommenderEmailText');
+  
+  var dialog = this.displayForm(obj);
+  $('form', dialog).bind('submit',function(e){
+    pageClass.setVariable('recommenderEmailText', $('textarea[name="recommenderEmailText"]', this).val());
+    pageClass.workspace();
+    dialog.dialog("destroy").remove();
+    return false;
+  });//end submit
+  var button = $('<button>').html('Edit Email to Recommenders').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    dialog.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-pencil'
+    }
+  });
+  return button;
+};
+
+/**
+ * Button for choosing to enforce teh deadline
+ * @return {jQuery}
+ */
+JazzeePageRecommenders.prototype.deadlineEnforcedButton = function(){
+  var pageClass = this;
+  var span = $('<span>');
+  span.append($('<input>').attr('type', 'radio').attr('name', 'lorDeadlineEnforced').attr('id', 'enforced').attr('value', '1').attr('checked', this.getVariable('lorDeadlineEnforced')==1)).append($('<label>').html('Enforced').attr('for', 'enforced'));
+  span.append($('<input>').attr('type', 'radio').attr('name', 'lorDeadlineEnforced').attr('id', 'notenforced').attr('value', '0').attr('checked', this.getVariable('lorDeadlineEnforced')==0)).append($('<label>').html('Not Enforced').attr('for', 'notenforced'));
+  span.buttonset();
+  
+  $('input', span).bind('change', function(e){
+    $('.qtip').qtip('api').hide();
+    pageClass.setVariable('lorDeadlineEnforced', $(e.target).val());
+  });
+  return $('<p>').html('Deadline: ').append(span);
+};
+
+/**
+ * Edit the recommender deadline
+ * @return {jQuery}
+ */
+JazzeePageRecommenders.prototype.deadlineButton = function(){
+  var pageClass = this;
+  var button = $('<button>').html('Set Recommendation Deadline').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    var dialog = pageClass.createDialog();
+    dialog.append($('<div>').attr('id', 'lorDeadlineForm').addClass('yui-g'));
+    pageClass.deadlineForm(pageClass.getVariable('lorDeadline')!='');
+    var button = $('<button>').html('Save').bind('click',function(){
+      if($('#lorDeadlineForm input[name="hasDeadline"]:checked').val() == 1){
+        pageClass.setVariable('lorDeadline', $('#lorDeadlineForm input[name="deadline"]').val());
+      } else {
+        pageClass.setVariable('lorDeadline', '');
+      }
+      pageClass.workspace();
+      dialog.dialog("destroy").remove();
+      return false;
+    }).button({
+      icons: {
+        primary: 'ui-icon-disk'
+      }
+    });
+    dialog.append(button);
+    dialog.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-pencil'
+    }
+  });
+  return button;
+};
+
+/**
+ * lorDeadline dialog content
+ * @param Boolean picker
+ * @return {jQuery}
+ */
+JazzeePageRecommenders.prototype.deadlineForm = function(picker){
+  var pageClass = this;
+  $('#lorDeadlineForm').empty();
+  if(picker){
+    var input = $('<input>').attr('type', 'text').attr('name', 'deadline').attr('id', 'deadline').attr('value', pageClass.getVariable('lorDeadline'));
+    $('#lorDeadlineForm').append($('<div>').addClass('yui-u first').append(input));
+    input.AnyTime_noPicker().AnyTime_picker({
+      labelTitle: 'Choose Deadline',
+      hideInput: true,
+      placement: 'inline'
+    });
+  }
+  
+  var span = $('<span>');
+  span.append($('<input>').attr('type', 'radio').attr('name', 'hasDeadline').attr('id', 'seperate').attr('value', '1').attr('checked', picker)).append($('<label>').html('Seperate Deadline').attr('for', 'seperate'));
+  span.append($('<input>').attr('type', 'radio').attr('name', 'hasDeadline').attr('id', 'same').attr('value', '0').attr('checked', !picker)).append($('<label>').html('Same As Application').attr('for', 'same'));
+  span.buttonset();
+
+  $('input', span).bind('change', function(e){
+    pageClass.deadlineForm($(e.target).val() == 1);
+  });
+  $('#lorDeadlineForm').append($('<div>').addClass('yui-u').append(span));
 };
 
 /**
  * Get the recommendation page (it is the first child)
- * @returns {ApplyPage}
+ * @returns {JazzeePage} | false
  */
 JazzeePageRecommenders.prototype.getRecommendationPage = function(){
+  if($.isEmptyObject(this.children)) return false;
   for (var firstId in this.children) break;
   return this.children[firstId];
 };
 
 /**
- * Edit the recommendation Page block
- * @returns {jQuery}
+ * Edit the LOR page
  */
-JazzeePageRecommenders.prototype.recommendationPageBlock = function(){
+JazzeePageRecommenders.prototype.editLorPage = function(){
   var pageClass = this;
-  var p = $('<p>').addClass('edit lorPage').html('Edit Recommendation Page').bind('click',function(e){
-    pageClass.getRecommendationPage().workspace();
-    //get rid of the min/max/preview/delete controls
-    $('#workspace-right-top').empty();
-    $('#workspace-right-bottom').empty();
-  });
-  return p;
-};
-
-/**
- * Answer status Block
- * @returns {jQuery}
- */
-JazzeePageRecommenders.prototype.recommenderEmailBlock = function(){
-  var pageClass = this;
-  var p = $('<p>').addClass('edit recommenderEmail').html('Recommender Email').append($('<br>')).append($('<em>').html(this.getVariable('emailText'))).bind('click', function(e){
-    var obj = new FormObject();
-    var field = obj.newField({name: 'legend', value: 'Edit Recommender Email'});
-    var replace = [
-      {title: 'Applicant Name', replacement: '%APPLICANT_NAME%'},
-      {title: 'Recommendation Dealine', replacement:'%DEADLINE%'},
-      {title: 'Link to the Recommendation', replacement:'%LINK%'},
-      {title: 'Recommender First Name', replacement:'%RECOMMENDER_FIRST_NAME%'},
-      {title: 'Recommender Last Name', replacement:'%RECOMMENDER_LAST_NAME%'},
-      {title: 'Recommender Institution', replacement:'%RECOMMENDER_INSTITUTION%'},
-      {title: 'Recommender Phone', replacement:'%RECOMMENDER_EMAIL%'},
-      {title: 'Recommender Email', replacement:'%RECOMMENDER_PHONE%'}
-    ];
-    field.instructions = 'The following will be replaced with the applicant input for this recommender: ';
-    for(var i in replace){
-      field.instructions += '<br />' + replace[i].replacement + ': ' + replace[i].title;
+  var div = $('<div>');
+  
+  var lorPage = this.getRecommendationPage();
+  if(!lorPage){
+    var dropdown = $('<ul>');
+    for(var i = 0; i < this.pageBuilder.pageTypes.length; i++){
+      var item = $('<a>').html(this.pageBuilder.pageTypes[i].typeName).attr('href', '#').data('pageType', this.pageBuilder.pageTypes[i]);
+      item.bind('click', function(e){
+        var pageType = $(e.target).data('pageType');
+        var child = new window[pageType.typeClass].prototype.newPage('newchildpage' + pageClass.pageBuilder.getUniqueId(),'Recommendation',pageType.id,pageType.typeName,pageType.typeClass,'new',pageClass.pageBuilder);
+        pageClass.addChild(child);
+        pageClass.markModified();
+        div.replaceWith(pageClass.editLorPage());
+        return false;
+      });
+      //for now only allow the standard page
+      if(this.pageBuilder.pageTypes[i].typeClass=='JazzeePageStandard')dropdown.append($('<li>').append(item));
     }
-    var element = field.newElement('Textarea', 'recommenderEmailText');
-    element.label = 'Email Text';
-    element.value = pageClass.getVariable('recommenderEmailText');
-    
-    var form = new Form();
-    var formObject = form.create(obj);
-    $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
-    
-    var div = $('<div>');
-    div.css("overflow-y", "auto");
-    div.html(formObject);
-    div.dialog({
-      modal: true,
-      autoOpen: true,
-      position: 'center',
-      width: 800,
-      close: function() {
-        div.dialog("destroy").remove();
+    var button = $('<button>').html('Select Recommendation Page Type').button();
+    button.qtip({
+      position: {
+        my: 'bottom-left',
+        at: 'bottom-right'
+      },
+      show: {
+        event: 'click'
+      },
+      hide: {
+        event: 'unfocus click',
+        fixed: true
+      },
+      content: {
+        text: dropdown,
+        title: {
+          text: 'Choose a page type',
+          button: true
+        }
       }
     });
-    $('form', div).unbind().bind('submit',function(e){
-
-      pageClass.setVariable('recommenderEmailText', $('textarea[name=recommenderEmailText]', this).val());
-      div.dialog("destroy").remove();
-      p.replaceWith(pageClass.recommenderEmailBlock());
-      return false;
-    });//end submit
-  });
-  return p;
+    div.append(button)
+  } else {
+    var button = $('<button>').html('Edit Recommendation Page').data('page', lorPage).bind('click',function(){
+      var page = $(this).data('page');
+      page.workspace();
+      //empty the toolbar becuase the delete/copy are going to be wrong
+      $('#pageToolbar .copy').remove();
+      $('#pageToolbar .delete').remove();
+      $('#pageToolbar .properties').remove();
+      var button = $('<button>').html('Back to '+pageClass.title).bind('click', function(){
+        pageClass.workspace();
+      });
+      button.button({
+        icons: {
+          primary: 'ui-icon-arrowreturnthick-1-s'
+        }
+      });
+      $('#pageToolbar').prepend(button);
+      
+      var button = $('<button>').html('Delete').data('page', page).bind('click', function(e){
+        $('#editPage').effect('explode',500);
+        pageClass.deleteChild($(e.target).parent().data('page'));
+      });
+      button.button({
+        icons: {
+          primary: 'ui-icon-trash'
+        }
+      });
+      $('#pageToolbar').append(button);
+    }).button({
+      icons: {
+        primary: 'ui-icon-pencil'
+      }
+    });
+    div.append(button);
+  }
+  return div;
 };

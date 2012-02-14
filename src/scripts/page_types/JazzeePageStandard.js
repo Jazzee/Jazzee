@@ -9,46 +9,116 @@ JazzeePageStandard.prototype.constructor = JazzeePageStandard;
 JazzeePageStandard.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
   var pageClass = this;
-  $('#workspace-right-top').append(this.selectListBlock('isRequired', 'This page is', {1:'Required',0:'Optional'}));
-  $('#workspace-right-top').append(this.showAnswerStatusBlock());
+  $('#pageToolbar').append(this.pagePropertiesButton());
   
-  var min = {0: 'No Minimum'};
-  for(var i = 1; i<=50;i++){
-    min[i] = i;
+  var dropdown = $('<ul>');
+  for(var i = 0; i < this.pageBuilder.elementTypes.length; i++){
+    var item = $('<a>').html(this.pageBuilder.elementTypes[i].typeName).attr('href', '#').data('elementTypes', this.pageBuilder.elementTypes[i]);
+    item.bind('click', function(e){
+      var elementType = $(e.target).data('elementTypes');
+      var element = new window[elementType.typeClass].prototype.newElement('new' + pageClass.pageBuilder.getUniqueId(),'New ' + elementType.typeName + ' Element',elementType.typeId,elementType.typeName,elementType.typeClass,'new',pageClass);
+      element.workspace();
+      pageClass.addElement(element);
+      pageClass.markModified();
+      pageClass.synchronizeElementList();
+      return false;
+    });
+    dropdown.append($('<li>').append(item));
   }
-  $('#workspace-right-top').append(this.selectListBlock('min','Minimum Answers Required:', min));
-  var max = {0: 'No Maximum'};
-  for(var i = 1; i<=50;i++){
-    max[i] = i;
-  }
-  $('#workspace-right-top').append(this.selectListBlock('max','Maximum Answers Allowed:', max));
+  var button = $('<button>').html('New Element').button({
+    icons: {
+      primary: 'ui-icon-plus',
+      secondary: 'ui-icon-carat-1-s'
+    }
+  });
+  button.qtip({
+    position: {
+      my: 'top-left',
+      at: 'bottom-left'
+    },
+    show: {
+      event: 'click'
+    },
+    hide: {
+      event: 'unfocus click',
+      fixed: true
+    },
+    content: {
+      text: dropdown,
+      title: {
+        text: 'Choose element type',
+        button: true
+      }
+    }
+  });
+  $('#pageToolbar').append(button);
   
-  
-  
-  $('#workspace-left-middle').show();
   for(var i = 0; i < this.elements.length; i++){
     this.elements[i].workspace();
   }
   this.synchronizeElementList();
-  $('#workspace-left-middle-left div.field:first').trigger('click');
+};
+
+/**
+ * Create the page properties dropdown
+*/
+JazzeePageStandard.prototype.pageProperties = function(){
+  var pageClass = this;
   
-  $.get(pageClass.pageStore.baseUrl + '/listElementTypes',function(json){
-    var div = $('<div>').addClass('new-elements').append($('<h5>').html('New Elements'));
-    var ol = $('<ol>').addClass('add-list');
-    $(json.data.result).each(function(i){
-      var elementType = this;
-      var li = $('<li>').html(elementType.name);
-      $(li).bind('click',function(e){
-        var element = new window[elementType.className].prototype.newElement('new' + pageClass.pageStore.getUniqueId(),'New ' + elementType.name + ' Element',elementType.id,elementType.className,'new',pageClass);
-        pageClass.addElement(element);
-        element.workspace();
-        pageClass.synchronizeElementList();
-      });
-      ol.append(li);
+  var div = $('<div>');
+  div.append(this.isRequiredButton());
+  div.append(this.showAnswerStatusButton());
+  if(pageClass.answerStatusDisplay == 1){
+    var button = $('<button>').html('Edit Answer Status Display').attr('id', 'editDisplayButton').bind('click', function(e){
+      $('.qtip').qtip('api').hide();
+      pageClass.displayAnswerStatusForm();
     });
-    div.append(ol);
-    $('#workspace-right-middle').append(div);
+    button.button({
+      icons: {
+        primary: 'ui-icon-newwin'
+      }
+    });
+    div.append(button);
+  }
+  
+  $('#answerStatusDisplayButton', div).bind('click',function(e){
+    if(pageClass.answerStatusDisplay == 0){
+      pageClass.setVariable('answerStatusTitle',  null);
+      pageClass.setVariable('answerStatusText', null);
+    }
+    //rebuild the tooltip so the edit status display button will show up or be hidden
+    div.replaceWith(pageClass.pageProperties());
   });
+ 
+  var slider = $('<div>');
+  slider.slider({
+    value: this.min,
+    min: 0,
+    max: 20,
+    step: 1,
+    slide: function( event, ui ) {
+      pageClass.setProperty('min', ui.value);
+      $('#minValue').html(pageClass.min == 0?'No Minimum':pageClass.min);
+    }
+  });
+  div.append($('<p>').html('Minimum Answers Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
+  div.append(slider);
+   
+  var slider = $('<div>');
+  slider.slider({
+    value: this.max,
+    min: 0,
+    max: 20,
+    step: 1,
+    slide: function( event, ui ) {
+      pageClass.setProperty('max', ui.value);
+      $('#maxValue').html(pageClass.max == 0?'No Maximum':pageClass.max);
+    }
+  });
+  div.append($('<p>').html('Maximum Answers Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
+  div.append(slider);
+  
+  return div;
 };
 
 /**
@@ -57,17 +127,18 @@ JazzeePageStandard.prototype.workspace = function(){
  */
 JazzeePageStandard.prototype.copyElement = function(e){
   var obj = e.getDataObject();
-  obj.id = 'newelement' + this.pageStore.getUniqueId();
+  obj.id = 'newelement' + this.pageBuilder.getUniqueId();
   obj.title = 'Copy of ' + obj.title;
-  var element = new window[obj.className]();
+  var element = new window[obj.typeClass]();
   element.init(obj, this);
   element.status = 'new';
-  element.isModified = true;
+  element.markModified();
   for(var i = 0; i < obj.list.length; i++){
     element.newListItem(obj.list[i].value);
   }
   this.addElement(element);
   element.workspace();
+  this.markModified();
   this.synchronizeElementList();
 };
 
@@ -77,83 +148,50 @@ JazzeePageStandard.prototype.copyElement = function(e){
  */
 JazzeePageStandard.prototype.synchronizeElementList = function(){
   var pageClass = this;
-  $('#workspace-left-middle-left div.field').unbind('click');
-  $('#workspace-left-middle-left div.field').each(function(i){
-    $(this).bind('click', function(){
-      $('#workspace-left-middle-right div').hide();
-      $('#workspace-left-middle-left div.selected').removeClass('selected');
-      $('#element-'+$(this).data('element').id).addClass('selected');
-      $('#element-options-'+$(this).data('element').id).show().children().show();
-    });
+  
+  $('#elements > div').each(function(i){
     $(this).data('element').setProperty('weight',i+1);
   });
-  var list = $('#workspace-left-middle-left');
+  var list = $('#elements');
   list.sortable();
   list.bind("sortupdate", function(event, ui) {
+    pageClass.markModified();
     pageClass.synchronizeElementList();
   });
 };
 
 /**
- * Answer status Block
+ * Display the form for setting up answer status
  * @returns {jQuery}
  */
-JazzeePageStandard.prototype.showAnswerStatusBlock = function(){
+JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
   var pageClass = this;
-  var value = (this.answerStatusDisplay)?'shown':'not shown';
-  var p = $('<p>').addClass('edit showAnswerStatus').html('Answer status ').append($('<span>').html(value)).bind('click', function(e){
-    var obj = new FormObject();
-    var field = obj.newField({name: 'legend', value: 'Answer Status'});
-    var element = field.newElement('RadioList', 'answerStatusDisplay');
-    element.label = 'Show status on this page?';
-    element.required = true;
-    element.addItem('Yes', 1);
-    element.addItem('No', 0);
-    element.value = (pageClass.answerStatusDisplay)?1:0;
-    var element = field.newElement('TextInput', 'title');
-    element.label = 'Title';
-    element.value = pageClass.getVariable('answerStatusTitle');
-    var element = field.newElement('Textarea', 'text');
-    element.label = 'Text';
-    element.value = pageClass.getVariable('answerStatusText');
-    element.instructions = 'The following will be replaced with the applicant input on this answer:';
-    for(var i in pageClass.elements){
-      var el = pageClass.elements[i];
-      element.instructions += '<br />' + el.replacementTitle() + ': ' + el.title;
-    }
-    
-    var form = new Form();
-    var formObject = form.create(obj);
-    $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
-    
-    var div = $('<div>');
-    div.css("overflow-y", "auto");
-    div.html(formObject);
-    div.dialog({
-      modal: true,
-      autoOpen: true,
-      position: 'center',
-      width: 800,
-      close: function() {
-        div.dialog("destroy").remove();
-      }
-    });
-    $('form', div).unbind().bind('submit',function(e){
-      var show = $('input[name=answerStatusDisplay]:checked', this).val();
-      pageClass.setProperty('answerStatusDisplay', show);
-      if(show == 1){
-        var title = $('input[name=title]', this).val();
-        var text = $('textarea[name=text]', this).val();
-      } else {
-        var title = null;
-        var text = null;
-      }
-      pageClass.setVariable('answerStatusTitle', title);
-      pageClass.setVariable('answerStatusText', text);
-      div.dialog("destroy").remove();
-      p.replaceWith(pageClass.showAnswerStatusBlock());
-      return false;
-    });//end submit
-  });
-  return p;
+  
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Answer Status'});
+  
+  var element = field.newElement('TextInput', 'title');
+  element.label = 'Title';
+  element.required = true;
+  element.value = pageClass.getVariable('answerStatusTitle');
+  var element = field.newElement('Textarea', 'text');
+  element.label = 'Text';
+  element.required = true;
+  element.value = pageClass.getVariable('answerStatusText');
+  element.instructions = 'The following will be replaced with the applicant input on this answer:';
+  for(var i in pageClass.elements){
+    var el = pageClass.elements[i];
+    element.instructions += '<br />' + el.replacementTitle() + ': ' + el.title;
+  }
+
+  var form = new Form();
+  var formObject = form.create(obj);
+  $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
+  var dialog = pageClass.displayForm(obj);
+  $('form', dialog).unbind().bind('submit',function(e){
+    pageClass.setVariable('answerStatusTitle',  $('input[name=title]', this).val());
+    pageClass.setVariable('answerStatusText', $('textarea[name=text]', this).val());
+    dialog.dialog("destroy").remove();
+    return false;
+  });//end submit
 };

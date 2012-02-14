@@ -71,7 +71,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
       case 'new':
         $page = new \Jazzee\Entity\Page();
         $page->notGlobal();
-        $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->classId));
+        $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
         $this->_em->persist($page);
         $applicationPage = new \Jazzee\Entity\ApplicationPage();
         $applicationPage->setPage($page);
