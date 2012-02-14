@@ -80,6 +80,8 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->addCss($this->path('resource/foundation/styles/reset-fonts-grids.css'));
     $this->addCss($this->path('resource/foundation/styles/base.css'));
     
+    //anytime css has to go before jquery ui theme
+    $this->addCss($this->path('resource/foundation/styles/anytime.css'));
     //default jquery theme
     $this->addCss($this->path('resource/foundation/styles/jquerythemes/ui-lightness/style.css'));
     
@@ -145,6 +147,8 @@ class JazzeePageController extends \Foundation\VC\Controller
     $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jquery.json-2.2.min.js'));
     $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jquery.cookie-1.min.js'));
     $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', __DIR__ . '/../../lib/foundation/lib/jquery/jquery-ui-1.8.16.min.js'));
+    $scripts->addFile('jquery.qtip.js', new \Foundation\Virtual\RealFile('jquery.qtip.min.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.js'));
+    $scripts->addFile('anytime.js', new \Foundation\Virtual\RealFile('anytime.js', __DIR__ . '/../../lib/foundation/lib/anytime/anytimec.js'));
     $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', __DIR__ . '/../../lib/foundation/src/javascript/form.js'));
     
     $styles = new \Foundation\Virtual\VirtualDirectory();
@@ -152,6 +156,8 @@ class JazzeePageController extends \Foundation\VC\Controller
     
     $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', __DIR__ . '/../../lib/foundation/lib/yui/base-min.css'));
     $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../lib/foundation/lib/yui/reset-fonts-grids-min.css'));
+    $styles->addFile('jquery.qtip.css', new \Foundation\Virtual\RealFile('jquery.qtip.min.css', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.css'));
+    $styles->addFile('anytime.css', new \Foundation\Virtual\RealFile('anytime.css', __DIR__ . '/../../lib/foundation/lib/anytime/anytimec.css'));
 
     $virtualFoundation->addDirectory('media',$media);
     $virtualFoundation->addDirectory('scripts',$scripts);

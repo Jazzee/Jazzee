@@ -76,6 +76,10 @@ class JazzeeController extends PageController
     $this->addScript($this->path('resource/foundation/scripts/jqueryui.js'));
     $this->addScript($this->path('resource/foundation/scripts/jquery.json.js'));
     $this->addScript($this->path('resource/foundation/scripts/jquery.cookie.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jquery.qtip.js'));
+    $this->addScript($this->path('resource/foundation/scripts/anytime.js'));
+    
+    $this->addCss($this->path('resource/foundation/styles/jquery.qtip.css'));
     
     //add the Services javascript class
     $this->addScript($this->path('resource/scripts/classes/Services.class.js'));
