@@ -214,7 +214,7 @@ class JazzeeController extends PageController
     $safeName = md5($filename);
     file_put_contents($this->getVarPath() . '/tmp/' . $safeName . '.' . $ext, $blob);
     $session = new \Foundation\Session();
-    $store = $session->getStore('files', 900);
+    $store = $session->getStore('files');
     $store->$safeName = $filename;
   }
   
@@ -229,7 +229,7 @@ class JazzeeController extends PageController
     $safeName = md5($filename);
     $path = $this->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
     $session = new \Foundation\Session();
-    $store = $session->getStore('files', 900);
+    $store = $session->getStore('files');
     if(is_readable($path) and isset($store->$safeName) and $store->$safeName == $filename) 
             return new \Foundation\Virtual\RealFile($filename, $path);
     return false;
