@@ -28,15 +28,15 @@ function JazzeePage(){
   this.children;
   this.deletedChildren;
   
-  this.global = {};
-  this.global.title;
-  this.global.min;
-  this.global.max;
-  this.global.isRequired;
-  this.global.instructions;
-  this.global.leadingText;
-  this.global.trailingText;
-  this.global.answerStatusDisplay;
+  this.globalPage = {};
+  this.globalPage.title;
+  this.globalPage.min;
+  this.globalPage.max;
+  this.globalPage.isRequired;
+  this.globalPage.instructions;
+  this.globalPage.leadingText;
+  this.globalPage.trailingText;
+  this.globalPage.answerStatusDisplay;
   
   this.status;
   this.isModified;
@@ -69,17 +69,17 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.deletedElements = [];
   this.children = {};
   this.deletedChildren = [];
+  this.globalPage = {};
   
-  if(pageObject.global != undefined){
-    this.global.title = pageObject.global.title;
-    this.global.isGlobal = pageObject.global.isGlobal;
-    this.global.min = pageObject.global.min;
-    this.global.max = pageObject.global.max;
-    this.global.isRequired = (pageObject.global.isRequired)?1:0;
-    this.global.instructions = pageObject.global.instructions;
-    this.global.leadingText = pageObject.global.leadingText;
-    this.global.trailingText = pageObject.global.trailingText;
-    this.global.answerStatusDisplay = (pageObject.global.answerStatusDisplay)?1:0;
+  if(pageObject.globalPage != undefined){
+    this.globalPage.title = pageObject.globalPage.title;
+    this.globalPage.min = pageObject.globalPage.min;
+    this.globalPage.max = pageObject.globalPage.max;
+    this.globalPage.isRequired = (pageObject.globalPage.isRequired)?1:0;
+    this.globalPage.instructions = pageObject.globalPage.instructions;
+    this.globalPage.leadingText = pageObject.globalPage.leadingText;
+    this.globalPage.trailingText = pageObject.globalPage.trailingText;
+    this.globalPage.answerStatusDisplay = (pageObject.globalPage.answerStatusDisplay)?1:0;
   }
   this.status = '';
   this.isModified = false;
@@ -435,7 +435,11 @@ JazzeePage.prototype.titleWorkspace = function(){
       primary: 'ui-icon-pencil'
     }
   });
-  div.append($('<p>').html('<strong>'+this.title+'</strong>').prepend(button));
+  var title = '<strong>'+this.title+'</strong>';
+  if(this.isGlobal && !this.pageBuilder.editGlobal){
+    title += ' ('+this.globalPage.title+')';
+  }
+  div.append($('<p>').html(title).prepend(button));
   return div;
 };
 
@@ -451,6 +455,10 @@ JazzeePage.prototype.instructionsWorkspace = function(){
   element.label = 'Form Instructions';
   element.value = this.instructions;
   var dialog = this.displayForm(obj);
+  if(this.isGlobal && !this.pageBuilder.editGlobal && this.instructions != this.globalPage.instructions){
+    var text = $('<pre>').text(this.globalPage.instructions);
+    dialog.prepend($('<div>').html('<h5>Global Instructions</h5>').append(text));
+  } 
   $('form', dialog).bind('submit',function(e){
     var value = $('textarea[name="instructions"]', this).val()==''?null:$('textarea[name="instructions"]', this).val();
     pageClass.setProperty('instructions', value);
@@ -483,6 +491,10 @@ JazzeePage.prototype.leadingTextWorkspace = function(){
   element.label = 'Leading Text';
   element.value = this.leadingText;
   var dialog = this.displayForm(obj);
+  if(this.isGlobal && !this.pageBuilder.editGlobal && this.leadingText != this.globalPage.leadingText){
+    var text = $('<pre>').text(this.globalPage.leadingText);
+    dialog.prepend($('<div>').html('<h5>Global Text</h5>').append(text));
+  } 
   $('form', dialog).bind('submit',function(e){
     var value = $('textarea[name="text"]', this).val() == ''?null:$('textarea[name="text"]', this).val();
     pageClass.setProperty('leadingText', value);
@@ -515,6 +527,10 @@ JazzeePage.prototype.trailingTextWorkspace = function(){
   element.label = 'Trailing Text';
   element.value = this.trailingText;
   var dialog = this.displayForm(obj);
+  if(this.isGlobal && !this.pageBuilder.editGlobal && this.trailingText != this.globalPage.trailingText){
+    var text = $('<pre>').text(this.globalPage.trailingText);
+    dialog.prepend($('<div>').html('<h5>Global Text</h5>').append(text));
+  } 
   $('form', dialog).bind('submit',function(e){
     var value = $('textarea[name="text"]', this).val()==''?null:$('textarea[name="text"]', this).val();
     pageClass.setProperty('trailingText', value);

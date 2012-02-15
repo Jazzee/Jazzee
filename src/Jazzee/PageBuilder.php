@@ -86,7 +86,6 @@ abstract class PageBuilder extends AdminController{
       'max' => is_null($page->getMax())?0:$page->getMax(),
       'isRequired' => (int)$page->isRequired(),
       'answerStatusDisplay' => $page->answerStatusDisplay()?1:0,
-      'isGlobal' => $page->isGlobal()?1:0,
       'instructions' => $page->getInstructions(),
       'leadingText' => $page->getLeadingText(),
       'trailingText' => $page->getTrailingText()
@@ -95,6 +94,7 @@ abstract class PageBuilder extends AdminController{
     //now that we have completed the general setup replace $applicationPage with $page
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $arr['weight'] = $page->getWeight();
+      $arr['applicationPageId'] = $page->getId();
       $page = $page->getPage();
       //for global pages also pass the global page info for reference
       if($page->isGlobal()){
@@ -114,6 +114,7 @@ abstract class PageBuilder extends AdminController{
     $arr['typeClass'] = $this->getClassName($page->getType()->getClass());
     $arr['typeName'] = $this->getClassName($page->getType()->getName());
     $arr['typeId'] = $page->getType()->getId();
+    $arr['isGlobal'] = $page->isGlobal()?1:0;
     $arr['elements'] = array();
     foreach($page->getElements() as $element){
       $e = array(

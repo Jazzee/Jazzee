@@ -46,7 +46,8 @@ PageBuilder.prototype.setup = function(){
         pageBuilder.elementTypes.push(this);
       });
     }
-  });$.ajax({
+  });
+  $.ajax({
     type: 'GET',
     url: this.controllerPath + '/listPaymentTypes',
     async: false,
@@ -133,7 +134,8 @@ PageBuilder.prototype.getPagesList = function(){
   for(var i in this.pages){
     var page = this.pages[i];
     var li = $('<li>');
-    li.html(page.title).attr('id', 'page-' + page.id).data('page', page);
+    li.html(page.title).attr('id', 'page-' + page.id);
+    li.data('page', page);
     li.unbind('click');
     li.bind('click', function(e){
       $(this).parent().children('li').removeClass('active');

@@ -3,60 +3,61 @@
   @extends ApplyPage
  */
 function JazzeePageStandard(){}
-JazzeePageStandard.prototype = new JazzeePage();
+JazzeePageStandard.prototype = new JazzeePage;
 JazzeePageStandard.prototype.constructor = JazzeePageStandard;
 
 JazzeePageStandard.prototype.workspace = function(){
   JazzeePage.prototype.workspace.call(this);
   var pageClass = this;
   $('#pageToolbar').append(this.pagePropertiesButton());
-  
-  var dropdown = $('<ul>');
-  for(var i = 0; i < this.pageBuilder.elementTypes.length; i++){
-    var item = $('<a>').html(this.pageBuilder.elementTypes[i].typeName).attr('href', '#').data('elementTypes', this.pageBuilder.elementTypes[i]);
-    item.bind('click', function(e){
-      var elementType = $(e.target).data('elementTypes');
-      var element = new window[elementType.typeClass].prototype.newElement('new' + pageClass.pageBuilder.getUniqueId(),'New ' + elementType.typeName + ' Element',elementType.typeId,elementType.typeName,elementType.typeClass,'new',pageClass);
-      element.workspace();
-      pageClass.addElement(element);
-      pageClass.markModified();
-      pageClass.synchronizeElementList();
-      return false;
-    });
-    dropdown.append($('<li>').append(item));
-  }
-  var button = $('<button>').html('New Element').button({
-    icons: {
-      primary: 'ui-icon-plus',
-      secondary: 'ui-icon-carat-1-s'
+  if(!this.isGlobal || this.pageBuilder.editGlobal){
+    var dropdown = $('<ul>');
+    for(var i = 0; i < this.pageBuilder.elementTypes.length; i++){
+      var item = $('<a>').html(this.pageBuilder.elementTypes[i].typeName).attr('href', '#').data('elementTypes', this.pageBuilder.elementTypes[i]);
+      item.bind('click', function(e){
+        var elementType = $(e.target).data('elementTypes');
+        var element = new window[elementType.typeClass].prototype.newElement('new' + pageClass.pageBuilder.getUniqueId(),'New ' + elementType.typeName + ' Element',elementType.typeId,elementType.typeName,elementType.typeClass,'new',pageClass);
+        element.workspace();
+        pageClass.addElement(element);
+        pageClass.markModified();
+        pageClass.synchronizeElementList();
+        return false;
+      });
+      dropdown.append($('<li>').append(item));
     }
-  });
-  button.qtip({
-    position: {
-      my: 'top-left',
-      at: 'bottom-left'
-    },
-    show: {
-      event: 'click'
-    },
-    hide: {
-      event: 'unfocus click',
-      fixed: true
-    },
-    content: {
-      text: dropdown,
-      title: {
-        text: 'Choose element type',
-        button: true
+    var button = $('<button>').html('New Element').button({
+      icons: {
+        primary: 'ui-icon-plus',
+        secondary: 'ui-icon-carat-1-s'
       }
+    });
+    button.qtip({
+      position: {
+        my: 'top-left',
+        at: 'bottom-left'
+      },
+      show: {
+        event: 'click'
+      },
+      hide: {
+        event: 'unfocus click',
+        fixed: true
+      },
+      content: {
+        text: dropdown,
+        title: {
+          text: 'Choose element type',
+          button: true
+        }
+      }
+    });
+    $('#pageToolbar').append(button);
+
+    for(var i = 0; i < this.elements.length; i++){
+      this.elements[i].workspace();
     }
-  });
-  $('#pageToolbar').append(button);
-  
-  for(var i = 0; i < this.elements.length; i++){
-    this.elements[i].workspace();
+    this.synchronizeElementList();
   }
-  this.synchronizeElementList();
 };
 
 /**
@@ -68,27 +69,25 @@ JazzeePageStandard.prototype.pageProperties = function(){
   var div = $('<div>');
   div.append(this.isRequiredButton());
   div.append(this.showAnswerStatusButton());
-  if(pageClass.answerStatusDisplay == 1){
-    var button = $('<button>').html('Edit Answer Status Display').attr('id', 'editDisplayButton').bind('click', function(e){
-      $('.qtip').qtip('api').hide();
-      pageClass.displayAnswerStatusForm();
-    });
-    button.button({
-      icons: {
-        primary: 'ui-icon-newwin'
-      }
-    });
-    div.append(button);
-  }
-  
-  $('#answerStatusDisplayButton', div).bind('click',function(e){
-    if(pageClass.answerStatusDisplay == 0){
-      pageClass.setVariable('answerStatusTitle',  null);
-      pageClass.setVariable('answerStatusText', null);
+  if(!this.isGlobal || this.pageBuilder.editGlobal){ 
+    if(pageClass.answerStatusDisplay == 1){
+      var button = $('<button>').html('Edit Answer Status Display').attr('id', 'editDisplayButton').bind('click', function(e){
+        $('.qtip').qtip('api').hide();
+        pageClass.displayAnswerStatusForm();
+      });
+      button.button({
+        icons: {
+          primary: 'ui-icon-newwin'
+        }
+      });
+      div.append(button);
     }
-    //rebuild the tooltip so the edit status display button will show up or be hidden
-    div.replaceWith(pageClass.pageProperties());
-  });
+
+    $('#answerStatusDisplayButton input', div).bind('click',function(e){
+      //rebuild the tooltip so the edit status display button will show up or be hidden
+      div.replaceWith(pageClass.pageProperties());
+    });
+  }
  
   var slider = $('<div>');
   slider.slider({
@@ -181,7 +180,9 @@ JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
   element.instructions = 'The following will be replaced with the applicant input on this answer:';
   for(var i in pageClass.elements){
     var el = pageClass.elements[i];
-    element.instructions += '<br />' + el.replacementTitle() + ': ' + el.title;
+    var text = el.title.replace(/\s+/, '_');
+    text = '%' + text.toUpperCase() + '%';
+    element.instructions += '<br />' + text + ': ' + el.title;
   }
 
   var form = new Form();
@@ -194,4 +195,5 @@ JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
     dialog.dialog("destroy").remove();
     return false;
   });//end submit
+  dialog.dialog('open');
 };

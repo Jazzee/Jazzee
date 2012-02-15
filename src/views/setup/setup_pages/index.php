@@ -1,8 +1,7 @@
 <?php 
 /**
- * setup_pages index view
+ * s index view
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  * @subpackage setup
@@ -10,40 +9,16 @@
 ?>
 <noscript>This Page Requires javascript.  Please consult your department IT support for help enabling Javascript in your browser.</noscript>
 <?php if($published){ ?>
-<p><strong>Warning:</strong> You are editing an application which has already been published.  This can result in applicant data loss.</p>
+  <p><strong>Warning:</strong> You are editing an application which has already been published.  This can result in applicant data loss.</p>
 <?php } ?>
 <div id='canvas' class='yui-t2'>
+  <div id='save'></div>
+  <div id='status'></div>
   <div id='yui-main'>
-    <div id='workspace' class='container yui-b'>
-    <div class='yui-ge'>
-      <div class='yui-u first yui-ge'>
-      	<div id='workspace-left-top'></div>
-      	<div id='workspace-left-middle'>
-          <div id='workspace-left-middle-left' class='yui-u first'></div>
-          <div id='workspace-left-middle-right' class='yui-u'></div>
-				</div>
-        <div id='workspace-left-bottom-left' class='yui-u first'></div>
-        <div id='workspace-left-bottom-right' class='yui-u'></div>
-      </div>
-      <div class='yui-u'>
-        <div id='workspace-right-top'></div>
-        <div id='workspace-right-middle'></div>
-        <div id='workspace-right-bottom'></div>
-      </div>
-    </div>
+    <div id='editPage' class='container yui-b'>
+      <span id="pageToolbar" class="ui-widget-header ui-corner-all toolbar"></span>
+      <div id='workspace'></div>
     </div>
   </div>
-  <div class='yui-b'>
-    <div id='status' class='container'></div>
-    <div id='pages' class='container'>
-    <h5>Application Pages</h5>
-    </div>
-    <div id='new-pages' class='container'>
-    <h5>New Pages</h5>
-    </div>
-    <div id='global-pages' class='container'>
-    <h5>Global Pages</h5>
-    </div>
-    <div class='container'><p id='save-pages' class='save'>Save</p></div>
-  </div>
+  <div class='yui-b' id='pages' class='container'></div>
 </div>

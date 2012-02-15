@@ -70,9 +70,9 @@ JazzeePageRecommenders.prototype.pageProperties = function(){
   div.append($('<p>').html('Maximum Recommendations Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
   div.append(slider);
   
-  div.append(this.editLOREmailButton());
-  div.append(this.deadlineEnforcedButton());
-  div.append(this.deadlineButton());
+  if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editLOREmailButton());
+  if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.deadlineEnforcedButton());
+  if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.deadlineButton());
   return div;
 };
 

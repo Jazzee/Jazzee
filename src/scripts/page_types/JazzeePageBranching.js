@@ -53,8 +53,7 @@ JazzeePageBranching.prototype.pageProperties = function(){
 //    //rebuild the tooltip so the edit status display button will show up or be hidden
 //    div.replaceWith(pageClass.pageProperties());
 //  });
-  
-  div.append(this.editBranchingElementLabelButton());
+  if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editBranchingElementLabelButton());
   var slider = $('<div>');
   slider.slider({
     value: this.min,
@@ -126,7 +125,7 @@ JazzeePageBranching.prototype.listBranchesBlock = function(){
           primary: 'ui-icon-pencil'
         }
       });
-    li.append(button);
+    if(!this.isGlobal || this.pageBuilder.editGlobal) li.append(button);
     ol.append(li);
   }
   
@@ -165,8 +164,9 @@ JazzeePageBranching.prototype.listBranchesBlock = function(){
       }
     }
   });
-  
-  return div.append(ol).append(button);
+  div.append(ol);
+  if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(button);
+  return div;
 };
 
 /**

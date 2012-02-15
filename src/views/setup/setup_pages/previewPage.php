@@ -2,15 +2,10 @@
 /**
  * setup_pages previewPage view
  * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage admin
  * @subpackage setup
  */
+$class = $page->getPage()->getType()->getClass();
+$this->renderElement($class::APPLY_PAGE_ELEMENT, array('page'=>$page, 'currentAnswerID'=>false, 'applicant'=>$applicant));
 ?>
-<div id='doc3'>
-  <?php 
-    $elementName = \Foundation\VC\Config::findElementCacading($page->getPage()->getType()->getClass(), '', '-page');
-    $this->renderElement($elementName, array('page'=>$page, 'currentAnswerID'=>null, 'applicant'=>$applicant));
-?>
-</div>
