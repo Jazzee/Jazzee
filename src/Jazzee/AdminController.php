@@ -254,22 +254,6 @@ abstract class AdminController extends Controller{
   }
   
   /**
-   * Notify and applicant that their status has changed
-   * Several controllers (ApplicantsView, ApplicantsDecisions) can change an applicants status (decisions, sir, answer status)
-   * Use this method to send them notifications 
-   * @param Applicant $applicant
-   */
-  protected function notifyApplicantStatusUpdate(Applicant $applicant){
-    $mail = JazzeeMail::getInstance();
-    $message = new EmailMessage;
-    $message->to($applicant->email, "{$applicant->firstName} {$applicant->lastName}");
-    $message->from($applicant->Application->contactEmail, $applicant->Application->contactName);
-    $message->subject = 'Application Status';
-    $message->body = "We have updated your application status.  In order to protect your privacy you must login to see these changes.  " . $mail->path("apply/{$applicant->Application->Program->shortName}/{$applicant->Application->Cycle->name}/applicant/login");
-    $mail->send($message);
-  }
-  
-  /**
    * Get an applicant by ID
    * Ensures we are fetching an applicant from our current program and cycle
    * @param integer $applicantId
