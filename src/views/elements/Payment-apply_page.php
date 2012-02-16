@@ -38,64 +38,14 @@
     print "<div id='answers'>";
     foreach($answers as $answer){
       if($answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::PENDING or $answer->getPayment()->getStatus() == \Jazzee\Entity\Payment::SETTLED) $completedPayment = true;
-      $payment = $answer->getPayment();
-      if($payment->getStatus() == \Jazzee\Entity\Payment::PENDING or $payment->getStatus() == \Jazzee\Entity\Payment::SETTLED){?>
-        <div class='answer active'>
-        <h5><?php print $payment->getType()->getName(); ?> Payment</h5>
-        <p><strong>Amount: </strong>$<?php print $payment->getAmount(); ?></p>
-        <p class='status'>
-        <?php 
-          $class = $payment->getType()->getClass();
-          switch($payment->getStatus()){
-            case \Jazzee\Entity\Payment::PENDING:
-              $status = $class::PENDING_TEXT;
-              break;
-            case \Jazzee\Entity\Payment::SETTLED:
-              $status = $class::SETTLED_TEXT;
-              break;
-          }
-        ?>
-        Status: <?php print $status; ?>   
-        <?php if($payment->getStatus() == \Jazzee\Entity\Payment::REJECTED){?>
-          <br />Reason: <?php print $payment->getVar('rejectedReason'); ?>
-        <?php } ?>
-        <?php if($payment->getStatus() == \Jazzee\Entity\Payment::REFUNDED){?>
-          <br />Reason: <?php print $payment->getVar('refundedReason'); ?>
-        <?php } ?>
-        </p>
-        <p class='paymentStatusText'><?php print $answer->getPayment()->getType()->getJazzeePaymentType()->getStatusText($payment);?></p>
-      <?php } else {
-          $class = $payment->getType()->getClass();
-          switch($payment->getStatus()){
-            case \Jazzee\Entity\Payment::REJECTED:
-              $reason = $payment->getVar('rejectedReason');
-              $status = $class::REJECTED_TEXT;
-              break;
-            case \Jazzee\Entity\Payment::REFUNDED:
-              $reason = $payment->getVar('refundedReason');
-              $status = $class::REFUNDED_TEXT;
-              break;
-          }
-        ?>
-        <div class='answer inactive'>
-        <h5><?php print $payment->getType()->getName() . ' ' . $status; ?></h5>
-        <p>
-          <strong>Reason:</strong> <?php print $reason; ?>
-        </p>
-        <p class='status'>
-          <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a');?>
-        </p>
-        <p class='paymentStatusText'><?php print $answer->getPayment()->getType()->getJazzeePaymentType()->getStatusText($payment);?></p>
-      <?php } ?>
-    </div>
-    <?php }
+      $class = $answer->getPayment()->getType()->getClass();
+      $this->renderElement($class::APPLY_PAGE_ELEMENT, array('answer'=>$answer));
+    }
     print '</div>';
-  }?>
-  <?php
-  
+  }
   if(!empty($currentAnswerID) or !$completedPayment or is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax()){ ?>
     <div id='leadingText'><?php print $page->getLeadingText()?></div>
       <?php $this->renderElement('form', array('form'=> $page->getJazzeePage()->getForm())); ?>
     <div id='trailingText'><?php print $page->getTrailingText()?></div>
   <?php }
-}
+  } //end else if not skipped

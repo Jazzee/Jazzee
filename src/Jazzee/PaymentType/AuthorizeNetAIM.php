@@ -5,11 +5,8 @@ require_once __DIR__ . '/../../../lib/anet_sdk/AuthorizeNet.php';
  * Pay via Authorize.net Advanced Integration Method
  */
 class AuthorizeNetAIM extends AbstractPaymentType{
-  const PENDING_TEXT = 'Approved';
-  const SETTLED_TEXT = 'Approved';
-  const REJECTED_TEXT = 'Rejected or Voided';
-  const REFUNDED_TEXT = 'Refunded';
-  
+  const APPLY_PAGE_ELEMENT = 'AuthorizeNetPayment-apply_page';
+  const APPLICANTS_SINGLE_ELEMENT = 'AuthorizeNetPayment-applicants_single';
   const MIN_CRON_INTERVAL = 86000; //24 hours minus a bit
   
   /**
@@ -367,9 +364,5 @@ class AuthorizeNetAIM extends AbstractPaymentType{
       }
       if($count) $cron->log("Settled {$count} AuthorizeNetAim Payments.");
     }
-  }
-  
-  public function getDetails(\Jazzee\Entity\Payment $payment){
-    return 'Transaction ID: ' . $payment->getVar('transactionId') . '<br />' . 'Authorization Code:' . $payment->getVar('authorizationCode');
   }
 }

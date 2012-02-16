@@ -4,6 +4,21 @@ namespace Jazzee\Interfaces;
  * Interface for PaymentTypes
  */
 interface PaymentType{
+  
+  /**
+   * Payment Element constants 
+   */
+  
+  /**
+   * The element to load for apply_page view 
+   */
+  const APPLY_PAGE_ELEMENT = '';
+  
+  
+  /**
+   * The element to load for applicants_singe view 
+   */
+  const APPLICANTS_SINGLE_ELEMENT = '';
 
   /**
    * Get the form for new payments
@@ -22,15 +37,6 @@ interface PaymentType{
    * @return Form
    */
   function adminPaymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath);
-  
-  /**
-   * Applypage paymetn status text
-   * 
-   * Instructions to display in the status portion of a payment answer
-   * @param \Jazzee\Entity\Payment $payment
-   * @return string
-   */
-  function getStatusText(\Jazzee\Entity\Payment $payment);
   
   /**
    * Get the setup form
@@ -102,11 +108,4 @@ interface PaymentType{
    * @param \Foundation\Form\Input $input
    */
   function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input);
-  
-  /**
-   * Get the details for a payment as text
-   * #param \Jazzee\Entity\Payment $payment
-   * @return string
-   */
-  function getDetails(\Jazzee\Entity\Payment $payment);
 }

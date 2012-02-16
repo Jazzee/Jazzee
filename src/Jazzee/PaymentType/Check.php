@@ -3,11 +3,9 @@ namespace Jazzee\PaymentType;
 /**
  * Pay by check
  */
-class Check extends AbstractPaymentType{  
-  const PENDING_TEXT = 'We have not recieved your check';
-  const SETTLED_TEXT = 'Your check has been received';
-  const REJECTED_TEXT = 'Your check did not clear or was rejected';
-  const REFUNDED_TEXT = 'We have sent you a refund for this payment';
+class Check extends AbstractPaymentType{
+  const APPLY_PAGE_ELEMENT = 'CheckPayment-apply_page';
+  const APPLICANTS_SINGLE_ELEMENT = 'CheckPayment-applicants_single';
   
   public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath){
     $form = new \Foundation\Form();
@@ -42,25 +40,6 @@ class Check extends AbstractPaymentType{
   
   public function adminPaymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath) {
     return $this->paymentForm($applicant, $amount, $actionPath);
-  }
-  
-  public function getStatusText(\Jazzee\Entity\Payment $payment){
-    $status = '<p><strong>Make Checks Payable to:</strong> ' . $this->_paymentType->getVar('payable') . '</p>';
-    if($this->_paymentType->getVar('address')) $status .= '<p><h4>Mail Check to:</h4>' . nl2br($this->_paymentType->getVar('address')) . '</p>';
-    if($this->_paymentType->getVar('coupon')) $status .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($this->_paymentType->getVar('coupon')) . '</p>';
-    $search = array(
-     '%Applicant_Name%',
-     '%Applicant_ID%',
-     '%Program_Name%',
-     '%Program_ID%'
-    );
-    $replace = array();
-    $replace[] = $payment->getAnswer()->getApplicant()->getFirstName() . ' ' . $payment->getAnswer()->getApplicant()->getLastName();
-    $replace[] = $payment->getAnswer()->getApplicant()->getId();
-    $replace[] = $payment->getAnswer()->getApplicant()->getApplication()->getProgram()->getName();
-    $replace[] = $payment->getAnswer()->getApplicant()->getApplication()->getProgram()->getId();
-
-    return str_ireplace($search, $replace, $status);
   }
   
   public function getSetupForm(){

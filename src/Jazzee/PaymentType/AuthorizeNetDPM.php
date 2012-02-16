@@ -11,7 +11,6 @@ require_once __DIR__ . '/../../../lib/anet_sdk/AuthorizeNet.php';
  * Use the class if you don't want to meet anythign but the most basic PCI requirements the AIM method is more reliable and configurable
  */
 class AuthorizeNetDPM extends AuthorizeNetAIM{
-  
   /**
    * Display a form which posts to authorize.net's server
    * @see ApplyPayment::paymentForm()
