@@ -83,7 +83,7 @@ class Check extends AbstractPaymentType{
   
   public function setup(\Foundation\Form\Input $input){
     $this->_paymentType->setName($input->get('name'));
-    $this->_paymentType->setClass('\\Jazzee\\Entity\\PaymentType\\Check');
+    $this->_paymentType->setClass('\\Jazzee\\PaymentType\\Check');
     $this->_paymentType->setVar('payable', $input->get('payable'));
     $this->_paymentType->setVar('address', $input->get('address'));
     $this->_paymentType->setVar('coupon', $input->get('coupon'));

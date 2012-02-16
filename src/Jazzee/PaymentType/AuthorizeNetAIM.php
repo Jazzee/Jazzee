@@ -81,7 +81,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   public function getSetupForm(){
     $form = new \Foundation\Form();
     $field = $form->newField();
-    $field->setLegend('Setup Authorize.net AIM Payments');        
+    $field->setLegend('Setup Authorize.net Payments');        
     $element = $field->newElement('TextInput','name');
     $element->setLabel('Payment Name');
     $element->setValue($this->_paymentType->getName());
@@ -131,7 +131,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   
   public function setup(\Foundation\Form\Input $input){
     $this->_paymentType->setName($input->get('name'));
-    $this->_paymentType->setClass('\\Jazzee\\Entity\\PaymentType\AuthorizeNetAIM');
+    $this->_paymentType->setClass('\\Jazzee\\PaymentType\AuthorizeNetAIM');
     $this->_paymentType->setVar('description', $input->get('description'));
     $this->_paymentType->setVar('gatewayId', $input->get('gatewayId'));
     $this->_paymentType->setVar('gatewayKey', $input->get('gatewayKey'));

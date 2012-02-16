@@ -90,6 +90,11 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
     return false;
   }
   
+  public function setup(\Foundation\Form\Input $input){
+    parent::setup($input);
+    $this->_paymentType->setClass('\\Jazzee\\PaymentType\AuthorizeNetDPM');
+  }
+  
   /**
    * Parse the transaction results sent from Authorize.net Direct Post
    * @param \TransactionController $transactionController
