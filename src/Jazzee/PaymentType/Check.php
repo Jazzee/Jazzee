@@ -121,6 +121,7 @@ class Check extends AbstractPaymentType{
     $element->setValue('today');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\DateBefore($element, 'tomorrow'));
+    $element->addFilter(new \Foundation\Form\Filter\DateFormat($element, 'c'));
     
     $form->newButton('submit', 'Save');
     return $form;
