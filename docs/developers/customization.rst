@@ -1,0 +1,6 @@
+Customization
+==========================
+
+.. note::
+
+    placeholder

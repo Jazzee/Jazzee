@@ -1,0 +1,6 @@
+Architecture
+============
+
+.. note::
+
+    placeholder

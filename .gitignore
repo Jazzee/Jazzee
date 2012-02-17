@@ -1,5 +1,6 @@
 etc/config.ini.php
 build
+docs/_build
 var/cache/*
 var/log/*
 var/sesion/*

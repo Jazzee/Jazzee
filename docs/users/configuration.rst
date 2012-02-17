@@ -1,0 +1,6 @@
+Configuration
+==============
+
+.. note::
+
+    placeholder
