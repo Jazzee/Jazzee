@@ -72,11 +72,17 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     }
 
     $form->newButton('submit', 'Submit');
-    if($input = $form->processInput($this->post)){   
+    if($input = $form->processInput($this->post)){
+      $count = 0;
       foreach($input->get('applicants') as $id){
         $applicant = $this->getApplicantById($id);
         $applicant->getDecision()->nominateAdmit();
         $this->_em->persist($applicant);
+        $count ++;
+        if($count > 100){
+          $this->_em->flush();
+          $count = 0;
+        }
       }
       $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) nominated for admit.');
       $this->redirectPath('applicants/decisions');
@@ -103,10 +109,16 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
 
     $form->newButton('submit', 'Submit');
     if($input = $form->processInput($this->post)){   
+      $count = 0;
       foreach($input->get('applicants') as $id){
         $applicant = $this->getApplicantById($id);
         $applicant->getDecision()->nominateDeny();
         $this->_em->persist($applicant);
+        $count ++;
+        if($count > 100){
+          $this->_em->flush();
+          $count = 0;
+        }
       }
       $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) nominated for deny.');
       $this->redirectPath('applicants/decisions');
@@ -144,6 +156,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     
     $form->newButton('submit', 'Submit');
     if($input = $form->processInput($this->post)){   
+      $count = 0;
       foreach($input->get('applicants') as $id){
         $applicant = $this->getApplicantById($id);
         $applicant->getDecision()->finalAdmit();
@@ -173,6 +186,11 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
           $this->_em->persist($message);
         }
         $this->_em->persist($applicant);
+        $count ++;
+        if($count > 100){
+          $this->_em->flush();
+          $count = 0;
+        }
       }
       $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) admited.');
       $this->redirectPath('applicants/decisions');
@@ -205,6 +223,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     
     $form->newButton('submit', 'Submit');
     if($input = $form->processInput($this->post)){   
+      $count = 0;
       foreach($input->get('applicants') as $id){
         $applicant = $this->getApplicantById($id);
         $applicant->getDecision()->finalDeny();
@@ -231,6 +250,11 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
           $this->_em->persist($message);
         }
         $this->_em->persist($applicant);
+        $count ++;
+        if($count > 100){
+          $this->_em->flush();
+          $count = 0;
+        }
       }
       $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) denied.');
       $this->redirectPath('applicants/decisions');
