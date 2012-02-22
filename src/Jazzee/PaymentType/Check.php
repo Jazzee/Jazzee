@@ -7,9 +7,9 @@ class Check extends AbstractPaymentType{
   const APPLY_PAGE_ELEMENT = 'CheckPayment-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = 'CheckPayment-applicants_single';
   
-  public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath){
+  public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount){
     $form = new \Foundation\Form();
-    $form->setAction($actionPath);
+    $form->setAction($this->_controller->getActionPath());
     $form->newHiddenElement('amount', $amount);
     $field = $form->newField();
     $field->setLegend($this->_paymentType->getName());
@@ -36,10 +36,6 @@ class Check extends AbstractPaymentType{
     
     $form->newButton('submit', 'Pay By Check');
     return $form;
-  }
-  
-  public function adminPaymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath) {
-    return $this->paymentForm($applicant, $amount, $actionPath);
   }
   
   public function getSetupForm(){
@@ -97,10 +93,6 @@ class Check extends AbstractPaymentType{
     $payment->setAmount($input->get('amount'));
     $payment->pending();
     return true;
-  }
-  
-  public function adminPendingPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
-    return $this->pendingPayment($payment, $input);
   }
   
   /**

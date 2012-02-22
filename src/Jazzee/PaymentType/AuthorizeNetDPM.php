@@ -13,61 +13,62 @@ require_once __DIR__ . '/../../../lib/anet_sdk/AuthorizeNet.php';
 class AuthorizeNetDPM extends AuthorizeNetAIM{
   /**
    * Display a form which posts to authorize.net's server
-   * @see ApplyPayment::paymentForm()
    */
-  public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount, $actionPath){
-    $config = new \Jazzee\Configuration();    
-    $time = time();
-    $fp_sequence = $applicant->getId() . $time;
-    $form = new \Foundation\Form();
-    
-    $form->newHiddenElement('x_amount', $amount);
-    $form->newHiddenElement('x_test_request', ($config->getStatus() == 'PRODUCTION')?0:1);
-    $form->newHiddenElement('x_fp_sequence', $fp_sequence);
-    $form->newHiddenElement('x_fp_hash', \AuthorizeNetDPM::getFingerprint($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'), $amount, $fp_sequence, $time));
-    $form->newHiddenElement('x_fp_timestamp', $time);
-    $form->newHiddenElement('x_relay_response', "TRUE");
-    $form->newHiddenElement('x_relay_url', $actionPath . '/../../../../../transaction/' . \urlencode(get_class($this)));
-    $form->newHiddenElement('redirect_url', $actionPath);
-    $form->newHiddenElement('x_login', $this->_paymentType->getVar('gatewayId'));
-    
-    $form->newHiddenElement('x_cust_id', $applicant->getId());
-    $form->newHiddenElement('x_customer_ip', $_SERVER['REMOTE_ADDR']);
-    $form->newHiddenElement('x_email', $applicant->getEmail());
-    $form->newHiddenElement('x_email_customer', 0);
-    $form->newHiddenElement('x_description', $this->_paymentType->getVar('description'));
+  public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount){
+    if(\is_a($this->_controller,'ApplyPageController')){
+      $time = time();
+      $fp_sequence = $applicant->getId() . $time;
+      $form = new \Foundation\Form();
 
-    
-    $form->setAction($this->_paymentType->getVar('testAccount')?\AuthorizeNetDPM::SANDBOX_URL:\AuthorizeNetDPM::LIVE_URL);
-    $field = $form->newField();
-    $field->setLegend($this->_paymentType->getName());
-    $field->setInstructions("<p><strong>Application Fee:</strong> &#36;{$amount}</p>");
-    
-    $e = $field->newElement('TextInput', 'x_card_num');
-    $e->setLabel('Credit Card Number');
-    $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
-    
-    $e = $field->newElement('TextInput', 'x_exp_date');
-    $e->setLabel('Expiration Date');
-    $e->setFormat('mm/yy eg ' . date('m/y'));
-    $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
-    
-    $e = $field->newElement('TextInput', 'x_card_code');
-    $e->setLabel('CCV');
-    $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
-    
-    $e = $field->newElement('TextInput', 'x_zip');
-    $e->setLabel('Billing Postal Code');
-    $e->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
+      $form->newHiddenElement('x_amount', $amount);
+      $form->newHiddenElement('x_test_request', ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?0:1);
+      $form->newHiddenElement('x_fp_sequence', $fp_sequence);
+      $form->newHiddenElement('x_fp_hash', \AuthorizeNetDPM::getFingerprint($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'), $amount, $fp_sequence, $time));
+      $form->newHiddenElement('x_fp_timestamp', $time);
+      $form->newHiddenElement('x_relay_response', "TRUE");
+      $form->newHiddenElement('x_relay_url', $this->_controller->getActionPath() . '/../../../../../transaction/' . \urlencode(get_class($this)));
+      $form->newHiddenElement('redirect_url', $this->_controller->getActionPath());
+      $form->newHiddenElement('x_login', $this->_paymentType->getVar('gatewayId'));
 
-    $form->newButton('submit', 'Pay with Credit Card');
+      $form->newHiddenElement('x_cust_id', $applicant->getId());
+      $form->newHiddenElement('x_customer_ip', $_SERVER['REMOTE_ADDR']);
+      $form->newHiddenElement('x_email', $applicant->getEmail());
+      $form->newHiddenElement('x_email_customer', 0);
+      $form->newHiddenElement('x_description', $this->_paymentType->getVar('description'));
+
+
+      $form->setAction($this->_paymentType->getVar('testAccount')?\AuthorizeNetDPM::SANDBOX_URL:\AuthorizeNetDPM::LIVE_URL);
+      $field = $form->newField();
+      $field->setLegend($this->_paymentType->getName());
+      $field->setInstructions("<p><strong>Application Fee:</strong> &#36;{$amount}</p>");
+
+      $e = $field->newElement('TextInput', 'x_card_num');
+      $e->setLabel('Credit Card Number');
+      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+
+      $e = $field->newElement('TextInput', 'x_exp_date');
+      $e->setLabel('Expiration Date');
+      $e->setFormat('mm/yy eg ' . date('m/y'));
+      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+
+      $e = $field->newElement('TextInput', 'x_card_code');
+      $e->setLabel('CCV');
+      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+
+      $e = $field->newElement('TextInput', 'x_zip');
+      $e->setLabel('Billing Postal Code');
+      $e->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
+
+      $form->newButton('submit', 'Pay with Credit Card');
+    } else {
+      $form = parent::paymentForm($applicant, $amount);
+    }
     return $form;
   }
   
   /**
    * Record transaction information pending
    * $input isn't used here becuase the DPM method uses the post data directly off the global $_POST
-   * @see ApplyPaymentInterface::pendingPayment()
    */
   public function pendingPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $input = false;

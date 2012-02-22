@@ -55,12 +55,8 @@ class Payment extends Standard {
     }
     //we are eithier processing a good choice of payment and amount or the input from an \Jazzee\Payment form
     //eithier way we need to create the apply payment form
-    //admin pages get a different form
-    if(\get_class($this->_controller) == 'ApplicantsSingleController'){
-      $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType($this->_controller)->adminPaymentForm($this->_applicant, $input['amount'], $this->_controller->getActionPath());
-    } else {
-      $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType($this->_controller)->paymentForm($this->_applicant, $input['amount'], $this->_controller->getActionPath());
-    }
+    $this->_form = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input['paymentType'])->getJazzeePaymentType($this->_controller)->paymentForm($this->_applicant, $input['amount']);
+    
     $this->_form->setCSRFToken($this->_controller->getCSRFToken());
     $this->_form->newHiddenElement('level', 2);
     $this->_form->newHiddenElement('paymentType',$input['paymentType']);
@@ -78,12 +74,8 @@ class Payment extends Standard {
     $payment = new \Jazzee\Entity\Payment();
     $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
     $answer->setPayment($payment);
-    //admin pages get a different payment page
-    if(\get_class($this->_controller) == 'ApplicantsSingleController'){
-      $result = $payment->getType()->getJazzeePaymentType($this->_controller)->adminPendingPayment($payment, $input);
-    } else {
-      $result = $payment->getType()->getJazzeePaymentType($this->_controller)->pendingPayment($payment, $input);
-    }
+    $result = $payment->getType()->getJazzeePaymentType($this->_controller)->pendingPayment($payment, $input);
+    
     if($result){
       $this->_controller->addMessage('success', 'Your payment has been recorded.');
       $this->_form = null;
