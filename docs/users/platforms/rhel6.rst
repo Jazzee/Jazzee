@@ -1,0 +1,69 @@
+RHEL 6 Install
+===============
+
+
+Satisfying Dependencies
+-----------------------------------
+Start with a standard server install with the Web Server profile selected.  
+Enable the Optional Repository by logging into RHN and selecting it.  
+
+Enable the Extra Packages for Enterprise Linux (EPEL) repository::
+
+  #rpm -Uvh http://download.fedora.redhat.com/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+
+Install dependencies::
+
+  #yum install php-devel ImageMagick-devel php-pecl-apc php-mysql libuuid-devel gcc php-ldap php-mbstring clamd clamav-devel
+
+Install pear packages that are not in the RHEL or EPEL repositories::
+
+  #pear install Log PECL/Imagick PECL/UUID
+
+Enable PHP Extensions::
+
+  #echo 'extension=imagick.so' > /etc/php.d/imagick.ini
+  #echo 'extension=uuid.so' > /etc/php.d/uuid.ini
+
+Install the Doctrine ORM::
+
+  #pear channel-discover pear.doctrine-project.org
+  #pear install doctrine/DoctrineORM
+  #pear channel-discover htmlpurifier.org
+
+Install HTML Purifier::
+
+  #pear install hp/HTMLPurifier
+  #chgrp apache /usr/share/pear/HTMLPurifier/DefinitionCache/Serializer
+  #chmod 775 /usr/share/pear/HTMLPurifier/DefinitionCache/Serializer
+
+Download the php clam-av extension from http://php-clamav.sourceforge.net/
+At the time of this writing the current version was 0.15.6.
+Install php-clamav::
+
+  #tar xvzf php-clamav-0.XX.tar.gz
+  #cd php-clamav-0.XX
+  #phpize
+  #./configure --with-clamav
+  #make
+  #cp modules/clamav.so /usr/local/lib/php/extensions/
+
+On a 64bit installation you will need to install the extension in a different location::
+
+  #mkdir -p /usr/local/lib64/php/extensions/
+  #cp modules/clamav.so /usr/local/lib64/php/extensions/
+
+Enable the module::
+
+  #echo 'extension=/usr/local/lib64/php/extensions/clamav.so
+  [clamav]
+  clamav.dbpath="/var/lib/clamav"
+  clamav.maxreclevel=16
+  clamav.maxfiles=10000
+  clamav.maxfilesize=26214400
+  clamav.maxscansize=104857600
+  clamav.keeptmp=0
+  clamav.tmpdir="/tmp"' > clamav.ini
+
+PDFLib is used to generate PDFs of applications.  It isn't free and we want to replace
+it but there does not seem to be a better solution available.  If you want to be able
+to create PDFs of applications you will need to purchase and install PDFLib from http://www.pdflib.com/
