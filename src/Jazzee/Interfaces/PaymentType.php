@@ -19,6 +19,21 @@ interface PaymentType{
    * The element to load for applicants_singe view 
    */
   const APPLICANTS_SINGLE_ELEMENT = '';
+  
+  /**
+   * Constructor
+   * Takes the controller we are working with
+   * 
+   * @param \Jazzee\Entity\PaymentType $paymentType
+   * @param \Jazzee\Controller $controller
+   */
+  function __construct(\Jazzee\Entity\PaymentType $paymentType, \Jazzee\Controller $controller);
+  
+  /**
+   * Set the controller
+   * @param \Jazzee\Controller $controller
+   */
+  function setController(\Jazzee\Controller $controller);
 
   /**
    * Get the form for new payments

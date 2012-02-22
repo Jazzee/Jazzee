@@ -946,11 +946,11 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
     if(!$payment = $answer->getPayment())  throw new \Jazzee\Exception("Answer {$answerId} does not have a payment.");
     if($payment->getStatus() != \Jazzee\Entity\Payment::PENDING) throw new \Jazzee\Exception('Payment ' . $payment->getId() . ' is not pending so cannot be settled.');
-    $form = $payment->getType()->getJazzeePaymentType()->getSettlePaymentForm($payment);
+    $form = $payment->getType()->getJazzeePaymentType($this)->getSettlePaymentForm($payment);
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
-        $result = $payment->getType()->getJazzeePaymentType()->settlePayment($payment, $input);
+        $result = $payment->getType()->getJazzeePaymentType($this)->settlePayment($payment, $input);
         if($result === true){
           $this->_em->persist($payment);
           foreach($payment->getVariables() as $var) $this->_em->persist($var);
@@ -981,11 +981,11 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
     if(!$payment = $answer->getPayment())  throw new \Jazzee\Exception("Answer {$answerId} does not have a payment.");
     if($payment->getStatus() != \Jazzee\Entity\Payment::PENDING and $payment->getStatus() != \Jazzee\Entity\Payment::SETTLED) throw new \Jazzee\Exception('Payment ' . $payment->getId() . ' is not settled or pending so cannot be refunded.');
-    $form = $payment->getType()->getJazzeePaymentType()->getRefundPaymentForm($payment);
+    $form = $payment->getType()->getJazzeePaymentType($this)->getRefundPaymentForm($payment);
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
-        $result = $payment->getType()->getJazzeePaymentType()->refundPayment($payment, $input);
+        $result = $payment->getType()->getJazzeePaymentType($this)->refundPayment($payment, $input);
         if($result === true){
           $this->_em->persist($payment);
           foreach($payment->getVariables() as $var) $this->_em->persist($var);
@@ -1016,11 +1016,11 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     if(!$answer = $applicant->findAnswerById($answerId))  throw new \Jazzee\Exception("Answer {$answerId} does not belong to applicant {$applicantId}");
     if(!$payment = $answer->getPayment())  throw new \Jazzee\Exception("Answer {$answerId} does not have a payment.");
     if($payment->getStatus() != \Jazzee\Entity\Payment::PENDING and $payment->getStatus() != \Jazzee\Entity\Payment::SETTLED) throw new \Jazzee\Exception('Payment ' . $payment->getId() . ' is not settled or pending so cannot be rejected.');
-    $form = $payment->getType()->getJazzeePaymentType()->getRejectPaymentForm($payment);
+    $form = $payment->getType()->getJazzeePaymentType($this)->getRejectPaymentForm($payment);
     if(!empty($this->post)){
       $this->setLayoutVar('textarea', true);
       if($input = $form->processInput($this->post)){
-        $result = $payment->getType()->getJazzeePaymentType()->rejectPayment($payment, $input);
+        $result = $payment->getType()->getJazzeePaymentType($this)->rejectPayment($payment, $input);
         if($result === true){
           $this->_em->persist($payment);
           foreach($payment->getVariables() as $var) $this->_em->persist($var);

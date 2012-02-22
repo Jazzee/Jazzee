@@ -31,12 +31,12 @@ class ManagePaymenttypesController extends \Jazzee\AdminController {
    public function actionEdit($paymentTypeId){ 
     if($paymentType = $this->_em->getRepository('\Jazzee\Entity\PaymentType')->find($paymentTypeId)){
       
-      $form = $paymentType->getJazzeePaymentType()->getSetupForm();
+      $form = $paymentType->getJazzeePaymentType($this)->getSetupForm();
       $form->setCSRFToken($this->getCSRFToken());
       $form->setAction($this->path("manage/paymenttypes/edit/{$paymentTypeId}"));
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
-        $paymentType->getJazzeePaymentType()->setup($input);
+        $paymentType->getJazzeePaymentType($this)->setup($input);
         $this->_em->persist($paymentType);
         foreach($paymentType->getVariables() as $var) $this->_em->persist($var);
         $this->addMessage('success', "Changes Saved");
