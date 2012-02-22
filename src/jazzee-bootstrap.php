@@ -57,8 +57,4 @@ $classLoader->register();
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/scores');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/applicants');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/admin');
-
-if(!class_exists('\PDFlib')){
-  throw new Exception('PDFLib is required and it is not availalbe');
-}
 ?>

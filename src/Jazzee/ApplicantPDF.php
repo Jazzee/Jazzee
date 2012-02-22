@@ -126,6 +126,17 @@ class ApplicantPDF {
   }
   
   /**
+   * Do we have the capability to created pdfs
+   * 
+   * @return boolean 
+   */
+  public static function isAvailable(){
+    if(class_exists('\PDFlib')) return true;
+    
+    return false;
+  }
+  
+  /**
    * PDF a full single applicant
    * @param \Jazzee\Entity\Applicant $applicant
    * @return string the PDF buffer suitable for display

@@ -1155,6 +1155,11 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     //several views are controller by the complete action
     if(in_array($action, array('refreshTags', 'refreshPage'))) $action = 'index';
     if(in_array($action, array('do', 'doAction', 'pageDo', 'doPageAction'))) $action = 'editAnswer';
+    
+    //require a working ApplicantPDF class
+    if(in_array($action, array('pdf'))){
+      if(!\Jazzee\ApplicantPDF::isAvailable()) return false;
+    }
     return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }
