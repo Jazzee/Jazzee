@@ -40,8 +40,35 @@ function JazzeePage(){
   
   this.status;
   this.isModified;
+  
+  this.editorDefaults = {
+    rmUnusedControls: true,
+    autoSave: true,
+    autoGrow: true,
+    maxHeight: '500px',
+    controls: {
+        bold: { visible: true },
+        italic: { visible: true },
+        underline: { visible: true },
+        subscript: { visible: true },
+        superscript: { visible: true },
+        undo: { visible: true },
+        redo: { visible: true },
+        insertOrderedList: { visible: true },
+        insertUnorderedList: { visible: true },
+        createLink: { visible: true },
+        h2: { visible: true },
+        h3: { visible: true },
+        paragraph: { visible: true },
+        cut: { visible: true },
+        copy: { visible: true },
+        paste: { visible: true },
+        html: { visible: true },
+        removeFormat: { visible: true },
+        insertTable: { visible: true }
+    }
+  };
 }
-
 /**
  * Initialize the object
  * @param {Object} pageObject
@@ -468,6 +495,7 @@ JazzeePage.prototype.instructionsWorkspace = function(){
   });//end submit
   var button = $('<button>').bind('click',function(){
     dialog.dialog('open');
+    $('textarea', dialog).wysiwyg(pageClass.editorDefaults);
   }).button({
     text: this.instructions == null?true:false,
     label: 'Edit Form Instructions',
@@ -504,6 +532,7 @@ JazzeePage.prototype.leadingTextWorkspace = function(){
   });//end submit
   var button = $('<button>').bind('click',function(){
     dialog.dialog('open');
+    $('textarea', dialog).wysiwyg(pageClass.editorDefaults);
   }).button({
     text: this.leadingText == null?true:false,
     label: 'Edit Leading Text',
@@ -540,6 +569,7 @@ JazzeePage.prototype.trailingTextWorkspace = function(){
   });//end submit
   var button = $('<button>').bind('click',function(){
     dialog.dialog('open');
+    $('textarea', dialog).wysiwyg(pageClass.editorDefaults);
   }).button({
     text: this.trailingText == null?true:false,
     label: 'Edit Trailing Text',

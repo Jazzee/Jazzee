@@ -148,6 +148,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jquery.cookie-1.min.js'));
     $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', __DIR__ . '/../../lib/foundation/lib/jquery/jquery-ui-1.8.16.min.js'));
     $scripts->addFile('jquery.qtip.js', new \Foundation\Virtual\RealFile('jquery.qtip.min.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.js'));
+    $scripts->addFile('jquery.wysiwyg.js', new \Foundation\Virtual\RealFile('jquery.wysiwyg.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.full.min.js'));
     $scripts->addFile('anytime.js', new \Foundation\Virtual\RealFile('anytime.js', __DIR__ . '/../../lib/foundation/lib/anytime/anytimec.js'));
     $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', __DIR__ . '/../../lib/foundation/src/javascript/form.js'));
     
@@ -158,6 +159,9 @@ class JazzeePageController extends \Foundation\VC\Controller
     $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../lib/foundation/lib/yui/reset-fonts-grids-min.css'));
     $styles->addFile('jquery.qtip.css', new \Foundation\Virtual\RealFile('jquery.qtip.min.css', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.css'));
     $styles->addFile('anytime.css', new \Foundation\Virtual\RealFile('anytime.css', __DIR__ . '/../../lib/foundation/lib/anytime/anytimec.css'));
+    $styles->addFile('jquery.wysiwyg.css', new \Foundation\Virtual\RealFile('jquery.wysiwyg.css', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.css'));
+    $styles->addFile('jquery.wysiwyg.bg.png', new \Foundation\Virtual\RealFile('jquery.wysiwyg.bg.png', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.bg.png'));
+    $styles->addFile('jquery.wysiwyg.gif', new \Foundation\Virtual\RealFile('jquery.wysiwyg.gif', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.gif'));
 
     $virtualFoundation->addDirectory('media',$media);
     $virtualFoundation->addDirectory('scripts',$scripts);

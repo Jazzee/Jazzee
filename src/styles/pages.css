@@ -76,3 +76,7 @@ div.listItems li.inactive{
   border:1px solid #7799bb;
   padding-bottom: 1em;
 }
+
+div.form textarea {
+  width: 100%;
+}

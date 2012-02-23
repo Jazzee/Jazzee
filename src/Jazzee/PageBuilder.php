@@ -18,6 +18,9 @@ abstract class PageBuilder extends AdminController{
     $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
     $this->addScript($this->path('resource/scripts/classes/AuthenticationTimeout.class.js'));
     $this->addScript($this->path('resource/scripts/page_types/JazzeePage.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jquery.wysiwyg.js'));
+    
+    $this->addCss($this->path('resource/foundation/styles/jquery.wysiwyg.css'));
     
     $types = $this->_em->getRepository('\Jazzee\Entity\PageType')->findAll();
     $scripts = array();
