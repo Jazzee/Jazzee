@@ -250,6 +250,7 @@ abstract class PageBuilder extends AdminController{
       //if this is a global page then we are done
       //programs can't edit any of the remaining properties on a globa page
       if($page->getPage()->isGlobal()){
+        $this->addMessage('success',$page->getTitle() . ' page saved.');
         return;
       }
       //otherwise continue making changes by swaping the $page varialbe for the correct \Jazzee\Entity\Page class
@@ -267,7 +268,7 @@ abstract class PageBuilder extends AdminController{
           $childPage = $page->getChildById($child->id);
           $this->_em->remove($childPage);
           $page->getChildren()->removeElement($childPage);
-          $this->addMessage('success',$childPage->getTitle() . ' deleted.');
+          $this->addMessage('success',$childPage->getTitle() . ' page deleted.');
         break;
         case 'new':
           $childPage = new \Jazzee\Entity\Page();
@@ -281,7 +282,7 @@ abstract class PageBuilder extends AdminController{
       }
       unset($childPage);
     }
-    $this->addMessage('success',$page->getTitle() . ' saved.');
+    $this->addMessage('success',$page->getTitle() . ' page saved.');
   }
   
   /**

@@ -39,19 +39,23 @@ a.highlight {font-weight: bold;}
   border-size: 1px;
 }
 
+div.jgrowl {
+  width: 15%;
+}
+
 #ajaxstatus { float: right;}
 
-.success {
+.success, .success div.ui-tooltip-content {
   color: #7799bb;
   border-color:#7799bb;
 }
 
-.notice {
+.notice, .notice div.ui-tooltip-content {
   color: #cc9933;
   border-color:#cc9933;
 }
 
-.error {
+.error, .error div.ui-tooltip-content {
   color: #990000;
   border-color: #990000;
 }

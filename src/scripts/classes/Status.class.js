@@ -1,8 +1,10 @@
-function Status(canvas){
+function Status(canvas, messageCanvas){
   this.counter = 0;
   this.canvas = canvas;
+  this.messageCanvas = messageCanvas;
   $(canvas).append($('<div>').attr('id', 'status-bar').append($('<img src="./index.php?url=resource/foundation/media/ajax-bar.gif">').hide()));
   $(canvas).append($('<div>').attr('id', 'status-message'));
+  $(document).delegate('.qtip.jgrowl', 'mouseover mouseout', this.messageTimer);
 }
 
 Status.prototype.start = function(){
@@ -21,5 +23,63 @@ Status.prototype.updateBar = function(){
 };
 
 Status.prototype.addMessage = function(type, text){
-  $('#status-message').append($('<p>').addClass(type).html(text).slideDown('slow').delay(5000).fadeOut('slow').slideUp('slow'));
+  var self = this;
+  console.log(text);
+  // Use the last visible jGrowl qtip as our positioning target
+  var target = $('.qtip.jgrowl:visible:last');
+  // Create your jGrowl qTip...
+  $(document.body).qtip({
+      // Any content config you want here really.... go wild!
+      content: {
+        text: text
+      },
+      position: {
+        my: 'top right', // Not really important...
+        at: (target.length ? 'bottom' : 'top') + ' right', // If target is window use 'top right' instead of 'bottom right'
+        target: target.length ? target : $(self.messageCanvas), // Use our target declared above
+        adjust: {y: 1} // Add some vertical spacing
+      },
+      show: {
+        event: false, // Don't show it on a regular event
+        ready: true, // Show it when ready (rendered)
+        effect: function() {$(this).stop(0,1).fadeIn(400);}, // Matches the hide effect
+        delay: 0 // Needed to prevent positioning issues
+        
+      },
+      hide: {
+        event: false, // Don't hide it on a regular event
+        effect: function(api) { 
+            // Do a regular fadeOut, but add some spice!
+            $(this).stop(0,1).hide('puff').queue(function() {
+              // Destroy this tooltip after fading out
+              api.destroy();
+            })
+        }
+      },
+      style: {
+        classes: 'jgrowl ui-tooltip-light ui-tooltip-rounded '+type, // Some nice visual classes
+        tip: false // No tips for this one (optional ofcourse)
+      },
+      events: {
+        render: function(event, api) {
+            // Trigger the timer (below) on render
+            self.messageTimer(event);
+            
+        }
+      }
+  })
+  .removeData('qtip');
+};
+
+/**
+ * Destoy messages after a timeout period
+ */
+Status.prototype.messageTimer = function(event){
+  var lifeSpan = 7000; //7 seconds
+  var api = $(event.target).parent().data('qtip');
+  // Otherwise, start/clear the timer depending on event type
+  clearTimeout(api.timer);
+  if(event.type !== 'mouseover') {
+    api.timer = setTimeout(api.hide, lifeSpan);
+  }
 };
