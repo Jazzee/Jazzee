@@ -101,7 +101,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
       'Last Login',
       'Last Update',
       'Account Created',
-      'Status'
+      'Status',
+      'Progress',
+      'Tags'
     );
     foreach($applicationPages as $applicationPage){
       for($i=1;$i<=$applicationPagesAnswerCount[$applicationPage->getPage()->getId()]; $i++){
@@ -123,8 +125,12 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
         $applicant->getLastLogin()->format('c'),
         $applicant->getUpdatedAt()->format('c'),
         $applicant->getCreatedAt()->format('c'),
-        $applicant->getDecision()?$applicant->getDecision()->status():'none'
+        $applicant->getDecision()?$applicant->getDecision()->status():'none',
+        $applicant->getPercentComplete() * 100 . '%'
       );
+      $tags = array();
+      foreach($applicant->getTags() as $tag) $tags[] = $tag->getTitle();
+      $arr[] = implode(' ', $tags);
       foreach($applicationPages as $applicationPage){
         $applicationPage->getJazzeePage()->setApplicant($applicant);
         $answers = $applicant->findAnswersByPage($applicationPage->getPage());
