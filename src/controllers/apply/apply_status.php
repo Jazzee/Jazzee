@@ -187,7 +187,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
     $link->setHref($this->applyPath('status'));
     $menu->addLink($link); 
     if($this->_applicant->getDecision() and $this->_applicant->getDecision()->status() == 'finalAdmit'){
-      $link = new \Foundation\Navigation\Link('Confirm Enrolment');
+      $link = new \Foundation\Navigation\Link('Confirm Enrollment');
       $link->setHref($this->applyPath('status/sir'));
       $menu->addLink($link); 
     }
