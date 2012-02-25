@@ -18,10 +18,10 @@
             $text .= '<p><h4>Mail Check to:</h4>' . nl2br($answer->getPayment()->getType()->getVar('address')) . '</p>';
             $text .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($answer->getPayment()->getType()->getVar('coupon')) . '</p>';
             $search = array(
-              '%Applicant_Name%',
-              '%Applicant_ID%',
-              '%Program_Name%',
-              '%Program_ID%'
+              '_Applicant_Name_',
+              '_Applicant_ID_',
+              '_Program_Name_',
+              '_Program_ID_'
             );
             $replace = array();
             $replace[] = $answer->getApplicant()->getFirstName() . ' ' . $answer->getApplicant()->getLastName();

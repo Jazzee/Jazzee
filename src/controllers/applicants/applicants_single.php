@@ -388,9 +388,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
           $message->setSender(\Jazzee\Entity\Message::PROGRAM);
           $text = $this->_application->getAdmitLetter();
           $search = array(
-           '%Admit_Date%',
-           '%Applicant_Name%',
-           '%Offer_Response_Deadline%'
+           '_Admit_Date_',
+           '_Applicant_Name_',
+           '_Offer_Response_Deadline_'
           );
           $replace = array();
           $replace[] = $applicant->getDecision()->getFinalAdmit()->format('F jS Y');
@@ -527,8 +527,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
           $message->setSender(\Jazzee\Entity\Message::PROGRAM);
           $text = $this->_application->getDenyLetter();
           $search = array(
-           '%Deny_Date%',
-           '%Applicant_Name%'
+           '_Deny_Date_',
+           '_Applicant_Name_'
           );
           $replace = array();
           $replace[] = $applicant->getDecision()->getFinalDeny()->format('F jS Y');

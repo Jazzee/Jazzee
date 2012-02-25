@@ -181,7 +181,7 @@ JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
   for(var i in pageClass.elements){
     var el = pageClass.elements[i];
     var text = el.title.replace(/\s+/, '_');
-    text = '%' + text.toUpperCase() + '%';
+    text = '_' + text.toUpperCase() + '_';
     element.instructions += '<br />' + text + ': ' + el.title;
   }
 

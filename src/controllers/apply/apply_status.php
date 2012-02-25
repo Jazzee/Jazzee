@@ -39,16 +39,16 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
       }
     }
     $search = array(
-     '%Applicant_Name%',
-     '%Application_Deadline%',
-     '%SIR_Link%',
-     '%Admit_Letter%',
-     '%Deny_Letter%',
-     '%Offer_Response_Deadline%',
-     '%Admit_Date%',
-     '%Deny_Date%',
-     '%Accept_Date%',
-     '%Decline_Date%'
+     '_Applicant_Name_',
+     '_Application_Deadline_',
+     '_SIR_Link_',
+     '_Admit_Letter_',
+     '_Deny_Letter_',
+     '_Offer_Response_Deadline_',
+     '_Admit_Date_',
+     '_Deny_Date_',
+     '_Accept_Date_',
+     '_Decline_Date_'
     );
     $replace = array(
      $this->_applicant->getFullName(),
@@ -117,9 +117,9 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
     }
     $text = $this->_application->getAdmitLetter();
     $search = array(
-     '%Admit_Date%',
-     '%Applicant_Name%',
-     '%Offer_Response_Deadline%'
+     '_Admit_Date_',
+     '_Applicant_Name_',
+     '_Offer_Response_Deadline_'
     );
     $replace = array();
     $replace[] = $this->_applicant->getDecision()->getFinalAdmit()->format('F jS Y');
@@ -140,8 +140,8 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
     }
     $text = $this->_application->getDenyLetter();
     $search = array(
-     '%Deny_Date%',
-     '%Applicant_Name%'
+     '_Deny_Date_',
+     '_Applicant_Name_'
     );
     $replace = array();
     $replace[] = $this->_applicant->getDecision()->getFinalDeny()->format('F jS Y');

@@ -22,7 +22,7 @@ if($answers = $page->getJazzeePage()->getAnswers()){
     $replace = array();
     foreach($page->getPage()->getElements() as $element){
       $element->getJazzeeElement()->setController($this->controller);
-      $search[] = '%' . preg_replace('/\s+/', '_', strtoupper($element->getTitle())) . '%';
+      $search[] = '_' . preg_replace('/\s+/', '_', strtoupper($element->getTitle())) . '_';
       $replace[] = $element->getJazzeeElement()->displayValue($answer);
     }?>
     <tr>

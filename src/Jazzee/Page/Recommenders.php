@@ -34,15 +34,15 @@ class Recommenders extends Standard {
    */
   protected function getMessage(\Jazzee\Entity\Answer $answer, $link){
     $search = array(
-     '%APPLICANT_NAME%',
-     '%DEADLINE%',
-     '%LINK%',
-     '%RECOMMENDER_FIRST_NAME%',
-     '%RECOMMENDER_LAST_NAME%',
-     '%RECOMMENDER_INSTITUTION%',
-     '%RECOMMENDER_EMAIL%',
-     '%RECOMMENDER_PHONE%',
-     '%APPLICANT_WAIVE_RIGHT%'
+     '_APPLICANT_NAME_',
+     '_DEADLINE_',
+     '_LINK_',
+     '_RECOMMENDER_FIRST_NAME_',
+     '_RECOMMENDER_LAST_NAME_',
+     '_RECOMMENDER_INSTITUTION_',
+     '_RECOMMENDER_EMAIL_',
+     '_RECOMMENDER_PHONE_',
+     '_APPLICANT_WAIVE_RIGHT_'
     );
     if($deadline = $this->_applicationPage->getPage()->getVar('lorDeadline')){
       $deadline = new \DateTime($deadline);

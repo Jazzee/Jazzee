@@ -20,10 +20,10 @@ class Check extends AbstractPaymentType{
     if($this->_paymentType->getVar('address')) $instructions .= '<p><h4>Mail Check to:</h4>' . nl2br($this->_paymentType->getVar('address')) . '</p>';
     if($this->_paymentType->getVar('coupon')) $instructions .= '<p><h4>Include the following information with your payment:</h4> ' . nl2br($this->_paymentType->getVar('coupon')) . '</p>';
     $search = array(
-     '%Applicant_Name%',
-     '%Applicant_ID%',
-     '%Program_Name%',
-     '%Program_ID%'
+     '_Applicant_Name_',
+     '_Applicant_ID_',
+     '_Program_Name_',
+     '_Program_ID_'
     );
     $replace = array();
     $replace[] = $applicant->getFirstName() . ' ' . $applicant->getLastName();
@@ -40,10 +40,10 @@ class Check extends AbstractPaymentType{
   
   public function getSetupForm(){
     $filters = array(
-      'Applicant Name' => '%Applicant_Name%',
-      'Applicant ID' => '%Applicant_ID%',
-      'Program Name' => '%Program_Name%',
-      'Program ID' => '%Program_ID%'
+      'Applicant Name' => '_Applicant_Name_',
+      'Applicant ID' => '_Applicant_ID_',
+      'Program Name' => '_Program_Name_',
+      'Program ID' => '_Program_ID_'
     );
     $instructions = 'These wildcards will be replaced in the text of each element: ';
     foreach($filters as $title => $wildcard){

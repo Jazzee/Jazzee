@@ -24,9 +24,9 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
     $now = new DateTime('now');
     $text = $this->_application->getAdmitLetter();
     $search = array(
-     '%Admit_Date%',
-     '%Applicant_Name%',
-     '%Offer_Response_Deadline%'
+     '_Admit_Date_',
+     '_Applicant_Name_',
+     '_Offer_Response_Deadline_'
     );
     $replace = array();
     $replace[] = $now->format('F jS Y');
@@ -39,8 +39,8 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
     
     $text = $this->_application->getDenyLetter();
     $search = array(
-     '%Deny_Date%',
-     '%Applicant_Name%'
+     '_Deny_Date_',
+     '_Applicant_Name_'
     );
     $replace = array();
     $replace[] = $now->format('F jS Y');
@@ -61,7 +61,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
     $field = $form->newField();
     $field->setLegend('Edit Admit Letter');
     
-    $field->setInstructions('These tokens will be replaced in the text: %Admit_Date%, %Applicant_Name%, %Offer_Response_Deadline%');
+    $field->setInstructions('These tokens will be replaced in the text: _Admit_Date_, _Applicant_Name_, _Offer_Response_Deadline_');
     
     $element = $field->newElement('Textarea','admitLetter');
     $element->setLabel('Content');
@@ -91,7 +91,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController {
     $field = $form->newField();
     $field->setLegend('Edit Deny Letter');
     
-    $field->setInstructions('These tokens will be replaced in the text: %Deny_Date%, %Applicant_Name%');
+    $field->setInstructions('These tokens will be replaced in the text: _Deny_Date_, _Applicant_Name_');
     
     $element = $field->newElement('Textarea','denyLetter');
     $element->setLabel('Content');

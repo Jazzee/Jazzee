@@ -55,16 +55,16 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $search = array(
-     '%Applicant_Name%',
-     '%Application_Deadline%',
-     '%Offer_Response_Deadline%',
-     '%SIR_Link%',
-     '%Admit_Letter%',
-     '%Deny_Letter%',
-     '%Admit_Date%',
-     '%Deny_Date%',
-     '%Accept_Date%',
-     '%Decline_Date%'
+     '_Applicant_Name_',
+     '_Application_Deadline_',
+     '_Offer_Response_Deadline_',
+     '_SIR_Link_',
+     '_Admit_Letter_',
+     '_Deny_Letter_',
+     '_Admit_Date_',
+     '_Deny_Date_',
+     '_Accept_Date_',
+     '_Decline_Date_'
     );
     
     $instructions = 'You can use these tokens in the text: <br />' . implode('</br />', $search);

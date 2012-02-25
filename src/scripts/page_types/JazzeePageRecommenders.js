@@ -15,11 +15,11 @@ JazzeePageRecommenders.prototype.newPage = function(id,title,typeId,typeName,typ
   var page = JazzeePage.prototype.newPage.call(this, id,title,typeId,typeName,typeClass,status,pageBuilder);
   page.setVariable('lorDeadline', '');
   page.setVariable('lorDeadlineEnforced', 0);
-  page.setVariable('recommenderEmailText', "Dear %RECOMMENDER_FIRST_NAME% %RECOMMENDER_LAST_NAME%,\n"
-      + "%APPLICANT_NAME% has requested a letter of recommendation from you in support of their application for admission to our program. \n"
+  page.setVariable('recommenderEmailText', "Dear _RECOMMENDER_FIRST_NAME_ _RECOMMENDER_LAST_NAME_,\n"
+      + "_APPLICANT_NAME_ has requested a letter of recommendation from you in support of their application for admission to our program. \n"
       + "We use an online system to collect letters of recommendation.  You have been assigned a unique URL for accessing this system.  Please save this email so that you can return to your letter at a later date. \n"
       + "Click the following link to access the online system; or, you may need to copy and paste this link into your browser. \n"
-      + "%LINK% \n");
+      + "_LINK_ \n");
   return page;
 };
 
@@ -85,14 +85,14 @@ JazzeePageRecommenders.prototype.editLOREmailButton = function(){
   var obj = new FormObject();
   var field = obj.newField({name: 'legend', value: 'Edit Email to Recommenders'});
   var replace = [
-    {title: 'Applicant Name', replacement: '%APPLICANT_NAME%'},
-    {title: 'Recommendation Dealine', replacement:'%DEADLINE%'},
-    {title: 'Link to the Recommendation', replacement:'%LINK%'},
-    {title: 'Recommender First Name', replacement:'%RECOMMENDER_FIRST_NAME%'},
-    {title: 'Recommender Last Name', replacement:'%RECOMMENDER_LAST_NAME%'},
-    {title: 'Recommender Institution', replacement:'%RECOMMENDER_INSTITUTION%'},
-    {title: 'Recommender Phone', replacement:'%RECOMMENDER_EMAIL%'},
-    {title: 'Recommender Email', replacement:'%RECOMMENDER_PHONE%'}
+    {title: 'Applicant Name', replacement: '_APPLICANT_NAME_'},
+    {title: 'Recommendation Dealine', replacement:'_DEADLINE_'},
+    {title: 'Link to the Recommendation', replacement:'_LINK_'},
+    {title: 'Recommender First Name', replacement:'_RECOMMENDER_FIRST_NAME_'},
+    {title: 'Recommender Last Name', replacement:'_RECOMMENDER_LAST_NAME_'},
+    {title: 'Recommender Institution', replacement:'_RECOMMENDER_INSTITUTION_'},
+    {title: 'Recommender Phone', replacement:'_RECOMMENDER_EMAIL_'},
+    {title: 'Recommender Email', replacement:'_RECOMMENDER_PHONE_'}
   ];
   field.instructions = 'The following will be replaced with the applicant input for this recommender: ';
   for(var i in replace){
