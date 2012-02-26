@@ -4,6 +4,7 @@
  <property name="source" location="."/>
  <property name="build" value="build"/>
  <property name="apidocsdestination" value="build/apidocs"/>
+ <property name="userdocsdestination" value="build/userdocs"/>
 
  <target name="clean"
          description="Clean up and create build directories">
@@ -45,5 +46,15 @@
      <arg line="--title 'Jazzee API'"/>
      <arg line="--base-url 'http://api.jazzee.org'"/>
    </exec>
-  </target> 
+  </target>
+ 
+  <target name="userdocs" description="Build User Documentation">
+   <exec executable="sphinx-build">
+     <arg line="-b html"/>
+     <arg value="-q"/>
+     <arg value="${source}/docs" />
+     <arg value="${userdocsdestination}"/>
+   </exec>
+  </target>
+  
 </project>
