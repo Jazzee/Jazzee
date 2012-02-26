@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="Jazzee" default="build" basedir='.'>
- <property name="source" value="."/>
+ <property name="source" location="."/>
  <property name="build" value="build"/>
+ <property name="apidocsdestination" value="build/apidocs"/>
 
  <target name="clean"
          description="Clean up and create build directories">
@@ -35,4 +36,14 @@
  <target name="archive" depends="export">
    <tar destfile="${basedir}/build/jazzee.tar" basedir="${basedir}/build/jazzee" />
  </target>
+ 
+  <target name="apidocs" description="Build API Documentation">
+   <exec executable="apigen">
+     <arg line="--source ${source}/src" />
+     <arg line="--destination '${apidocsdestination}'"/>
+     <arg value="--quiet"/>
+     <arg line="--title 'Jazzee API'"/>
+     <arg line="--base-url 'http://api.jazzee.org'"/>
+   </exec>
+  </target> 
 </project>
