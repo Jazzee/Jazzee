@@ -297,6 +297,7 @@ protected $_adminCronAllowed;
       self::setPath(__DIR__ . '/../../etc/config.ini.php');
     }
     $arr = parse_ini_file(self::$_configPath);
+    if(empty($arr) or $arr === false) throw new Exception("Unable to read configuration file at " . self::$_configPath);
     foreach($arr as $name => $value){
       $setter = 'set' . \ucfirst($name);
       if(!method_exists($this, $setter)) throw new Exception("Configuration variable ({$name}) found in file, but it is not a recognized option.");
