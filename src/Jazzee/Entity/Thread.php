@@ -162,6 +162,8 @@ class Thread{
 /**
  * Thread Repository
  * Special Repository methods for Threads
+ * @package jazzee
+ * @subpackage orm
  */
 class ThreadRepository extends \Doctrine\ORM\EntityRepository{
   

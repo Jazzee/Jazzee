@@ -4,6 +4,10 @@ namespace Jazzee\Interfaces;
  * AdminDirectory interface
  * Allows differnt user directory systems to be plugged in
  * Find new users to add and get attributes for existing users
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage admin
  */
 interface AdminDirectory 
 {

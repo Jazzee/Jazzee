@@ -464,6 +464,8 @@ class Application{
 /**
  * ApplicationRepository
  * Special Repository methods for Application to make searchign for special conditions easier
+ * @package jazzee
+ * @subpackage orm
  */
 class ApplicationRepository extends \Doctrine\ORM\EntityRepository{
   

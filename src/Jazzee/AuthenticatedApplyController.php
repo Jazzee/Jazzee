@@ -2,6 +2,10 @@
 namespace Jazzee;
 /**
  * Base controller for all authenticated application controllers
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage apply
  */
 class AuthenticatedApplyController extends ApplyController
 {

@@ -4,6 +4,10 @@ namespace Jazzee\Console;
 /**
  * Update the database to match the schema
  *
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage console
  */
 class Update extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand
 {   

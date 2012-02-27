@@ -637,6 +637,8 @@ class GREScore{
 /**
  * GREScoreRepository
  * Special Repository methods for GREScore
+ * @package jazzee
+ * @subpackage orm
  */
 class GREScoreRepository extends \Doctrine\ORM\EntityRepository{
   

@@ -3,6 +3,11 @@ namespace Jazzee\PaymentType;
 require_once __DIR__ . '/../../../lib/anet_sdk/AuthorizeNet.php'; 
 /**
  * Pay via Authorize.net Advanced Integration Method
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage paymenttypes
  */
 class AuthorizeNetAIM extends AbstractPaymentType{
   const APPLY_PAGE_ELEMENT = 'AuthorizeNetPayment-apply_page';

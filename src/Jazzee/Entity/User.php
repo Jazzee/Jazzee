@@ -306,6 +306,8 @@ class User{
 /**
  * UserRepository
  * Special Repository methods for User to make searchign for special conditions easier
+ * @package jazzee
+ * @subpackage orm
  */
 class UserRepository extends \Doctrine\ORM\EntityRepository{
   

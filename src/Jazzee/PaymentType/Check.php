@@ -2,6 +2,11 @@
 namespace Jazzee\PaymentType;
 /**
  * Pay by check
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage paymenttypes
  */
 class Check extends AbstractPaymentType{
   const APPLY_PAGE_ELEMENT = 'CheckPayment-apply_page';

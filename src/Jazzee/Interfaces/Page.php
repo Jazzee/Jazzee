@@ -3,6 +3,11 @@ namespace Jazzee\Interfaces;
 /**
  * Page interface
  * Allows us to impelement a strategy pattern to load page types with thier Entities
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 interface Page 
 {

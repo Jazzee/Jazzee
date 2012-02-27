@@ -1,6 +1,8 @@
 <?php
 namespace Jazzee;
 /**
+ * Dependancy free controller
+ * 
  * Base page controller doesn't depend on anything so it is safe
  * for error pages and file pages to use it when they don't need acess
  * to configuration or session info setup by JazzeeController

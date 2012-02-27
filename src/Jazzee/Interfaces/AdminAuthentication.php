@@ -4,6 +4,10 @@ namespace Jazzee\Interfaces;
  * AdminAuthentication interface
  * Allows differnt authentication systems to be plugged in
  * Creates an authenticated \Jazzee\Entity\User object
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage admin
  */
 interface AdminAuthentication 
 {

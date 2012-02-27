@@ -96,6 +96,8 @@ class Cycle{
 /**
  * CycleRepository
  * Special Repository methods for Cycles
+ * @package jazzee
+ * @subpackage orm
  */
 class CycleRepository extends \Doctrine\ORM\EntityRepository{
   

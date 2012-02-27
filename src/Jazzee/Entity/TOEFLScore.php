@@ -629,6 +629,8 @@ class TOEFLScore{
 /**
  * TOEFLScoreRepository
  * Special Repository methods for TOEFLScore
+ * @package jazzee
+ * @subpackage orm
  */
 class TOEFLScoreRepository extends \Doctrine\ORM\EntityRepository{
   

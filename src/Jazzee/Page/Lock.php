@@ -2,6 +2,11 @@
 namespace Jazzee\Page;
 /**
  * Test the application for completness and lock it
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 class Lock extends Standard {
   

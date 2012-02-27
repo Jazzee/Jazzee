@@ -2,6 +2,11 @@
 namespace Jazzee\Page;
 /**
  * AbstractPage
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 abstract class AbstractPage implements \Jazzee\Interfaces\Page {
   const ERROR_MESSAGE = 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.';

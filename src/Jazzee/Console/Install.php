@@ -4,6 +4,10 @@ namespace Jazzee\Console;
 /**
  * Install a new database
  *
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage console
  */
 class Install extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand
 {

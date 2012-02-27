@@ -2,6 +2,11 @@
 namespace Jazzee\Page;
 /**
  * Get recommender information from applicnats and send out invitations
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 class Recommenders extends Standard {
   const APPLY_PAGE_ELEMENT = 'Recommenders-apply_page';

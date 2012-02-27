@@ -45,6 +45,7 @@
      <arg value="--quiet"/>
      <arg line="--title 'Jazzee API'"/>
      <arg line="--base-url 'http://api.jazzee.org'"/>
+     <arg line="--groups packages"/>
    </exec>
   </target>
  

@@ -9,6 +9,11 @@ require_once __DIR__ . '/../../../lib/anet_sdk/AuthorizeNet.php';
  * sends a redirect back to authorize.net who sends teh applicant back to the original page
  * 
  * Use the class if you don't want to meet anythign but the most basic PCI requirements the AIM method is more reliable and configurable
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage paymenttypes
  */
 class AuthorizeNetDPM extends AuthorizeNetAIM{
   /**

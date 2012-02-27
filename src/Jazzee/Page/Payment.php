@@ -4,6 +4,11 @@ namespace Jazzee\Page;
  * Payment Page
  * 
  * Branching form to select payment type
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 class Payment extends Standard {
   const APPLY_PAGE_ELEMENT = 'Payment-apply_page';

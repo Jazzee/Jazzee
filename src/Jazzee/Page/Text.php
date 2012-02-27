@@ -2,6 +2,11 @@
 namespace Jazzee\Page;
 /**
  * A page with no form just text
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 class Text extends Standard {
   const APPLY_PAGE_ELEMENT = 'Text-apply_page';

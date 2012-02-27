@@ -5,6 +5,10 @@ namespace Jazzee\Console;
  * Validate database information
  * Just extend the doctrine orm command for this
  *
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage console
  */
 class Validate extends \Doctrine\ORM\Tools\Console\Command\ValidateSchemaCommand
 {

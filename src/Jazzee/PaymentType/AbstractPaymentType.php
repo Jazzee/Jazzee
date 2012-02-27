@@ -2,6 +2,11 @@
 namespace Jazzee\PaymentType;
 /**
  * Abstract PaymeType Class
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage paymenttypes
  *
  */
 abstract class AbstractPaymentType implements \Jazzee\Interfaces\PaymentType{

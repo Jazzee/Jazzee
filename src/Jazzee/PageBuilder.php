@@ -4,6 +4,8 @@ namespace Jazzee;
  * PageBuilder
  * 
  * The page builder abstracts common functionality between application pages and global pages
+ * @package jazzee
+ * @subpackage admin
  */
 abstract class PageBuilder extends AdminController{
   

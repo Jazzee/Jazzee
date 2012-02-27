@@ -2,9 +2,11 @@
 namespace Jazzee\Page;
 /**
  * Branch a child page depending on an applicant input
+ * 
  * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
  * @package jazzee
- * @subpackage apply
+ * @subpackage pages
  */
 class Branching extends Standard 
 {

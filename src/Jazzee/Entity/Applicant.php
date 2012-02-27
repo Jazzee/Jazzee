@@ -706,6 +706,8 @@ class Applicant{
 /**
  * ApplicantRepository
  * Special Repository methods for Applicants
+ * @package jazzee
+ * @subpackage orm
  */
 class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
   

@@ -1,6 +1,10 @@
 <?php
 /**
  * Authentication and Creation of applicants
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage apply
  */
 class ApplyApplicantController extends \Jazzee\ApplyController {
   /**

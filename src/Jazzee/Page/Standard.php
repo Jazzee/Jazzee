@@ -4,6 +4,11 @@ namespace Jazzee\Page;
  * The Standard Application Page
  * 
  * Unless special functionaility is required all pages are of this type
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 class Standard extends AbstractPage {
   const APPLY_PAGE_ELEMENT = 'Standard-apply_page';

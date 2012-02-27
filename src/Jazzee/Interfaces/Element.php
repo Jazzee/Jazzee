@@ -2,6 +2,11 @@
 namespace Jazzee\Interfaces;
 /**
  * Interface for Jazzee Elements
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage elements
  */
 interface Element 
 {

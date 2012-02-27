@@ -3,9 +3,11 @@ namespace Jazzee\Element;
 /**
  * EncryptedTextInput Element
  * Filter the text input through PKI to get an encrypted value
+ * 
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
+ * @subpackage elements
  */
 class EncryptedTextInput extends TextInput {
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementEncryptedTextInput.js';

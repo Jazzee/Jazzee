@@ -11,6 +11,8 @@ namespace Jazzee\Entity;
  *   @UniqueConstraint(name="program_name",columns={"name"}),
  *   @UniqueConstraint(name="program_shortname",columns={"shortName"})
  * })
+ * @package jazzee
+ * @subpackage orm
  **/
 class Program{
   /**
@@ -94,6 +96,8 @@ class Program{
 
 /**
  * Program Repository
+ * @package jazzee
+ * @subpackage orm
  */
 class ProgramRepository extends \Doctrine\ORM\EntityRepository{
   

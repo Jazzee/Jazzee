@@ -1,7 +1,12 @@
 <?php
 namespace Jazzee\Element;
 /**
- * The Abstract Application Elements
+ * The Abstract Application Element
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage elements
  */
 abstract class AbstractElement implements \Jazzee\Interfaces\Element {
  

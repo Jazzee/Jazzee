@@ -2,6 +2,9 @@
 namespace Jazzee;
 /**
  * Jazzee base controller
+ * 
+ * Requires working configuration and dependancies.  
+ * Most usefull contorllers descend from here
  * @package jazzee
  */
 

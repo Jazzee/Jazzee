@@ -2,9 +2,11 @@
 namespace Jazzee\Element;
 /**
  * Date Element
+ * 
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
+ * @subpackage elements
  */
 class Date extends AbstractElement {
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementDate.js';

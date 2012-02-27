@@ -2,6 +2,11 @@
 namespace Jazzee\Page;
 /**
  * The ETSMatch Application Page
+ * 
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage pages
  */
 class ETSMatch extends Standard {
   const APPLY_PAGE_ELEMENT = 'ETSMatch-apply_page';

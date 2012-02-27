@@ -2,9 +2,11 @@
 namespace Jazzee\Element;
 /**
  * Ranking List Element
+ * 
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
+ * @subpackage elements
  */
 class RankingList extends AbstractElement {
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementRankingList.js';

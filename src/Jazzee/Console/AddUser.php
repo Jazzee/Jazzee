@@ -3,6 +3,10 @@ namespace Jazzee\Console;
 
 /**
  * Sets up the first user
+ * @author Jon Johnson <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license.txt
+ * @package jazzee
+ * @subpackage console
  *
  */
 class AddUser extends \Symfony\Component\Console\Command\Command

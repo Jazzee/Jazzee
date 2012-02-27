@@ -2,9 +2,11 @@
 namespace Jazzee\Element;
 /**
  * EmailAddress Element
+ * 
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license.txt
  * @package jazzee
+ * @subpackage elements
  */
 class EmailAddress extends TextInput {
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementEmailAddress.js';
