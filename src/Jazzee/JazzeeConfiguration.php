@@ -286,9 +286,25 @@ protected $_adminCronAllowed;
    */
   public function __construct(){
     $path = $this->getPath();
-    if(!$realPath = \realpath($path) or !\is_readable($realPath)){
-      if($realPath) $path = $realPath;
-      throw new Exception("Unable to load {$path}.", E_ERROR); 
+    if(!$realPath = \realpath($path)){
+      $directory = \dirname($path);
+      if($realPath = \realpath($directory)) $directory = $realPath;
+      $file = \basename($path);
+      throw new Exception("Unable to load configuration.  We were looking for {$file} in {$directory}."); 
+    }
+    if(!\is_readable($realPath)){
+      $perms = \substr(\sprintf('%o', \fileperms($realPath)), -4);
+      $owner = \fileowner($realPath);
+      $group = \filegroup($realPath);
+      if(function_exists('posix_getpwuid')){
+        $arr = posix_getpwuid($owner);
+        $owner = $arr['name'];
+      }
+      if(function_exists('posix_getgrgid')){
+        $arr = posix_getgrgid($group);
+        $group = $arr['name'];
+      }
+      throw new Exception("The configuration file at {$realPath} is not readable.  The file is owned by user {$owner} and group {$group} and has permissions {$perms}."); 
     }
     $arr = parse_ini_file($realPath);
     if(empty($arr) or $arr === false) throw new Exception("Unable to read configuration file at " . $realPath);
