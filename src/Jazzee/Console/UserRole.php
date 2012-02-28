@@ -16,46 +16,31 @@ class UserRole extends \Symfony\Component\Console\Command\Command
      */
     protected function configure()
     {
-        $this
-        ->setName('user-role')
-        ->setDescription('Add a new user.')
-        ->setDefinition(array(
-            new \Symfony\Component\Console\Input\InputOption(
-                'uniqueName', null, \Symfony\Component\Console\Input\InputOption::VALUE_REQUIRED,
-                'Users identity name.'
-            ),
-            new \Symfony\Component\Console\Input\InputOption(
-                'role', null, \Symfony\Component\Console\Input\InputOption::VALUE_REQUIRED,
-                'The name of the role.'
-            )
-        ))
-        ->setHelp('Put a user in a role by name.');
+        $this->setName('user-role') ->setDescription('Add a new user.');
+        $this->addArgument('user name', \Symfony\Component\Console\Input\InputArgument::REQUIRED, 'User name to act on.  Use find-user to search for users in the directory.');
+        $this->addArgument('role name', \Symfony\Component\Console\Input\InputArgument::REQUIRED, 'The name of the role.');
+        $this->setHelp('Put a user in a role by name.');
     }
     protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output){
-      $error = false;
-      if(!$input->getOption('uniqueName')){
-        $output->write('<error>--uniqueName is required.</error>' . PHP_EOL);
-        $error = true;
-      }
-      if(!$input->getOption('role')){
-        $output->write('<error>--role is required.</error>' . PHP_EOL);
-        $error = true;
-      }
-      if($error) exit(1);
       $em = $this->getHelper('em')->getEntityManager();
-      $user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$input->getOption('uniqueName')));
+      $user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$input->getArgument('user name')));
       if(!$user){
-        $output->write('<error>Bad user name.</error>' . PHP_EOL);
+        $output->write('<error>That user does not have an account on this system.  User add-user to create one.</error>' . PHP_EOL);
         exit();
       }
       
-      $role = $em->getRepository('\Jazzee\Entity\Role')->findOneByName($input->getOption('role'));
-      if(!$role){
-        $output->write('<error>Bad role name.</error>' . PHP_EOL);
+      $roles = $em->getRepository('\Jazzee\Entity\Role')->findBy(array('name'=>$input->getArgument('role name'),'isGlobal'=>true));
+      if(count($roles) == 0){
+        $output->write('<error>There are no roles with that name.</error>' . PHP_EOL);
         exit();
       }
-      $user->addRole($role);
+      if(count($roles) > 1){
+        $output->write('<error>There are ' . count($roles) . ' global roles with that name.  You will have to add the user to a different role or edit the names in the web interface.</error>' . PHP_EOL);
+        exit();
+      }
+      $user->addRole($roles[0]);
       $em->persist($user);
       $em->flush();
+      $output->write("<info>{$user->getLastName()}, {$user->getFirstName()} added to {$roles[0]->getName()} role</info>" . PHP_EOL);
     }
 }
