@@ -16,28 +16,18 @@ class CreateAdminRole extends \Symfony\Component\Console\Command\Command
      */
     protected function configure()
     {
-        $this
-        ->setName('create-admin-role')
-        ->setDescription('Create an administrators group with enough permissions to setup other roles and the system.')
-        ->setDefinition(array(
-            new \Symfony\Component\Console\Input\InputOption(
-                'name', null, \Symfony\Component\Console\Input\InputOption::VALUE_REQUIRED,
-                'The name of the role.'
-            )
-        ))
-        ->setHelp('Run this command once when Jazzee is first installed to give your first users enough permissions to access the system and setup other roles.');
+        $this->setName('create-admin-role')->setDescription('Create an administrators group with enough permissions to setup other roles and the system.');
+        $this->addArgument('name', \Symfony\Component\Console\Input\InputArgument::OPTIONAL, 'The name of the role.  Defaults to Administrator');
+        $this->setHelp('Run this command once when Jazzee is first installed to give your first users enough permissions to access the system and setup other roles.');
     }
     protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output){
-      if(!$input->getOption('name')){
-        $output->write('<error>--name is required.</error>' . PHP_EOL);
-        exit();
-      }
+      $roleName = $input->getArgument('name')?$input->getArgument('name'):'Administrator';
       
       $em = $this->getHelper('em')->getEntityManager();
       $role = new \Jazzee\Entity\Role();
       $role->makeGlobal();
       $em->persist($role);
-      $role->setName($input->getOption('name'));
+      $role->setName($roleName);
       $arr = array(
         'manage_users' => array('index', 'edit', 'new', 'reset'),
         'manage_roles' => array('index', 'edit', 'new')     
@@ -52,5 +42,6 @@ class CreateAdminRole extends \Symfony\Component\Console\Command\Command
         }
       }
       $em->flush();
+      $output->write("<info>{$roleName} created.</info>" . PHP_EOL);
     }
 }
