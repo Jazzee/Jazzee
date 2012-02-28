@@ -18,9 +18,9 @@ class NoAuthentication implements \Jazzee\Interfaces\AdminAuthentication{
    * Constructor
    * 
    * Grab the desired user from the configuration file and log in as them
-   * @param \Doctrine\ORM\EntityManager
+   * @param \Jazzee\Interfaces\AdminController
    */
-  public function __construct(\Jazzee\AdminController $controller){
+  public function __construct(\Jazzee\Interfaces\AdminController $controller){
     if($controller->getConfig()->getStatus() != 'DEVELOPMENT'){
       throw new \Jazzee\Exception('Attmpted to use NoAuthentication in a non development environment.');
     }

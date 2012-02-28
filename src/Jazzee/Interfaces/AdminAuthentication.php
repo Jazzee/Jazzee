@@ -15,9 +15,9 @@ interface AdminAuthentication
   /**
    * Constructor
    * Pass the controller so we can access configuration and entity manager
-   * @param \Jazzee\AdminController 
+   * @param \Jazzee\Interfaces\AdminController 
    */
-  public function __construct(\Jazzee\AdminController $controller);
+  public function __construct(\Jazzee\Interfaces\AdminController $controller);
   
   /**
    * Successfull authentication does not always give us a valid user 

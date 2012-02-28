@@ -26,9 +26,9 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
    * 
    * Require authentication and setup the user if a valid session is detected
    * 
-   * @param \Doctrine\ORM\EntityManager
+   * @param \Jazzee\Interfaces\AdminController
    */
-  public function __construct(\Jazzee\AdminController $controller){
+  public function __construct(\Jazzee\Interfaces\AdminController $controller){
     $this->_config = $controller->getConfig();
     if(isset($_SERVER['Shib-Application-ID'])){
       if (!isset($_SERVER[$this->_config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($this->_config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');

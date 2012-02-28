@@ -6,7 +6,7 @@ namespace Jazzee;
  * @package jazzee
  * @subpackage manage
  */
-abstract class AdminController extends Controller{
+abstract class AdminController extends Controller implements \Jazzee\Interfaces\AdminController {
   /**
    * The navigation constants for this controller
    * @constant string

@@ -26,9 +26,9 @@ class SimpleSAML implements \Jazzee\Interfaces\AdminAuthentication{
    * 
    * Require authentication and setup the user if a valid session is detected
    * 
-   * @param \Doctrine\ORM\EntityManager
+   * @param \Jazzee\Interfaces\AdminController
    */
-  public function __construct(\Jazzee\AdminController $controller){
+  public function __construct(\Jazzee\Interfaces\AdminController $controller){
     $config = $controller->getConfig();
     require_once($config->getSimpleSAMLIncludePath());
     

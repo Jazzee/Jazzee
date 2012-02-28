@@ -19,7 +19,7 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory{
    */
   private $_controller;
   
-  public function __construct(\Jazzee\AdminController $controller){
+  public function __construct(\Jazzee\Interfaces\AdminController $controller){
     $this->_controller = $controller;
     if(!$this->_directoryServer = ldap_connect($this->_controller->getConfig()->getLdapHostname(), $this->_controller->getConfig()->getLdapPort())){
       throw new \Jazzee\Exception('Unable to connect to ldap server ' . $this->_controller->getConfig()->getLdapHostname() . ' at port' . $this->_controller->getConfig()->getLdapPort());
