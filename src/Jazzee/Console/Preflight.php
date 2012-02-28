@@ -116,19 +116,3 @@ class Preflight extends \Symfony\Component\Console\Command\Command
       else $output->write(PHP_EOL . "<info>Preflight Check Passed</info>" . PHP_EOL);
     }
 }
-
-
-class AdminStub implements \Jazzee\Interfaces\AdminController{
-  public $em;
-  public $config;
-  static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
-    return false;
-  }
-  static function addControllerPath($path){}
-  public function getEntityManager(){
-    return $this->em;
-  }
-  public function getConfig(){
-    return $this->config;
-  }
-}

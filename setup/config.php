@@ -1,4 +1,6 @@
 <?php
+namespace Jazzee\Console;
+
 try{
   require_once __dir__ . '/../lib/foundation/src/foundation.php';
 
@@ -8,9 +10,9 @@ try{
   $classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'Doctrine');
   $classLoader->register();
 
-  $classLoader = new Doctrine\Common\ClassLoader('Jazzee', __DIR__ . '/../src/');
+  $classLoader = new \Doctrine\Common\ClassLoader('Jazzee', __DIR__ . '/../src/');
   $classLoader->register();
-
+  
 
   $jazzeeConfiguration = new \Jazzee\Configuration();
 
@@ -53,3 +55,22 @@ $helpers = array(
     'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($em->getConnection()),
     'em' => new \Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper($em)
 );
+
+/**
+ * We need to be able to call AdminDirectory adn AdminAuthentication functions
+ * from different Console commands.  This Lets that happen 
+ */
+class AdminStub implements \Jazzee\Interfaces\AdminController{
+  public $em;
+  public $config;
+  static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
+    return false;
+  }
+  static function addControllerPath($path){}
+  public function getEntityManager(){
+    return $this->em;
+  }
+  public function getConfig(){
+    return $this->config;
+  }
+}
