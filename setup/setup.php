@@ -12,6 +12,7 @@ $cli->addCommands(array(
   new \Jazzee\Console\Install(),
   new \Jazzee\Console\Update(),
   new \Jazzee\Console\AddUser(),
+  new \Jazzee\Console\FindUser(),
   new \Jazzee\Console\CreateAdminRole(),
   new \Jazzee\Console\UserRole(),
   new \Jazzee\Console\Preflight(),
