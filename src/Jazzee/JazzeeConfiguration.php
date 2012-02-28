@@ -7,14 +7,7 @@ namespace Jazzee;
  */
 class JazzeeConfiguration
 {
-  
-  /**
-   * Path to the configuration file
-   * @var string
-   */
-  static protected $_configPath;
-
-    /**
+/**
  * @var string
  */
 protected $_mode;
@@ -292,30 +285,31 @@ protected $_adminCronAllowed;
    * Load data from the ini file
    */
   public function __construct(){
-    if(!self::$_configPath){
-      //try the default path
-      self::setPath(__DIR__ . '/../../etc/config.ini.php');
-    }
-    $arr = parse_ini_file(self::$_configPath);
-    if(empty($arr) or $arr === false) throw new Exception("Unable to read configuration file at " . self::$_configPath);
-    foreach($arr as $name => $value){
-      $setter = 'set' . \ucfirst($name);
-      if(!method_exists($this, $setter)) throw new Exception("Configuration variable ({$name}) found in file, but it is not a recognized option.");
-      $this->$setter($value);
-    }  
-  }
-  
-  /**
-   * Set the configuration path
-   * @param string $path
-   */
-  public static function setPath($path){
+    $path = $this->getPath();
     if(!$realPath = \realpath($path) or !\is_readable($realPath)){
       if($realPath) $path = $realPath;
       throw new Exception("Unable to load {$path}.", E_ERROR); 
     }
-    self::$_configPath=$realPath;
+    $arr = parse_ini_file($realPath);
+    if(empty($arr) or $arr === false) throw new Exception("Unable to read configuration file at " . $realPath);
+    foreach($arr as $name => $value){
+      $setter = 'set' . \ucfirst($name);
+      if(!method_exists($this, $setter)) throw new Exception("Configuration variable ({$name}) found in file, but it is not a recognized option.");
+      $this->$setter($value);
+    }
   }
+  
+  /**
+   * Get the path to the configuration file
+   * 
+   * This is here so it is easy to override this path or customize a path for 
+   * different environments.
+   * @return string path
+   */
+  protected function getPath(){
+    return __DIR__ . '/../../etc/config.ini.php';
+  }
+  
   /**
    * get mode
    * @return string
