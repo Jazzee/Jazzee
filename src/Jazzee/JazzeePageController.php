@@ -204,7 +204,7 @@ class JazzeePageController extends \Foundation\VC\Controller
    * @return string
    */
   protected function getVarPath(){
-    $path = $this->_config->getVarPath()?$this->_config->getVarPath():__DIR__ . '/../../var';
+    $path = $this->_config->getVarPath();
     if(!$realPath = \realpath($path) or !\is_dir($realPath) or !\is_writable($realPath)){
       if($realPath) $path = $realPath; //nicer error message if the path exists
       throw new Exception("{$path} is not readable by the webserver so we cannot use it as the 'var' directory");

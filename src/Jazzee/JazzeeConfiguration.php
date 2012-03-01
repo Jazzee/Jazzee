@@ -682,10 +682,12 @@ protected $_adminCronAllowed;
   
   /**
    * get varPath
+   * 
+   * If there is no path defined return the default one
    * @return string
    */
   public function getVarPath() {
-    return $this->_varPath;
+    return $this->_varPath?$this->_varPath:__DIR__ . '/../../var';
   }
   
   /**
