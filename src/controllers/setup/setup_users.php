@@ -20,31 +20,13 @@ class SetupUsersController extends \Jazzee\AdminController {
    * List users in the programa and earch for new users
    */
   public function actionIndex(){
-    $form = new \Foundation\Form();
-    $form->setCSRFToken($this->getCSRFToken());
+    $directory = $this->getAdminDirectory();
+    $form = $directory->getSearchForm();
     $form->setAction($this->path("setup/users/index"));
-    $field = $form->newField();
-    $field->setLegend('Find New Users');
-    $element = $field->newElement('TextInput','firstName');
-    $element->setLabel('First Name');
-
-    $element = $field->newElement('TextInput','lastName');
-    $element->setLabel('Last Name');
-    
-    $element = $field->newElement('TextInput','email');
-    $element->setLabel('Email Address');
-    
-    $form->newButton('submit', 'Search');
+    $form->setCSRFToken($this->getCSRFToken());
     
     $results = array();  //array of all the users who match the search
-    if($input = $form->processInput($this->post)){
-      $directory = $this->getAdminDirectory();
-      $attributes = array();
-      if($input->get('firstName')) $attributes[$this->_config->getLdapFirstNameAttribute()] = $input->get('firstName') . '*';
-      if($input->get('lastName')) $attributes[$this->_config->getLdapLastNameAttribute()] = $input->get('lastName') . '*';
-      if($input->get('email')) $attributes[$this->_config->getLdapEmailAddressAttribute()] = $input->get('email') . '*';
-      $results = $directory->search($attributes);
-    }
+    if($input = $form->processInput($this->post)) $results = $directory->search($input);
     $this->setVar('results', $results);
     $this->setVar('users', $this->_em->getRepository('\Jazzee\Entity\User')->findByProgram($this->_program));
     $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findBy(array('program' => $this->_program->getId()), array('name'=>'asc')));
@@ -106,7 +88,7 @@ class SetupUsersController extends \Jazzee\AdminController {
       }
     } else {
       $directory = $this->getAdminDirectory();
-      $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $uniqueName));
+      $result = $directory->findByUniqueName($uniqueName);
       if(!isset($result[0])){
         $this->addMessage('error', "Unable to find entry in directory");
         $this->redirectPath('setup/users');

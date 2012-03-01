@@ -22,9 +22,24 @@ interface AdminDirectory
   /**
    * Search for a user
    * 
-   * @param array $attributes
+   * @param \Foundation\Form\Input $input
    * @return array
    */
-  function search(array $attributes);
+  function search(\Foundation\Form\Input $input);
   
+  /**
+   * Form to find a user
+   * 
+   * @return \Foundation\Form
+   */
+  function getSearchForm();
+  
+  /**
+   * Search by uniqueName
+   * 
+   * When we already know the uniquename we dont need a search
+   * @param string uniqueName
+   * @return array
+   */
+  function findByUniqueName($name);
 }

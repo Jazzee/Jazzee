@@ -29,8 +29,11 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory{
     }
   }
   
-  public function search(array $attributes){
-    $result = array();
+  public function search(\Foundation\Form\Input $input){
+    $attributes = array();
+    if($input->get('firstName')) $attributes[$this->_controller->getConfig()->getLdapFirstNameAttribute()] = $input->get('firstName') . '*';
+    if($input->get('lastName')) $attributes[$this->_controller->getConfig()->getLdapLastNameAttribute()] = $input->get('lastName') . '*';
+    if($input->get('email')) $attributes[$this->_controller->getConfig()->getLdapEmailAddressAttribute()] = $input->get('email') . '*';
     $filters = array();
     $filter = '';
     foreach($attributes as $key=>$value)$filters[] = "{$key}={$value}";
@@ -42,6 +45,40 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory{
       $filter .= ')';
     }
     $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter);
+    return $this->parseSearchResult($searchResult);
+  }
+  
+  public function getSearchForm(){
+    $form = new \Foundation\Form();
+    $field = $form->newField();
+    $field->setLegend('Find New Users');
+    $element = $field->newElement('TextInput','firstName');
+    $element->setLabel('First Name');
+
+    $element = $field->newElement('TextInput','lastName');
+    $element->setLabel('Last Name');
+    
+    $element = $field->newElement('TextInput','email');
+    $element->setLabel('Email Address');
+    
+    $form->newButton('submit', 'Search');
+    return $form;
+  }
+  
+  function findByUniqueName($uniqueName){
+    $filter = "{$this->_controller->getConfig()->getLdapUsernameAttribute()}={$uniqueName}";
+    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter);
+    return $this->parseSearchResult($searchResult);
+  }
+  
+  /**
+   * Parse the LDAP search results into a nice array
+   * 
+   * @param resource $searchResult
+   * @return array 
+   */
+  protected function parseSearchResult($searchResult){
+    $result = array();
     ldap_sort($this->_directoryServer, $searchResult, $this->_controller->getConfig()->getLdapFirstNameAttribute());
     ldap_sort($this->_directoryServer, $searchResult, $this->_controller->getConfig()->getLdapLastNameAttribute());
     if(ldap_count_entries($this->_directoryServer, $searchResult)){
@@ -61,7 +98,7 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory{
         $result[] = $arr;
       }
     }
-    return $result;
+    return $result; 
   }
 }
 

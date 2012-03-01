@@ -23,31 +23,13 @@ class ManageUsersController extends \Jazzee\AdminController {
    * Search for a user to modify
    */
   public function actionIndex(){
-    $form = new \Foundation\Form();
-    $form->setCSRFToken($this->getCSRFToken());
+    $directory = $this->getAdminDirectory();
+    $form = $directory->getSearchForm();
     $form->setAction($this->path("manage/users/index"));
-    $field = $form->newField();
-    $field->setLegend('Find New Users');
-    $element = $field->newElement('TextInput','firstName');
-    $element->setLabel('First Name');
-
-    $element = $field->newElement('TextInput','lastName');
-    $element->setLabel('Last Name');
-    
-    $element = $field->newElement('TextInput','email');
-    $element->setLabel('Email Address');
-    
-    $form->newButton('submit', 'Search');
+    $form->setCSRFToken($this->getCSRFToken());
     
     $results = array();  //array of all the users who match the search
-    if($input = $form->processInput($this->post)){
-      $directory = $this->getAdminDirectory();
-      $attributes = array();
-      if($input->get('firstName')) $attributes[$this->_config->getLdapFirstNameAttribute()] = $input->get('firstName') . '*';
-      if($input->get('lastName')) $attributes[$this->_config->getLdapLastNameAttribute()] = $input->get('lastName') . '*';
-      if($input->get('email')) $attributes[$this->_config->getLdapEmailAddressAttribute()] = $input->get('email') . '*';
-      $results = $directory->search($attributes);
-    }
+    if($input = $form->processInput($this->post)) $results = $directory->search($input);
     $this->setVar('results', $results);
     $this->setVar('users', $this->_em->getRepository('\Jazzee\Entity\User')->findBy(array('isActive'=>true), array('lastName'=>'asc', 'firstName'=>'asc')));
     $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findByIsGlobal(true));
@@ -119,7 +101,7 @@ class ManageUsersController extends \Jazzee\AdminController {
   public function actionRefreshUser($userID){ 
     if($user = $this->_em->getRepository('\Jazzee\Entity\User')->find($userID)){
       $directory = $this->getAdminDirectory();
-      $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $user->getUniqueName()));
+      $result = $directory->findByUniqueName($user->getUniqueName());
       if(!isset($result[0])){
         $this->addMessage('error', "Unable to find entry in directory");
         $this->redirectPath('manage/users');
@@ -165,7 +147,7 @@ class ManageUsersController extends \Jazzee\AdminController {
       }
     } else {
       $directory = $this->getAdminDirectory();
-      $result = $directory->search(array($this->_config->getLdapUsernameAttribute() => $uniqueName));
+      $result = $directory->findByUniqueName($uniqueName);
       if(!isset($result[0])){
         $this->addMessage('error', "Unable to find entry in directory");
         $this->redirectPath('manage/users');
