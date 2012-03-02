@@ -139,6 +139,7 @@ class ManageUsersController extends \Jazzee\AdminController {
    * @param string $uniqueName
    */
   public function actionNew($uniqueName){
+    $uniqueName = base64_decode($uniqueName);
     if($user = $this->_em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName))){
       if(!$user->isActive()){
         $user->activate();

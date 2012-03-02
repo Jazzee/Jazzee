@@ -13,7 +13,7 @@ $this->renderElement('form', array('form'=>$form));?>
   <?php foreach($results as $result){ ?>
   <li><?php print $result['lastName'] . ', ' . $result['firstName'] . ' (' . ($result['emailAddress']?$result['emailAddress']:'no email') . ') (' . $result['userName'] . ')' ?> 
     <?php if($this->controller->checkIsAllowed('manage_users', 'new')){ ?>
-    (<a href='<?php print $this->path('manage/users/new/') . $result['userName']?>'>Add User</a>)
+    (<a href='<?php print $this->path('manage/users/new/') . base64_encode($result['userName'])?>'>Add User</a>)
     <?php }?>
   </li>
   <?php }?>
