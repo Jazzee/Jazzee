@@ -21,12 +21,22 @@ class SetupUsersController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $directory = $this->getAdminDirectory();
-    $form = $directory->getSearchForm();
+    $form = new \Foundation\Form();
+    $field = $form->newField();
     $form->setAction($this->path("setup/users/index"));
     $form->setCSRFToken($this->getCSRFToken());
+    $field->setLegend('Find Users');
+    $element = $field->newElement('TextInput','firstName');
+    $element->setLabel('First Name');
+
+    $element = $field->newElement('TextInput','lastName');
+    $element->setLabel('Last Name');
+    
+    $form->newButton('submit', 'Search');
     
     $results = array();  //array of all the users who match the search
-    if($input = $form->processInput($this->post)) $results = $directory->search($input);
+    if($input = $form->processInput($this->post))$results = $directory->search($input->get('firstName'), $input->get('lastName'));
+    
     $this->setVar('results', $results);
     $this->setVar('users', $this->_em->getRepository('\Jazzee\Entity\User')->findByProgram($this->_program));
     $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findBy(array('program' => $this->_program->getId()), array('name'=>'asc')));

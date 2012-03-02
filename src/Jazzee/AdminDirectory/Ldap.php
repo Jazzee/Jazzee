@@ -29,11 +29,10 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory{
     }
   }
   
-  public function search(\Foundation\Form\Input $input){
+  public function search($firstName, $lastName){
     $attributes = array();
-    if($input->get('firstName')) $attributes[$this->_controller->getConfig()->getLdapFirstNameAttribute()] = $input->get('firstName') . '*';
-    if($input->get('lastName')) $attributes[$this->_controller->getConfig()->getLdapLastNameAttribute()] = $input->get('lastName') . '*';
-    if($input->get('email')) $attributes[$this->_controller->getConfig()->getLdapEmailAddressAttribute()] = $input->get('email') . '*';
+    if(!empty($firstName)) $attributes[$this->_controller->getConfig()->getLdapFirstNameAttribute()] = $firstName . '*';
+    if(!empty($lastName)) $attributes[$this->_controller->getConfig()->getLdapLastNameAttribute()] = $lastName . '*';
     $filters = array();
     $filter = '';
     foreach($attributes as $key=>$value)$filters[] = "{$key}={$value}";
@@ -46,23 +45,6 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory{
     }
     $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter);
     return $this->parseSearchResult($searchResult);
-  }
-  
-  public function getSearchForm(){
-    $form = new \Foundation\Form();
-    $field = $form->newField();
-    $field->setLegend('Find New Users');
-    $element = $field->newElement('TextInput','firstName');
-    $element->setLabel('First Name');
-
-    $element = $field->newElement('TextInput','lastName');
-    $element->setLabel('Last Name');
-    
-    $element = $field->newElement('TextInput','email');
-    $element->setLabel('Email Address');
-    
-    $form->newButton('submit', 'Search');
-    return $form;
   }
   
   function findByUniqueName($uniqueName){

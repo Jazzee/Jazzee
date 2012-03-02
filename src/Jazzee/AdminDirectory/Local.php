@@ -17,23 +17,9 @@ class Local implements \Jazzee\Interfaces\AdminDirectory{
     $this->_controller = $controller;
   }
   
-  public function search(\Foundation\Form\Input $input){
-    $users = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findByName($input->get('firstName') . '%', $input->get('lastName') . '%');
+  public function search($firstName, $lastName){
+    $users = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findByName($firstName . '%', $lastName . '%');
     return $this->parseSearchResult($users);
-  }
-  
-  public function getSearchForm(){
-    $form = new \Foundation\Form();
-    $field = $form->newField();
-    $field->setLegend('Find New Users');
-    $element = $field->newElement('TextInput','firstName');
-    $element->setLabel('First Name');
-
-    $element = $field->newElement('TextInput','lastName');
-    $element->setLabel('Last Name');
-    
-    $form->newButton('submit', 'Search');
-    return $form;
   }
   
   function findByUniqueName($uniqueName){
