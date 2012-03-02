@@ -9,6 +9,8 @@
  */
 namespace Jazzee\AdminAuthentication;
 class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
+  const SESSION_VAR_ID = 'shibd_userid';
+  
   /**
    * Our authenticated user
    * @var \Jazzee\Entity\User
@@ -17,9 +19,9 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
   
   /**
    * Config instance
-   * @var \Jazzee\Configuration 
+   * @var \Jazzee\Interfaces\AdminController 
    */
-  private $_config;
+  private $_controller;
   
   /**
    * Constructor
@@ -29,22 +31,9 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
    * @param \Jazzee\Interfaces\AdminController
    */
   public function __construct(\Jazzee\Interfaces\AdminController $controller){
-    $this->_config = $controller->getConfig();
-    if(isset($_SERVER['Shib-Application-ID'])){
-      if (!isset($_SERVER[$this->_config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($this->_config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
-      
-      $uniqueName = $_SERVER[$this->_config->getShibbolethUsernameAttribute()];
-      $firstName = $_SERVER[$this->_config->getShibbolethFirstNameAttribute()];
-      $lastName = $_SERVER[$this->_config->getShibbolethLastNameAttribute()];
-      $mail = $_SERVER[$this->_config->getShibbolethEmailAddressAttribute()];
-      
-      $this->_user = $controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName, 'isActive'=>true));
-      if($this->_user){
-        $this->_user->setFirstName($firstName);
-        $this->_user->setLastName($lastName);
-        $this->_user->setEmail($mail);
-        $controller->getEntityManager()->persist($this->_user);
-      }
+    $this->_controller = $controller;
+    if($this->_controller->getStore()->check(self::SESSION_VAR_ID)){
+      $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->find($this->_controller->getStore()->get(self::SESSION_VAR_ID));
     }
   }
   
@@ -57,18 +46,33 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
   }
   
   public function loginUser(){
-    $this->_user = null;
-    $session = new \Foundation\Session();
-    $session->getStore('admin')->expire();
-    header('Location: ' . $this->_config->getShibbolethLoginUrl());
-    die();
+    $config = $this->_controller->getConfig();
+    if(!isset($_SERVER['Shib-Application-ID'])){
+      header('Location: ' . $config->getShibbolethLoginUrl());
+      exit();
+    }
+    if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
+    $uniqueName = $_SERVER[$config->getShibbolethUsernameAttribute()];
+    $firstName = $_SERVER[$config->getShibbolethFirstNameAttribute()];
+    $lastName = $_SERVER[$config->getShibbolethLastNameAttribute()];
+    $mail = $_SERVER[$config->getShibbolethEmailAddressAttribute()];
+
+    $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName, 'isActive'=>true));
+    if($this->_user){
+      $this->_user->setFirstName($firstName);
+      $this->_user->setLastName($lastName);
+      $this->_user->setEmail($mail);
+      $this->_controller->getStore()->expire();
+      $this->_controller->getStore()->touchAuthentication();
+      $this->_controller->getStore()->set(self::SESSION_VAR_ID, $this->_user->getId());
+      $this->_controller->getEntityManager()->persist($this->_user);
+    }
   }
   
   public function logoutUser(){
     $this->_user = null;
-    $session = new \Foundation\Session();
-    $session->getStore('admin')->expire();
-    header('Location: ' . $this->_config->getShibbolethLogoutUrl());
+    $this->_controller->getStore()->expire();
+    header('Location: ' . $this->_controller->getConfig()->getShibbolethLogoutUrl());
     die();
   }
 }
