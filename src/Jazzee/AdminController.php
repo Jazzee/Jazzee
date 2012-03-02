@@ -80,11 +80,10 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
   public final function __construct(){
     parent::__construct();
     $this->layout = 'wide';
+    $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     $class = $this->_config->getAdminAuthenticationClass();
     $this->_adminAuthentication = new $class($this);
     if(!($this->_adminAuthentication instanceof Interfaces\AdminAuthentication)) throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthentication Interface.');
-    
-    $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
     if($this->_adminAuthentication->isValidUser()){
       $this->_user = $this->_adminAuthentication->getUser();
       
@@ -282,6 +281,14 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
    */
   public function applyPath($path){
     return parent::path($path);
+  }
+  
+  /**
+   * Get the session store
+   * @return \Foundation\Session\Store
+   */
+  public function getStore(){
+    return $this->_store;
   }
   
   /**

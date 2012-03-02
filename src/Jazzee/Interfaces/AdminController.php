@@ -28,6 +28,13 @@ interface AdminController
   function getConfig();
   
   /**
+   * Get the current session store
+   * 
+   * @return \Foundation\Session\Store
+   */
+  function getStore();
+  
+  /**
    * Check the credentials of a user
    * 
    * @param string $controller

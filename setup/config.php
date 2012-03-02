@@ -63,6 +63,7 @@ $helpers = array(
 class AdminStub implements \Jazzee\Interfaces\AdminController{
   public $em;
   public $config;
+  public $store;
   static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     return false;
   }
@@ -72,5 +73,8 @@ class AdminStub implements \Jazzee\Interfaces\AdminController{
   }
   public function getConfig(){
     return $this->config;
+  }
+  public function getStore(){
+    return $this->store;
   }
 }
