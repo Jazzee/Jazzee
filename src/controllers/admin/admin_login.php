@@ -21,6 +21,7 @@ class AdminLoginController extends \Jazzee\AdminController {
     if($this->_adminAuthentication->isValidUser()){
       $this->redirectPath('welcome');
     }
+    $this->setVar('authenticationClass', $this->_adminAuthentication);
   }
   
   /**
