@@ -33,7 +33,6 @@ adminAuthenticationClass=
 ;ShibbolethEmailAddressAttribute='mail'
 
 ;##NoAuthentication##;
-;noAuthUserId=0
 ;noAuthIpAddresses='127.0.0.1'
 
 ;##SimpleSAML##;

@@ -175,11 +175,6 @@ protected $_shibbolethLogoutUrl;
 /**
  * @var string
  */
-protected $_noAuthUserId;
-
-/**
- * @var string
- */
 protected $_noAuthIpAddresses;
 
 /**
@@ -894,22 +889,6 @@ protected $_adminCronAllowed;
    */
   public function setShibbolethLogoutUrl($shibbolethLogoutUrl) {
     $this->_shibbolethLogoutUrl = $shibbolethLogoutUrl;
-  }
-  
-  /**
-   * get noAuthUserId
-   * @return string
-   */
-  public function getNoAuthUserId() {
-    return $this->_noAuthUserId;
-  }
-  
-  /**
-   * set noAuthUserId
-   * @var string $noAuthUserId
-   */
-  public function setNoAuthUserId($noAuthUserId) {
-    $this->_noAuthUserId = $noAuthUserId;
   }
   
   /**
