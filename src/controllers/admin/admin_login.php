@@ -18,15 +18,9 @@ class AdminLoginController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $this->_adminAuthentication->loginUser();
-    $this->redirectPath('welcome');
-  }
-  
-  /**
-   * Get the navigation
-   * @return Navigation
-   */
-  public function getNavigation(){
-    return false;
+    if($this->_adminAuthentication->isValidUser()){
+      $this->redirectPath('welcome');
+    }
   }
   
   /**
