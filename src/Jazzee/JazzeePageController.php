@@ -170,6 +170,12 @@ class JazzeePageController extends \Foundation\VC\Controller
     $virtualFoundation->addDirectory('styles',$styles);
     
     $this->_vfs->addDirectory('foundation', $virtualFoundation);
+    
+    $vOpenID = new \Foundation\Virtual\VirtualDirectory();
+    $vOpenID->addDirectory('js', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/openid-selector/js'));
+    $vOpenID->addDirectory('css', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/openid-selector/css'));
+    $vOpenID->addDirectory('images', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/openid-selector/images'));
+    $this->_vfs->addDirectory('openid-selector', $vOpenID);
   }
   
   /**
