@@ -92,7 +92,8 @@ ApplicationPageBuilder.prototype.addNewPageControl = function(){
     item.bind('click', function(e){
       var pageType = $(e.target).data('pageType');
       var page = new window[pageType.typeClass].prototype.newPage('newpage' + pageBuilder.getUniqueId(),'New ' + pageType.typeName + ' Page',pageType.id,pageType.typeName,pageType.typeClass,'new',pageBuilder);
-      page.weight = parseInt($('#pages li').last().data('page').weight)+1;
+      if($('#pages li').length > 0) page.weight = parseInt($('#pages li').last().data('page').weight)+1;
+      else page.weight = 0; //this is the only page so it gets a weight of 0
       pageBuilder.addPage(page);
       return false;
     });
