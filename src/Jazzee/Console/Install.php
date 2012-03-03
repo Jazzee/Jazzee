@@ -41,9 +41,50 @@ EOT
               $output->write('<error>ATTENTION: You are attempting to create tables on a database that is not empty.  Use --dump-sql to output the sql file and override this restriction.</error>' . PHP_EOL . PHP_EOL);
               exit(1);
             }
-            $output->write('Creating database schema...' . PHP_EOL);
+            $output->write('Creating database schema and installing default components...' . PHP_EOL);
             $schemaTool->createSchema($metadatas);
-            $output->write('Database schema created successfully!' . PHP_EOL);
+            $output->write('<info>Database schema created successfully</info>' . PHP_EOL);
+            $pageTypes = array(
+                '\Jazzee\Page\Branching' => 'Branching',
+                '\Jazzee\Page\ETSMatch' => 'ETS Score Matching',
+                '\Jazzee\Page\Lock' => 'Lock Application',
+                '\Jazzee\Page\Payment' => 'Payment',
+                '\Jazzee\Page\Recommenders' => 'Recommenders',
+                '\Jazzee\Page\Standard' => 'Standard',
+                '\Jazzee\Page\Text' => 'Plain Text'
+            );
+            foreach($pageTypes as $class => $name){
+              $pageType = new \Jazzee\Entity\PageType();
+              $pageType->setName($name);
+              $pageType->setClass($class);
+              $this->getHelper('em')->getEntityManager()->persist($pageType);
+            }
+            $this->getHelper('em')->getEntityManager()->flush();
+            $output->write('<info>Default Page types added</info>' . PHP_EOL);
+            
+            $elementTypes = array(
+                '\Jazzee\Element\CheckboxList' => 'Checkboxes',
+                '\Jazzee\Element\Date' => 'Date',
+                '\Jazzee\Element\EmailAddress' => 'Email Address',
+                '\Jazzee\Element\EncryptedTextInput' => 'Encrypted Text Input',
+                '\Jazzee\Element\PDFFileInput' => 'PDF Upload',
+                '\Jazzee\Element\Phonenumber' => 'Phone Number',
+                '\Jazzee\Element\RadioList' => 'Radio Buttons',
+                '\Jazzee\Element\RankingList' => 'Rank Order Dropdown',
+                '\Jazzee\Element\SelectList' => 'Dropdown List',
+                '\Jazzee\Element\ShortDate' => 'Short Date',
+                '\Jazzee\Element\TextInput' => 'Single Line Text',
+                '\Jazzee\Element\Textarea' => 'Text Area'
+            );
+            foreach($elementTypes as $class => $name){
+              $elementType = new \Jazzee\Entity\ElementType();
+              $elementType->setName($name);
+              $elementType->setClass($class);
+              $this->getHelper('em')->getEntityManager()->persist($elementType);
+            }
+            $this->getHelper('em')->getEntityManager()->flush();
+            $output->write('<info>Default Element types added</info>' . PHP_EOL);
+            
         }
     }
 }
