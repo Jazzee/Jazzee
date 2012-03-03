@@ -91,6 +91,11 @@ class ManageProgramsController extends \Jazzee\AdminController {
       $program->setShortName($input->get('shortName'));
       $this->addMessage('success', "New Program Saved");
       $this->_em->persist($program);
+      //if the user isn't in a program then make this one their default
+      if(!$this->_program){
+        $this->_user->setDefaultProgram($program);
+        $this->_em->persist($this->_user);
+      }
       $this->redirectPath('manage/programs');
     }
   }
