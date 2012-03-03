@@ -19,6 +19,7 @@ class AdminLoginController extends \Jazzee\AdminController {
   public function actionIndex(){
     $this->_adminAuthentication->loginUser();
     if($this->_adminAuthentication->isValidUser()){
+      $this->_authLog->log('Successfull login for user ' . $this->_adminAuthentication->getUser()->getId() . ' from ' . $_SERVER['REMOTE_ADDR'], PEAR_LOG_INFO);
       $this->redirectPath('welcome');
     }
     $this->setVar('authenticationClass', $this->_adminAuthentication);
