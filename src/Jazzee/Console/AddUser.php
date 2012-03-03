@@ -28,11 +28,8 @@ class AddUser extends \Symfony\Component\Console\Command\Command
       $stub->config = $jazzeeConfiguration;
       $class = $jazzeeConfiguration->getAdminDirectoryClass();
       $directory = new $class($stub);
-      
-      $attributes = array(
-         $jazzeeConfiguration->getLdapUsernameAttribute() => $input->getArgument('user name')
-      );
-      $results = $directory->search($attributes);
+
+      $results = $directory->findByUniqueName($input->getArgument('user name'));
       if(count($results) == 0){
         $output->write('<error>That user name is not in the directory.</error>' . PHP_EOL);
       } else if(count($results) > 1){
