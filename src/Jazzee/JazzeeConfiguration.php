@@ -326,7 +326,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getMode() {
-    return $this->_mode;
+    return !empty($this->_mode)?$this->_mode:'LIVE';
   }
   
   /**
@@ -375,7 +375,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getStatus() {
-    return $this->_status;
+    return !empty($this->_status)?$this->_status:'PRODUCTION';
   }
   
   /**
@@ -392,7 +392,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getDbHost() {
-    return $this->_dbHost;
+    return !empty($this->_dbHost)?$this->_dbHost:'localhost';
   }
   
   /**
@@ -488,7 +488,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getSessionName() {
-    return $this->_sessionName;
+    return !empty($this->_sessionName)?$this->_sessionName:'JAZZEE';
   }
   
   /**
@@ -504,7 +504,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getAdminSessionLifetime() {
-    return $this->_adminSessionLifetime;
+    return !empty($this->_adminSessionLifetime)?$this->_adminSessionLifetime:'7200';
   }
   
   /**
@@ -520,7 +520,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getApplicantSessionLifetime() {
-    return $this->_applicantSessionLifetime;
+    return !empty($this->_applicantSessionLifetime)?$this->_applicantSessionLifetime:'0';
   }
   
   /**
@@ -536,7 +536,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getMailServerType() {
-    return $this->_mailServerType;
+    return !empty($this->_mailServerType)?$this->_mailServerType:'php';
   }
   
   /**
@@ -682,7 +682,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getVarPath() {
-    return $this->_varPath?$this->_varPath:__DIR__ . '/../../var';
+    return $this->_varPath?$this->_varPath:\realpath(__DIR__ . '/../../var');
   }
   
   /**
@@ -746,7 +746,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getMaximumApplicantFileUploadSize() {
-    return $this->_maximumApplicantFileUploadSize;
+    return !empty($this->_maximumApplicantFileUploadSize)?$this->_maximumApplicantFileUploadSize:\convertIniShorthandValue(\ini_get('upload_max_filesize'));
   }
   
   /**
@@ -765,7 +765,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getMaximumAdminFileUploadSize() {
-    return $this->_maximumAdminFileUploadSize;
+    return !empty($this->_maximumAdminFileUploadSize)?$this->_maximumAdminFileUploadSize:\convertIniShorthandValue(\ini_get('upload_max_filesize'));
   }
   
   /**
@@ -800,7 +800,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getShibbolethUsernameAttribute() {
-    return $this->_shibbolethUsernameAttribute;
+    return !empty($this->_shibbolethUsernameAttribute)?$this->_shibbolethUsernameAttribute:'eppn';
   }
   
   /**
@@ -816,7 +816,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getShibbolethFirstNameAttribute() {
-    return $this->_shibbolethFirstNameAttribute;
+    return !empty($this->_shibbolethFirstNameAttribute)?$this->_shibbolethFirstNameAttribute:'givenName';
   }
   
   /**
@@ -832,7 +832,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getShibbolethLastNameAttribute() {
-    return $this->_shibbolethLastNameAttribute;
+    return !empty($this->_shibbolethLastNameAttribute)?$this->_shibbolethLastNameAttribute:'sn';
   }
   
   /**
@@ -848,7 +848,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getShibbolethEmailAddressAttribute() {
-    return $this->_shibbolethEmailAddressAttribute;
+    return !empty($this->_shibbolethEmailAddressAttribute)?$this->_shibbolethEmailAddressAttribute:'mail';
   }
   
   /**
@@ -864,7 +864,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getShibbolethLoginUrl() {
-    return $this->_shibbolethLoginUrl;
+    return !empty($this->_shibbolethLoginUrl)?$this->_shibbolethLoginUrl:'/Shibboleth.sso/Login';
   }
   
   /**
@@ -880,7 +880,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getShibbolethLogoutUrl() {
-    return $this->_shibbolethLogoutUrl;
+    return !empty($this->_shibbolethLogoutUrl)?$this->_shibbolethLogoutUrl:'/Shibboleth.sso/Logout';
   }
   
   /**
@@ -896,9 +896,9 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getNoAuthIpAddresses() {
-    return $this->_noAuthIpAddresses;
+    return !empty($this->_noAuthIpAddresses)?$this->_noAuthIpAddresses:'127.0.0.1';
   }
-  
+
   /**
    * set noAuthIpAddresses
    * @var string $noAuthIpAddresses
@@ -928,7 +928,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getSimpleSAMLAuthenticationSource() {
-    return $this->_simpleSAMLAuthenticationSource;
+    return !empty($this->_simpleSAMLAuthenticationSource)?$this->_simpleSAMLAuthenticationSource:'default-sp';
   }
   
   /**
@@ -944,7 +944,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getSimpleSAMLUsernameAttribute() {
-    return $this->_simpleSAMLUsernameAttribute;
+    return !empty($this->_simpleSAMLUsernameAttribute)?$this->_simpleSAMLUsernameAttribute:'eduPersonPrincipalName';
   }
   
   /**
@@ -960,7 +960,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getSimpleSAMLFirstNameAttribute() {
-    return $this->_simpleSAMLFirstNameAttribute;
+    return !empty($this->_simpleSAMLFirstNameAttribute)?$this->_simpleSAMLFirstNameAttribute:'givenName';
   }
   
   /**
@@ -976,7 +976,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getSimpleSAMLLastNameAttribute() {
-    return $this->_simpleSAMLLastNameAttribute;
+    return !empty($this->_simpleSAMLLastNameAttribute)?$this->_simpleSAMLLastNameAttribute:'sn';
   }
   
   /**
@@ -992,7 +992,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getSimpleSAMLEmailAddressAttribute() {
-    return $this->_simpleSAMLEmailAddressAttribute;
+    return !empty($this->_simpleSAMLEmailAddressAttribute)?$this->_simpleSAMLEmailAddressAttribute:'mail';
   }
   
   /**
@@ -1008,7 +1008,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getPublicKeyCertificatePath() {
-    return $this->_publicKeyCertificatePath;
+    return !empty($this->_publicKeyCertificatePath)?$this->_publicKeyCertificatePath:realpath(__DIR__ . '/../../etc/publickey.crt');
   }
   
   /**
@@ -1024,7 +1024,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getAdminDirectoryClass() {
-    return $this->_adminDirectoryClass;
+    return !empty($this->_adminDirectoryClass)?$this->_adminDirectoryClass:'\Jazzee\AdminDirectory\Local';
   }
   
   /**
@@ -1104,7 +1104,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getLdapUsernameAttribute() {
-    return $this->_ldapUsernameAttribute;
+    return !empty($this->_ldapUsernameAttribute)?$this->_ldapUsernameAttribute:'eppn';
   }
   
   /**
@@ -1120,7 +1120,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getLdapFirstNameAttribute() {
-    return $this->_ldapFirstNameAttribute;
+    return !empty($this->_ldapFirstNameAttribute)?$this->_ldapFirstNameAttribute:'givenName';
   }
   
   /**
@@ -1136,7 +1136,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getLdapLastNameAttribute() {
-    return $this->_ldapLastNameAttribute;
+    return !empty($this->_ldapLastNameAttribute)?$this->_ldapLastNameAttribute:'sn';
   }
   
   /**
@@ -1152,7 +1152,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getLdapEmailAddressAttribute() {
-    return $this->_ldapEmailAddressAttribute;
+    return !empty($this->_ldapEmailAddressAttribute)?$this->_ldapEmailAddressAttribute:'mail';
   }
   
   /**
@@ -1200,7 +1200,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getAdminCronAllowed() {
-    return $this->_adminCronAllowed;
+    return !empty($this->_adminCronAllowed)?$this->_adminCronAllowed:'localhost';
   }
   
   /**
