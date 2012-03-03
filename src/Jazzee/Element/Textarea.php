@@ -21,6 +21,14 @@ class Textarea extends AbstractElement {
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
     }
+    if($this->_element->getMin()){
+      $validator = new \Foundation\Form\Validator\MinimumLength($element, (int)$this->_element->getMin());
+      $element->addValidator($validator);
+    }
+    if($this->_element->getMax()){
+      $validator = new \Foundation\Form\Validator\MaximumLength($element, (int)$this->_element->getMax());
+      $element->addValidator($validator);
+    }
     $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     return $element;
   }
