@@ -14,7 +14,6 @@ class SetupRolesController extends \Jazzee\AdminController {
   const ACTION_EDIT = 'Edit';
   const ACTION_COPY = 'Copy';
   const ACTION_NEW = 'New';
-  const REQUIRE_APPLICATION = false;
   
   /**
    * List all the Roles

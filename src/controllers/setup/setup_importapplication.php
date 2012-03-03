@@ -153,5 +153,19 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
     return $page;
   }
   
+  /**
+   * Don't allow users who don't have a program and a cycle
+   * @param string $controller
+   * @param string $action
+   * @param \Jazzee\Entity\User $user
+   * @param \Jazzee\Entity\Program $program
+   * @param \Jazzee\Entity\Application $application
+   * @return boolean 
+   */
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
+    if(!$program) return false;
+    return parent::isAllowed($controller, $action, $user, $program, $application);
+  }
+  
   
 }

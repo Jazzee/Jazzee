@@ -14,7 +14,6 @@ class SetupUsersController extends \Jazzee\AdminController {
   const ACTION_NEW = 'Add User to Program';
   const ACTION_EDIT = 'Grant Permissions';
   const ACTION_REMOVE = 'Remove User from program';
-  const REQUIRE_APPLICATION = false;
   
   /**
    * List users in the programa and earch for new users
