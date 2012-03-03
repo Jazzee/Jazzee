@@ -15,5 +15,6 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   users/introduction
+   install/introduction
+   install/configuration
    developers/introduction

@@ -12,8 +12,9 @@ Install lamp stack::
 
 Install required php extensions::
 
-  #sudo apt-get install php-log php5-imagick php-apc
+  $sudo apt-get install php-log php5-imagick php-apc
 
 Install the Doctrine ORM::
+
   $sudo pear config-set auto_discover 1
   $sudo pear install pear.doctrine-project.org/DoctrineORM
