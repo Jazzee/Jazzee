@@ -9,269 +9,385 @@ class JazzeeConfiguration
 {
 /**
  * @var string
+ * The mode allows you to limit access to the application easily.  Possible values are:
+ * <ul>
+ * <li><b>LIVE</b> the default everything running mode</li>
+ * <li><b>APPLY_MAINTENANCE</b> which does not allow applicants or recommenders to access the system</li>
+ * <li><b>MAINTENANCE which</b> prevents everyone from accessing the system</li>
+ * </ul>
  */
 protected $_mode;
 
 /**
  * @var string
+ * Message displayed to anyone who cannot access the system becuase of a mode setting
  */
-protected $_maintenanceModeMessage;
+protected $_maintenancbodbessage;
 
 /**
  * @var string
+ * Message displayed to everyone on every page.  Usefull for advertising future 
+ * downtime or any other significant system wide events.
  */
 protected $_broadcastMessage;
 
 /**
  * @var string
+ * Provides information  to JAZZEE components about the current system state.  Possible values are:
+ * <ul>
+ * <li><b>PRODUCTION</b> the default live application status</li>
+ * <li><b>PREVIEW</b> limits some functionality in a draft installation.  Usefull for QA
+ * where somethign like payments shouldn't work - but caching should still work and email should still go out</li>
+ * <li><b>DEVELOPMENT</b> If you're working on Jazzee this is the status for you.  If redirects outgoing
+ * email and limits caching</li>
+ * </ul>
  */
 protected $_status;
 
 /**
  * @var string
+ * The Database host name.  Defaults to 'localhost'
  */
 protected $_dbHost;
 
 /**
  * @var string
+ * The database port
  */
 protected $_dbPort;
 
 /**
  * @var string
+ * The database name
  */
 protected $_dbName;
 
 /**
  * @var string
+ * The database user
  */
 protected $_dbUser;
 
 /**
  * @var string
+ * The database password
  */
 protected $_dbPassword;
 
 /**
  * @var string
+ * The database driver.  The allowed types can be found at the Doctrine Project website
+ * @link http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#driver
  */
 protected $_dbDriver;
 
 /**
  * @var string
+ * What to name the PHP session.  Defaults to 'JAZZEE'
  */
 protected $_sessionName;
 
 /**
  * @var string
+ * The maximum session lifetime for an applicant in seconds.  Defaults to '0' which means applicants
+ * stay logged in until they close their browser or logout manually
  */
 protected $_applicantSessionLifetime;
 
 /**
  * @var string
+ * The maximum session lifetime for administrators.  Defaults to 7200 or two hours.
  */
 protected $_adminSessionLifetime;
 
 /**
  * @var string
+ * The type of outgoing mail server we will be using defaults to php. Possible values are:
+ * <ul>
+ * <li><b>php</b> to use the builtin php mail() function</li>
+ * <li><b>sendmail</b> to use the sendmail binary on the server</li>
+ * <li><b>smtp</b> to use a remote smtp server</li>
+ * <li><b>smtp+ssl</b> for a secure connection to a remote smtp server</li>
+ * </ul>
  */
 protected $_mailServerType;
 
 /**
  * @var string
+ * The hostname for the mailserver - only required for external smtp mailServerTypes
  */
 protected $_mailServerHost;
 
 /**
  * @var string
+ *  The port for the mailserver - only required for external smtp mailServerTypes
  */
 protected $_mailServerPort;
 
 /**
  * @var string
+ *  The username for the mailserver - only required for external smtp mailServerTypes
  */
 protected $_mailServerUsername;
 
 /**
  * @var string
+ *  The password for the mailserver - only required for external smtp mailServerTypes
  */
 protected $_mailServerPassword;
 
 /**
  * @var string
+ * If set all outgoing mail subject lines will be prefixed with this string
  */
 protected $_mailSubjectPrefix;
 
 /**
  * @var string
+ * If no address is set for the outgoing message it will default to this address.  
+ * You should set this otherwise a system default like postmaster@local.nothing could 
+ * get sent.
  */
 protected $_mailDefaultFromAddress;
 
 /**
  * @var string
+ * If no address is set for the outgoing message it will use this name.
  */
 protected $_mailDefaultFromName;
 
 /**
  * @var string
+ * This should only be used in DEVELOPMENT environments.  It will send ALL outoing mail
+ * to this address.  NOT the intended recipient.
  */
 protected $_mailOverrideToAddress;
 
 /**
  * @var string
+ * The system path to the VAR directory.  Defaults to JAZZEESOURCE/var.  This directory
+ * must be writable be the webserver.  It is where session data, temporary files, uploads, 
+ * and logs will get writtend to.
  */
 protected $_varPath;
 
 /**
  * @var string
- */
-protected $_adminEmail;
-
-/**
- * @var string
+ * The maximum size for applicant file uploads.  Programs will not be able to override this setting.
+ * Defaults to the value of PHP's builtin upload_max_filesize which is gernally pretty large
+ * so you should set this to somethign sensible like 1M
  */
 protected $_maximumApplicantFileUploadSize;
 
 /**
  * @var string
+ * The maximum size for administrator file uploads.
+ * Defaults to the value of PHP's builtin upload_max_filesize which is gernally pretty large
+ * so you should set this to somethign sensible like 5M
  */
 protected $_maximumAdminFileUploadSize;
 
 /**
  * @var string
+ * Authentication for administrators can be handled by several different methods.  
+ * Builtin options are:
+ * <ul>
+ * <li><b>Shibboleth</b> - for schools which have shibboleth IDPs.</li>
+ * <li><b>SimpleSAML</b> - an easier to configure shibboleth SP.  If the webserver you are 
+ * using doesn't have shibboleth installed this may be the right choice for you.</li>
+ * <li><b>OpenID</b> - This will allow anyone with a google, yahoo or other internet account to log in.</li>
+ * <li><b>NoAuthentication</b> - only if Jazzee is in DEVELOPER status.  This allows the user to 
+ * pick ANY user account and login as them.</li>
+ * </ul>
  */
 protected $_adminAuthenticationClass;
 
 /**
  * @var string
+ * If Shibboleth is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the userName.  This is almost always the default of 'eppn'
  */
 protected $_shibbolethUsernameAttribute;
 
 /**
  * @var string
+ * If Shibboleth is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the first name.  This is almost always the default of 'givenName'
  */
 protected $_shibbolethFirstNameAttribute;
 
 /**
  * @var string
+ * If Shibboleth is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the last name.  This is almost always the default of 'sn'
  */
 protected $_shibbolethLastNameAttribute;
 
 /**
  * @var string
+ * If Shibboleth is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the email address.  This is almost always the default of 'mail'
  */
 protected $_shibbolethEmailAddressAttribute;
 
 /**
  * @var string
+ * If Shibboleth is set as the adminAuthenticationClass this is the url applicants will 
+ * be directed to in order to login.  This is almost always the default of '/Shibboleth.sso/Login'
  */
 protected $_shibbolethLoginUrl;
 
 /**
  * @var string
+ * If Shibboleth is set as the adminAuthenticationClass this is the url applicants will 
+ * be directed to in order to logout.  This is almost always the default of '/Shibboleth.sso/Logout'
  */
 protected $_shibbolethLogoutUrl;
 
 /**
  * @var string
+ * if NoAuthentication is set as the adminAuthenticationClass this restricts what
+ * ip addresses can be used to authenticate.  Defaults to 127.0.0.1 (the localhost)
  */
 protected $_noAuthIpAddresses;
 
 /**
  * @var string
+ * If SimpleSAML is set as the adminAuthenticationClass this is the path to the 
+ * autoloader so it can be included when needed.
  */
 protected $_simpleSAMLIncludePath;
 
 /**
  * @var string
+ * If SimpleSAML is set as th adminAuthenticationClass this is the IDP
  */
 protected $_simpleSAMLAuthenticationSource;
 
 /**
  * @var string
+ * If SimpleSAML is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the userName.  This is almost always the default of 'eduPersonPrincipalName'
  */
 protected $_simpleSAMLUsernameAttribute;
 
 /**
  * @var string
+ * If SimpleSAML is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the first name.  This is almost always the default of 'givenName'
  */
 protected $_simpleSAMLFirstNameAttribute;
 
 /**
  * @var string
+ * If SimpleSAML is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the last name.  This is almost always the default of 'sn'
  */
 protected $_simpleSAMLLastNameAttribute;
 
 /**
  * @var string
+ * If SimpleSAML is set as the adminAuthenticationClass this is the attribute name
+ * we will use as the email address.  This is almost always the default of 'mail'
  */
 protected $_simpleSAMLEmailAddressAttribute;
 
 /**
  * @var string
+ * The SSL public key certificate to use in encrypting data.  Only the public key
+ * should reside on the Jazzee server as Jazzee has no method for decrypting data.
  */
 protected $_publicKeyCertificatePath;
 
 /**
  * @var string
+ * Your reCaptch private key to use for new applicant accounts.  
+ * @link http://www.google.com/recaptcha
  */
 protected $_recaptchaPrivateKey;
 
 /**
  * @var string
+ * Your reCaptch public key to use for new applicant accounts.  
+ * @link http://www.google.com/recaptcha
  */
 protected $_recaptchaPublicKey;
 
 /**
  * @var string
+ * The class to use when looking up users.  If your campus has an LDAP directory you
+ * should use Ldap so you can search for new users there.  Otherwise Local looks up users
+ * who alrady have Jazzee accounts.  If your using OpenID for you adminAuthenticationClass
+ * then Local is the only way to go. 
  */
 protected $_adminDirectoryClass;
 
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the host name for you server
  * */
 protected $_ldapHostname;
 
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the port for you server
  */
 protected $_ldapPort;
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the bind RDN for you server
  */
 protected $_ldapBindRdn;
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the bind password for you server
  */
 protected $_ldapBindPassword;
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the attribute name
+ * we will use as the username.  This is should match what will be returend in 
+ * for the shibbolethUserName
  */
 protected $_ldapUsernameAttribute;
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the attribute name
+ * we will use as the first name.  This is almost always the default of 'givenName'
  */
 protected $_ldapFirstNameAttribute;
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the attribute name
+ * we will use as the last name.  This is almost always the default of 'sn'
  */
 protected $_ldapLastNameAttribute;
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the attribute name
+ * we will use as the email address.  This is almost always the default of 'mail'
  */
 protected $_ldapEmailAddressAttribute;
 /**
  * @var string
+ * If Ldap is set as your adminDirectoryClass then this is the search base for
+ * your directory.  Usually something like 'ou=people, dc=ucsf, dc=edu'
  */
 protected $_ldapSearchBase;
 
 /**
  *  @var string
+ * If you want some advanced PDF functions you will have to purchase a PDFlib+PDI license
+ * and enter your license key here.
+ * @link http://www.pdflib.com/
  */
 protected $_pdflibLicenseKey;
 
 /**
  *  @var array
+ * Hostnames or IP addresses which are allowed to hit the cron page and trigger 
+ * a run.  If you're using links to trigger cron from the webserver jazzee is on then
+ * leaving this as the default 'localhost' is fine.
  */
 protected $_adminCronAllowed;
 
@@ -691,22 +807,6 @@ protected $_adminCronAllowed;
    */
   public function setVarPath($varPath) {
     $this->_varPath = $varPath;
-  }
-  
-  /**
-   * get adminEmail
-   * @return string
-   */
-  public function getAdminEmail() {
-    return $this->_adminEmail;
-  }
-  
-  /**
-   * set adminEmail
-   * @var string adminEmail
-   */
-  public function setAdminEmail($adminEmail) {
-    $this->_adminEmail = $adminEmail;
   }
   
   /**
