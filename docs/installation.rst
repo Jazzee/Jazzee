@@ -82,3 +82,27 @@ Copy that name and add it to the Administrators role::
 
   $./setup user-role 581234@ucsf.edu Administrator
   Johnson, Jonathan added to Administrator role
+
+First Steps in a new Install
+-----------------------------
+
+Once you have configured and successfully logged into Jazzee you will need to create
+a Cycle and Program to really start seeing what Jazzee can do.  If you were already
+logged into Jazzee before you added yourself as an administrator you will need to logout
+and back in again.
+
+If you only see the Home and My Account menus at the top of the screen then you 
+are not in the correct role.  Go back and review the instructions for adding yourself
+to the Administrator role above.
+
+Create a new cycle by choosing Cycles from the Manage menu.  Call it something like
+test2012 and give it a start and end date.  
+
+Create a new program by choosing Programs from the Manage menu.  You can name it
+anything you like.  The Short name is used when creating custom URLs for each program
+so keep it short and descriptive.
+
+Now that you have a cycle and program setup you can start building your first application.
+Choose Application from the Setup menu.  For now just fill out the required fields and save.  
+You can come back for the rest later.  Once you have done that the Setup Menu will include the Pages 
+option for creating the structure of your application and you should be off to the races.
