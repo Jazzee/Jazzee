@@ -1,5 +1,5 @@
-RHEL 6 Install
-===============
+Red Hat Enterprise Linux 6
+===========================
 
 
 Satisfying Dependencies

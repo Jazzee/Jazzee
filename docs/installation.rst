@@ -19,12 +19,16 @@ Required PHP extensions
 * pear/apc
 * pear/ldap
 * PECL/UUID
+* `PHP ClamAV <http://php-clamav.sourceforge.net/>`_
+* `PDFLib <http://www.pdflib.com/>`_ is used to generate PDFs of applications.  It isn't free and we want to replace
+  it but there does not seem to be a better solution available.  If you want to be able
+  to create PDFs of applications you will need to purchase and install PDFLib.
 
-http://php-clamav.sourceforge.net/
+Platform Specific Instructions
+-------------------------------
+:doc:`platforms/rhel6`
 
-PDFLib is used to generate PDFs of applications.  It isn't free and we want to replace
-it but there does not seem to be a better solution available.  If you want to be able
-to create PDFs of applications you will need to purchase and install PDFLib from http://www.pdflib.com/
+:doc:`platforms/ubuntu1104`
 
 Download Jazzee
 ----------------
@@ -43,12 +47,3 @@ Initial Setup
 
 Install the databse and the first user.  This is currently done with the setup 
 command, but that needs to go away and get replaced with a nice web interface.
-
-
-Platform Specific Instructions
--------------------------------
-.. toctree::
-   :maxdepth: 1
-
-   platforms/rhel6
-   platforms/ubuntu1104
