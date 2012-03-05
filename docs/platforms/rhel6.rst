@@ -13,7 +13,7 @@ Enable the Extra Packages for Enterprise Linux (EPEL) repository::
 
 Install dependencies::
 
-  #yum install php-devel ImageMagick-devel php-pecl-apc php-mysql libuuid-devel gcc php-ldap php-mbstring clamd clamav-devel
+  #yum install php-devel ImageMagick-devel php-pecl-apc php-mysql libuuid-devel gcc php-ldap php-mbstring clamd clamav-devel php-curl
 
 Install pear packages that are not in the RHEL or EPEL repositories::
 
@@ -25,14 +25,13 @@ Enable PHP Extensions::
   #echo 'extension=uuid.so' > /etc/php.d/uuid.ini
 
 Install the Doctrine ORM::
-
-  #pear channel-discover pear.doctrine-project.org
-  #pear install doctrine/DoctrineORM
-  #pear channel-discover htmlpurifier.org
+  $sudo pear config-set auto_discover 1
+  #pear install pear.doctrine-project.org/DoctrineORM
 
 Install HTML Purifier::
-
-  #pear install hp/HTMLPurifier
+  
+  #pear config-set auto_discover 1
+  #pear install htmlpurifier.org/HTMLPurifier
   #chgrp apache /usr/share/pear/HTMLPurifier/DefinitionCache/Serializer
   #chmod 775 /usr/share/pear/HTMLPurifier/DefinitionCache/Serializer
 
@@ -67,3 +66,6 @@ Enable the module::
 PDFLib is used to generate PDFs of applications.  It isn't free and we want to replace
 it but there does not seem to be a better solution available.  If you want to be able
 to create PDFs of applications you will need to purchase and install PDFLib from http://www.pdflib.com/
+
+Edit your apache configuration to allow .htaccess to work by adding AllowOverride FileInto
+to the Jazzee Directory
