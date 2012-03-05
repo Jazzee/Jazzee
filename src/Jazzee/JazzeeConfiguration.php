@@ -26,7 +26,7 @@ protected $_maintenancbodbessage;
 
 /**
  * @var string
- * Message displayed to everyone on every page.  Usefull for advertising future 
+ * Message displayed to everyone on every page.  Useful for advertising future 
  * downtime or any other significant system wide events.
  */
 protected $_broadcastMessage;
@@ -36,8 +36,8 @@ protected $_broadcastMessage;
  * Provides information  to JAZZEE components about the current system state.  Possible values are:
  * <ul>
  * <li><b>PRODUCTION</b> the default live application status</li>
- * <li><b>PREVIEW</b> limits some functionality in a draft installation.  Usefull for QA
- * where somethign like payments shouldn't work - but caching should still work and email should still go out</li>
+ * <li><b>PREVIEW</b> limits some functionality in a draft installation.  Useful for QA
+ * where something like payments shouldn't work - but caching should still work and email should still go out</li>
  * <li><b>DEVELOPMENT</b> If you're working on Jazzee this is the status for you.  If redirects outgoing
  * email and limits caching</li>
  * </ul>
@@ -174,16 +174,16 @@ protected $_varPath;
 /**
  * @var string
  * The maximum size for applicant file uploads.  Programs will not be able to override this setting.
- * Defaults to the value of PHP's builtin upload_max_filesize which is gernally pretty large
- * so you should set this to somethign sensible like 1M
+ * Defaults to the value of PHP's builtin upload_max_filesize which is generally pretty large
+ * so you should set this to something sensible like 1M
  */
 protected $_maximumApplicantFileUploadSize;
 
 /**
  * @var string
  * The maximum size for administrator file uploads.
- * Defaults to the value of PHP's builtin upload_max_filesize which is gernally pretty large
- * so you should set this to somethign sensible like 5M
+ * Defaults to the value of PHP's builtin upload_max_filesize which is generally pretty large
+ * so you should set this to something sensible like 5M
  */
 protected $_maximumAdminFileUploadSize;
 
