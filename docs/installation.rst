@@ -34,6 +34,17 @@ Download Jazzee
 ----------------
 You can download the latest version of jazzee from http://jazzee.org
 
+There is only one directory in Jazzee that should be open to the public JAZZEESRC/webroot.  
+The safest way to install Jazzee is to create a link to that directory from your webservers
+root.
+
+Jazzee doesn't care whether you run it in a subdirectory, but you will have to make
+one important change for that work work properly.  If you planning to install jazzee in 
+a subdirectory of your webserver like https://example.com/ourjazzee then you will need to edit
+JAZZEESRC/webroot/.htaccess to put that as the RewriteBase::
+
+ RewriteBase /ourjazzee
+
 Initial Configuration
 ----------------------
 Copy JAZZEESRC/etc/config.ini.new.php to JAZZEESRC/etc/config.ini.php and edit it for your environment.  
