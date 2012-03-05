@@ -441,6 +441,7 @@ protected $_adminCronAllowed;
         'mailServerType' => 'php',
         'maximumApplicantFileUploadSize' => \convertIniShorthandValue(\ini_get('upload_max_filesize')),
         'maximumAdminFileUploadSize' => \convertIniShorthandValue(\ini_get('upload_max_filesize')),
+        'varPath' => \realpath(__DIR__ . '/../../var'),
         'shibbolethUsernameAttribute' => 'eppn',
         'shibbolethFirstNameAttribute' => 'givenName',
         'shibbolethLastNameAttribute' => 'sn',
@@ -841,7 +842,7 @@ protected $_adminCronAllowed;
    * @return string
    */
   public function getVarPath() {
-    return $this->_varPath?$this->_varPath:\realpath(__DIR__ . '/../../var');
+    return $this->_varPath;
   }
   
   /**
