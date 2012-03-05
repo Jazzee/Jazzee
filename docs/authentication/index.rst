@@ -13,3 +13,4 @@ your solution can be used by other campuses please contribute it back.
   shibboleth
   openid
   simplesaml
+  noauthentication
