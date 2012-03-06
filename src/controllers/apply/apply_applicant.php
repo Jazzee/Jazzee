@@ -18,7 +18,14 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
    * @const ingeger
    */
   const MIN_INTERVAL_APPLICANTS = 7200;
-    
+  
+  /**
+   * Index redirects to login 
+   */
+  public function actionIndex() {
+    $this->redirectApplyPath('applicant/login');
+  }
+  
   /**
    * Authenticate applicants
    */
