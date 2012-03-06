@@ -81,7 +81,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
    * SIR Form
    */
   public function actionSir(){
-    if($this->_applicant->getDecision()->status() != 'finalAdmit') throw new \Jazzee\Exception('Applicant is not in the status finalAdmit');
+    if($this->_applicant->getDecision()->status() != 'finalAdmit') throw new \Jazzee\Exception("Applicant #{$this->_applicant->getId()} tried to access SIR but is not in the status finalAdmit", E_USER_NOTICE, 'You do not have access to this page.');
     $form = new \Foundation\Form();
     $form->setAction($this->applyPath('status/sir'));
     $field = $form->newField();
