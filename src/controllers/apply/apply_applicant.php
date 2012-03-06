@@ -18,7 +18,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
    * @const ingeger
    */
   const MIN_INTERVAL_APPLICANTS = 7200;
-  
+    
   /**
    * Authenticate applicants
    */
@@ -123,7 +123,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
     if(!$applicant){
       sleep(3);
       $this->addMessage('error','We were not able to find your password reset request.  It may have expired.  You can try your request again.');
-      $this->redirectApplyPath('applicant/resetpassword');
+      $this->redirectApplyPath('applicant/forgotpassword');
     }
     $form = new \Foundation\Form();
     $form->setCSRFToken($this->getCSRFToken());

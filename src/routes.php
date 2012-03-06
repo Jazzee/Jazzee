@@ -128,7 +128,7 @@ $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/status/do/([^/]+)/([0-9]+)/?([0-
 ));
 
 //applicant status
-$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/?([^/]+)?$#i', array(
+$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/?(index|login|logout|new|forgotpassword)?$#i', array(
   'controller' => 'apply_applicant',
   'action' => 3,
   'action_params' => array(
