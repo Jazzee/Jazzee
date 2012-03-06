@@ -84,6 +84,12 @@ $basicRouter->addRoute('#^apply/?([^/]*)/?([^/]*)$#i', array(
   )
 ));
 
+//apply welcome gets any blank requests
+$basicRouter->addRoute('#^$#i', array(
+  'controller' => 'apply_welcome',
+  'action' => 'index'
+));
+
 //lor requests
 $basicRouter->addRoute('#^lor/([^/]+)$#i', array(
   'controller' => 'lor',

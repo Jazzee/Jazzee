@@ -47,8 +47,9 @@ $classLoader->register();
 \Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/scores/');
 
 \Foundation\VC\Config::setViewClassName('\Jazzee\View');
-\Foundation\VC\Config::setDefaultControllerName('apply_welcome');
+\Foundation\VC\Config::setDefaultControllerName('error');
 \Foundation\VC\Config::setDefaultControllerActionName('index');
+\Foundation\VC\Config::setDefaultControllerActionParams(array('error'=>404, 'message'=>'Sorry the page you are looking for could not be found.'));
 
 
 //add the builtin admin controller directories
