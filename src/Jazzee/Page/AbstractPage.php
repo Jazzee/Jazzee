@@ -64,6 +64,8 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
    */
   public function getForm(){
     if(is_null($this->_form)) $this->_form = $this->makeForm();
+    //reset the CSRF token on every request so when submission fails token validation doesn't even if the session has timed out
+    $this->_form->setCSRFToken($this->_controller->getCSRFToken());
     return $this->_form;
   }
   
