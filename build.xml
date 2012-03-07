@@ -35,7 +35,7 @@
 
  <target name="export" depends="clean,src"/>
  <target name="archive" depends="export">
-   <tar destfile="${basedir}/build/jazzee.tar" basedir="${basedir}/build/jazzee" />
+   <tar destfile="${basedir}/build/jazzee.tar.gz" basedir="${basedir}/build/jazzee" compression="gzip" />
  </target>
  
   <target name="apidocs" description="Build API Documentation">
