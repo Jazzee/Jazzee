@@ -9,11 +9,11 @@ Enable the Optional Repository by logging into RHN and selecting it.
 
 Enable the Extra Packages for Enterprise Linux (EPEL) repository::
 
-  #rpm -Uvh http://download.fedora.redhat.com/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+  #rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
 
 Install dependencies::
 
-  #yum install php-devel ImageMagick-devel php-pecl-apc php-mysql libuuid-devel gcc php-ldap php-mbstring clamd clamav-devel php-curl
+  #yum install php-devel ImageMagick-devel php-pecl-apc php-mysql libuuid-devel gcc php-ldap php-mbstring clamd clamav-devel php-curl php-xml php-bcmath
 
 Install pear packages that are not in the RHEL or EPEL repositories::
 
@@ -25,8 +25,9 @@ Enable PHP Extensions::
   #echo 'extension=uuid.so' > /etc/php.d/uuid.ini
 
 Install the Doctrine ORM::
-  $sudo pear config-set auto_discover 1
-  #pear install pear.doctrine-project.org/DoctrineORM
+
+  #pear config-set auto_discover 1
+  #pear install pear.doctrine-project.org/DoctrineCommon-2.1.4 pear.doctrine-project.org/DoctrineDBAL-2.1.6 pear.doctrine-project.org/DoctrineORM-2.1.6
 
 Install HTML Purifier::
   
@@ -44,16 +45,12 @@ Install php-clamav::
   #phpize
   #./configure --with-clamav
   #make
+  #mkdir -p /usr/local/lib/php/extensions/
   #cp modules/clamav.so /usr/local/lib/php/extensions/
-
-On a 64bit installation you will need to install the extension in a different location::
-
-  #mkdir -p /usr/local/lib64/php/extensions/
-  #cp modules/clamav.so /usr/local/lib64/php/extensions/
 
 Enable the module::
 
-  #echo 'extension=/usr/local/lib64/php/extensions/clamav.so
+  #echo 'extension=/usr/local/libfd/php/extensions/clamav.so
   [clamav]
   clamav.dbpath="/var/lib/clamav"
   clamav.maxreclevel=16
@@ -69,3 +66,5 @@ to create PDFs of applications you will need to purchase and install PDFLib from
 
 Edit your apache configuration to allow .htaccess to work by adding AllowOverride FileInto
 to the Jazzee Directory
+
+Set your correct timezon in /etc/php.ini.  eg date.timezon=America/Los_Angelas

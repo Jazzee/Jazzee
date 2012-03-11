@@ -21,3 +21,12 @@ Pear/OpenID must be installed and the Curl extension must be available in PHP.
 Because OpenID does not have a central directory users should sign in to Jazzee
 once before they are put in any roles.  Enable OpenID for user authentication by 
 setting :ref:`configuration-adminAuthenticationClass` to OpenID.
+
+Install pear packages that are not in the RHEL or EPEL repositories::
+
+  #pear config-set auto_discover 1
+  #pear install OpenID
+
+At the time of this writing the OpenID package is still in alpha state so you would need to do::
+
+  #pear install OpenID-alpha
