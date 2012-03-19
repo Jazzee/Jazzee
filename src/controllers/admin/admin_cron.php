@@ -12,7 +12,7 @@ class AdminCronController extends \Jazzee\AdminController {
   /**
    * The maximum time a cron semephor can stick around before throwing an exception and deleting itself
    */
-  const MAX_INTERVAL = 86400;
+  const MAX_INTERVAL = 3600;
   const REQUIRE_AUTHORIZATION = false;
   const REQUIRE_APPLICATION = false;
   
@@ -43,6 +43,7 @@ class AdminCronController extends \Jazzee\AdminController {
         $class = \Foundation\VC\Config::getControllerClassName($controller);
         if(method_exists($class, 'runCron')){
           $class::runCron($this);
+          $this->_em->flush();
         }   
         //reset the max execution time and memory limit after every admin script is included because some override this
         set_time_limit(600);
@@ -53,6 +54,7 @@ class AdminCronController extends \Jazzee\AdminController {
         $class = $pageType->getClass();
         if(method_exists($class, 'runCron')){
           $class::runCron($this);
+          $this->_em->flush();
         }
       }
       //Perform and applicant actions
