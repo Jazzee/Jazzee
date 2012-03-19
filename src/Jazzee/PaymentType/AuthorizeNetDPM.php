@@ -141,10 +141,9 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
       $count = 0;
       if($paymentType){
         $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type'=>$paymentType->getId(), 'status'=>\Jazzee\Entity\Payment::PENDING),array(), 100);
-        $class = new AuthorizeNetAIM($paymentType);
         $fakeInput = new \Foundation\Form\Input(array());
         foreach($payments as $payment){
-          $result = $class->settlePayment($payment, $fakeInput);
+          $result = $paymentType->getJazzeePaymentType($cron)->settlePayment($payment, $fakeInput);
           if($result === true){
             $count++;
             $cron->getEntityManager()->persist($payment);
