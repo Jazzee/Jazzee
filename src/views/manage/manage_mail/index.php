@@ -22,7 +22,6 @@
 <p>
 <strong>From Address: </strong><?php print $config->getMailDefaultFromAddress(); ?><br />
 <strong>From Name: </strong><?php print $config->getMailDefaultFromName(); ?><br />
-<strong>Admin Address: </strong><?php print $config->getAdminEmail(); ?><br />
 </p>
 <?php if($this->controller->checkIsAllowed('manage_mail', 'test')){ ?>
   <p><a href='<?php print $this->path('manage/mail/test')?>'>Send Test Email</a></p>
