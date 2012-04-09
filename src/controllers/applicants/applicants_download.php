@@ -37,7 +37,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
     $element->newItem('admitted', 'Admitted');
     $element->newItem('denied', 'Denied');
     $element->newItem('accepted', 'Accepted');
-    $element->newItem('decined', 'Declined');
+    $element->newItem('declined', 'Declined');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newButton('submit', 'Download Applicants');
