@@ -281,13 +281,7 @@ JazzeeElement.prototype.workspace = function(){
   field.append(element);
   
   var toolbar = $('<span>').addClass('ui-widget-header ui-corner-all toolbar');
-  var button = $('<button>').bind('click', function(e){
-    $('.qtip').qtip('api').hide();
-    $('#element-' + elementClass.id).effect('explode',500);
-    elementClass.status = 'delete';
-    elementClass.page.deleteElement(elementClass);
-    elementClass.markModified();
-  });
+  var button = $('<button>');
   button.button({
     text: false,
     label: 'Delete Element',
@@ -295,6 +289,19 @@ JazzeeElement.prototype.workspace = function(){
       primary: 'ui-icon-trash'
     }
   });
+  if(this.page.hasAnswers){
+    button.addClass('ui-button-disabled ui-state-disabled');
+    button.attr('title', 'This element cannot be deleted because there is applicant information associated with it.');
+    button.qtip();
+  } else {
+    button.bind('click', function(e){
+      $('.qtip').qtip('api').hide();
+      $('#element-' + elementClass.id).effect('explode',500);
+      elementClass.status = 'delete';
+      elementClass.page.deleteElement(elementClass);
+      elementClass.markModified();
+    });
+  }
   toolbar.append(button);
   
   var button = $('<button>').bind('click', function(e){

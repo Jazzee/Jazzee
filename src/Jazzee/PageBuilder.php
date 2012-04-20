@@ -303,8 +303,13 @@ abstract class PageBuilder extends AdminController{
         case 'delete':
           //don't try and delete temporary elements
           if($element = $page->getElementByID($e->id)){
-            $this->_em->remove($element);
-            $page->getElements()->remove($element->getId());
+            if($this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($page)){
+              $this->setLayoutVar('status', 'error');
+              $this->addMessage('error',$element->getTitle() . '  could not be deleted becuase it has applicant information associated with it.');
+            } else {
+              $this->_em->remove($element);
+              $page->getElements()->remove($element->getId());
+            }
           }
           break;
         case 'new':
