@@ -340,6 +340,7 @@ JazzeeElement.prototype.workspace = function(){
       }
     }
   });
+  button.qtip('api').render();
   toolbar.append(button);
   
   $('.options', div).html(toolbar);
