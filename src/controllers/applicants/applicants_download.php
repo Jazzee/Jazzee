@@ -107,8 +107,8 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
     );
     foreach($applicationPages as $applicationPage){
       for($i=1;$i<=$applicationPagesAnswerCount[$applicationPage->getPage()->getId()]; $i++){
-        foreach($applicationPage->getPage()->getElements() as $element){
-          $header[] = $applicationPage->getTitle() . ' ' . $i . ' ' . $element->getTitle();
+        foreach($applicationPage->getJazzeePage()->getCsvHeaders() as $title){
+          $header[] = $applicationPage->getTitle() . ' ' . $i . ' ' . $title;
         }
       }
     }
@@ -133,16 +133,8 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
       $arr[] = implode(' ', $tags);
       foreach($applicationPages as $applicationPage){
         $applicationPage->getJazzeePage()->setApplicant($applicant);
-        $answers = $applicant->findAnswersByPage($applicationPage->getPage());
-        for($i=0;$i<$applicationPagesAnswerCount[$applicationPage->getPage()->getId()]; $i++){
-          foreach($applicationPage->getPage()->getElements() as $element){
-            $element->getJazzeeElement()->setController($this);
-            if(isset($answers[$i])){
-              $arr[] = $element->getJazzeeElement()->displayValue($answers[$i]);
-            } else {
-              $arr[] = '';
-            }
-          }
+        for($i=0;$i<$applicationPagesAnswerCount[$applicationPage->getPage()->getId()]; $i++){  
+          $arr = array_merge($arr, $applicationPage->getJazzeePage()->getCsvAnswer($i));
         }
       }
       $rows[] = $arr;

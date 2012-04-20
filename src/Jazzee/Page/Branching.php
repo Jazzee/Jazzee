@@ -147,6 +147,45 @@ class Branching extends Standard
   }
   
   /**
+   * Branchign pages get special CSV headers so all the branches are reprsented
+   * @return array 
+   */
+  public function getCsvHeaders(){
+    $headers = array();
+    $headers[] = $this->_applicationPage->getPage()->getVar('branchingElementLabel');
+    foreach($this->_applicationPage->getPage()->getChildren() as $child){
+      foreach($child->getElements() as $element){
+        $headers[] = $child->getTitle() . ' ' . $element->getTitle();
+      }
+    }
+    return $headers;
+  }
+  
+  /**
+   * Branching pages return elements for every page
+   * @param int $position
+   * @return array
+   */
+  function getCsvAnswer($position){
+    $arr = array();
+    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
+    if(isset($answers[$position])){
+      $arr[] = $answers[$position]->getChildren()->first()->getPage()->getTitle();
+    }
+    foreach($this->_applicationPage->getPage()->getChildren() as $child){
+      foreach($child->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
+        if(isset($answers[$position]) and $child == $answers[$position]->getChildren()->first()->getPage()){
+          $arr[] = $element->getJazzeeElement()->displayValue($answers[$position]->getChildren()->first());
+        } else {
+          $arr[] = '';
+        }
+      }
+    }
+    return $arr;
+  }
+  
+  /**
    * Setup the default variables
    */
   public function setupNewPage(){

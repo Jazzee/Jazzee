@@ -139,6 +139,37 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
   }
   
   /**
+   * Default CSV headers are just the elements for a page
+   * @return array 
+   */
+  public function getCsvHeaders(){
+    $headers = array();
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $headers[] = $element->getTitle();
+    }
+    return $headers;
+  }
+  
+  /**
+   * Defaults to just usign the element display values
+   * @param int $position
+   * @return array
+   */
+  function getCsvAnswer($position){
+    $arr = array();
+    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
+      if(isset($answers[$position])){
+        $arr[] = $element->getJazzeeElement()->displayValue($answers[$position]);
+      } else {
+        $arr[] = '';
+      }
+    }
+    return $arr;
+  }
+  
+  /**
    * Create a table from answers
    * and append any attached PDFs
    * @param \Jazzee\ApplicantPDF $pdf 
