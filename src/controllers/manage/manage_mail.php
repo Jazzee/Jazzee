@@ -40,7 +40,7 @@ class ManageMailController extends \Jazzee\AdminController {
     $form->newButton('submit', 'Send Test');
     $this->setVar('form', $form);  
     if($input = $form->processInput($this->post)){
-      $message = $this->newMessage();
+      $message = $this->newMailMessage();
       $message->AddAddress($input->get('address'));
       $message->Subject = 'Test Email';
       $message->Body = 'This is a test email from the application system.';

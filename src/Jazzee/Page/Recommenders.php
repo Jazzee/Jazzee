@@ -67,7 +67,7 @@ class Recommenders extends Standard {
     $replace[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer);
     $body = str_ireplace($search, $replace, $this->_applicationPage->getPage()->getVar('recommenderEmailText'));
 
-    $message = $this->_controller->newMessage();
+    $message = $this->_controller->newMailMessage();
     $message->AddAddress(
       $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
       $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer));

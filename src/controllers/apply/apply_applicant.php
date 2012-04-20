@@ -106,7 +106,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
       . "If you cannot click on the link you should copy and paste it into your browser. \n"
       . "For your protection this link will only be valid for a limited time. \n \n"
       . $this->applyPath('applicant/resetpassword/' . $applicant->getUniqueId());
-        $message = $this->newMessage();
+        $message = $this->newMailMessage();
         $message->AddAddress($applicant->getEmail(), $applicant->getFullName());
         $message->Subject = 'Password Reset Request';
         $message->Body = $body;

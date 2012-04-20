@@ -127,7 +127,7 @@ class JazzeeController extends PageController
    * 
    * @return \Foundation\Mail\Message
    */
-  public function newMessage(){
+  public function newMailMessage(){
     return new \Foundation\Mail\Message($this->_foundationConfig);
   }
   

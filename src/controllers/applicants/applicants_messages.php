@@ -179,7 +179,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
       }
       foreach($applicants as $arr){
         try{
-          $message = $cron->newMessage();
+          $message = $cron->newMailMessage();
           $message->AddAddress(
             $arr['applicant']->getEmail(),
             $arr['applicant']->getFullName());
@@ -213,7 +213,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
       }
       foreach($applications as $arr){
         try{
-          $message = $cron->newMessage();
+          $message = $cron->newMailMessage();
           $message->AddAddress(
             $arr['application']->getContactEmail(),
             $arr['application']->getContactName());
