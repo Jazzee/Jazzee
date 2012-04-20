@@ -72,9 +72,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
     }
     $statusPageText = str_ireplace($search, $replace, $statusPageText);
     $this->setVar('statusPageText', nl2br($statusPageText));
-    $pages = array();
-    foreach($this->_pages as $key => $page)if($page->answerStatusDisplay()) $pages[] = $page;
-    $this->setVar('pages', $pages);
+    $this->setVar('pages', $this->_pages);
   }
   
   /**

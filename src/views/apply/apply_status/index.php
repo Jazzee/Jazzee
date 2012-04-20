@@ -16,7 +16,9 @@ $this->controller->setLayoutVar('layoutContentTop', $layoutContentTop);
 <?php 
 if($applicant->isLocked()){
   foreach($pages as $page){
-    $class = $page->getPage()->getType()->getClass();
-    $this->renderElement($class::APPLY_STATUS_ELEMENT, array('page'=>$page));
+    if($page->answerStatusDisplay()){
+      $class = $page->getPage()->getType()->getClass();
+      $this->renderElement($class::APPLY_STATUS_ELEMENT, array('page'=>$page));
+    }
   }
 }
