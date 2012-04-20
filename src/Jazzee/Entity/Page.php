@@ -4,7 +4,7 @@ namespace Jazzee\Entity;
 /** 
  * Page
  * A page is not directly associated with an application - it can be a single case or a global page associated with many applications
- * @Entity
+ * @Entity(repositoryClass="\Jazzee\Entity\PageRepository")
  * @HasLifecycleCallbacks 
  * @Table(name="pages", 
  * uniqueConstraints={@UniqueConstraint(name="page_uuid",columns={"uuid"})})
@@ -470,4 +470,26 @@ class Page{
     $ap->setPage($this);
     return $ap->getJazzeePage();
   }
+}
+
+/**
+ * Page Repository
+ * Special Repository methods for Pages
+ * @package jazzee
+ * @subpackage orm
+ */
+class PageRepository extends \Doctrine\ORM\EntityRepository{
+  
+  /**
+   * Check if a page has any answers associated with it
+   * @return boolean
+   */
+  public function hasAnswers(Page $page){
+    $query = $this->_em->createQuery('SELECT a.id FROM Jazzee\Entity\Answer a WHERE a.page = :pageId');
+    $query->setParameter('pageId', $page->getId());
+    $query->setMaxResults(1);
+    $result = $query->getResult();
+    return count($result);
+  }
+  
 }

@@ -120,6 +120,7 @@ abstract class PageBuilder extends AdminController{
     $arr['typeName'] = $this->getClassName($page->getType()->getName());
     $arr['typeId'] = $page->getType()->getId();
     $arr['isGlobal'] = $page->isGlobal()?1:0;
+    $arr['hasAnswers'] = $this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($page);
     $arr['elements'] = array();
     foreach($page->getElements() as $element){
       $e = array(
