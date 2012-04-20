@@ -80,9 +80,12 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
         $applicationPage->setMax((string)$attributes['max']);
         if((string)$attributes['required'])$applicationPage->required(); else $applicationPage->optional();
         if((string)$attributes['answerStatusDisplay'])$applicationPage->showAnswerStatus(); else $applicationPage->hideAnswerStatus();
-        $applicationPage->setInstructions(html_entity_decode((string)$attributes['instructions']));
-        $applicationPage->setLeadingText(html_entity_decode((string)$attributes['leadingText']));
-        $applicationPage->setTrailingText(html_entity_decode((string)$attributes['trailingText']));
+        $e = $element->xpath('instructions');
+        $applicationPage->setInstructions((string)$e[0]);
+        $e = $element->xpath('leadingText');
+        $applicationPage->setLeadingText((string)$e[0]);
+        $e = $element->xpath('trailingText');
+        $applicationPage->setTrailingText((string)$e[0]);
         $applicationPage->setWeight((string)$attributes['weight']);
         $this->_em->persist($applicationPage);
       }
@@ -110,9 +113,12 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
       $page->setMax((string)$attributes['max']);
       if((string)$attributes['required'])$page->required(); else $page->optional();
       if((string)$attributes['answerStatusDisplay'])$page->showAnswerStatus(); else $page->hideAnswerStatus();
-      $page->setInstructions(html_entity_decode((string)$attributes['instructions']));
-      $page->setLeadingText(html_entity_decode((string)$attributes['leadingText']));
-      $page->setTrailingText(html_entity_decode((string)$attributes['trailingText']));
+      $e = $xml->xpath('instructions');
+      $page->setInstructions((string)$e[0]);
+      $e = $xml->xpath('leadingText');
+      $page->setLeadingText((string)$e[0]);
+      $e = $xml->xpath('trailingText');
+      $page->setTrailingText((string)$e[0]);
       $page->notGlobal();
       $this->_em->persist($page);
       foreach($xml->xpath('elements/element') as $elementElement){

@@ -47,9 +47,15 @@ class SetupExportApplicationController extends \Jazzee\AdminController {
     $pxml->setAttribute('max', $page->getMax());
     $pxml->setAttribute('required', $page->isRequired());
     $pxml->setAttribute('answerStatusDisplay', $page->answerStatusDisplay());
-    $pxml->setAttribute('instructions', htmlentities($page->getInstructions(),ENT_COMPAT,'utf-8'));
-    $pxml->setAttribute('leadingText', htmlentities($page->getLeadingText(),ENT_COMPAT,'utf-8'));
-    $pxml->setAttribute('trailingText', htmlentities($page->getTrailingText(),ENT_COMPAT,'utf-8'));
+    $element = $dom->createElement('instructions');
+    if($page->getInstructions()) $element->appendChild($dom->createCDATASection($page->getInstructions()));
+    $pxml->appendChild($element);
+    $element = $dom->createElement('leadingText');
+    if($page->getLeadingText()) $element->appendChild($dom->createCDATASection($page->getLeadingText()));
+    $pxml->appendChild($element);
+    $element = $dom->createElement('trailingText');
+    if($page->getTrailingText()) $element->appendChild($dom->createCDATASection($page->getTrailingText()));
+    $pxml->appendChild($element);
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $pxml->setAttribute('weight', $page->getWeight());
       $pxml->setAttribute('kind', $page->getKind());
