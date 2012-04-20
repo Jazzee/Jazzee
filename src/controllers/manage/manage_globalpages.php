@@ -46,6 +46,9 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
           if($applicationPages){
             $this->setLayoutVar('status', 'error');
             $this->addMessage('error',$page->getTitle() . ' could not be deleted becuase it is part of at least one application');
+          } else if($this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($page)){
+            $this->setLayoutVar('status', 'error');
+            $this->addMessage('error',$page->getTitle() . '  could not be deleted becuase it has applicant information associated with it.');
           } else {
             $this->addMessage('success',$page->getTitle() . ' deleted');
             $this->_em->remove($page);

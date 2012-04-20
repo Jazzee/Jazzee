@@ -49,9 +49,14 @@ class SetupPagesController extends \Jazzee\PageBuilder {
     switch($data->status){
       case 'delete':
         if($applicationPage = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page' => $pageId, 'application'=>$this->_application->getId()))){
-          if(!$applicationPage->getPage()->isGlobal()) $this->_em->remove($applicationPage->getPage());
-          $this->_em->remove($applicationPage);
-          $this->addMessage('success',$applicationPage->getTitle() . ' deleted');
+          if($this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($applicationPage->getPage())){
+            $this->setLayoutVar('status', 'error');
+            $this->addMessage('error',$applicationPage->getTitle() . ' could not be deleted becuase it has applicant information associated with it.');
+          } else {
+            if(!$applicationPage->getPage()->isGlobal()) $this->_em->remove($applicationPage->getPage());
+            $this->_em->remove($applicationPage);
+            $this->addMessage('success',$applicationPage->getTitle() . ' deleted');
+          }
         }
       break;
       case 'new-global':
