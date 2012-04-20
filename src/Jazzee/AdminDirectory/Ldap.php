@@ -43,13 +43,26 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory{
       foreach($filters as $f) $filter .= "({$f})";
       $filter .= ')';
     }
-    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter);
+    //limit the LDAP attributes for efficiency
+    $limitAttributes = array(
+      $this->_controller->getConfig()->getLdapUsernameAttribute(),
+      $this->_controller->getConfig()->getLdapFirstNameAttribute(),
+      $this->_controller->getConfig()->getLdapLastNameAttribute(),
+      $this->_controller->getConfig()->getLdapEmailAddressAttribute()
+    );
+    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter, $limitAttributes);
     return $this->parseSearchResult($searchResult);
   }
   
   function findByUniqueName($uniqueName){
     $filter = "{$this->_controller->getConfig()->getLdapUsernameAttribute()}={$uniqueName}";
-    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter);
+    $limitAttributes = array(
+      $this->_controller->getConfig()->getLdapUsernameAttribute(),
+      $this->_controller->getConfig()->getLdapFirstNameAttribute(),
+      $this->_controller->getConfig()->getLdapLastNameAttribute(),
+      $this->_controller->getConfig()->getLdapEmailAddressAttribute()
+    );
+    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter, $limitAttributes);
     return $this->parseSearchResult($searchResult);
   }
   
