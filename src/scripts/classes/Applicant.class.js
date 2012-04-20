@@ -237,10 +237,12 @@ Applicant.prototype.refreshDecisions = function(json){
  */
 Applicant.prototype.refreshTags = function(json){
   var self = this;
+  var currentTags = [];
   $('#tags').empty();
   var ul = $('<ul>');
   for(var i=0; i<json.tags.length; i++){
     var li = $('<li>').html(json.tags[i].title).attr('id', 'tag'+json.tags[i].id);
+    currentTags.push(json.tags[i].title);
     if(json.allowRemove){
       li.prepend($('<img>').attr('src',self.baseUrl + '/resource/foundation/media/icons/delete.png').addClass('removeTag'));
     }
@@ -267,9 +269,21 @@ Applicant.prototype.refreshTags = function(json){
 
   form.submit(function(e){
     var value = $('input', e.target).first().val();
-    $.post(self.baseUrl + '/addTag',{tagTitle: value},function(json){
-      self.refreshTags(json.data.result.tags);
-    });
+    if($.inArray(value, currentTags) != -1){
+      var div = $('<div>').html('"' + value + '" has already been applied to this applicant and cannot be applied again.');
+      $(div).dialog({
+        modal: true,
+        buttons: {
+          Ok: function() {
+            $( this ).dialog( "close" );
+          }
+        }
+      });
+    } else {
+      $.post(self.baseUrl + '/addTag',{tagTitle: value},function(json){
+        self.refreshTags(json.data.result.tags);
+      });
+    }
     return false;
   });
   $('#tags').append(form);
