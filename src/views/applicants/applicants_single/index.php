@@ -60,9 +60,13 @@
               switch($status){
                 case '': $status = 'No Decision'; break;
                 case 'nominateAdmit': $status = 'Nominated for Admission'; break; 
-                case 'nominateDeny': $status = 'Nominated for Deny'; break; 
-                case 'finalDeny': $status = 'Denied'; break; 
-                case 'finalAdmit': $status = 'Admited'; break; 
+                case 'nominateDeny': $status = 'Nominated for Deny'; break;       
+                case 'finalDeny': 
+                  $status = 'Denied ' . ($applicant->getDecision()->getDecisionViewed()?'(decision viewed ' . $applicant->getDecision()->getDecisionViewed()->format('c') . ')':'(decision not viewed)');
+                  break; 
+                case 'finalAdmit': 
+                  $status = 'Admited ' . ($applicant->getDecision()->getDecisionViewed()?'(decision viewed ' . $applicant->getDecision()->getDecisionViewed()->format('c') . ')':'(decision not viewed)'); 
+                  break; 
                 case 'acceptOffer': $status = 'Accepted'; break; 
                 case 'declineOffer': $status = 'Declined'; break;
               }

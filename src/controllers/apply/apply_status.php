@@ -58,6 +58,11 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
      $this->applyPath('status/denyLetter')
     );
     if($this->_applicant->getDecision()){
+      
+      if(!$this->_applicant->getDecision()->getDecisionViewed() and ($this->_applicant->getDecision()->getFinalAdmit() or $this->_applicant->getDecision()->getFinalDeny())){
+        $this->_applicant->getDecision()->decisionViewed();
+        $this->_em->persist($this->_applicant);
+      }
       $replace[] = ($this->_applicant->getDecision()->getOfferResponseDeadline())?$this->_applicant->getDecision()->getOfferResponseDeadline()->format('l F jS Y g:ia'):null;
       $replace[] = ($this->_applicant->getDecision()->getFinalAdmit())?$this->_applicant->getDecision()->getFinalAdmit()->format('l F jS Y g:ia'):null;
       $replace[] = ($this->_applicant->getDecision()->getFinalDeny())?$this->_applicant->getDecision()->getFinalDeny()->format('l F jS Y g:ia'):null;

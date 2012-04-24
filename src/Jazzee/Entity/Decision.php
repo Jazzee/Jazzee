@@ -40,10 +40,7 @@ class Decision{
   private $offerResponseDeadline;
   
   /** @Column(type="datetime", nullable=true) */
-  private $decisionLetterSent;
-  
-  /** @Column(type="datetime", nullable=true) */
-  private $decisionLetterViewed;
+  private $decisionViewed;
   
   /** @Column(type="datetime", nullable=true) */
   private $acceptOffer;
@@ -138,6 +135,7 @@ class Decision{
    */
   public function undoFinalDeny(){
     $this->finalDeny = null;
+    $this->decisionViewed = null;
   }
   
   /**
@@ -177,6 +175,7 @@ class Decision{
       throw new \Jazzee\Exception('Cannot undo admit for an applicant with a offer response.');
     }
     $this->finalAdmit = null;
+    $this->decisionViewed = null;
   }
   
   /**
@@ -216,19 +215,11 @@ class Decision{
   }
   
   /**
-   * Register a decision letter has been sent
-   * @param string $dateString
-   */
-  public function decisionLetterSent($dateString = null){
-    $this->decisionLetterSent = $this->decisionStamp($dateString);
-  }
-  
-  /**
    * Register a decision letter has been viewed
    * @param string $dateString
    */
-  public function decisionLetterViewed($dateString = null){
-    $this->decisionLetterViewed = $this->decisionStamp($dateString);
+  public function decisionViewed($dateString = null){
+    $this->decisionViewed = $this->decisionStamp($dateString);
   }
    
   /**
@@ -286,21 +277,12 @@ class Decision{
   }
    
   /**
-   * get decisionLetterSent
-   *
-   * @return \DateTime
-   */
-  public function getDecisionLetterSent(){
-    return $this->decisionLetterSent;
-  }
-   
-  /**
    * get decisionLetterViewed
    *
    * @return \DateTime
    */
-  public function getDecisionLetterViewed(){
-    return $this->decisionLetterViewed;
+  public function getDecisionViewed(){
+    return $this->decisionViewed;
   }
    
   /**
