@@ -98,6 +98,12 @@ class Preflight extends \Symfony\Component\Console\Command\Command
             $em->getProxyFactory()->generateProxyClasses($metadatas, $proxyDir);          
           }
         }
+        if(
+        !apc_clear_cache() ||
+        !apc_clear_cache('user') ||
+        !apc_clear_cache('opcode')){
+          $output->write("<error>Error Clearning APC Cache</error>" . PHP_EOL);
+        }
       }
       
       try{
