@@ -17,7 +17,7 @@ class PaymentTypeVariable{
   
   /** 
    * @ManyToOne(targetEntity="PaymentType", inversedBy="variables")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $type;
   

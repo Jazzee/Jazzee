@@ -19,7 +19,7 @@ class Payment{
   
   /** 
    * @OneToOne(targetEntity="Answer",inversedBy="payment")
-   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="SET NULL") 
    */
   private $answer;
   

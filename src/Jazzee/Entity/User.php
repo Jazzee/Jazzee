@@ -24,30 +24,30 @@ class User{
    * */
   private $uniqueName;
   
-  /** @Column(type="string", nullable="true") */
+  /** @Column(type="string", nullable=true) */
   private $email;
   
-  /** @Column(type="string", nullable="true") */
+  /** @Column(type="string", nullable=true) */
   private $firstName;
   
-  /** @Column(type="string", nullable="true") */
+  /** @Column(type="string", nullable=true) */
   private $lastName;
   
-  /** @Column(type="string", nullable="true") */
+  /** @Column(type="string", nullable=true) */
   private $apiKey;
   
-  /** @Column(type="boolean", nullable="false") */
+  /** @Column(type="boolean") */
   private $isActive;
   
   /** 
    * @ManyToOne(targetEntity="Program")
-   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="SET NULL") 
    */
   private $defaultProgram;
   
   /** 
    * @ManyToOne(targetEntity="Cycle")
-   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="SET NULL") 
    */
   private $defaultCycle;
   

@@ -18,7 +18,7 @@ class RoleAction{
   
   /** 
    * @ManyToOne(targetEntity="Role", inversedBy="actions")
-   * @JoinColumn(onDelete="CASCADE",onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $role;
   

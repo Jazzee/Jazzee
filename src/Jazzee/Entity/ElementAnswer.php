@@ -21,13 +21,13 @@ class ElementAnswer{
   
   /** 
    * @ManyToOne(targetEntity="Answer",inversedBy="elements")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $answer;
   
   /** 
    * @ManyToOne(targetEntity="Element")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $element;
   

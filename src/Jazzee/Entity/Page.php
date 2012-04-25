@@ -27,7 +27,7 @@ class Page{
   
   /** 
    * @ManyToOne(targetEntity="PageType")
-   * @JoinColumn(onDelete="SET NULL", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="SET NULL") 
    */
   private $type;
   
@@ -36,7 +36,7 @@ class Page{
   
   /** 
    * @ManyToOne(targetEntity="Page",inversedBy="children")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $parent;
   

@@ -21,13 +21,13 @@ class Application{
   
   /** 
    * @ManyToOne(targetEntity="Program")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $program;
   
   /** 
    * @ManyToOne(targetEntity="Cycle", inversedBy="applications")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE")
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $cycle;
   

@@ -20,7 +20,7 @@ class Decision{
   
   /** 
    * @OneToOne(targetEntity="Applicant",inversedBy="decision")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $applicant;
   

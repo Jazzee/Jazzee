@@ -35,13 +35,13 @@ class ApplicationPage
   
   /** 
    * @ManyToOne(targetEntity="Application", inversedBy="applicationPages")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $application;
   
   /** 
    * @ManyToOne(targetEntity="Page")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $page;
   

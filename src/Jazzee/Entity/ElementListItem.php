@@ -20,7 +20,7 @@ class ElementListItem{
   
   /** 
    * @ManyToOne(targetEntity="Element",inversedBy="listItems")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $element;
   

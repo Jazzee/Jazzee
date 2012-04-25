@@ -22,19 +22,19 @@ class Answer{
   
   /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="answers")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   protected $applicant;
   
   /** 
    * @ManyToOne(targetEntity="Page")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   protected $page;
   
   /** 
    * @ManyToOne(targetEntity="Answer",inversedBy="children")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   protected $parent;
   
@@ -50,13 +50,11 @@ class Answer{
   
   /** 
    * @ManyToOne(targetEntity="AnswerStatusType")
-   * @JoinColumn(onUpdate="CASCADE") 
    */
   protected $publicStatus;
   
   /** 
    * @ManyToOne(targetEntity="AnswerStatusType")
-   * @JoinColumn(onUpdate="CASCADE") 
    */
   protected $privateStatus;
   

@@ -29,7 +29,7 @@ class Applicant{
   
   /** 
    * @ManyToOne(targetEntity="Application", inversedBy="applicants")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $application;
   
@@ -60,10 +60,10 @@ class Applicant{
   /** @Column(type="datetime", nullable=true) */
   private $lastLogin;
   
-  /** @Column(type="string", length="15", nullable=true) */
+  /** @Column(type="string", length=15, nullable=true) */
   private $lastLoginIp;
   
-  /** @Column(type="string", length="15", nullable=true) */
+  /** @Column(type="string", length=15, nullable=true) */
   private $lastFailedLoginIp;
   
   /** @Column(type="integer", nullable=true) */

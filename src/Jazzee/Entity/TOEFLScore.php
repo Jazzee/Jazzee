@@ -42,7 +42,7 @@ class TOEFLScore{
   /** @Column(type="datetime") */
   private $birthDate;
   
-  /** @Column(type="string", length=1, nullable="true") */
+  /** @Column(type="string", length=1, nullable=true) */
   private $gender;
   
   /** @Column(type="string") */

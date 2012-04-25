@@ -19,13 +19,13 @@ class Attachment{
   
   /** 
    * @OneToOne(targetEntity="Answer",inversedBy="attachment")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $answer;
   
   /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="attachments")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   private $applicant;
   

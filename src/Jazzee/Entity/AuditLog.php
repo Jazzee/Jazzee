@@ -27,13 +27,13 @@ class AuditLog{
   
   /** 
    * @ManyToOne(targetEntity="User",inversedBy="auditLogs")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   protected $user;
   
   /** 
    * @ManyToOne(targetEntity="Applicant",inversedBy="auditLogs")
-   * @JoinColumn(onDelete="CASCADE", onUpdate="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE") 
    */
   protected $applicant;
   
