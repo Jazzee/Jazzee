@@ -56,6 +56,9 @@ $page->getJazzeePage()->setApplicant($applicant);
                 }
               ?>
                 <a href="<?php print $this->path('file/' . \urlencode($pdfName));?>"><img src="<?php print $this->path('file/' . \urlencode($pngName));?>" /></a>
+                <?php if($this->controller->checkIsAllowed('applicants_single', 'deleteAnswerPdf')){ ?>
+                  <br /><a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswerPdf/' . $answer->getId());?>' class='action'>Delete PDF</a>
+                <?php } ?>
               <?php } else if($this->controller->checkIsAllowed('applicants_single', 'attachAnswerPdf')){ ?>
               <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/attachAnswerPdf/' . $answer->getId());?>' class='actionForm'>Attach PDF</a>
             <?php } ?>
