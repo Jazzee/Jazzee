@@ -67,8 +67,13 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
             $this->_store->expire();
             $this->_store->touchAuthentication();
             $this->_store->applicantID = $applicant->getId();
-            $this->addMessage('success', 'Welcome to the ' . $this->_application->getProgram()->getName() . ' application.');
-            $this->redirectApplyFirstPage();
+            if($count = $applicant->unreadMessageCount()){
+              $this->addMessage('success', 'You have ' . $count . ' unread message(s).');
+              $this->redirectApplyPath('support');
+            } else {
+              $this->addMessage('success', 'Welcome to the ' . $this->_application->getProgram()->getName() . ' application.');
+              $this->redirectApplyFirstPage();
+            }
           }
           $applicant->loginFail();
           $this->_authLog->log('Incorrect Password for applicant ' . $applicant->getId() . ' from ' . $_SERVER['REMOTE_ADDR'] . '. ' . $applicant->getFailedLoginAttempts() . ' attempts.', PEAR_LOG_INFO);
