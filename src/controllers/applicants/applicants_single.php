@@ -772,12 +772,15 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     foreach($this->_em->getRepository('\Jazzee\Entity\AnswerStatusType')->findBy(array(),array('name'=>'ASC')) as $type){
       $answerStatusTypes[$type->getId()] = $type;
     }
-    $element = $field->newElement('SelectList', 'publicStatus');
-    $element->setLabel('Public Status');
-    $element->setFormat('Visible to applicants');
-    $element->newItem('', '');
-    foreach($answerStatusTypes as $id => $type) $element->newItem($id, $type->getName());
-    if($answer->getPublicStatus()) $element->setValue($answer->getPublicStatus()->getId());
+    //only set public status on pages where the status can be displayed
+    if($answer->getPage()->answerStatusDisplay()){
+      $element = $field->newElement('SelectList', 'publicStatus');
+      $element->setLabel('Public Status');
+      $element->setFormat('Visible to applicants');
+      $element->newItem('', '');
+      foreach($answerStatusTypes as $id => $type) $element->newItem($id, $type->getName());
+      if($answer->getPublicStatus()) $element->setValue($answer->getPublicStatus()->getId());
+    }
     
     $element = $field->newElement('SelectList', 'privateStatus');
     $element->setLabel('Private Status');
