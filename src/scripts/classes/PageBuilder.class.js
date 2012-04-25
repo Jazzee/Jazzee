@@ -18,6 +18,12 @@ function PageBuilder(canvas){
   
   //are we editing global pages or application pages
   this.editGlobal = false;
+  var pageBuilder = this;
+  $(window).bind('beforeunload', function(){
+    if(pageBuilder.isModified){
+      return 'Are you sure you want to leave?  If you do all of your changes will be lost.';
+    }
+  });
 };
 
 /**
@@ -122,6 +128,7 @@ PageBuilder.prototype.refreshPages = function(){
     });
     pageBuilder.synchronizePageList();
     $('#pages li', this.canvas).first().click();
+    pageBuilder.isModified = false;
   });
 };
 
