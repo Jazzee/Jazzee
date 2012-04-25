@@ -41,6 +41,7 @@
   <target name="apidocs" description="Build API Documentation">
    <exec executable="apigen">
      <arg line="--source ${source}/src" />
+     <arg line="--source ${source}/lib/foundation/src" />
      <arg line="--destination '${apidocsdestination}'"/>
      <arg value="--quiet"/>
      <arg line="--title 'Jazzee API'"/>
