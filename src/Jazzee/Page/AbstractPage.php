@@ -123,6 +123,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
       $eXml->setAttribute('elementId', $element->getId());
       $eXml->setAttribute('title', htmlentities($element->getTitle(),ENT_COMPAT,'utf-8'));
       $eXml->setAttribute('type', htmlentities($element->getType()->getClass(),ENT_COMPAT,'utf-8'));
+      $eXml->setAttribute('weight', $element->getWeight());
       if($value = $element->getJazzeeElement()->rawValue($answer)) $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
       $answerXml->appendChild($eXml);
     }
