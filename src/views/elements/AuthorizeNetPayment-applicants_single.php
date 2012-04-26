@@ -33,8 +33,17 @@
           Authorization Code: <?php print $answer->getPayment()->getVar('authorizationCode');?>
         </p>
         <div class='tools'>
+          <?php 
+            $settlement = new \DateTime($answer->getPayment()->getVar('settlementTimeUTC'), new \DateTimeZone('UTC'));
+            $settlement->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+            $diff = $settlement->diff(new \DateTime())->days;
+          ?>
           <?php if($this->controller->checkIsAllowed('applicants_single', 'refundPayment')){ ?>
-            <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/refundPayment/' . $answer->getId());?>' class='actionForm'>Refund Payment</a>   
+            <?php if($diff < 120){?>
+              <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/refundPayment/' . $answer->getId());?>' class='actionForm'>Refund Payment</a> 
+            <?php } else { ?>
+              <p>This transaction cannot be refunded because it is <?php print $diff; ?> days old.  Authorize.net cannot refund transaction older than 120 days.</p>
+            <?php } ?>
           <?php } ?>
         </div>
       <?php break;

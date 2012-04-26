@@ -273,6 +273,9 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     if($response->isError())
       throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}.  Authorize.net said ". $response->getMessageText(), E_ERROR, 'There was a problem getting payment information.');
      
+    $submitted = new \DateTime($response->xml->transaction->submitTimeLocal);
+    if($submitted->diff(new \DateTime())->days > 120)
+      throw new \Jazzee\Exception('Cannot refund payment, it is too old. Payment ID #' . $payment->getId() . " transcation id {$transactionId}.", E_ERROR, 'Payment is too old to refund.');
     $form = new \Foundation\Form;
     $field = $form->newField();
     $field->setLegend('Refund Payment');
