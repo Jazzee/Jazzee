@@ -459,6 +459,20 @@ class Application{
     foreach($this->applicationPages as $applicationPage) if($applicationPage->getKind() == $kind) $applicationPages[] = $applicationPage;
     return $applicationPages;
   }
+  
+  /**
+   * Get page by tile
+   * @param string $title
+   * @return ApplicationPage
+   */
+  public function getApplicationPageByTitle($title){
+    foreach($this->applicationPages as $applicationPage){
+      if($applicationPage->getTitle() == $title){
+        return $applicationPage;
+      }
+    }
+    return false;
+  }
 }
 
 /**

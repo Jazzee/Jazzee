@@ -57,5 +57,19 @@ class SelectList extends AbstractElement {
     }
     return null;
   }
+  
+  /**
+   * Perform a regular expression match on each value
+   * @param \Jazzee\Entity\Answer $answer
+   * @param \stdClass $obj
+   * @return boolean 
+   */
+  public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(!isset($elementsAnswers[0])){
+      return false;
+    }
+    return preg_match($obj->pattern, $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getValue());
+  }
 }
 ?>

@@ -77,5 +77,14 @@ interface Element
    * @return mixed
    */
   function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf);
+  
+  /**
+   * Test a query
+   * Checks if answer meets query parameters
+   * @param \Jazzee\Entity\Answer $answer
+   * @param \stdClass $query
+   * @returns boolean
+   */
+  public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj);
 }
 ?>

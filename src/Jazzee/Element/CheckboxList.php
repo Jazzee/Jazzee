@@ -58,5 +58,22 @@ class CheckboxList extends AbstractElement {
     }
     return $arr;
   }
+  
+  /**
+   * Perform a regular expression match on each value
+   * @param \Jazzee\Entity\Answer $answer
+   * @param \stdClass $obj
+   * @return boolean 
+   */
+  public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    foreach($elementsAnswers as $elementsAnswer){
+      if(preg_match($obj->pattern, $this->_element->getItemById($elementsAnswer->getEInteger())->getValue())){
+        return true;
+      }
+    }
+    
+    return false;
+  }
 }
 ?>

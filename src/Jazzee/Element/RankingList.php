@@ -61,5 +61,27 @@ class RankingList extends AbstractElement {
     }
     return $arr;
   }
+  
+  /**
+   * Perform a regular expression match on each value
+   * @param \Jazzee\Entity\Answer $answer
+   * @param \stdClass $obj
+   * @return boolean 
+   */
+  public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    foreach($elementsAnswers as $elementsAnswer){
+      if(isset($obj->all)){
+        if(preg_match($obj->all, $this->_element->getItemById($elementsAnswer->getEInteger())->getValue())){
+          return true;
+        }
+      }
+      if(isset($obj->{$elementsAnswer->getPosition()})){
+        if(preg_match($obj->{$elementsAnswer->getPosition()}, $this->_element->getItemById($elementsAnswer->getEInteger())->getValue())){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
-?>

@@ -452,6 +452,16 @@ class Page{
   }
   
   /**
+   * Get element by title
+   * @param string $title
+   * @return Element $element
+   */
+  public function getElementByTitle($title){
+    foreach($this->elements as $element) if($element->getTitle() == $title) return $element;
+    return false;
+  }
+  
+  /**
    * Get element by fixed ID
    * @param integer $id
    * @return Entity\Element $element

@@ -170,4 +170,12 @@ interface Page
    * @param \Jazzee\ApplicantPDF
    */
   function renderPdfSection(\Jazzee\ApplicantPDF $pdf);
+  
+  /**
+   * Test a query
+   * Checks if the applicant meets the query parameters
+   * @param \stdClass $query
+   * @returns boolean
+   */
+  public function testQuery(\stdClass $obj);
 }

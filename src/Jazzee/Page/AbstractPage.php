@@ -212,6 +212,14 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
     if($this->_controller instanceof \Jazzee\AdminController) return true;
     throw new \Jazzee\Exception('Admin only action was called from a non admin controller');
   }
+  
+  /**
+   * Abstract page kills all queries
+   * @param \stdClass $obj 
+   */
+  public function testQuery(\stdClass $obj){
+    return false;
+  }
 }
 
 ?>

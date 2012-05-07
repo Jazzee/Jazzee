@@ -782,6 +782,67 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
   }
   
   /**
+   * Find applicants by name
+   * 
+   * @param \stdClass $obj
+   * @param \Jazzee\Controller $controller
+   * @param Application $application
+   * @return array Applicant
+   */
+  public function findApplicantsByQuery(\stdClass $obj, \Jazzee\Controller $controller, Application $application = null){
+    $qb = $this->_em->createQueryBuilder();
+    $qb->add('select', 'a')
+     ->from('Jazzee\Entity\Applicant', 'a');
+    
+    if(!is_null($application)){
+      $qb->where('a.application = :applicationId');
+      $qb->setParameter('applicationId', $application->getId());
+    }
+    if(isset($obj->applicant)){
+      foreach(array('email','firstName','lastName','middleName','suffix') as $name){
+        if(isset($obj->applicant->$name) and !is_null($obj->applicant->$name)){
+          $qb->andWhere("a.{$name} LIKE :{$name}");
+          $qb->setParameter($name, $obj->applicant->$name);
+        }
+      }
+      foreach(array('lastLogin','createdAt','updatedAt') as $name){
+        if(isset($obj->applicant->$name) and !is_null($obj->applicant->$name)){
+          $qb->andWhere("a.{$name} >= :{$name}");
+          $qb->setParameter($name, $obj->applicant->$name);
+        }
+      }
+      if(isset($obj->applicant->isLocked) and !is_null($obj->applicant->isLocked)){
+        $qb->andWhere("a.isLocked = :isLocked");
+        $qb->setParameter('isLocked', $obj->applicant->isLocked);
+      }
+    }
+    
+    if(isset($obj->decision)){
+      $qb->innerJoin('a.decision','d');
+      foreach(array('nominateAdmit','nominateDeny','finalAdmit','finalDeny','acceptOffer','declineOffer') as $name){
+        if(isset($obj->decision->$name) and $obj->decision->$name == true){
+          $qb->andWhere("d.{$name} IS NOT NULL");
+        }
+      }
+    }
+    $qb->orderBy('a.lastName, a.firstName');
+    $applicants = $qb->getQuery()->getResult();
+    
+    foreach($obj->pages as $pageObj){
+      foreach($applicants as $key => $applicant){
+        if($applicationPage = $applicant->getApplication()->getApplicationPageByTitle($pageObj->title)){
+          $applicationPage->getJazzeePage()->setApplicant($applicant);
+          $applicationPage->getJazzeePage()->setController($controller);
+          if(!$applicationPage->getJazzeePage()->testQuery($pageObj->query)){
+            unset($applicants[$key]);
+          }
+        }
+      }
+    }
+    return $applicants;
+  }
+  
+  /**
    * Reset all the failed login counter for applicants
    */
   public function resetFailedLoginCounters(){

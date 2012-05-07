@@ -10,7 +10,8 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
   const TITLE = 'Search';
   const PATH = 'applicants/search';
   
-  const ACTION_INDEX = 'Search Applicants';
+  const ACTION_INDEX = 'Basic Search';
+  const ACTION_ADVANCED = 'Advanced Search';
   
     /**
    * Add the required JS
@@ -68,6 +69,33 @@ class ApplicantsSearchController extends \Jazzee\AdminController {
       $this->setVar('applicants', $applicants);
     }
     $this->setVar('form', $form);
+  }
+  
+  
+  
+  /**
+   * Advanced Search Form 
+   */
+  public function actionAdvanced(){
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('applicants/search/advanced'));
+    $field = $form->newField();
+    $field->setLegend('Advanced Search');
+    $element = $field->newElement('Textarea','query');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\Json($element));
+    $element->setLabel('Query');
+
+    $form->newButton('submit', 'Search');
+    if($input = $form->processInput($this->post)){
+      $obj = json_decode($input->get('query'));
+      $applicants = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByQuery($obj, $this, $this->_application);
+      $this->setVar('applicants', $applicants);
+    }
+    $this->setVar('form', $form);
+    
+    $this->loadView('applicants_search/index');
   }
   
 }

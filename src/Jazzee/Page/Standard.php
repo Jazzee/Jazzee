@@ -147,4 +147,26 @@ class Standard extends AbstractPage {
     
     return self::INCOMPLETE;
   }
+  
+  /**
+   * Standard pages query by elements finding values that match
+   * 
+   * @param \stdClass $obj
+   * @return boolean 
+   */
+  public function testQuery(\stdClass $obj){
+    if(isset($obj->elements)){
+      foreach($obj->elements as $eObj){
+        if($element = $this->_applicationPage->getPage()->getElementByTitle($eObj->title)){
+          $element->getJazzeeElement()->setController($this->_controller);
+          foreach($this->getAnswers() as $answer){
+            if($element->getJazzeeElement()->testQuery($answer, $eObj->query)){
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
 }

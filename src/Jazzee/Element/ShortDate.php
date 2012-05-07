@@ -52,5 +52,34 @@ class ShortDate extends AbstractElement {
     }
     return null;
   }
+  
+  /**
+   * Perform a regular expression match on each value
+   * @param \Jazzee\Entity\Answer $answer
+   * @param \stdClass $obj
+   * @return boolean 
+   */
+  public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj){
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    if(!isset($elementsAnswers[0])){
+      return false;
+    }
+    $match = false;
+    $date = $elementsAnswers[0]->getEDate();
+    if(isset($obj->after)){
+      if($date > new \DateTime($obj->after)){
+        $match = true;
+      } else {
+        return false;
+      }
+    }
+    if(isset($obj->before)){
+      if($date < new \DateTime($obj->before)){
+        $match = true;
+      } else {
+        return false;
+      }
+    }
+    return $match;
+  }
 }
-?>

@@ -5,8 +5,11 @@
  * @subpackage admin
  * @subpackage applicants
  */
-$this->renderElement('form', array('form'=>$form));
-if(isset($applicants)){?>
+$this->renderElement('form', array('form'=>$form)); ?>
+<?php if($this->controller->checkIsAllowed('applicants_search', 'advanced')){ ?>
+  <p><a href='<?php print $this->path('applicants/search/advanced');?>'>Advanced Search</a>
+<?php } ?>
+  <?php if(isset($applicants)){?>
   <h4>Search Results</h4>
   <table>
   <caption>Your search returned (<?php print count($applicants); ?>) results</caption>

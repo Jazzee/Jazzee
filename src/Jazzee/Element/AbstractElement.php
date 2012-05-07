@@ -37,5 +37,11 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element {
   public function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf){
     return $this->rawValue($answer);
   }
+  
+  /**
+   * Abstract element kills all queries
+   */
+  public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj){
+    return false;
+  }
 }
-?>
