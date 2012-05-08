@@ -32,7 +32,6 @@ class Standard extends AbstractPage {
     }
     $form->setCSRFToken($this->_controller->getCSRFToken());
     $form->newButton('submit', 'Save');
-    $form->newButton('reset', 'Clear Form');
     return $form;
   }
   

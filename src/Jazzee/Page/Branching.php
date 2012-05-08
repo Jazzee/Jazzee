@@ -54,7 +54,6 @@ class Branching extends Standard
     $form->newHiddenElement('level', 2);
     $form->newHiddenElement('branching', $branchingPageID);
     $form->newButton('submit', 'Save');
-    $form->newButton('reset', 'Clear Form');
     
     $this->_form = $form;
   }

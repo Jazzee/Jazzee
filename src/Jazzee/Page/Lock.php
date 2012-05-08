@@ -28,7 +28,6 @@ class Lock extends Standard {
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
     $form->newButton('submit','Submit Application');
-    $form->newButton('reset', 'Clear Form');
     return $form;
   }
   
