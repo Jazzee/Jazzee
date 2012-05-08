@@ -15,6 +15,7 @@ JazzeePageRecommenders.prototype.newPage = function(id,title,typeId,typeName,typ
   var page = JazzeePage.prototype.newPage.call(this, id,title,typeId,typeName,typeClass,status,pageBuilder);
   page.setVariable('lorDeadline', '');
   page.setVariable('lorDeadlineEnforced', 0);
+  page.setVariable('lorWaitDays', 14);
   page.setVariable('recommenderEmailText', "Dear _RECOMMENDER_FIRST_NAME_ _RECOMMENDER_LAST_NAME_,\n"
       + "_APPLICANT_NAME_ has requested a letter of recommendation from you in support of their application for admission to our program. \n"
       + "We use an online system to collect letters of recommendation.  You have been assigned a unique URL for accessing this system.  Please save this email so that you can return to your letter at a later date. \n"
@@ -55,7 +56,6 @@ JazzeePageRecommenders.prototype.pageProperties = function(){
   div.append($('<p>').html('Minimum Recommendations Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
   div.append(slider);
   
-  
   var slider = $('<div>');
   slider.slider({
     value: this.max,
@@ -68,6 +68,20 @@ JazzeePageRecommenders.prototype.pageProperties = function(){
     }
   });
   div.append($('<p>').html('Maximum Recommendations Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
+  div.append(slider);
+  
+  var slider = $('<div>');
+  slider.slider({
+    value: this.getVariable('lorWaitDays'),
+    min: 0,
+    max: 20,
+    step: 1,
+    slide: function( event, ui ) {
+      pageClass.setVariable('lorWaitDays', ui.value);
+      $('#lorWaitDays').html(pageClass.getVariable('lorWaitDays') == 0?'No Wait':pageClass.getVariable('lorWaitDays'));
+    }
+  });
+  div.append($('<p>').html('Days the applicant must wait to send reminder email ').append($('<span>').attr('id', 'lorWaitDays').html(this.getVariable('lorWaitDays') == 0?'No Wait':this.getVariable('lorWaitDays'))));
   div.append(slider);
   
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editLOREmailButton());

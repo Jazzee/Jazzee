@@ -31,8 +31,8 @@ if($answers = $page->getJazzeePage()->getAnswers()){ ?>
     } else if($answer->isLocked()){?>
       <strong>Status:</strong> This recommendation had not been received.<br />
       <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?>
-      <?php if($answer->getUpdatedAt()->diff(new DateTime('now'))->days < \Jazzee\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS){?> 
-        You will be able to send the invitation to your recommender again in <?php print (\Jazzee\Page\Recommenders::RECOMMENDATION_EMAIL_WAIT_DAYS - $answer->getUpdatedAt()->diff(new DateTime('now'))->days);?> days.
+      <?php if($answer->getUpdatedAt()->diff(new DateTime('now'))->days < $answer->getPage()->getVar('lorWaitDays')){?> 
+        You will be able to send the invitation to your recommender again in <?php print ($answer->getPage()->getVar('lorWaitDays') - $answer->getUpdatedAt()->diff(new DateTime('now'))->days);?> days.
       <?php } else {?>
         <br /><a class='invite' href='<?php print $this->controller->getActionPath();?>/do/sendEmail/<?php print $answer->getPage()->getId()?>/<?php print $answer->getId()?>'>Send Reminder Email</a>
       <?php } ?>

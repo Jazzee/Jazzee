@@ -15,12 +15,6 @@ class Recommenders extends Standard {
   const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageRecommenders.js';
   
   /**
-   * The time to wait between sending emails to recommenders in days
-   * @cons integer 14 days
-   */
-  const RECOMMENDATION_EMAIL_WAIT_DAYS = 14;
-  
-  /**
    * These fixedIDs make it easy to find the element we are looking for
    * @const integer
    */
@@ -84,7 +78,7 @@ class Recommenders extends Standard {
    */
   public function do_sendEmail($answerId, $postData){
     if($answer = $this->_applicant->findAnswerById($answerId)){
-      if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND $answer->getUpdatedAt()->diff(new \DateTime('now'))->days >= self::RECOMMENDATION_EMAIL_WAIT_DAYS)){
+      if(!$answer->isLocked() OR (!$answer->getChildren()->count() AND $answer->getUpdatedAt()->diff(new \DateTime('now'))->days >= $answer->getPage()->getVar('lorWaitDays'))){
         $message = $this->getMessage($answer, $this->_controller->path('lor/' . $answer->getUniqueId()));
         $message->Send();
         $answer->lock();
@@ -327,7 +321,8 @@ class Recommenders extends Standard {
     $defaultVars = array(
       'lorDeadline' => null,
       'lorDeadlineEnforced' => false,
-      'recommenderEmailText' => ''
+      'recommenderEmailText' => '',
+      'lorWaitDays' => 14
     );
     foreach($defaultVars as $name=>$value){
       $var = $this->_applicationPage->getPage()->setVar($name, $value);
@@ -398,6 +393,14 @@ class Recommenders extends Standard {
             }
             $value = \date('Y-m-d H:i:s', $value);
           }
+        break;
+      case 'lorWaitDays':
+        if(!empty($value)){
+          $value = (int)$value;
+          if($value < 0 OR $value > 100){
+            throw new \Jazzee\Exception("lorWaitDays should be between 0 and 100.  {$value} is not.");
+          }
+        }
         break;
       case 'lorDeadlineEnforced':
         break;
