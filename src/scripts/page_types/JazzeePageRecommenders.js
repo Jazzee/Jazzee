@@ -239,17 +239,18 @@ JazzeePageRecommenders.prototype.editLorPage = function(){
   if(!lorPage){
     var dropdown = $('<ul>');
     for(var i = 0; i < this.pageBuilder.pageTypes.length; i++){
-      var item = $('<a>').html(this.pageBuilder.pageTypes[i].typeName).attr('href', '#').data('pageType', this.pageBuilder.pageTypes[i]);
-      item.bind('click', function(e){
-        var pageType = $(e.target).data('pageType');
-        var child = new window[pageType.typeClass].prototype.newPage('newchildpage' + pageClass.pageBuilder.getUniqueId(),'Recommendation',pageType.id,pageType.typeName,pageType.typeClass,'new',pageClass.pageBuilder);
-        pageClass.addChild(child);
-        pageClass.markModified();
-        div.replaceWith(pageClass.editLorPage());
-        return false;
-      });
-      //for now only allow the standard page
-      if(this.pageBuilder.pageTypes[i].typeClass=='JazzeePageStandard')dropdown.append($('<li>').append(item));
+      if($.inArray('Jazzee\\Interfaces\\LorPage', this.pageBuilder.pageTypes[i].interfaces) > -1){
+        var item = $('<a>').html(this.pageBuilder.pageTypes[i].typeName).attr('href', '#').data('pageType', this.pageBuilder.pageTypes[i]);
+        item.bind('click', function(e){
+          var pageType = $(e.target).data('pageType');
+          var child = new window[pageType.typeClass].prototype.newPage('newchildpage' + pageClass.pageBuilder.getUniqueId(),'Recommendation',pageType.id,pageType.typeName,pageType.typeClass,'new',pageClass.pageBuilder);
+          pageClass.addChild(child);
+          pageClass.markModified();
+          div.replaceWith(pageClass.editLorPage());
+          return false;
+        });
+        dropdown.append($('<li>').append(item));
+      }
     }
     var button = $('<button>').html('Select Recommendation Page Type').button();
     button.qtip({

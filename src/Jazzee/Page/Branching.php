@@ -38,9 +38,12 @@ class Branching extends Standard
     return $form;
   }
   
-  protected function branchingForm($branchingPageID){
-    $page = $this->_applicationPage->getPage()->getChildById($branchingPageID);
-    
+  /**
+   * Branching Page Form
+   * Replaces the form with the correct branch
+   * @param \Jazzee\Entity\Page $page 
+   */
+  protected function branchingForm(\Jazzee\Entity\Page $page){
     $form = new \Foundation\Form;
     $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
@@ -52,14 +55,14 @@ class Branching extends Standard
       $element->getJazzeeElement()->addToField($field);
     }
     $form->newHiddenElement('level', 2);
-    $form->newHiddenElement('branching', $branchingPageID);
+    $form->newHiddenElement('branching', $page->getId());
     $form->newButton('submit', 'Save');
-    
     $this->_form = $form;
   }
   
   public function validateInput($input){
-    $this->branchingForm($input['branching']);
+    $page = $this->_applicationPage->getPage()->getChildById($input['branching']);
+    $this->branchingForm($page);
     if($input['level'] == 1) return false;
     return parent::validateInput($input);
   }
@@ -117,7 +120,7 @@ class Branching extends Standard
   public function fill($answerId){
     if($answer = $this->_applicant->findAnswerById($answerId)){
       $child = $answer->getChildren()->first();
-      $this->branchingForm($child->getPage()->getId());
+      $this->branchingForm($child->getPage());
       foreach($child->getPage()->getElements() as $element){
         $element->getJazzeeElement()->setController($this->_controller);
         $value = $element->getJazzeeElement()->formValue($child);
@@ -224,5 +227,70 @@ class Branching extends Standard
       }
       $pdf->writeTable();
     }
+  }
+  
+  public function newLorAnswer(\Foundation\Form\Input $input, \Jazzee\Entity\Answer $parent){
+    if($parent->getChildren()->count() == 0){
+      $page = $parent->getPage()->getChildren()->first();
+      $child = new \Jazzee\Entity\Answer();
+      $parent->addChild($child);
+      $child->setPage($page);
+      
+      $branch = new \Jazzee\Entity\Answer;
+      $branch->setPage($page->getChildById($input->get('branching')));
+      $child->addChild($branch);
+      
+      foreach($branch->getPage()->getElements() as $element){
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $branch->addElementAnswer($elementAnswer);
+        }
+      }
+      $this->_form->applyDefaultValues();
+      $this->_controller->getEntityManager()->persist($child);
+      $this->_controller->getEntityManager()->persist($branch);
+      //flush here so the answerId will be correct when we view
+      $this->_controller->getEntityManager()->flush();
+    }
+  }
+  
+  public function updateLorAnswer(\Foundation\Form\Input $input, \Jazzee\Entity\Answer $answer){
+    foreach($answer->getElementAnswers() as $ea){
+      $this->_controller->getEntityManager()->remove($ea);
+      $answer->getElementAnswers()->removeElement($ea);
+    }
+    foreach($answer->getChildren() as $childAnswer){
+      $this->_controller->getEntityManager()->remove($childAnswer);
+      $answer->getChildren()->removeElement($childAnswer);
+    }
+
+    $branch = new \Jazzee\Entity\Answer;
+    $answer->addChild($branch);
+    $branch->setPage($answer->getPage()->getChildById($input->get('branching')));
+
+    foreach($branch->getPage()->getElements() as $element){
+      foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+        $branch->addElementAnswer($elementAnswer);
+      }
+    }
+    $this->_form = null;
+    $this->_controller->getEntityManager()->persist($branch);
+  }
+  
+  public function fillLorForm(\Jazzee\Entity\Answer $answer){
+    $child = $answer->getChildren()->first();
+    $this->branchingForm($child->getPage());
+    foreach($child->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
+      $value = $element->getJazzeeElement()->formValue($child);
+      if($value) $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
+    }
+  }
+  
+  public static function lorApplicantsSingleElement(){
+    return 'Branching-lor_applicants_single';
+  }
+  
+  public static function lorReviewElement(){
+    return 'Branching-lor_review';
   }
 }

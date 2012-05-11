@@ -179,7 +179,8 @@ abstract class PageBuilder extends AdminController{
       $arr[] = array(
         'id' => $id,
         'typeClass' => $this->getClassName($pageTypes[$id]->getClass()),
-        'typeName' => $this->getClassName($pageTypes[$id]->getName())
+        'typeName' => $this->getClassName($pageTypes[$id]->getName()),
+        'interfaces' => array_values(class_implements($pageTypes[$id]->getClass()))
       );
     }
     $this->setVar('result', $arr);

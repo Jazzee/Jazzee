@@ -270,6 +270,7 @@ class Answer{
   public function addChild(Answer $child){
     $this->children[] = $child;
     if($child->getParent() != $this) $child->setParent($this);
+    if($child->getApplicant() != $this->applicant) $child->setApplicant($this->applicant);
   }
 
   /**

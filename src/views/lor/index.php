@@ -14,6 +14,7 @@
 <?php print $page->getParent()->getElementByFixedId(\Jazzee\Page\Recommenders::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer);?>.
 If this is not you, please do not complete this recommendation</p>
 <p><?php print $applicantName . ' <em>' . ($page->getParent()->getElementByFixedId(\Jazzee\Page\Recommenders::FID_WAIVE_RIGHT)->getJazzeeElement()->displayValue($answer)=='Yes'?'has':'has not') . '</em>';?> waived their right to view this letter after the application is reviewed.</p>
-<div id='leadingText'><?php print $page->getLeadingText() ?></div>
-<?php $this->renderElement('form', array('form'=> $form));?>
-<div id='trailingText'><?php print $page->getTrailingText() ?></div>
+
+<?php
+$class = $page->getType()->getClass();
+$this->renderElement($class::lorPageElement(), array('page'=>$page, 'answer'=>$answer));

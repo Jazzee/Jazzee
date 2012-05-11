@@ -10,7 +10,7 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-class Standard extends AbstractPage {
+class Standard extends AbstractPage implements \Jazzee\Interfaces\LorPage{
   const APPLY_PAGE_ELEMENT = 'Standard-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = 'Standard-applicants_single';
   const APPLY_STATUS_ELEMENT = 'Standard-apply_status';
@@ -167,5 +167,84 @@ class Standard extends AbstractPage {
       }
     }
     return false;
+  }
+  
+  /**
+   * Record the LOR answer as a child answer
+   * @param \Foundation\Form\Input $input
+   * @param \Jazzee\Entity\Answer $parent 
+   */
+  public function newLorAnswer(\Foundation\Form\Input $input, \Jazzee\Entity\Answer $parent){
+    if($parent->getChildren()->count() == 0){
+      $page = $parent->getPage()->getChildren()->first();
+      $child = new \Jazzee\Entity\Answer();
+      $parent->addChild($child);
+      $child->setPage($page);
+      $child->setApplicant($parent->getApplicant());
+      foreach($page->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $child->addElementAnswer($elementAnswer);
+        }
+      }
+      $this->_form->applyDefaultValues();
+      $this->_controller->getEntityManager()->persist($child);
+      //flush here so the answerId will be correct when we view
+      $this->_controller->getEntityManager()->flush();
+    }
+  }
+  
+  /**
+   * Update the LOR
+   * @param \Foundation\Form\Input $input
+   * @param \Jazzee\Entity\Answer $answer 
+   */
+  public function updateLorAnswer(\Foundation\Form\Input $input, \Jazzee\Entity\Answer $answer){
+    foreach($answer->getElementAnswers() as $ea){
+      $answer->getElementAnswers()->removeElement($ea);
+      $this->_controller->getEntityManager()->remove($ea);
+    }
+    foreach($answer->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
+      foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+        $answer->addElementAnswer($elementAnswer);
+      }
+    }
+    $this->getForm()->applyDefaultValues();
+    $this->getForm()->setAction($this->_controller->getActionPath());
+    $this->_controller->getEntityManager()->persist($answer);
+  }
+  
+  /**
+   * Delete the LOR answer children
+   * @param \Jazzee\Entity\Answer $parent 
+   */
+  public function deleteLorAnswer(\Jazzee\Entity\Answer $answer){
+    $applicant = $answer->getApplicant();
+    $answer->getParent()->getChildren()->removeElement($answer);
+    $this->_controller->getEntityManager()->remove($answer);
+    $applicant->getAnswers()->removeElement($answer);
+    $applicant->markLastUpdate();
+    $this->_controller->getEntityManager()->persist($applicant);
+  }
+  
+  public function fillLorForm(\Jazzee\Entity\Answer $answer){
+    foreach($answer->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
+      $value = $element->getJazzeeElement()->formValue($answer);
+      if($value) $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
+    }
+  }
+  
+  public static function lorPageElement(){
+    return 'Standard-lor_page';
+  }
+  
+  public static function lorReviewElement(){
+    return 'Standard-lor_review';
+  }
+  
+  public static function lorApplicantsSingleElement(){
+    return 'Standard-lor_applicants_single';
   }
 }

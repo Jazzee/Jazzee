@@ -163,30 +163,13 @@ class Recommenders extends Standard {
     $this->checkIsAdmin();
     if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
       $lorPage = $child->getPage();
-      $form = new \Foundation\Form;
-      $field = $form->newField();
-      $field->setLegend($lorPage->getTitle());
-      $field->setInstructions($lorPage->getInstructions());
-      foreach($lorPage->getElements() as $element){
-        $element->getJazzeeElement()->setController($this->_controller);
-        $element->getJazzeeElement()->addToField($field);
-        $value = $element->getJazzeeElement()->formValue($child);
-        if($value) $form->getElementByName('el' . $element->getId())->setValue($value);
-      }
-      $form->newButton('submit', 'Edit Recommendation');
-      $form->newButton('reset', 'Clear Form');
+      $jp = $lorPage->getApplicationPageJazzeePage();
+      $jp->setController($this->_controller);
+      $jp->fillLorForm($child);
+      $form = $jp->getForm();
       if(!empty($postData)){
-        if($input = $form->processInput($postData)){
-          foreach($child->getElementAnswers() as $ea){
-            $child->getElementAnswers()->removeElement($ea);
-            $this->_controller->getEntityManager()->remove($ea);
-          }
-          foreach($lorPage->getElements() as $element){
-            foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
-              $child->addElementAnswer($elementAnswer);
-            }
-          }
-          $this->_controller->getEntityManager()->persist($child);
+        if($input = $jp->validateInput($postData)){
+          $jp->updateLorAnswer($input, $child);
           $this->_controller->setLayoutVar('status', 'success');
         } else {
           $this->_controller->setLayoutVar('status', 'error');
@@ -207,35 +190,19 @@ class Recommenders extends Standard {
     $this->checkIsAdmin();
     if($answer = $this->_applicant->findAnswerById($answerId) and $answer->getChildren()->count() == 0){
       $lorPage = $answer->getPage()->getChildren()->first();
-      $form = new \Foundation\Form;
-      $field = $form->newField();
-      $field->setLegend($lorPage->getTitle());
-      $field->setInstructions($lorPage->getInstructions());
-      foreach($lorPage->getElements() as $element){
-        $element->getJazzeeElement()->setController($this->_controller);
-        $element->getJazzeeElement()->addToField($field);
-      }
-      $form->newButton('submit', 'Submit Recommendation');
-      $form->newButton('reset', 'Clear Form');
+      $jp = $lorPage->getApplicationPageJazzeePage();
+      $jp->setController($this->_controller);
+      $form = $jp->getForm();
+      
       if(!empty($postData)){
-        if($input = $form->processInput($postData)){
-          $answer->lock();
-          $this->_controller->getEntityManager()->persist($answer);
-          $child = new \Jazzee\Entity\Answer;
-          $child->setApplicant($answer->getApplicant());
-          $child->setParent($answer);
-          $child->setPage($lorPage);
-          foreach($lorPage->getElements() as $element){
-            foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
-              $child->addElementAnswer($elementAnswer);
-            }
-          }
-          $this->_controller->getEntityManager()->persist($child);
+        if($input = $jp->validateInput($postData)){
+          $jp->newLorAnswer($input, $answer);
           $this->_controller->setLayoutVar('status', 'success');
         } else {
           $this->_controller->setLayoutVar('status', 'error');
         }
       }
+      
       return $form;
     }
     $this->_controller->setLayoutVar('status', 'error');
@@ -249,7 +216,10 @@ class Recommenders extends Standard {
   public function do_deleteLor($answerId){
     $this->checkIsAdmin();
     if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
-      $this->_controller->getEntityManager()->remove($child);
+      $lorPage = $child->getPage();
+      $jp = $lorPage->getApplicationPageJazzeePage();
+      $jp->setController($this->_controller);
+      $jp->deleteLorAnswer($child);
       $this->_controller->setLayoutVar('status', 'success');
     } else {
       $this->_controller->setLayoutVar('status', 'error');

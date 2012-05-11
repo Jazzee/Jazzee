@@ -10,20 +10,6 @@
 ?>
 <h3>Thank you.  We have received your recommendation.</h3>
 <h5>For our applicant's security this page will only display once.  If you wish to have a copy of this recommendation for your records you should print one now.</h5>
-<fieldset>
-  <legend>Submitted Recommendation</legend>
-  <?php
-  if($answer){?>
-    <p>
-    <?php 
-    foreach($answer->getPage()->getElements() as $element){
-      $element->getJazzeeElement()->setController($this->controller);
-      $value = $element->getJazzeeElement()->displayValue($answer);
-      if($value){
-        print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>'; 
-      }
-    }
-    ?>
-    </p>
-  <?php } ?>
-</fieldset>
+<?php
+$class = $page->getType()->getClass();
+$this->renderElement($class::lorReviewElement(), array('page'=>$page, 'answer'=>$answer));

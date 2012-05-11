@@ -77,6 +77,12 @@ class Page{
   /** @Column(type="text", nullable=true) */
   private $trailingText;
   
+  /**
+   * a Generic application Jazzee page we store it so it can be persistent
+   * @var \Jazzee\Interfaces\Page 
+   */
+  private $_applicationPageJazzeePage;
+  
   public function __construct(){
     $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
@@ -476,9 +482,12 @@ class Page{
    * @return \Jazzee\Interfaces\Page 
    */
   public function getApplicationPageJazzeePage(){
-    $ap = new ApplicationPage;
-    $ap->setPage($this);
-    return $ap->getJazzeePage();
+    if($this->_applicationPageJazzeePage == null){
+      $ap = new ApplicationPage;
+      $ap->setPage($this);
+      $this->_applicationPageJazzeePage = $ap->getJazzeePage();
+    }
+    return $this->_applicationPageJazzeePage;
   }
 }
 
