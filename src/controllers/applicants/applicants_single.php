@@ -42,6 +42,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_SETTLEPAYMENT = 'Settle Payment';
   const ACTION_REFUNDPAYMENT = 'Refund Payment';
   const ACTION_REJECTPAYMENT = 'Reject Payment';
+  const ACTION_VIEWAUDITLOG = 'View Applicant Audit Logs';
   
   
   /**
@@ -327,6 +328,13 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->setVar('element', $class::APPLICANTS_SINGLE_ELEMENT);
     $this->loadView($this->controllerName . '/element');
   }
+  
+  /**
+   * View the applicants audit log
+   * Placeholder for authorization
+   * @param integer $applicantId
+   */
+  public function actionViewAuditLog($applicantId){}
   
   /**
    * Nominate and applicant for admission
@@ -698,7 +706,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       if($input = $pageEntity->getJazzeePage()->validateInput($this->post)){
         $pageEntity->getJazzeePage()->newAnswer($input);
         $this->setLayoutVar('status', 'success');
-        $this->auditLog($applicant, 'Added Aswer to page' . $pageEntity->getTitle());
+        $this->auditLog($applicant, 'Added Answer to page ' . $pageEntity->getTitle());
       } else {
         $this->setLayoutVar('status', 'error');
       }

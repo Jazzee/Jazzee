@@ -648,6 +648,15 @@ class Applicant{
   }
 
   /**
+   * Get Audit Logs
+   *
+   * @return Doctrine\Common\Collections\Collection $auditLogs
+   */
+  public function getAuditLogs(){
+    return $this->auditLogs;
+  }
+
+  /**
    * Unread Message Count
    *
    * @return integer

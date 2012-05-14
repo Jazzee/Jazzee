@@ -162,4 +162,17 @@
       <a class='attach' href="<?php print $this->path("applicants/single/{$applicant->getId()}/attachApplicantPdf");?>">Attach PDF</a>
     <?php } ?>
   </div>
+    
+            <?php if($this->controller->checkIsAllowed('applicants_single', 'viewAuditLog')){ ?>
+              <fieldset id='auditLog'>
+                <legend>Audit Logs</legend>
+                <?php
+                  $result = array();
+                  foreach($applicant->getAuditLogs() as $log){?>
+                    <p>
+                      <strong><?php print $log->getText();?></strong> <em>by <?php print $log->getUser()->getFirstName() . ' ' . $log->getUser()->getLastName();?> at <?php print $log->getCreatedAt()->format('c');?></em>
+                    </p>
+                  <?php }?>
+              </fieldset>
+            <?php }?>
 </div><!-- /container-->
