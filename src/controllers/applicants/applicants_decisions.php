@@ -78,6 +78,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
         $applicant = $this->getApplicantById($id);
         $applicant->getDecision()->nominateAdmit();
         $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Nominated for Admission');
         $count ++;
         if($count > 100){
           $this->_em->flush();
@@ -114,6 +115,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
         $applicant = $this->getApplicantById($id);
         $applicant->getDecision()->nominateDeny();
         $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Nominate Deny');
         $count ++;
         if($count > 100){
           $this->_em->flush();
@@ -186,6 +188,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
           $this->_em->persist($message);
         }
         $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Final Admit');
         $count ++;
         if($count > 100){
           $this->_em->flush();
@@ -250,6 +253,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
           $this->_em->persist($message);
         }
         $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Final Deny');
         $count ++;
         if($count > 100){
           $this->_em->flush();
@@ -261,5 +265,15 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
     }
     $this->setVar('form', $form);
     $this->loadView('applicants_decisions/form');
+  }
+  
+  /**
+   * Log something in the audit log
+   * @param \Jazzee\Entity\Applicant $applicant
+   * @param type $string 
+   */
+  protected function auditLog(\Jazzee\Entity\Applicant $applicant, $text){
+    $auditLog = new \Jazzee\Entity\AuditLog($this->_user, $applicant, $text);
+    $this->_em->persist($auditLog);
   }
 }
