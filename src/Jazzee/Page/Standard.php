@@ -74,7 +74,7 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\LorPage{
       }
       $this->getForm()->applyDefaultValues();
       $this->_controller->getEntityManager()->persist($answer);
-      $this->_controller->addMessage('success', 'Answered Saved Successfully');
+      $this->_controller->addMessage('success', 'Answer Saved Successfully');
       //flush here so the answerId will be correct when we view
       $this->_controller->getEntityManager()->flush();
     }
