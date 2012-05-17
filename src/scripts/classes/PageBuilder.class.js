@@ -15,6 +15,7 @@ function PageBuilder(canvas){
   //make sure we don't have any collisions with new page and element Ids
   this.IdCounter = 0;
   this.controllerPath = '';
+  this.currentPage = false;
   
   //are we editing global pages or application pages
   this.editGlobal = false;
@@ -127,7 +128,12 @@ PageBuilder.prototype.refreshPages = function(){
       pageBuilder.pages[page.id] = page;
     });
     pageBuilder.synchronizePageList();
-    $('#pages li', this.canvas).first().click();
+    var currentPageLi = $('#'+pageBuilder.currentPage);
+    if(currentPageLi.length){
+      currentPageLi.click();
+    } else {
+      $('#pages li', this.canvas).first().click();
+    }
     pageBuilder.isModified = false;
   });
 };
@@ -137,6 +143,7 @@ PageBuilder.prototype.refreshPages = function(){
  * @return {jQuery} ol
  */
 PageBuilder.prototype.getPagesList = function(){
+  var pageBuilder = this;
   var ol = $('<ol>');
   for(var i in this.pages){
     var page = this.pages[i];
@@ -148,6 +155,7 @@ PageBuilder.prototype.getPagesList = function(){
       $(this).parent().children('li').removeClass('active');
       $(this).addClass('active');
       $(this).data('page').workspace();
+      pageBuilder.currentPage = $(this).attr('id');
     });
     $(ol).append(li);
   }
