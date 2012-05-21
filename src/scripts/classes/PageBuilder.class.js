@@ -157,6 +157,9 @@ PageBuilder.prototype.getPagesList = function(){
       $(this).data('page').workspace();
       pageBuilder.currentPage = $(this).attr('id');
     });
+    if(page.isGlobal && !this.editGlobal){
+      li.addClass('global');
+    }
     $(ol).append(li);
   }
   return ol;

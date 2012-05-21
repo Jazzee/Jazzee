@@ -51,6 +51,14 @@ ul, ol, ol li, ul li, li{
   font-weight: bold;
 }
 
+#pages ol li.global{
+  list-style-image: url(resource/foundation/media/icons/world.png);
+}
+
+#pages ol li.global.active{
+  list-style-image: url(resource/foundation/media/icons/world_edit.png);
+}
+
 div.listItems li.inactive{
   text-decoration: line-through;
 }
