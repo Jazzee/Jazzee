@@ -257,7 +257,7 @@ JazzeeElement.prototype.workspace = function(){
   var elementClass = this;
   var div = $('#element-'+this.id);
   if(div.length == 0){
-    $('#elements').append($('<div>').attr('id','element-'+this.id).addClass('elements yui-g'));
+    $('#elements').append($('<div>').attr('id','element-'+this.id).addClass('elements yui-gc'));
     var div = $('#element-'+this.id);
     div.data('element', this);
     div.append($('<div>').addClass('yui-u first field'));
@@ -268,12 +268,12 @@ JazzeeElement.prototype.workspace = function(){
   if(this.instructions != null){
     field.append($('<div>').append($('<p>').html(this.instructions).addClass('instructions')));
   }
-  var element = $('<div>').addClass('element');
+  var element = $('<div>').addClass('element yui-gd');
   var label = $('<div>').addClass('yui-u first label').append($('<label>').html(this.title + ':'));
   if(this.isRequired == 1) label.addClass('required');
   element.append(label);
   
-  var control = $('<div>').addClass('control').append(this.avatar());
+  var control = $('<div>').addClass('control yui-u').append(this.avatar());
   if(this.format != null){
     control.append($('<div>').append($('<p>').html(this.format).addClass('format')));
   }
