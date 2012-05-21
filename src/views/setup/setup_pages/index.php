@@ -17,6 +17,7 @@
   <div id='yui-main'>
     <div id='editPage' class='container yui-b'>
       <span id="pageToolbar" class="ui-widget-header ui-corner-all toolbar"></span>
+      <div id='pageInfo'></div>
       <div id='workspace'></div>
     </div>
   </div>

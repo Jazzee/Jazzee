@@ -18,6 +18,11 @@ div#editPage {
   padding: 10px 4px;
 }
 
+div#pageInfo {
+  float: right;
+  border-left: 1px dotted #7799bb;
+}
+
 div#workspace {
   clear: both;
   margin-top: 1em;

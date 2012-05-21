@@ -473,9 +473,6 @@ JazzeePage.prototype.titleWorkspace = function(){
     }
   });
   var title = '<strong>'+this.title+'</strong>';
-  if(this.isGlobal && !this.pageBuilder.editGlobal){
-    title += ' ('+this.globalPage.title+')';
-  }
   div.append($('<p>').html(title).prepend(button));
   return div;
 };
@@ -592,6 +589,23 @@ JazzeePage.prototype.trailingTextWorkspace = function(){
 };
 
 /**
+ * Instructions display and editing workspace
+ */
+JazzeePage.prototype.pageInfo = function(){
+  var pageClass = this;
+  var div = $('<div>');
+  div.append($('<h5>').html('Page Properties'));
+  var p = $('<p>');
+  p.append('Page Type: ' + this.typeName);
+  if(this.isGlobal && !this.pageBuilder.editGlobal){
+    p.append('<br />Global Page: ' + this.globalPage.title);
+  }
+  
+  div.append(p);
+  return div;
+};
+
+/**
  * Page properties Button
  * @return {jQuery}
  */
@@ -642,9 +656,9 @@ JazzeePage.prototype.workspace = function(){
   $('#editPage').hide();
   $('#workspace').empty();
   $('#pageToolbar').empty();
+  $('#pageInfo').empty();
   
   $('#workspace').parent().addClass('form');
-  
   $('#workspace').append(this.titleWorkspace());
   $('#workspace').append(this.leadingTextWorkspace());
   var formDiv = $('<div>').addClass('form');
@@ -656,5 +670,6 @@ JazzeePage.prototype.workspace = function(){
   $('#pageToolbar').append(this.previewPageButton());
   $('#pageToolbar').append(this.deletePageButton());
   
+  $('#pageInfo').append(this.pageInfo());
   $('#editPage').show('slide');
 };
