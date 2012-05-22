@@ -246,7 +246,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->_foundationConfig->setMailServerPassword($this->_config->getMailServerPassword());
     
     
-    $this->_cache = new \Foundation\Cache('Jazzee',$this->_foundationConfig);
+    $this->_cache = new \Foundation\Cache('Jazzee' . __DIR__,$this->_foundationConfig);
     
     \Foundation\VC\Config::setCache($this->_cache);
     
