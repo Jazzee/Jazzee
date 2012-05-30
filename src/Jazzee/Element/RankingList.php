@@ -48,7 +48,7 @@ class RankingList extends AbstractElement {
     $arr = array();
     $elementAnswers = $answer->getElementAnswersForElement($this->_element);
     foreach($elementAnswers as $position => $elementAnswer){
-      $arr[] = ordinalValue($position+1) . ' ' . $this->_element->getItemById($elementAnswer->getEInteger())->getValue();
+      $arr[] = \Foundation\Utility::ordinalValue($position+1) . ' ' . $this->_element->getItemById($elementAnswer->getEInteger())->getValue();
     }
     return empty($arr)?null:implode(', ', $arr);
   }

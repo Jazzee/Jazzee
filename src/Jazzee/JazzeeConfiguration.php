@@ -439,8 +439,8 @@ protected $_adminCronAllowed;
         'adminSessionLifetime' => '7200',
         'applicantSessionLifetime' => '0',
         'mailServerType' => 'php',
-        'maximumApplicantFileUploadSize' => \convertIniShorthandValue(\ini_get('upload_max_filesize')),
-        'maximumAdminFileUploadSize' => \convertIniShorthandValue(\ini_get('upload_max_filesize')),
+        'maximumApplicantFileUploadSize' => \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize')),
+        'maximumAdminFileUploadSize' => \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize')),
         'varPath' => \realpath(__DIR__ . '/../../var'),
         'shibbolethUsernameAttribute' => 'eppn',
         'shibbolethFirstNameAttribute' => 'givenName',
@@ -898,10 +898,10 @@ protected $_adminCronAllowed;
    * @var string $maximumApplicantFileUploadSize
    */
   public function setMaximumApplicantFileUploadSize($maximumApplicantFileUploadSize) {
-    if(\convertIniShorthandValue($maximumApplicantFileUploadSize) > \convertIniShorthandValue(\ini_get('upload_max_filesize'))){
+    if(\Foundation\Utility::convertIniShorthandValue($maximumApplicantFileUploadSize) > \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize'))){
       throw new \Jazzee\Exception('Configured Applicant File Upload Size is larger than PHP upload_max_filesize');
     }
-    $this->_maximumApplicantFileUploadSize = \convertIniShorthandValue($maximumApplicantFileUploadSize);
+    $this->_maximumApplicantFileUploadSize = \Foundation\Utility::convertIniShorthandValue($maximumApplicantFileUploadSize);
   }
   
   /**
@@ -917,10 +917,10 @@ protected $_adminCronAllowed;
    * @var string $maximumAdminFileUploadSize
    */
   public function setMaximumAdminFileUploadSize($maximumAdminFileUploadSize) {
-    if(\convertIniShorthandValue($maximumAdminFileUploadSize) > \convertIniShorthandValue(\ini_get('upload_max_filesize'))){
+    if(\Foundation\Utility::convertIniShorthandValue($maximumAdminFileUploadSize) > \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize'))){
       throw new \Jazzee\Exception('Configured Admin File Upload Size is larger than PHP upload_max_filesize');
     }
-    $this->_maximumAdminFileUploadSize = \convertIniShorthandValue($maximumAdminFileUploadSize);
+    $this->_maximumAdminFileUploadSize = \Foundation\Utility::convertIniShorthandValue($maximumAdminFileUploadSize);
   }
   
   /**

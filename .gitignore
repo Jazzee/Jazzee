@@ -1,5 +1,6 @@
 etc/config.ini.php
 build
+vendor
 docs/_build
 var/cache/*
 var/log/*

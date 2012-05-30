@@ -835,7 +835,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
     
     if($this->_config->getMaximumAdminFileUploadSize()) $max = $this->_config->getMaximumAdminFileUploadSize();
-    else $max = \convertIniShorthandValue(\ini_get('upload_max_filesize'));
+    else $max = \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize'));
     $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $max));
     
     $form->newButton('submit', 'Attach PDF to Answer');
@@ -897,7 +897,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
     
     if($this->_config->getMaximumAdminFileUploadSize()) $max = $this->_config->getMaximumAdminFileUploadSize();
-    else $max = \convertIniShorthandValue(\ini_get('upload_max_filesize'));
+    else $max = \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize'));
     $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $max));
         
     $form->newButton('submit', 'Attach PDF to Applicant');

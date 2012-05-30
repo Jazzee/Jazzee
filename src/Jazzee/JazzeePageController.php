@@ -138,32 +138,32 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->_vfs->addDirectory('styles', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../styles'));
     
     $virtualFoundation = new \Foundation\Virtual\VirtualDirectory();
-    $virtualFoundation->addDirectory('javascript', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/src/javascript'));
+    $virtualFoundation->addDirectory('javascript', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../vendor/jazzee/foundation/src/javascript'));
     $media = new \Foundation\Virtual\VirtualDirectory();
-    $media->addFile('blank.gif', new \Foundation\Virtual\RealFile('blank.gif,', __DIR__ . '/../../lib/foundation/src/media/blank.gif'));
-    $media->addFile('ajax-bar.gif', new \Foundation\Virtual\RealFile('ajax-bar.gif,', __DIR__ . '/../../lib/foundation/src/media/ajax-bar.gif'));
-    $media->addDirectory('icons', new \Foundation\Virtual\ProxyDirectory( __DIR__ . '/../../lib/foundation/src/media/famfamfam_silk_icons_v013/icons'));
+    $media->addFile('blank.gif', new \Foundation\Virtual\RealFile('blank.gif,', __DIR__ . '/../../vendor/jazzee/foundation/src/media/blank.gif'));
+    $media->addFile('ajax-bar.gif', new \Foundation\Virtual\RealFile('ajax-bar.gif,', __DIR__ . '/../../vendor/jazzee/foundation/src/media/ajax-bar.gif'));
+    $media->addDirectory('icons', new \Foundation\Virtual\ProxyDirectory( __DIR__ . '/../../vendor/jazzee/foundation/src/media/famfamfam_silk_icons_v013/icons'));
     
     $scripts = new \Foundation\Virtual\VirtualDirectory();
-    $scripts->addFile('jquery.js', new \Foundation\Virtual\RealFile('jquery.js', __DIR__ . '/../../lib/foundation/lib/jquery/jquery-1.7.1.min.js'));
-    $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jquery.json-2.2.min.js'));
-    $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jquery.cookie-1.min.js'));
-    $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', __DIR__ . '/../../lib/foundation/lib/jquery/jquery-ui-1.8.16.min.js'));
-    $scripts->addFile('jquery.qtip.js', new \Foundation\Virtual\RealFile('jquery.qtip.min.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.js'));
-    $scripts->addFile('jquery.wysiwyg.js', new \Foundation\Virtual\RealFile('jquery.wysiwyg.js', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.full.min.js'));
-    $scripts->addFile('anytime.js', new \Foundation\Virtual\RealFile('anytime.js', __DIR__ . '/../../lib/foundation/lib/anytime/anytimec.js'));
-    $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', __DIR__ . '/../../lib/foundation/src/javascript/form.js'));
+    $scripts->addFile('jquery.js', new \Foundation\Virtual\RealFile('jquery.js', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/jquery-1.7.1.min.js'));
+    $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/jquery.json-2.2.min.js'));
+    $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/jquery.cookie-1.min.js'));
+    $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/jquery-ui-1.8.16.min.js'));
+    $scripts->addFile('jquery.qtip.js', new \Foundation\Virtual\RealFile('jquery.qtip.min.js', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.js'));
+    $scripts->addFile('jquery.wysiwyg.js', new \Foundation\Virtual\RealFile('jquery.wysiwyg.js', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.full.min.js'));
+    $scripts->addFile('anytime.js', new \Foundation\Virtual\RealFile('anytime.js', __DIR__ . '/../../vendor/jazzee/foundation/lib/anytime/anytimec.js'));
+    $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', __DIR__ . '/../../vendor/jazzee/foundation/src/javascript/form.js'));
     
     $styles = new \Foundation\Virtual\VirtualDirectory();
-    $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../lib/foundation/lib/jquery/themes'));
+    $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/themes'));
     
-    $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', __DIR__ . '/../../lib/foundation/lib/yui/base-min.css'));
-    $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../lib/foundation/lib/yui/reset-fonts-grids-min.css'));
-    $styles->addFile('jquery.qtip.css', new \Foundation\Virtual\RealFile('jquery.qtip.min.css', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.css'));
-    $styles->addFile('anytime.css', new \Foundation\Virtual\RealFile('anytime.css', __DIR__ . '/../../lib/foundation/lib/anytime/anytimec.css'));
-    $styles->addFile('jquery.wysiwyg.css', new \Foundation\Virtual\RealFile('jquery.wysiwyg.css', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.css'));
-    $styles->addFile('jquery.wysiwyg.bg.png', new \Foundation\Virtual\RealFile('jquery.wysiwyg.bg.png', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.bg.png'));
-    $styles->addFile('jquery.wysiwyg.gif', new \Foundation\Virtual\RealFile('jquery.wysiwyg.gif', __DIR__ . '/../../lib/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.gif'));
+    $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', __DIR__ . '/../../vendor/jazzee/foundation/lib/yui/base-min.css'));
+    $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', __DIR__ . '/../../vendor/jazzee/foundation/lib/yui/reset-fonts-grids-min.css'));
+    $styles->addFile('jquery.qtip.css', new \Foundation\Virtual\RealFile('jquery.qtip.min.css', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/qtip/jquery.qtip.min.css'));
+    $styles->addFile('anytime.css', new \Foundation\Virtual\RealFile('anytime.css', __DIR__ . '/../../vendor/jazzee/foundation/lib/anytime/anytimec.css'));
+    $styles->addFile('jquery.wysiwyg.css', new \Foundation\Virtual\RealFile('jquery.wysiwyg.css', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.css'));
+    $styles->addFile('jquery.wysiwyg.bg.png', new \Foundation\Virtual\RealFile('jquery.wysiwyg.bg.png', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.bg.png'));
+    $styles->addFile('jquery.wysiwyg.gif', new \Foundation\Virtual\RealFile('jquery.wysiwyg.gif', __DIR__ . '/../../vendor/jazzee/foundation/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.gif'));
 
     $virtualFoundation->addDirectory('media',$media);
     $virtualFoundation->addDirectory('scripts',$scripts);

@@ -68,7 +68,7 @@ class JazzeeController extends PageController
       So a check has to be done using the CONTENT_LENGTH superglobal against the post_max_size value on every request
 	  */
     if(!empty($_SERVER['CONTENT_LENGTH'])){
-      $max = \convertIniShorthandValue(\ini_get('post_max_size'));
+      $max = \Foundation\Utility::convertIniShorthandValue(\ini_get('post_max_size'));
       if($_SERVER['CONTENT_LENGTH'] > $max){
         $this->addMessage('error', 'Your input has exceeded the maximum allowed size.  If you are trying to upload a file it is too large.  Please reduce your file size and try again');
       }

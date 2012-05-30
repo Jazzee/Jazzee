@@ -8,11 +8,7 @@
  * @license ../LICENSE
  * @package jazzee
  */
-$src = realpath(__DIR__ . '/..');
-
-require_once($src . '/lib/foundation/src/foundation.php');
-$classLoader = new Foundation\ClassLoader('Jazzee', $src . '/src');
-$classLoader->register();
+require __DIR__ . '/../vendor/autoload.php';
 
 //Setup the Lvc options
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/');
@@ -20,7 +16,7 @@ $classLoader->register();
 \Foundation\VC\Config::addLayoutViewPath(__DIR__ . '/views/layouts/');
 \Foundation\VC\Config::addElementViewPath(__DIR__ . '/views/elements/');
 
-\Foundation\VC\Config::addElementViewPath(__DIR__ . '/../lib/foundation/src/elements/');
+\Foundation\VC\Config::addElementViewPath(__DIR__ . '/../vendor/jazzee/foundation/src/elements/');
 
 //Load apply controllers and views
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/apply/');

@@ -29,7 +29,7 @@ class PDFFileInput extends AbstractElement {
     
     $config = $this->_controller->getConfig();
     $max = $config->getMaximumApplicantFileUploadSize();
-    if($this->_element->getMax() and \convertIniShorthandValue($this->_element->getMax()) < $max) $max = $this->_element->getMax();
+    if($this->_element->getMax() and \Foundation\Utility::convertIniShorthandValue($this->_element->getMax()) < $max) $max = $this->_element->getMax();
     
     $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $max));
     
