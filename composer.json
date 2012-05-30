@@ -16,7 +16,7 @@
   ],
   "require": {  
     "php": ">=5.3.0",
-    "jazzee/foundation": "1.*",
+    "jazzee/foundation": "dev-master",
     "doctrine/orm": "2.2.1",
     "symfony/console": ">=2.0",
     "pear-pear/Log": ">=1.12"

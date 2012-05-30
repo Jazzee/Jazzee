@@ -1,5 +1,5 @@
 {
-    "hash": "06ac4883690f1ac7724a945961e59b5a",
+    "hash": "65106a29340d73a9aa4fc3d11f938b5a",
     "packages": [
         {  
             "package": "doctrine/common",
@@ -20,7 +20,8 @@
         },
         {  
             "package": "jazzee/foundation",
-            "version": "1.0.2"
+            "version": "dev-master",
+            "source-reference": "9cd4bc2f3c2c7da41c31b3d875f6028bcc9125e5"
         },
         {  
             "package": "pear-pear/Log",
@@ -44,7 +45,7 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ]
+    "stability-flags": {
+        "jazzee/foundation": 20
+    }
 }

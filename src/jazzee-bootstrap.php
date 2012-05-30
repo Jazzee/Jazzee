@@ -1,14 +1,17 @@
 <?php
 /**
  * Jazzee Bootstrap
- * @todo load localBootstrap without loading config multipe times
- * Defines usefull constants
- * Sets up LVC, Foundation, Theme
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license ../LICENSE
+ * 
+ * Load all of the Views, Controllers, and Elements
  * @package jazzee
  */
-require __DIR__ . '/../vendor/autoload.php';
+
+//If the composer autoloader hasn't been loaded then load it here
+//We do it this way in case Jazzee has been built as a composer app into another app
+if (!class_exists('Composer\\Autoload\\ClassLoader', false)) {
+    require __DIR__ . '/../vendor/autoload.php';
+}
+
 
 //Setup the Lvc options
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/');
@@ -16,7 +19,7 @@ require __DIR__ . '/../vendor/autoload.php';
 \Foundation\VC\Config::addLayoutViewPath(__DIR__ . '/views/layouts/');
 \Foundation\VC\Config::addElementViewPath(__DIR__ . '/views/elements/');
 
-\Foundation\VC\Config::addElementViewPath(__DIR__ . '/../vendor/jazzee/foundation/src/elements/');
+\Foundation\VC\Config::addElementViewPath(\Foundation\Configuration::getSourcePath() . '/src/elements/');
 
 //Load apply controllers and views
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/apply/');

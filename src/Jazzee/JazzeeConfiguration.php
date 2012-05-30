@@ -1354,6 +1354,15 @@ protected $_adminCronAllowed;
   public function setAdminCronAllowed($adminCronAllowed) {
     $this->_adminCronAllowed = $adminCronAllowed;
   }
+
+  /**
+   * Get the path to the jazzee source
+   * @return string
+   */
+  public static function getSourcePath()
+  {
+    return realpath(__DIR__ . '/../..');
+  }
   
 
 }
