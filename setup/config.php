@@ -2,8 +2,11 @@
 namespace Jazzee\Console;
 
 try{
-  require_once __dir__ . '/../vendor/autoload.php';
-  
+  //If the composer autoloader hasn't been loaded then load it here
+  //We do it this way in case Jazzee has been built as a composer app into another app
+  if (!class_exists('Composer\\Autoload\\ClassLoader', false)) {
+      require __DIR__ . '/../vendor/autoload.php';
+  }
   $jazzeeConfiguration = new \Jazzee\Configuration();
 
   //setup doctrine
