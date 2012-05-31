@@ -33,22 +33,16 @@ class JazzeePageController extends \Foundation\VC\Controller
   protected $_serverPath;
   
   /**
-   * Pear log instance for error logging
-   * @var \Log
+   * Mono log instance for jazzee logging
+   * @var \Monolog\Logger
    */
-  protected $_errorLog;
+  protected $_log;
   
   /**
    * Pear log instance for authentication logging
    * @var \Log
    */
   protected $_authLog;
-  
-  /**
-   * Pear log instance for message logging
-   * @var \Log
-   */
-  protected $_messageLog;
   
   /**
    * Virtual File system root directory
@@ -275,25 +269,25 @@ class JazzeePageController extends \Foundation\VC\Controller
   protected function setupLogging(){
     $path = $this->getVarPath() . '/log';
     //create an access log with browser information
-    $accessLog = \Log::singleton('file', $path . '/access_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
+    $accessLog = new \Monolog\Logger('access');
+    $accessLog->pushHandler(new \Monolog\Handler\StreamHandler($path . '/access_log'));
+    
     $accessMessage ="[{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} {$_SERVER['SERVER_PROTOCOL']}] " .
       '[' . (!empty($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'-') . '] ' .
       '[' . (!empty($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:'-') . ']';
-    $accessLog->log($accessMessage, PEAR_LOG_INFO);
-    
+    $accessLog->addInfo($accessMessage);
+
     //create an authenticationLog
-    $this->_authLog = \Log::singleton('file', $path . '/authentication_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
+    $this->_authLog = new \Monolog\Logger('authentication');
+    $this->_authLog->pushHandler(new \Monolog\Handler\StreamHandler($path . '/authentication_log'));
     
-    //create a messgage log
-    $this->_messageLog = \Log::singleton('file', $path . '/messages_log', '', array('lineFormat'=>'%{timestamp} %{message}'),PEAR_LOG_INFO);
-    
-    $log = \Log::singleton('file', $path . '/error_log', '',array(), PEAR_LOG_ERR);
-    $strict = \Log::singleton('file', $path . '/strict_log');
-    $php = \Log::singleton('error_log', PEAR_LOG_TYPE_SYSTEM, 'Jazzee Error');
-    $this->_errorLog = \Log::singleton('composite');
-    $this->_errorLog->addChild($log);
-    $this->_errorLog->addChild($strict);
-    $this->_errorLog->addChild($php);
+    $this->_log = new \Monolog\Logger('jazzee');
+    $this->_log->pushProcessor(new \Monolog\Processor\WebProcessor());
+    $this->_log->pushProcessor(new \Monolog\Processor\IntrospectionProcessor());
+    $this->_log->pushHandler(new \Monolog\Handler\StreamHandler($path . '/strict_log'));
+    $this->_log->pushHandler(new \Monolog\Handler\StreamHandler($path . '/messages_log', \Monolog\Logger::INFO));
+    $this->_log->pushHandler(new \Monolog\Handler\StreamHandler($path . '/error_log', \Monolog\Logger::ERROR));
+    $this->_log->pushHandler(new \Monolog\Handler\SyslogHandler('jazzee','syslog',\Monolog\Logger::ERROR));
     
     //Handle PHP errors with out logs
     set_error_handler(array($this, 'handleError'));
@@ -303,10 +297,11 @@ class JazzeePageController extends \Foundation\VC\Controller
   
   /**
    * Log something
-   * @param type $string 
+   * @param string $message 
+   * @param integer $level
    */
-  public function log($string){
-    $this->_messageLog->log($string, PEAR_LOG_INFO);
+  public function log($message, $level = \Monolog\Logger::INFO){
+    $this->_log->addRecord($level, $message);
   }
   
   /**
@@ -324,25 +319,25 @@ class JazzeePageController extends \Foundation\VC\Controller
     switch ($code) {
       case E_WARNING:
       case E_USER_WARNING:
-        $priority = PEAR_LOG_WARNING;
+        $priority = \Monolog\Logger::WARNING;
         break;
       case E_NOTICE:
       case E_USER_NOTICE:
-        $priority = PEAR_LOG_NOTICE;
+        $priority = \Monolog\Logger::INFO;
         break;
       case E_ERROR:
       case E_USER_ERROR:
-        $priority = PEAR_LOG_ERR;
+        $priority = \Monolog\Logger::ERROR;
         break;
       default:
-        $priority = PEAR_LOG_INFO;
+        $priority = \Monolog\Logger::INFO;
     }
     if(error_reporting() === 0){// Error reporting is currently turned off or suppressed with @
-      $this->_errorLog->log('Supressed error: ' . $message . ' in ' . $file . ' at line ' . $line, PEAR_LOG_INFO);
+      $this->_log->debug('Supressed error: ' . $message . ' in ' . $file . ' at line ' . $line);
       return false;
     }
-    $this->_errorLog->log($message . ' in ' . $file . ' at line ' . $line, $priority);
-    throw new \Exception('Jazzee caught a PHP error');
+    $this->_log->addRecord($priority, $message . ' in ' . $file . ' at line ' . $line);
+    throw new \Exception('Jazzee caught a PHP error: ' . $message . ' in ' . $file . ' at line ' . $line);
   }
   
 
@@ -354,7 +349,7 @@ class JazzeePageController extends \Foundation\VC\Controller
   public function handleException(\Exception $e){
     $message = $e->getMessage();
     $userMessage = 'Unspecified Technical Difficulties';
-    $error = 500;
+    $code = 500;
     if($e instanceof \Lvc_Exception){
       $code = 404;
       $userMessage = 'Page not found.';
@@ -374,26 +369,27 @@ class JazzeePageController extends \Foundation\VC\Controller
     switch ($e->getCode()) {
       case E_WARNING:
       case E_USER_WARNING:
-        $priority = PEAR_LOG_WARNING;
+        $priority = \Monolog\Logger::WARNING;
         break;
       case E_NOTICE:
       case E_USER_NOTICE:
-        $priority = PEAR_LOG_NOTICE;
+        $priority = \Monolog\Logger::INFO;
         break;
       case E_ERROR:
       case E_USER_ERROR:
-        $priority = PEAR_LOG_ERR;
+        $priority = \Monolog\Logger::CRITICAL;
         break;
       default:
-        $priority = PEAR_LOG_INFO;
+        $priority = \Monolog\Logger::INFO;
     }
-    $this->_errorLog->log($message, $priority);
-    
+    $this->_log->addRecord($priority, $message);
+    //send the error to PHP as well
+    error_log($message);
     // Get a request for the error page
     $request = new \Lvc_Request();
     $request->setControllerName('error');
     $request->setActionName('index');
-    $request->setActionParams(array('error' => $error, 'message'=>$userMessage));
+    $request->setActionParams(array('error' => $code, 'message'=>$userMessage));
   
     // Get a new front controller without any routers, and have it process our handmade request.
     $fc = new \Lvc_FrontController();

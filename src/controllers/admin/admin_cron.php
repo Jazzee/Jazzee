@@ -106,12 +106,12 @@ class AdminCronController extends \Jazzee\AdminController {
     if(!empty($semephore)){
       //attempting to run cron again too soon
       if(time() - (int)$lastRun < self::MAX_INTERVAL){
-        $this->_errorLog->log('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' and cron is being run again at ' . date('r') . '.', PEAR_LOG_ERR);
+        $this->log('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' and cron is being run again at ' . date('r') . '.', \Monolog\Logger::ERROR);
         return false;
       }
       //This semephore has been around for too long delete it and throw an exception so the next run can proceed normally
       $this->setVar('adminCronSemephore', false);
-      $this->_errorLog->log('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' which was more than ' . self::MAX_INTERVAL . ' seconds ago.  This can indicate a broken cron process.  The semaphore has been reset so cron can run again.', PEAR_LOG_ERR);
+      $this->log('AdminCron semephore was set last at ' . date('r',$lastRun) .  ' which was more than ' . self::MAX_INTERVAL . ' seconds ago.  This can indicate a broken cron process.  The semaphore has been reset so cron can run again.', \Monolog\Logger::ERROR);
     }
     $this->setVar('adminCronSemephore', true);
     $this->setVar('adminCronLastRun', time());
