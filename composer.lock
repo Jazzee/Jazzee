@@ -1,43 +1,42 @@
 {
-    "hash": "65106a29340d73a9aa4fc3d11f938b5a",
+    "hash": "1824930a0e5ea867584a0e2a427c4e2e",
     "packages": [
-        {  
+        {
             "package": "doctrine/common",
             "version": "2.2.2"
         },
-        {  
+        {
             "package": "doctrine/dbal",
             "version": "2.2.2"
         },
-        {  
+        {
             "package": "doctrine/orm",
             "version": "2.2.1"
         },
-        {  
+        {
             "package": "ezyang/htmlpurifier",
             "version": "dev-master",
             "source-reference": "7291f19347b05f5833421eaf5152558bfbd2b454"
         },
-        {  
+        {
             "package": "jazzee/foundation",
             "version": "dev-master",
-            "source-reference": "9cd4bc2f3c2c7da41c31b3d875f6028bcc9125e5"
+            "source-reference": "be16502e7bac09f970c832855a23c6af7958023f"
         },
-        {  
-            "package": "pear-pear/Log",
-            "version": "1.12.7"
+        {
+            "package": "monolog/monolog",
+            "version": "1.1.0"
         },
-        {  
+        {
+            "package": "symfony/console",
+            "version": "dev-master",
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
+        },
+        {
             "package": "symfony/console",
             "version": "dev-master",
             "source-reference": "22be75777fe18315637abe092de5aa5c7f4ed3cd"
-        },
-        {  
-            "package": "symfony/console",
-            "version": "dev-master",
-            "source-reference": "22be75777fe18315637abe092de5aa5c7f4ed3cd",
-            "alias-pretty-version": "2.1.x-dev",
-            "alias-version": "2.1.9999999.9999999-dev"
         }
     ],
     "packages-dev": null,
