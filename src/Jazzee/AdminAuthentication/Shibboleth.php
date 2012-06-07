@@ -53,9 +53,9 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
     }
     if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
     $uniqueName = $_SERVER[$config->getShibbolethUsernameAttribute()];
-    $firstName = $_SERVER[$config->getShibbolethFirstNameAttribute()];
-    $lastName = $_SERVER[$config->getShibbolethLastNameAttribute()];
-    $mail = $_SERVER[$config->getShibbolethEmailAddressAttribute()];
+    $firstName = isset($_SERVER[$config->getShibbolethFirstNameAttribute()])?$_SERVER[$config->getShibbolethFirstNameAttribute()]:null;
+    $lastName = isset($_SERVER[$config->getShibbolethLastNameAttribute()])?$_SERVER[$config->getShibbolethLastNameAttribute()]:null;
+    $mail = isset($_SERVER[$config->getShibbolethEmailAddressAttribute()])?$_SERVER[$config->getShibbolethEmailAddressAttribute()]:null;
 
     $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName, 'isActive'=>true));
     if($this->_user){
