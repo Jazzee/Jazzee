@@ -20,6 +20,31 @@ class Preflight extends \Symfony\Component\Console\Command\Command
       $stub = new AdminStub;
       $stub->em = $em;
       $stub->config = $jazzeeConfiguration;
+      
+      $requiredExtensions = array(
+          'ldap',
+          'apc',
+          'curl',
+          'json',
+          'imagick',
+          'uuid',
+          'mbstring',
+          'xml',
+          'dom'    
+      );
+      $missing = array();
+      foreach($requiredExtensions as $re){
+        if(!extension_loaded($re)){
+          $missing[] = $re;
+        }
+      }
+      if(count($missing)){
+        $error = true;
+        foreach($missing as $m){
+          $output->write("<error>The PHP {$m} extension is required and it is not installed.</error>" . PHP_EOL);
+        }
+      }
+      
       //Check that the var direcotry is working
       $path = $jazzeeConfiguration->getVarPath()?$jazzeeConfiguration->getVarPath():__DIR__ . '/../../../var';
       if(!$realPath = \realpath($path) or !\is_dir($realPath)){
@@ -131,13 +156,19 @@ class Preflight extends \Symfony\Component\Console\Command\Command
         $error = true;
         $output->writeln('<error>' . $e->getMessage() . '</error>');
       }
-      
       require_once 'HTMLPurifier.includes.php';
       require_once 'HTMLPurifier.autoload.php';
       if(!class_exists('HTMLPurifier')){
         $error = true;
         $output->write("<error>HTML Purifier is required and it is not installed.</error>" . PHP_EOL);
-        throw new \Foundation\Exception('');
+      }
+      if(!class_exists('\Doctrine\ORM\Version')){
+        $error = true;
+        $output->write("<error>Doctrine ORM is required and it is not installed.</error>" . PHP_EOL);
+      }
+      if(!class_exists('\Monolog\Logger')){
+        $error = true;
+        $output->write("<error>Monolog is required and it is not installed.</error>" . PHP_EOL);
       }
       
       if($error) $output->write(PHP_EOL . "<error>Preflight Check Failed</error>" . PHP_EOL);
