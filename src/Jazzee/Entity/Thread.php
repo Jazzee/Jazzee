@@ -157,6 +157,47 @@ class Thread{
     return $lastMessage;
   }
   
+  /**
+   * Get first message
+   * 
+   * @return Message $message
+   */
+  public function getFirstMessage(){
+    return $this->messages->first();
+  }
+  
+  /**
+   * Get first message
+   * 
+   * @return Message $message
+   */
+  public function getLastMessage(){
+    return $this->messages->last();
+  }
+  
+  /**
+   * Get the unread message count
+   * 
+   * @param integer $sender
+   * @return integer $count
+   */
+  public function getUnreadMessageCount($sender){
+    if(!$this->hasUnreadMessage($sender)) return 0;
+    $count = 0;
+    foreach($this->messages as $message)if(!$message->isRead($sender)) $count++;
+    return $count;
+  }
+  
+  /**
+   * Get the message count
+   * 
+   * @param integer $sender
+   * @return integer $count
+   */
+  public function getMessageCount($sender){
+    return $this->messages->count();
+  }
+  
 }
 
 /**
@@ -174,7 +215,7 @@ class ThreadRepository extends \Doctrine\ORM\EntityRepository{
    * @return Array $threads
    */
   public function findByApplication(Application $application){
-    $query = $this->_em->createQuery('SELECT t FROM Jazzee\Entity\Thread t WHERE t.applicant IN (SELECT a.id from \Jazzee\Entity\Applicant a WHERE a.application = :applicationId)');
+    $query = $this->_em->createQuery('SELECT t FROM Jazzee\Entity\Thread t WHERE t.applicant IN (SELECT a.id from \Jazzee\Entity\Applicant a WHERE a.application = :applicationId) order by t.createdAt DESC');
     $query->setParameter('applicationId', $application->getId());
     return $query->getResult();
   }

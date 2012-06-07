@@ -237,7 +237,7 @@ div.discussion td.read{
   background-position:center center;
 }
 
-div.discussion td.unread{
+div.discussion tr.unread td:first-child{
   width: 16px;
   height: 16px;
   background-image: url(resource/foundation/media/icons/email_add.png);
