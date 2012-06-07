@@ -13,8 +13,8 @@ Required Apache Modules
 Required PHP extensions
 ------------------------
 * PECL/Imagick
-* pear/apc
-* pear/ldap
+* PECL/apc
+* ldap <http://www.php.net/manual/en/book.ldap.php>
 * PECL/UUID
 * `PHP ClamAV <http://php-clamav.sourceforge.net/>`_
 * `PDFLib <http://www.pdflib.com/>`_ is used to generate PDFs of applications.  It isn't free and we want to replace
