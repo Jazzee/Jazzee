@@ -12,10 +12,7 @@ Required Apache Modules
 
 Required PHP extensions
 ------------------------
-* pear/Log
 * PECL/Imagick
-* htmlpurifier.org/HTMLPurifier
-* pear.doctrine-project.org/DoctrineORM
 * pear/apc
 * pear/ldap
 * PECL/UUID

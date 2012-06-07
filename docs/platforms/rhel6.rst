@@ -24,18 +24,6 @@ Enable PHP Extensions::
   #echo 'extension=imagick.so' > /etc/php.d/imagick.ini
   #echo 'extension=uuid.so' > /etc/php.d/uuid.ini
 
-Install the Doctrine ORM::
-
-  #pear config-set auto_discover 1
-  #pear install pear.doctrine-project.org/DoctrineCommon-2.1.4 pear.doctrine-project.org/DoctrineDBAL-2.1.6 pear.doctrine-project.org/DoctrineORM-2.1.6
-
-Install HTML Purifier::
-  
-  #pear config-set auto_discover 1
-  #pear install htmlpurifier.org/HTMLPurifier
-  #chgrp apache /usr/share/pear/HTMLPurifier/DefinitionCache/Serializer
-  #chmod 775 /usr/share/pear/HTMLPurifier/DefinitionCache/Serializer
-
 Download the php clam-av extension from http://php-clamav.sourceforge.net/
 At the time of this writing the current version was 0.15.6.
 Install php-clamav::
@@ -58,7 +46,7 @@ Enable the module::
   clamav.maxfilesize=26214400
   clamav.maxscansize=104857600
   clamav.keeptmp=0
-  clamav.tmpdir="/tmp"' > clamav.ini
+  clamav.tmpdir="/tmp"' > /etc/php.d/clamav.ini
 
 PDFLib is used to generate PDFs of applications.  It isn't free and we want to replace
 it but there does not seem to be a better solution available.  If you want to be able
