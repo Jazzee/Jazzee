@@ -20,6 +20,7 @@ class SelectList extends AbstractElement {
     if($this->_element->isRequired()){
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
+      $element->newItem('', 'Select ' . $this->_element->getTitle() . '...');
     } else {
       //only put a blank if it isn't required
       $element->newItem('', '');
