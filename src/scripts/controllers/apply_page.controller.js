@@ -21,4 +21,8 @@ $(document).ready(function(){
     });
     label.append(img);
   });
+  
+  $('#answers p.controls a.delete').click(function(i){
+    if(!confirm('Are you sure you want to delete?  This cannot be undone')) return false;
+  });
 });
