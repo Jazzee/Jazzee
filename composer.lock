@@ -21,7 +21,7 @@
         {
             "package": "jazzee/foundation",
             "version": "dev-master",
-            "source-reference": "93cf7d6385d627e4de899a32d0267f531bac4056"
+            "source-reference": "d407e123425b092139985bfee86df6f467b0afe1"
         },
         {
             "package": "monolog/monolog",
@@ -30,13 +30,13 @@
         {
             "package": "symfony/console",
             "version": "dev-master",
-            "alias-pretty-version": "2.1.x-dev",
-            "alias-version": "2.1.9999999.9999999-dev"
+            "source-reference": "afc5ecf2967bf3510363535c0389ddc0f6284784"
         },
         {
             "package": "symfony/console",
             "version": "dev-master",
-            "source-reference": "22be75777fe18315637abe092de5aa5c7f4ed3cd"
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
         }
     ],
     "packages-dev": null,
