@@ -330,6 +330,32 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
+   * Get content for the SIR page
+   * @param integer $applicantId
+   */
+  public function actionRefreshSirPage($applicantId){
+    $this->layout = 'blank';
+    $applicant = $this->getApplicantById($applicantId);
+    if($applicant->getDecision()->getAcceptOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_ACCEPT)){
+      $page = $pages[0];
+      $this->setVar('variables', array('page'=>$page,'applicant'=>$applicant));
+      $class = $page->getPage()->getType()->getClass();
+      $this->setVar('element', $class::sirApplicantsSingleElement());
+      $this->loadView($this->controllerName . '/element');
+      return;
+    }
+    if($applicant->getDecision()->getDeclineOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_DECLINE)){
+      $page = $pages[0];
+      $this->setVar('variables', array('page'=>$page,'applicant'=>$applicant));
+      $class = $page->getPage()->getType()->getClass();
+      $this->setVar('element', $class::sirApplicantsSingleElement());
+      $this->loadView($this->controllerName . '/element');
+      return;
+    }
+    exit(0);
+  }
+  
+  /**
    * View the applicants audit log
    * Placeholder for authorization
    * @param integer $applicantId
@@ -581,24 +607,89 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    */
   public function actionAcceptOffer($applicantId){
     $applicant = $this->getApplicantById($applicantId);
-    $applicant->getDecision()->acceptOffer();
-    $this->_em->persist($applicant);
-    $this->auditLog($applicant, 'Accept Offer');
-    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
-    $this->loadView($this->controllerName . '/result');
+    $accept = false;
+    if($pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_ACCEPT)){  
+      $sirPage = $pages[0];
+      $sirPage->getJazzeePage()->setApplicant($applicant);
+      $sirPage->getJazzeePage()->setController($this);
+      $form = $sirPage->getJazzeePage()->getForm();
+      if(!empty($this->post)){
+        $this->setLayoutVar('textarea', true);
+        if($input = $sirPage->getJazzeePage()->validateInput($this->post)){
+          $accept = true;
+          $sirPage->getJazzeePage()->newAnswer($input);
+          
+        }
+        $form = $sirPage->getJazzeePage()->getForm();  //refresh the form for branching
+      }
+    } else {
+      $form = new \Foundation\Form();
+      $field = $form->newField();
+      $field->setLegend('Accept Offer For ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+      $form->newButton('submit', 'Accept Offer');
+      if(!empty($this->post)){
+        $this->setLayoutVar('textarea', true);
+        if($input = $form->processInput($this->post)){
+          $accept = true;
+        }
+      }
+    }
+    
+    if($accept){
+      $applicant->getDecision()->acceptOffer();
+      $this->_em->persist($applicant);
+      $this->auditLog($applicant, 'Accept Offer');
+      $this->setLayoutVar('status', 'success');
+      $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    }
+    $form->setAction($this->path("applicants/single/{$applicantId}/acceptOffer"));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
   }
   
   /**
-   * Decline Offer
+   * Declien Offer Offer
    * @param integer $applicantId
    */
   public function actionDeclineOffer($applicantId){
     $applicant = $this->getApplicantById($applicantId);
-    $applicant->getDecision()->declineOffer();
-    $this->_em->persist($applicant);
-    $this->auditLog($applicant, 'Decline Offer');
-    $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
-    $this->loadView($this->controllerName . '/result');
+    $decline = false;
+    if($pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_DECLINE)){  
+      $sirPage = $pages[0];
+      $sirPage->getJazzeePage()->setApplicant($applicant);
+      $sirPage->getJazzeePage()->setController($this);
+      $form = $sirPage->getJazzeePage()->getForm();
+      if(!empty($this->post)){
+        $this->setLayoutVar('textarea', true);
+        if($input = $sirPage->getJazzeePage()->validateInput($this->post)){
+          $decline = true;
+          $sirPage->getJazzeePage()->newAnswer($input);
+        }
+        $form = $sirPage->getJazzeePage()->getForm();  //refresh the form for branching
+      }
+    } else {
+      $form = new \Foundation\Form();
+      $field = $form->newField();
+      $field->setLegend('Accept Offer For ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+      $form->newButton('submit', 'Accept Offer');
+      if(!empty($this->post)){
+        $this->setLayoutVar('textarea', true);
+        if($input = $form->processInput($this->post)){
+          $decline = true;
+        }
+      }
+    }
+    
+    if($decline){
+      $applicant->getDecision()->declineOffer();
+      $this->_em->persist($applicant);
+      $this->auditLog($applicant, 'Decline Offer');
+      $this->setLayoutVar('status', 'success');
+      $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
+    }
+    $form->setAction($this->path("applicants/single/{$applicantId}/declineOffer"));
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
   }
   
   /**
@@ -608,6 +699,14 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionUndoAcceptOffer($applicantId){
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoAcceptOffer();
+    if($pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_ACCEPT)){
+      $applicationPage = $pages[0];
+      $applicationPage->getJazzeePage()->setApplicant($applicant);
+      $applicationPage->getJazzeePage()->setController($this);
+      foreach($applicant->findAnswersByPage($applicationPage->getPage()) as $answer){
+        $applicationPage->getJazzeePage()->deleteAnswer($answer->getId());
+      }
+    }
     $this->_em->persist($applicant);
     $this->auditLog($applicant, 'Undo Accept Offer');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
@@ -621,6 +720,14 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   public function actionUndoDeclineOffer($applicantId){
     $applicant = $this->getApplicantById($applicantId);
     $applicant->getDecision()->undoDeclineOffer();
+    if($pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_DECLINE)){
+      $applicationPage = $pages[0];
+      $applicationPage->getJazzeePage()->setApplicant($applicant);
+      $applicationPage->getJazzeePage()->setController($this);
+      foreach($applicant->findAnswersByPage($applicationPage->getPage()) as $answer){
+        $applicationPage->getJazzeePage()->deleteAnswer($answer->getId());
+      }
+    }
     $this->_em->persist($applicant);
     $this->auditLog($applicant, 'Undo Decline Offer');
     $this->setVar('result', array('decisions'=>$this->getDecisions($applicant)));
@@ -1168,7 +1275,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     //several views are controller by the complete action
-    if(in_array($action, array('refreshTags', 'refreshPage'))) $action = 'index';
+    if(in_array($action, array('refreshTags', 'refreshPage', 'refreshSirPage'))) $action = 'index';
     if(in_array($action, array('do', 'doAction', 'pageDo', 'doPageAction'))) $action = 'editAnswer';
     
     //require a working ApplicantPDF class

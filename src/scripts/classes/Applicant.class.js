@@ -34,6 +34,10 @@ Applicant.prototype.init = function(){
     var id = $(this).attr('id').substr(4);
     self.parsePage(id);
   });
+  $('#sirPages div.page').each(function(){
+    var id = $(this).attr('id').substr(4);
+    self.parsePage(id);
+  });
   $.get(this.baseUrl+'/refreshTags',function(json){
     self.refreshTags(json.data.result.tags);
   });
@@ -175,6 +179,12 @@ Applicant.prototype.parseDecisions = function(){
       var obj = {
         display: function(json){
           self.refreshDecisions(json.data.result.decisions);
+          $.get(self.baseUrl + '/refreshSirPage/',function(html){
+            var div = $('<div>');
+            div.html(html);
+            var pageId = $(div).attr('id');
+            $('#sirPages').append(div);
+          });
         }
       };
       self.createForm(json.data.form, obj);
@@ -184,6 +194,10 @@ Applicant.prototype.parseDecisions = function(){
     
   $('#decisions a.action').click(function(e){
     $.get($(e.target).attr('href'),function(json){
+      var id = $(e.target).attr('id');
+      if(id == 'decisionundoAcceptOffer' || id == 'decisionundoDeclineOffer'){
+        $('#sirPages').empty();
+      }
       self.refreshDecisions(json.data.result.decisions);
     });
     return false;
@@ -208,14 +222,14 @@ Applicant.prototype.refreshDecisions = function(json){
       {title: 'Undo Decision', action: 'undoFinalAdmit', className: 'action'}, 
       {title: 'Deny Applicant', action: 'finalDeny', className: 'actionForm'}, 
       {title: 'Undo Decision', action: 'undoFinalDeny', className: 'action'}, 
-      {title: 'Accept Offer', action: 'acceptOffer', className: 'action'}, 
-      {title: 'Decline Offer', action: 'declineOffer', className: 'action'},
+      {title: 'Accept Offer', action: 'acceptOffer', className: 'actionForm'}, 
+      {title: 'Decline Offer', action: 'declineOffer', className: 'actionForm'},
       {title: 'Undo Offer Response', action: 'undoAcceptOffer', className: 'action'}, 
       {title: 'Undo Offer Response', action: 'undoDeclineOffer', className: 'action'}        
     ];
     for(var i = 0; i < types.length; i++){
       if(json['allow'+types[i].action]){
-        var a = $('<a>').attr('href', this.baseUrl + '/' + types[i].action).addClass(types[i].className).html(types[i].title +'<br />');
+        var a = $('<a>').attr('id', 'decision'+types[i].action).attr('href', this.baseUrl + '/' + types[i].action).addClass(types[i].className).html(types[i].title +'<br />');
         $('#decisions').append(a);
       }
     }

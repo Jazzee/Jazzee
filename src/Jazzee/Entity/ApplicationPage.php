@@ -4,6 +4,7 @@ namespace Jazzee\Entity;
 /** 
  * ApplicationPage
  * Assocaites a Page with an Application.  Allows the application to override many of the page varialbes for global pages
+ * @HasLifecycleCallbacks 
  * @Entity
  * @Table(name="application_pages",uniqueConstraints={@UniqueConstraint(name="application_page", columns={"application_id", "page_id"})}) 
  * @package    jazzee
@@ -141,6 +142,26 @@ class ApplicationPage
     $allowed = array(self::APPLICATION, self::SIR_ACCEPT, self::SIR_DECLINE);
     if(!in_array($kind, $allowed)) throw new \Jazzee\Exception($kind . ' is not a valid application page kind.');
     $this->kind = $kind;
+  }
+  
+  /**
+   * Check constraints
+   * Ensure there is no more than one application page of kind SIR_ACCPT or SIR_DECLINE
+   * @PrePersist
+   */
+  public function checkConstraints(){
+    $kinds = array(self::SIR_ACCEPT => 'SIR_ACCEPT', self::SIR_DECLINE => 'SIR_DECLINE');
+    foreach($kinds as $kind => $name){
+      if($this->kind == $kind){
+        foreach($this->application->getApplicationPages($kind) as $page){
+          if($page !== $this){
+            throw new \Jazzee\Exception("{$this->getTitle()} and {$page->getTitle()} both have the kind {$name}.  This is not allowed.");
+          }
+        }
+        return true;
+      }  
+    }
+    return true;
   }
   
   /**

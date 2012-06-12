@@ -37,7 +37,14 @@ function ApplicationPageBuilder(canvas){
   this.controllerPath = this.services.getControllerPath('setup_pages');
   this.editGlobal = false;
   this.globalPages = {};
-}
+  this.sirAcceptPages = {};
+  this.sirDeclinePages = {};
+  this.applicationPageKinds = {
+    'application': 2,
+    'sirAccept': 4,
+    'sirDecline': 8
+  }
+};
 
 ApplicationPageBuilder.prototype = new PageBuilder();
 ApplicationPageBuilder.prototype.constructor = ApplicationPageBuilder;
@@ -61,45 +68,69 @@ ApplicationPageBuilder.prototype.setup = function(){
 };
 
 ApplicationPageBuilder.prototype.synchronizePageList = function(){
+  var pageBuilder = this;
   var div = $('#pages', this.canvas);
   div.empty();
   div.append($('<h5>').html('Application Pages'));
-  var ol = this.getPagesList();
-  $('li',ol).sort(function(a,b){  
-    return $(a).data('page').weight > $(b).data('page').weight ? 1 : -1;  
-  }).appendTo(ol);
-  ol.sortable();
-  ol.bind("sortupdate", function(e, ui) {
-    $('li',$(e.target).parent()).each(function(i){
-      $('#'+$(this).attr('id')).data('page').setProperty('weight',i);
+  var ol = this.getPagesList(this.applicationPageKinds.application);
+  div.append(ol);
+  div.append(this.addNewPageControl('New Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
+  div.append(this.addNewGlobalPageControl('Add Gobal Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
+  
+  div.append($('<h5>').html('SIR Accept Page'));
+  var ol = this.getPagesList(this.applicationPageKinds.sirAccept);
+  div.append(ol);
+  if($('li',ol).length == 0){
+    ol.append(this.addNewPageControl('Set Page', this.applicationPageKinds.sirAccept, 'Jazzee\\Interfaces\\SirPage'));
+    ol.append(this.addNewGlobalPageControl('Set Gobal Page', this.applicationPageKinds.sirAccept, 'Jazzee\\Interfaces\\SirPage'));
+  }
+  
+  div.append($('<h5>').html('SIR Decline Page'));
+  var ol = this.getPagesList(this.applicationPageKinds.sirDecline);
+  div.append(ol);
+  if($('li',ol).length == 0){
+    ol.append(this.addNewPageControl('Set Page', this.applicationPageKinds.sirDecline, 'Jazzee\\Interfaces\\SirPage'));
+    ol.append(this.addNewGlobalPageControl('Set Global Page', this.applicationPageKinds.sirDecline, 'Jazzee\\Interfaces\\SirPage'));
+  }
+  $('ol', div).each(function(i){
+    var ol = $(this);
+    $('li',ol).sort(function(a,b){  
+      return $(a).data('page').weight > $(b).data('page').weight ? 1 : -1;  
+    }).appendTo(ol);
+    ol.sortable();
+    ol.bind("sortupdate", function(e, ui) {
+      $('li',$(e.target).parent()).each(function(i){
+        $('#'+$(this).attr('id')).data('page').setProperty('weight',i);
+      });
     });
   });
-  div.append(ol);
-  
-  div.append(this.addNewPageControl());
-  div.append(this.addNewGlobalPageControl());
 };
 
 /**
  * Create a control for adding new page
+ * @param String title
+ * @param integer kind
  * @return {jQuery}
  */
-ApplicationPageBuilder.prototype.addNewPageControl = function(){
+ApplicationPageBuilder.prototype.addNewPageControl = function(title, kind, inter){
   var pageBuilder = this;
   var dropdown = $('<ul>');
   for(var i = 0; i < this.pageTypes.length; i++){
-    var item = $('<a>').html(this.pageTypes[i].typeName).attr('href', '#').data('pageType', this.pageTypes[i]);
-    item.bind('click', function(e){
-      var pageType = $(e.target).data('pageType');
-      var page = new window[pageType.typeClass].prototype.newPage('newpage' + pageBuilder.getUniqueId(),'New ' + pageType.typeName + ' Page',pageType.id,pageType.typeName,pageType.typeClass,'new',pageBuilder);
-      if($('#pages li').length > 0) page.weight = parseInt($('#pages li').last().data('page').weight)+1;
-      else page.weight = 0; //this is the only page so it gets a weight of 0
-      pageBuilder.addPage(page);
-      return false;
-    });
-    dropdown.append($('<li>').append(item));
+    if($.inArray(inter, this.pageTypes[i].interfaces) > -1){
+      var item = $('<a>').html(this.pageTypes[i].typeName).attr('href', '#').data('pageType', this.pageTypes[i]);
+      item.bind('click', function(e){
+        var pageType = $(e.target).data('pageType');
+        var page = new window[pageType.typeClass].prototype.newPage('newpage' + pageBuilder.getUniqueId(),'New ' + pageType.typeName + ' Page',pageType.id,pageType.typeName,pageType.typeClass,'new',pageBuilder);
+        page.kind = kind;
+        if($('#pages li').length > 0) page.weight = parseInt($('#pages li').last().data('page').weight)+1;
+        else page.weight = 0; //this is the only page so it gets a weight of 0
+        pageBuilder.addPage(page);
+        return false;
+      });
+      dropdown.append($('<li>').append(item));
+    }
   }
-  var button = $('<button>').html('New Page').button();
+  var button = $('<button>').html(title).button();
   button.qtip({
     position: {
       my: 'bottom-left',
@@ -125,19 +156,22 @@ ApplicationPageBuilder.prototype.addNewPageControl = function(){
 
 /**
  * Create a control for adding new global page
+ * @param String title
+ * @param integer kind
  * @return {jQuery}
  */
-ApplicationPageBuilder.prototype.addNewGlobalPageControl = function(){
+ApplicationPageBuilder.prototype.addNewGlobalPageControl = function(title, kind, inter){
   var pageBuilder = this;
   var dropdown = $('<ul>');
   for(var i in this.globalPages){
     var globalPage = this.globalPages[i];
     //only if the global page isn't already being used
-    if(pageBuilder.pages[globalPage.id] == undefined){
+    if(pageBuilder.pages[globalPage.id] == undefined && $.inArray(inter, globalPage.interfaces) > -1){
       var item = $('<a>').html(globalPage.title).attr('href', '#').data('page', globalPage);
       item.bind('click', function(e){
         var globalPage = $(e.target).data('page');
         var page = new window[globalPage.typeClass].prototype.newPage(globalPage.id,globalPage.title,globalPage.typeId,globalPage.typeName,globalPage.typeClass,'new-global',pageBuilder);
+        page.kind = kind;
         page.isGlobal = true;
         page.title = globalPage.title;
         page.min = globalPage.min;
@@ -154,7 +188,7 @@ ApplicationPageBuilder.prototype.addNewGlobalPageControl = function(){
       dropdown.append($('<li>').append(item));
     }
   }
-  var button = $('<button>').html('New Gobal Page').button();
+  var button = $('<button>').html(title).button();
   button.qtip({
     position: {
       my: 'bottom-left',

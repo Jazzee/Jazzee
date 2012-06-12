@@ -85,6 +85,21 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
    */
   public function actionSir(){
     if($this->_applicant->getDecision()->status() != 'finalAdmit') throw new \Jazzee\Exception("Applicant #{$this->_applicant->getId()} tried to access SIR but is not in the status finalAdmit", E_USER_NOTICE, 'You do not have access to this page.');
+    $sirAcceptPage = false;
+    if($pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_ACCEPT)){
+      $sirAcceptPage = $pages[0];
+      $sirAcceptPage->getJazzeePage()->setApplicant($this->_applicant);
+      $sirAcceptPage->getJazzeePage()->setController($this);
+    }
+    $sirDeclinePage = false;
+    if($pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_DECLINE)){
+      $sirDeclinePage = $pages[0];
+      $sirDeclinePage->getJazzeePage()->setApplicant($this->_applicant);
+      $sirDeclinePage->getJazzeePage()->setController($this);
+    }
+    $this->setVar('sirAcceptPage', $sirAcceptPage);
+    $this->setVar('sirDeclinePage', $sirDeclinePage);
+    
     $form = new \Foundation\Form();
     $form->setAction($this->applyPath('status/sir'));
     $field = $form->newField();
@@ -95,18 +110,57 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
     $element->newItem(0,'No');
     $element->newItem(1,'Yes');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $form->newButton('submit', 'Save');
+    $buttonText = ($sirAcceptPage or $sirDeclinePage)?'Next':'Save';
+    $form->newButton('submit', $buttonText);
+    $form->newHiddenElement('sirLevel', '1');
     $this->setVar('form', $form);
-    if($input = $form->processInput($this->post)){
-      if($input->get('confirm')){
-        $this->_applicant->getDecision()->acceptOffer();
-      } else {
-        $this->_applicant->getDecision()->declineOffer();
+    if($this->post){
+      if(isset($this->post['sirLevel']) and $this->post['sirLevel'] == 1 and $input = $form->processInput($this->post)){
+        $this->setVar('confirm', $input->get('confirm'));
+        if($input->get('confirm') == 1 and !$sirAcceptPage){
+          $this->acceptApplicant();
+        } else if($input->get('confirm') == 0 and !$sirDeclinePage){
+          $this->declineApplicant();
+        }
+      } else if(isset($this->post['confirm'])){
+        if($this->post['confirm'] == 0){
+          $this->setVar('confirm', 0);
+          if($input = $sirDeclinePage->getJazzeePage()->validateInput($this->post)){
+            $sirDeclinePage->getJazzeePage()->newAnswer($input);
+            $this->declineApplicant();
+          }
+        }
+        if($this->post['confirm'] == 1){
+          $this->setVar('confirm', 1);
+          if($input = $sirAcceptPage->getJazzeePage()->validateInput($this->post)){
+            $sirAcceptPage->getJazzeePage()->newAnswer($input);
+            $this->acceptApplicant();
+          }
+        }
       }
-      $this->_em->persist($this->_applicant);
-      $this->addMessage('success', 'Your intent was recorded.');
-      $this->redirectApplyPath('status');
     }
+  }
+  
+  /**
+   * Accept applicant
+   * Break out the steps to accept an applicant so they dont get repeated all over 
+   */
+  protected function acceptApplicant(){
+    $this->_applicant->getDecision()->acceptOffer();
+    $this->_em->persist($this->_applicant);
+    $this->addMessage('success', 'Your intent to enroll was recorded.');
+    $this->redirectApplyPath('status');
+  }
+  
+  /**
+   * Decline applicant
+   * Break out the steps to decline an applicant so they dont get repeated all over 
+   */
+  protected function declineApplicant(){
+    $this->_applicant->getDecision()->declineOffer();
+    $this->_em->persist($this->_applicant);
+    $this->addMessage('success', 'Your decision not to enroll was recorded.');
+    $this->redirectApplyPath('status');
   }
   
 
@@ -160,7 +214,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController {
    * @return string
    */
   public function getActionPath(){
-    return $this->ApplyPath('status');
+    return $this->applyPath('status/sir');
   }
   
   /**

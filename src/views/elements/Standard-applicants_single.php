@@ -28,7 +28,7 @@ $page->getJazzeePage()->setApplicant($applicant);
           <tbody>
           <?php 
           foreach($page->getJazzeePage()->getAnswers() as $answer){?>
-            <tr id='answer<?print $answer->getId() ?>'>
+            <tr id='answer<?php print $answer->getId() ?>'>
               <?php foreach($page->getPage()->getElements() as $element){
                 $element->getJazzeeElement()->setController($this->controller);
                 ?><td><?php print $element->getJazzeeElement()->displayValue($answer); ?></td>

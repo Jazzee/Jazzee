@@ -11,6 +11,7 @@ function JazzeePage(){
   this.typeName;
   this.typeId;
   this.typeClass;
+  this.kind;
   this.isGlobal;
   this.title;
   this.min = 0;
@@ -81,6 +82,7 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.typeId = pageObject.typeId;
   this.typeName = pageObject.typeName;
   this.typeClass = pageObject.typeClass;
+  this.kind = pageObject.kind;
   this.title = pageObject.title;
   this.isGlobal = pageObject.isGlobal;
   this.min = pageObject.min;
@@ -134,6 +136,7 @@ JazzeePage.prototype.newPage = function(id,title,typeId,typeName,typeClass,statu
     leadingText: null,
     trailingText: null,
     weight: 0,
+    kind: null,
     hasAnswers: 0
   };
   var page = new window[typeClass]();
@@ -414,6 +417,7 @@ JazzeePage.prototype.getDataObject = function(){
     typeId: this.typeId,
     typeName: this.typeName,
     typeClass: this.typeClass,
+    kind: this.kind,
     id: this.id,
     status: this.status,
     title: this.title,

@@ -140,27 +140,30 @@ PageBuilder.prototype.refreshPages = function(){
 
 /**
  * Get an ordered list object of all the pages in the list
+ * @param integer kind
  * @return {jQuery} ol
  */
-PageBuilder.prototype.getPagesList = function(){
+PageBuilder.prototype.getPagesList = function(kind){
   var pageBuilder = this;
   var ol = $('<ol>');
   for(var i in this.pages){
     var page = this.pages[i];
-    var li = $('<li>');
-    li.html(page.title).attr('id', 'page-' + page.id);
-    li.data('page', page);
-    li.unbind('click');
-    li.bind('click', function(e){
-      $(this).parent().children('li').removeClass('active');
-      $(this).addClass('active');
-      $(this).data('page').workspace();
-      pageBuilder.currentPage = $(this).attr('id');
-    });
-    if(page.isGlobal && !this.editGlobal){
-      li.addClass('global');
+    if(page.kind == kind){
+      var li = $('<li>');
+      li.html(page.title).attr('id', 'page-' + page.id);
+      li.data('page', page);
+      li.unbind('click');
+      li.bind('click', function(e){
+        $(this).parent().children('li').removeClass('active');
+        $(this).addClass('active');
+        $(this).data('page').workspace();
+        pageBuilder.currentPage = $(this).attr('id');
+      });
+      if(page.isGlobal && !this.editGlobal){
+        li.addClass('global');
+      }
+      $(ol).append(li);
     }
-    $(ol).append(li);
   }
   return ol;
 };

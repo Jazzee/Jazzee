@@ -83,14 +83,14 @@
                   array('action' => 'undoFinalAdmit','title'=>'Undo Decision','class'=>'action'),
                   array('action' => 'finalDeny','title'=>'Deny Applicant','class'=>'actionForm'),
                   array('action' => 'undoFinalDeny','title'=>'Undo Decision','class'=>'action'),
-                  array('action' => 'acceptOffer','title'=>'Accept Offer','class'=>'action'),
-                  array('action' => 'declineOffer','title'=>'Decline Offer','class'=>'action'),
+                  array('action' => 'acceptOffer','title'=>'Accept Offer','class'=>'actionForm'),
+                  array('action' => 'declineOffer','title'=>'Decline Offer','class'=>'actionForm'),
                   array('action' => 'undoAcceptOffer','title'=>'Undo Offer Response','class'=>'action'),
                   array('action' => 'undoDeclineOffer','title'=>'Undo Offer Response','class'=>'action')
                 );
                 foreach($actions as $arr){
                   if($this->controller->checkIsAllowed('applicants_single', $arr['action']) && $applicant->getDecision()->can($arr['action'])){?>
-                    <a class="<?php print $arr['class']?>" href="<?php print $this->path("applicants/single/{$applicant->getId()}/{$arr['action']}");?>"><?php print $arr['title'];?></a><br />
+                    <a id="decision<?php print $arr['action']?>" class="<?php print $arr['class']?>" href="<?php print $this->path("applicants/single/{$applicant->getId()}/{$arr['action']}");?>"><?php print $arr['title'];?></a><br />
                   <?php }
                 }
                 if($this->controller->checkIsAllowed('applicants_single', 'unlock')){?>
@@ -129,6 +129,20 @@
       <a href="<?php print $this->path("applicants/messages/new/{$applicant->getId()}");?>">New Message</a>
     </div>
   <?php } ?>
+  <div id='sirPages'>
+    <?php
+    if($applicant->getDecision()->getAcceptOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_ACCEPT)){
+      $applicationPage = $pages[0];
+      $class = $applicationPage->getPage()->getType()->getClass();
+      $this->renderElement($class::sirApplicantsSingleElement(), array('page'=>$applicationPage, 'applicant'=>$applicant));
+    }
+    if($applicant->getDecision()->getDeclineOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_DECLINE)){
+      $applicationPage = $pages[0];
+      $class = $applicationPage->getPage()->getType()->getClass();
+      $this->renderElement($class::sirApplicantsSingleElement(), array('page'=>$applicationPage, 'applicant'=>$applicant));
+    }
+    ?>
+  </div>
   <div id='pages'>
     <?php 
     foreach($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){

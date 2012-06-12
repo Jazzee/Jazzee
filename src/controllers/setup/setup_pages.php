@@ -33,7 +33,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
    */
   public function actionListPages(){
     $applicationPages = array();
-    foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) AS $applicationPage){
+    foreach($this->_application->getApplicationPages() AS $applicationPage){
       $applicationPages[] = $this->pageArray($applicationPage);
     }
     $this->setVar('result', $applicationPages);
@@ -62,7 +62,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
       case 'new-global':
         $applicationPage = new \Jazzee\Entity\ApplicationPage();
         $applicationPage->setPage($this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('id'=>$pageId, 'isGlobal'=>true)));
-        $applicationPage->setKind(\Jazzee\Entity\ApplicationPage::APPLICATION);
+        $applicationPage->setKind($data->kind);
         $applicationPage->setApplication($this->_application);
         $applicationPage->setWeight($data->weight);
         $applicationPage->setTitle($data->title);
@@ -82,7 +82,7 @@ class SetupPagesController extends \Jazzee\PageBuilder {
         $this->_em->persist($page);
         $applicationPage = new \Jazzee\Entity\ApplicationPage();
         $applicationPage->setPage($page);
-        $applicationPage->setKind(\Jazzee\Entity\ApplicationPage::APPLICATION);
+        $applicationPage->setKind($data->kind);
         $applicationPage->setWeight($data->weight);
         $applicationPage->setApplication($this->_application);
         $applicationPage->getJazzeePage()->setController($this);

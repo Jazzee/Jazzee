@@ -52,7 +52,7 @@ GlobalPageBuilder.prototype.synchronizePageList = function(){
   var div = $('#pages', this.canvas);
   div.empty();
   div.append($('<h5>').html('Global Pages'));
-  div.append(this.getPagesList());
+  div.append(this.getPagesList(null));
   div.append(this.addNewPageControl());
 };
 

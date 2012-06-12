@@ -293,4 +293,8 @@ class Branching extends Standard
   public static function lorReviewElement(){
     return 'Branching-lor_review';
   }
+  
+  public static function sirApplicantsSingleElement(){
+    return 'Branching-sir_applicants_single';
+  }
 }

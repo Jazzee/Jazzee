@@ -100,6 +100,7 @@ abstract class PageBuilder extends AdminController{
     if($page instanceof \Jazzee\Entity\ApplicationPage){
       $arr['weight'] = $page->getWeight();
       $arr['applicationPageId'] = $page->getId();
+      $arr['kind'] = $page->getKind();
       $page = $page->getPage();
       //for global pages also pass the global page info for reference
       if($page->isGlobal()){

@@ -10,7 +10,7 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-class Standard extends AbstractPage implements \Jazzee\Interfaces\LorPage{
+class Standard extends AbstractPage implements \Jazzee\Interfaces\LorPage, \Jazzee\Interfaces\SirPage{
   const APPLY_PAGE_ELEMENT = 'Standard-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = 'Standard-applicants_single';
   const APPLY_STATUS_ELEMENT = 'Standard-apply_status';
@@ -246,5 +246,13 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\LorPage{
   
   public static function lorApplicantsSingleElement(){
     return 'Standard-lor_applicants_single';
+  }
+  
+  public static function sirPageElement(){
+    return 'Standard-sir_page';
+  }
+  
+  public static function sirApplicantsSingleElement(){
+    return 'Standard-sir_applicants_single';
   }
 }
