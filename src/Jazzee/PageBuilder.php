@@ -50,10 +50,7 @@ abstract class PageBuilder extends AdminController{
     
     $this->addScript($this->path('resource/scripts/classes/PageBuilder.class.js'));
     $this->addCss($this->path('resource/styles/pages.css'));
-    
-    
-    require_once 'HTMLPurifier.includes.php';
-    require_once 'HTMLPurifier.autoload.php';
+
     if(!class_exists('HTMLPurifier')){
       throw new \Foundation\Exception('HTML Purifier is required for building pages and it is not available.');
     }

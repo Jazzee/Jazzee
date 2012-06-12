@@ -156,8 +156,7 @@ class Preflight extends \Symfony\Component\Console\Command\Command
         $error = true;
         $output->writeln('<error>' . $e->getMessage() . '</error>');
       }
-      require_once 'HTMLPurifier.includes.php';
-      require_once 'HTMLPurifier.autoload.php';
+      
       if(!class_exists('HTMLPurifier')){
         $error = true;
         $output->write("<error>HTML Purifier is required and it is not installed.</error>" . PHP_EOL);
