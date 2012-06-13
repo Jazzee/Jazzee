@@ -34,7 +34,7 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->path("setup/application"));
     $field = $form->newField();
-    $field->setLegend('Setup Applicant');
+    $field->setLegend('Setup Application');
     
     $element = $field->newElement('TextInput','contactName');
     $element->setLabel('Contact Name');
