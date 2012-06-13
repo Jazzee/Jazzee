@@ -237,7 +237,7 @@ abstract class PageBuilder extends AdminController{
    * @param \Jazzee\Entity\Page $page
    */
   public function savePage($page, $data){
-    $htmlPurifier = new \HTMLPurifier();
+    $htmlPurifier = $this->getFilter();
     
     $page->setTitle($htmlPurifier->purify($data->title));
     $page->setMin(empty($data->min)?null:$data->min);
@@ -296,7 +296,7 @@ abstract class PageBuilder extends AdminController{
    * @param array $elements
    */
   protected function savePageElements(\Jazzee\Entity\Page $page, array $elements){
-    $htmlPurifier = new \HTMLPurifier();
+    $htmlPurifier = $this->getFilter();
     foreach($elements as $e){
       switch($e->status){
         case 'delete':
@@ -455,5 +455,23 @@ abstract class PageBuilder extends AdminController{
    */
   public function getActionPath(){
     return $this->path('');
+  }
+  
+  protected function getFilter(){
+    $cachePath = $this->getVarPath() . '/tmp/htmlpurifiercache';
+    if (!is_dir($cachePath)) {
+      mkdir($cachePath, 0755, true);
+    }
+    //call the bootstrap class so that we get the constant definitions
+    $bsBootstrap = new \HTMLPurifier_Bootstrap();
+    // set up configuration
+    $config = \HTMLPurifier_Config::createDefault();
+    $config->set('HTML.DefinitionID', 'JazzeeJazzeeConfig');
+    $config->set('HTML.DefinitionRev', 1); // increment when configuration changes
+    $config->set('Cache.SerializerPath', $cachePath);
+
+    $purifier = new \HTMLPurifier($config);
+
+    return $purifier;
   }
 }
