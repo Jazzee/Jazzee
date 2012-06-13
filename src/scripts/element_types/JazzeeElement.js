@@ -326,7 +326,7 @@ JazzeeElement.prototype.workspace = function(){
       secondary: 'ui-icon-carat-1-s'
     }
   });
-    button.qtip({
+  button.qtip({
     position: {
       my: 'top-left',
       at: 'bottom-left'
@@ -347,7 +347,6 @@ JazzeeElement.prototype.workspace = function(){
       }
     }
   });
-  button.qtip('api').render();
   toolbar.append(button);
   
   $('.options', div).html(toolbar);
