@@ -62,11 +62,12 @@ class Recommenders extends Standard {
     $body = str_ireplace($search, $replace, $this->_applicationPage->getPage()->getVar('recommenderEmailText'));
 
     $message = $this->_controller->newMailMessage();
+    $message->AddCustomHeader('X-Jazzee-Applicant-ID:' . $this->_applicant->getId());
     $message->AddAddress(
       $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->displayValue($answer),
       $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->displayValue($answer) . ' ' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->displayValue($answer));
     $message->setFrom($this->_applicant->getApplication()->getContactEmail(), $this->_applicant->getApplication()->getContactName());
-    $message->Subject = 'Letter of Recommendation Request';
+    $message->Subject = 'Recommendation Request for ' . $this->_applicant->getFullName();
     $message->Body = $body;
     return $message;
   }
