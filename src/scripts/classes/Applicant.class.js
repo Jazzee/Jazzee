@@ -117,7 +117,7 @@ Applicant.prototype.refreshBio = function(json){
   $('#bio').empty().hide();
   var h1 = $('<h1>').html(json.name);
   if(json.allowEdit){
-    var a = $('<a>').attr('href', this.baseUrl + '/updateBio').html(' (edit)');
+    var a = $('<a>').attr('href', this.baseUrl + '/updateBio').html(' (edit)').attr('id','updateBio');
     h1.append(a);
   }
   $('#bio').append(h1);
