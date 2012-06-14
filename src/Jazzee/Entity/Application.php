@@ -165,7 +165,11 @@ class Application{
    * @param string $open
    */
   public function setOpen($open){
-    $this->open = new \DateTime($open);
+    if(empty($open)){
+      $this->open = null;
+    } else {
+      $this->open = new \DateTime($open);
+    }
   }
 
   /**
@@ -183,7 +187,11 @@ class Application{
    * @param string $close
    */
   public function setClose($close){
-    $this->close = new \DateTime($close);
+    if(empty($close)){
+      $this->close = $close;
+    } else {
+      $this->close = new \DateTime($close);
+    }
   }
 
   /**
@@ -201,7 +209,11 @@ class Application{
    * @param string $begin
    */
   public function setBegin($begin){
-    $this->begin = new \DateTime($begin);
+    if(empty($begin)){
+      $this->begin = null;
+    } else {
+      $this->begin = new \DateTime($begin);
+    }
   }
 
   /**
