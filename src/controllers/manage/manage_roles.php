@@ -18,6 +18,14 @@ class ManageRolesController extends \Jazzee\AdminController {
   const REQUIRE_APPLICATION = false;
   
   /**
+   * Add the required JS
+   */
+  protected function setUp(){
+    parent::setUp();
+    $this->addScript($this->path('resource/scripts/controllers/manage_roles.controller.js'));
+  }
+  
+  /**
    * List all the Roles
    */
   public function actionIndex(){

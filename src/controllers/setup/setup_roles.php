@@ -16,6 +16,14 @@ class SetupRolesController extends \Jazzee\AdminController {
   const ACTION_NEW = 'New';
   
   /**
+   * Add the required JS
+   */
+  protected function setUp(){
+    parent::setUp();
+    $this->addScript($this->path('resource/scripts/controllers/setup_roles.controller.js'));
+  }
+  
+  /**
    * List all the Roles
    */
   public function actionIndex(){
