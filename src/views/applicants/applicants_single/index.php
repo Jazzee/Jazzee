@@ -131,12 +131,12 @@
   <?php } ?>
   <div id='sirPages'>
     <?php
-    if($applicant->getDecision()->getAcceptOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_ACCEPT)){
+    if($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_ACCEPT)){
       $applicationPage = $pages[0];
       $class = $applicationPage->getPage()->getType()->getClass();
       $this->renderElement($class::sirApplicantsSingleElement(), array('page'=>$applicationPage, 'applicant'=>$applicant));
     }
-    if($applicant->getDecision()->getDeclineOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_DECLINE)){
+    if($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer() and $pages = $applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::SIR_DECLINE)){
       $applicationPage = $pages[0];
       $class = $applicationPage->getPage()->getType()->getClass();
       $this->renderElement($class::sirApplicantsSingleElement(), array('page'=>$applicationPage, 'applicant'=>$applicant));
