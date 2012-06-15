@@ -37,6 +37,11 @@ class Cycle{
   **/
   private $requiredPages;
   
+  public function __construct(){
+    $this->requiredPages = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->applications = new \Doctrine\Common\Collections\ArrayCollection();
+  }
+  
   /**
    * Get the id
    * @return integer
