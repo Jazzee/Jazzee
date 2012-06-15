@@ -221,20 +221,12 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     
     $element = $field->newElement('RadioList','visible');
-    $element->setLabel('Visible');
+    $element->setLabel('Is this application visible in the list of cycles?');
     $element->newItem(0, 'No');
     $element->newItem(1, 'Yes');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     $element->setValue($this->_application->isVisible());
-    
-    $element = $field->newElement('RadioList','published');
-    $element->setLabel('Published');
-    $element->newItem(0, 'No');
-    $element->newItem(1, 'Yes');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
-    $element->setValue($this->_application->isPublished());
     
     $form->newButton('submit', 'Save');
     
@@ -243,7 +235,6 @@ class SetupApplicationController extends \Jazzee\AdminController {
       $this->_application->setClose($input->get('close'));
       $this->_application->setBegin($input->get('begin'));
       if($input->get('visible')) $this->_application->visible(); else $this->_application->inVisible();
-      if($input->get('published')) $this->_application->publish(); else $this->_application->unPublish();
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application Status Saved.');
       $this->redirectPath('setup/application');
