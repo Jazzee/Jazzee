@@ -227,9 +227,26 @@ class Application{
 
   /**
    * Publish and application
+   * @param boolean $override if this is true the application willbe published without checking
    */
-  public function publish(){
+  public function publish($override = false){
+    if(!$override AND !$this->canPublish()){
+      throw new \Jazzee\Exception('Application cannot be published, it is not ready.  Specify override if this should be ignored.');
+    }
     $this->published = true;
+  }
+  
+  /**
+   * Check if application is ready to be published
+   * @return boolean
+   */
+  public function canPublish(){
+    foreach($this->cycle->getRequiredPages() as $requiredPage){
+      if(!$this->hasPage($requiredPage)){
+        return false;
+      }
+    }
+    return true;
   }
   
  /**
@@ -470,6 +487,21 @@ class Application{
     $applicationPages = array();
     foreach($this->applicationPages as $applicationPage) if($applicationPage->getKind() == $kind) $applicationPages[] = $applicationPage;
     return $applicationPages;
+  }
+  
+  /**
+   * Check if application has a page
+   * @param Page $page
+   * @return boolean
+   */
+  public function hasPage(Page $page){
+    if(!$this->applicationPages) return false;
+    foreach($this->applicationPages as $applicationPage){
+      if($applicationPage->getPage() == $page){
+        return true;
+      }
+    }
+    return false;
   }
   
   /**
