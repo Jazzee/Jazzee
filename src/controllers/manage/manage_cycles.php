@@ -72,8 +72,10 @@ class ManageCyclesController extends \Jazzee\AdminController {
         foreach($cycle->getRequiredPages() as $page){
           $cycle->getRequiredPages()->removeElement($page);
         }
-        foreach($input->get('requiredPages') as $id){
-          $cycle->addRequiredPage($globalPages[$id]);
+        if($input->get('requiredPages')){
+          foreach($input->get('requiredPages') as $id){
+            $cycle->addRequiredPage($globalPages[$id]);
+          }
         }
         $this->_em->persist($cycle);
         $this->addMessage('success', "Changes Saved Successfully");
