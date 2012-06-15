@@ -50,13 +50,31 @@ class ManageCyclesController extends \Jazzee\AdminController {
       $element->setLabel('End Date');
       $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
       $element->setValue($cycle->getEnd()->format('m/d/Y'));
-  
+      
+      $element = $field->newElement('CheckboxList','requiredPages');
+      $element->setLabel('Required Pages');
+      $globalPages = array();
+      $values = array();
+      foreach ($this->_em->getRepository('\Jazzee\Entity\Page')->findBy(array('isGlobal'=>true), array('title'=>'ASC')) as $page){
+        $globalPages[$page->getId()] = $page;
+        $element->newItem($page->getId(), $page->getTitle());
+        if($cycle->hasRequiredPage($page)){
+          $values[] = $page->getId();
+        }
+      }
+      $element->setValue($values);
       $form->newButton('submit', 'Save Changes');
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
         $cycle->setName($input->get('name'));
         $cycle->setStart($input->get('start'));
         $cycle->setEnd($input->get('end'));
+        foreach($cycle->getRequiredPages() as $page){
+          $cycle->getRequiredPages()->removeElement($page);
+        }
+        foreach($input->get('requiredPages') as $id){
+          $cycle->addRequiredPage($globalPages[$id]);
+        }
         $this->_em->persist($cycle);
         $this->addMessage('success', "Changes Saved Successfully");
         $this->redirectPath('manage/cycles');

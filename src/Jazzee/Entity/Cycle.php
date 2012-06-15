@@ -33,6 +33,11 @@ class Cycle{
   protected $applications;
   
   /**
+   * @ManyToMany(targetEntity="Page")
+  **/
+  private $requiredPages;
+  
+  /**
    * Get the id
    * @return integer
    */
@@ -90,6 +95,37 @@ class Cycle{
     $end = new \DateTime($dateTime);
     if($this->start and $end < $this->start) throw new \Jazzee\Exception('Cycle end date must be after start date.');
     $this->end = $end;
+  }
+  
+  /**
+   * Add a required page
+   * @param Page $page 
+   */
+  public function addRequiredPage(Page $page){
+    if(!$page->isGlobal()){
+      throw new \Jazzee\Exception("{$page->getTitle()} (#{$page->getId()}) is not a global page and cannot be a required page for a cycle");
+    }
+    $this->requiredPages[] = $page;
+  }
+  
+  /**
+   * Get the required pages for a cycle
+   * @return array Page
+   */
+  public function getRequiredPages(){
+    return $this->requiredPages;
+  }
+  
+  public function hasRequiredPage(Page $page){
+    if(count($this->requiredPages) == 0){
+      return false;
+    }
+    foreach($this->requiredPages as $p){
+      if($p == $page){
+        return true;
+      }
+    }
+    return false;
   }
 }
 
