@@ -141,6 +141,9 @@ class ApplicationPage
   public function setKind($kind){
     $allowed = array(self::APPLICATION, self::SIR_ACCEPT, self::SIR_DECLINE);
     if(!in_array($kind, $allowed)) throw new \Jazzee\Exception($kind . ' is not a valid application page kind.');
+    if(($kind = self::SIR_ACCEPT or $kind = self::SIR_DECLINE) AND !($this->getJazzeePage() instanceof \Jazzee\Interfaces\SirPage)){
+      throw new \Jazzee\Exception('Tried to set an SIR page kind, but ' . $this->getPage()->getClass() . ' does not implement \Jazzee\Interfaces\SirPage');
+    }
     $this->kind = $kind;
   }
   

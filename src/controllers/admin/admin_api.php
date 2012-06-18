@@ -220,18 +220,20 @@ class AdminApiController extends \Jazzee\AdminController {
     
     $pages = $this->dom->createElement("pages");
     foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
-      $page = $this->dom->createElement("page");
-      $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
-      $page->setAttribute('type', htmlentities($applicationPage->getPage()->getType()->getClass(),ENT_COMPAT,'utf-8'));
-      $page->setAttribute('pageId', $applicationPage->getPage()->getId());
-      $answersXml = $this->dom->createElement('answers');
-      $applicationPage->getJazzeePage()->setApplicant($applicant);
-      $applicationPage->getJazzeePage()->setController($this);
-      foreach($applicationPage->getJazzeePage()->getXmlAnswers($this->dom) as $answerXml){
-        $answersXml->appendChild($answerXml);
+      if($applicationPage instanceof \Jazzee\Interfaces\XmlPage){
+        $page = $this->dom->createElement("page");
+        $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
+        $page->setAttribute('type', htmlentities($applicationPage->getPage()->getType()->getClass(),ENT_COMPAT,'utf-8'));
+        $page->setAttribute('pageId', $applicationPage->getPage()->getId());
+        $answersXml = $this->dom->createElement('answers');
+        $applicationPage->getJazzeePage()->setApplicant($applicant);
+        $applicationPage->getJazzeePage()->setController($this);
+        foreach($applicationPage->getJazzeePage()->getXmlAnswers($this->dom) as $answerXml){
+          $answersXml->appendChild($answerXml);
+        }
+        $page->appendChild($answersXml);
+        $pages->appendChild($page);
       }
-      $page->appendChild($answersXml);
-      $pages->appendChild($page);
     }
     $applicantXml->appendChild($pages);
     

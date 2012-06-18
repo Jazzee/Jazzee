@@ -8,19 +8,14 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-class Branching extends Standard 
+class Branching extends Standard
 {
-  
-  const APPLY_PAGE_ELEMENT = 'Branching-apply_page';
-  const APPLICANTS_SINGLE_ELEMENT = 'Branching-applicants_single';
-  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageBranching.js';
   /**
    * 
    * Enter description here ...
    */
   protected function makeForm(){
     $form = new \Foundation\Form;
-    $form->setCSRFToken($this->_controller->getCSRFToken());
     $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
@@ -285,6 +280,18 @@ class Branching extends Standard
       if($value) $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
     }
   }
+  
+  public static function applyPageElement(){
+    return 'Branching-apply_page';
+  }
+  
+  public static function pageBuilderScriptPath(){
+    return 'resource/scripts/page_types/JazzeePageBranching.js';
+  }
+  
+  public static function applicantsSingleElement(){
+   return 'Branching-applicants_single';
+ }
   
   public static function lorApplicantsSingleElement(){
     return 'Branching-lor_applicants_single';

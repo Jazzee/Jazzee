@@ -8,11 +8,7 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-class Recommenders extends Standard {
-  const APPLY_PAGE_ELEMENT = 'Recommenders-apply_page';
-  const APPLICANTS_SINGLE_ELEMENT = 'Recommenders-applicants_single';
-  const APPLY_STATUS_ELEMENT = 'Recommenders-apply_status';
-  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageRecommenders.js';
+class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
   
   /**
    * These fixedIDs make it easy to find the element we are looking for
@@ -348,6 +344,22 @@ class Recommenders extends Standard {
       $pdf->writeTable();
     }
   }
+  
+  public static function applyPageElement(){
+    return 'Recommenders-apply_page';
+  }
+  
+  public static function pageBuilderScriptPath(){
+    return 'resource/scripts/page_types/JazzeePageRecommenders.js';
+  }
+  
+  public static function applyStatusElement(){
+    return 'Recommenders-apply_status';
+  }
+  
+  public static function applicantsSingleElement(){
+   return 'Recommenders-applicants_single';
+ }
   
   /**
    * Check variables before they are set

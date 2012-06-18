@@ -21,4 +21,4 @@ if($count = $applicant->unreadMessageCount()) $layoutContentTop .= '<sup class="
 $layoutContentTop .= '<a href="' . $this->controller->applyPath('/applicant/logout') . '">Log Out</a></p>';
 $this->controller->setLayoutVar('layoutContentTop', $layoutContentTop);
 $class = $page->getPage()->getType()->getClass();
-$this->renderElement($class::APPLY_PAGE_ELEMENT, array('page'=>$page, 'currentAnswerID'=>$currentAnswerID, 'applicant'=>$applicant));
+$this->renderElement($class::applyPageElement(), array('page'=>$page, 'currentAnswerID'=>$currentAnswerID, 'applicant'=>$applicant));

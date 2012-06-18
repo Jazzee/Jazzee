@@ -10,10 +10,7 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-class Payment extends Standard {
-  const APPLY_PAGE_ELEMENT = 'Payment-apply_page';
-  const APPLICANTS_SINGLE_ELEMENT = 'Payment-applicants_single';
-  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePagePayment.js';
+class Payment extends AbstractPage {
   /**
    * The payment type and the amount are selected first
    * then we display the form for the payment type
@@ -195,6 +192,18 @@ class Payment extends Standard {
     //if none of the payments are pending or settled we are incomplete
     return self::INCOMPLETE;
   }
+  
+  public static function applyPageElement(){
+    return 'Payment-apply_page';
+  }
+  
+  public static function pageBuilderScriptPath(){
+    return 'resource/scripts/page_types/JazzeePagePayment.js';
+  }
+  
+  public static function applicantsSingleElement(){
+   return 'Payment-applicants_single';
+ }
   
   /**
    * Rus cron jobs for payments types

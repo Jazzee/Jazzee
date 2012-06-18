@@ -326,7 +326,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page'=>$pageId, 'application'=>$this->_application->getId()));
     $this->setVar('variables', array('page'=>$page,'applicant'=>$applicant));
     $class = $page->getPage()->getType()->getClass();
-    $this->setVar('element', $class::APPLICANTS_SINGLE_ELEMENT);
+    $this->setVar('element', $class::applicantsSingleElement());
     $this->loadView($this->controllerName . '/element');
   }
   

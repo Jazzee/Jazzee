@@ -8,18 +8,52 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-class ETSMatch extends Standard {
-  const APPLY_PAGE_ELEMENT = 'ETSMatch-apply_page';
-  const APPLICANTS_SINGLE_ELEMENT = 'ETSMatch-applicants_single';
-  const APPLY_STATUS_ELEMENT = 'ETSMatch-apply_status';
-  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageETSMatch.js';
+class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
   /**
    * These fixedIDs make it easy to find the element we are looking for
    * @const integer
    */
   const FID_TEST_TYPE = 2;
   const FID_REGISTRATION_NUMBER = 4;
+  
   const FID_TEST_DATE = 6;
+  
+  /**
+   * Skip an optional page
+   * 
+   */
+  public function do_skip(){
+    if(count($this->getAnswers())){
+      $this->_controller->addMessage('error', 'You must delete your existing answers before you can skip this page.');
+      return false;
+    }
+    if(!$this->_applicationPage->isRequired()){
+      $answer = new \Jazzee\Entity\Answer();
+      $answer->setPage($this->_applicationPage->getPage());
+      $this->_applicant->addAnswer($answer);
+      $answer->setPageStatus(self::SKIPPED);
+      $this->_controller->getEntityManager()->persist($answer);
+    }
+  }
+  
+  public function do_unskip(){
+    $answers = $this->getAnswers();
+    if(count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){
+      $this->_applicant->getAnswers()->removeElement($answers[0]);
+      $this->_controller->getEntityManager()->remove($answers[0]);
+    }
+  }
+  
+  public function getStatus(){
+    $answers = $this->getAnswers();
+    if(!$this->_applicationPage->isRequired() and count($answers) and $answers[0]->getPageStatus() == self::SKIPPED){
+      return self::SKIPPED;
+    }
+    if(is_null($this->_applicationPage->getMin()) and count($answers)) return self::COMPLETE;
+    if(!is_null($this->_applicationPage->getMin()) and count($answers) >= $this->_applicationPage->getMin()) return self::COMPLETE;
+    
+    return self::INCOMPLETE;
+  }
   
   /**
    * Try and match a score to an answer
@@ -288,4 +322,20 @@ class ETSMatch extends Standard {
     if($countGre) $cron->log("Found {$countGre} new GRE score matches");
     if($countToefl) $cron->log("Found {$countToefl} new TOEFL score matches");
   }
+  
+  public static function applyPageElement(){
+    return 'ETSMatch-apply_page';
+  }
+  
+  public static function pageBuilderScriptPath(){
+    return 'resource/scripts/page_types/JazzeePageETSMatch.js';
+  }
+  
+  public static function applyStatusElement(){
+    return 'ETSMatch-apply_status';
+  }
+  
+  public static function applicantsSingleElement(){
+   return 'ETSMatch-applicants_single';
+ }
 }

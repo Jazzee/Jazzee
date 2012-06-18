@@ -8,8 +8,9 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-abstract class AbstractPage implements \Jazzee\Interfaces\Page {
+abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage, \Jazzee\Interfaces\ReviewPage, \Jazzee\Interfaces\PdfPage, \Jazzee\Interfaces\CsvPage, \Jazzee\Interfaces\XmlPage {
   const ERROR_MESSAGE = 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.';
+  
  /**
   * The ApplicationPage Entity
   * @var \Jazzee\Entity\ApplicationPage
@@ -34,34 +35,18 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
    */
   protected $_form;
   
- /**
-  * Contructor
-  * 
-  * @param \Jazzee\Entity\ApplicationPage $applicationPage
-  */
   public function __construct(\Jazzee\Entity\ApplicationPage $applicationPage){
     $this->_applicationPage = $applicationPage;
   }
   
-  /**
-   * 
-   * @see Jazzee.Page::setController()
-   */
   public function setController(\Jazzee\Controller $controller){
     $this->_controller = $controller;
   }
   
-  /**
-   * 
-   * @see Jazzee.Page::setApplicant()
-   */
   public function setApplicant(\Jazzee\Entity\Applicant $applicant){
     $this->_applicant = $applicant;
   }
-  
-  /**
-   * @see Jazzee.Page::getForm()
-   */
+
   public function getForm(){
     if(is_null($this->_form)) $this->_form = $this->makeForm();
     //reset the CSRF token on every request so when submission fails token validation doesn't even if the session has timed out
@@ -71,14 +56,22 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
   
   /**
    * Make the form for the page
-   * @return \Foundation\Form or false if no form
+   * @return \Foundation\Form
    */
-  abstract protected function makeForm();
-  
-  /**
-   * 
-   * @see Jazzee.Page::validateInput()
-   */
+  protected function makeForm(){
+    $form = new \Foundation\Form;
+    $form->setAction($this->_controller->getActionPath());
+    $field = $form->newField();
+    $field->setLegend($this->_applicationPage->getTitle());
+    $field->setInstructions($this->_applicationPage->getInstructions());
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
+      $element->getJazzeeElement()->addToField($field);
+    }
+    $form->newButton('submit', 'Save');
+    return $form;
+  }
+
   public function validateInput($arr){
     if($input = $this->getForm()->processInput($arr)){
       return $input;
@@ -87,20 +80,118 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
     return false;
   }
   
+  public function newAnswer($input){
+    if(is_null($this->_applicationPage->getMax()) or count($this->getAnswers()) < $this->_applicationPage->getMax()){
+      $answer = new \Jazzee\Entity\Answer();
+      $answer->setPage($this->_applicationPage->getPage());
+      $this->_applicant->addAnswer($answer);
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $answer->addElementAnswer($elementAnswer);
+        }
+      }
+      $this->getForm()->applyDefaultValues();
+      $this->_controller->getEntityManager()->persist($answer);
+      $this->_controller->addMessage('success', 'Answer Saved Successfully');
+      //flush here so the answerId will be correct when we view
+      $this->_controller->getEntityManager()->flush();
+    }
+  }
+  
+  public function updateAnswer($input, $answerId){
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      foreach($answer->getElementAnswers() as $ea){
+        $answer->getElementAnswers()->removeElement($ea);
+        $this->_controller->getEntityManager()->remove($ea);
+      }
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
+        foreach($element->getJazzeeElement()->getElementAnswers($input->get('el'.$element->getId())) as $elementAnswer){
+          $answer->addElementAnswer($elementAnswer);
+        }
+      }
+      $this->getForm()->applyDefaultValues();
+      $this->getForm()->setAction($this->_controller->getActionPath());
+      $this->_controller->getEntityManager()->persist($answer);
+      $this->_controller->addMessage('success', 'Answer Updated Successfully');
+    }
+  }
+
+  public function deleteAnswer($answerId){
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      $this->_controller->getEntityManager()->remove($answer);
+      $this->_applicant->getAnswers()->removeElement($answer);
+      $this->_applicant->markLastUpdate();
+      $this->_controller->getEntityManager()->persist($this->_applicant);
+      $this->_controller->addMessage('success', 'Answered Deleted Successfully');
+    }
+  }
+  
+  public function fill($answerId){
+    if($answer = $this->_applicant->findAnswerById($answerId)){
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $element->getJazzeeElement()->setController($this->_controller);
+        $value = $element->getJazzeeElement()->formValue($answer);
+        if($value) $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
+      }
+      $this->getForm()->setAction($this->_controller->getActionPath() . "/edit/{$answerId}");
+    }
+  }
+  
+  /**
+   * Get all the answers for this page
+   * @return \Jazzee\Entity\Answer
+   */
+  public function getAnswers(){
+    return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
+  }
+  
+  public function getXmlAnswers(\DOMDocument $dom){
+    $answers = array();
+    foreach($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer){
+      $answers[] = $this->xmlAnswer($dom, $answer);
+    }
+    return $answers;
+  }
+  
   /**
    * Most pages don't require any setup
-   * @see Jazzee.Page::setupNewPage()
+   * 
    */
   public function setupNewPage(){
     return;
   }
   
-/**
-   * (non-PHPdoc)
-   * @see Jazzee.Page::showReviewPage()
+  /**
+   * Default CSV headers are just the elements for a page
+   * @return array 
    */
-  public function showReviewPage(){
-    return true;
+  public function getCsvHeaders(){
+    $headers = array();
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $headers[] = $element->getTitle();
+    }
+    return $headers;
+  }
+  
+  /**
+   * Defaults to just usign the element display values
+   * @param int $position
+   * @return array
+   */
+  function getCsvAnswer($position){
+    $arr = array();
+    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $element->getJazzeeElement()->setController($this->_controller);
+      if(isset($answers[$position])){
+        $arr[] = $element->getJazzeeElement()->displayValue($answers[$position]);
+      } else {
+        $arr[] = '';
+      }
+    }
+    return $arr;
   }
   
   /**
@@ -137,37 +228,6 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
     }
     $answerXml->appendChild($children);
     return $answerXml;
-  }
-  
-  /**
-   * Default CSV headers are just the elements for a page
-   * @return array 
-   */
-  public function getCsvHeaders(){
-    $headers = array();
-    foreach($this->_applicationPage->getPage()->getElements() as $element){
-      $headers[] = $element->getTitle();
-    }
-    return $headers;
-  }
-  
-  /**
-   * Defaults to just usign the element display values
-   * @param int $position
-   * @return array
-   */
-  function getCsvAnswer($position){
-    $arr = array();
-    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
-    foreach($this->_applicationPage->getPage()->getElements() as $element){
-      $element->getJazzeeElement()->setController($this->_controller);
-      if(isset($answers[$position])){
-        $arr[] = $element->getJazzeeElement()->displayValue($answers[$position]);
-      } else {
-        $arr[] = '';
-      }
-    }
-    return $arr;
   }
   
   /**
@@ -212,14 +272,4 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page {
     if($this->_controller instanceof \Jazzee\AdminController) return true;
     throw new \Jazzee\Exception('Admin only action was called from a non admin controller');
   }
-  
-  /**
-   * Abstract page kills all queries
-   * @param \stdClass $obj 
-   */
-  public function testQuery(\stdClass $obj){
-    return false;
-  }
 }
-
-?>

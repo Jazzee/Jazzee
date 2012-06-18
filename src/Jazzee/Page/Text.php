@@ -8,25 +8,49 @@ namespace Jazzee\Page;
  * @package jazzee
  * @subpackage pages
  */
-class Text extends Standard {
-  const APPLY_PAGE_ELEMENT = 'Text-apply_page';
-  const APPLICANTS_SINGLE_ELEMENT = '';
-  const APPLY_STATUS_ELEMENT = '';
-  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageText.js';
+class Text implements \Jazzee\Interfaces\Page {
+  
+ /**
+  * The ApplicationPage Entity
+  * @var \Jazzee\Entity\ApplicationPage
+  */
+  protected $_applicationPage;
+    
+  /**
+   * Our controller
+   * @var \Jazzee\Controller
+   */
+  protected $_controller;
   
   /**
-   * (non-PHPdoc)
-   * @see Jazzee.Page::showReviewPage()
+   * The Applicant
+   * @var \Jazzee\Entity\Applicant
    */
-  public function showReviewPage(){
-    return false;
+  protected $_applicant;
+  
+ /**
+  * Contructor
+  * 
+  * @param \Jazzee\Entity\ApplicationPage $applicationPage
+  */
+  public function __construct(\Jazzee\Entity\ApplicationPage $applicationPage){
+    $this->_applicationPage = $applicationPage;
   }
   
   /**
-   * Text pages dont have forms
+   * 
+   * @see Jazzee.Page::setController()
    */
-  protected function makeForm(){
-    return false;
+  public function setController(\Jazzee\Controller $controller){
+    $this->_controller = $controller;
+  }
+  
+  /**
+   * 
+   * @see Jazzee.Page::setApplicant()
+   */
+  public function setApplicant(\Jazzee\Entity\Applicant $applicant){
+    $this->_applicant = $applicant;
   }
   
   /**
@@ -34,6 +58,32 @@ class Text extends Standard {
    */
   public function getStatus(){
     return self::COMPLETE;
+  }
+  
+  public static function applyPageElement(){
+    return 'Text-apply_page';
+  }
+  
+  public static function pageBuilderScriptPath(){
+    return 'resource/scripts/page_types/JazzeePageText.js';
+  }
+  
+  /**
+   * No Special setup
+   * @return null
+   */
+  public function setupNewPage(){
+    return;
+  }
+  
+  /**
+   * By default just set the varialbe dont check it
+   * @param string $name
+   * @param string $value 
+   */
+  public function setVar($name, $value){
+    $var = $this->_applicationPage->getPage()->setVar($name, $value);
+    $this->_controller->getEntityManager()->persist($var);
   }
 }
 ?>

@@ -172,9 +172,9 @@
   <div id='pages'>
     <?php 
     foreach($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
-      if($applicationPage->getJazzeePage()->showReviewPage()){
+      if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\ReviewPage){
         $class = $applicationPage->getPage()->getType()->getClass();
-        $this->renderElement($class::APPLICANTS_SINGLE_ELEMENT, array('page'=>$applicationPage, 'applicant'=>$applicant));
+        $this->renderElement($class::applicantsSingleElement(), array('page'=>$applicationPage, 'applicant'=>$applicant));
       }
     }
     ?>

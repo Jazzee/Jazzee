@@ -26,10 +26,10 @@ abstract class PageBuilder extends AdminController{
     
     $types = $this->_em->getRepository('\Jazzee\Entity\PageType')->findAll();
     $scripts = array();
-    $scripts[] = $this->path(\Jazzee\Interfaces\Page::PAGEBUILDER_SCRIPT);
+    $scripts[] = $this->path('resource/scripts/page_types/JazzeePage.js');
     foreach($types as $type){
       $class = $type->getClass();
-      $scripts[] = $this->path($class::PAGEBUILDER_SCRIPT);
+      $scripts[] = $this->path($class::pageBuilderScriptPath());
     }
     $scripts = array_unique($scripts);
     foreach($scripts as $path) $this->addScript($path);

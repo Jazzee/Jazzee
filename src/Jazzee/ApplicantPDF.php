@@ -162,9 +162,11 @@ class ApplicantPDF {
     $this->addText("Admission Status: {$status}\n", 'p');
     $this->write();
     foreach($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page){
-      $page->getJazzeePage()->setApplicant($applicant);
-      $page->getJazzeePage()->setController($this->_controller);
-      $page->getJazzeePage()->renderPdfSection($this);
+      if($page->getJazzeePage() instanceof \Jazzee\Interfaces\PdfPage){
+        $page->getJazzeePage()->setApplicant($applicant);
+        $page->getJazzeePage()->setController($this->_controller);
+        $page->getJazzeePage()->renderPdfSection($this);
+      }
     }
     $this->pdf->end_page_ext("");
     foreach($applicant->getAttachments() as $attachment) $this->addPdf ($attachment->getAttachment());

@@ -697,7 +697,7 @@ class Applicant{
     $total = 0;
     $pages = $this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
     foreach($pages as $pageEntity){
-      if($pageEntity->getJazzeePage()->showReviewPage()){
+      if($pageEntity->getJazzeePage() instanceof \Jazzee\Interfaces\ReviewPage){
         $total++;
         $pageEntity->getJazzeePage()->setApplicant($this);
         if($pageEntity->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::COMPLETE OR $pageEntity->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) $complete++;

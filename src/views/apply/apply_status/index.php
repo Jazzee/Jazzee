@@ -18,7 +18,7 @@ if($applicant->isLocked()){
   foreach($pages as $page){
     if($page->answerStatusDisplay()){
       $class = $page->getPage()->getType()->getClass();
-      $this->renderElement($class::APPLY_STATUS_ELEMENT, array('page'=>$page));
+      $this->renderElement($class::applyStatusElement(), array('page'=>$page));
     }
   }
 }

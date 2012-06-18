@@ -11,8 +11,6 @@ require_once __DIR__ . '/../../../lib/qas/qaddress.inc';
  */
 class QASAddress extends Standard 
 {
-  const APPLY_PAGE_ELEMENT = 'QASAddress-apply_page';
-  const PAGEBUILDER_SCRIPT = 'resource/scripts/page_types/JazzeePageQASAddress.js';
   
   /**
    * Element Fixed IDs 
@@ -317,5 +315,13 @@ class QASAddress extends Standard
     } else {
       $this->newAnswer($input);
     }
+  }
+  
+  public static function applyPageElement(){
+    return 'QASAddress-apply_page';
+  }
+  
+  public static function pageBuilderScriptPath(){
+    return 'resource/scripts/page_types/JazzeePageQASAddress.js';
   }
 }

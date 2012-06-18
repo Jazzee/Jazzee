@@ -80,8 +80,13 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
    * @param array \Jazzee\Entity\Applicant $applicants
    */
   protected function makeXls(array $applicants){
-    $applicationPages = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc'));  
+    $applicationPages = array();
     $applicationPagesAnswerCount = array();
+    foreach($this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$this->_application->getId(), 'kind'=>\Jazzee\Entity\ApplicationPage::APPLICATION), array('weight'=> 'asc')) as $applicationPage){
+      if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\CsvPage){
+        $applicationPages[] = $applicationPage;
+      }
+    }
     foreach($applicationPages as $applicationPage) $applicationPagesAnswerCount[$applicationPage->getPage()->getId()] = 1;
     foreach($applicants as $applicant){
       foreach($applicationPages as $applicationPage){
@@ -200,16 +205,18 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
       
       $pages = $xml->createElement("pages");
       foreach($applicationPages as $applicationPage){
-        $page = $xml->createElement("page");
-        $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
-        $page->setAttribute('pageId', $applicationPage->getPage()->getId());
-        $answersXml = $xml->createElement('answers');
-        $applicationPage->getJazzeePage()->setApplicant($applicant);
-        foreach($applicationPage->getJazzeePage()->getXmlAnswers($xml) as $answerXml){
-          $answersXml->appendChild($answerXml);
+        if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\XmlPage){
+          $page = $xml->createElement("page");
+          $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
+          $page->setAttribute('pageId', $applicationPage->getPage()->getId());
+          $answersXml = $xml->createElement('answers');
+          $applicationPage->getJazzeePage()->setApplicant($applicant);
+          foreach($applicationPage->getJazzeePage()->getXmlAnswers($xml) as $answerXml){
+            $answersXml->appendChild($answerXml);
+          }
+          $page->appendChild($answersXml);
+          $pages->appendChild($page);
         }
-        $page->appendChild($answersXml);
-        $pages->appendChild($page);
       }
       $applicantXml->appendChild($pages);
       $applicantsXml->appendChild($applicantXml);
