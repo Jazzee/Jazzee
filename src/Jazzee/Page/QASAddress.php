@@ -55,6 +55,8 @@ class QASAddress extends Standard
     
     $element = $field->newElement('TextInput','postalCode');
     $element->setLabel('ZIP or Postal Code');
+    $element->setFormat('');
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 60));
     
     $element = $field->newElement('SelectList','country');
     $element->setLabel('Country');
