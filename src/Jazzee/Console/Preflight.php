@@ -27,7 +27,6 @@ class Preflight extends \Symfony\Component\Console\Command\Command
           'curl',
           'json',
           'imagick',
-          'uuid',
           'mbstring',
           'xml',
           'dom'    
