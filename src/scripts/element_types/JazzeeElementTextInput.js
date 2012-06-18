@@ -9,6 +9,18 @@ JazzeeElementTextInput.prototype.constructor = JazzeeElementTextInput;
 JazzeeElementTextInput.prototype.avatar = function(){
   return $('<input type="text" disabled="true">');
 };
+
+/**
+ * Override JazzeeElement new page to set max default
+ * @param {String} id the id to use
+ * @returns {JazzeeElementRankingList}
+ */
+JazzeeElementTextInput.prototype.newElement = function(id,title,typeId,typeName,typeClass,status,page){
+  var element = JazzeeElement.prototype.newElement.call(this,id,title,typeId,typeName,typeClass,status,page);
+  element.max = 255;
+  return element;
+};
+
 /**
  * Add minimum and maximum sliders
  * @returns {jQuery}
@@ -35,7 +47,7 @@ JazzeeElementTextInput.prototype.elementProperties = function(){
   slider.slider({
     value: elementClass.max,
     min: 0,
-    max: 250,
+    max: 255,
     step: 5,
     slide: function( event, ui ) {
       elementClass.setProperty('max', ui.value);

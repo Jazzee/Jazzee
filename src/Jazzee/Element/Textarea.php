@@ -25,10 +25,15 @@ class Textarea extends AbstractElement {
       $validator = new \Foundation\Form\Validator\MinimumLength($element, (int)$this->_element->getMin());
       $element->addValidator($validator);
     }
-    if($this->_element->getMax()){
-      $validator = new \Foundation\Form\Validator\MaximumLength($element, (int)$this->_element->getMax());
-      $element->addValidator($validator);
+    
+    //restrict to 1M chars so the DB cant be filled with 4GB text dumps
+    if(!$this->_element->getMax() or $this->_element->getMax() > 1000000){
+      $max = 1000000;
+    } else {
+      $max = (int)$this->_element->getMax();
     }
+    $validator = new \Foundation\Form\Validator\MaximumLength($element,$max);
+    $element->addValidator($validator);
     $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     return $element;
   }

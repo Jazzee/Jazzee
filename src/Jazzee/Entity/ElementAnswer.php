@@ -34,7 +34,7 @@ class ElementAnswer{
   /** @Column(type="integer", nullable=true) */
   private $position;
   
-  /** @Column(type="string", nullable=true) */
+  /** @Column(type="string", length=255, nullable=true) */
   private $eShortString;
   
   /** @Column(type="text", nullable=true) */
