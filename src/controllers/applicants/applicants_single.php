@@ -19,6 +19,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   const ACTION_UNLOCK = 'UnLock';
   const ACTION_ADDTAG = 'Tag';
   const ACTION_REMOVETAG = 'Remove Tag';
+  const ACTION_IGNOREDUPLICATE = 'Mark a duplicate applicant as ignored';
   const ACTION_ATTACHAPPLICANTPDF = 'Attach PDF';
   const ACTION_DELETEAPPLICANTPDF = 'Delete PDF';
   const ACTION_EDITANSWER = 'Edit Answer';
@@ -822,6 +823,34 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $form->setAction($this->path("applicants/single/{$applicantId}/addAnswer/{$pageId}"));
     $this->setVar('form', $form);
     $this->loadView($this->controllerName . '/form');
+  }
+  
+  /**
+   * Edit an answer
+   * @param integer $applicantId
+   * @param integer $answerId
+   */
+  public function actionIgnoreDuplicate($applicantId, $duplicateId){
+    $applicant = $this->getApplicantById($applicantId);
+    if(!$duplicate = $applicant->getDuplicateById($duplicateId))  throw new \Jazzee\Exception("Duplicate {$duplicateId} does not belong to applicant {$applicantId}");
+    $duplicate->ignore();
+    $this->_em->persist($duplicate);
+    $this->auditLog($applicant, 'Ignored Duplicate application for ' . $duplicate->getDuplicate()->getFullName());
+    $duplicates = array();
+    foreach($applicant->getDuplicates() as $duplicate){
+      if(!$duplicate->isIgnored()){
+        $duplicates[] = array(
+          'id' => $duplicate->getId(),
+          'name' => $duplicate->getDuplicate()->getFullName(),
+          'complete' => $duplicate->getDuplicate()->getPercentComplete()*100,
+          'program' => $duplicate->getDuplicate()->getApplication()->getProgram()->getName()
+        );
+      }
+    }
+    $this->setLayoutVar('status', 'success');
+    $this->setVar('result', array('duplicates'=> $duplicates));
+    $this->addMessage('success', "Duplicate Ignored");
+    $this->loadView($this->controllerName . '/result');
   }
   
   /**

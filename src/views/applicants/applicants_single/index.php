@@ -144,12 +144,26 @@
     ?>
   </div>
   <div id="duplicates">
-    <?php if($duplicates = $applicant->getDuplicates()){?>
+    <?php 
+      $duplicates = array();
+      foreach($applicant->getDuplicates() as $duplicate){
+        if(!$duplicate->isIgnored()){
+          $duplicates[] = $duplicate;
+        }
+      }
+    ?>
+    <?php if(count($duplicates)){?>
       <fieldset>
-        <legend>Possible Duplicate Applications (<?php print count($duplicates); ?>)</legend>
+        <legend>Possible Duplicate Applicants (<?php print count($duplicates); ?>)</legend>
         <ul>
           <?php foreach($duplicates as $duplicate){ ?>
-            <li><em><?php print $duplicate->getDuplicate()->getFullName(); ?></em> <?php print $duplicate->getDuplicate()->getPercentComplete()*100; ?> % completed in <?php print $duplicate->getDuplicate()->getApplication()->getProgram()->getName(); ?></li>
+            <li>
+              <em><?php print $duplicate->getDuplicate()->getFullName(); ?></em> 
+              <?php print $duplicate->getDuplicate()->getPercentComplete()*100; ?> % completed in <?php print $duplicate->getDuplicate()->getApplication()->getProgram()->getName(); ?>
+              <?php if($this->controller->checkIsAllowed('applicants_single', 'ignoreDuplicate')){ ?>
+                &nbsp;(<a class='ignoreDuplicate' href="<?php print $this->path("applicants/single/{$applicant->getId()}/ignoreDuplicate/{$duplicate->getId()}");?>">Ignore</a>)
+              <?php } ?>
+            </li>
           <?php } ?>
         </ul>
       </fieldset>

@@ -12,6 +12,7 @@ Applicant.prototype.init = function(){
   this.parseBio();
   this.parseActions();
   this.parseDecisions();
+  this.parseDuplicates();
   $('a#actas').click(function(e){
     $.get($(e.target).attr('href'),function(json){
       window.open(json.data.result.link);
@@ -109,6 +110,32 @@ Applicant.prototype.parseBio = function(){
   });
 };
 
+/**
+ *Parse the duplicates section and activate links
+ */
+Applicant.prototype.parseDuplicates = function(){
+  var self = this;
+  $('#duplicates a.ignoreDuplicate').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      $('#duplicates').empty().hide();
+      if(json.data.result.duplicates.length > 0){
+        var ul = $('<ul>');
+        for(var i = 0; i < json.data.result.duplicates.length; i++){
+          var obj = json.data.result.duplicates[i];
+          ul.append($('<li>').html("<em>"+obj.name+"</em> " + obj.complete + " % completed in " + obj.program).append($('<a>').addClass('ignoreDuplicate').attr('href', self.baseUrl + '/ignoreDuplicate/'+obj.id).html('ignore').before(' (').after(')')));
+        }
+        var fieldset = $('<fieldset>');
+        fieldset.append($('<legend>').html('Possible Duplicate Applicants (' + json.data.result.duplicates.length + ')'));
+        fieldset.append(ul);
+        $('#duplicates').append(fieldset);
+        $('#duplicates').show();
+        self.parseDuplicates();
+      }
+    });
+    return false;
+  });
+};
+  
 /**
  * Display Biographic information
  * @param Object json

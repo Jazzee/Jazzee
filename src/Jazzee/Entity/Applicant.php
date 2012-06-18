@@ -648,6 +648,21 @@ class Applicant{
   }
 
   /**
+   * Get duplicate by ID
+   * 
+   * @param integer $duplicateId
+   * @return Doctrine\Common\Collections\Collection $duplicates
+   */
+  public function getDuplicateById($duplicateId){
+    foreach($this->duplicates as $duplicate){
+      if($duplicate->getId() == $duplicateId){
+        return $duplicate;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Get Audit Logs
    *
    * @return Doctrine\Common\Collections\Collection $auditLogs

@@ -19,11 +19,18 @@ class ApplicantsDuplicatesController extends \Jazzee\AdminController {
    */
   public function actionIndex(){
     $applicants = array();
+    $applicantsIgnored = array();
     foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%','%', $this->_application) as $applicant){
-      $duplicates = $applicant->getDuplicates();
-      if(count($duplicates))$applicants[] = $applicant;
+      foreach($applicant->getDuplicates() as $duplicate){
+        if($duplicate->isIgnored()){
+          $applicantsIgnored[$applicant->getId()] = $applicant;
+        } else {
+          $applicants[$applicant->getId()] = $applicant;
+        }
+      }
     }
     $this->setVar('applicants', $applicants);
+    $this->setVar('applicantsIgnored', $applicantsIgnored);
   }
   
   /**

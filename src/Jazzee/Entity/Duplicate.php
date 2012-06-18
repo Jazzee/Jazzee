@@ -38,7 +38,14 @@ class Duplicate{
    */
   private $duplicate;
   
-  
+  /**
+   * Get the ID
+   * 
+   * @return integer 
+   */
+  public function getId(){
+    return $this->id;
+  }  
 
   /**
    * Set applicant
