@@ -89,19 +89,31 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     
   }
   
-  public function newAnswer($input){
+  /**
+   * Fix the registration numner
+   * 
+   * Transform out leading 0s and non numeric chars
+   * @param \Foundation\Form\Input $input
+   */
+  protected function fixRegistrationNumber(\Foundation\Form\Input $input){
     $e = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
+    $value = $input->get('el'.$e->getId());
+    $value = preg_replace('#[^0-9]#','', $value);
+    $value = ltrim($value, '0');
     //trim leading zeros from Registration Number
-    $input->set('el'.$e->getId(), ltrim($input->get('el'.$e->getId()), '0'));
+    $input->set('el'.$e->getId(), $value);
+    
+  }
+  
+  public function newAnswer($input){
+    $this->fixRegistrationNumber($input);
     parent::newAnswer($input);
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
   }
   
   public function updateAnswer($input, $answerId){
-    $e = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
-    //trim leading zeros from Registration Number
-    $input->set('el'.$e->getId(), ltrim($input->get('el'.$e->getId()), '0'));
+    $this->fixRegistrationNumber($input);
     parent::updateAnswer($input, $answerId);
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
@@ -203,7 +215,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     $this->_applicationPage->getPage()->addElement($element);
     $element->setType($elementTypes['\\Jazzee\Element\TextInput']);
     $element->setTitle('ETS Registration Number');
-    $element->setFormat('no leading zeros');
+    $element->setFormat('no leading zeros or hyphens');
     $element->required();
     $element->setWeight(2);
     $element->setFixedId(self::FID_REGISTRATION_NUMBER);
