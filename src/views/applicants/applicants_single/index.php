@@ -143,6 +143,18 @@
     }
     ?>
   </div>
+  <div id="duplicates">
+    <?php if($duplicates = $applicant->getDuplicates()){?>
+      <fieldset>
+        <legend>Possible Duplicate Applications (<?php print count($duplicates); ?>)</legend>
+        <ul>
+          <?php foreach($duplicates as $duplicate){ ?>
+            <li><em><?php print $duplicate->getDuplicate()->getFullName(); ?></em> <?php print $duplicate->getDuplicate()->getPercentComplete()*100; ?> % completed in <?php print $duplicate->getDuplicate()->getApplication()->getProgram()->getName(); ?></li>
+          <?php } ?>
+        </ul>
+      </fieldset>
+    <?php } ?>
+  </div>
   <div id='pages'>
     <?php 
     foreach($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
