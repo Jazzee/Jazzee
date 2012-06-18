@@ -21,7 +21,7 @@
         {
             "package": "jazzee/foundation",
             "version": "dev-master",
-            "source-reference": "edf2609f3f1c4c581c2c61fcf5245775d7cbd4ef"
+            "source-reference": "52eefaea523d8d334fa91575603471ef6ff3e1a3"
         },
         {
             "package": "monolog/monolog",
