@@ -13,20 +13,35 @@
   </target>
 
   <target name="src" description="Prepares a clean source tree">
-	  <copy todir="${build}/jazzee">
-	    <fileset dir="${source}" includes="src/ webroot/ setup/ var/"/>
-	  </copy>
-	  <copy todir="${build}/jazzee/etc">
-      <fileset dir="${source}/etc/" excludes="config.ini.php"/>
-    </copy>
-    <copy todir="${build}/jazzee/lib">
-      <fileset dir="${source}/lib/" />
+    <copy todir="${build}/jazzee">
+      <fileset dir="${source}" includes="etc/ src/ webroot/ setup/ var/ vendor/ lib/"/>
+      <fileset dir="${source}/etc" excludes="config.ini.php"/>
     </copy>
  </target>
+ 
+ <target name="composer" description="Install dependencies using composer">
+    <get src="http://getcomposer.org/installer" dest="${build}/composerinstaller"/>
+    <exec executable="php" failonerror="true">
+      <arg value="${build}/composerinstaller" />
+      <arg line="--install-dir=${build}" />
+    </exec>
+    <exec executable="php" failonerror="true">
+      <arg value="${build}/composer.phar" />
+      <arg value="install" />
+    </exec>
+  </target>
 
- <target name="export" depends="clean,src"/>
+ <target name="export" depends="clean,composer,src"/>
  <target name="archive" depends="export">
-   <tar destfile="${basedir}/build/jazzee.tar.gz" basedir="${basedir}/build/jazzee" compression="gzip" />
+   <exec executable="git" outputproperty="build.version">
+     <arg value="describe"/>
+     <arg value="--tags"/>
+     <arg value="--abbrev=0"/>
+   </exec>
+   <delete dir="${build}/archive"/>
+   <mkdir dir="${build}/archive"/>
+   <move file="${build}/jazzee" tofile="${build}/archive/jazzee-${build.version}" />
+   <tar destfile="${basedir}/build/jazzee-${build.version}.tar.gz" basedir="${basedir}/build/archive" compression="gzip" longfile="gnu" />
  </target>
  
   <target name="apidocs" description="Build API Documentation">
