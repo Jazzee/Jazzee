@@ -11,7 +11,10 @@
   <?php
     $jp = $page->getApplicationPageJazzeePage();
     $jp->setController($this->controller);
-    $this->renderElement('form', array('form'=> $jp->getForm()));
+    $form = $jp->getForm();
+    $element = $form->getElementByName('submit');
+    $element->setValue('Submit Recommendation (Cannot be undone)');
+    $this->renderElement('form', array('form'=> $form));
   ?>
 <div id='trailingText'><?php print $page->getTrailingText()?></div>
   
