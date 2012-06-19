@@ -9,8 +9,8 @@
  * 
  */
 namespace Jazzee\AdminAuthentication;
-require_once 'OpenID/RelyingParty.php';
-require_once 'OpenID/Extension/AX.php';
+@include_once 'OpenID/RelyingParty.php';
+@include_once 'OpenID/Extension/AX.php';
 class OpenID implements \Jazzee\Interfaces\AdminAuthentication{
   const LOGIN_ELEMENT = 'OpenID_Login';
   
@@ -35,6 +35,9 @@ class OpenID implements \Jazzee\Interfaces\AdminAuthentication{
    * @param \Jazzee\Interfaces\AdminController
    */
   public function __construct(\Jazzee\Interfaces\AdminController $controller){
+    if(!class_exists('OpenID')){
+      throw new \Jazzee\Exception("Pear OpenID library is required to use OpenID for authentication.");
+    }
     $this->_controller = $controller;
     if($this->_controller->getStore()->check(self::SESSION_VAR_ID)){
       $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$this->_controller->getStore()->get(self::SESSION_VAR_ID)));
