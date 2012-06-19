@@ -773,6 +773,22 @@ class Applicant{
       return $dom;
     }
     
+    $auditLogs = $dom->createElement("auditLogs");
+    foreach($this->getAuditLogs() as $log){
+      $logXml = $dom->createElement('log');
+      $logXml->setAttribute('id', $log->getId());
+      $logXml->setAttribute('userId', $log->getUser()->getId());
+      $logXml->setAttribute('createAt', $log->getCreatedAt()->format('c'));
+      $user = $dom->createElement('user');
+      $user->appendChild($dom->createCDATASection($log->getUser()->getLastName() . ', ' . $log->getUser()->getFirstName()));
+      $logXml->appendChild($user);
+      $text = $dom->createElement('text');
+      $text->appendChild($dom->createCDATASection($log->getText()));
+      $logXml->appendChild($text);
+      $auditLogs->appendChild($logXml);
+    }
+    $applicantXml->appendChild($auditLogs);
+    
     $pages = $dom->createElement("pages");
     foreach($this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
       if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\XmlPage){
