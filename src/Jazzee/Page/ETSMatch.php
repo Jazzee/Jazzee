@@ -88,32 +88,30 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     }
     
   }
-  
+
   /**
-   * Fix the registration numner
+   * Fix the registration number
    * 
-   * Transform out leading 0s and non numeric chars
-   * @param \Foundation\Form\Input $input
+   * Transform out leading 0s and non numeric chars before processing input
+   * This way if we remove everything there will still be ab error for required input being blank
+   * @param array $arr
+   * @return \Foundation\Form\Input or boolean
    */
-  protected function fixRegistrationNumber(\Foundation\Form\Input $input){
+  public function validateInput($arr){
     $e = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
-    $value = $input->get('el'.$e->getId());
-    $value = preg_replace('#[^0-9]#','', $value);
-    $value = ltrim($value, '0');
-    //trim leading zeros from Registration Number
-    $input->set('el'.$e->getId(), $value);
-    
+    $key = 'el'.$e->getId();
+    $arr[$key] = preg_replace('#[^0-9]#','', $arr[$key]);
+    $arr[$key] = ltrim($arr[$key], '0');
+    return parent::validateInput($arr);
   }
   
   public function newAnswer($input){
-    $this->fixRegistrationNumber($input);
     parent::newAnswer($input);
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
   }
   
   public function updateAnswer($input, $answerId){
-    $this->fixRegistrationNumber($input);
     parent::updateAnswer($input, $answerId);
     //attempt to match any scores
     foreach($this->getAnswers() as $answer) $this->matchScore($answer);
