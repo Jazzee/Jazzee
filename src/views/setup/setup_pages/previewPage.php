@@ -7,5 +7,5 @@
  * @subpackage setup
  */
 $class = $page->getPage()->getType()->getClass();
-$this->renderElement($class::APPLY_PAGE_ELEMENT, array('page'=>$page, 'currentAnswerID'=>false, 'applicant'=>$applicant));
+$this->renderElement($class::applyPageElement(), array('page'=>$page, 'currentAnswerID'=>false, 'applicant'=>$applicant));
 ?>
