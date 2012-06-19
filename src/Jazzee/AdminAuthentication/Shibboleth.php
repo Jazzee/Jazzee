@@ -34,6 +34,8 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
     $this->_controller = $controller;
     if($this->_controller->getStore()->check(self::SESSION_VAR_ID)){
       $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->find($this->_controller->getStore()->get(self::SESSION_VAR_ID));
+    } else if(isset($_SERVER['Shib-Application-ID'])){ //this happens when the user is SHib authenticated, but not application authenticated.
+       $this->loginUser();
     }
   }
   
