@@ -19,8 +19,3 @@ Add AllowOverride FileInfo to the Jazzee Directory
 Install required php extensions::
 
   $sudo apt-get install php-log php5-imagick php-apc php-curl php-uuid php-htmlpurifier
-
-Install the Doctrine ORM::
-
-  $sudo pear config-set auto_discover 1
-  $sudo pear install pear.doctrine-project.org/DoctrineORM
