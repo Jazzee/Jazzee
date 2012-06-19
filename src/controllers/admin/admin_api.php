@@ -183,61 +183,9 @@ class AdminApiController extends \Jazzee\AdminController {
    * @return DOMElement
    */
   protected function singleApplicant(\Jazzee\Entity\Applicant $applicant, $partial = true){
-    $applicantXml = $this->dom->createElement("applicant");
-    $account = $this->dom->createElement("account");
-    $account->appendChild($this->dom->createElement('id', $applicant->getId()));
-    $account->appendChild($this->dom->createElement('firstName', $applicant->getFirstName()));
-    $account->appendChild($this->dom->createElement('middleName', $applicant->getMiddleName()));
-    $account->appendChild($this->dom->createElement('lastName', $applicant->getLastName()));
-    $account->appendChild($this->dom->createElement('suffix', $applicant->getSuffix()));
-    $account->appendChild($this->dom->createElement('email', $applicant->getEmail()));
-    $account->appendChild($this->dom->createElement('isLocked', $applicant->isLocked()?'yes':'no'));
-    $account->appendChild($this->dom->createElement('lastLogin', $applicant->getLastLogin()->format('c')));
-    $account->appendChild($this->dom->createElement('updatedAt', $applicant->getUpdatedAt()->format('c')));
-    $account->appendChild($this->dom->createElement('createdAt', $applicant->getCreatedAt()->format('c')));
-    $account->appendChild($this->dom->createElement('percentComplete', $applicant->getPercentComplete()));
-    $applicantXml->appendChild($account);
-    
-    $decision = $this->dom->createElement("decision");
-    $decision->appendChild($this->dom->createElement('status', $applicant->getDecision()?$applicant->getDecision()->status():'none'));
-    $decision->appendChild($this->dom->createElement('nominateAdmit', ($applicant->getDecision() and $applicant->getDecision()->getNominateAdmit())?$applicant->getDecision()->getNominateAdmit()->format('c'):''));
-    $decision->appendChild($this->dom->createElement('nominateDeny', ($applicant->getDecision() and $applicant->getDecision()->getNominateDeny())?$applicant->getDecision()->getNominateDeny()->format('c'):''));
-    $decision->appendChild($this->dom->createElement('finalAdmit', ($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit())?$applicant->getDecision()->getFinalAdmit()->format('c'):''));
-    $decision->appendChild($this->dom->createElement('finalDeny', ($applicant->getDecision() and $applicant->getDecision()->getFinalDeny())?$applicant->getDecision()->getFinalDeny()->format('c'):''));
-    $decision->appendChild($this->dom->createElement('acceptOffer', ($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer())?$applicant->getDecision()->getAcceptOffer()->format('c'):''));
-    $decision->appendChild($this->dom->createElement('declineOffer', ($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer())?$applicant->getDecision()->getDeclineOffer()->format('c'):''));
-    $applicantXml->appendChild($decision);
-    
-    $tags = $this->dom->createElement("tags");
-    foreach($applicant->getTags() as $tag){
-      $tagXml = $this->dom->createElement('tag');
-      $tagXml->setAttribute('tagId', $tag->getId());
-      $tagXml->appendChild($this->dom->createCDATASection($tag->getTitle()));
-      $tags->appendChild($tagXml);
-    }
-    $applicantXml->appendChild($tags);
-    if($partial) return $applicantXml;
-    
-    $pages = $this->dom->createElement("pages");
-    foreach($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
-      if($applicationPage instanceof \Jazzee\Interfaces\XmlPage){
-        $page = $this->dom->createElement("page");
-        $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
-        $page->setAttribute('type', htmlentities($applicationPage->getPage()->getType()->getClass(),ENT_COMPAT,'utf-8'));
-        $page->setAttribute('pageId', $applicationPage->getPage()->getId());
-        $answersXml = $this->dom->createElement('answers');
-        $applicationPage->getJazzeePage()->setApplicant($applicant);
-        $applicationPage->getJazzeePage()->setController($this);
-        foreach($applicationPage->getJazzeePage()->getXmlAnswers($this->dom) as $answerXml){
-          $answersXml->appendChild($answerXml);
-        }
-        $page->appendChild($answersXml);
-        $pages->appendChild($page);
-      }
-    }
-    $applicantXml->appendChild($pages);
-    
-    return $applicantXml;
+    $xml = $applicant->toXml($this, $partial);
+    $node = $this->dom->importNode($xml->documentElement, true);
+    return $node;
   }
   
   

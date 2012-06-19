@@ -168,58 +168,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController {
     $applicantsXml = $xml->createElement("applicants");
     
     foreach($applicants as $applicant){
-      $applicantXml = $xml->createElement("applicant");
-      
-      $account = $xml->createElement("account");
-      $account->appendChild($xml->createElement('id', $applicant->getId()));
-      $account->appendChild($xml->createElement('firstName', $applicant->getFirstName()));
-      $account->appendChild($xml->createElement('middleName', $applicant->getMiddleName()));
-      $account->appendChild($xml->createElement('lastName', $applicant->getLastName()));
-      $account->appendChild($xml->createElement('suffix', $applicant->getSuffix()));
-      $account->appendChild($xml->createElement('email', $applicant->getEmail()));
-      $account->appendChild($xml->createElement('isLocked', $applicant->isLocked()?'yes':'no'));
-      $account->appendChild($xml->createElement('lastLogin', $applicant->getLastLogin()->format('c')));
-      $account->appendChild($xml->createElement('updatedAt', $applicant->getLastLogin()->format('c')));
-      $account->appendChild($xml->createElement('createdAt', $applicant->getLastLogin()->format('c')));
-      $applicantXml->appendChild($account);
-      
-      $decision = $xml->createElement("decision");
-      $decision->appendChild($xml->createElement('status', $applicant->getDecision()?$applicant->getDecision()->status():'none'));
-      $decision->appendChild($xml->createElement('nominateAdmit', ($applicant->getDecision() and $applicant->getDecision()->getNominateAdmit())?$applicant->getDecision()->getNominateAdmit()->format('c'):''));
-      $decision->appendChild($xml->createElement('nominateDeny', ($applicant->getDecision() and $applicant->getDecision()->getNominateDeny())?$applicant->getDecision()->getNominateDeny()->format('c'):''));
-      $decision->appendChild($xml->createElement('finalAdmit', ($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit())?$applicant->getDecision()->getFinalAdmit()->format('c'):''));
-      $decision->appendChild($xml->createElement('finalDeny', ($applicant->getDecision() and $applicant->getDecision()->getFinalDeny())?$applicant->getDecision()->getFinalDeny()->format('c'):''));
-      $decision->appendChild($xml->createElement('acceptOffer', ($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer())?$applicant->getDecision()->getAcceptOffer()->format('c'):''));
-      $decision->appendChild($xml->createElement('declineOffer', ($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer())?$applicant->getDecision()->getDeclineOffer()->format('c'):''));
-      $applicantXml->appendChild($decision);
-      
-      $tags = $xml->createElement("tags");
-      foreach($applicant->getTags() as $tag){
-        $tagXml = $xml->createElement('tag');
-        $tagXml->setAttribute('tagId', $tag->getId());
-        $tagXml ->appendChild($xml->createCDATASection($tag->getTitle()));
-        $tags->appendChild($tagXml);
-      }
-      $applicantXml->appendChild($tags);
-      
-      
-      $pages = $xml->createElement("pages");
-      foreach($applicationPages as $applicationPage){
-        if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\XmlPage){
-          $page = $xml->createElement("page");
-          $page->setAttribute('title', htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
-          $page->setAttribute('pageId', $applicationPage->getPage()->getId());
-          $answersXml = $xml->createElement('answers');
-          $applicationPage->getJazzeePage()->setApplicant($applicant);
-          foreach($applicationPage->getJazzeePage()->getXmlAnswers($xml) as $answerXml){
-            $answersXml->appendChild($answerXml);
-          }
-          $page->appendChild($answersXml);
-          $pages->appendChild($page);
-        }
-      }
-      $applicantXml->appendChild($pages);
-      $applicantsXml->appendChild($applicantXml);
+      $appXml = $applicant->toXml($this);
+      $node = $xml->importNode($appXml->documentElement, true);
+      $applicantsXml->appendChild($node);
     }
     $xml->appendChild($applicantsXml);
     $this->setVar('outputType', 'xml');

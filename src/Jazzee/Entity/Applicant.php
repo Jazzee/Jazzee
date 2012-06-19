@@ -725,6 +725,75 @@ class Applicant{
   public function hasPaid(){
     return $this->hasPaid;
   }
+  
+  /**
+   * Create applicant XML file
+   * 
+   * @param \Jazzee\Controller $controller
+   * @param boolean $partial
+   * @return \DOMDocument 
+   */
+  public function toXml($controller, $partial = false){
+    $dom = new \DOMDocument('1.0', 'UTF-8');
+    $applicantXml = $dom->createElement("applicant");
+    $account = $dom->createElement("account");
+    $account->appendChild($dom->createElement('id', $this->getId()));
+    $account->appendChild($dom->createElement('firstName', $this->getFirstName()));
+    $account->appendChild($dom->createElement('middleName', $this->getMiddleName()));
+    $account->appendChild($dom->createElement('lastName', $this->getLastName()));
+    $account->appendChild($dom->createElement('suffix', $this->getSuffix()));
+    $account->appendChild($dom->createElement('email', $this->getEmail()));
+    $account->appendChild($dom->createElement('isLocked', $this->isLocked()?'yes':'no'));
+    $account->appendChild($dom->createElement('lastLogin', $this->getLastLogin()->format('c')));
+    $account->appendChild($dom->createElement('updatedAt', $this->getUpdatedAt()->format('c')));
+    $account->appendChild($dom->createElement('createdAt', $this->getCreatedAt()->format('c')));
+    $account->appendChild($dom->createElement('percentComplete', $this->getPercentComplete()));
+    $applicantXml->appendChild($account);
+    
+    $decision = $dom->createElement("decision");
+    $decision->appendChild($dom->createElement('status', $this->getDecision()?$this->getDecision()->status():'none'));
+    $decision->appendChild($dom->createElement('nominateAdmit', ($this->getDecision() and $this->getDecision()->getNominateAdmit())?$this->getDecision()->getNominateAdmit()->format('c'):''));
+    $decision->appendChild($dom->createElement('nominateDeny', ($this->getDecision() and $this->getDecision()->getNominateDeny())?$this->getDecision()->getNominateDeny()->format('c'):''));
+    $decision->appendChild($dom->createElement('finalAdmit', ($this->getDecision() and $this->getDecision()->getFinalAdmit())?$this->getDecision()->getFinalAdmit()->format('c'):''));
+    $decision->appendChild($dom->createElement('finalDeny', ($this->getDecision() and $this->getDecision()->getFinalDeny())?$this->getDecision()->getFinalDeny()->format('c'):''));
+    $decision->appendChild($dom->createElement('acceptOffer', ($this->getDecision() and $this->getDecision()->getAcceptOffer())?$this->getDecision()->getAcceptOffer()->format('c'):''));
+    $decision->appendChild($dom->createElement('declineOffer', ($this->getDecision() and $this->getDecision()->getDeclineOffer())?$this->getDecision()->getDeclineOffer()->format('c'):''));
+    $applicantXml->appendChild($decision);
+    
+    $tags = $dom->createElement("tags");
+    foreach($this->getTags() as $tag){
+      $tagXml = $dom->createElement('tag');
+      $tagXml->setAttribute('tagId', $tag->getId());
+      $tagXml->appendChild($dom->createCDATASection($tag->getTitle()));
+      $tags->appendChild($tagXml);
+    }
+    $applicantXml->appendChild($tags);
+    if($partial){
+      $dom->appendChild($applicantXml);
+      return $dom;
+    }
+    
+    $pages = $dom->createElement("pages");
+    foreach($this->application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage){
+      if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\XmlPage){
+        $page = $dom->createElement("page");
+        $page->setAttribute('title', \htmlentities($applicationPage->getTitle(),ENT_COMPAT,'utf-8'));
+        $page->setAttribute('type', \htmlentities($applicationPage->getPage()->getType()->getClass(),ENT_COMPAT,'utf-8'));
+        $page->setAttribute('pageId', $applicationPage->getPage()->getId());
+        $answersXml = $dom->createElement('answers');
+        $applicationPage->getJazzeePage()->setApplicant($this);
+        $applicationPage->getJazzeePage()->setController($controller);
+        foreach($applicationPage->getJazzeePage()->getXmlAnswers($dom) as $answerXml){
+          $answersXml->appendChild($answerXml);
+        }
+        $page->appendChild($answersXml);
+        $pages->appendChild($page);
+      }
+    }
+    $applicantXml->appendChild($pages);
+    $dom->appendChild($applicantXml);
+    return $dom;
+  }
 }
 
 /**
