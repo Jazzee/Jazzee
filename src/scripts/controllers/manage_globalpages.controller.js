@@ -2,8 +2,6 @@
  * Javascript for the setup_pages controller
  */
 $(document).ready(function(){
-  var timeout = new AuthenticationTimeout('JazzeeAdminLoginTimeout');
-  timeout.start();
   
   var status = new Status($('#status'), $('#content'));
   $(document).ajaxError(function(e, xhr, settings, exception) {

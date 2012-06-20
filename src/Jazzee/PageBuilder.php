@@ -17,8 +17,6 @@ abstract class PageBuilder extends AdminController{
     $this->layout = 'json';
     
     $this->addScript($this->path('resource/foundation/scripts/form.js'));
-    $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
-    $this->addScript($this->path('resource/scripts/classes/AuthenticationTimeout.class.js'));
     $this->addScript($this->path('resource/foundation/scripts/jquery.wysiwyg.js'));
     
     $this->addCss($this->path('resource/foundation/styles/jquery.wysiwyg.css'));

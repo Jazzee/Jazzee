@@ -54,8 +54,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     $this->layout = 'json';
     $this->setLayoutVar('status', 'error');  //default to an error
     $this->addScript($this->path('resource/foundation/scripts/form.js'));
-    $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
-    $this->addScript($this->path('resource/scripts/classes/AuthenticationTimeout.class.js'));
     $this->addScript($this->path('resource/scripts/classes/Applicant.class.js'));
     $this->addScript($this->path('resource/scripts/controllers/applicants_single.controller.js'));
   }

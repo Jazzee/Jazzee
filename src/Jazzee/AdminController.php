@@ -147,6 +147,9 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
       $this->setLayoutVar('pageTitle', $this->_cycle->getName() . ' ' . $this->_program->getName());
       $this->setLayoutVar('layoutTitle', $this->_cycle->getName() . ' ' . $this->_program->getName());
     }
+    $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/AuthenticationTimeout.class.js'));
+    $this->addScript($this->path('resource/scripts/controllers/admin.controller.js'));
     $this->setup();
   }
   
