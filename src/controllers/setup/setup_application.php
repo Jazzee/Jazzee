@@ -23,6 +23,14 @@ class SetupApplicationController extends \Jazzee\AdminController {
   const ACTION_EDITSTATUS = 'Edit status information (open, close, published, visible)';
   const REQUIRE_APPLICATION = false;
   
+  /**
+   * Add the required JS
+   */
+  protected function setUp(){
+    parent::setUp();
+    $this->addScript($this->path('resource/scripts/controllers/setup_application.controller.js'));
+  }
+  
   
   /**
    * View the current Setup or setup a new app
