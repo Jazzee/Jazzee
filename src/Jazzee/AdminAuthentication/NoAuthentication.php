@@ -62,6 +62,8 @@ class NoAuthentication implements \Jazzee\Interfaces\AdminAuthentication{
         $this->_controller->getStore()->expire();
         $this->_controller->getStore()->touchAuthentication();
         $this->_controller->getStore()->set(self::SESSION_VAR_ID, $this->_user->getId());
+      } else {
+        throw new \Jazzee\Exception("{$_SERVER['REMOTE_ADDR']} is not a valid ip address for NoAuthentication.  Add it to the noAuthIpAddresses configuration to continue.");
       }
     }
   }
