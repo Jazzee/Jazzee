@@ -669,8 +669,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
     } else {
       $form = new \Foundation\Form();
       $field = $form->newField();
-      $field->setLegend('Accept Offer For ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
-      $form->newButton('submit', 'Accept Offer');
+      $field->setLegend('Decline Offer For ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+      $form->newButton('submit', 'Decline Offer');
       if(!empty($this->post)){
         $this->setLayoutVar('textarea', true);
         if($input = $form->processInput($this->post)){
