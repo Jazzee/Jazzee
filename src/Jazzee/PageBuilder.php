@@ -111,11 +111,13 @@ abstract class PageBuilder extends AdminController{
       }
     } 
     $arr['id'] = $page->getId();
+    $arr['uuid'] = $page->getUuid();
     $arr['typeClass'] = $this->getClassName($page->getType()->getClass());
     $arr['typeName'] = $this->getClassName($page->getType()->getName());
     $arr['typeId'] = $page->getType()->getId();
     $arr['isGlobal'] = $page->isGlobal()?1:0;
     $arr['hasAnswers'] = $this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($page);
+    $arr['interfaces'] = array_values(class_implements($page->getType()->getClass()));
     $arr['elements'] = array();
     foreach($page->getElements() as $element){
       $e = array(
@@ -272,13 +274,23 @@ abstract class PageBuilder extends AdminController{
           $page->getChildren()->removeElement($childPage);
           $this->addMessage('success',$childPage->getTitle() . ' page deleted.');
         break;
+        case 'import':
+          $childPage = new \Jazzee\Entity\Page();
+          $childPage->setParent($page);
+          $childPage->notGlobal();
+          $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->typeId));
+          $childPage->setUuid($child->uuid);
+          $this->savePage($childPage, $child);
+          break;
         case 'new':
           $childPage = new \Jazzee\Entity\Page();
           $childPage->setParent($page);
           $childPage->notGlobal();
           $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->typeId));
+          $this->savePage($childPage, $child);
+          break;
         default:
-          if(!isset($childPage)) $childPage = $page->getChildById($child->id);
+          $childPage = $page->getChildById($child->id);
           $this->savePage($childPage, $child);
         break;
       }

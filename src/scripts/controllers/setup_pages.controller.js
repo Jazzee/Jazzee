@@ -74,6 +74,7 @@ ApplicationPageBuilder.prototype.synchronizePageList = function(){
   div.append(ol);
   div.append(this.addNewPageControl('New Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
   div.append(this.addNewGlobalPageControl('Add Gobal Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
+  div.append(this.importPageControl());
   
   div.append($('<h5>').html('SIR Accept Page'));
   var ol = this.getPagesList(this.applicationPageKinds.sirAccept);
@@ -206,6 +207,52 @@ ApplicationPageBuilder.prototype.addNewGlobalPageControl = function(title, kind,
         button: true
       }
     }
+  });
+  return button;
+};
+
+/**
+ * Create a control for importing a page
+ * @param String title
+ * @param integer kind
+ * @return {jQuery}
+ */
+ApplicationPageBuilder.prototype.importPageControl = function(){
+  var pageBuilder = this;
+  
+  var button = $('<button>').html('Import Page').button();
+  button.click(function(e){
+    
+    var obj = new FormObject();
+    var field = obj.newField({name: 'legend', value: 'Import Page'});
+
+    var element = field.newElement('Textarea', 'pageJson');
+    element.label = 'Page';
+    element.required = true;
+    
+    var form = new Form();
+    var formObject = form.create(obj);
+    $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
+    
+    var div = $('<div>');
+    div.css("overflow-y", "auto");
+    div.dialog({
+      modal: true,
+      autoOpen: false,
+      position: 'center',
+      width: 800
+    });
+    div.html(formObject);
+    $('form', div).unbind().bind('submit',function(e){
+      e.preventDefault();
+      var json = $('textarea[name=pageJson]', this).val();
+      var obj = $.parseJSON(json);
+      pageBuilder.copyPage(obj);
+      div.dialog("close");
+      return false;
+    });//end submit
+    div.dialog('open');
+    return false;
   });
   return button;
 };

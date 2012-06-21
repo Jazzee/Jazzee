@@ -7,6 +7,7 @@
 function JazzeePage(){
   this.pageBuilder;
   this.pageId;
+  this.uuid;
   this.applicationPageId;
   this.typeName;
   this.typeId;
@@ -49,25 +50,25 @@ function JazzeePage(){
     autoGrow: true,
     maxHeight: '500px',
     controls: {
-        bold: { visible: true },
-        italic: { visible: true },
-        underline: { visible: true },
-        subscript: { visible: true },
-        superscript: { visible: true },
-        undo: { visible: true },
-        redo: { visible: true },
-        insertOrderedList: { visible: true },
-        insertUnorderedList: { visible: true },
-        createLink: { visible: true },
-        h2: { visible: true },
-        h3: { visible: true },
-        paragraph: { visible: true },
-        cut: { visible: true },
-        copy: { visible: true },
-        paste: { visible: true },
-        html: { visible: true },
-        removeFormat: { visible: true },
-        insertTable: { visible: true }
+        bold: {visible: true},
+        italic: {visible: true},
+        underline: {visible: true},
+        subscript: {visible: true},
+        superscript: {visible: true},
+        undo: {visible: true},
+        redo: {visible: true},
+        insertOrderedList: {visible: true},
+        insertUnorderedList: {visible: true},
+        createLink: {visible: true},
+        h2: {visible: true},
+        h3: {visible: true},
+        paragraph: {visible: true},
+        cut: {visible: true},
+        copy: {visible: true},
+        paste: {visible: true},
+        html: {visible: true},
+        removeFormat: {visible: true},
+        insertTable: {visible: true}
     }
   };
 }
@@ -79,6 +80,7 @@ function JazzeePage(){
 JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.pageBuilder = pageBuilder;
   this.id = pageObject.id;
+  this.uuid = pageObject.uuid;
   this.typeId = pageObject.typeId;
   this.typeName = pageObject.typeName;
   this.typeClass = pageObject.typeClass;
@@ -124,6 +126,7 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
 JazzeePage.prototype.newPage = function(id,title,typeId,typeName,typeClass,status,pageBuilder){
   var obj = {
     id: id,
+    uuid: null,
     typeId: typeId,
     typeName: typeName,
     typeClass: typeClass,
@@ -296,7 +299,8 @@ JazzeePage.prototype.deletePageButton = function(){
 JazzeePage.prototype.copyPageButton = function(){
   var pageClass = this;
   var button = $('<button>').html('Copy').addClass('copy').bind('click', function(e){
-    pageClass.pageBuilder.copyPage(pageClass);
+    var obj = pageClass.getDataObject();
+    pageClass.pageBuilder.copyPage(obj);
   });
   button.button({
     icons: {
@@ -321,6 +325,30 @@ JazzeePage.prototype.previewPageButton = function(){
   button.button({
     icons: {
       primary: 'ui-icon-info'
+    }
+  });
+  return button;
+};
+
+/**
+ * Button for previewwing the current page
+ * @returns {jQuery}
+ */
+JazzeePage.prototype.exportPageButton = function(){
+  var pageClass = this;
+  var button = $('<button>').html('Export').addClass('export').bind('click', function(e){
+    var dialog = pageClass.createDialog();
+    var obj = pageClass.getDataObject();
+    obj.id = null;
+    var textarea = $('<textarea>').val($.toJSON(obj));
+    dialog.append(textarea);
+    dialog.append($('<p>').html('Copy this text into the import utility.'));
+    dialog.dialog('open');
+    textarea.select();
+  });
+  button.button({
+    icons: {
+      primary: 'ui-icon-clipboard'
     }
   });
   return button;
@@ -419,6 +447,7 @@ JazzeePage.prototype.getDataObject = function(){
     typeClass: this.typeClass,
     kind: this.kind,
     id: this.id,
+    uuid: this.uuid,
     status: this.status,
     title: this.title,
     min: this.min,
@@ -673,6 +702,7 @@ JazzeePage.prototype.workspace = function(){
   $('#pageToolbar').append(this.copyPageButton());
   $('#pageToolbar').append(this.previewPageButton());
   $('#pageToolbar').append(this.deletePageButton());
+  $('#pageToolbar').append(this.exportPageButton());
   
   $('#pageInfo').append(this.pageInfo());
   $('#editPage').show('slide');

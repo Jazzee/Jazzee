@@ -52,6 +52,7 @@ GlobalPageBuilder.prototype.synchronizePageList = function(){
   div.append($('<h5>').html('Global Pages'));
   div.append(this.getPagesList(null));
   div.append(this.addNewPageControl());
+  div.append(this.importPageControl());
 };
 
 /**
@@ -93,4 +94,50 @@ GlobalPageBuilder.prototype.addNewPageControl = function(){
     }
   });
   return button;
-}
+};
+
+/**
+ * Create a control for importing a page
+ * @param String title
+ * @param integer kind
+ * @return {jQuery}
+ */
+GlobalPageBuilder.prototype.importPageControl = function(){
+  var pageBuilder = this;
+  
+  var button = $('<button>').html('Import Page').button();
+  button.click(function(e){ 
+    var obj = new FormObject();
+    var field = obj.newField({name: 'legend', value: 'Import Page'});
+
+    var element = field.newElement('Textarea', 'pageJson');
+    element.label = 'Page';
+    element.required = true;
+    
+    var form = new Form();
+    var formObject = form.create(obj);
+    $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
+    
+    var div = $('<div>');
+    div.css("overflow-y", "auto");
+    div.dialog({
+      modal: true,
+      autoOpen: false,
+      position: 'center',
+      width: 800
+    });
+    div.html(formObject);
+    $('form', div).unbind().bind('submit',function(e){
+      e.preventDefault();
+      var json = $('textarea[name=pageJson]', this).val();
+      var obj = $.parseJSON(json);
+      pageBuilder.importPage(obj);
+      console.log(div);
+      div.dialog("close");
+      return false;
+    });//end submit
+    div.dialog('open');
+    return false;
+  });
+  return button;
+};

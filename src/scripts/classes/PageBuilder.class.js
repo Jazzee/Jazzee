@@ -196,45 +196,54 @@ PageBuilder.prototype.markModified = function(){
 
 /**
  * Copy a page
- * @param {ApplyPage} page
+ * @param {Object} obj
  */
-PageBuilder.prototype.copyPage = function(page){
-  this.addPage(this.createPageCopy(page.getDataObject()));
+PageBuilder.prototype.copyPage = function(obj){
+  this.addPage(this.pageFromObject(obj, 'Copy of '+ obj.title, 'new'));
 };
 
 /**
- * Make a copy of a page
- * Need to seperate this function so it can be used recursivly on child pages
+ * Import a page
  * @param {Object} obj
- * @returns {ApplyPage}
  */
-PageBuilder.prototype.createPageCopy = function(obj){
+PageBuilder.prototype.importPage = function(obj){
+  this.addPage(this.pageFromObject(obj, obj.title, 'import'));
+};
+
+/**
+ * Import a page
+ * @param {Object} obj
+ * @param String title
+ * @param String status
+ * @return {JazzeePage}
+ */
+PageBuilder.prototype.pageFromObject = function(obj, title, status){
   var id = 'newpage' + this.getUniqueId();
   obj.id = id;
-  obj.title = 'Copy of ' + obj.title;
-  var copy = new window[obj.typeClass]();
-  copy.init(obj, this);
-  copy.status = 'new';
-  copy.isModified = true;
+  obj.title = title;
+  var page = new window[obj.typeClass]();
+  page.init(obj, this);
+  page.status = status;
+  page.isModified = true;
   for(var i=0; i<obj.elements.length; i++){
     var e = obj.elements[i];
     e.id = 'newelement' + this.getUniqueId();
     var Element = new window[e.typeClass]();
-    Element.init(e, copy);
+    Element.init(e, page);
     Element.status = 'new';
     Element.isModified = true;
     for(var j = 0; j < e.list.length; j++){
       Element.newListItem(e.list[j].value);
     }
-    copy.addElement(Element);
+    page.addElement(Element);
   }
   for(var property in obj.variables){
-    copy.setVariable(property, obj.variables[property].value);
+    page.setVariable(property, obj.variables[property].value);
   }
   for(var i=0; i<obj.children.length; i++){
-    copy.addChild(this.createPageCopy(obj.children[i]));
+    page.addChild(this.pageFromObject(obj.children[i], obj.children[i].title, status));
   }
-  return copy;
+  return page;
 };
 
 /**

@@ -55,6 +55,13 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
           }
         }
       break;
+      case 'import':
+        $page = new \Jazzee\Entity\Page();
+        $page->makeGlobal();
+        $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
+        $page->setUuid($data->uuid);
+        $this->savePage($page, $data);
+        break;
       case 'new':
         $page = new \Jazzee\Entity\Page();
         $page->makeGlobal();
@@ -66,8 +73,10 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
         $ap->getJazzeePage()->setupNewPage();
         $this->addMessage('success',$data->title . ' created.');
         unset($ap);
+        $this->savePage($page, $data);
+        break;
       default:
-        if(!isset($page)) $page = $this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('id'=>$pageId, 'isGlobal'=>true));
+        $page = $this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('id'=>$pageId, 'isGlobal'=>true));
         $this->savePage($page, $data);
     }
   }
