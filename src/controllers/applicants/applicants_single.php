@@ -772,7 +772,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
 
     $element = $field->newElement('DateInput', 'deadline');
     $element->setLabel('New Deadline');
-    $element->setFormat('Leave blank to remove the extension');
+    $element->setFormat('Clear to remove the extension');
     if($applicant->getDeadlineExtension()) $element->setValue($applicant->getDeadlineExtension()->format('c'));
     $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, $applicant->getApplication()->getClose()->format('c')));
     $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'now'));

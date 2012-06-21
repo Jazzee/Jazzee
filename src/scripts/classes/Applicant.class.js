@@ -52,44 +52,50 @@ Applicant.prototype.init = function(){
  * @param {String} the callback function when we succeed
  */
 Applicant.prototype.createForm = function(json, callback){
-	var applicant = this;
-	var form = new Form();
-	var div = $('<div>');
-    div.css("overflow-y", "auto");
-    div.html(form.create(json));
-    var statusP = $('<p>').addClass('status').html('<img src="resource/foundation/media/ajax-bar.gif" />').hide();
-    div.prepend(statusP);
-    div.dialog({
-      modal: true,
-      autoOpen: true,
-      position: 'center',
-      width: 800,
-      overlay: {
-        backgroundColor: '#fff',
-        opacity: 0.8
-      },
-      close: function() {
-        div.dialog("destroy").remove();
+  var applicant = this;
+  var form = new Form();
+  var div = $('<div>');
+  div.css("overflow-y", "auto");
+  div.html(form.create(json));
+  var statusP = $('<p>').addClass('status').html('<img src="resource/foundation/media/ajax-bar.gif" />').hide();
+  div.prepend(statusP);
+  div.dialog({
+    modal: true,
+    autoOpen: true,
+    position: 'center',
+    width: 800,
+    overlay: {
+      backgroundColor: '#fff',
+      opacity: 0.8
+    },
+    close: function() {
+      div.dialog("destroy").remove();
+    }
+  });
+  $('input.DateInput', div).each(function(i){
+    if($(this).val().length < 1){
+      applicant.datePickerEmpty($(this));
+    } else {
+      applicant.datePicker($(this));
+    }
+  });
+  $('form', div).bind('submit',function(e){
+    $('p.status', div).fadeIn();
+    //give our iframe a unique name from the timestamp
+    var iFrameName = "iFrame" + (new Date().getTime());
+    var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
+    iFrame.css("display", "none");
+    e.target.target = iFrameName;
+    iFrame.load(function(e){
+      var json = eval("(" + $(this).contents().find('textarea').get(0).value + ")");
+      div.dialog("destroy").remove();
+      if(json.status == 'success'){
+        callback.display(json);
+      } else {
+        applicant.createForm(json.data.form, callback);
       }
-    });
-    
-    $('form', div).bind('submit',function(e){
-      $('p.status', div).fadeIn();
-      //give our iframe a unique name from the timestamp
-      var iFrameName = "iFrame" + (new Date().getTime());
-      var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
-      iFrame.css("display", "none");
-      e.target.target = iFrameName;
-      iFrame.load(function(e){
-        var json = eval("(" + $(this).contents().find('textarea').get(0).value + ")");
-        div.dialog("destroy").remove();
-        if(json.status == 'success'){
-          callback.display(json);
-        } else {
-          applicant.createForm(json.data.form, callback);
-        }
-      }); //end iFrame Load
-    });//end submit
+    }); //end iFrame Load
+  });//end submit
 };
 
 /**
@@ -108,6 +114,57 @@ Applicant.prototype.parseBio = function(){
     });
     return false;
   });
+};
+
+
+
+/**
+ * Setup the data picker on an input element
+ */
+Applicant.prototype.datePicker = function(input){
+  var self = this;
+  var button = $('<button>').html('Clear');
+  button.button({
+    icons: {
+      primary: 'ui-icon-trash'
+    }
+  });
+  button.bind('click', function(e){
+    var input = $('input', $(this).parent());
+    input.val('');
+    input.AnyTime_noPicker();
+    $(this).remove();
+    self.datePickerEmpty(input);
+    return false;
+  });
+  input.after(button);
+  input.AnyTime_noPicker().AnyTime_picker(
+    {format: "%Y-%m-%dT%T%:",
+          formatUtcOffset: "%: (%@)",
+          hideInput: true,
+          placement: "inline"}
+  );
+  
+};
+
+/**
+ * Setup the data picker on an input element
+ */
+Applicant.prototype.datePickerEmpty = function(input){
+  var self = this;
+  var button = $('<button>').html('Pick Date');
+  button.button({
+    icons: {
+      primary: 'ui-icon-plus'
+    }
+  });
+  button.bind('click', function(e){
+    input.show();
+    self.datePicker(input);
+    $(this).remove();
+  });
+  input.after(button);
+  input.hide();
 };
 
 /**
