@@ -24,6 +24,7 @@ function JazzeePage(){
   this.answerStatusDisplay;
   this.weight;
   this.hasAnswers;
+  this.hasCycleAnswers;
 
   this.variables;
   this.elements;
@@ -96,6 +97,7 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.answerStatusDisplay = (pageObject.answerStatusDisplay)?1:0;
   this.weight = pageObject.weight;
   this.hasAnswers = pageObject.hasAnswers;
+  this.hasCycleAnswers = pageObject.hasCycleAnswers;
 
   this.variables = {};
   this.elements = [];
@@ -140,7 +142,8 @@ JazzeePage.prototype.newPage = function(id,title,typeId,typeName,typeClass,statu
     trailingText: null,
     weight: 0,
     kind: null,
-    hasAnswers: 0
+    hasAnswers: 0,
+    hasCycleAnswers: 0
   };
   var page = new window[typeClass]();
   page.init(obj, pageBuilder);
@@ -278,7 +281,7 @@ JazzeePage.prototype.deletePageButton = function(){
       primary: 'ui-icon-trash'
     }
   });
-  if(pageClass.hasAnswers){
+  if((this.pageBuilder.editGlobal && this.isGlobal && pageClass.hasAnswers) || (this.isGlobal && pageClass.hasCycleAnswers) || (!this.isGlobal && pageClass.hasAnswers)){
     button.addClass('ui-button-disabled ui-state-disabled');
     button.attr('title', 'This page cannot be deleted because there is applicant information associated with it.');
     button.qtip();

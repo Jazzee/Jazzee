@@ -117,6 +117,7 @@ abstract class PageBuilder extends AdminController{
     $arr['typeId'] = $page->getType()->getId();
     $arr['isGlobal'] = $page->isGlobal()?1:0;
     $arr['hasAnswers'] = $this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($page);
+    $arr['hasCycleAnswers'] = $this->_em->getRepository('\Jazzee\Entity\Page')->hasCycleAnswers($page, $this->_cycle);
     $arr['interfaces'] = array_values(class_implements($page->getType()->getClass()));
     $arr['elements'] = array();
     foreach($page->getElements() as $element){
