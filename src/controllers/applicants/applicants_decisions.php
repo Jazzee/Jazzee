@@ -17,6 +17,8 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
   const ACTION_NOMINATEDENY = 'Nominate for Deny';
   const ACTION_FINALADMIT = 'Final Admit';
   const ACTION_FINALDENY = 'Final Deny';
+  const ACTION_ACCEPTOFFER = 'Accept Offer';
+  const ACTION_DECLINEOFFER = 'Decline Offer';
   
   /**
    * Add the required JS
@@ -41,7 +43,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
       if($applicant->isLocked()){
         if($applicant->getDecision()->getFinalDeny()){
           $list['finalDeny'][] = $applicant;
-        } else if($applicant->getDecision()->getFinalAdmit()){
+        } else if($applicant->getDecision()->getFinalAdmit() and !($applicant->getDecision()->getAcceptOffer() or $applicant->getDecision()->getDeclineOffer())){
           $list['finalAdmit'][] = $applicant;
         } else if($applicant->getDecision()->getNominateDeny()){
           $list['nominateDeny'][] = $applicant;
@@ -261,6 +263,80 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController {
         }
       }
       $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) denied.');
+      $this->redirectPath('applicants/decisions');
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_decisions/form');
+  }
+  
+  /**
+   * Accept Applicants
+   */
+  public function actionAcceptOffer(){
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('applicants/decisions/acceptOffer'));
+    $field = $form->newField();
+    $field->setLegend('Accept Offer for applicants');
+    
+    $element = $field->newElement('CheckboxList','applicants');
+    $element->setLabel('Select applicants to mark as accepted');
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+      if($applicant->isLocked() AND $applicant->getDecision()->can('acceptOffer')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
+    }
+    
+    $form->newButton('submit', 'Submit');
+    if($input = $form->processInput($this->post)){   
+      $count = 0;
+      foreach($input->get('applicants') as $id){
+        $applicant = $this->getApplicantById($id);
+        $applicant->getDecision()->acceptOffer();
+        $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Accept Offer');
+        $count ++;
+        if($count > 100){
+          $this->_em->flush();
+          $count = 0;
+        }
+      }
+      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) accepted.');
+      $this->redirectPath('applicants/decisions');
+    }
+    $this->setVar('form', $form);
+    $this->loadView('applicants_decisions/form');
+  }
+  
+  /**
+   * Decline Applicants
+   */
+  public function actionDeclineOffer(){
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('applicants/decisions/declineOffer'));
+    $field = $form->newField();
+    $field->setLegend('Decline Offer for applicants');
+    
+    $element = $field->newElement('CheckboxList','applicants');
+    $element->setLabel('Select applicants to mark as declined');
+    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+      if($applicant->isLocked() AND $applicant->getDecision()->can('declineOffer')) $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
+    }
+    
+    $form->newButton('submit', 'Submit');
+    if($input = $form->processInput($this->post)){   
+      $count = 0;
+      foreach($input->get('applicants') as $id){
+        $applicant = $this->getApplicantById($id);
+        $applicant->getDecision()->declineOffer();
+        $this->_em->persist($applicant);
+        $this->auditLog($applicant, 'Decline Offer');
+        $count ++;
+        if($count > 100){
+          $this->_em->flush();
+          $count = 0;
+        }
+      }
+      $this->addMessage('success', count($this->post['applicants']) . ' applicant(s) declined.');
       $this->redirectPath('applicants/decisions');
     }
     $this->setVar('form', $form);
