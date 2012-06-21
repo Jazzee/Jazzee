@@ -100,9 +100,10 @@ class SetupImportApplicationController extends \Jazzee\AdminController {
   protected function addPageFromXml(SimpleXMLElement $xml){
     $attributes = $xml->attributes();
     if(!empty($attributes['globalPageUuid'])){
-      $page = $this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('isGlobal'=>true,'uuid'=>$attributes['globalPageUuid']));
+      $page = $this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('isGlobal'=>true,'uuid'=>(string)$attributes['globalPageUuid']));
       if(!$page){
-        $this->addMessage('error', $xml->getAttribute('title') . ' page in import references global page with uuid '. $xml->getAttribute('globalPageUuid') . ' but this page does not exist.  You need to import it before importing this application.');
+        $this->addMessage('error', (string)$attributes['title'] . ' page in import references global page with uuid '. (string)$attributes['globalPageUuid'] . ' but this page does not exist.  You need to import it before importing this application.');
+        $this->_em->clear();
         $this->redirectPath('setup/importapplication');
       }
     } else {
