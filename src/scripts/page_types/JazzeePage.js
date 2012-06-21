@@ -275,7 +275,11 @@ JazzeePage.prototype.setProperty = function(name, value){
  */
 JazzeePage.prototype.deletePageButton = function(){
   var pageClass = this;
-  var button = $('<button>').html('Delete').addClass('delete');
+  var buttonText = 'Delete';
+  if(this.isGlobal && !this.pageBuilder.editGlobal){
+    buttonText = 'Remove';
+  }
+  var button = $('<button>').html(buttonText).addClass('delete');
   button.button({
     icons: {
       primary: 'ui-icon-trash'
