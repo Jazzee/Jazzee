@@ -66,20 +66,24 @@ class ManageCyclesController extends \Jazzee\AdminController {
       $form->newButton('submit', 'Save Changes');
       $this->setVar('form', $form);  
       if($input = $form->processInput($this->post)){
-        $cycle->setName($input->get('name'));
-        $cycle->setStart($input->get('start'));
-        $cycle->setEnd($input->get('end'));
-        foreach($cycle->getRequiredPages() as $page){
-          $cycle->getRequiredPages()->removeElement($page);
-        }
-        if($input->get('requiredPages')){
-          foreach($input->get('requiredPages') as $id){
-            $cycle->addRequiredPage($globalPages[$id]);
+        if($input->get('name') != $cycle->getName() and count($this->_em->getRepository('\Jazzee\Entity\Cycle')->findBy(array('name' => $input->get('name'))))){
+          $this->addMessage('error', "A cycle with that name already exists");
+        } else {
+          $cycle->setName($input->get('name'));
+          $cycle->setStart($input->get('start'));
+          $cycle->setEnd($input->get('end'));
+          foreach($cycle->getRequiredPages() as $page){
+            $cycle->getRequiredPages()->removeElement($page);
           }
+          if($input->get('requiredPages')){
+            foreach($input->get('requiredPages') as $id){
+              $cycle->addRequiredPage($globalPages[$id]);
+            }
+          }
+          $this->_em->persist($cycle);
+          $this->addMessage('success', "Changes Saved Successfully");
+          $this->redirectPath('manage/cycles');
         }
-        $this->_em->persist($cycle);
-        $this->addMessage('success', "Changes Saved Successfully");
-        $this->redirectPath('manage/cycles');
       }
     } else {
       $this->addMessage('error', "Error: Cycle #{$cycleID} does not exist.");
@@ -113,13 +117,17 @@ class ManageCyclesController extends \Jazzee\AdminController {
     $form->newButton('submit', 'Save Changes');
     $this->setVar('form', $form);  
     if($input = $form->processInput($this->post)){
-      $cycle = new \Jazzee\Entity\Cycle;
-      $cycle->setName($input->get('name'));
-      $cycle->setStart($input->get('start'));
-      $cycle->setEnd($input->get('end'));
-      $this->_em->persist($cycle);
-      $this->addMessage('success', "New Cycle Saved");
-      $this->redirectPath('manage/cycles');
+      if(count($this->_em->getRepository('\Jazzee\Entity\Cycle')->findBy(array('name' => $input->get('name'))))){
+        $this->addMessage('error', "A cycle with that name already exists");
+      } else {
+        $cycle = new \Jazzee\Entity\Cycle;
+        $cycle->setName($input->get('name'));
+        $cycle->setStart($input->get('start'));
+        $cycle->setEnd($input->get('end'));
+        $this->_em->persist($cycle);
+        $this->addMessage('success', "New Cycle Saved");
+        $this->redirectPath('manage/cycles');
+      }
     }
   }
 }
