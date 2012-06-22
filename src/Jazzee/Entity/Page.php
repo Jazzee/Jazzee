@@ -441,7 +441,7 @@ class Page{
   /**
    * Get elements
    *
-   * @return Doctrine\Common\Collections\Collection $elements
+   * @return array \Jazzee\Entity\Element
    */
   public function getElements(){
     return $this->elements;
