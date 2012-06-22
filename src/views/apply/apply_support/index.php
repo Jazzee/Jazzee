@@ -4,27 +4,50 @@
  * @package jazzee
  * @subpackage apply
  */
+$today = new DateTime;
 ?>
-<h1>Applicant Support</h1>
-<a href='<?php print $this->controller->applyPath('support/new');?>'>New Message</a>
+<h1>Applicant Messages and Support</h1>
+<?php if($count = $applicant->unreadMessageCount()){?>
+<p><strong>You have <?php print $count;?> unread messages.</strong></p>
+<?php } ?>
+<a href='<?php print $this->controller->applyPath('support/new');?>'>Create a new message</a>
 
 <?php if(count($threads)){ ?>
   <div class='discussion'>
-    <h3>Your Messages</h3>
     <table>
-      <thead><tr><th></th><th>Sent</th><th>Subject</th><th>Reply</th></tr></thead>
+      <thead><tr><th>Message</th><th>Last Message</th><th>Messages</th></tr></thead>
       <tbody>
         <?php 
         foreach($threads as $thread){?>
-          <tr>
-            <td class='<?php
+          <tr class='<?php 
               if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM)) print 'unread';
               else print 'read';
             ?>'>
+            <td><strong><?php print $thread->getSubject();?></strong>
+              <br /><a href='<?php print $this->controller->applyPath('/support/single/' . $thread->getId());?>'><?php print strip_tags(substr($thread->getLastMessage()->getText(), 0, 100));?>
+              <?php if(strlen($thread->getLastMessage()->getText()) > 100){ print '...'; }?>
+              </a>
             </td>
-            <td><?php print $thread->getCreatedAt()->format('l F jS Y \a\t g:ia')?></td>
-            <td><a href='<?php print $this->controller->applyPath('/support/single/' . $thread->getId());?>'><?php print $thread->getSubject();?></a></td> 
-            <td><a href='<?php print $this->controller->applyPath('/support/reply/' . $thread->getId());?>'>Reply</a></td> 
+            <td>
+              <?php if($thread->getLastMessage()->getSender() == \Jazzee\Entity\Message::APPLICANT){?>
+                From you
+              <?php } else { ?>
+                From your program
+              <?php } ?>
+              <?php 
+                if($thread->getCreatedAt()->diff($today)->days > 0){
+                  print $thread->getCreatedAt()->diff($today)->days . ' days ago';
+                } else {
+                  print 'less than one day ago';
+                }
+              ?>
+            </td>
+            <td>
+              <?php 
+                  print $thread->getMessageCount(\Jazzee\Entity\Message::PROGRAM) . ' total and ';
+                  print $thread->getUnreadMessageCount(\Jazzee\Entity\Message::PROGRAM) . ' new messages';
+                ?>
+            </td>
           </tr>
         <?php } //end foreach threads ?>
       </tbody>

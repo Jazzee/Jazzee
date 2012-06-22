@@ -85,20 +85,6 @@ div.jgrowl {
 	color:#cc6600;
 }
 
-div.threaded{
-	border-bottom:  1px solid #003366;
-}
-
-div.threaded div{
-  margin-left: 2em;	
-  padding-left: .5em;
-  border-left: 1px solid #003366;
-}
-
-div.threaded div.unread{
-  border-left: 5px solid #7799bb;
-}
-
 /***** NAVIGATION Style *****/
 
 /* Horizontal/Dropdown Navigation */
@@ -229,20 +215,11 @@ div.form div.control li{
   background-color: #eeeeee;
 }
 
-div.discussion td.read{
-	width: 16px;
-	height: 16px;
-  background-image: url(resource/foundation/media/icons/email.png);
-  background-repeat: no-repeat;
-  background-position:center center;
-}
-
-div.discussion tr.unread td:first-child{
-  width: 16px;
-  height: 16px;
+#main div.discussion tr.unread td:first-child{
+  padding-left: 20px;
   background-image: url(resource/foundation/media/icons/email_add.png);
   background-repeat: no-repeat;
-  background-position:center center;
+  background-position:left center;
 }
 
 fieldset {

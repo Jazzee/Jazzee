@@ -108,25 +108,7 @@
   </div>
     <div id="threads" class="discussion">
       <h4>Applicant Messages</h4>
-      <?php if($this->controller->checkIsAllowed('applicants_messages') and count($applicant->getThreads())){?>
-        <table>
-          <thead><tr>
-              <th></th>
-              <th>Sent</th>
-              <th>Subject</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach($applicant->getThreads() as $thread){?>
-              <tr id='thread<?php print $thread->getId();?>'>
-                <td class="<?php print $thread->hasUnreadMessage(\Jazzee\Entity\Message::APPLICANT)?'unread':'read';?>"></td>
-                <td><?php print $thread->getCreatedAt()->format('c');?></td>
-                <td><a href="<?php print $this->path("applicants/messages/single/{$thread->getId()}");?>"><?php print $thread->getSubject();?></a></td>
-              </tr>
-            <?php } ?>
-          </tbody>
-        </table>
-      <?php } ?>
+      <?php $this->renderElement('applicants_messages_list', array('threads'=>$applicant->getThreads())); ?>  
       <a href="<?php print $this->path("applicants/messages/new/{$applicant->getId()}");?>">New Message</a>
     </div>
   <div id='sirPages'>
