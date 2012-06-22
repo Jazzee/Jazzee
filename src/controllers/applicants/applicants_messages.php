@@ -165,8 +165,10 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
       foreach($threads as $thread){
         if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM)){
           $lastUnreadMessageCreatedAt = $thread->getLastUnreadMessage(\Jazzee\Entity\Message::PROGRAM)->getCreatedAt();
-          //if created since our last run
-          if($lastUnreadMessageCreatedAt > $lastRun){
+          $diff = $lastUnreadMessageCreatedAt->diff(new DateTime('now'));
+          //if created since our last run or it is a multiplier fo 7 days old in te hour it was crated
+          //don't send messages to applicants who have logged in since the message was created
+          if(($lastUnreadMessageCreatedAt > $lastRun OR ($diff->days > 5 AND $diff->days%7 == 0 AND $diff->h == 0)) AND $thread->getApplicant()->getLastLogin() < $lastUnreadMessageCreatedAt){
             if(!array_key_exists($thread->getApplicant()->getId(), $applicants)){
               $applicants[$thread->getApplicant()->getId()] = array(
                 'applicant' => $thread->getApplicant(),
