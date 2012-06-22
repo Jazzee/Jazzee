@@ -73,7 +73,7 @@ Applicant.prototype.createForm = function(json, callback){
     }
   });
   $('input.DateInput', div).each(function(i){
-    if($(this).val().length < 1){
+    if(!$(this).hasClass('required') && $(this).val().length < 1){
       applicant.datePickerEmpty($(this));
     } else {
       applicant.datePicker($(this));
@@ -123,21 +123,23 @@ Applicant.prototype.parseBio = function(){
  */
 Applicant.prototype.datePicker = function(input){
   var self = this;
-  var button = $('<button>').html('Clear');
-  button.button({
-    icons: {
-      primary: 'ui-icon-trash'
-    }
-  });
-  button.bind('click', function(e){
-    var input = $('input', $(this).parent());
-    input.val('');
-    input.AnyTime_noPicker();
-    $(this).remove();
-    self.datePickerEmpty(input);
-    return false;
-  });
-  input.after(button);
+  if(!input.hasClass('required')){
+    var button = $('<button>').html('Clear');
+    button.button({
+      icons: {
+        primary: 'ui-icon-trash'
+      }
+    });
+    button.bind('click', function(e){
+      var input = $('input', $(this).parent());
+      input.val('');
+      input.AnyTime_noPicker();
+      $(this).remove();
+      self.datePickerEmpty(input);
+      return false;
+    });
+    input.after(button);
+  }
   input.AnyTime_noPicker().AnyTime_picker(
     {format: "%Y-%m-%dT%T%:",
           formatUtcOffset: "%: (%@)",
