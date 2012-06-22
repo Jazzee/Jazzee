@@ -218,6 +218,9 @@ PageBuilder.prototype.importPage = function(obj){
  * @return {JazzeePage}
  */
 PageBuilder.prototype.pageFromObject = function(obj, title, status){
+  if(window[obj.typeClass] == undefined){
+    alert('Canot create this page becuase ' + obj.typeName + ' is not a recognized page type.');
+  }
   var id = 'newpage' + this.getUniqueId();
   obj.id = id;
   obj.title = title;
