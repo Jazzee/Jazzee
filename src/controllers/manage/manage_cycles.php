@@ -16,6 +16,14 @@ class ManageCyclesController extends \Jazzee\AdminController {
   const REQUIRE_APPLICATION = false;
   
   /**
+   * Add the required JS
+   */
+  protected function setUp(){
+    parent::setUp();
+    $this->addScript($this->path('resource/scripts/controllers/manage_cycles.controller.js'));
+  }
+  
+  /**
    * List cycles
    */
   public function actionIndex(){
