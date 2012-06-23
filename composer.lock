@@ -1,5 +1,5 @@
 {
-    "hash": "56571256a772fc60ffd7813de0aede73",
+    "hash": "f06293699d74a856c96c3ae1c5949bdf",
     "packages": [
         {
             "package": "doctrine/common",
@@ -20,8 +20,7 @@
         },
         {
             "package": "jazzee/foundation",
-            "version": "dev-master",
-            "source-reference": "b6425a470726296d00876c551659bd505991dbb3"
+            "version": "1.0.3"
         },
         {
             "package": "monolog/monolog",
@@ -30,7 +29,13 @@
         {
             "package": "symfony/console",
             "version": "dev-master",
-            "source-reference": "afc5ecf2967bf3510363535c0389ddc0f6284784"
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/console",
+            "version": "dev-master",
+            "source-reference": "956147352c2666287b39be57a50d98750a772160"
         }
     ],
     "packages-dev": null,
@@ -38,7 +43,7 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "jazzee/foundation": 20
-    }
+    "stability-flags": [
+
+    ]
 }
