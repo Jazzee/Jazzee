@@ -86,6 +86,7 @@ JazzeePageStandard.prototype.pageProperties = function(){
     $('#answerStatusDisplayButton input', div).bind('click',function(e){
       //rebuild the tooltip so the edit status display button will show up or be hidden
       div.replaceWith(pageClass.pageProperties());
+      return true;
     });
   }
  
