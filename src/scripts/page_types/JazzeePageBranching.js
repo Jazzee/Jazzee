@@ -111,8 +111,9 @@ JazzeePageBranching.prototype.listBranchesBlock = function(){
       $('#pageToolbar').prepend(button);
       
       var button = $('<button>').html('Delete Branch').data('page', page).bind('click', function(e){
+        pageClass.deleteChild($(this).data('page'));
         $('#editPage').effect('explode',500);
-        pageClass.deleteChild($(e.target).parent().data('page'));
+        pageClass.workspace();
       });
       button.button({
         icons: {
