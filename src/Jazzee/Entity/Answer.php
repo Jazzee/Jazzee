@@ -10,6 +10,8 @@ namespace Jazzee\Entity;
  * uniqueConstraints={@UniqueConstraint(name="answer_uniqueId",columns={"uniqueId"})})
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  **/
 
 class Answer{
@@ -89,12 +91,6 @@ class Answer{
    * @OneToOne(targetEntity="Payment", mappedBy="answer")
    */
   private $payment;
-  
-  /**
-   * The Jazzee Answer instance
-   * @var \Jazzee\Answer
-   */
-  private $jazzeeAnswer;
   
   /**
    * If we set a manual update don't override it

@@ -8,6 +8,7 @@ namespace Jazzee\Entity;
  * @Table(name="gre_scores",uniqueConstraints={@UniqueConstraint(name="gre_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 
 class GREScore{

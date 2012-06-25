@@ -10,6 +10,7 @@ namespace Jazzee\Entity;
  * @Table(name="element_answers") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class ElementAnswer{
   /**

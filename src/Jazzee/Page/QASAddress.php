@@ -102,8 +102,8 @@ class QASAddress extends Standard
    * Create the recommenders form
    */
   public function setupNewPage(){
-    $em = $this->_controller->getEntityManager();
-    $types = $em->getRepository('Jazzee\Entity\ElementType')->findAll();
+    $entityManager = $this->_controller->getEntityManager();
+    $types = $entityManager->getRepository('Jazzee\Entity\ElementType')->findAll();
     $elementTypes = array();
     foreach($types as $type){
       $elementTypes[$type->getClass()] = $type;
@@ -115,7 +115,7 @@ class QASAddress extends Standard
     $element->setWeight(1);
     $element->setFixedId(self::FID_ADDRESS3);
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\TextInput']);
@@ -124,7 +124,7 @@ class QASAddress extends Standard
     $element->setWeight(2);
     $element->setFixedId(self::FID_ADDRESS1);
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\TextInput']);
@@ -132,7 +132,7 @@ class QASAddress extends Standard
     $element->setWeight(3);
     $element->setFixedId(self::FID_ADDRESS2);
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\TextInput']);
@@ -141,7 +141,7 @@ class QASAddress extends Standard
     $element->setFixedId(self::FID_CITY);
     $element->required();
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\TextInput']);
@@ -149,7 +149,7 @@ class QASAddress extends Standard
     $element->setWeight(5);
     $element->setFixedId(self::FID_STATE);
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\TextInput']);
@@ -158,7 +158,7 @@ class QASAddress extends Standard
     $element->setFixedId(self::FID_COUNTRY);
     $element->required();
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\TextInput']);
@@ -167,7 +167,7 @@ class QASAddress extends Standard
     $element->setFixedId(self::FID_POSTALCODE);
     $element->required();
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $defaultVars = array(
       'wsdlAddress' => null,
@@ -175,7 +175,7 @@ class QASAddress extends Standard
     );
     foreach($defaultVars as $name=>$value){
       $var = $this->_applicationPage->getPage()->setVar($name, $value);
-      $em->persist($var);
+      $entityManager->persist($var);
     }    
   }
   
@@ -203,7 +203,6 @@ class QASAddress extends Standard
     $country = $input->get('country');
     $countriesToValidate = explode(',', $this->_applicationPage->getPage()->getVar('validatedCountries'));
     if($sameUserInput or !in_array($country, $countriesToValidate)){
-      $address = array();
       $input->set('el'.$this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId(), $input->get('address1'));
       $input->set('el'.$this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId(), $input->get('address2'));
       $input->set('el'.$this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $input->get('address3'));

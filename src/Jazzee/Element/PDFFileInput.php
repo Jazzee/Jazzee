@@ -7,6 +7,7 @@ namespace Jazzee\Element;
  * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage elements
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class PDFFileInput extends AbstractElement {
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementPDFFileInput.js';
@@ -47,20 +48,20 @@ class PDFFileInput extends AbstractElement {
       
       //create the preview image
       try{
-        $im = new \imagick;
-        $im->readimageblob($input);
-        $im->setiteratorindex(0);
-        $im->setImageFormat("png");
-        $im->scaleimage(100, 0);
+        $imagick = new \imagick;
+        $imagick->readimageblob($input);
+        $imagick->setiteratorindex(0);
+        $imagick->setImageFormat("png");
+        $imagick->scaleimage(100, 0);
       } catch (ImagickException $e){
-        $im = new \imagick;
-        $im->readimage(realpath(__DIR__ . '/../../../../lib/foundation/src/media/default_pdf_logo.png'));
-        $im->scaleimage(100, 0);
+        $imagick = new \imagick;
+        $imagick->readimage(realpath(__DIR__ . '/../../../../lib/foundation/src/media/default_pdf_logo.png'));
+        $imagick->scaleimage(100, 0);
       }
       $elementAnswer = new \Jazzee\Entity\ElementAnswer;
       $elementAnswer->setElement($this->_element);
       $elementAnswer->setPosition(1);
-      $elementAnswer->setEBlob($im->getimageblob());
+      $elementAnswer->setEBlob($imagick->getimageblob());
       $elementAnswers[] = $elementAnswer;
     }
     return $elementAnswers;

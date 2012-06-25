@@ -20,11 +20,13 @@ class AdminCronController extends \Jazzee\AdminController {
    * Check to see if this host is allowed to run cron
    */
   protected function setUp() {
+    $this->layout = 'blank';
     if($this->_config->getAdminCronAllowed()){
       $allowedIps = array();
       foreach(\explode(',',$this->_config->getAdminCronAllowed()) as $value){
-        if(!empty($value) AND $resolvedIps = \gethostbynamel($value)) 
-          $allowedIps = array_merge($allowedIps, \gethostbynamel($value));
+        if(!empty($value) AND $resolvedIps = \gethostbynamel($value)){
+          $allowedIps = array_merge($allowedIps, $resolvedIps);
+        }
       }
       $hostname = \gethostbyaddr($_SERVER['REMOTE_ADDR']);
       $allowed = false;
@@ -66,9 +68,6 @@ class AdminCronController extends \Jazzee\AdminController {
       $this->setVar('adminCronSemephore', false);
       $this->log('Cron run finished');
     }
-    //cron outputs nothing
-    $this->_em->flush();
-    exit(0);
   }
   
 /**

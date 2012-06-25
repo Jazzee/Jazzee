@@ -9,6 +9,7 @@ namespace Jazzee\Entity;
  * @Table(name="application_pages",uniqueConstraints={@UniqueConstraint(name="application_page", columns={"application_id", "page_id"})}) 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class ApplicationPage
 {

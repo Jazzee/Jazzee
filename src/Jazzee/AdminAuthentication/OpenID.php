@@ -52,39 +52,42 @@ class OpenID implements \Jazzee\Interfaces\AdminAuthentication{
     return $this->_user;
   }
 
+  /**
+   * @SuppressWarnings(PHPMD.ExitExpression) 
+   */
   public function loginUser(){
     
     $returnTo = $this->_controller->path('login');
     $realm    = $this->_controller->path('');
     if(!empty($_POST['openid_identifier'])) {
       $identifier = $_POST['openid_identifier'];
-      $rp = new \OpenID_RelyingParty($returnTo, $realm, $identifier);
-      $authRequest = $rp->prepare();
-      $ax = new \OpenID_Extension_AX(\OpenID_Extension::REQUEST);
-      $ax->set('type.email', 'http://axschema.org/contact/email');
-      $ax->set('type.firstname', 'http://axschema.org/namePerson/first');
-      $ax->set('type.lastname', 'http://axschema.org/namePerson/last');
-      $ax->set('mode', 'fetch_request');
-      $ax->set('required', 'email,firstname,lastname');
-      $authRequest->addExtension($ax);
+      $relayParty = new \OpenID_RelyingParty($returnTo, $realm, $identifier);
+      $authRequest = $relayParty->prepare();
+      $authExtension = new \OpenID_Extension_AX(\OpenID_Extension::REQUEST);
+      $authExtension->set('type.email', 'http://axschema.org/contact/email');
+      $authExtension->set('type.firstname', 'http://axschema.org/namePerson/first');
+      $authExtension->set('type.lastname', 'http://axschema.org/namePerson/last');
+      $authExtension->set('mode', 'fetch_request');
+      $authExtension->set('required', 'email,firstname,lastname');
+      $authRequest->addExtension($authExtension);
 
       header('Location: ' . $authRequest->getAuthorizeURL());
       exit(0);
     }
-    $rp = new \OpenID_RelyingParty($returnTo, $realm);
+    $relayParty = new \OpenID_RelyingParty($returnTo, $realm);
     $arr = explode('?', $_SERVER['REQUEST_URI']);
     $queryString = isset($arr[1])?$arr[1]:'';
     if($queryString){
       $message = new \OpenID_Message($queryString, \OpenID_Message::FORMAT_HTTP);
-      $result = $rp->verify(new \Net_URL2($returnTo), $message);
+      $result = $relayParty->verify(new \Net_URL2($returnTo), $message);
       if ($result->success()) {
         $this->_controller->getStore()->expire();
         $this->_controller->getStore()->touchAuthentication();
-        $ax = new \OpenID_Extension_AX(\OpenID_Extension::RESPONSE, $message);
+        $authExtension = new \OpenID_Extension_AX(\OpenID_Extension::RESPONSE, $message);
         $uniqueName = $message->get('openid.claimed_id');
-        $email = $ax->get('value.email');
-        $firstName = $ax->get('value.firstname');
-        $lastName = $ax->get('value.lastname');
+        $email = $authExtension->get('value.email');
+        $firstName = $authExtension->get('value.firstname');
+        $lastName = $authExtension->get('value.lastname');
         $this->_controller->getStore()->set(self::SESSION_VAR_ID, $uniqueName);
         $user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName));
         if(!$user){

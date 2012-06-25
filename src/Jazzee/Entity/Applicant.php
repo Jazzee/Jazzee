@@ -15,6 +15,8 @@ namespace Jazzee\Entity;
  * ) 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  **/
 class Applicant{
   /**
@@ -169,8 +171,8 @@ class Applicant{
    * @param string $password
    */
   public function setPassword($password){
-    $p = new \PasswordHash(8, FALSE);
-    $this->password = $p->HashPassword($password);
+    $passHash = new \PasswordHash(8, FALSE);
+    $this->password = $passHash->HashPassword($password);
     //when a new password is set reset the failedLogin counter
     $this->failedLoginAttempts = 0;
   }
@@ -199,8 +201,8 @@ class Applicant{
    * @param string $hashedPassword
    */
   public function checkPassword($password){
-    $p = new \PasswordHash(8, FALSE);
-    return $p->CheckPassword($password, $this->password);
+    $passHash = new \PasswordHash(8, FALSE);
+    return $passHash->CheckPassword($password, $this->password);
   }
 
   /**
@@ -534,11 +536,11 @@ class Applicant{
   /**
    * Find answer by id
    * 
-   * @param integer $id
+   * @param integer $answerId
    * @return \Jazzee\Entity\Answer or false
    */
-  public function findAnswerById($id){
-    foreach($this->answers as $answer) if($answer->getId() == $id) return $answer;
+  public function findAnswerById($answerId){
+    foreach($this->answers as $answer) if($answer->getId() == $answerId) return $answer;
     return false;
   }
 
@@ -873,21 +875,21 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
    * @return Application
    */
   public function findApplicantsByName($firstName, $lastName, Application $application = null){
-    $qb = $this->_em->createQueryBuilder();
-    $qb->add('select', 'a')
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->add('select', 'a')
      ->from('Jazzee\Entity\Applicant', 'a');
     
     if(!is_null($application)){
-      $qb->where('a.application = :applicationId');
-      $qb->setParameter('applicationId', $application->getId());
+      $queryBuilder->where('a.application = :applicationId');
+      $queryBuilder->setParameter('applicationId', $application->getId());
     }
-    $qb->andWhere('a.firstName LIKE :firstName')
+    $queryBuilder->andWhere('a.firstName LIKE :firstName')
      ->andWhere('a.lastName LIKE :lastName')
      ->orderBy('a.lastName, a.firstName');
-    $qb->setParameter('firstName', $firstName);
-    $qb->setParameter('lastName', $lastName);
+    $queryBuilder->setParameter('firstName', $firstName);
+    $queryBuilder->setParameter('lastName', $lastName);
     
-    return $qb->getQuery()->getResult();
+    return $queryBuilder->getQuery()->getResult();
   }
   
   /**
@@ -899,43 +901,43 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository{
    * @return array Applicant
    */
   public function findApplicantsByQuery(\stdClass $obj, \Jazzee\Controller $controller, Application $application = null){
-    $qb = $this->_em->createQueryBuilder();
-    $qb->add('select', 'a')
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->add('select', 'a')
      ->from('Jazzee\Entity\Applicant', 'a');
     
     if(!is_null($application)){
-      $qb->where('a.application = :applicationId');
-      $qb->setParameter('applicationId', $application->getId());
+      $queryBuilder->where('a.application = :applicationId');
+      $queryBuilder->setParameter('applicationId', $application->getId());
     }
     if(isset($obj->applicant)){
       foreach(array('email','firstName','lastName','middleName','suffix') as $name){
         if(isset($obj->applicant->$name) and !is_null($obj->applicant->$name)){
-          $qb->andWhere("a.{$name} LIKE :{$name}");
-          $qb->setParameter($name, $obj->applicant->$name);
+          $queryBuilder->andWhere("a.{$name} LIKE :{$name}");
+          $queryBuilder->setParameter($name, $obj->applicant->$name);
         }
       }
       foreach(array('lastLogin','createdAt','updatedAt') as $name){
         if(isset($obj->applicant->$name) and !is_null($obj->applicant->$name)){
-          $qb->andWhere("a.{$name} >= :{$name}");
-          $qb->setParameter($name, $obj->applicant->$name);
+          $queryBuilder->andWhere("a.{$name} >= :{$name}");
+          $queryBuilder->setParameter($name, $obj->applicant->$name);
         }
       }
       if(isset($obj->applicant->isLocked) and !is_null($obj->applicant->isLocked)){
-        $qb->andWhere("a.isLocked = :isLocked");
-        $qb->setParameter('isLocked', $obj->applicant->isLocked);
+        $queryBuilder->andWhere("a.isLocked = :isLocked");
+        $queryBuilder->setParameter('isLocked', $obj->applicant->isLocked);
       }
     }
     
     if(isset($obj->decision)){
-      $qb->innerJoin('a.decision','d');
+      $queryBuilder->innerJoin('a.decision','d');
       foreach(array('nominateAdmit','nominateDeny','finalAdmit','finalDeny','acceptOffer','declineOffer') as $name){
         if(isset($obj->decision->$name) and $obj->decision->$name == true){
-          $qb->andWhere("d.{$name} IS NOT NULL");
+          $queryBuilder->andWhere("d.{$name} IS NOT NULL");
         }
       }
     }
-    $qb->orderBy('a.lastName, a.firstName');
-    $applicants = $qb->getQuery()->getResult();
+    $queryBuilder->orderBy('a.lastName, a.firstName');
+    $applicants = $queryBuilder->getQuery()->getResult();
     
     foreach($obj->pages as $pageObj){
       foreach($applicants as $key => $applicant){

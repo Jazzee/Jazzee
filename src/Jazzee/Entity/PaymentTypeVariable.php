@@ -6,6 +6,7 @@ namespace Jazzee\Entity;
  * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variables", columns={"type_id", "name"})}) 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class PaymentTypeVariable{
   /**

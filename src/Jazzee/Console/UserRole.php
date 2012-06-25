@@ -21,15 +21,20 @@ class UserRole extends \Symfony\Component\Console\Command\Command
         $this->addArgument('role name', \Symfony\Component\Console\Input\InputArgument::REQUIRED, 'The name of the role.');
         $this->setHelp('Put a user in a role by name.');
     }
+    /**
+     * @SuppressWarnings(PHPMD.ExitExpression)
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output 
+     */
     protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output){
-      $em = $this->getHelper('em')->getEntityManager();
-      $user = $em->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$input->getArgument('user name')));
+      $entityManager = $this->getHelper('em')->getEntityManager();
+      $user = $entityManager->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$input->getArgument('user name')));
       if(!$user){
         $output->write('<error>That user does not have an account on this system.  User add-user to create one.</error>' . PHP_EOL);
         exit();
       }
       
-      $roles = $em->getRepository('\Jazzee\Entity\Role')->findBy(array('name'=>$input->getArgument('role name'),'isGlobal'=>true));
+      $roles = $entityManager->getRepository('\Jazzee\Entity\Role')->findBy(array('name'=>$input->getArgument('role name'),'isGlobal'=>true));
       if(count($roles) == 0){
         $output->write('<error>There are no roles with that name.</error>' . PHP_EOL);
         exit();
@@ -39,8 +44,8 @@ class UserRole extends \Symfony\Component\Console\Command\Command
         exit();
       }
       $user->addRole($roles[0]);
-      $em->persist($user);
-      $em->flush();
+      $entityManager->persist($user);
+      $entityManager->flush();
       $output->write("<info>{$user->getLastName()}, {$user->getFirstName()} added to {$roles[0]->getName()} role</info>" . PHP_EOL);
     }
 }

@@ -28,6 +28,7 @@ class AdminApiController extends \Jazzee\AdminController {
   
   /**
    * If there is no application then create a new one to work with
+   * @SuppressWarnings(PHPMD.ExitExpression)
    */
   protected function setUp(){
     parent::setUp();
@@ -41,7 +42,7 @@ class AdminApiController extends \Jazzee\AdminController {
         $this->setLayoutVar('status', 'error');
         $this->addMessage('error', 'Invalid API Version');
         $this->loadView('admin_api/index');
-        exit();
+        exit(0);
     }
     $this->version = $this->post['version'];
     
@@ -50,7 +51,7 @@ class AdminApiController extends \Jazzee\AdminController {
       $this->setLayoutVar('status', 'error');
       $this->addMessage('error', 'Invalid API Key');
       $this->loadView('admin_api/index');
-      exit();
+      exit(0);
     }
     if(!empty($this->post['applicationId'])){
       $userPrograms = $this->_user->getPrograms();
@@ -61,7 +62,7 @@ class AdminApiController extends \Jazzee\AdminController {
         $this->setLayoutVar('status', 'error');
         $this->addMessage('error', 'Invalid Application ID or you do not have access to that application');
         $this->loadView('admin_api/index');
-        exit();
+        exit(0);
       }
     }
   }
@@ -69,16 +70,16 @@ class AdminApiController extends \Jazzee\AdminController {
   public function actionIndex(){
     switch($this->post['type']){
       case 'listapplicants':
-        $this->listApplicants($this->post);
+        $this->listApplicants();
         break;
       case 'getapplicants':
         $this->getApplicants($this->post);
         break;
       case 'listapplications':
-        $this->listApplications($this->post);
+        $this->listApplications();
         break;
       case 'getapplication':
-        $this->getApplication($this->post);
+        $this->getApplication();
         break;
       default: 
         $this->setLayoutVar('status', 'error');
@@ -88,9 +89,8 @@ class AdminApiController extends \Jazzee\AdminController {
   
   /**
    * List all the applicants in a program
-   * @param array $post
    */
-  protected function listApplicants(array $post){
+  protected function listApplicants(){
     if(!$this->_application){
       $this->setLayoutVar('status', 'error');
       $this->addMessage('error', 'This request requires an applicationId.');
@@ -134,9 +134,8 @@ class AdminApiController extends \Jazzee\AdminController {
   
   /**
    * List all the applications in the system where the user has access
-   * @param array $post
    */
-  protected function listApplications(array $post){
+  protected function listApplications(){
     $applicationsXml = $this->dom->createElement("applications");
     if($this->checkIsAllowed('admin_changeprogram', 'anyProgram')){
       $programs = $this->_em->getRepository('\Jazzee\Entity\Program')->findAll();
@@ -159,9 +158,8 @@ class AdminApiController extends \Jazzee\AdminController {
   
   /**
    * Get application structure
-   * @param array $post
    */
-  protected function getApplication(array $post){
+  protected function getApplication(){
     if(!$this->_application){
       $this->setLayoutVar('status', 'error');
       $this->addMessage('error', 'This request requires an applicationId.');

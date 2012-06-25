@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../../lib/anet_sdk/AuthorizeNet.php';
  * @license http://jazzee.org/license.txt
  * @package jazzee
  * @subpackage paymenttypes
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class AuthorizeNetAIM extends AbstractPaymentType{
   const APPLY_PAGE_ELEMENT = 'AuthorizeNetPayment-apply_page';
@@ -17,6 +18,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   /**
    * Credit card payment form
    * Different form for administrators
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    */
   public function paymentForm(\Jazzee\Entity\Applicant $applicant, $amount){
     $form = new \Foundation\Form();
@@ -29,31 +31,31 @@ class AuthorizeNetAIM extends AbstractPaymentType{
     if(\is_a($this->_controller,'ApplyPageController')){
       $field->setInstructions("<p><strong>Application Fee:</strong> &#36;{$amount}</p>");
 
-      $e = $field->newElement('TextInput', 'cardNumber');
-      $e->setLabel('Credit Card Number');
-      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
-      $e->addValidator(new \Foundation\Form\Validator\CreditCard($e, explode(',',$this->_paymentType->getVar('acceptedCards'))));
+      $element = $field->newElement('TextInput', 'cardNumber');
+      $element->setLabel('Credit Card Number');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addValidator(new \Foundation\Form\Validator\CreditCard($element, explode(',',$this->_paymentType->getVar('acceptedCards'))));
 
-      $e = $field->newElement('ShortDateInput', 'expirationDate');
-      $e->setLabel('Expiration Date');
-      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
-      $e->addValidator(new \Foundation\Form\Validator\DateAfter($e, 'last month'));
-      $e->addFilter(new \Foundation\Form\Filter\DateFormat($e, 'mY'));
+      $element = $field->newElement('ShortDateInput', 'expirationDate');
+      $element->setLabel('Expiration Date');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'last month'));
+      $element->addFilter(new \Foundation\Form\Filter\DateFormat($element, 'mY'));
 
-      $e = $field->newElement('TextInput', 'cardCode');
-      $e->setLabel('CCV');
-      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+      $element = $field->newElement('TextInput', 'cardCode');
+      $element->setLabel('CCV');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-      $e = $field->newElement('TextInput', 'postalCode');
-      $e->setLabel('Billing Postal Code');
-      $e->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
+      $element = $field->newElement('TextInput', 'postalCode');
+      $element->setLabel('Billing Postal Code');
+      $element->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
 
       $form->newButton('submit', 'Pay with Credit Card');
     } else if(\is_a($this->_controller,'ApplicantsSingle')){
       $field->setInstructions("<p>Credit card details should be enterd directly at the authorize.net website and then the transaction entered here.</p>");
-      $e = $field->newElement('TextInput', 'transactionId');
-      $e->setLabel('Transaction ID');
-      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+      $element = $field->newElement('TextInput', 'transactionId');
+      $element->setLabel('Transaction ID');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
       $form->newButton('submit', 'Lookup Transaction');
     }
     return $form;
@@ -159,11 +161,11 @@ class AuthorizeNetAIM extends AbstractPaymentType{
         return false;
       }
     } else if(\is_a($this->_controller,'ApplicantsSingle')){
-      $td = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
-      $td->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+      $transactionDetails = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+      $transactionDetails->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
       // Get Transaction Details
       $transactionId = $input->get('transactionId');
-      $response = $td->getTransactionDetails($transactionId);
+      $response = $transactionDetails->getTransactionDetails($transactionId);
       if(!$response->response or $response->isError())
         throw new \Jazzee\Exception("Unable to get transaction details for transcation id {$transactionId}", E_ERROR, 'There was a problem getting payment information.');
       if((int)$response->xml->transaction->customer->id != $payment->getAnswer()->getApplicant()->getId())
@@ -187,6 +189,7 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   
   /**
    * Attempt to settle payment with anet's API
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    */
   public function getSettlePaymentForm(\Jazzee\Entity\Payment $payment){
     $form = new \Foundation\Form(); 
@@ -201,14 +204,15 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   }
   
   /**
-   * Once checks have been cashed we settle the payment
+   * Attempt to settle the payment with authorize.net
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    */
   public function settlePayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
-    $td = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
-    $td->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $transactionDetails = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+    $transactionDetails->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     // Get Transaction Details
     $transactionId = $payment->getVar('transactionId');
-    $response = $td->getTransactionDetails($transactionId);
+    $response = $transactionDetails->getTransactionDetails($transactionId);
     if(!$response->response or $response->isError())
       throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId} authorize.net said " . $response->getMessageText(), E_ERROR, 'There was a problem getting payment information.');
     //has this transaction has been settled already
@@ -225,7 +229,8 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   }
   
   /**
-   * Record the reason the payment was refunded
+   * Record the reason the payment was rejected
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    */
   function getRejectPaymentForm(\Jazzee\Entity\Payment $payment){
     $form = new \Foundation\Form(); 
@@ -265,11 +270,11 @@ class AuthorizeNetAIM extends AbstractPaymentType{
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
   public function getRefundPaymentForm(\Jazzee\Entity\Payment $payment){
-    $td = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
-    $td->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
+    $transactionDetails = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
+    $transactionDetails->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
     // Get Transaction Details
     $transactionId = $payment->getVar('transactionId');
-    $response = $td->getTransactionDetails($transactionId);
+    $response = $transactionDetails->getTransactionDetails($transactionId);
     if($response->isError())
       throw new \Jazzee\Exception('Unable to get transaction details for payment #' . $payment->getId() . " transcation id {$transactionId}.  Authorize.net said ". $response->getMessageText(), E_ERROR, 'There was a problem getting payment information.');
      
@@ -300,7 +305,6 @@ class AuthorizeNetAIM extends AbstractPaymentType{
   public function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input){
     $aim = new \AuthorizeNetAIM($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
     $aim->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
-    $config = new \Jazzee\Configuration();
     $aim->test_request = ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?0:1;
     $aim->zip = $input->get('zip');
     $response = $aim->credit($payment->getVar('transactionId'), $payment->getAmount(), $input->get('cardNumber'));

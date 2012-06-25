@@ -98,8 +98,8 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
    * @return \Foundation\Form\Input or boolean
    */
   public function validateInput($arr){
-    $e = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
-    $key = 'el'.$e->getId();
+    $element = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
+    $key = 'el'.$element->getId();
     $arr[$key] = preg_replace('#[^0-9]#','', $arr[$key]);
     $arr[$key] = ltrim($arr[$key], '0');
     return parent::validateInput($arr);
@@ -175,18 +175,17 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     return $form;
   }
   
-/**
+  /**
    * Create the ets match form
    * @param Entity\Page $page
    */
   public function setupNewPage(){
-    $em = $this->_controller->getEntityManager();
-    $types = $em->getRepository('\Jazzee\Entity\ElementType')->findAll();
+    $entityManager = $this->_controller->getEntityManager();
+    $types = $entityManager->getRepository('\Jazzee\Entity\ElementType')->findAll();
     $elementTypes = array();
     foreach($types as $type){
       $elementTypes[$type->getClass()] = $type;
     };
-    $count = 1;
 
     $element = new \Jazzee\Entity\Element;
     $this->_applicationPage->getPage()->addElement($element);
@@ -195,19 +194,19 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     $element->required();
     $element->setWeight(1);
     $element->setFixedId(self::FID_TEST_TYPE);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $item = new \Jazzee\Entity\ElementListItem;
     $element->addItem($item);
     $item->setValue('GRE/GRE Subject');
     $item->setWeight(1);
-    $em->persist($item);
+    $entityManager->persist($item);
     
     $item = new \Jazzee\Entity\ElementListItem;
     $element->addItem($item);
     $item->setValue('TOEFL');
     $item->setWeight(2);
-    $em->persist($item);
+    $entityManager->persist($item);
     
     $element = new \Jazzee\Entity\Element;
     $this->_applicationPage->getPage()->addElement($element);
@@ -217,7 +216,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     $element->required();
     $element->setWeight(2);
     $element->setFixedId(self::FID_REGISTRATION_NUMBER);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $this->_applicationPage->getPage()->addElement($element);
@@ -226,7 +225,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     $element->required();
     $element->setWeight(3);
     $element->setFixedId(self::FID_TEST_DATE);
-    $em->persist($element);
+    $entityManager->persist($element);
   }
   
   /**
@@ -237,12 +236,11 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage {
     $xml = parent::xmlAnswer($dom, $answer);
     if($answer->getMatchedScore()){
       $scoreXml = $dom->createElement('score');
-      $element = $answer->getPage()->getElementByFixedId(self::FID_TEST_TYPE);
       foreach($answer->getMatchedScore()->getSummary() as $name => $value){
-        $e = $dom->createElement('component');
-        $e->setAttribute('name', htmlentities($name,ENT_COMPAT,'utf-8'));
-        $e->appendChild($dom->createCDATASection($value));
-        $scoreXml->appendChild($e);
+        $element = $dom->createElement('component');
+        $element->setAttribute('name', htmlentities($name,ENT_COMPAT,'utf-8'));
+        $element->appendChild($dom->createCDATASection($value));
+        $scoreXml->appendChild($element);
       }
       $xml->appendChild($scoreXml);
     }

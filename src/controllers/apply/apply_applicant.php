@@ -176,7 +176,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
    * @param string $cycleName
    * @return null
    */
-  public function actionNew($programShortName, $cycleName) {
+  public function actionNew() {
     $form = new \Foundation\Form;
     $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('applicant/new'));
@@ -250,7 +250,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController {
     $this->setVar('form', $form);
   }
   
-  public function actionLogout($programShortName,$cycleName){
+  public function actionLogout(){
     $this->_store->expire();
   }
   

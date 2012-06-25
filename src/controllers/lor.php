@@ -24,7 +24,6 @@ class LorController extends \Jazzee\Controller{
     if(!$answer OR !$answer->isLocked()) $this->send404();
     if($answer->getChildren()->count()){
       $this->loadView($this->controllerName . '/complete');
-      exit;
     }
     $this->_parentAnswer = $answer;
     $this->setVar('answer', $answer);
@@ -40,17 +39,15 @@ class LorController extends \Jazzee\Controller{
     $this->setVar('deadline', $deadline->format('m/d/Y g:ia T'));
     if($page->getParent()->getVar('lorDeadlineEnforced') and $deadline < new \DateTime('now')){
       $this->loadView($this->controllerName . '/missed_deadline');
-      exit;
     }
     
     if(!empty($this->post)){
-      $jp = $page->getApplicationPageJazzeePage();
-      $jp->setController($this);
-      if($input = $jp->validateInput($this->post)){
-        $jp->newLorAnswer($input, $answer);
+      $jzp = $page->getApplicationPageJazzeePage();
+      $jzp->setController($this);
+      if($input = $jzp->validateInput($this->post)){
+        $jzp->newLorAnswer($input, $answer);
         $this->setVar('answer', $answer);
         $this->loadView($this->controllerName . '/review');
-        exit();
       }
     }
     $this->setVar('applicantName', $answer->getApplicant()->getFullName());
@@ -60,6 +57,7 @@ class LorController extends \Jazzee\Controller{
   
   /**
    * Send a 404 error page
+   * @SuppressWarnings(PHPMD.ExitExpression)
    */
   protected function send404(){
     $request = new Lvc_Request();
@@ -68,8 +66,8 @@ class LorController extends \Jazzee\Controller{
     $request->setActionParams(array('error' => '404', 'message'=>'We were unable to locate this recommendation, or it has already been submitted.'));
   
     // Get a new front controller without any routers, and have it process our handmade request.
-    $fc = new Lvc_FrontController();
-    $fc->processRequest($request);
+    $frontController = new Lvc_FrontController();
+    $frontController->processRequest($request);
     exit();
   }
   

@@ -8,6 +8,7 @@ namespace Jazzee\Entity;
  * @Table(name="attachments") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class Attachment{
   /**
@@ -84,17 +85,17 @@ class Attachment{
   public function setAttachment($blob){
     $this->attachment = base64_encode($blob);
     try{
-      $im = new \imagick;
-      $im->readimageblob($blob);
-      $im->setiteratorindex(0);
-      $im->setImageFormat("png");
-      $im->scaleimage(100, 0);
+      $imagick = new \imagick;
+      $imagick->readimageblob($blob);
+      $imagick->setiteratorindex(0);
+      $imagick->setImageFormat("png");
+      $imagick->scaleimage(100, 0);
     } catch (\ImagickException $e){
-      $im = new \imagick;
-      $im->readimage(realpath(__DIR__ . '/../../../lib/foundation/src/media/default_pdf_logo.png'));
-      $im->scaleimage(100, 0);
+      $imagick = new \imagick;
+      $imagick->readimage(realpath(__DIR__ . '/../../../lib/foundation/src/media/default_pdf_logo.png'));
+      $imagick->scaleimage(100, 0);
     }
-    $this->thumbnail = base64_encode($im->getimageblob());
+    $this->thumbnail = base64_encode($imagick->getimageblob());
   }
 
   /**

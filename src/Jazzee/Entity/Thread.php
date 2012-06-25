@@ -9,6 +9,7 @@ namespace Jazzee\Entity;
  * @Table(name="threads") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class Thread{
   /**
@@ -191,10 +192,9 @@ class Thread{
   /**
    * Get the message count
    * 
-   * @param integer $sender
    * @return integer $count
    */
-  public function getMessageCount($sender){
+  public function getMessageCount(){
     return $this->messages->count();
   }
   

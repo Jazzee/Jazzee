@@ -41,7 +41,8 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   public function actionSingle($threadId) {
     $thread = $this->_em->getRepository('\Jazzee\Entity\Thread')->find($threadId);
     if(!$thread) throw new \Jazzee\Exception("{$threadId} is not a valid thread id");
-    $applicant = $this->getApplicantById($thread->getApplicant()->getId());
+    //check to be sure the user has access to the thread
+    $this->getApplicantById($thread->getApplicant()->getId());
     $this->setVar('thread', $thread);
   }
   
@@ -53,7 +54,8 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   public function actionMarkUnread($messageId) {
     $message = $this->_em->getRepository('\Jazzee\Entity\Message')->find($messageId);
     if(!$message) throw new \Jazzee\Exception("{$messageId} is not a valid message id");
-    $applicant = $this->getApplicantById($message->getThread()->getApplicant()->getId());
+    //check to be sure the user has access to the thread
+    $this->getApplicantById($message->getThread()->getApplicant()->getId());
     $message->unRead();
     $this->_em->persist($message);
     $this->addMessage('success', 'Message marked as unread');
@@ -68,7 +70,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   public function actionReply($threadId) {
     $thread = $this->_em->getRepository('\Jazzee\Entity\Thread')->find($threadId);
     if(!$thread) throw new \Jazzee\Exception("{$threadId} is not a valid thread id");
-    $applicant = $this->getApplicantById($thread->getApplicant()->getId());
+    $this->getApplicantById($thread->getApplicant()->getId()); //check to be sure the user has access to the thread
     $this->setVar('thread', $thread);
     
     $form = new \Foundation\Form();
@@ -164,11 +166,11 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
       $applicants = array();
       foreach($threads as $thread){
         if($thread->hasUnreadMessage(\Jazzee\Entity\Message::PROGRAM)){
-          $lastUnreadMessageCreatedAt = $thread->getLastUnreadMessage(\Jazzee\Entity\Message::PROGRAM)->getCreatedAt();
-          $diff = $lastUnreadMessageCreatedAt->diff(new DateTime('now'));
+          $createdAt = $thread->getLastUnreadMessage(\Jazzee\Entity\Message::PROGRAM)->getCreatedAt();
+          $diff = $createdAt->diff(new DateTime('now'));
           //if created since our last run or it is a multiplier fo 7 days old in te hour it was crated
           //don't send messages to applicants who have logged in since the message was created
-          if(($lastUnreadMessageCreatedAt > $lastRun OR ($diff->days > 5 AND $diff->days%7 == 0 AND $diff->h == 0)) AND $thread->getApplicant()->getLastLogin() < $lastUnreadMessageCreatedAt){
+          if(($createdAt > $lastRun OR ($diff->days > 5 AND $diff->days%7 == 0 AND $diff->h == 0)) AND $thread->getApplicant()->getLastLogin() < $createdAt){
             if(!array_key_exists($thread->getApplicant()->getId(), $applicants)){
               $applicants[$thread->getApplicant()->getId()] = array(
                 'applicant' => $thread->getApplicant(),
@@ -234,6 +236,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController {
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     //all action authorizations are controlled by the index action
-    return parent::isAllowed($controller, 'index', $user, $program, $application);
+    $action = 'index';
+    return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }

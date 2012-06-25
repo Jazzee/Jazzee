@@ -102,6 +102,7 @@ class Check extends AbstractPaymentType{
   
   /**
    * Record the check number and the deposit date for a payment
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @see ApplyPaymentInterface::settlePaymentForm()
    */
   function getSettlePaymentForm(\Jazzee\Entity\Payment $payment){
@@ -137,6 +138,7 @@ class Check extends AbstractPaymentType{
   
   /**
    * Record the reason the payment was refunded
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
   function getRejectPaymentForm(\Jazzee\Entity\Payment $payment){
@@ -164,6 +166,7 @@ class Check extends AbstractPaymentType{
   
   /**
    * Record the reason the payment was refunded
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @see ApplyPaymentInterface::rejectPaymentForm()
    */
   function getRefundPaymentForm(\Jazzee\Entity\Payment $payment){

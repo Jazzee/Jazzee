@@ -70,6 +70,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
   
   /**
    * Send the invitaiton email
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @param integer $answerID
    * @param array $postData
    */
@@ -127,6 +128,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
   /**
    * View the recommendation Link
    * Admin feature to display the link that recommenders are emailed
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @param integer $answerID
    * @param array $postData
    */
@@ -160,13 +162,13 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $this->checkIsAdmin();
     if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
       $lorPage = $child->getPage();
-      $jp = $lorPage->getApplicationPageJazzeePage();
-      $jp->setController($this->_controller);
-      $jp->fillLorForm($child);
-      $form = $jp->getForm();
+      $jazzeePage = $lorPage->getApplicationPageJazzeePage();
+      $jazzeePage->setController($this->_controller);
+      $jazzeePage->fillLorForm($child);
+      $form = $jazzeePage->getForm();
       if(!empty($postData)){
-        if($input = $jp->validateInput($postData)){
-          $jp->updateLorAnswer($input, $child);
+        if($input = $jazzeePage->validateInput($postData)){
+          $jazzeePage->updateLorAnswer($input, $child);
           $this->_controller->setLayoutVar('status', 'success');
         } else {
           $this->_controller->setLayoutVar('status', 'error');
@@ -187,13 +189,13 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $this->checkIsAdmin();
     if($answer = $this->_applicant->findAnswerById($answerId) and $answer->getChildren()->count() == 0){
       $lorPage = $answer->getPage()->getChildren()->first();
-      $jp = $lorPage->getApplicationPageJazzeePage();
-      $jp->setController($this->_controller);
-      $form = $jp->getForm();
+      $jazzeePage = $lorPage->getApplicationPageJazzeePage();
+      $jazzeePage->setController($this->_controller);
+      $form = $jazzeePage->getForm();
       
       if(!empty($postData)){
-        if($input = $jp->validateInput($postData)){
-          $jp->newLorAnswer($input, $answer);
+        if($input = $jazzeePage->validateInput($postData)){
+          $jazzeePage->newLorAnswer($input, $answer);
           $this->_controller->setLayoutVar('status', 'success');
         } else {
           $this->_controller->setLayoutVar('status', 'error');
@@ -214,9 +216,9 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $this->checkIsAdmin();
     if($child = $this->_applicant->findAnswerById($answerId)->getChildren()->first()){
       $lorPage = $child->getPage();
-      $jp = $lorPage->getApplicationPageJazzeePage();
-      $jp->setController($this->_controller);
-      $jp->deleteLorAnswer($child);
+      $jazzeePage = $lorPage->getApplicationPageJazzeePage();
+      $jazzeePage->setController($this->_controller);
+      $jazzeePage->deleteLorAnswer($child);
       $this->_controller->setLayoutVar('status', 'success');
     } else {
       $this->_controller->setLayoutVar('status', 'error');
@@ -227,8 +229,8 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
    * Create the recommenders form
    */
   public function setupNewPage(){
-    $em = $this->_controller->getEntityManager();
-    $types = $em->getRepository('Jazzee\Entity\ElementType')->findAll();
+    $entityManager = $this->_controller->getEntityManager();
+    $types = $entityManager->getRepository('Jazzee\Entity\ElementType')->findAll();
     $elementTypes = array();
     foreach($types as $type){
       $elementTypes[$type->getClass()] = $type;
@@ -242,7 +244,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
       $element->setWeight($count);
       $element->setFixedId($fid);
       $this->_applicationPage->getPage()->addElement($element);
-      $em->persist($element);
+      $entityManager->persist($element);
       $count++;
     }
     
@@ -253,7 +255,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $element->setWeight(5);
     $element->setFixedId(self::FID_EMAIL);
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\Phonenumber']);
@@ -262,7 +264,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $element->setWeight(6);
     $element->setFixedId(self::FID_PHONE);
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\RadioList']);
@@ -271,19 +273,19 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $element->setWeight(7);
     $element->setFixedId(self::FID_WAIVE_RIGHT);
     $this->_applicationPage->getPage()->addElement($element);
-    $em->persist($element);
+    $entityManager->persist($element);
     
     $item = new \Jazzee\Entity\ElementListItem;
     $item->setValue('Yes');
     $item->setWeight(1);
     $element->addItem($item);
-    $em->persist($item);
+    $entityManager->persist($item);
     
     $item = new \Jazzee\Entity\ElementListItem;
     $item->setValue('No');
     $item->setWeight(2);
     $element->addItem($item);
-    $em->persist($item);
+    $entityManager->persist($item);
     
     $defaultVars = array(
       'lorDeadline' => null,
@@ -293,7 +295,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     );
     foreach($defaultVars as $name=>$value){
       $var = $this->_applicationPage->getPage()->setVar($name, $value);
-      $em->persist($var);
+      $entityManager->persist($var);
     }    
   }
   

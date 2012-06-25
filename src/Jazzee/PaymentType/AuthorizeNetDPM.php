@@ -47,22 +47,22 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
       $field->setLegend($this->_paymentType->getName());
       $field->setInstructions("<p><strong>Application Fee:</strong> &#36;{$amount}</p>");
 
-      $e = $field->newElement('TextInput', 'x_card_num');
-      $e->setLabel('Credit Card Number');
-      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+      $element = $field->newElement('TextInput', 'x_card_num');
+      $element->setLabel('Credit Card Number');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-      $e = $field->newElement('TextInput', 'x_exp_date');
-      $e->setLabel('Expiration Date');
-      $e->setFormat('mm/yy eg ' . date('m/y'));
-      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+      $element = $field->newElement('TextInput', 'x_exp_date');
+      $element->setLabel('Expiration Date');
+      $element->setFormat('mm/yy eg ' . date('m/y'));
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-      $e = $field->newElement('TextInput', 'x_card_code');
-      $e->setLabel('CCV');
-      $e->addValidator(new \Foundation\Form\Validator\NotEmpty($e));
+      $element = $field->newElement('TextInput', 'x_card_code');
+      $element->setLabel('CCV');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-      $e = $field->newElement('TextInput', 'x_zip');
-      $e->setLabel('Billing Postal Code');
-      $e->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
+      $element = $field->newElement('TextInput', 'x_zip');
+      $element->setLabel('Billing Postal Code');
+      $element->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
 
       $form->newButton('submit', 'Pay with Credit Card');
     } else {
@@ -103,31 +103,32 @@ class AuthorizeNetDPM extends AuthorizeNetAIM{
   
   /**
    * Parse the transaction results sent from Authorize.net Direct Post
-   * @param \TransactionController $transactionController
+   * @param \TransactionController $controller
    */
-  public static function transaction($transactionController){
-    $applicant = $transactionController->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->find($_POST['x_cust_id']);
+  public static function transaction($controller){
+    $applicant = $controller->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->find($_POST['x_cust_id']);
     if(!$applicant) throw new \Jazzee\Exception("{$_POST['x_cust_id']} is not a valid applicant id.  Anet post: " . var_export($_POST, true));
     $matches = array();
     preg_match('#page/(\d{1,})/?#', $_POST['redirect_url'], $matches);
     if(!isset($matches[1])) throw new \Jazzee\Exception("No page id match found in redirect_url: '{$_POST['redirect_url']}");
-    $applicationPage = $transactionController->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->find($matches[1]);
+    $applicationPage = $controller->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->find($matches[1]);
     if(!$applicationPage) throw new \Jazzee\Exception("{$matches[1]} is not a valid applicationPage id");
     $answer = new \Jazzee\Entity\Answer();
     $answer->setPage($applicationPage->getPage());
     $applicant->addAnswer($answer);
     
     $payment = new \Jazzee\Entity\Payment();
-    $payment->setType($transactionController->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($_POST['paymentType']));
+    $payment->setType($controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($_POST['paymentType']));
     $answer->setPayment($payment);
     $fakeInput = new \Foundation\Form\Input(array());
-    $result = $payment->getType()->getJazzeePaymentType($transactionController)->pendingPayment($payment, $fakeInput);
-    $transactionController->getEntityManager()->persist($applicant);
-    $transactionController->getEntityManager()->persist($answer);
-    $transactionController->getEntityManager()->persist($payment);
-    foreach($payment->getVariables() as $var) $transactionController->getEntityManager()->persist($var);
-    $transactionController->getEntityManager()->flush();
-    print \AuthorizeNetDPM::getRelayResponseSnippet($_POST['redirect_url']);
+    if($payment->getType()->getJazzeePaymentType($controller)->pendingPayment($payment, $fakeInput)){
+      $controller->getEntityManager()->persist($applicant);
+      $controller->getEntityManager()->persist($answer);
+      $controller->getEntityManager()->persist($payment);
+      foreach($payment->getVariables() as $var) $controller->getEntityManager()->persist($var);
+      $controller->getEntityManager()->flush();
+      print \AuthorizeNetDPM::getRelayResponseSnippet($_POST['redirect_url']);
+    }
   }
   
   /**

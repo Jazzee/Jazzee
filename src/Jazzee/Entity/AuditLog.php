@@ -9,6 +9,7 @@ namespace Jazzee\Entity;
  * @Table(name="audit_log")
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 
 class AuditLog{

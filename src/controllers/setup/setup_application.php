@@ -277,8 +277,8 @@ class SetupApplicationController extends \Jazzee\AdminController {
     $field->setInstructions('You can use these tokens in the text, they will be replaced automatically: <br />' . implode('</br />', $search));
     $element = $field->newElement('Textarea','message');
     $element->setLabel('Message');
-    $f = "getStatus{$status}Text";
-    $element->setValue($this->_application->$f());
+    $func = "getStatus{$status}Text";
+    $element->setValue($this->_application->$func());
     $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     
@@ -293,8 +293,8 @@ class SetupApplicationController extends \Jazzee\AdminController {
    */
   protected function processStatusForm($status, \Foundation\Form $form){
     if($input = $form->processInput($this->post)){
-      $f = "setStatus{$status}Text";
-      $this->_application->$f($input->get('message'));
+      $func = "setStatus{$status}Text";
+      $this->_application->$func($input->get('message'));
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Message Saved.');
       $this->redirectPath('setup/application');

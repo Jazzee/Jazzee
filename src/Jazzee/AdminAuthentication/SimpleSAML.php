@@ -41,7 +41,7 @@ class SimpleSAML implements \Jazzee\Interfaces\AdminAuthentication{
       $this->_user->setFirstName($attrs[$config->getSimpleSAMLFirstNameAttribute()][0]);
       $this->_user->setLastName($attrs[$config->getSimpleSAMLLastNameAttribute()][0]);
       $this->_user->setEmail($attrs[$config->getSimpleSAMLEmailAddressAttribute()][0]);
-      $em->persist($this->_user);
+      $controller->getEntityManager()->persist($this->_user);
     }
   }
   

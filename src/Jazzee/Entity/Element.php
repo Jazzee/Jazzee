@@ -9,6 +9,8 @@ namespace Jazzee\Entity;
  * @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"})}) 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  **/
 class Element{
   /**
@@ -341,11 +343,11 @@ class Element{
   /**
    * Get list item by id
    *
-   * @param integer $id
+   * @param integer $itemId
    * @return Entity\ElementListItem $item
    */
-  public function getItemById($id){
-    foreach($this->listItems as $item) if($item->getId() == $id) return $item;
+  public function getItemById($itemId){
+    foreach($this->listItems as $item) if($item->getId() == $itemId) return $item;
     return false;
   }
   

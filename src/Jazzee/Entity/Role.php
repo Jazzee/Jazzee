@@ -8,6 +8,7 @@ namespace Jazzee\Entity;
  * @Table(name="roles") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class Role{
   /**
@@ -74,7 +75,7 @@ class Role{
    * Make global
    */
   public function makeGlobal(){
-    if($this->program) throw new \Jazzee\Exception("{this->name} is set for program " . $program->getName() . ' but you are trying to make it global.');
+    if($this->program) throw new \Jazzee\Exception("{this->name} is set for program " . $this->program->getName() . ' but you are trying to make it global.');
     $this->isGlobal = true;
   }
   

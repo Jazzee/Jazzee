@@ -28,6 +28,7 @@ class ApplyWelcomeController extends \Jazzee\Controller {
  /**
    * Constructor
    * Check for maintenance mode
+   * @SuppressWarnings(PHPMD.ExitExpression)
    */
   public function __construct(){
     parent::__construct();
@@ -39,9 +40,9 @@ class ApplyWelcomeController extends \Jazzee\Controller {
       $request->setActionParams(array('error' => '503', 'message'=>$message));
     
       // Get a new front controller without any routers, and have it process our handmade request.
-      $fc = new \Lvc_FrontController();
-      $fc->processRequest($request);
-      exit();
+      $frontController = new \Lvc_FrontController();
+      $frontController->processRequest($request);
+      exit(0);
     }
   }
   

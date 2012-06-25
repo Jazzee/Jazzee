@@ -48,7 +48,7 @@ class ManagePagetypesController extends \Jazzee\AdminController {
         $this->redirectPath('manage/pagetypes');
       }
     } else {
-      $this->addMessage('error', "Error: PageType #{$elementTypeID} does not exist.");
+      $this->addMessage('error', "Error: PageType #{$pageTypeId} does not exist.");
     }
   }
    

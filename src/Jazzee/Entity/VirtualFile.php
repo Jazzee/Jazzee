@@ -10,6 +10,7 @@ namespace Jazzee\Entity;
  * uniqueConstraints={@UniqueConstraint(name="virtualfile_name",columns={"name"})})
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class VirtualFile{
   /**

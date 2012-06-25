@@ -44,12 +44,15 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
   public function getUser(){
     return $this->_user;
   }
-  
+  /**
+   * @SuppressWarnings(PHPMD.ExitExpression)
+   * @throws \Jazzee\Exception 
+   */
   public function loginUser(){
     $config = $this->_controller->getConfig();
     if(!isset($_SERVER['Shib-Application-ID'])){
       header('Location: ' . $config->getShibbolethLoginUrl());
-      exit();
+      exit(0);
     }
     if (!isset($_SERVER[$config->getShibbolethUsernameAttribute()])) throw new \Jazzee\Exception($config->getShibbolethUsernameAttribute() . ' attribute is missing from authentication source.');
     $uniqueName = $_SERVER[$config->getShibbolethUsernameAttribute()];
@@ -69,11 +72,14 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication{
     }
   }
   
+  /**
+   * @SuppressWarnings(PHPMD.ExitExpression) 
+   */
   public function logoutUser(){
     $this->_user = null;
     $this->_controller->getStore()->expire();
     header('Location: ' . $this->_controller->getConfig()->getShibbolethLogoutUrl());
-    die();
+    exit(0);
   }
 }
 

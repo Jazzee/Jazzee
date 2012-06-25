@@ -4,6 +4,7 @@
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
  * @subpackage applicants
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ApplicantsSingleController extends \Jazzee\AdminController {
   const TITLE = 'Single Applicant';
@@ -59,12 +60,12 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
   }
   
   /**
-   * Javascript does the display work
-   * @param integer $id the applicants id
+   * Display single applicant
+   * @param integer $applicantId
    */
-  public function actionIndex($id){
+  public function actionIndex($applicantId){
     $this->layout = 'wide';
-    $applicant = $this->getApplicantById($id);
+    $applicant = $this->getApplicantById($applicantId);
     $this->setVar('applicant', $applicant);
   }
   
@@ -351,7 +352,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
       $this->loadView($this->controllerName . '/element');
       return;
     }
-    exit(0);
+      $this->loadView($this->controllerName . '/form'); //loads a blank since there is no form
   }
   
   /**
@@ -359,7 +360,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController {
    * Placeholder for authorization
    * @param integer $applicantId
    */
-  public function actionViewAuditLog($applicantId){}
+  public function actionViewAuditLog(){}
   
   /**
    * Nominate and applicant for admission

@@ -13,12 +13,18 @@ class Preflight extends \Symfony\Component\Console\Command\Command
         $this->setName('preflight')
         ->setDescription('Preflight Check that everythig is installed and configured');
     }
+    /**
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output 
+     */
     protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output){
       $error = false;
       $jazzeeConfiguration = new \Jazzee\Configuration;
-      $em = $this->getHelper('em')->getEntityManager();
+      $entityManager = $this->getHelper('em')->getEntityManager();
       $stub = new AdminStub;
-      $stub->em = $em;
+      $stub->em = $entityManager;
       $stub->config = $jazzeeConfiguration;
       
       $requiredExtensions = array(
@@ -65,7 +71,7 @@ class Preflight extends \Symfony\Component\Console\Command\Command
       $output->write("<comment>{$realPath} is owned by {$owner}:{$group} and has permissions {$perms}.  Ensure your webserver can write to that directory</comment>" . PHP_EOL);
       
       //Check that the schema is correct
-      $validator = new \Doctrine\ORM\Tools\SchemaValidator($em);
+      $validator = new \Doctrine\ORM\Tools\SchemaValidator($entityManager);
       $errors = $validator->validateMapping();
       if($errors) {
         $error = true;
@@ -82,8 +88,8 @@ class Preflight extends \Symfony\Component\Console\Command\Command
         $output->write('<error>The database schema is not correct.  Run "setup update" to fix this.</error>' . PHP_EOL);
       }
       try {
-        $em->getConfiguration()->ensureProductionSettings();
-        $em->getConnection()->connect();
+        $entityManager->getConfiguration()->ensureProductionSettings();
+        $entityManager->getConnection()->connect();
       } catch (\Exception $e) {
         $error = true;
         $output->writeln('<error>' . $e->getMessage() . '</error>');
@@ -100,8 +106,8 @@ class Preflight extends \Symfony\Component\Console\Command\Command
         }
 
 
-        $metadatas = $em->getMetadataFactory()->getAllMetadata();
-        $path = $em->getConfiguration()->getProxyDir();
+        $metadatas = $entityManager->getMetadataFactory()->getAllMetadata();
+        $path = $entityManager->getConfiguration()->getProxyDir();
         if(!is_dir($path)){
           $directory = dirname($path);
           if(\realpath($directory)) $directory = \realpath($directory);
@@ -119,7 +125,7 @@ class Preflight extends \Symfony\Component\Console\Command\Command
             $error = true;
             $output->write("<error>We do not have permission to write to {$proxyDir}.</error>" . PHP_EOL);
           } else {
-            $em->getProxyFactory()->generateProxyClasses($metadatas, $proxyDir);          
+            $entityManager->getProxyFactory()->generateProxyClasses($metadatas, $proxyDir);          
           }
         }
         if(

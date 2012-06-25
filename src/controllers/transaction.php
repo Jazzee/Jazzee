@@ -12,7 +12,6 @@ class TransactionController extends \Jazzee\Controller
 { 
   public function actionPost($class){
     $class::transaction($this);
-    exit();
   }
 }
 ?>

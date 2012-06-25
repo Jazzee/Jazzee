@@ -8,6 +8,7 @@ namespace Jazzee\Entity;
  * @Table(name="toefl_scores",uniqueConstraints={@UniqueConstraint(name="toefl_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 
 class TOEFLScore{

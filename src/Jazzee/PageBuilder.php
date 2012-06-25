@@ -368,12 +368,12 @@ abstract class PageBuilder extends AdminController{
     $applicant->setSuffix('Jr.');
     $applicant->setEmail('jtSmith@example.com');
     $applicant->setApplication($this->_application);
-    $ap = new \Jazzee\Entity\ApplicationPage();
-    $ap->setPage($page);
-    $ap->setApplication($this->_application);
-    $ap->getJazzeePage()->setController($this);
-    $ap->getJazzeePage()->setApplicant($applicant);
-    $this->setVar('page', $ap);
+    $applicationPage = new \Jazzee\Entity\ApplicationPage();
+    $applicationPage->setPage($page);
+    $applicationPage->setApplication($this->_application);
+    $applicationPage->getJazzeePage()->setController($this);
+    $applicationPage->getJazzeePage()->setApplicant($applicant);
+    $this->setVar('page', $applicationPage);
     $this->setVar('applicant', $applicant);
   }
   
@@ -388,11 +388,11 @@ abstract class PageBuilder extends AdminController{
     $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
     //create a temporary application page so we can access the JazzeePage and do setup
     if($data->status == 'new'){
-      $ap = new \Jazzee\Entity\ApplicationPage();
-      $ap->setPage($page);
-      $ap->getJazzeePage()->setController($this);
-      $ap->getJazzeePage()->setupNewPage();
-      unset($ap);
+      $applicationPage = new \Jazzee\Entity\ApplicationPage();
+      $applicationPage->setPage($page);
+      $applicationPage->getJazzeePage()->setController($this);
+      $applicationPage->getJazzeePage()->setupNewPage();
+      unset($applicationPage);
       //give any created elements a temporary id so they will display in the form
       foreach($page->getElements() as $element){
         $element->tempId();
@@ -427,20 +427,20 @@ abstract class PageBuilder extends AdminController{
   /**
    * Crate a generic element to use in previewing a page
    * @param \Jazzee\Entity\Element $element that we are workign with
-   * @param stdClass $e
+   * @param stdClass $obj
    */
-  protected function genericElement(\Jazzee\Entity\Element $element, \stdClass $e){
+  protected function genericElement(\Jazzee\Entity\Element $element, \stdClass $obj){
     $element->tempId();
-    $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($e->typeId));
-    $element->setTitle($e->title);
-    $element->setTitle($e->title);
-    $element->setFormat(empty($e->format)?null:$e->format);
-    $element->setInstructions(empty($e->instructions)?null:$e->instructions);
-    $element->setDefaultValue(empty($e->defaultValue)?null:$e->defaultValue);
-    if($e->isRequired) $element->required(); else $element->optional();
-    $element->setMin(empty($e->min)?null:$e->min);
-    $element->setMax(empty($e->max)?null:$e->max);
-    foreach($e->list as $i){
+    $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($obj->typeId));
+    $element->setTitle($obj->title);
+    $element->setTitle($obj->title);
+    $element->setFormat(empty($obj->format)?null:$obj->format);
+    $element->setInstructions(empty($obj->instructions)?null:$obj->instructions);
+    $element->setDefaultValue(empty($obj->defaultValue)?null:$obj->defaultValue);
+    if($obj->isRequired) $element->required(); else $element->optional();
+    $element->setMin(empty($obj->min)?null:$obj->min);
+    $element->setMax(empty($obj->max)?null:$obj->max);
+    foreach($obj->list as $i){
       $item = new \Jazzee\Entity\ElementListItem();
       $item->tempId();
       $element->addItem($item);
@@ -474,6 +474,7 @@ abstract class PageBuilder extends AdminController{
     }
     //call the bootstrap class so that we get the constant definitions
     $bsBootstrap = new \HTMLPurifier_Bootstrap();
+    unset($bsBootstrap);
     // set up configuration
     $config = \HTMLPurifier_Config::createDefault();
     $config->set('HTML.DefinitionID', 'JazzeeJazzeeConfig');

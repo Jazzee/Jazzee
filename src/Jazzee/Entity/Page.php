@@ -10,6 +10,8 @@ namespace Jazzee\Entity;
  * uniqueConstraints={@UniqueConstraint(name="page_uuid",columns={"uuid"})})
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  **/
 class Page{
   /**
@@ -378,11 +380,11 @@ class Page{
   /**
    * Get a child by id
    *
-   * @param integer $id
+   * @param integer $childId
    * @return \Jazzee\Entity\Page
    */
-  public function getChildById($id){
-    foreach($this->children as $child) if($child->getId() == $id) return $child;
+  public function getChildById($childId){
+    foreach($this->children as $child) if($child->getId() == $childId) return $child;
     return false;
   }
   
@@ -449,11 +451,11 @@ class Page{
   
 	/**
    * Get element by ID
-   * @param integer $id
+   * @param integer $elementId
    * @return Entity\Element $element
    */
-  public function getElementById($id){
-    foreach($this->elements as $element) if($element->getId() == $id) return $element;
+  public function getElementById($elementId){
+    foreach($this->elements as $element) if($element->getId() == $elementId) return $element;
     return false;
   }
   
@@ -469,11 +471,11 @@ class Page{
   
   /**
    * Get element by fixed ID
-   * @param integer $id
+   * @param integer $fixedId
    * @return Entity\Element $element
    */
-  public function getElementByFixedId($id){
-    foreach($this->elements as $element) if($element->getFixedId() == $id) return $element;
+  public function getElementByFixedId($fixedId){
+    foreach($this->elements as $element) if($element->getFixedId() == $fixedId) return $element;
     return false;
   }
   
@@ -483,9 +485,9 @@ class Page{
    */
   public function getApplicationPageJazzeePage(){
     if($this->_applicationPageJazzeePage == null){
-      $ap = new ApplicationPage;
-      $ap->setPage($this);
-      $this->_applicationPageJazzeePage = $ap->getJazzeePage();
+      $applicationPage = new ApplicationPage;
+      $applicationPage->setPage($this);
+      $this->_applicationPageJazzeePage = $applicationPage->getJazzeePage();
     }
     return $this->_applicationPageJazzeePage;
   }

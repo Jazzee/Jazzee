@@ -9,6 +9,7 @@ namespace Jazzee\Entity;
  * @Table(name="element_list_items") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class ElementListItem{
   /**

@@ -67,12 +67,9 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
         $page->makeGlobal();
         $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
         //create a fake application page to work with so we can run setupNewPage
-        $ap = new \Jazzee\Entity\ApplicationPage();
-        $ap->setPage($page);
-        $ap->getJazzeePage()->setController($this);
-        $ap->getJazzeePage()->setupNewPage();
+        $page->getApplicationPageJazzeePage()->setController($this);
+        $page->getApplicationPageJazzeePage()->setupNewPage();
         $this->addMessage('success',$data->title . ' created.');
-        unset($ap);
         $this->savePage($page, $data);
         break;
       default:
@@ -83,6 +80,7 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder {
   
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null){
     //all action authorizations are controlled by the index action
-    return parent::isAllowed($controller, 'index', $user, $program, $application);
+    $action = 'index';
+    return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 }

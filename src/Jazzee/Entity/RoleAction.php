@@ -7,6 +7,7 @@ namespace Jazzee\Entity;
  * @Entity @Table(name="role_actions") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/ 
 class RoleAction{
   /**

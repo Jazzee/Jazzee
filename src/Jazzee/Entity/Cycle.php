@@ -9,6 +9,7 @@ namespace Jazzee\Entity;
  * uniqueConstraints={@UniqueConstraint(name="cycle_name_unique",columns={"name"})})
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  */
 class Cycle{
   /**

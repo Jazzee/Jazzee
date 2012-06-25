@@ -8,7 +8,8 @@ namespace Jazzee\Entity;
  * @Table(name="answer_status_types", 
  * uniqueConstraints={@UniqueConstraint(name="answerstatustype_name",columns={"name"})})
  * @package    jazzee
- * @subpackage orm
+ * @subpackage orm  
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class AnswerStatusType{
   /**

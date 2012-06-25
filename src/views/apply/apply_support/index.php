@@ -44,7 +44,7 @@ $today = new DateTime;
             </td>
             <td>
               <?php 
-                  print $thread->getMessageCount(\Jazzee\Entity\Message::PROGRAM) . ' total and ';
+                  print $thread->getMessageCount() . ' total and ';
                   print $thread->getUnreadMessageCount(\Jazzee\Entity\Message::PROGRAM) . ' new messages';
                 ?>
             </td>

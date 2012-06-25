@@ -9,6 +9,7 @@ namespace Jazzee\Entity;
  * @Table(name="decisions") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class Decision{
   /**
@@ -47,6 +48,14 @@ class Decision{
   
   /** @Column(type="datetime", nullable=true) */
   private $declineOffer;
+  
+  /**
+   * Get Id
+   * @return integer 
+   */
+  public function getId(){
+    return $this->id;
+  }
 
   /**
    * Set applicant

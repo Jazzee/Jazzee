@@ -240,7 +240,7 @@ class ManageRolesController extends \Jazzee\AdminController {
         $this->redirectPath('manage/roles');
       }
     } else {
-      $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
+      $this->addMessage('error', "Error: Role #{$roleId} does not exist.");
     }
   }
   

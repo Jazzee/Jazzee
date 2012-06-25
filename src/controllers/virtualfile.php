@@ -24,9 +24,8 @@ class VirtualfileController extends \Jazzee\Controller{
     $request->setActionParams(array('error' => '404', 'message'=>'File Not Found'));
   
     // Get a new front controller without any routers, and have it process our handmade request.
-    $fc = new Lvc_FrontController();
-    $fc->processRequest($request);
-    exit();
+    $frontController = new Lvc_FrontController();
+    $frontController->processRequest($request);
   }
 }
 ?>

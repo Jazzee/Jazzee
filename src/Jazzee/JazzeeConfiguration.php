@@ -4,6 +4,7 @@ namespace Jazzee;
 /**
  * Config class
  * @package jazzee
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 class JazzeeConfiguration
 {

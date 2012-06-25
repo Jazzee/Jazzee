@@ -60,18 +60,17 @@ class ManageScoresController extends \Jazzee\AdminController {
    * @param FormInput $input
    */
   protected function etsgreScores($input){
-    $file = $input->get('file');
-    $f = file($file['tmp_name'], FILE_IGNORE_NEW_LINES);
-    switch(strlen($f[0])){
+    $fileArr = $input->get('file');
+    $file = file($fileArr['tmp_name'], FILE_IGNORE_NEW_LINES);
+    switch(strlen($file[0])){
       case 500:
-        print 'version1'; die;
-        $scores = $this->parseGREVersion1($f);
+        $scores = $this->parseGREVersion1($file);
         break;
       case 600:
-        $scores = $this->parseGREVersion2($f);
+        $scores = $this->parseGREVersion2($file);
         break;
       default:
-        $this->addMessage('error', "Unrecognized GRE format:  ({$file['name']}) has " . strlen($f[0]) . ' characters per line.');
+        $this->addMessage('error', "Unrecognized GRE format:  ({$fileArr['name']}) has " . strlen($file[0]) . ' characters per line.');
         return false;
     }
     $new = 0;
@@ -224,17 +223,17 @@ class ManageScoresController extends \Jazzee\AdminController {
    * @param FormInput $input
    */
   protected function etstoeflScores($input){
-    $file = $input->get('file');
-    $f = file($file['tmp_name'], FILE_IGNORE_NEW_LINES);
-    switch(strlen($f[0])){
+    $fileArr = $input->get('file');
+    $file = file($fileArr['tmp_name'], FILE_IGNORE_NEW_LINES);
+    switch(strlen($file[0])){
       case 590:
-        $scores = $this->parseTOEFLVersion1($f);
+        $scores = $this->parseTOEFLVersion1($file);
         break;
       case 900:
-        $scores = $this->parseTOEFLVersion2($f);
+        $scores = $this->parseTOEFLVersion2($file);
         break;
       default:
-        $this->addMessage('error', "Unrecognized TOEFL format:  ({$file['name']}) has " . strlen($f[0]) . ' characters per line.');
+        $this->addMessage('error', "Unrecognized TOEFL format:  ({$fileArr['name']}) has " . strlen($file[0]) . ' characters per line.');
         return false;
     }
     

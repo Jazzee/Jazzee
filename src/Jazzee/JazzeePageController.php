@@ -7,6 +7,7 @@ namespace Jazzee;
  * for error pages and file pages to use it when they don't need acess
  * to configuration or session info setup by JazzeeController
  * @package jazzee
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 
 class JazzeePageController extends \Foundation\VC\Controller
@@ -102,6 +103,7 @@ class JazzeePageController extends \Foundation\VC\Controller
   /**
    * Call any after action properties, redirect, and exit
    * @param string $path
+   * @SuppressWarnings(PHPMD.ExitExpression)
    */
   public function redirectPath($path){
     $this->redirect($this->path($path));
@@ -111,6 +113,7 @@ class JazzeePageController extends \Foundation\VC\Controller
 
   /**
    * Call any after action properties, redirect, and exit
+   * @SuppressWarnings(PHPMD.ExitExpression)
    * @param string $url
    */
   public function redirectUrl($url){
@@ -347,29 +350,30 @@ class JazzeePageController extends \Foundation\VC\Controller
   
   /**
    * Handle PHP Exception
-   * @param Exception $e
+   * @SuppressWarnings(PHPMD.ExitExpression)
+   * @param Exception $exception
    */
-  public function handleException(\Exception $e){
-    $message = $e->getMessage();
+  public function handleException(\Exception $exception){
+    $message = $exception->getMessage();
     $userMessage = 'Unspecified Technical Difficulties';
     $code = 500;
-    if($e instanceof \Lvc_Exception){
+    if($exception instanceof \Lvc_Exception){
       $code = 404;
       $userMessage = 'Page not found.';
     }
-    if($e instanceof \PDOException){
+    if($exception instanceof \PDOException){
       $message = 'Problem with database connection. PDO says: ' . $message;
       $userMessage = 'We are experiencing a problem connecting to our database.  Please try your request again.';
     }
-    if($e instanceof \Foundation\Exception){
-      $userMessage = $e->getUserMessage();
+    if($exception instanceof \Foundation\Exception){
+      $userMessage = $exception->getUserMessage();
     }
-    if($e instanceof \Foundation\Virtual\Exception){
-      $userMessage = $e->getUserMessage();
-      $code = $e->getHttpErrorCode();
+    if($exception instanceof \Foundation\Virtual\Exception){
+      $userMessage = $exception->getUserMessage();
+      $code = $exception->getHttpErrorCode();
     }
     /* Map the PHP error to a Log priority. */
-    switch ($e->getCode()) {
+    switch ($exception->getCode()) {
       case E_WARNING:
       case E_USER_WARNING:
         $priority = \Monolog\Logger::WARNING;
@@ -395,8 +399,8 @@ class JazzeePageController extends \Foundation\VC\Controller
     $request->setActionParams(array('error' => $code, 'message'=>$userMessage));
   
     // Get a new front controller without any routers, and have it process our handmade request.
-    $fc = new \Lvc_FrontController();
-    $fc->processRequest($request);
+    $frontController = new \Lvc_FrontController();
+    $frontController->processRequest($request);
     exit(1);
   }
 }

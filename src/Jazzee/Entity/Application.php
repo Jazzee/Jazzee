@@ -10,6 +10,8 @@ namespace Jazzee\Entity;
  * 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  **/
 class Application{  
   /**

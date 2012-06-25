@@ -95,6 +95,10 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage {
     return !$error;
   }
   
+  /**
+   * @param type $input
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+   */
   public function newAnswer($input){
     $this->_applicant->lock();
     $this->_controller->getEntityManager()->persist($this->_applicant);
@@ -107,6 +111,7 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage {
    * Lock Doesn't update answers
    * @param type $input
    * @param type $answerId
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @return boolean 
    */
   public function updateAnswer($input, $answerId){
@@ -116,6 +121,7 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage {
   /**
    * Lock Doesn't delete answers
    * @param type $answerId
+   * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @return boolean 
    */
   public function deleteAnswer($answerId){

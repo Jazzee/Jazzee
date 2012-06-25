@@ -8,6 +8,7 @@ namespace Jazzee\Entity;
  * @Table(name="payments") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class Payment{
   /**

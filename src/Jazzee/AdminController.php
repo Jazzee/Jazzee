@@ -5,6 +5,8 @@ namespace Jazzee;
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
  * @subpackage manage
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
  */
 abstract class AdminController extends Controller implements \Jazzee\Interfaces\AdminController {
   /**
@@ -132,6 +134,7 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
   /**
    * Check set the default page title and layout title
    * don't allow this to be overridden past this point so authentication is always required
+   * @SuppressWarnings(PHPMD.ExitExpression)
    */
   public final function beforeAction(){
     parent::beforeAction();

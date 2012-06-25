@@ -17,17 +17,22 @@ class Scramble extends \Symfony\Component\Console\Command\Command
     protected function configure(){
         $this->setName('scramble')->setDescription('Scramble Applicants for testing.');
     }
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output 
+     */
     protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output){
       $jazzeeConfiguration = new \Jazzee\Configuration;
       if($jazzeeConfiguration->getStatus() == 'PRODUCTION'){
         $output->write('<error>You cannot scramble in production.</error>' . PHP_EOL);
       } else {
         $start = time();
-        $em = $this->getHelper('em')->getEntityManager();
+        $entityManager = $this->getHelper('em')->getEntityManager();
         $offset = 0;
         $maxResults = 100;
         $count = 0;
-        $query = $em->createQuery("SELECT a.firstName, a.lastName FROM \Jazzee\Entity\Applicant a");
+        $query = $entityManager->createQuery("SELECT a.firstName, a.lastName FROM \Jazzee\Entity\Applicant a");
         $query->setMaxResults(500);
         $firstNames = array();
         $lastNames = array();
@@ -36,7 +41,7 @@ class Scramble extends \Symfony\Component\Console\Command\Command
           $lastNames[] = $arr['lastName'];
         }
         do{
-          $query = $em->createQuery("SELECT a FROM \Jazzee\Entity\Applicant a");
+          $query = $entityManager->createQuery("SELECT a FROM \Jazzee\Entity\Applicant a");
           $query->setMaxResults($maxResults);
           $query->setFirstResult($offset);
           $applicants = $query->getResult();
@@ -46,11 +51,11 @@ class Scramble extends \Symfony\Component\Console\Command\Command
             $applicant->setFirstName($firstNames[array_rand($firstNames)]);
             $applicant->setLastName($lastNames[array_rand($lastNames)]);
             $applicant->setEmail("nobody{$count}@example.com");
-            $em->persist($applicant);
+            $entityManager->persist($applicant);
           }
           $offset = $offset+$maxResults;
-          $em->flush();
-          $em->clear();
+          $entityManager->flush();
+          $entityManager->clear();
           gc_collect_cycles();
         } while ($continue);
         $total = time() - $start;

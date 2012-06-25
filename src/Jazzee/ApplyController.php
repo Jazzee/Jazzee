@@ -30,6 +30,7 @@ class ApplyController extends Controller
  /**
    * Constructor
    * Check for maintenance mode
+   * @SuppressWarnings(PHPMD.ExitExpression)
    */
   public function __construct(){
     parent::__construct();
@@ -41,8 +42,8 @@ class ApplyController extends Controller
       $request->setActionParams(array('error' => '503', 'message'=>$message));
     
       // Get a new front controller without any routers, and have it process our handmade request.
-      $fc = new \Lvc_FrontController();
-      $fc->processRequest($request);
+      $frontController = new \Lvc_FrontController();
+      $frontController->processRequest($request);
       exit();
     }
   }

@@ -10,6 +10,7 @@ namespace Jazzee\Entity;
  * @Table(name="messages") 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class Message{
   /**

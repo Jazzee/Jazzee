@@ -11,9 +11,10 @@ namespace Jazzee\Console;
  */
 class Install extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand
 {
-    /**
-     * @see Console\Command\Command
-     */
+  /**
+    * @see Console\Command\Command
+    * @SuppressWarnings(PHPMD.ExitExpression)
+    */
     protected function configure()
     {
         $this
@@ -24,9 +25,15 @@ class Install extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateComma
 EOT
         );
     }
+    
+   /**
+    * @see Console\Command\Command
+    * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+    * @SuppressWarnings(PHPMD.ExitExpression)
+    */
     protected function executeSchemaCommand(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output, \Doctrine\ORM\Tools\SchemaTool $schemaTool, array $metadatas){
-      $sm = $this->getHelper('em')->getEntityManager()->getConnection()->getSchemaManager();
-      $tables = $sm->listTableNames();
+      $schemaManager = $this->getHelper('em')->getEntityManager()->getConnection()->getSchemaManager();
+      $tables = $schemaManager->listTableNames();
       if(!empty($tables)){
         $output->write('<error>ATTENTION: You are attempting to install jazzee on a database that is not empty..</error>' . PHP_EOL . PHP_EOL);
         exit(1);
@@ -75,10 +82,10 @@ EOT
       $this->getHelper('em')->getEntityManager()->flush();
       $output->write('<info>Default Element types added</info>' . PHP_EOL);
 
-      $em = $this->getHelper('em')->getEntityManager();
+      $entityManager = $this->getHelper('em')->getEntityManager();
       $role = new \Jazzee\Entity\Role();
       $role->makeGlobal();
-      $em->persist($role);
+      $entityManager->persist($role);
       $role->setName('Administrator');
       \Foundation\VC\Config::addControllerPath(__DIR__ . '/../../controllers/');
       foreach(array('admin','applicants','manage','scores','setup') as $path){
@@ -89,22 +96,21 @@ EOT
           $controller = basename($fileName, '.php');
           \Foundation\VC\Config::includeController($controller);
           $class = \Foundation\VC\Config::getControllerClassName($controller);
-          $arr = array('name'=> $controller, 'actions'=>array());
           foreach(get_class_methods($class) as $method){
             if(substr($method, 0, 6) == 'action'){
               $constant = 'ACTION_' . strtoupper(substr($method, 6));
               if(defined("{$class}::{$constant}")){
-                $ra = new \Jazzee\Entity\RoleAction();
-                $ra->setController($controller);
-                $ra->setAction(substr($method, 6));
-                $ra->setRole($role);
-                $em->persist($ra);
+                $roleAction = new \Jazzee\Entity\RoleAction();
+                $roleAction->setController($controller);
+                $roleAction->setAction(substr($method, 6));
+                $roleAction->setRole($role);
+                $entityManager->persist($roleAction);
               }
             }
           }
         }
       }
-      $em->flush();
+      $entityManager->flush();
       $output->write("<info>Administrator role created</info>" . PHP_EOL);
         
     }

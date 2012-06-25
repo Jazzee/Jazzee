@@ -9,6 +9,7 @@ namespace Jazzee\Entity;
  * uniqueConstraints={@UniqueConstraint(name="user_name",columns={"uniqueName"})})
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class User{
   /**

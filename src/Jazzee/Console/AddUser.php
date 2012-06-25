@@ -21,10 +21,10 @@ class AddUser extends \Symfony\Component\Console\Command\Command
     }
     protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output){
       $jazzeeConfiguration = new \Jazzee\Configuration;
-      $em = $this->getHelper('em')->getEntityManager();
+      $entityManager = $this->getHelper('em')->getEntityManager();
       $stub = new AdminStub;
       $stub = new AdminStub;
-      $stub->em = $em;
+      $stub->em = $entityManager;
       $stub->config = $jazzeeConfiguration;
       $class = $jazzeeConfiguration->getAdminDirectoryClass();
       $directory = new $class($stub);
@@ -45,8 +45,8 @@ class AddUser extends \Symfony\Component\Console\Command\Command
         $user->setFirstName($arr['firstName']);
         $user->setLastName($arr['lastName']);
         $user->setEmail($arr['emailAddress']);
-        $em->persist($user);
-        $em->flush();
+        $entityManager->persist($user);
+        $entityManager->flush();
         $output->write("<info>{$arr['lastName']}, {$arr['firstName']} ({$arr['emailAddress']}) add as user #{$user->getId()}</info>" . PHP_EOL);
       }
       

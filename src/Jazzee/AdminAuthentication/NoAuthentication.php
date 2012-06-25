@@ -55,7 +55,7 @@ class NoAuthentication implements \Jazzee\Interfaces\AdminAuthentication{
   
   public function loginUser(){
     $form = $this->getLoginForm();
-    if($input = $form->processInput($_POST)){
+    if($form->processInput($_POST)){
       $allowedIps = explode(',', $this->_controller->getConfig()->getNoAuthIpAddresses());
       if(in_array($_SERVER['REMOTE_ADDR'], $allowedIps)){
         $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('id'=>$_POST['userid'], 'isActive'=>true));

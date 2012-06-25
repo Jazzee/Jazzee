@@ -8,6 +8,7 @@ namespace Jazzee\Entity;
  * uniqueConstraints={@UniqueConstraint(name="tag_title",columns={"title"})})
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class Tag{
   /**
@@ -25,6 +26,10 @@ class Tag{
   **/
   private $applicants;
   
+  public function __construct(){
+    $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
+  }
+  
 
   /**
    * Get id
@@ -33,6 +38,14 @@ class Tag{
    */
   public function getId(){
     return $this->id;
+  }
+  
+  /**
+   * Get Applicants 
+   * array Applicant
+   */
+  public function getApplicants(){
+    return $this->applicants;
   }
   
   /**

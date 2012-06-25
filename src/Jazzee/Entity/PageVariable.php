@@ -8,6 +8,7 @@ namespace Jazzee\Entity;
  * @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="pagevariable_name", columns={"page_id", "name"})}) 
  * @package    jazzee
  * @subpackage orm
+ * @SuppressWarnings(PHPMD.ShortVariable)
  **/
 class PageVariable{
   /**
