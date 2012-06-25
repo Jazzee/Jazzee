@@ -1,108 +1,110 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * GREScore
  * Scores imported from ETS
+ *
  * @Entity(repositoryClass="\Jazzee\Entity\GREScoreRepository")
- * @Table(name="gre_scores",uniqueConstraints={@UniqueConstraint(name="gre_registration", columns={"registrationNumber", "testMonth", "testYear"})}) 
- * @package    jazzee
- * @subpackage orm
+ * @Table(name="gre_scores",uniqueConstraints={@UniqueConstraint(name="gre_registration", columns={"registrationNumber", "testMonth", "testYear"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class GREScore
+{
 
-class GREScore{
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
+
   /** @Column(type="bigint") */
   private $registrationNumber;
-  
+
   /** @Column(type="integer") */
   private $testMonth;
-  
+
   /** @Column(type="integer") */
   private $testYear;
-  
+
   /** @Column(type="string", length=4, nullable=true) */
   private $departmentCode;
-  
+
   /** @Column(type="string", nullable=true) */
   private $departmentName;
-  
+
   /** @Column(type="string") */
   private $firstName;
-  
+
   /** @Column(type="string", length=1, nullable=true) */
   private $middleInitial;
-  
+
   /** @Column(type="string") */
   private $lastName;
-  
+
   /** @Column(type="datetime") */
   private $birthDate;
-  
+
   /** @Column(type="string", length=1, nullable=true) */
   private $gender;
-  
+
   /** @Column(type="datetime") */
   private $testDate;
-  
+
   /** @Column(type="string", length=2) */
   private $testCode;
-  
+
   /** @Column(type="string") */
   private $testName;
-  
+
   /** @Column(type="string", length=1) */
   private $score1Type;
-  
+
   /** @Column(type="integer", length=3) */
   private $score1Converted;
-  
+
   /** @Column(type="decimal", length=3) */
   private $score1Percentile;
-  
+
   /** @Column(type="string", length=1, nullable=true) */
   private $score2Type;
-  
+
   /** @Column(type="integer", length=3, nullable=true) */
   private $score2Converted;
-  
+
   /** @Column(type="decimal", length=3, nullable=true) */
   private $score2Percentile;
-  
+
   /** @Column(type="string", length=1, nullable=true) */
   private $score3Type;
-  
+
   /** @Column(type="integer", length=3, nullable=true) */
   private $score3Converted;
-  
+
   /** @Column(type="decimal", length=3, nullable=true) */
   private $score3Percentile;
-  
+
   /** @Column(type="string", length=1, nullable=true) */
   private $score4Type;
-  
+
   /** @Column(type="integer", length=3, nullable=true) */
   private $score4Converted;
-  
+
   /** @Column(type="decimal", length=3, nullable=true) */
   private $score4Percentile;
-  
+
   /** @Column(type="integer", length=4) */
   private $sequenceNumber;
-  
+
   /** @Column(type="integer", length=2) */
   private $recordSerialNumber;
-  
+
   /** @Column(type="integer", length=4) */
   private $cycleNumber;
-  
+
   /** @Column(type="datetime") */
   private $processDate;
 
@@ -111,7 +113,8 @@ class GREScore{
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -122,9 +125,14 @@ class GREScore{
    * @param integer $testMonth
    * @param integer $testYear
    */
-  public function setRegistrationNumber($registrationNumber, $testMonth, $testYear){
-    if($testMonth < 1 OR $testMonth > 12) throw new Jazzee_Exception("{$testMonth} is not a valid month");
-    if($testYear < 1900 OR $testMonth > 2100) throw new Jazzee_Exception("{$testYear} is not a valid year");
+  public function setRegistrationNumber($registrationNumber, $testMonth, $testYear)
+  {
+    if ($testMonth < 1 OR $testMonth > 12) {
+      throw new Jazzee_Exception("{$testMonth} is not a valid month");
+    }
+    if ($testYear < 1900 OR $testMonth > 2100) {
+      throw new Jazzee_Exception("{$testYear} is not a valid year");
+    }
     //remove leading 0s
     $this->registrationNumber = ltrim($registrationNumber, '0');
     $this->testMonth = $testMonth;
@@ -136,7 +144,8 @@ class GREScore{
    *
    * @return string $registrationNumber
    */
-  public function getRegistrationNumber(){
+  public function getRegistrationNumber()
+  {
     return $this->registrationNumber;
   }
 
@@ -145,7 +154,8 @@ class GREScore{
    *
    * @param string $departmentCode
    */
-  public function setDepartmentCode($departmentCode){
+  public function setDepartmentCode($departmentCode)
+  {
     $this->departmentCode = $departmentCode;
   }
 
@@ -154,7 +164,8 @@ class GREScore{
    *
    * @return string $departmentCode
    */
-  public function getDepartmentCode(){
+  public function getDepartmentCode()
+  {
     return $this->departmentCode;
   }
 
@@ -163,7 +174,8 @@ class GREScore{
    *
    * @param string $departmentName
    */
-  public function setDepartmentName($departmentName){
+  public function setDepartmentName($departmentName)
+  {
     $this->departmentName = $departmentName;
   }
 
@@ -172,7 +184,8 @@ class GREScore{
    *
    * @return string $departmentName
    */
-  public function getDepartmentName(){
+  public function getDepartmentName()
+  {
     return $this->departmentName;
   }
 
@@ -181,7 +194,8 @@ class GREScore{
    *
    * @param string $firstName
    */
-  public function setFirstName($firstName){
+  public function setFirstName($firstName)
+  {
     $this->firstName = $firstName;
   }
 
@@ -190,7 +204,8 @@ class GREScore{
    *
    * @return string $firstName
    */
-  public function getFirstName(){
+  public function getFirstName()
+  {
     return $this->firstName;
   }
 
@@ -199,7 +214,8 @@ class GREScore{
    *
    * @param string $middleInitial
    */
-  public function setMiddleInitial($middleInitial){
+  public function setMiddleInitial($middleInitial)
+  {
     $this->middleInitial = $middleInitial;
   }
 
@@ -208,7 +224,8 @@ class GREScore{
    *
    * @return string $middleInitial
    */
-  public function getMiddleInitial(){
+  public function getMiddleInitial()
+  {
     return $this->middleInitial;
   }
 
@@ -217,7 +234,8 @@ class GREScore{
    *
    * @param string $lastName
    */
-  public function setLastName($lastName){
+  public function setLastName($lastName)
+  {
     $this->lastName = $lastName;
   }
 
@@ -226,7 +244,8 @@ class GREScore{
    *
    * @return string $lastName
    */
-  public function getLastName(){
+  public function getLastName()
+  {
     return $this->lastName;
   }
 
@@ -235,7 +254,8 @@ class GREScore{
    *
    * @param string $birthDate
    */
-  public function setBirthDate($birthDate){
+  public function setBirthDate($birthDate)
+  {
     $this->birthDate = new \DateTime($birthDate);
   }
 
@@ -244,7 +264,8 @@ class GREScore{
    *
    * @return datetime $birthDate
    */
-  public function getBirthDate(){
+  public function getBirthDate()
+  {
     return $this->birthDate;
   }
 
@@ -253,9 +274,14 @@ class GREScore{
    *
    * @param string $gender
    */
-  public function setGender($gender){
-    if(is_null($gender)) return;
-    if(!in_array(strtolower($gender), array('m', 'f'))) throw new \Jazzee_Exception("'{$gender}' is not a valid gender");
+  public function setGender($gender)
+  {
+    if (is_null($gender)) {
+      return;
+    }
+    if (!in_array(strtolower($gender), array('m', 'f'))) {
+      throw new \Jazzee_Exception("'{$gender}' is not a valid gender");
+    }
     $this->gender = $gender;
   }
 
@@ -264,7 +290,8 @@ class GREScore{
    *
    * @return string $gender
    */
-  public function getGender(){
+  public function getGender()
+  {
     return $this->gender;
   }
 
@@ -273,7 +300,8 @@ class GREScore{
    *
    * @param string $testDate
    */
-  public function setTestDate($testDate){
+  public function setTestDate($testDate)
+  {
     $this->testDate = new \DateTime($testDate);
   }
 
@@ -282,7 +310,8 @@ class GREScore{
    *
    * @return DateTime $testDate
    */
-  public function getTestDate(){
+  public function getTestDate()
+  {
     return $this->testDate;
   }
 
@@ -291,7 +320,8 @@ class GREScore{
    *
    * @param string $testCode
    */
-  public function setTestCode($testCode){
+  public function setTestCode($testCode)
+  {
     $this->testCode = $testCode;
   }
 
@@ -300,7 +330,8 @@ class GREScore{
    *
    * @return string $testCode
    */
-  public function getTestCode(){
+  public function getTestCode()
+  {
     return $this->testCode;
   }
 
@@ -309,7 +340,8 @@ class GREScore{
    *
    * @param string $testName
    */
-  public function setTestName($testName){
+  public function setTestName($testName)
+  {
     $this->testName = $testName;
   }
 
@@ -318,7 +350,8 @@ class GREScore{
    *
    * @return string $testName
    */
-  public function getTestName(){
+  public function getTestName()
+  {
     return $this->testName;
   }
 
@@ -327,7 +360,8 @@ class GREScore{
    *
    * @param string $score1Type
    */
-  public function setScore1Type($score1Type){
+  public function setScore1Type($score1Type)
+  {
     $this->score1Type = $score1Type;
   }
 
@@ -336,7 +370,8 @@ class GREScore{
    *
    * @return string $score1Type
    */
-  public function getScore1Type(){
+  public function getScore1Type()
+  {
     return $this->score1Type;
   }
 
@@ -345,7 +380,8 @@ class GREScore{
    *
    * @param integer $score1Converted
    */
-  public function setScore1Converted($score1Converted){
+  public function setScore1Converted($score1Converted)
+  {
     $this->score1Converted = $score1Converted;
   }
 
@@ -354,7 +390,8 @@ class GREScore{
    *
    * @return integer $score1Converted
    */
-  public function getScore1Converted(){
+  public function getScore1Converted()
+  {
     return $this->score1Converted;
   }
 
@@ -363,7 +400,8 @@ class GREScore{
    *
    * @param decimal $score1Percentile
    */
-  public function setScore1Percentile($score1Percentile){
+  public function setScore1Percentile($score1Percentile)
+  {
     $this->score1Percentile = $score1Percentile;
   }
 
@@ -372,16 +410,18 @@ class GREScore{
    *
    * @return decimal $score1Percentile
    */
-  public function getScore1Percentile(){
+  public function getScore1Percentile()
+  {
     return $this->score1Percentile;
   }
-  
-/**
+
+  /**
    * Set score2Type
    *
    * @param string $score2Type
    */
-  public function setscore2Type($score2Type){
+  public function setscore2Type($score2Type)
+  {
     $this->score2Type = $score2Type;
   }
 
@@ -390,7 +430,8 @@ class GREScore{
    *
    * @return string $score2Type
    */
-  public function getscore2Type(){
+  public function getscore2Type()
+  {
     return $this->score2Type;
   }
 
@@ -399,7 +440,8 @@ class GREScore{
    *
    * @param integer $score2Converted
    */
-  public function setscore2Converted($score2Converted){
+  public function setscore2Converted($score2Converted)
+  {
     $this->score2Converted = $score2Converted;
   }
 
@@ -408,7 +450,8 @@ class GREScore{
    *
    * @return integer $score2Converted
    */
-  public function getscore2Converted(){
+  public function getscore2Converted()
+  {
     return $this->score2Converted;
   }
 
@@ -417,7 +460,8 @@ class GREScore{
    *
    * @param decimal $score2Percentile
    */
-  public function setscore2Percentile($score2Percentile){
+  public function setscore2Percentile($score2Percentile)
+  {
     $this->score2Percentile = $score2Percentile;
   }
 
@@ -426,16 +470,18 @@ class GREScore{
    *
    * @return decimal $score2Percentile
    */
-  public function getscore2Percentile(){
+  public function getscore2Percentile()
+  {
     return $this->score2Percentile;
   }
-  
+
   /**
    * Set score3Type
    *
    * @param string $score3Type
    */
-  public function setscore3Type($score3Type){
+  public function setscore3Type($score3Type)
+  {
     $this->score3Type = $score3Type;
   }
 
@@ -444,7 +490,8 @@ class GREScore{
    *
    * @return string $score3Type
    */
-  public function getscore3Type(){
+  public function getscore3Type()
+  {
     return $this->score3Type;
   }
 
@@ -453,7 +500,8 @@ class GREScore{
    *
    * @param integer $score3Converted
    */
-  public function setscore3Converted($score3Converted){
+  public function setscore3Converted($score3Converted)
+  {
     $this->score3Converted = $score3Converted;
   }
 
@@ -462,7 +510,8 @@ class GREScore{
    *
    * @return integer $score3Converted
    */
-  public function getscore3Converted(){
+  public function getscore3Converted()
+  {
     return $this->score3Converted;
   }
 
@@ -471,7 +520,8 @@ class GREScore{
    *
    * @param decimal $score3Percentile
    */
-  public function setscore3Percentile($score3Percentile){
+  public function setscore3Percentile($score3Percentile)
+  {
     $this->score3Percentile = $score3Percentile;
   }
 
@@ -480,16 +530,18 @@ class GREScore{
    *
    * @return decimal $score3Percentile
    */
-  public function getscore3Percentile(){
+  public function getscore3Percentile()
+  {
     return $this->score3Percentile;
   }
-  
+
   /**
    * Set score4Type
    *
    * @param string $score4Type
    */
-  public function setscore4Type($score4Type){
+  public function setscore4Type($score4Type)
+  {
     $this->score4Type = $score4Type;
   }
 
@@ -498,7 +550,8 @@ class GREScore{
    *
    * @return string $score4Type
    */
-  public function getscore4Type(){
+  public function getscore4Type()
+  {
     return $this->score4Type;
   }
 
@@ -507,7 +560,8 @@ class GREScore{
    *
    * @param integer $score4Converted
    */
-  public function setscore4Converted($score4Converted){
+  public function setscore4Converted($score4Converted)
+  {
     $this->score4Converted = $score4Converted;
   }
 
@@ -516,7 +570,8 @@ class GREScore{
    *
    * @return integer $score4Converted
    */
-  public function getscore4Converted(){
+  public function getscore4Converted()
+  {
     return $this->score4Converted;
   }
 
@@ -525,7 +580,8 @@ class GREScore{
    *
    * @param decimal $score4Percentile
    */
-  public function setscore4Percentile($score4Percentile){
+  public function setscore4Percentile($score4Percentile)
+  {
     $this->score4Percentile = $score4Percentile;
   }
 
@@ -534,7 +590,8 @@ class GREScore{
    *
    * @return decimal $score4Percentile
    */
-  public function getscore4Percentile(){
+  public function getscore4Percentile()
+  {
     return $this->score4Percentile;
   }
 
@@ -543,7 +600,8 @@ class GREScore{
    *
    * @param integer $sequenceNumber
    */
-  public function setSequenceNumber($sequenceNumber){
+  public function setSequenceNumber($sequenceNumber)
+  {
     $this->sequenceNumber = $sequenceNumber;
   }
 
@@ -552,7 +610,8 @@ class GREScore{
    *
    * @return integer $sequenceNumber
    */
-  public function getSequenceNumber(){
+  public function getSequenceNumber()
+  {
     return $this->sequenceNumber;
   }
 
@@ -561,7 +620,8 @@ class GREScore{
    *
    * @param integer $recordSerialNumber
    */
-  public function setRecordSerialNumber($recordSerialNumber){
+  public function setRecordSerialNumber($recordSerialNumber)
+  {
     $this->recordSerialNumber = $recordSerialNumber;
   }
 
@@ -570,7 +630,8 @@ class GREScore{
    *
    * @return integer $recordSerialNumber
    */
-  public function getRecordSerialNumber(){
+  public function getRecordSerialNumber()
+  {
     return $this->recordSerialNumber;
   }
 
@@ -579,7 +640,8 @@ class GREScore{
    *
    * @param integer $cycleNumber
    */
-  public function setCycleNumber($cycleNumber){
+  public function setCycleNumber($cycleNumber)
+  {
     $this->cycleNumber = $cycleNumber;
   }
 
@@ -588,7 +650,8 @@ class GREScore{
    *
    * @return integer $cycleNumber
    */
-  public function getCycleNumber(){
+  public function getCycleNumber()
+  {
     return $this->cycleNumber;
   }
 
@@ -597,7 +660,8 @@ class GREScore{
    *
    * @param string $processDate
    */
-  public function setProcessDate($processDate){
+  public function setProcessDate($processDate)
+  {
     $this->processDate = new \DateTime($processDate);
   }
 
@@ -606,77 +670,35 @@ class GREScore{
    *
    * @return DateTime $processDate
    */
-  public function getProcessDate(){
+  public function getProcessDate()
+  {
     return $this->processDate;
   }
-  
+
   /**
    * Get all the fields of the score as an array
    *
    * @return array
    */
-  public function getSummary(){
+  public function getSummary()
+  {
     $arr = array(
       'Registration Number' => $this->registrationNumber,
       'Department Name' => $this->departmentName,
-      'First Name' => $this->firstName, 
-      'Middle Initial' => $this->middleInitial, 
-      'Last Name' => $this->lastName, 
-      'Birth Date' => $this->birthDate->format('m/d/Y'), 
-      'Gender' => $this->gender, 
-      'Test Date' => $this->testDate->format('m/d/Y'), 
-      'Test Name' => $this->testName, 
-      'Score 1' => $this->score1Type . ' ' . $this->score1Converted . ' ' . $this->score1Percentile .'%',
-      'Score 2' => $this->score2Type . ' ' . $this->score2Converted . ' ' . $this->score2Percentile .'%', 
-      'Score 3' => $this->score3Type . ' ' . $this->score3Converted . ' ' . $this->score3Percentile .'%', 
-      'Score 4' => $this->score4Type . ' ' . $this->score4Converted . ' ' . $this->score4Percentile .'%'
+      'First Name' => $this->firstName,
+      'Middle Initial' => $this->middleInitial,
+      'Last Name' => $this->lastName,
+      'Birth Date' => $this->birthDate->format('m/d/Y'),
+      'Gender' => $this->gender,
+      'Test Date' => $this->testDate->format('m/d/Y'),
+      'Test Name' => $this->testName,
+      'Score 1' => $this->score1Type . ' ' . $this->score1Converted . ' ' . $this->score1Percentile . '%',
+      'Score 2' => $this->score2Type . ' ' . $this->score2Converted . ' ' . $this->score2Percentile . '%',
+      'Score 3' => $this->score3Type . ' ' . $this->score3Converted . ' ' . $this->score3Percentile . '%',
+      'Score 4' => $this->score4Type . ' ' . $this->score4Converted . ' ' . $this->score4Percentile . '%'
     );
+
     return $arr;
   }
-}
 
-/**
- * GREScoreRepository
- * Special Repository methods for GREScore
- * @package jazzee
- * @subpackage orm
- */
-class GREScoreRepository extends \Doctrine\ORM\EntityRepository{
-  
-  /**
-   * Score stats
-   * 
-   * Get statistics on scores in the system
-   * @return array
-   */
-  public function getStatistics(){
-    $return = array();
-    $query = $this->_em->createQuery('SELECT count(g) as Total FROM Jazzee\Entity\GREScore g');
-    $result = $query->getResult();
-    $return['total'] = $result[0]['Total'];
-    
-    $query = $this->_em->createQuery("SELECT DISTINCT(CONCAT(CONCAT(g.testYear,'-'),g.cycleNumber) as Cycle FROM Jazzee\Entity\GREScore g ORDER BY Cycle DESC");
-
-    foreach($query->getResult() as $arr){
-      $return['cycles'][] = $arr['Cycle'];
-    }
-    
-    return $return;
-  }
-  
-  /**
-   * Find scores by name
-   * 
-   * @param string $firstName
-   * @param string $lastName
-   * @return \Doctrine\ORM\Collection
-   */
-  public function findByName($firstName, $lastName){
-    $query = $this->_em->createQuery('SELECT s FROM Jazzee\Entity\GREScore s WHERE s.firstName LIKE :firstName AND s.lastName LIKE :lastName order by s.lastName, s.firstName');
-    //ETS strips apostraphes from names
-    $search = array("'");
-    $query->setParameter('firstName', str_ireplace($search, '', $firstName));
-    $query->setParameter('lastName', str_ireplace($search, '', $lastName));
-    return $query->getResult();
-  }
 }

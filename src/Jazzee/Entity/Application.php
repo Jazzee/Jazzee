@@ -1,109 +1,113 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * Application
  * Cycle+Program=Application
  * Sets the unique preferences for a givien Cycle/Program and contains all of its Applicants
+ *
  * @Entity(repositoryClass="\Jazzee\Entity\ApplicationRepository")
- * @Table(name="applications",uniqueConstraints={@UniqueConstraint(name="program_cycle", columns={"program_id", "cycle_id"})}) 
- * 
- * @package    jazzee
- * @subpackage orm
+ * @Table(name="applications",uniqueConstraints={@UniqueConstraint(name="program_cycle", columns={"program_id", "cycle_id"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- **/
-class Application{  
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class Application
+{
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Program")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $program;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Cycle", inversedBy="applications")
    * @JoinColumn(onDelete="CASCADE")
    */
   private $cycle;
-  
-  /** 
+
+  /**
    * @OneToMany(targetEntity="Applicant", mappedBy="application")
    */
   private $applicants;
-  
-  /** 
+
+  /**
    * @OneToMany(targetEntity="ApplicationPage", mappedBy="application")
    * @OrderBy({"weight" = "ASC"})
    */
   private $applicationPages;
-  
+
   /** @Column(type="string", nullable=true) */
   private $contactName;
-  
+
   /** @Column(type="string", nullable=true) */
   private $contactEmail;
-  
+
   /** @Column(type="text", nullable=true) */
   private $welcome;
-  
+
   /** @Column(type="datetime", nullable=true) */
   private $open;
-  
+
   /** @Column(type="datetime", nullable=true) */
   private $close;
-  
+
   /** @Column(type="datetime", nullable=true) */
   private $begin;
-  
+
   /** @Column(type="boolean") */
   private $published;
-  
+
   /** @Column(type="boolean") */
   private $visible;
-  
+
   /** @Column(type="text", nullable=true) */
   private $admitLetter;
-  
+
   /** @Column(type="text", nullable=true) */
   private $denyLetter;
-  
+
   /** @Column(type="text", nullable=true) */
   private $statusIncompleteText;
-  
+
   /** @Column(type="text", nullable=true) */
   private $statusNoDecisionText;
-  
+
   /** @Column(type="text", nullable=true) */
   private $statusAdmitText;
-  
+
   /** @Column(type="text", nullable=true) */
   private $statusDenyText;
-  
+
   /** @Column(type="text", nullable=true) */
   private $statusAcceptText;
-  
+
   /** @Column(type="text", nullable=true) */
   private $statusDeclineText;
-  
-  public function __construct(){
+
+  public function __construct()
+  {
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
     $this->published = false;
     $this->visible = false;
   }
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -112,7 +116,8 @@ class Application{
    *
    * @param string $contactName
    */
-  public function setContactName($contactName){
+  public function setContactName($contactName)
+  {
     $this->contactName = $contactName;
   }
 
@@ -121,7 +126,8 @@ class Application{
    *
    * @return string $contactName
    */
-  public function getContactName(){
+  public function getContactName()
+  {
     return $this->contactName;
   }
 
@@ -130,7 +136,8 @@ class Application{
    *
    * @param string $contactEmail
    */
-  public function setContactEmail($contactEmail){
+  public function setContactEmail($contactEmail)
+  {
     $this->contactEmail = $contactEmail;
   }
 
@@ -139,7 +146,8 @@ class Application{
    *
    * @return string $contactEmail
    */
-  public function getContactEmail(){
+  public function getContactEmail()
+  {
     return $this->contactEmail;
   }
 
@@ -148,7 +156,8 @@ class Application{
    *
    * @param text $welcome
    */
-  public function setWelcome($welcome){
+  public function setWelcome($welcome)
+  {
     $this->welcome = $welcome;
   }
 
@@ -157,7 +166,8 @@ class Application{
    *
    * @return text $welcome
    */
-  public function getWelcome(){
+  public function getWelcome()
+  {
     return $this->welcome;
   }
 
@@ -166,8 +176,9 @@ class Application{
    *
    * @param string $open
    */
-  public function setOpen($open){
-    if(empty($open)){
+  public function setOpen($open)
+  {
+    if (empty($open)) {
       $this->open = null;
     } else {
       $this->open = new \DateTime($open);
@@ -179,7 +190,8 @@ class Application{
    *
    * @return \DateTime $open
    */
-  public function getOpen(){
+  public function getOpen()
+  {
     return $this->open;
   }
 
@@ -188,8 +200,9 @@ class Application{
    *
    * @param string $close
    */
-  public function setClose($close){
-    if(empty($close)){
+  public function setClose($close)
+  {
+    if (empty($close)) {
       $this->close = $close;
     } else {
       $this->close = new \DateTime($close);
@@ -201,7 +214,8 @@ class Application{
    *
    * @return DateTime $close
    */
-  public function getClose(){
+  public function getClose()
+  {
     return $this->close;
   }
 
@@ -210,8 +224,9 @@ class Application{
    *
    * @param string $begin
    */
-  public function setBegin($begin){
-    if(empty($begin)){
+  public function setBegin($begin)
+  {
+    if (empty($begin)) {
       $this->begin = null;
     } else {
       $this->begin = new \DateTime($begin);
@@ -223,7 +238,8 @@ class Application{
    *
    * @return \DateTime $begin
    */
-  public function getBegin(){
+  public function getBegin()
+  {
     return $this->begin;
   }
 
@@ -231,30 +247,34 @@ class Application{
    * Publish and application
    * @param boolean $override if this is true the application willbe published without checking
    */
-  public function publish($override = false){
-    if(!$override AND !$this->canPublish()){
+  public function publish($override = false)
+  {
+    if (!$override AND !$this->canPublish()) {
       throw new \Jazzee\Exception('Application cannot be published, it is not ready.  Specify override if this should be ignored.');
     }
     $this->published = true;
   }
-  
+
   /**
    * Check if application is ready to be published
    * @return boolean
    */
-  public function canPublish(){
-    foreach($this->cycle->getRequiredPages() as $requiredPage){
-      if(!$this->hasPage($requiredPage)){
+  public function canPublish()
+  {
+    foreach ($this->cycle->getRequiredPages() as $requiredPage) {
+      if (!$this->hasPage($requiredPage)) {
         return false;
       }
     }
+
     return true;
   }
-  
- /**
+
+  /**
    * Un Publish and application
    */
-  public function unPublish(){
+  public function unPublish()
+  {
     $this->published = false;
   }
 
@@ -262,21 +282,24 @@ class Application{
    * Get published status
    * @return boolean $published
    */
-  public function isPublished(){
+  public function isPublished()
+  {
     return $this->published;
   }
 
   /**
    * Make Application Visible
    */
-  public function visible(){
+  public function visible()
+  {
     $this->visible = true;
   }
-  
-/**
+
+  /**
    * Make Application InVisible
    */
-  public function inVisible(){
+  public function inVisible()
+  {
     $this->visible = false;
   }
 
@@ -285,7 +308,8 @@ class Application{
    *
    * @return boolean $visible
    */
-  public function isVisible(){
+  public function isVisible()
+  {
     return $this->visible;
   }
 
@@ -294,7 +318,8 @@ class Application{
    *
    * @param text $admitLetter
    */
-  public function setAdmitLetter($admitLetter){
+  public function setAdmitLetter($admitLetter)
+  {
     $this->admitLetter = $admitLetter;
   }
 
@@ -303,7 +328,8 @@ class Application{
    *
    * @return text $admitLetter
    */
-  public function getAdmitLetter(){
+  public function getAdmitLetter()
+  {
     return $this->admitLetter;
   }
 
@@ -312,7 +338,8 @@ class Application{
    *
    * @param text $denyLetter
    */
-  public function setDenyLetter($denyLetter){
+  public function setDenyLetter($denyLetter)
+  {
     $this->denyLetter = $denyLetter;
   }
 
@@ -321,7 +348,8 @@ class Application{
    *
    * @return text $denyLetter
    */
-  public function getDenyLetter(){
+  public function getDenyLetter()
+  {
     return $this->denyLetter;
   }
 
@@ -330,7 +358,8 @@ class Application{
    *
    * @param text $statusIncompleteText
    */
-  public function setStatusIncompleteText($statusIncompleteText){
+  public function setStatusIncompleteText($statusIncompleteText)
+  {
     $this->statusIncompleteText = $statusIncompleteText;
   }
 
@@ -339,7 +368,8 @@ class Application{
    *
    * @return text $statusIncompleteText
    */
-  public function getStatusIncompleteText(){
+  public function getStatusIncompleteText()
+  {
     return $this->statusIncompleteText;
   }
 
@@ -348,7 +378,8 @@ class Application{
    *
    * @param text $statusNoDecisionText
    */
-  public function setStatusNoDecisionText($statusNoDecisionText){
+  public function setStatusNoDecisionText($statusNoDecisionText)
+  {
     $this->statusNoDecisionText = $statusNoDecisionText;
   }
 
@@ -357,7 +388,8 @@ class Application{
    *
    * @return text $statusNoDecisionText
    */
-  public function getStatusNoDecisionText(){
+  public function getStatusNoDecisionText()
+  {
     return $this->statusNoDecisionText;
   }
 
@@ -366,7 +398,8 @@ class Application{
    *
    * @param text $statusAdmitText
    */
-  public function setStatusAdmitText($statusAdmitText){
+  public function setStatusAdmitText($statusAdmitText)
+  {
     $this->statusAdmitText = $statusAdmitText;
   }
 
@@ -375,7 +408,8 @@ class Application{
    *
    * @return text $statusAdmitText
    */
-  public function getStatusAdmitText(){
+  public function getStatusAdmitText()
+  {
     return $this->statusAdmitText;
   }
 
@@ -384,7 +418,8 @@ class Application{
    *
    * @param text $statusDenyText
    */
-  public function setStatusDenyText($statusDenyText){
+  public function setStatusDenyText($statusDenyText)
+  {
     $this->statusDenyText = $statusDenyText;
   }
 
@@ -393,7 +428,8 @@ class Application{
    *
    * @return text $statusDenyText
    */
-  public function getStatusDenyText(){
+  public function getStatusDenyText()
+  {
     return $this->statusDenyText;
   }
 
@@ -402,7 +438,8 @@ class Application{
    *
    * @param text $statusAcceptText
    */
-  public function setStatusAcceptText($statusAcceptText){
+  public function setStatusAcceptText($statusAcceptText)
+  {
     $this->statusAcceptText = $statusAcceptText;
   }
 
@@ -411,7 +448,8 @@ class Application{
    *
    * @return text $statusAcceptText
    */
-  public function getStatusAcceptText(){
+  public function getStatusAcceptText()
+  {
     return $this->statusAcceptText;
   }
 
@@ -420,7 +458,8 @@ class Application{
    *
    * @param text $statusDeclineText
    */
-  public function setStatusDeclineText($statusDeclineText){
+  public function setStatusDeclineText($statusDeclineText)
+  {
     $this->statusDeclineText = $statusDeclineText;
   }
 
@@ -429,7 +468,8 @@ class Application{
    *
    * @return text $statusDeclineText
    */
-  public function getStatusDeclineText(){
+  public function getStatusDeclineText()
+  {
     return $this->statusDeclineText;
   }
 
@@ -438,7 +478,8 @@ class Application{
    *
    * @param Entity\Program $program
    */
-  public function setProgram(Program $program){
+  public function setProgram(Program $program)
+  {
     $this->program = $program;
   }
 
@@ -447,7 +488,8 @@ class Application{
    *
    * @return Entity\Program $program
    */
-  public function getProgram(){
+  public function getProgram()
+  {
     return $this->program;
   }
 
@@ -456,7 +498,8 @@ class Application{
    *
    * @param Entity\Cycle $cycle
    */
-  public function setCycle(Cycle $cycle){
+  public function setCycle(Cycle $cycle)
+  {
     $this->cycle = $cycle;
   }
 
@@ -465,111 +508,77 @@ class Application{
    *
    * @return Entity\Cycle $cycle
    */
-  public function getCycle(){
+  public function getCycle()
+  {
     return $this->cycle;
   }
-  
+
   /**
    * Get applicants
    *
    * @return \Doctrine\Common\Collections\Collection \Jazzee\Entity\Applicant
    */
-  public function getApplicants(){
+  public function getApplicants()
+  {
     return $this->applicants;
   }
-  
+
   /**
    * Get pages
    * @param string $kind optionally only incude certain pages
    * @return array \Jazzee\Entity\ApplicationPage
    */
-  public function getApplicationPages($kind = null){
-    if(!$this->applicationPages) return array();
-    if(is_null($kind)) return $this->applicationPages->toArray();
+  public function getApplicationPages($kind = null)
+  {
+    if (!$this->applicationPages) {
+      return array();
+    }
+    if (is_null($kind)) {
+      return $this->applicationPages->toArray();
+    }
     $applicationPages = array();
-    foreach($this->applicationPages as $applicationPage) if($applicationPage->getKind() == $kind) $applicationPages[] = $applicationPage;
+    foreach ($this->applicationPages as $applicationPage) {
+      if ($applicationPage->getKind() == $kind) {
+        $applicationPages[] = $applicationPage;
+      }
+    }
+
     return $applicationPages;
   }
-  
+
   /**
    * Check if application has a page
    * @param Page $page
    * @return boolean
    */
-  public function hasPage(Page $page){
-    if(!$this->applicationPages) return false;
-    foreach($this->applicationPages as $applicationPage){
-      if($applicationPage->getPage() == $page){
+  public function hasPage(Page $page)
+  {
+    if (!$this->applicationPages) {
+      return false;
+    }
+    foreach ($this->applicationPages as $applicationPage) {
+      if ($applicationPage->getPage() == $page) {
         return true;
       }
     }
+
     return false;
   }
-  
+
   /**
    * Get page by tile
    * @param string $title
    * @return ApplicationPage
    */
-  public function getApplicationPageByTitle($title){
-    foreach($this->applicationPages as $applicationPage){
-      if($applicationPage->getTitle() == $title){
+  public function getApplicationPageByTitle($title)
+  {
+    foreach ($this->applicationPages as $applicationPage) {
+      if ($applicationPage->getTitle() == $title) {
         return $applicationPage;
       }
     }
-    return false;
-  }
-}
 
-/**
- * ApplicationRepository
- * Special Repository methods for Application to make searchign for special conditions easier
- * @package jazzee
- * @subpackage orm
- */
-class ApplicationRepository extends \Doctrine\ORM\EntityRepository{
-  
-  /**
-   * findOneByProgramAndCycle
-   * Search for an Application using its Program and Cycle
-   * @param Program $program
-   * @param Cycle $cycle
-   * @return Application
-   */
-  public function findOneByProgramAndCycle(Program $program, Cycle $cycle){
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a WHERE a.program = :programId AND  a.cycle = :cycleId');
-    $query->setParameter('programId', $program->getId());
-    $query->setParameter('cycleId', $cycle->getId());
-    $result = $query->getResult();
-    if(count($result)) return $result[0];
     return false;
   }
-  
-  /**
-   * findByProgram
-   * Search for all the Applications belonging to a program
-   * @param Program $program
-   * @return Doctrine\Common\Collections\Collection $applications
-   */
-  public function findByProgram(Program $program){
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a JOIN a.cycle c WHERE a.program = :programId ORDER BY c.start DESC');
-    $query->setParameter('programId', $program->getId());
-    return $query->getResult();
-  }
-  
-/**
-   * Find an application be the program short name and cycle name
-   * 
-   * @param string $programShortName
-   * @param string $cycleNamme
-   * @return Application
-   */
-  public function findEasy($programShortName, $cycleName){
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a WHERE a.program = (SELECT p FROM Jazzee\Entity\Program p WHERE p.shortName = :programShortName) AND  a.cycle = (SELECT c FROM \Jazzee\Entity\Cycle c WHERE c.name= :cycleName)');
-    $query->setParameter('programShortName', $programShortName);
-    $query->setParameter('cycleName', $cycleName);
-    $result = $query->getResult();
-    if(count($result)) return $result[0];
-    return false;
-  }
+
 }

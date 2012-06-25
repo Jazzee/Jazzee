@@ -1,105 +1,111 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * Element
  * Elements are the individual fields on a Page
+ *
  * @Entity
- * @HasLifecycleCallbacks 
- * @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"})}) 
- * @package    jazzee
- * @subpackage orm
+ * @HasLifecycleCallbacks
+ * @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- **/
-class Element{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class Element
+{
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="ElementType")
    */
   private $type;
 
-  /** 
+  /**
    * @ManyToOne(targetEntity="Page",inversedBy="elements")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $page;
-  
+
   /** @Column(type="integer") */
   private $weight;
-  
+
   /** @Column(type="integer", nullable=true) */
   private $fixedId;
-  
+
   /** @Column(type="string") */
   private $title;
-  
+
   /** @Column(type="string", nullable=true) */
   private $format;
-  
+
   /** @Column(type="decimal", nullable=true) */
   private $min;
-  
+
   /** @Column(type="decimal", nullable=true) */
   private $max;
-  
+
   /** @Column(type="boolean") */
   private $required = false;
-  
+
   /** @Column(type="text", nullable=true) */
   private $instructions;
-  
+
   /** @Column(type="string", nullable=true) */
   private $defaultValue;
-  
-  /** 
+
+  /**
    * @OneToMany(targetEntity="ElementListItem",mappedBy="element")
    * @OrderBy({"weight" = "ASC"})
    */
   private $listItems;
-  
+
   /**
    * @var \Jazzee\Interfaces\Element
    */
   private $jazzeeElement;
-  
 
-  public function __construct(){
+  public function __construct()
+  {
     $this->listItems = new \Doctrine\Common\Collections\ArrayCollection();
   }
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
-  
+
   /**
    * Generate a Temporary id
    *
-   * This should only be used when we need to termporarily generate an element 
+   * This should only be used when we need to termporarily generate an element
    * but have no intention of persisting it.  Use a string to be sure we cant persist
    */
-  public function tempId(){
+  public function tempId()
+  {
     $this->id = uniqid('element');
   }
-  
+
   /**
    * Replace Page UUID
    * @PreUpdate
-   * 
+   *
    * When an element is modified it changes its parents UUID
    */
-  public function replacePageUuid(){
+  public function replacePageUuid()
+  {
     $this->page->replaceUuid();
   }
 
@@ -108,7 +114,8 @@ class Element{
    *
    * @param integer $weight
    */
-  public function setWeight($weight){
+  public function setWeight($weight)
+  {
     $this->weight = $weight;
   }
 
@@ -117,7 +124,8 @@ class Element{
    *
    * @return integer $weight
    */
-  public function getWeight(){
+  public function getWeight()
+  {
     return $this->weight;
   }
 
@@ -126,7 +134,8 @@ class Element{
    *
    * @param integer $fixedId
    */
-  public function setFixedId($fixedId){
+  public function setFixedId($fixedId)
+  {
     $this->fixedId = $fixedId;
   }
 
@@ -135,7 +144,8 @@ class Element{
    *
    * @return integer $fixedId
    */
-  public function getFixedId(){
+  public function getFixedId()
+  {
     return $this->fixedId;
   }
 
@@ -144,7 +154,8 @@ class Element{
    *
    * @param string $title
    */
-  public function setTitle($title){
+  public function setTitle($title)
+  {
     $this->title = $title;
   }
 
@@ -153,7 +164,8 @@ class Element{
    *
    * @return string $title
    */
-  public function getTitle(){
+  public function getTitle()
+  {
     return $this->title;
   }
 
@@ -162,8 +174,11 @@ class Element{
    *
    * @param string $format
    */
-  public function setFormat($format){
-    if(empty($format)) $format = null;
+  public function setFormat($format)
+  {
+    if (empty($format)) {
+      $format = null;
+    }
     $this->format = $format;
   }
 
@@ -172,7 +187,8 @@ class Element{
    *
    * @return string $format
    */
-  public function getFormat(){
+  public function getFormat()
+  {
     return $this->format;
   }
 
@@ -181,8 +197,11 @@ class Element{
    *
    * @param decimal $min
    */
-  public function setMin($min){
-    if(empty($min)) $min = null;
+  public function setMin($min)
+  {
+    if (empty($min)) {
+      $min = null;
+    }
     $this->min = $min;
   }
 
@@ -191,7 +210,8 @@ class Element{
    *
    * @return decimal $min
    */
-  public function getMin(){
+  public function getMin()
+  {
     return $this->min;
   }
 
@@ -200,8 +220,11 @@ class Element{
    *
    * @param decimal $max
    */
-  public function setMax($max){
-    if(empty($max)) $max = null;
+  public function setMax($max)
+  {
+    if (empty($max)) {
+      $max = null;
+    }
     $this->max = $max;
   }
 
@@ -210,21 +233,24 @@ class Element{
    *
    * @return decimal $max
    */
-  public function getMax(){
+  public function getMax()
+  {
     return $this->max;
   }
 
   /**
    * Mark this element as required
    */
-  public function required(){
+  public function required()
+  {
     $this->required = true;
   }
-  
+
   /**
    * Mark this element as optional
    */
-  public function optional(){
+  public function optional()
+  {
     $this->required = false;
   }
 
@@ -232,7 +258,8 @@ class Element{
    * Is this elemetn required
    * @return boolean $required
    */
-  public function isRequired(){
+  public function isRequired()
+  {
     return $this->required;
   }
 
@@ -241,8 +268,11 @@ class Element{
    *
    * @param text $instructions
    */
-  public function setInstructions($instructions){
-    if(empty($instructions)) $instructions = null;
+  public function setInstructions($instructions)
+  {
+    if (empty($instructions)) {
+      $instructions = null;
+    }
     $this->instructions = $instructions;
   }
 
@@ -251,7 +281,8 @@ class Element{
    *
    * @return text $instructions
    */
-  public function getInstructions(){
+  public function getInstructions()
+  {
     return $this->instructions;
   }
 
@@ -260,8 +291,11 @@ class Element{
    *
    * @param string $defaultValue
    */
-  public function setDefaultValue($defaultValue){
-    if(empty($defaultValue)) $defaultValue = null;
+  public function setDefaultValue($defaultValue)
+  {
+    if (empty($defaultValue)) {
+      $defaultValue = null;
+    }
     $this->defaultValue = $defaultValue;
   }
 
@@ -270,7 +304,8 @@ class Element{
    *
    * @return string $defaultValue
    */
-  public function getDefaultValue(){
+  public function getDefaultValue()
+  {
     return $this->defaultValue;
   }
 
@@ -279,7 +314,8 @@ class Element{
    *
    * @param Entity\ElementType $type
    */
-  public function setType(ElementType $type){
+  public function setType(ElementType $type)
+  {
     $this->type = $type;
   }
 
@@ -288,7 +324,8 @@ class Element{
    *
    * @return Entity\ElementType $type
    */
-  public function getType(){
+  public function getType()
+  {
     return $this->type;
   }
 
@@ -297,7 +334,8 @@ class Element{
    *
    * @param Entity\Page $page
    */
-  public function setPage(Page $page){
+  public function setPage(Page $page)
+  {
     $this->page = $page;
   }
 
@@ -306,7 +344,8 @@ class Element{
    *
    * @return Entity\Page $page
    */
-  public function getPage(){
+  public function getPage()
+  {
     return $this->page;
   }
 
@@ -315,9 +354,12 @@ class Element{
    *
    * @param Entity\ElementListItem $item
    */
-  public function addItem(\Jazzee\Entity\ElementListItem $item){
+  public function addItem(\Jazzee\Entity\ElementListItem $item)
+  {
     $this->listItems[] = $item;
-    if($item->getElement() != $this) $item->setElement($this);
+    if ($item->getElement() != $this) {
+      $item->setElement($this);
+    }
   }
 
   /**
@@ -325,43 +367,61 @@ class Element{
    *
    * @return Doctrine\Common\Collections\Collection $listItems
    */
-  public function getListItems(){
+  public function getListItems()
+  {
     return $this->listItems;
   }
-  
+
   /**
    * Get list item by value
    *
    * @param string $value
    * @return Entity\ElementListItem $item
    */
-  public function getItemByValue($value){
-    foreach($this->listItems as $item) if($item->getValue() == $value) return $item;
+  public function getItemByValue($value)
+  {
+    foreach ($this->listItems as $item) {
+      if ($item->getValue() == $value) {
+        return $item;
+      }
+    }
+
     return false;
   }
-  
+
   /**
    * Get list item by id
    *
    * @param integer $itemId
    * @return Entity\ElementListItem $item
    */
-  public function getItemById($itemId){
-    foreach($this->listItems as $item) if($item->getId() == $itemId) return $item;
+  public function getItemById($itemId)
+  {
+    foreach ($this->listItems as $item) {
+      if ($item->getId() == $itemId) {
+        return $item;
+      }
+    }
+
     return false;
   }
-  
+
   /**
    * Get the jazzeeElement
-   * 
+   *
    * @return \Jazzee\Interfaces\Element
    */
-  public function getJazzeeElement(){
-    if(is_null($this->jazzeeElement)){
+  public function getJazzeeElement()
+  {
+    if (is_null($this->jazzeeElement)) {
       $className = $this->type->getClass();
       $this->jazzeeElement = new $className($this);
-      if(!($this->jazzeeElement instanceof \Jazzee\Interfaces\Element)) throw new \Jazzee\Exception($this->type>getName() . ' has class ' . $className . ' that does not implement \Jazzee\Interfaces\Element interface');
+      if (!($this->jazzeeElement instanceof \Jazzee\Interfaces\Element)) {
+        throw new \Jazzee\Exception($this->type > getName() . ' has class ' . $className . ' that does not implement \Jazzee\Interfaces\Element interface');
+      }
     }
+
     return $this->jazzeeElement;
   }
+
 }

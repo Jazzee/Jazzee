@@ -1,63 +1,67 @@
-<?php 
+<?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * AuditLog
  * AuditLog entries record critical user actions against applicants
- * Liked editing or deleting answers
+ * Like editing or deleting answers
+ *
  * @Entity
  * @Table(name="audit_log")
- * @package    jazzee
- * @subpackage orm
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class AuditLog
+{
 
-class AuditLog{
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
+
   /** @Column(type="datetime") */
   protected $createdAt;
-  
+
   /** @Column(type="text") */
   private $text;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="User",inversedBy="auditLogs")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   protected $user;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Applicant",inversedBy="auditLogs")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   protected $applicant;
-  
+
   /**
-   * Constructor 
+   * Constructor
    * Everythign is specified here and can't be set any other way
    * @param User $user
    * @param Applicant $applicant
    * @param strig $text
    */
-  public function __construct(User $user, Applicant $applicant, $text){
+  public function __construct(User $user, Applicant $applicant, $text)
+  {
     $this->createdAt = new \DateTime('now');
     $this->user = $user;
     $this->applicant = $applicant;
     $this->text = $text;
   }
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -66,7 +70,8 @@ class AuditLog{
    *
    * @return \DateTime $createdAt
    */
-  public function getCreatedAt(){
+  public function getCreatedAt()
+  {
     return $this->createdAt;
   }
 
@@ -75,7 +80,8 @@ class AuditLog{
    *
    * @return Entity\User $user
    */
-  public function getUser(){
+  public function getUser()
+  {
     return $this->user;
   }
 
@@ -84,7 +90,8 @@ class AuditLog{
    *
    * @return Applicant $applicant
    */
-  public function getApplicant(){
+  public function getApplicant()
+  {
     return $this->applicant;
   }
 
@@ -93,7 +100,9 @@ class AuditLog{
    *
    * @return string $text
    */
-  public function getText(){
+  public function getText()
+  {
     return $this->text;
   }
+
 }

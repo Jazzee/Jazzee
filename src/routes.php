@@ -1,6 +1,9 @@
 <?php
+
 /**
  * Routing for apply requests
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
  */
 $fc = new \Foundation\VC\FrontController();
 
@@ -9,12 +12,12 @@ $basicRouter = new Lvc_RegexRewriteRouter;
 //anything with a trailing slash gets redirected without it
 //this should be done with modrewrite so we get a permanent redirect, but it is here in case
 //modrewrite isn't available
-$basicRouter->addRoute('#(.*)/$#', array( 
+$basicRouter->addRoute('#(.*)/$#', array(
   'redirect' => 'index.php?url=$1'
 ));
 
 //dynmaic files like applicant pdfs and previews stored in sessions
-$basicRouter->addRoute('#^(?:.*)/?virtualfile/(.*)$#i', array( 
+$basicRouter->addRoute('#^(?:.*)/?virtualfile/(.*)$#i', array(
   'controller' => 'virtualfile',
   'action' => 'get',
   'action_params' => array(
@@ -23,7 +26,7 @@ $basicRouter->addRoute('#^(?:.*)/?virtualfile/(.*)$#i', array(
 ));
 
 //resources in the virtual file system
-$basicRouter->addRoute('#^(?:.*)/?resource/(.*)$#i', array( 
+$basicRouter->addRoute('#^(?:.*)/?resource/(.*)$#i', array(
   'controller' => 'resource',
   'action' => 'get',
   'action_params' => array(
@@ -32,7 +35,7 @@ $basicRouter->addRoute('#^(?:.*)/?resource/(.*)$#i', array(
 ));
 
 //dynmaic files like applicant pdfs and previews stored in sessions
-$basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array( 
+$basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array(
   'controller' => 'file',
   'action' => 'get',
   'action_params' => array(
@@ -41,7 +44,7 @@ $basicRouter->addRoute('#^(?:.*)/?file/(.*)$#i', array(
 ));
 
 //static pulls physical files from the cache where they are created when first needed
-$basicRouter->addRoute('#^(?:admin/)?static/(.*)$#i', array( 
+$basicRouter->addRoute('#^(?:admin/)?static/(.*)$#i', array(
   'controller' => 'static',
   'action' => 'get',
   'action_params' => array(
@@ -170,7 +173,7 @@ $basicRouter->addRoute('#^admin/applicants/single/([0-9]+)/?([^/]+)?/?(.*)$#i', 
 ));
 
 //transactions come as posts from outside sources
-$basicRouter->addRoute('#^transaction/(.*)$#i', array( 
+$basicRouter->addRoute('#^transaction/(.*)$#i', array(
   'controller' => 'transaction',
   'action' => 'post',
   'action_params' => array(

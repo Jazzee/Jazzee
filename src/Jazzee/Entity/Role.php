@@ -1,55 +1,60 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * Role
  * Roles grant access to admin users
- * @Entity 
- * @Table(name="roles") 
- * @package    jazzee
- * @subpackage orm
+ *
+ * @Entity
+ * @Table(name="roles")
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class Role{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class Role
+{
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
+
   /** @Column(type="string") */
   private $name;
-  
+
   /** @Column(type="boolean") */
   private $isGlobal;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Program")
    */
   private $program;
-  
-  /** 
+
+  /**
    * @OneToMany(targetEntity="RoleAction", mappedBy="role")
    */
   private $actions;
-  
+
   /**
    * @ManyToMany(targetEntity="User", mappedBy="roles")
-  **/
+   * */
   private $users;
 
-  public function __construct(){
+  public function __construct()
+  {
     $this->actions = new \Doctrine\Common\Collections\ArrayCollection();
     $this->users = new \Doctrine\Common\Collections\ArrayCollection();
   }
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -58,7 +63,8 @@ class Role{
    *
    * @param string $name
    */
-  public function setName($name){
+  public function setName($name)
+  {
     $this->name = $name;
   }
 
@@ -67,22 +73,27 @@ class Role{
    *
    * @return string $name
    */
-  public function getName(){
+  public function getName()
+  {
     return $this->name;
   }
 
   /**
    * Make global
    */
-  public function makeGlobal(){
-    if($this->program) throw new \Jazzee\Exception("{this->name} is set for program " . $this->program->getName() . ' but you are trying to make it global.');
+  public function makeGlobal()
+  {
+    if ($this->program) {
+      throw new \Jazzee\Exception("{this->name} is set for program " . $this->program->getName() . ' but you are trying to make it global.');
+    }
     $this->isGlobal = true;
   }
-  
-/**
+
+  /**
    * Make not global
    */
-  public function notGlobal(){
+  public function notGlobal()
+  {
     $this->isGlobal = false;
   }
 
@@ -90,17 +101,21 @@ class Role{
    * Get global status
    * @return boolean $isGlobal
    */
-  public function isGlobal(){
+  public function isGlobal()
+  {
     return $this->isGlobal;
   }
-  
+
   /**
    * Set program
    *
    * @param \Jazzee\Entity\Program $program
    */
-  public function setProgram(Program $program){
-    if($this->isGlobal) throw new \Jazzee\Exception("{this->name} is global but you are trying to set its program to " . $program->getName());
+  public function setProgram(Program $program)
+  {
+    if ($this->isGlobal) {
+      throw new \Jazzee\Exception("{this->name} is global but you are trying to set its program to " . $program->getName());
+    }
     $this->program = $program;
   }
 
@@ -109,7 +124,8 @@ class Role{
    *
    * @return \Jazzee\Entity\Program $program
    */
-  public function getProgram(){
+  public function getProgram()
+  {
     return $this->program;
   }
 
@@ -118,9 +134,12 @@ class Role{
    *
    * @param Entity\RoleAction $action
    */
-  public function addAction(RoleAction $action){
+  public function addAction(RoleAction $action)
+  {
     $this->actions[] = $action;
-    if($action->getRole() != $this) $action->setRole($this);
+    if ($action->getRole() != $this) {
+      $action->setRole($this);
+    }
   }
 
   /**
@@ -128,7 +147,8 @@ class Role{
    *
    * @return Doctrine\Common\Collections\Collection $actions
    */
-  public function getActions(){
+  public function getActions()
+  {
     return $this->actions;
   }
 
@@ -137,7 +157,8 @@ class Role{
    *
    * @param Entity\User $user
    */
-  public function addUser(User $user){
+  public function addUser(User $user)
+  {
     $this->users[] = $user;
   }
 
@@ -146,23 +167,28 @@ class Role{
    *
    * @return Doctrine\Common\Collections\Collection $users
    */
-  public function getUsers(){
+  public function getUsers()
+  {
     return $this->users;
   }
-  
+
   /**
    * Check if an action is allowed by this role
-   * 
+   *
    * @param string $controller
    * @param string $action
    * @param \Jazzee\Entity\Program $program
    * @return bool
    */
-  public function isAllowed($controllerName, $actionName){
-    foreach($this->actions as $action){
-      if($action->getController() == $controllerName and $action->getAction() == strtolower($actionName)) return true;
+  public function isAllowed($controllerName, $actionName)
+  {
+    foreach ($this->actions as $action) {
+      if ($action->getController() == $controllerName and $action->getAction() == strtolower($actionName)) {
+        return true;
+      }
     }
+
     return false;
   }
-  
+
 }

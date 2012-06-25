@@ -1,60 +1,67 @@
 <?php
 namespace Jazzee\Entity;
-/** 
+
+/**
  * PageVariable
  * Allow developers to store arbitrary data as a PageVariable so we don't need new tables for every new ApplyPage type
+ *
  * @Entity
- * @HasLifecycleCallbacks 
- * @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="pagevariable_name", columns={"page_id", "name"})}) 
- * @package    jazzee
- * @subpackage orm
+ * @HasLifecycleCallbacks
+ * @Table(name="page_variables",uniqueConstraints={@UniqueConstraint(name="pagevariable_name", columns={"page_id", "name"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class PageVariable{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class PageVariable
+{
+
   /**
-   * @Id 
+   * @Id
    * @Column(type="bigint")
    * @GeneratedValue(strategy="AUTO")
-  */
+   */
   private $id;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Page", inversedBy="variables")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $page;
-  
+
   /** @Column(type="string") */
   private $name;
-  
+
   /** @Column(type="text") */
   private $value;
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
-  
+
   /**
    * Replace Page UUID
    * @PreUpdate
-   * 
+   *
    * When a variable is modified it changes its parents UUID
    */
-  public function replacePageUuid(){
+  public function replacePageUuid()
+  {
     $this->page->replaceUuid();
   }
-  
+
   /**
    * Set page
    *
    * @param Entity\Page $page
    */
-  public function setPage($page){
+  public function setPage($page)
+  {
     $this->page = $page;
   }
 
@@ -63,7 +70,8 @@ class PageVariable{
    *
    * @param string $name
    */
-  public function setName($name){
+  public function setName($name)
+  {
     $this->name = $name;
   }
 
@@ -72,7 +80,8 @@ class PageVariable{
    *
    * @return string $name
    */
-  public function getName(){
+  public function getName()
+  {
     return $this->name;
   }
 
@@ -81,7 +90,8 @@ class PageVariable{
    *
    * @param string $value
    */
-  public function setValue($value){
+  public function setValue($value)
+  {
     $this->value = base64_encode($value);
   }
 
@@ -90,7 +100,9 @@ class PageVariable{
    *
    * @return string $value
    */
-  public function getValue(){
+  public function getValue()
+  {
     return base64_decode($this->value);
   }
+
 }

@@ -1,16 +1,15 @@
 <?php
 namespace Jazzee\Interfaces;
+
 /**
  * LORPage interface
  * Allows us to define interface for pages which can be used to compelted
  * letters of recommendation
- * 
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package jazzee
- * @subpackage pages
+ *
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
  */
-interface LorPage 
+interface LorPage
 {
 
   /**
@@ -41,22 +40,22 @@ interface LorPage
    * @param \Jazzee\Entity\Answer $answer
    */
   function fillLorForm(\Jazzee\Entity\Answer $answer);
-  
+
   /**
    * Get the element for the LOR page view
-   * @return string 
+   * @return string
    */
   public static function lorPageElement();
-  
+
   /**
    * Get the element for the LOR page view
-   * @return string 
+   * @return string
    */
   public static function lorReviewElement();
-  
+
   /**
    * Get the element for the LOR page view
-   * @return string 
+   * @return string
    */
   public static function lorApplicantsSingleElement();
 }

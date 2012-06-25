@@ -1,12 +1,13 @@
-<?php 
+<?php
+
 /**
  * applicants_download index view
  * @package jazzee
  * @subpackage admin
  * @subpackage applicants
  */
-if(isset($outputType)){
-  switch($outputType){
+if (isset($outputType)) {
+  switch ($outputType) {
     case 'string':
       header("Content-type: {$type}");
       header("Content-Disposition: attachment; filename={$filename}");
@@ -17,5 +18,5 @@ if(isset($outputType)){
       echo $xml->saveXML();
   }
 } else {
-  $this->renderElement('form', array('form'=>$form));
+  $this->renderElement('form', array('form' => $form));
 }

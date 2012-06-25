@@ -1,22 +1,22 @@
 @CHARSET "UTF-8";
 /***** Default Jazzee layout *****/
 body {
-	margin-top: -20px;
+  margin-top: -20px;
 }
 
 #hd h1 {
-  padding: 2em 1em 0 0; 
+  padding: 2em 1em 0 0;
   text-align: right;
 }
 
 #topbar {
-	padding-top: .5em;
+  padding-top: .5em;
 }
 
 #topbar p {
-	padding: .5em 0;
-	margin: 0;
-	display: inline-block;
+  padding: .5em 0;
+  margin: 0;
+  display: inline-block;
 }
 
 #content {
@@ -25,7 +25,7 @@ body {
 }
 
 #bar {
-	margin-top: 2em;
+  margin-top: 2em;
 }
 
 
@@ -36,11 +36,11 @@ body {
 }
 
 #ft {
-	clear: both;
+  clear: both;
 }
 
 #ft p {
-	margin: 20px 0;
+  margin: 20px 0;
 }
 
 .hidden {
@@ -52,10 +52,10 @@ body {
 
 /* Horizontal/Dropdown Navigation */
 div.h-navigation {
-	display:block;
-	padding: .5em 0 0 1em;
-	margin-bottom:1em;
-	height:2em;
+  display:block;
+  padding: .5em 0 0 1em;
+  margin-bottom:1em;
+  height:2em;
 }
 
 div.h-navigation ol, div.h-navigation a {
@@ -120,15 +120,15 @@ div.h-navigation li ol {
 /***** SIDEBAR NAVIGATION *****/
 
 div.v-navigation {
-margin:0 .1em 0 .8em;
-padding:0;
+  margin:0 .1em 0 .8em;
+  padding:0;
 }
 
 div.v-navigation ul, div.v-navigation ol{
-margin:0;
-padding:0;
-position:relative;
-overflow:hidden;
+  margin:0;
+  padding:0;
+  position:relative;
+  overflow:hidden;
 }
 
 div.v-navigation li {
@@ -174,7 +174,7 @@ div.form div.control div, div.form div.control ol{
 }
 
 div.form div.control label{
-	clear: left;
+  clear: left;
 }
 
 div.form div.control ol li{
@@ -203,9 +203,9 @@ div.form .instructions {
 }
 
 div.form div.field p.instructions {
-	margin-bottom: 0;
-	margin-top: 2em;
-	padding: .1em;
+  margin-bottom: 0;
+  margin-top: 2em;
+  padding: .1em;
   width: 60%;
 }
 
@@ -215,9 +215,9 @@ div.form textarea {
 }
 
 .monthpicker#ui-datepicker-div .ui-datepicker-calendar {
-	display: none;
+  display: none;
 }
 
 #recaptcha_widget_div *{
-	float: none;
+  float: none;
 }

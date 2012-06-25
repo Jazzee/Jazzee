@@ -1,18 +1,22 @@
 <?php
+
 namespace Jazzee\Element;
+
 /**
  * PDF File Element
- * 
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package jazzee
- * @subpackage elements
+ *
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class PDFFileInput extends AbstractElement {
+class PDFFileInput extends AbstractElement
+{
+
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementPDFFileInput.js';
-  public function addToField(\Foundation\Form\Field $field){
-    if(!ini_get('file_uploads')){
+
+  public function addToField(\Foundation\Form\Field $field)
+  {
+    if (!ini_get('file_uploads')) {
       throw new \Jazzee\Exception('File uploads are not turned on for this system and a PDFFileInputElement is being created', E_ERROR);
     }
     $element = $field->newElement('FileInput', 'el' . $this->_element->getId());
@@ -20,40 +24,42 @@ class PDFFileInput extends AbstractElement {
     $element->setInstructions($this->_element->getInstructions());
     $element->setFormat($this->_element->getFormat());
     $element->setDefaultValue($this->_element->getDefaultValue());
-    if($this->_element->isRequired()){
+    if ($this->_element->isRequired()) {
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
     }
     $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
-    
+
     $config = $this->_controller->getConfig();
     $max = $config->getMaximumApplicantFileUploadSize();
-    if($this->_element->getMax() and \Foundation\Utility::convertIniShorthandValue($this->_element->getMax()) < $max) $max = $this->_element->getMax();
-    
+    if ($this->_element->getMax() and \Foundation\Utility::convertIniShorthandValue($this->_element->getMax()) < $max) {
+      $max = $this->_element->getMax();
+    }
     $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $max));
-    
+
     return $element;
   }
-  
-  public function getElementAnswers($input){
+
+  public function getElementAnswers($input)
+  {
     $elementAnswers = array();
-    if(!is_null($input)){
+    if (!is_null($input)) {
       $elementAnswer = new \Jazzee\Entity\ElementAnswer;
       $elementAnswer->setElement($this->_element);
       $elementAnswer->setPosition(0);
       $elementAnswer->setEBlob($input);
       $elementAnswers[] = $elementAnswer;
-      
+
       //create the preview image
-      try{
+      try {
         $imagick = new \imagick;
         $imagick->readimageblob($input);
         $imagick->setiteratorindex(0);
         $imagick->setImageFormat("png");
         $imagick->scaleimage(100, 0);
-      } catch (ImagickException $e){
+      } catch (ImagickException $e) {
         $imagick = new \imagick;
         $imagick->readimage(realpath(__DIR__ . '/../../../../lib/foundation/src/media/default_pdf_logo.png'));
         $imagick->scaleimage(100, 0);
@@ -64,45 +70,55 @@ class PDFFileInput extends AbstractElement {
       $elementAnswer->setEBlob($imagick->getimageblob());
       $elementAnswers[] = $elementAnswer;
     }
+
     return $elementAnswers;
   }
-  
-  public function displayValue(\Jazzee\Entity\Answer $answer){
+
+  public function displayValue(\Jazzee\Entity\Answer $answer)
+  {
     $elementAnswers = $answer->getElementAnswersForElement($this->_element);
-    if(isset($elementAnswers[0])){
+    if (isset($elementAnswers[0])) {
       $base = $answer->getApplicant()->getFullName() . ' ' . $this->_element->getTitle() . '_' . $answer->getApplicant()->getId() . $elementAnswers[0]->getId();
-      $pdfName =  $base . '.pdf';
+      $pdfName = $base . '.pdf';
       $pngName = $base . 'preview.png';
-      if(!$pdfFile = $this->_controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()){
+      if (!$pdfFile = $this->_controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
         $this->_controller->storeFile($pdfName, $elementAnswers[0]->getEBlob());
       }
-      if(!$pngFile = $this->_controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()){
+      if (!$pngFile = $this->_controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
         $this->_controller->storeFile($pngName, $elementAnswers[1]->getEBlob());
       }
+
       return '<a href="' . $this->_controller->path('file/' . \urlencode($pdfName)) . '"><img src="' . $this->_controller->path('file/' . \urlencode($pngName)) . '" /></a>';
     }
+
     return null;
   }
-  
-  public function rawValue(\Jazzee\Entity\Answer $answer){
+
+  public function rawValue(\Jazzee\Entity\Answer $answer)
+  {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
-    if(isset($elementsAnswers[0])){
+    if (isset($elementsAnswers[0])) {
       return base64_encode($elementsAnswers[0]->getEBlob());
     }
+
     return null;
   }
-  
-  public function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf){
+
+  public function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf)
+  {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
-    if(isset($elementsAnswers[0])){
+    if (isset($elementsAnswers[0])) {
       $pdf->addPdf($elementsAnswers[0]->getEBlob());
+
       return 'Attached';
     }
+
     return null;
   }
-  
-  public function formValue(\Jazzee\Entity\Answer $answer){
+
+  public function formValue(\Jazzee\Entity\Answer $answer)
+  {
     return false;
   }
+
 }
-?>

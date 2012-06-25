@@ -1,69 +1,75 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * Message
- * 
+ *
  * Messages between applicants and programs
+ *
  * @Entity
  * @HasLifecycleCallbacks
- * @Table(name="messages") 
- * @package    jazzee
- * @subpackage orm
+ * @Table(name="messages")
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class Message{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class Message
+{
   /**
-   * Sender Types 
+   * Sender Types
    */
+
   const APPLICANT = 2;
   const PROGRAM = 4;
-  
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
-  /** 
-   * @ManyToOne(targetEntity="Thread",inversedBy="messages") 
-   * @JoinColumn(onDelete="CASCADE") 
+
+  /**
+   * @ManyToOne(targetEntity="Thread",inversedBy="messages")
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $thread;
-  
+
   /** @Column(type="integer") */
   private $sender;
 
   /** @Column(type="text") */
   private $text;
-  
+
   /** @Column(type="datetime") */
   private $createdAt;
-  
+
   /** @Column(type="boolean") */
   private $isRead;
-  
-  public function __construct(){
+
+  public function __construct()
+  {
     $this->isRead = false;
     $this->createdAt = new \DateTime();
   }
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
-  
+
   /**
    * Mark the lastUpdate automatically
    * @PrePersist @PreUpdate
    */
-  public function markLastUpdate(){
-      $this->thread->markLastUpdate();
+  public function markLastUpdate()
+  {
+    $this->thread->markLastUpdate();
   }
 
   /**
@@ -71,8 +77,11 @@ class Message{
    *
    * @param string $sender
    */
-  public function setSender($sender){
-    if(!in_array($sender, array(self::APPLICANT, self::PROGRAM))) throw new \Jazzee\Exception("Invalid sender type.  Must be one of the constants APPLICANT or PROGRAM");
+  public function setSender($sender)
+  {
+    if (!in_array($sender, array(self::APPLICANT, self::PROGRAM))) {
+      throw new \Jazzee\Exception("Invalid sender type.  Must be one of the constants APPLICANT or PROGRAM");
+    }
     $this->sender = $sender;
   }
 
@@ -81,7 +90,8 @@ class Message{
    *
    * @return string $sender
    */
-  public function getSender(){
+  public function getSender()
+  {
     return $this->sender;
   }
 
@@ -90,7 +100,8 @@ class Message{
    *
    * @param text $text
    */
-  public function setText($text){
+  public function setText($text)
+  {
     $this->text = $text;
   }
 
@@ -99,7 +110,8 @@ class Message{
    *
    * @return text $text
    */
-  public function getText(){
+  public function getText()
+  {
     return $this->text;
   }
 
@@ -108,7 +120,8 @@ class Message{
    *
    * @param string $createdAt
    */
-  public function setCreatedAt($createdAt){
+  public function setCreatedAt($createdAt)
+  {
     $this->createdAt = new \DateTime($createdAt);
   }
 
@@ -117,21 +130,24 @@ class Message{
    *
    * @return datetime $createdAt
    */
-  public function getCreatedAt(){
+  public function getCreatedAt()
+  {
     return $this->createdAt;
   }
-  
+
   /**
    * Mark as read
    */
-  public function read(){
+  public function read()
+  {
     $this->isRead = true;
   }
-  
- /**
+
+  /**
    * Un Mark as read
    */
-  public function unRead(){
+  public function unRead()
+  {
     $this->isRead = false;
   }
 
@@ -141,8 +157,12 @@ class Message{
    * @param integer $sender who is the sender
    * @return boolean $isRead
    */
-  public function isRead($sender){
-    if($this->sender == $sender) return $this->isRead;
+  public function isRead($sender)
+  {
+    if ($this->sender == $sender) {
+      return $this->isRead;
+    }
+
     return true;
   }
 
@@ -151,7 +171,8 @@ class Message{
    *
    * @param Entity\Thread $thread
    */
-  public function setThread(Thread $thread){
+  public function setThread(Thread $thread)
+  {
     $this->thread = $thread;
   }
 
@@ -160,8 +181,9 @@ class Message{
    *
    * @return \Jazzee\Entity\Thread $thread
    */
-  public function getThread(){
+  public function getThread()
+  {
     return $this->thread;
   }
-  
+
 }

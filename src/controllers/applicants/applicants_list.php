@@ -1,28 +1,33 @@
 <?php
+
 /**
  * List all applicants by status
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @package jazzee
- * @subpackage applicants
+ *
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
  */
-class ApplicantsListController extends \Jazzee\AdminController {
+class ApplicantsListController extends \Jazzee\AdminController
+{
+
   const MENU = 'Applicants';
   const TITLE = 'List by Tag';
   const PATH = 'applicants/list';
-  
   const ACTION_INDEX = 'All Applicants';
-  
-    /**
+
+  /**
    * Add the required JS
    */
-  protected function setUp(){
+  protected function setUp()
+  {
     parent::setUp();
     $this->addScript($this->path('resource/scripts/controllers/applicants_list.controller.js'));
   }
+
   /**
    * List all applicants
    */
-  public function actionIndex(){
+  public function actionIndex()
+  {
     $tags = array();
     $tags['Accepted'] = array();
     $tags['Admitted'] = array();
@@ -32,20 +37,36 @@ class ApplicantsListController extends \Jazzee\AdminController {
     $tags['Paid'] = array();
     $tags['Not Locked'] = array();
     $tags['All Applicants'] = array();
-    foreach($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant){
+    foreach ($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant) {
       $tags['All Applicants'][] = $applicant;
-      if($applicant->isLocked()) $tags['Locked'][] = $applicant;
-      else $tags['Not Locked'][] = $applicant;
-      if($applicant->hasPaid()) $tags['Paid'][] = $applicant;
-      if($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer()) $tags['Accepted'][] = $applicant;
-      if($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit()) $tags['Admitted'][] = $applicant;
-      if($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer()) $tags['Declined'][] = $applicant;
-      if($applicant->getDecision() and $applicant->getDecision()->getFinalDeny()) $tags['Denied'][] = $applicant;
-      foreach($applicant->getTags() as $tag){
-        if(!isset($tags[$tag->getTitle()])) $tags = array($tag->getTitle() => array()) + $tags;
+      if ($applicant->isLocked()) {
+        $tags['Locked'][] = $applicant;
+      } else {
+        $tags['Not Locked'][] = $applicant;
+      }
+      if ($applicant->hasPaid()) {
+        $tags['Paid'][] = $applicant;
+      }
+      if ($applicant->getDecision() and $applicant->getDecision()->getAcceptOffer()) {
+        $tags['Accepted'][] = $applicant;
+      }
+      if ($applicant->getDecision() and $applicant->getDecision()->getFinalAdmit()) {
+        $tags['Admitted'][] = $applicant;
+      }
+      if ($applicant->getDecision() and $applicant->getDecision()->getDeclineOffer()) {
+        $tags['Declined'][] = $applicant;
+      }
+      if ($applicant->getDecision() and $applicant->getDecision()->getFinalDeny()) {
+        $tags['Denied'][] = $applicant;
+      }
+      foreach ($applicant->getTags() as $tag) {
+        if (!isset($tags[$tag->getTitle()])) {
+          $tags = array($tag->getTitle() => array()) + $tags;
+        }
         $tags[$tag->getTitle()][] = $applicant;
       }
     }
     $this->setVar('tags', $tags);
   }
+
 }

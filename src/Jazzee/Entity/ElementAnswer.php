@@ -1,73 +1,78 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * ElementAnswer
  * Break down the response from each Element on a Page into an ElementAnswer
  * In cases where there are multiple answers (like checkboxes) a single answer gets multiple rows by position
+ *
  * @Entity
- * @HasLifecycleCallbacks 
- * @Table(name="element_answers") 
- * @package    jazzee
- * @subpackage orm
+ * @HasLifecycleCallbacks
+ * @Table(name="element_answers")
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class ElementAnswer{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class ElementAnswer
+{
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Answer",inversedBy="elements")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $answer;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Element")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $element;
-  
+
   /** @Column(type="integer", nullable=true) */
   private $position;
-  
+
   /** @Column(type="string", length=255, nullable=true) */
   private $eShortString;
-  
+
   /** @Column(type="text", nullable=true) */
   private $eText;
-  
+
   /** @Column(type="datetime", nullable=true) */
   private $eDate;
-  
+
   /** @Column(type="integer", nullable=true) */
   private $eInteger;
-  
+
   /** @Column(type="decimal", nullable=true) */
   private $eDecimal;
-  
+
   /** @Column(type="text", nullable=true) */
   private $eBlob;
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
-  
+
   /**
    * Mark the lastUpdate automatically
    * @PrePersist @PreUpdate
    */
-  public function markLastUpdate(){
-      $this->answer->markLastUpdate();
+  public function markLastUpdate()
+  {
+    $this->answer->markLastUpdate();
   }
 
   /**
@@ -75,7 +80,8 @@ class ElementAnswer{
    *
    * @param integer $position
    */
-  public function setPosition($position){
+  public function setPosition($position)
+  {
     $this->position = $position;
   }
 
@@ -84,7 +90,8 @@ class ElementAnswer{
    *
    * @return integer $position
    */
-  public function getPosition(){
+  public function getPosition()
+  {
     return $this->position;
   }
 
@@ -93,7 +100,8 @@ class ElementAnswer{
    *
    * @param string $eShortString
    */
-  public function setEShortString($eShortString){
+  public function setEShortString($eShortString)
+  {
     $this->eShortString = $eShortString;
   }
 
@@ -102,7 +110,8 @@ class ElementAnswer{
    *
    * @return string $eShortString
    */
-  public function getEShortString(){
+  public function getEShortString()
+  {
     return $this->eShortString;
   }
 
@@ -111,7 +120,8 @@ class ElementAnswer{
    *
    * @param text $eText
    */
-  public function setEText($eText){
+  public function setEText($eText)
+  {
     $this->eText = $eText;
   }
 
@@ -120,7 +130,8 @@ class ElementAnswer{
    *
    * @return text $eText
    */
-  public function getEText(){
+  public function getEText()
+  {
     return $this->eText;
   }
 
@@ -129,7 +140,8 @@ class ElementAnswer{
    *
    * @param string $eDate
    */
-  public function setEDate($eDate){
+  public function setEDate($eDate)
+  {
     $this->eDate = new \DateTime($eDate);
   }
 
@@ -138,7 +150,8 @@ class ElementAnswer{
    *
    * @return \DateTime $eDate
    */
-  public function getEDate(){
+  public function getEDate()
+  {
     return $this->eDate;
   }
 
@@ -147,7 +160,8 @@ class ElementAnswer{
    *
    * @param integer $eInteger
    */
-  public function setEInteger($eInteger){
+  public function setEInteger($eInteger)
+  {
     $this->eInteger = $eInteger;
   }
 
@@ -156,7 +170,8 @@ class ElementAnswer{
    *
    * @return integer $eInteger
    */
-  public function getEInteger(){
+  public function getEInteger()
+  {
     return $this->eInteger;
   }
 
@@ -165,7 +180,8 @@ class ElementAnswer{
    *
    * @param decimal $eDecimal
    */
-  public function setEDecimal($eDecimal){
+  public function setEDecimal($eDecimal)
+  {
     $this->eDecimal = $eDecimal;
   }
 
@@ -174,7 +190,8 @@ class ElementAnswer{
    *
    * @return decimal $eDecimal
    */
-  public function getEDecimal(){
+  public function getEDecimal()
+  {
     return $this->eDecimal;
   }
 
@@ -183,7 +200,8 @@ class ElementAnswer{
    *
    * @param text $eBlob
    */
-  public function setEBlob($blob){
+  public function setEBlob($blob)
+  {
     $this->eBlob = base64_encode($blob);
   }
 
@@ -192,7 +210,8 @@ class ElementAnswer{
    *
    * @return text $eBlob
    */
-  public function getEBlob(){
+  public function getEBlob()
+  {
     return base64_decode($this->eBlob);
   }
 
@@ -201,34 +220,39 @@ class ElementAnswer{
    *
    * @param Entity\Element $element
    */
-  public function setElement(Element $element){
+  public function setElement(Element $element)
+  {
     $this->element = $element;
   }
-  
+
   /**
    * Get element
    *
    * @return Entity\Element
    */
-  public function getElement(){
+  public function getElement()
+  {
     return $this->element;
   }
-  
+
   /**
    * Set answer
    *
    * @param Entity\Answer $answer
    */
-  public function setAnswer(Answer $answer){
+  public function setAnswer(Answer $answer)
+  {
     $this->answer = $answer;
   }
-  
+
   /**
    * Get answer
    *
    * @return Entity\Answer $answer
    */
-  public function getAnswer(){
+  public function getAnswer()
+  {
     return $this->answer;
   }
+
 }

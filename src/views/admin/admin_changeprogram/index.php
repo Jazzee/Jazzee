@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /**
  * admin_changeprogram view
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -6,4 +7,4 @@
  * @package jazzee
  * @subpackage admin
  */
-$this->renderElement('form', array('form'=>$form)) ?>
+$this->renderElement('form', array('form' => $form));

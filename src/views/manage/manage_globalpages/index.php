@@ -1,10 +1,7 @@
-<?php 
+<?php
 /**
  * manage_globalpages index view
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @package jazzee
- * @subpackage admin
- * @subpackage setup
+ * 
  */
 ?>
 <noscript>This Page Requires javascript.  Please consult your department IT support for help enabling Javascript in your browser.</noscript>

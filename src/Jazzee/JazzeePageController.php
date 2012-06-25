@@ -1,68 +1,74 @@
 <?php
+
 namespace Jazzee;
+
 /**
  * Dependancy free controller
- * 
+ *
  * Base page controller doesn't depend on anything so it is safe
  * for error pages and file pages to use it when they don't need acess
  * to configuration or session info setup by JazzeeController
- * @package jazzee
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ *
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
  */
-
 class JazzeePageController extends \Foundation\VC\Controller
-{ 
+{
+
   /**
    *  @var \Jazzee\Configuration
    */
   protected $_config;
-  
+
   /**
    *  @var \Foundation\Configuration
    */
   protected $_foundationConfig;
-  
+
   /**
    * @var \Foundation\Cache
    */
   protected $_cache;
-  
+
   /**
    * Absolute server path
    * @var string
    */
   protected $_serverPath;
-  
+
   /**
    * Mono log instance for jazzee logging
    * @var \Monolog\Logger
    */
   protected $_log;
-  
+
   /**
    * Pear log instance for authentication logging
    * @var \Log
    */
   protected $_authLog;
-  
+
   /**
    * Virtual File system root directory
    * @var \Foundation\Virtual\Directory
    */
   protected $_vfs;
-  
-  public function __construct(){
+
+  public function __construct()
+  {
     $this->setupConfiguration();
     $this->setupVarPath();
     $this->setupLogging();
   }
+
   /**
    * Basic page disply setup
-   * 
+   *
    * Create the default layout varialbes so the layout doesn't have to guess if they are available
    * @return null
    */
-  protected function beforeAction(){
+  protected function beforeAction()
+  {
     $this->buildVirtualFilesystem();
     //required layout variables get default values
     $this->setLayoutVar('requiredCss', array());
@@ -72,31 +78,32 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->setLayoutVar('layoutContentTop', '');
     $this->setLayoutVar('navigation', false);
     $this->setLayoutVar('status', 'success'); //used in some json ajax requests
-    
     //yui css library
     $this->addCss($this->path('resource/foundation/styles/reset-fonts-grids.css'));
     $this->addCss($this->path('resource/foundation/styles/base.css'));
-    
+
     //anytime css has to go before jquery ui theme
     $this->addCss($this->path('resource/foundation/styles/anytime.css'));
     //default jquery theme
     $this->addCss($this->path('resource/foundation/styles/jquerythemes/ui-lightness/style.css'));
-    
+
     //our css
     $this->addCss($this->path('resource/styles/layout.css'));
     $this->addCss($this->path('resource/styles/style.css'));
-    
+
     //Set HTML purifier cache location
     \Foundation\Form\Filter\Safe::setCachePath($this->getVarPath() . '/tmp/');
   }
-  
+
   /**
    * Create a good path even if modrewrite is not present
    * @param string $path
    * @return string
    */
-  public function path($path){
-    $prefix = $this->_serverPath . rtrim(dirname($_SERVER['SCRIPT_NAME']),'/\\.');
+  public function path($path)
+  {
+    $prefix = $this->_serverPath . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\.');
+
     return $prefix . '/' . $path;
   }
 
@@ -105,7 +112,8 @@ class JazzeePageController extends \Foundation\VC\Controller
    * @param string $path
    * @SuppressWarnings(PHPMD.ExitExpression)
    */
-  public function redirectPath($path){
+  public function redirectPath($path)
+  {
     $this->redirect($this->path($path));
     $this->afterAction();
     exit(0);
@@ -116,35 +124,38 @@ class JazzeePageController extends \Foundation\VC\Controller
    * @SuppressWarnings(PHPMD.ExitExpression)
    * @param string $url
    */
-  public function redirectUrl($url){
+  public function redirectUrl($url)
+  {
     $this->redirect($url);
     $this->afterAction();
     exit(0);
   }
-  
+
   /**
    * No messages
    */
-  public function getMessages(){
+  public function getMessages()
+  {
     return array();
   }
-  
+
   /**
    * Build our virtual file system
    */
-  protected function buildVirtualFileSystem(){
+  protected function buildVirtualFileSystem()
+  {
     $this->_vfs = new \Foundation\Virtual\VirtualDirectory();
     $this->_vfs->addDirectory('scripts', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../scripts'));
     $this->_vfs->addDirectory('styles', new \Foundation\Virtual\ProxyDirectory(__DIR__ . '/../styles'));
-    
+
     $virtualFoundation = new \Foundation\Virtual\VirtualDirectory();
     $foundationPath = \Foundation\Configuration::getSourcePath();
     $virtualFoundation->addDirectory('javascript', new \Foundation\Virtual\ProxyDirectory($foundationPath . '/src/javascript'));
     $media = new \Foundation\Virtual\VirtualDirectory();
     $media->addFile('blank.gif', new \Foundation\Virtual\RealFile('blank.gif,', $foundationPath . '/src/media/blank.gif'));
     $media->addFile('ajax-bar.gif', new \Foundation\Virtual\RealFile('ajax-bar.gif,', $foundationPath . '/src/media/ajax-bar.gif'));
-    $media->addDirectory('icons', new \Foundation\Virtual\ProxyDirectory( $foundationPath . '/src/media/famfamfam_silk_icons_v013/icons'));
-    
+    $media->addDirectory('icons', new \Foundation\Virtual\ProxyDirectory($foundationPath . '/src/media/famfamfam_silk_icons_v013/icons'));
+
     $scripts = new \Foundation\Virtual\VirtualDirectory();
     $scripts->addFile('jquery.js', new \Foundation\Virtual\RealFile('jquery.js', $foundationPath . '/lib/jquery/jquery-1.7.1.min.js'));
     $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', $foundationPath . '/lib/jquery/plugins/jquery.json-2.2.min.js'));
@@ -154,24 +165,24 @@ class JazzeePageController extends \Foundation\VC\Controller
     $scripts->addFile('jquery.wysiwyg.js', new \Foundation\Virtual\RealFile('jquery.wysiwyg.js', $foundationPath . '/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.full.min.js'));
     $scripts->addFile('anytime.js', new \Foundation\Virtual\RealFile('anytime.js', $foundationPath . '/lib/anytime/anytimec.js'));
     $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', $foundationPath . '/src/javascript/form.js'));
-    
+
     $styles = new \Foundation\Virtual\VirtualDirectory();
     $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory($foundationPath . '/lib/jquery/themes'));
-    
+
     $styles->addFile('base.css', new \Foundation\Virtual\RealFile('base.css', $foundationPath . '/lib/yui/base-min.css'));
     $styles->addFile('reset-fonts-grids.css', new \Foundation\Virtual\RealFile('reset-fonts-grids.css', $foundationPath . '/lib/yui/reset-fonts-grids-min.css'));
     $styles->addFile('jquery.qtip.css', new \Foundation\Virtual\RealFile('jquery.qtip.min.css', $foundationPath . '/lib/jquery/plugins/qtip/jquery.qtip.min.css'));
     $styles->addFile('anytime.css', new \Foundation\Virtual\RealFile('anytime.css', $foundationPath . '/lib/anytime/anytimec.css'));
     $styles->addFile('jquery.wysiwyg.css', new \Foundation\Virtual\RealFile('jquery.wysiwyg.css', $foundationPath . '/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.css'));
     $styles->addFile('jquery.wysiwyg.bg.png', new \Foundation\Virtual\RealFile('jquery.wysiwyg.bg.png', $foundationPath . '/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.bg.png'));
-    $styles->addFile('jquery.wysiwyg.gif', new \Foundation\Virtual\RealFile('jquery.wysiwyg.gif',$foundationPath . '/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.gif'));
+    $styles->addFile('jquery.wysiwyg.gif', new \Foundation\Virtual\RealFile('jquery.wysiwyg.gif', $foundationPath . '/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.gif'));
 
-    $virtualFoundation->addDirectory('media',$media);
-    $virtualFoundation->addDirectory('scripts',$scripts);
-    $virtualFoundation->addDirectory('styles',$styles);
-    
+    $virtualFoundation->addDirectory('media', $media);
+    $virtualFoundation->addDirectory('scripts', $scripts);
+    $virtualFoundation->addDirectory('styles', $styles);
+
     $this->_vfs->addDirectory('foundation', $virtualFoundation);
-    
+
     $jazzeePath = \Jazzee\Configuration::getSourcePath();
     $vOpenID = new \Foundation\Virtual\VirtualDirectory();
     $vOpenID->addDirectory('js', new \Foundation\Virtual\ProxyDirectory($jazzeePath . '/lib/openid-selector/js'));
@@ -179,60 +190,67 @@ class JazzeePageController extends \Foundation\VC\Controller
     $vOpenID->addDirectory('images', new \Foundation\Virtual\ProxyDirectory($jazzeePath . '/lib/openid-selector/images'));
     $this->_vfs->addDirectory('openid-selector', $vOpenID);
   }
-  
+
   /**
    * No Navigation
    */
-  public function getNavigation(){
+  public function getNavigation()
+  {
     return false;
   }
-  
+
   /**
    * Setup the var directories
    */
-  protected function setupVarPath(){
+  protected function setupVarPath()
+  {
     $var = $this->getVarPath();
     //check to see if all the directories exist and are writable
-    $varDirectories = array('log','session','cache','tmp','uploads','cache/public');
-    foreach($varDirectories as $dir){
+    $varDirectories = array('log', 'session', 'cache', 'tmp', 'uploads', 'cache/public');
+    foreach ($varDirectories as $dir) {
       $path = $var . '/' . $dir;
-      if(!is_dir($path)){
-        if(!mkdir($path)){
+      if (!is_dir($path)) {
+        if (!mkdir($path)) {
           throw new Exception("Tried to create 'var/{$dir}' directory but {$path} is not writable by the webserver");
         }
       }
-      if(!is_writable($path)){
+      if (!is_writable($path)) {
         throw new Exception("Invalid path to 'var/{$dir}' {$path} is not writable by the webserver");
       }
     }
   }
-  
+
   /**
    * Get the path to the var directory
    * @return string
    */
-  protected function getVarPath(){
+  protected function getVarPath()
+  {
     $path = $this->_config->getVarPath();
-    if(!$realPath = \realpath($path) or !\is_dir($realPath) or !\is_writable($realPath)){
-      if($realPath) $path = $realPath; //nicer error message if the path exists
+    if (!$realPath = \realpath($path) or !\is_dir($realPath) or !\is_writable($realPath)) {
+      if ($realPath) {
+        $path = $realPath; //nicer error message if the path exists
+      }
       throw new Exception("{$path} is not readable by the webserver so we cannot use it as the 'var' directory");
     }
+
     return $realPath;
   }
-  
+
   /**
    * Setup configuration
-   * 
+   *
    * Load config.ini.php
    * translate to foundation config
    * create absolute path
    * set defautl timezone
    */
-  protected function setupConfiguration(){
+  protected function setupConfiguration()
+  {
     $this->_config = new \Jazzee\Configuration();
-    
+
     $this->_foundationConfig = new \Foundation\Configuration();
-    if($this->_config->getStatus() == 'DEVELOPMENT'){
+    if ($this->_config->getStatus() == 'DEVELOPMENT') {
       $this->_foundationConfig->setCacheType('array');
     } else {
       $this->_foundationConfig->setCacheType('apc');
@@ -246,73 +264,76 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->_foundationConfig->setMailServerPort($this->_config->getMailServerPort());
     $this->_foundationConfig->setMailServerUsername($this->_config->getMailServerUsername());
     $this->_foundationConfig->setMailServerPassword($this->_config->getMailServerPassword());
-    
-    
-    $this->_cache = new \Foundation\Cache('Jazzee' . __DIR__,$this->_foundationConfig);
-    
+
+
+    $this->_cache = new \Foundation\Cache('Jazzee' . __DIR__, $this->_foundationConfig);
+
     \Foundation\VC\Config::setCache($this->_cache);
-    
-    if((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off')){
+
+    if ((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off')) {
       $protocol = 'http';
     } else {
       $protocol = 'https';
     }
-    
-    $this->_serverPath = $protocol . '://' .  $_SERVER['SERVER_NAME'];
+
+    $this->_serverPath = $protocol . '://' . $_SERVER['SERVER_NAME'];
   }
-  
+
   /**
    * Get the current configuration
    * @return \Jazzee\Configuration
    */
-  public function getConfig(){
+  public function getConfig()
+  {
     return $this->_config;
   }
-  
+
   /**
    * Setup logging
    */
-  protected function setupLogging(){
+  protected function setupLogging()
+  {
     $path = $this->getVarPath() . '/log';
     //create an access log with browser information
     $accessLog = new \Monolog\Logger('access');
     $accessLog->pushHandler(new \Monolog\Handler\StreamHandler($path . '/access_log'));
-    
-    $accessMessage ="[{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} {$_SERVER['SERVER_PROTOCOL']}] " .
-      '[' . (!empty($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'-') . '] ' .
-      '[' . (!empty($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:'-') . ']';
+
+    $accessMessage = "[{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} {$_SERVER['SERVER_PROTOCOL']}] " .
+            '[' . (!empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '-') . '] ' .
+            '[' . (!empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '-') . ']';
     $accessLog->addInfo($accessMessage);
 
     //create an authenticationLog
     $this->_authLog = new \Monolog\Logger('authentication');
     $this->_authLog->pushHandler(new \Monolog\Handler\StreamHandler($path . '/authentication_log'));
-    
+
     $this->_log = new \Monolog\Logger('jazzee');
     $this->_log->pushProcessor(new \Monolog\Processor\WebProcessor());
     $this->_log->pushProcessor(new \Monolog\Processor\IntrospectionProcessor());
     $this->_log->pushHandler(new \Monolog\Handler\StreamHandler($path . '/strict_log'));
     $this->_log->pushHandler(new \Monolog\Handler\StreamHandler($path . '/messages_log', \Monolog\Logger::INFO));
     $this->_log->pushHandler(new \Monolog\Handler\StreamHandler($path . '/error_log', \Monolog\Logger::ERROR));
-    $this->_log->pushHandler(new \Monolog\Handler\SyslogHandler('jazzee','syslog',\Monolog\Logger::ERROR));
-    
+    $this->_log->pushHandler(new \Monolog\Handler\SyslogHandler('jazzee', 'syslog', \Monolog\Logger::ERROR));
+
     //Handle PHP errors with out logs
     set_error_handler(array($this, 'handleError'));
     //catch any excpetions
     set_exception_handler(array($this, 'handleException'));
   }
-  
+
   /**
    * Log something
-   * @param string $message 
+   * @param string $message
    * @param integer $level
    */
-  public function log($message, $level = \Monolog\Logger::INFO){
+  public function log($message, $level = \Monolog\Logger::INFO)
+  {
     $this->_log->addRecord($level, $message);
   }
-  
+
   /**
    * Handle PHP error
-   * Takes input from PHPs built in error handler logs it  
+   * Takes input from PHPs built in error handler logs it
    * throws a jazzee exception to handle if the error reporting level is high enough
    * @param $code
    * @param $message
@@ -320,55 +341,57 @@ class JazzeePageController extends \Foundation\VC\Controller
    * @param $line
    * @throws \Jazzee\Exception
    */
-  public function handleError($code, $message, $file, $line){
+  public function handleError($code, $message, $file, $line)
+  {
     /* Map the PHP error to a Log priority. */
     switch ($code) {
       case E_WARNING:
       case E_USER_WARNING:
         $priority = \Monolog\Logger::WARNING;
-        break;
+          break;
       case E_NOTICE:
       case E_USER_NOTICE:
         $priority = \Monolog\Logger::INFO;
-        break;
+          break;
       case E_ERROR:
       case E_USER_ERROR:
         $priority = \Monolog\Logger::ERROR;
-        break;
+          break;
       default:
         $priority = \Monolog\Logger::INFO;
     }
-    if(error_reporting() === 0){// Error reporting is currently turned off or suppressed with @
+    // Error reporting is currently turned off or suppressed with @
+    if (error_reporting() === 0) {
       $this->_log->debug('Supressed error: ' . $message . ' in ' . $file . ' at line ' . $line);
+
       return false;
     }
     $this->_log->addRecord($priority, $message . ' in ' . $file . ' at line ' . $line);
     throw new \Exception('Jazzee caught a PHP error: ' . $message . ' in ' . $file . ' at line ' . $line);
   }
-  
 
-  
   /**
    * Handle PHP Exception
    * @SuppressWarnings(PHPMD.ExitExpression)
    * @param Exception $exception
    */
-  public function handleException(\Exception $exception){
+  public function handleException(\Exception $exception)
+  {
     $message = $exception->getMessage();
     $userMessage = 'Unspecified Technical Difficulties';
     $code = 500;
-    if($exception instanceof \Lvc_Exception){
+    if ($exception instanceof \Lvc_Exception) {
       $code = 404;
       $userMessage = 'Page not found.';
     }
-    if($exception instanceof \PDOException){
+    if ($exception instanceof \PDOException) {
       $message = 'Problem with database connection. PDO says: ' . $message;
       $userMessage = 'We are experiencing a problem connecting to our database.  Please try your request again.';
     }
-    if($exception instanceof \Foundation\Exception){
+    if ($exception instanceof \Foundation\Exception) {
       $userMessage = $exception->getUserMessage();
     }
-    if($exception instanceof \Foundation\Virtual\Exception){
+    if ($exception instanceof \Foundation\Virtual\Exception) {
       $userMessage = $exception->getUserMessage();
       $code = $exception->getHttpErrorCode();
     }
@@ -377,15 +400,15 @@ class JazzeePageController extends \Foundation\VC\Controller
       case E_WARNING:
       case E_USER_WARNING:
         $priority = \Monolog\Logger::WARNING;
-        break;
+          break;
       case E_NOTICE:
       case E_USER_NOTICE:
         $priority = \Monolog\Logger::INFO;
-        break;
+          break;
       case E_ERROR:
       case E_USER_ERROR:
         $priority = \Monolog\Logger::CRITICAL;
-        break;
+          break;
       default:
         $priority = \Monolog\Logger::INFO;
     }
@@ -396,11 +419,12 @@ class JazzeePageController extends \Foundation\VC\Controller
     $request = new \Lvc_Request();
     $request->setControllerName('error');
     $request->setActionName('index');
-    $request->setActionParams(array('error' => $code, 'message'=>$userMessage));
-  
+    $request->setActionParams(array('error' => $code, 'message' => $userMessage));
+
     // Get a new front controller without any routers, and have it process our handmade request.
     $frontController = new \Lvc_FrontController();
     $frontController->processRequest($request);
     exit(1);
   }
+
 }

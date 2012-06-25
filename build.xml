@@ -18,7 +18,7 @@
       <fileset dir="${source}/etc" excludes="config.ini.php"/>
     </copy>
  </target>
- 
+
  <target name="composer" description="Install dependencies using composer">
     <get src="http://getcomposer.org/installer" dest="${build}/composerinstaller"/>
     <exec executable="php" failonerror="true">
@@ -43,7 +43,7 @@
    <move file="${build}/jazzee" tofile="${build}/archive/jazzee-${build.version}" />
    <tar destfile="${basedir}/build/jazzee-${build.version}.tar.gz" basedir="${basedir}/build/archive" compression="gzip" longfile="gnu" />
  </target>
- 
+
   <target name="apidocs" description="Build API Documentation">
    <exec executable="apigen">
      <arg line="--source ${source}/src" />
@@ -51,10 +51,9 @@
      <arg value="--quiet"/>
      <arg line="--title 'Jazzee API'"/>
      <arg line="--base-url 'http://api.jazzee.org'"/>
-     <arg line="--groups packages"/>
    </exec>
   </target>
- 
+
   <target name="userdocs" description="Build User Documentation">
    <exec executable="sphinx-build">
      <arg line="-b html"/>
@@ -63,6 +62,24 @@
      <arg value="${userdocsdestination}"/>
    </exec>
   </target>
+
+ <target name="phpcs"
+         description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
+  <exec executable="phpcs">
+   <arg value="--standard=${basedir}/buildconfig/phpcs.xml" />
+   <arg path="${basedir}/src" />
+  </exec>
+ </target>
+
+ <target name="phpcs-ci"
+         description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
+  <exec executable="phpcs" output="/dev/null">
+   <arg value="--report=checkstyle" />
+   <arg value="--report-file=${basedir}/build/logs/checkstyle.xml" />
+   <arg value="--standard=${basedir}/buildconfig/phpcs.xml" />
+   <arg path="${basedir}/src" />
+  </exec>
+ </target>
 
  <target name="phpmd"
          description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
@@ -83,5 +100,5 @@
    <arg value="${basedir}/build/logs/pmd.xml" />
   </exec>
  </target>
-  
+
 </project>

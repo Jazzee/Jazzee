@@ -1,34 +1,39 @@
 <?php
 namespace Jazzee\Entity;
-/** 
+
+/**
  * CronVariable
  * Cron run variables
+ *
  * @Entity
- * @Table(name="cron_variables",uniqueConstraints={@UniqueConstraint(name="cronvariable_name", columns={"name"})}) 
- * @package    jazzee
- * @subpackage orm
+ * @Table(name="cron_variables",uniqueConstraints={@UniqueConstraint(name="cronvariable_name", columns={"name"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class CronVariable{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class CronVariable
+{
+
   /**
-   * @Id 
+   * @Id
    * @Column(type="bigint")
    * @GeneratedValue(strategy="AUTO")
-  */
+   */
   private $id;
-  
+
   /** @Column(type="string") */
   private $name;
-  
+
   /** @Column(type="text") */
   private $value;
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -37,7 +42,8 @@ class CronVariable{
    *
    * @param string $name
    */
-  public function setName($name){
+  public function setName($name)
+  {
     $this->name = $name;
   }
 
@@ -46,7 +52,8 @@ class CronVariable{
    *
    * @return string $name
    */
-  public function getName(){
+  public function getName()
+  {
     return $this->name;
   }
 
@@ -55,7 +62,8 @@ class CronVariable{
    *
    * @param string $value
    */
-  public function setValue($value){
+  public function setValue($value)
+  {
     $this->value = base64_encode($value);
   }
 
@@ -64,7 +72,9 @@ class CronVariable{
    *
    * @return string $value
    */
-  public function getValue(){
+  public function getValue()
+  {
     return base64_decode($this->value);
   }
+
 }

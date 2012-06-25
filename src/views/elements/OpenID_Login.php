@@ -1,12 +1,7 @@
-<?php 
+<?php
 /**
  * admin_login OpenID view
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package jazzee
- * @subpackage admin
  */
-
 ?>
 <link rel="stylesheet" href="<?php print $this->controller->path('resource/openid-selector/css/openid.css'); ?>" type="text/css" media="all" charset="utf-8" />
 <script type="text/javascript" src="<?php print $this->controller->path('resource/openid-selector/js/openid-jquery.js'); ?>"></script>
@@ -31,8 +26,8 @@
       <input id="openid_submit" type="submit" value="Sign-In"/>
     </div>
     <noscript>
-            <p>OpenID is service that allows you to log-on to many different websites using a single indentity.
-            Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
+    <p>OpenID is service that allows you to log-on to many different websites using a single indentity.
+      Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
     </noscript>
   </fieldset>
 </form>
