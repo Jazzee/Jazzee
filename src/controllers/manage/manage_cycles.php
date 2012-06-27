@@ -83,6 +83,7 @@ class ManageCyclesController extends \Jazzee\AdminController
           $this->addMessage('error', "A cycle with that name already exists");
         } else {
           $cycle->setName($input->get('name'));
+          $cycle->clearDates();
           $cycle->setStart($input->get('start'));
           $cycle->setEnd($input->get('end'));
           foreach ($cycle->getRequiredPages() as $page) {

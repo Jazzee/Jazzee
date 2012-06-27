@@ -118,6 +118,11 @@ class Cycle
     $this->end = $end;
   }
 
+  public function clearDates(){
+    $this->start = null;
+    $this->end = null;
+  }
+
   /**
    * Add a required page
    * @param Page $page
