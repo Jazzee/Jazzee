@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * manage_globalpages savePage view
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -6,4 +6,3 @@
  * @subpackage admin
  * @subpackage setup
  */
-?>

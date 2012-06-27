@@ -1,38 +1,43 @@
 <?php
 namespace Jazzee\Entity;
-/** 
+
+/**
  * PageType
  * The ApplyPage class we are going to use
- * @Entity 
- * @Table(name="page_types", 
+ *
+ * @Entity
+ * @Table(name="page_types",
  * uniqueConstraints={
  *   @UniqueConstraint(name="pagetype_class",columns={"class"}),
  *   @UniqueConstraint(name="pagetype_name",columns={"name"})
  *   })
- * @package    jazzee
- * @subpackage orm
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class PageType{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class PageType
+{
+
   /**
-   * @Id 
+   * @Id
    * @Column(type="bigint")
    * @GeneratedValue(strategy="AUTO")
-  */
+   */
   private $id;
-  
+
   /** @Column(type="string") */
   private $name;
-  
+
   /** @Column(type="string") */
   private $class;
-  
-/**
+
+  /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -41,7 +46,8 @@ class PageType{
    *
    * @param string $name
    */
-  public function setName($name){
+  public function setName($name)
+  {
     $this->name = $name;
   }
 
@@ -50,7 +56,8 @@ class PageType{
    *
    * @return string $name
    */
-  public function getName(){
+  public function getName()
+  {
     return $this->name;
   }
 
@@ -59,7 +66,8 @@ class PageType{
    *
    * @param string $class
    */
-  public function setClass($class){
+  public function setClass($class)
+  {
     $this->class = $class;
   }
 
@@ -68,7 +76,9 @@ class PageType{
    *
    * @return string $class
    */
-  public function getClass(){
+  public function getClass()
+  {
     return $this->class;
   }
+
 }

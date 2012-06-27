@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Export application data to xml
  */
@@ -10,7 +11,7 @@ $app = $xml->createElement("application");
 $preferences = $xml->createElement("preferences");
 $preferences->appendChild($xml->createElement('contactName', $application->getContactName()));
 $preferences->appendChild($xml->createElement('contactEmail', $application->getContactEmail()));
-$preferences->appendChild($xml->createElement('welcome', htmlentities($application->getWelcome(),ENT_COMPAT,'utf-8')));
+$preferences->appendChild($xml->createElement('welcome', htmlentities($application->getWelcome(), ENT_COMPAT, 'utf-8')));
 $preferences->appendChild($xml->createElement('open', $application->getOpen()->format('c')));
 $preferences->appendChild($xml->createElement('close', $application->getClose()->format('c')));
 $preferences->appendChild($xml->createElement('begin', $application->getBegin()->format('c')));
@@ -26,8 +27,8 @@ $preferences->appendChild($xml->createElement('statusDeclineText', $application-
 $app->appendChild($preferences);
 
 $applicationPages = $xml->createElement("pages");
-$pages = $this->controller->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application'=>$application->getId()));
-foreach($pages as $page){
+$pages = $this->controller->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application' => $application->getId()));
+foreach ($pages as $page) {
   $applicationPages->appendChild($this->controller->pageXml($xml, $page));
 }
 $app->appendChild($applicationPages);

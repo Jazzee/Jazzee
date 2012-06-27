@@ -1,17 +1,16 @@
-<?php 
+<?php
 /**
  * List of programs
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package jazzee
- * @subpackage apply
+ *
  */
 ?>
 <fieldset>
   <legend>Select the program you are applying to:</legend>
   <ul class='nobullets'>
-  <?php foreach($programs as $program): ?>
-    <li><a href='<?php print $this->path('apply/' . $program->getShortName());?>'><?php print $program->getName(); ?></a></li>
-  <?php endforeach; ?>
-	</ul>
+    <?php
+    foreach ($programs as $program) {?>
+      <li><a href='<?php print $this->path('apply/' . $program->getShortName()); ?>'><?php print $program->getName(); ?></a></li>
+    <?php
+    }?>
+  </ul>
 </fieldset>

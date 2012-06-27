@@ -1,80 +1,84 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * User
  * Admin users details
+ *
  * @Entity(repositoryClass="\Jazzee\Entity\UserRepository")
- * @Table(name="users", 
+ * @Table(name="users",
  * uniqueConstraints={@UniqueConstraint(name="user_name",columns={"uniqueName"})})
- * @package    jazzee
- * @subpackage orm
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class User{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class User
+{
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
+
   /**
    * Unique name for use with federated authentication
-   * @Column(type="string") 
+   * @Column(type="string")
    * */
   private $uniqueName;
-  
+
   /** @Column(type="string", nullable=true) */
   private $email;
-  
+
   /** @Column(type="string", nullable=true) */
   private $firstName;
-  
+
   /** @Column(type="string", nullable=true) */
   private $lastName;
-  
+
   /** @Column(type="string", nullable=true) */
   private $apiKey;
-  
+
   /** @Column(type="boolean") */
   private $isActive;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Program")
-   * @JoinColumn(onDelete="SET NULL") 
+   * @JoinColumn(onDelete="SET NULL")
    */
   private $defaultProgram;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="Cycle")
-   * @JoinColumn(onDelete="SET NULL") 
+   * @JoinColumn(onDelete="SET NULL")
    */
   private $defaultCycle;
-  
+
   /**
    * @ManyToMany(targetEntity="Role", inversedBy="users")
    * @JoinTable(name="user_roles")
-  **/
+   * */
   private $roles;
-  
-  /** 
+
+  /**
    * @OneToMany(targetEntity="AuditLog", mappedBy="user")
    */
   protected $auditLogs;
-  
 
-  public function __construct(){
+  public function __construct()
+  {
     $this->isActive = true;
     $this->roles = new \Doctrine\Common\Collections\ArrayCollection();
   }
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -83,7 +87,8 @@ class User{
    *
    * @param string $uniqueName
    */
-  public function setUniqueName($uniqueName){
+  public function setUniqueName($uniqueName)
+  {
     $this->uniqueName = $uniqueName;
   }
 
@@ -92,7 +97,8 @@ class User{
    *
    * @return string $uniqueName
    */
-  public function getUniqueName(){
+  public function getUniqueName()
+  {
     return $this->uniqueName;
   }
 
@@ -101,7 +107,8 @@ class User{
    *
    * @param string $email
    */
-  public function setEmail($email){
+  public function setEmail($email)
+  {
     $this->email = $email;
   }
 
@@ -110,7 +117,8 @@ class User{
    *
    * @return string $email
    */
-  public function getEmail(){
+  public function getEmail()
+  {
     return $this->email;
   }
 
@@ -119,7 +127,8 @@ class User{
    *
    * @param string $firstName
    */
-  public function setFirstName($firstName){
+  public function setFirstName($firstName)
+  {
     $this->firstName = $firstName;
   }
 
@@ -128,7 +137,8 @@ class User{
    *
    * @return string $firstName
    */
-  public function getFirstName(){
+  public function getFirstName()
+  {
     return $this->firstName;
   }
 
@@ -137,7 +147,8 @@ class User{
    *
    * @param string $lastName
    */
-  public function setLastName($lastName){
+  public function setLastName($lastName)
+  {
     $this->lastName = $lastName;
   }
 
@@ -146,57 +157,63 @@ class User{
    *
    * @return string $lastName
    */
-  public function getLastName(){
+  public function getLastName()
+  {
     return $this->lastName;
   }
-  
+
   /**
    * Generate apiKey
    */
-  public function generateApiKey(){
+  public function generateApiKey()
+  {
     //PHPs uniquid function is time based and therefor guessable
     //So we get unique through uniquid and we get random by prefixing it with a part of an MD5
-    $this->apiKey = \uniqid(md5((mt_rand()*mt_rand()*$this->id) . $this->uniqueName . $this->lastName . $this->firstName));
+    $this->apiKey = \uniqid(md5((mt_rand() * mt_rand() * $this->id) . $this->uniqueName . $this->lastName . $this->firstName));
   }
-  
+
   /**
    * get apiKey
    */
-  public function getApiKey(){
+  public function getApiKey()
+  {
     return $this->apiKey;
   }
-  
+
   /**
    * Is the user active
    * @return boolean
    */
-  public function isActive(){
+  public function isActive()
+  {
     return $this->isActive;
   }
-  
+
   /**
    * Active User
-   * 
+   *
    */
-  public function activate(){
+  public function activate()
+  {
     $this->isActive = true;
   }
-  
+
   /**
    * Deactivate User
    */
-  public function deActivate(){
+  public function deActivate()
+  {
     $this->isActive = false;
     $this->roles->clear();
   }
-  
-  
+
   /**
    * Set defaultProgram
    *
    * @param Entity\Program $defaultProgram
    */
-  public function setDefaultProgram(Program $defaultProgram){
+  public function setDefaultProgram(Program $defaultProgram)
+  {
     $this->defaultProgram = $defaultProgram;
   }
 
@@ -205,7 +222,8 @@ class User{
    *
    * @return Entity\Program $defaultProgram
    */
-  public function getDefaultProgram(){
+  public function getDefaultProgram()
+  {
     return $this->defaultProgram;
   }
 
@@ -214,7 +232,8 @@ class User{
    *
    * @param Entity\Cycle $defaultCycle
    */
-  public function setDefaultCycle(Cycle $defaultCycle){
+  public function setDefaultCycle(Cycle $defaultCycle)
+  {
     $this->defaultCycle = $defaultCycle;
   }
 
@@ -223,7 +242,8 @@ class User{
    *
    * @return Entity\Cycle $defaultCycle
    */
-  public function getDefaultCycle(){
+  public function getDefaultCycle()
+  {
     return $this->defaultCycle;
   }
 
@@ -232,7 +252,8 @@ class User{
    *
    * @param Entity\Role $role
    */
-  public function addRole(Role $role){
+  public function addRole(Role $role)
+  {
     $this->roles[] = $role;
   }
 
@@ -241,7 +262,8 @@ class User{
    *
    * @return Doctrine\Common\Collections\Collection $roles
    */
-  public function getRoles(){
+  public function getRoles()
+  {
     return $this->roles;
   }
 
@@ -251,8 +273,14 @@ class User{
    * @param \Jazzee\Entity\Role $role
    * @return boolean
    */
-  public function hasRole(Role $role){
-    foreach($this->roles as $r) if($r == $role) return true;
+  public function hasRole(Role $role)
+  {
+    foreach ($this->roles as $r) {
+      if ($r == $role) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -261,7 +289,8 @@ class User{
    *
    * @param Entity\Log $log
    */
-  public function addLog(AuditLog $log){
+  public function addLog(AuditLog $log)
+  {
     $this->logs[] = $log;
   }
 
@@ -270,73 +299,44 @@ class User{
    *
    * @return Doctrine\Common\Collections\Collection $logs
    */
-  public function getLogs(){
+  public function getLogs()
+  {
     return $this->logs;
   }
-  
+
   /**
    * get an array of all the users program affiliations
    * @return array
    */
-  public function getPrograms(){
+  public function getPrograms()
+  {
     $programs = array();
-    foreach($this->roles as $role){
-      if($role->getProgram()) $programs[] = $role->getProgram()->getId();
+    foreach ($this->roles as $role) {
+      if ($role->getProgram()) {
+        $programs[] = $role->getProgram()->getId();
+      }
     }
     array_unique($programs);
+
     return $programs;
   }
-  
+
   /**
    * Check if a user is allowed to access a resource
-   * 
+   *
    * @param string $controller
    * @param string $action
    * @param \Jazzee\Entity\Program $program
    */
-  public function isAllowed($controller, $action, \Jazzee\Entity\Program $program = null){
-    foreach($this->roles as $role) {
-      if(($role->isGlobal() or $role->getProgram() == $program) and $role->isAllowed($controller, $action)) {
+  public function isAllowed($controller, $action, \Jazzee\Entity\Program $program = null)
+  {
+    foreach ($this->roles as $role) {
+      if (($role->isGlobal() or $role->getProgram() == $program) and $role->isAllowed($controller, $action)) {
         return true;
       }
     }
+
     return false;
   }
-}
 
-/**
- * UserRepository
- * Special Repository methods for User to make searchign for special conditions easier
- * @package jazzee
- * @subpackage orm
- */
-class UserRepository extends \Doctrine\ORM\EntityRepository{
-  
-  /**
-   * find all by name
-   * 
-   * @param string $firstName
-   * @param string $lastName
-   * 
-   * @return Doctrine\Common\Collections\Collection \Jazzee\Entity\User
-   */
-  public function findByName($firstName, $lastName){
-    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u WHERE (u.firstName IS NULL OR u.firstName LIKE :firstName) AND (u.lastName IS NULL OR u.lastName LIKE :lastName) ORDER BY u.lastName, u.firstName');
-    $query->setParameter('firstName', $firstName);
-    $query->setParameter('lastName', $lastName);
-    return $query->getResult();
-  }
-  
-/**
-   * find all users in a program
-   * 
-   * @param \Jazzee\Entity\Program $program
-   * 
-   * @return Doctrine\Common\Collections\Collection \Jazzee\Entity\User
-   */
-  public function findByProgram($program){
-    $query = $this->_em->createQuery('SELECT u FROM Jazzee\Entity\User u JOIN u.roles r WHERE r.program = :programId AND u.isActive = true ORDER BY u.lastName, u.firstName');
-    $query->setParameter('programId', $program->getId());
-    return $query->getResult();
-  }
 }

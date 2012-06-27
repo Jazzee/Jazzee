@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * s index view
  * @author Jon Johnson <jon.johnson@ucsf.edu>
@@ -7,10 +7,10 @@
  * @subpackage setup
  */
 ?>
-<noscript>This Page Requires javascript.  Please consult your department IT support for help enabling Javascript in your browser.</noscript>
-<?php if($published){ ?>
-  <p><strong>Warning:</strong> You are editing an application which has already been published.  This can result in applicant data loss.</p>
-<?php } ?>
+<noscript>This Page Requires javascript.  Please consult your department IT support for help enabling Javascript in your browser.</noscript><?php
+if ($published) { ?>
+  <p><strong>Warning:</strong> You are editing an application which has already been published.  This can result in applicant data loss.</p><?php
+} ?>
 <div id='canvas' class='yui-t2'>
   <div id='save'></div>
   <div id='status'></div>

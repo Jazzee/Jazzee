@@ -1,30 +1,34 @@
 <?php
 namespace Jazzee\Entity;
-/** 
+
+/**
  * PaymentTypeVariable
  * Allow developers to store arbitrary data as a PaymentTypeVariable so we don't need new tables for every new ApplyPaymentType type
- * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variables", columns={"type_id", "name"})}) 
- * @package    jazzee
- * @subpackage orm
+ *
+ * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variables", columns={"type_id", "name"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class PaymentTypeVariable{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class PaymentTypeVariable
+{
+
   /**
-   * @Id 
+   * @Id
    * @Column(type="bigint")
    * @GeneratedValue(strategy="AUTO")
-  */
+   */
   private $id;
-  
-  /** 
+
+  /**
    * @ManyToOne(targetEntity="PaymentType", inversedBy="variables")
-   * @JoinColumn(onDelete="CASCADE") 
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $type;
-  
+
   /** @Column(type="string") */
   private $name;
-  
+
   /** @Column(type="string") */
   private $value;
 
@@ -33,7 +37,8 @@ class PaymentTypeVariable{
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -42,16 +47,18 @@ class PaymentTypeVariable{
    *
    * @param Entity\PaymentType $type
    */
-  public function setType($type){
+  public function setType($type)
+  {
     $this->type = $type;
   }
-  
+
   /**
    * Set name
    *
    * @param string $name
    */
-  public function setName($name){
+  public function setName($name)
+  {
     $this->name = $name;
   }
 
@@ -60,26 +67,28 @@ class PaymentTypeVariable{
    *
    * @return string $name
    */
-  public function getName(){
+  public function getName()
+  {
     return $this->name;
   }
-  
+
   /**
    * Base64 encode the value
    * @param mixed $value
    * @return mixed
    */
-  public function setValue($value){
+  public function setValue($value)
+  {
     return $this->value = base64_encode($value);
   }
-  
+
   /**
    * Get the base64 decoded value
    * @return blob
    */
-  public function getValue(){
+  public function getValue()
+  {
     return base64_decode($this->value);
   }
-  
-  
+
 }

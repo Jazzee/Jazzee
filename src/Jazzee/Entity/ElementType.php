@@ -1,30 +1,33 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * ElementType
  * The ApplyElement class we are going to use for an element
- * @Entity 
- * @Table(name="element_types", 
+ *
+ * @Entity
+ * @Table(name="element_types",
  * uniqueConstraints={
  *   @UniqueConstraint(name="elementtype_class",columns={"class"}),
  *   @UniqueConstraint(name="elementtype_name",columns={"name"})
  *   })
- * @package    jazzee
- * @subpackage orm
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class ElementType{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class ElementType
+{
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
+
   /** @Column(type="string") */
   private $name;
-  
+
   /** @Column(type="string") */
   private $class;
 
@@ -33,7 +36,8 @@ class ElementType{
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -42,7 +46,8 @@ class ElementType{
    *
    * @param string $name
    */
-  public function setName($name){
+  public function setName($name)
+  {
     $this->name = $name;
   }
 
@@ -51,7 +56,8 @@ class ElementType{
    *
    * @return string $name
    */
-  public function getName(){
+  public function getName()
+  {
     return $this->name;
   }
 
@@ -60,7 +66,8 @@ class ElementType{
    *
    * @param string $class
    */
-  public function setClass($class){
+  public function setClass($class)
+  {
     $this->class = $class;
   }
 
@@ -69,7 +76,9 @@ class ElementType{
    *
    * @return string $class
    */
-  public function getClass(){
+  public function getClass()
+  {
     return $this->class;
   }
+
 }

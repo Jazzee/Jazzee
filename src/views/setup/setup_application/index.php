@@ -1,29 +1,28 @@
-<?php 
+<?php
 /**
  * setup_application index view
- * @author Jon Johnson <jon.johnson@ucsf.edu>
- * @license http://jazzee.org/license.txt
- * @package jazzee
+ *
  */
-$dateFormat = 'l F jS Y g:ia'; ?>
+$dateFormat = 'l F jS Y g:ia';
+?>
 <fieldset>
-  <legend>Contact Information
-  <?php if($this->controller->checkIsAllowed('setup_application', 'editContact')){ ?>
-    (<a href='<?php print $this->path('setup/application/editContact')?>'>Edit</a>)
-    <?php }?>
+  <legend>Contact Information<?php
+    if ($this->controller->checkIsAllowed('setup_application', 'editContact')) { ?>
+      (<a href='<?php print $this->path('setup/application/editContact') ?>'>Edit</a>)<?php
+    } ?>
   </legend>
-  Contact Name: <?php print $application->getContactName();?><br />
-  Contact Email: <?php print $application->getContactEmail();?><br />
+  Contact Name: <?php print $application->getContactName(); ?><br />
+  Contact Email: <?php print $application->getContactEmail(); ?><br />
 </fieldset>
 <fieldset>
-  <legend>Welcome Message
-  <?php if($this->controller->checkIsAllowed('setup_application', 'editWelcome')){ ?>
-    (<a href='<?php print $this->path('setup/application/editWelcome')?>'>Edit</a>)
-    <?php }?>
+  <legend>Welcome Message<?php
+    if ($this->controller->checkIsAllowed('setup_application', 'editWelcome')) { ?>
+      (<a href='<?php print $this->path('setup/application/editWelcome') ?>'>Edit</a>)<?php
+    } ?>
   </legend>
-  <?php print $application->getWelcome();?>
+<?php print $application->getWelcome(); ?>
 </fieldset>
-<?php 
+<?php
 $statusMessages = array(
   'StatusIncomplete' => 'Message for applicants who missed the deadline',
   'StatusNoDecision' => 'Message for locked applicants with no decision',
@@ -48,7 +47,7 @@ $search = array(
 $someDate = new DateTime('midnight');
 $replace = array(
   'John Doe Applicant',
-  $application->getClose()?$application->getClose()->format($dateFormat):$someDate->format($dateFormat),
+  $application->getClose() ? $application->getClose()->format($dateFormat) : $someDate->format($dateFormat),
   $someDate->format($dateFormat),
   '#',
   '#',
@@ -58,25 +57,28 @@ $replace = array(
   $someDate->format($dateFormat),
   $someDate->format($dateFormat)
 );
-foreach($statusMessages as $status => $title){
-?>
+foreach ($statusMessages as $status => $title) {
+  ?>
+  <fieldset>
+    <legend><?php print $title;
+      if ($this->controller->checkIsAllowed('setup_application', 'edit' . $status)) { ?>
+        (<a href='<?php print $this->path('setup/application/edit' . $status) ?>'>Edit</a>)<?php
+      } ?>
+    </legend>
+  <?php
+    $f = 'get' . $status . 'Text';
+    print str_replace($search, $replace, $application->$f());
+  ?>
+  </fieldset><?php
+} //end foreach status type  ?>
 <fieldset>
-  <legend><?php print $title; ?>
-  <?php if($this->controller->checkIsAllowed('setup_application', 'edit' . $status)){ ?>
-    (<a href='<?php print $this->path('setup/application/edit' . $status)?>'>Edit</a>)
-    <?php }?>
+  <legend>Status<?php
+    if ($this->controller->checkIsAllowed('setup_application', 'editStatus')) { ?>
+      (<a href='<?php print $this->path('setup/application/editStatus') ?>'>Edit</a>)<?php
+    } ?>
   </legend>
-  <?php $f = 'get' . $status . 'Text'; print str_replace($search, $replace,$application->$f());?>
-</fieldset>
-<?php } //end foreach status type ?>
-<fieldset>
-  <legend>Status
-  <?php if($this->controller->checkIsAllowed('setup_application', 'editStatus')){ ?>
-    (<a href='<?php print $this->path('setup/application/editStatus')?>'>Edit</a>)
-    <?php }?>
-  </legend>
-  Application Opens: <?php print ($application->getOpen()?$application->getOpen()->format($dateFormat):'not set');?><br />
-  Application Closes: <?php print ($application->getClose()?$application->getClose()->format($dateFormat):'not set');?><br />
-  Program Begins: <?php print ($application->getBegin()?$application->getBegin()->format($dateFormat):'not set');?><br />
-  Visible: <?php print ($application->isVisible()?'Yes':'No'); ?><br />
+  Application Opens: <?php print ($application->getOpen() ? $application->getOpen()->format($dateFormat) : 'not set'); ?><br />
+  Application Closes: <?php print ($application->getClose() ? $application->getClose()->format($dateFormat) : 'not set'); ?><br />
+  Program Begins: <?php print ($application->getBegin() ? $application->getBegin()->format($dateFormat) : 'not set'); ?><br />
+  Visible: <?php print ($application->isVisible() ? 'Yes' : 'No'); ?><br />
 </fieldset>

@@ -1,10 +1,7 @@
-<?php 
+<?php
 /**
- * apply_status denyLetter iew
- * @package jazzee
- * @subpackage apply
+ * apply_status denyLetter view
  */
-if($applicant->isLocked() and $applicant->getDecision()->getFinalDeny()){
+if ($applicant->isLocked() and $applicant->getDecision()->getFinalDeny()) {
   print $text;
 }
-?>

@@ -1,15 +1,16 @@
 <?php
+
 /**
  * Jazzee Bootstrap
- * 
+ *
  * Load all of the Views, Controllers, and Elements
- * @package jazzee
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
  */
-
 //If the composer autoloader hasn't been loaded then load it here
 //We do it this way in case Jazzee has been built as a composer app into another app
 if (!class_exists('Composer\\Autoload\\ClassLoader', false)) {
-    require __DIR__ . '/../vendor/autoload.php';
+  require __DIR__ . '/../vendor/autoload.php';
 }
 
 
@@ -48,7 +49,7 @@ if (!class_exists('Composer\\Autoload\\ClassLoader', false)) {
 \Foundation\VC\Config::setViewClassName('\Jazzee\View');
 \Foundation\VC\Config::setDefaultControllerName('error');
 \Foundation\VC\Config::setDefaultControllerActionName('index');
-\Foundation\VC\Config::setDefaultControllerActionParams(array('error'=>404, 'message'=>'Sorry the page you are looking for could not be found.'));
+\Foundation\VC\Config::setDefaultControllerActionParams(array('error' => 404, 'message' => 'Sorry the page you are looking for could not be found.'));
 
 
 //add the builtin admin controller directories
@@ -57,4 +58,3 @@ if (!class_exists('Composer\\Autoload\\ClassLoader', false)) {
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/scores');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/applicants');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/admin');
-?>

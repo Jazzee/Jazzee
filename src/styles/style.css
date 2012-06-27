@@ -1,15 +1,15 @@
 @CHARSET "UTF-8";
 
 html {
-	background-color: #e6e6e6;
+  background-color: #e6e6e6;
 }
 
 
 #hd {
-	background-color:#003366;
+  background-color:#003366;
 }
 
-#hd h1{ 
+#hd h1{
   color:#ffffff;
 }
 
@@ -21,7 +21,7 @@ html {
 a, a:visited {color:#003366;}
 a:hover {color:#cc6600;}
 a.highlight {font-weight: bold;}
-	
+
 #main {
   border-left: 1px solid #003366;
 }
@@ -61,15 +61,15 @@ div.jgrowl {
 }
 
 .strong {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 #topbar {
   background-color: #003366;
-  color: #ffffff; 
+  color: #ffffff;
 }
 
-#topbar p.links{	
+#topbar p.links{
   background-color: #7799bb;
   float: right;
 }
@@ -81,16 +81,16 @@ div.jgrowl {
 }
 
 #topbar p.links a:hover {
-	background-color: #336699;
-	color:#cc6600;
+  background-color: #336699;
+  color:#cc6600;
 }
 
 /***** NAVIGATION Style *****/
 
 /* Horizontal/Dropdown Navigation */
 div.h-navigation, div.h-navigation li, div.h-navigation ol {
-	background-color: #7799bb;
-	color: #000000;
+  background-color: #7799bb;
+  color: #000000;
 }
 
 div.h-navigation li:hover, div.h-navigation a:hover, div.h-navigation li:hover>a {
@@ -118,17 +118,17 @@ div.form {
   padding: 10px;
 }
 
-div.form ol{  
+div.form ol{
   list-style: none;
 }
 
 div.form fieldset{
-	border: none;
+  border: none;
 }
 
 div.form legend{
-	font-size: 121%;
-	font-weight: bold;
+  font-size: 121%;
+  font-weight: bold;
 }
 
 div.form p.required{
@@ -143,8 +143,8 @@ div.form div.required div.control div.control{
 }
 
 div.form div.control{
-	padding-left: 16px;
-	margin-left: -16px;
+  padding-left: 16px;
+  margin-left: -16px;
 }
 div.form div.required div.control, div.form div.control.required{
   background-image: url(resource/foundation/media/icons/asterisk_yellow.png);
@@ -177,7 +177,7 @@ div.form textarea {
 }
 
 div.form div.control li{
-	padding-bottom: .25em;
+  padding-bottom: .25em;
 }
 
 /***** TABLE STYLE *****/
@@ -185,7 +185,7 @@ div.form div.control li{
 #main table {
   border-collapse: collapse;
   border: 1px solid #000000;
-  
+
 }
 #main td, #main th {
   padding: .25em;
@@ -223,12 +223,12 @@ div.form div.control li{
 }
 
 fieldset {
-	border: 1px solid #003366;
-	padding: 2em;
+  border: 1px solid #003366;
+  padding: 2em;
 }
 
 legend {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 ul.nobullets, ol.nobullets, .nobullets li{

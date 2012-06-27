@@ -1,37 +1,41 @@
 <?php
 namespace Jazzee\Entity;
 
-/** 
+/**
  * Virtual File
- * 
+ *
  * Allow binary objects like images and PDFs to be stored
+ *
  * @Entity
- * @Table(name="virtual_files", 
+ * @Table(name="virtual_files",
  * uniqueConstraints={@UniqueConstraint(name="virtualfile_name",columns={"name"})})
- * @package    jazzee
- * @subpackage orm
  * @SuppressWarnings(PHPMD.ShortVariable)
- **/
-class VirtualFile{
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
+ */
+class VirtualFile
+{
+
   /**
-    * @Id 
-    * @Column(type="bigint")
-    * @GeneratedValue(strategy="AUTO")
-  */
+   * @Id
+   * @Column(type="bigint")
+   * @GeneratedValue(strategy="AUTO")
+   */
   private $id;
-  
+
   /** @Column(type="string") */
   private $name;
-  
+
   /** @Column(type="text") */
   private $contents;
-  
+
   /**
    * Get id
    *
    * @return bigint $id
    */
-  public function getId(){
+  public function getId()
+  {
     return $this->id;
   }
 
@@ -40,7 +44,8 @@ class VirtualFile{
    *
    * @param string $name
    */
-  public function setName($name){
+  public function setName($name)
+  {
     $this->name = $name;
   }
 
@@ -49,7 +54,8 @@ class VirtualFile{
    *
    * @return string $name
    */
-  public function getName(){
+  public function getName()
+  {
     return $this->name;
   }
 
@@ -58,7 +64,8 @@ class VirtualFile{
    *
    * @param text $contents
    */
-  public function setContents($contents){
+  public function setContents($contents)
+  {
     $this->contents = base64_encode($contents);
   }
 
@@ -67,7 +74,9 @@ class VirtualFile{
    *
    * @return text $contents
    */
-  public function getContents(){
+  public function getContents()
+  {
     return base64_decode($this->contents);
   }
+
 }

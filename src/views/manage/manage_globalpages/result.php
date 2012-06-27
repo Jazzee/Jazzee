@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * manage_globalpages result view
  * a default json view for outputting simple data
@@ -7,6 +7,4 @@
  * @subpackage admin
  * @subpackage setup
  */
-
-?>
-"result":<?php print json_encode($result) ?>
+?>"result":<?php print json_encode($result);

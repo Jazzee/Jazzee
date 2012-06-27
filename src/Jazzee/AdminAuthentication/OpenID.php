@@ -1,65 +1,71 @@
 <?php
+namespace Jazzee\AdminAuthentication;
+@include_once 'OpenID/RelyingParty.php';
+@include_once 'OpenID/Extension/AX.php';
 /**
  * OpenID Admin Authentication Controller
- * 
+ *
  * OpenID is used for SSO accross the internet.  Organizations like google and yahoo
  * already provide thier users with an OpenID so if you don't want to maintain
  * your own identity provider or if you are just testing jazzee then this is a good
  * choice.
  * 
+ * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @license http://jazzee.org/license BSD-3-Clause
  */
-namespace Jazzee\AdminAuthentication;
-@include_once 'OpenID/RelyingParty.php';
-@include_once 'OpenID/Extension/AX.php';
-class OpenID implements \Jazzee\Interfaces\AdminAuthentication{
+class OpenID implements \Jazzee\Interfaces\AdminAuthentication
+{
   const LOGIN_ELEMENT = 'OpenID_Login';
-  
+
   const SESSION_VAR_ID = 'openid_id';
   /**
    * Our authenticated user
    * @var \Jazzee\Entity\User
    */
   private $_user;
-  
+
   /**
    * Config instance
-   * @var \Jazzee\Controller 
+   * @var \Jazzee\Controller
    */
   private $_controller;
-  
+
   /**
    * Constructor
-   * 
+   *
    * Require authentication and setup the user if a valid session is detected
-   * 
+   *
    * @param \Jazzee\Interfaces\AdminController
    */
-  public function __construct(\Jazzee\Interfaces\AdminController $controller){
-    if(!class_exists('OpenID')){
+  public function __construct(\Jazzee\Interfaces\AdminController $controller)
+  {
+    if (!class_exists('OpenID')) {
       throw new \Jazzee\Exception("Pear OpenID library is required to use OpenID for authentication.");
     }
     $this->_controller = $controller;
-    if($this->_controller->getStore()->check(self::SESSION_VAR_ID)){
+    if ($this->_controller->getStore()->check(self::SESSION_VAR_ID)) {
       $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$this->_controller->getStore()->get(self::SESSION_VAR_ID)));
     }
   }
-  
-  public function isValidUser(){
-    return (bool)$this->_user;
+
+  public function isValidUser()
+  {
+    return (bool) $this->_user;
   }
-  
-  public function getUser(){
+
+  public function getUser()
+  {
     return $this->_user;
   }
 
   /**
-   * @SuppressWarnings(PHPMD.ExitExpression) 
+   * @SuppressWarnings(PHPMD.ExitExpression)
    */
-  public function loginUser(){
-    
+  public function loginUser()
+  {
     $returnTo = $this->_controller->path('login');
     $realm    = $this->_controller->path('');
-    if(!empty($_POST['openid_identifier'])) {
+    if (!empty($_POST['openid_identifier'])) {
       $identifier = $_POST['openid_identifier'];
       $relayParty = new \OpenID_RelyingParty($returnTo, $realm, $identifier);
       $authRequest = $relayParty->prepare();
@@ -77,7 +83,7 @@ class OpenID implements \Jazzee\Interfaces\AdminAuthentication{
     $relayParty = new \OpenID_RelyingParty($returnTo, $realm);
     $arr = explode('?', $_SERVER['REQUEST_URI']);
     $queryString = isset($arr[1])?$arr[1]:'';
-    if($queryString){
+    if ($queryString) {
       $message = new \OpenID_Message($queryString, \OpenID_Message::FORMAT_HTTP);
       $result = $relayParty->verify(new \Net_URL2($returnTo), $message);
       if ($result->success()) {
@@ -90,7 +96,7 @@ class OpenID implements \Jazzee\Interfaces\AdminAuthentication{
         $lastName = $authExtension->get('value.lastname');
         $this->_controller->getStore()->set(self::SESSION_VAR_ID, $uniqueName);
         $user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName'=>$uniqueName));
-        if(!$user){
+        if (!$user) {
           $user = new \Jazzee\Entity\User;
           $user->setUniqueName($uniqueName);
         }
@@ -102,10 +108,10 @@ class OpenID implements \Jazzee\Interfaces\AdminAuthentication{
       }
     }
   }
-  
-  public function logoutUser(){
+
+  public function logoutUser()
+  {
     $this->_user = null;
     $this->_controller->getStore()->expire();
   }
 }
-

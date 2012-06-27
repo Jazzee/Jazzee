@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * admin_changeprogram json result view
  * a default json view for outputting simple data
@@ -9,4 +9,4 @@
  */
 
 ?>
-"result":<?php print json_encode($result, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>
+"result":<?php print json_encode($result, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
