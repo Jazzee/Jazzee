@@ -85,13 +85,11 @@ class SetupRolesController extends \Jazzee\AdminController
             $actions = $input->get($controller['name']);
             if (!empty($actions)) {
               foreach ($actions as $actionName) {
-                if ($this->checkIsAllowed($controller['name'], $actionName)) {
-                  $action = new \Jazzee\Entity\RoleAction;
-                  $action->setController($controller['name']);
-                  $action->setAction($actionName);
-                  $action->setRole($role);
-                  $this->_em->persist($action);
-                }
+                $action = new \Jazzee\Entity\RoleAction;
+                $action->setController($controller['name']);
+                $action->setAction($actionName);
+                $action->setRole($role);
+                $this->_em->persist($action);
               }
             }
           }
