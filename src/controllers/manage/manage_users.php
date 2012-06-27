@@ -80,9 +80,11 @@ class ManageUsersController extends \Jazzee\AdminController
             $user->getRoles()->removeElement($role);
           }
         }
-        foreach ($input->get('roles') as $roleID) {
-          $role = $this->_em->getRepository('\Jazzee\Entity\Role')->find($roleID);
-          $user->addRole($role);
+        if($input->get('roles')){
+          foreach ($input->get('roles') as $roleID) {
+            $role = $this->_em->getRepository('\Jazzee\Entity\Role')->find($roleID);
+            $user->addRole($role);
+          }
         }
         $this->_em->persist($user);
 
