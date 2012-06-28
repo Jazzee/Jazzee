@@ -11,23 +11,23 @@ $app = $xml->createElement("application");
 $preferences = $xml->createElement("preferences");
 $preferences->appendChild($xml->createElement('contactName', $application->getContactName()));
 $preferences->appendChild($xml->createElement('contactEmail', $application->getContactEmail()));
-$preferences->appendChild($xml->createElement('welcome', htmlentities($application->getWelcome(), ENT_COMPAT, 'utf-8')));
-$preferences->appendChild($xml->createElement('open', $application->getOpen()->format('c')));
-$preferences->appendChild($xml->createElement('close', $application->getClose()->format('c')));
-$preferences->appendChild($xml->createElement('begin', $application->getBegin()->format('c')));
-$preferences->appendChild($xml->createElement('admitletter', $application->getAdmitLetter()));
-$preferences->appendChild($xml->createElement('denyletter', $application->getDenyLetter()));
-$preferences->appendChild($xml->createElement('statusIncompleteText', $application->getStatusIncompleteText()));
-$preferences->appendChild($xml->createElement('statusNoDecisionText', $application->getStatusNoDecisionText()));
-$preferences->appendChild($xml->createElement('statusAdmitText', $application->getStatusAdmitText()));
-$preferences->appendChild($xml->createElement('statusDenyText', $application->getStatusDenyText()));
-$preferences->appendChild($xml->createElement('statusAcceptText', $application->getStatusAcceptText()));
-$preferences->appendChild($xml->createElement('statusDeclineText', $application->getStatusDeclineText()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'welcome', $application->getWelcome()));
+$preferences->appendChild($xml->createElement('open', ($application->getOpen()?$application->getOpen()->format('c'):null)));
+$preferences->appendChild($xml->createElement('close', ($application->getOpen()?$application->getClose()->format('c'):null)));
+$preferences->appendChild($xml->createElement('begin', ($application->getOpen()?$application->getBegin()->format('c'):null)));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'admitletter', $application->getAdmitLetter()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'denyletter', $application->getDenyLetter()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'statusIncompleteText', $application->getStatusIncompleteText()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'statusNoDecisionText', $application->getStatusNoDecisionText()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'statusAdmitText', $application->getStatusAdmitText()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'statusDenyText', $application->getStatusDenyText()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'statusAcceptText', $application->getStatusAcceptText()));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'statusDeclineText', $application->getStatusDeclineText()));
 
 $app->appendChild($preferences);
 
 $applicationPages = $xml->createElement("pages");
-$pages = $this->controller->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application' => $application->getId()));
+$pages = $application->getApplicationPages();
 foreach ($pages as $page) {
   $applicationPages->appendChild($this->controller->pageXml($xml, $page));
 }

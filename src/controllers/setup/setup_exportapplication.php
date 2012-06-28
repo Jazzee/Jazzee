@@ -51,21 +51,11 @@ class SetupExportApplicationController extends \Jazzee\AdminController
     $pxml->setAttribute('max', $page->getMax());
     $pxml->setAttribute('required', $page->isRequired());
     $pxml->setAttribute('answerStatusDisplay', $page->answerStatusDisplay());
-    $element = $dom->createElement('instructions');
-    if ($page->getInstructions()) {
-      $element->appendChild($dom->createCDATASection($page->getInstructions()));
-    }
-    $pxml->appendChild($element);
-    $element = $dom->createElement('leadingText');
-    if ($page->getLeadingText()) {
-      $element->appendChild($dom->createCDATASection($page->getLeadingText()));
-    }
-    $pxml->appendChild($element);
-    $element = $dom->createElement('trailingText');
-    if ($page->getTrailingText()) {
-      $element->appendChild($dom->createCDATASection($page->getTrailingText()));
-    }
-    $pxml->appendChild($element);
+
+    $pxml->appendChild($this->createCdataElement($dom, 'instructions', $page->getInstructions()));
+    $pxml->appendChild($this->createCdataElement($dom, 'leadingText', $page->getLeadingText()));
+    $pxml->appendChild($this->createCdataElement($dom, 'trailingText', $page->getTrailingText()));
+
     if ($page instanceof \Jazzee\Entity\ApplicationPage) {
       $pxml->setAttribute('weight', $page->getWeight());
       $pxml->setAttribute('kind', $page->getKind());
@@ -118,6 +108,21 @@ class SetupExportApplicationController extends \Jazzee\AdminController
     }
 
     return $pxml;
+  }
+
+  /**
+   * Create a CDATA section from a value
+   * @param DOMDocument $dom
+   * @param string $elementName
+   * @param string $value
+   * @return \DOMElement
+   */
+  public function createCdataElement(\DOMDocument $dom, $elementName, $value){
+    $element = $dom->createElement($elementName);
+    if($value){
+      $element->appendChild($dom->createCDATASection($value));
+    }
+    return $element;
   }
 
 }
