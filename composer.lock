@@ -1,5 +1,5 @@
 {
-    "hash": "f06293699d74a856c96c3ae1c5949bdf",
+    "hash": "40c2d15de120bf23faba92e1f4448901",
     "packages": [
         {
             "package": "doctrine/common",
@@ -15,12 +15,11 @@
         },
         {
             "package": "ezyang/htmlpurifier",
-            "version": "dev-master",
-            "source-reference": "ab0906123d17d5af2a51d6d59042f13f4f42cf8f"
+            "version": "v4.4.0.1"
         },
         {
             "package": "jazzee/foundation",
-            "version": "1.0.3"
+            "version": "1.0.4"
         },
         {
             "package": "monolog/monolog",
@@ -28,14 +27,8 @@
         },
         {
             "package": "symfony/console",
-            "version": "dev-master",
-            "alias-pretty-version": "2.1.x-dev",
-            "alias-version": "2.1.9999999.9999999-dev"
-        },
-        {
-            "package": "symfony/console",
-            "version": "dev-master",
-            "source-reference": "956147352c2666287b39be57a50d98750a772160"
+            "version": "2.0.x-dev",
+            "source-reference": "v2.0.15"
         }
     ],
     "packages-dev": null,
