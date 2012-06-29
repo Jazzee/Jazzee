@@ -2,12 +2,12 @@
  * Javascript for the setup_pages controller
  */
 $(document).ready(function(){
-  
+
   var status = new Status($('#status'), $('#content'));
   $(document).ajaxError(function(e, xhr, settings, exception) {
     status.addMessage('error','There was an error with your request, please try again.');
   });
-  
+
   $(document).ajaxComplete(function(e, xhr, settings) {
     if(xhr.getResponseHeader('Content-Type') == 'application/json'){
       eval("var json="+xhr.responseText);
@@ -104,20 +104,20 @@ GlobalPageBuilder.prototype.addNewPageControl = function(){
  */
 GlobalPageBuilder.prototype.importPageControl = function(){
   var pageBuilder = this;
-  
+
   var button = $('<button>').html('Import Page').button();
-  button.click(function(e){ 
+  button.click(function(e){
     var obj = new FormObject();
     var field = obj.newField({name: 'legend', value: 'Import Page'});
 
     var element = field.newElement('Textarea', 'pageJson');
     element.label = 'Page';
     element.required = true;
-    
+
     var form = new Form();
     var formObject = form.create(obj);
     $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
-    
+
     var div = $('<div>');
     div.css("overflow-y", "auto");
     div.dialog({
@@ -132,7 +132,6 @@ GlobalPageBuilder.prototype.importPageControl = function(){
       var json = $('textarea[name=pageJson]', this).val();
       var obj = $.parseJSON(json);
       pageBuilder.importPage(obj);
-      console.log(div);
       div.dialog("close");
       return false;
     });//end submit
