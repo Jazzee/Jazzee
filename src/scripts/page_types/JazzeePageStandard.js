@@ -65,11 +65,11 @@ JazzeePageStandard.prototype.workspace = function(){
 */
 JazzeePageStandard.prototype.pageProperties = function(){
   var pageClass = this;
-  
+
   var div = $('<div>');
   div.append(this.isRequiredButton());
   div.append(this.showAnswerStatusButton());
-  if(!this.isGlobal || this.pageBuilder.editGlobal){ 
+  if(!this.isGlobal || this.pageBuilder.editGlobal){
     if(pageClass.answerStatusDisplay == 1){
       var button = $('<button>').html('Edit Answer Status Display').attr('id', 'editDisplayButton').bind('click', function(e){
         $('.qtip').qtip('api').hide();
@@ -83,13 +83,13 @@ JazzeePageStandard.prototype.pageProperties = function(){
       div.append(button);
     }
 
-    $('#answerStatusDisplayButton input', div).bind('click',function(e){
+    $('#answerStatusDisplayButton input', div).bind('change',function(e){
       //rebuild the tooltip so the edit status display button will show up or be hidden
       div.replaceWith(pageClass.pageProperties());
       return true;
     });
   }
- 
+
   var slider = $('<div>');
   slider.slider({
     value: this.min,
@@ -103,7 +103,7 @@ JazzeePageStandard.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Minimum Answers Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
   div.append(slider);
-   
+
   var slider = $('<div>');
   slider.slider({
     value: this.max,
@@ -117,7 +117,7 @@ JazzeePageStandard.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Maximum Answers Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
   div.append(slider);
-  
+
   return div;
 };
 
@@ -148,7 +148,7 @@ JazzeePageStandard.prototype.copyElement = function(e){
  */
 JazzeePageStandard.prototype.synchronizeElementList = function(){
   var pageClass = this;
-  
+
   $('#elements > div').each(function(i){
     $(this).data('element').setProperty('weight',i+1);
   });
@@ -166,10 +166,10 @@ JazzeePageStandard.prototype.synchronizeElementList = function(){
  */
 JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
   var pageClass = this;
-  
+
   var obj = new FormObject();
   var field = obj.newField({name: 'legend', value: 'Answer Status'});
-  
+
   var element = field.newElement('TextInput', 'title');
   element.label = 'Title';
   element.required = true;
