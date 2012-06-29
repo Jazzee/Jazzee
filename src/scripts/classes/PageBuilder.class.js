@@ -16,7 +16,7 @@ function PageBuilder(canvas){
   this.IdCounter = 0;
   this.controllerPath = '';
   this.currentPage = false;
-  
+
   //are we editing global pages or application pages
   this.editGlobal = false;
   var pageBuilder = this;
@@ -28,7 +28,7 @@ function PageBuilder(canvas){
 };
 
 /**
- * Setup the workspace layout 
+ * Setup the workspace layout
  */
 PageBuilder.prototype.setup = function(){
   var pageBuilder = this;
@@ -121,7 +121,7 @@ PageBuilder.prototype.createPageObject = function(obj){
  */
 PageBuilder.prototype.refreshPages = function(){
   var pageBuilder = this;
-  $.get(this.controllerPath + '/listPages',function(json){  
+  $.get(this.controllerPath + '/listPages',function(json){
     pageBuilder.pages = {};
     $(json.data.result).each(function(i){
       var page = pageBuilder.createPageObject(this);
@@ -167,12 +167,12 @@ PageBuilder.prototype.getPagesList = function(kind){
   }
   return ol;
 };
-  
+
 /**
  * Add a page to the store
  * @param {JazzeePage} page
  */
-PageBuilder.prototype.addPage = function(page){ 
+PageBuilder.prototype.addPage = function(page){
   this.pages[page.id] = page;
   this.synchronizePageList();
   this.markModified();
@@ -236,7 +236,9 @@ PageBuilder.prototype.pageFromObject = function(obj, title, status){
     Element.status = 'new';
     Element.isModified = true;
     for(var j = 0; j < e.list.length; j++){
-      Element.newListItem(e.list[j].value);
+      var item = Element.newListItem(e.list[j].value);
+      item.isActive = e.list[j].isActive;
+      item.weight = e.list[j].weight;
     }
     page.addElement(Element);
   }
