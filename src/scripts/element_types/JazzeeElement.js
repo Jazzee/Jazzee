@@ -7,6 +7,7 @@
 function JazzeeElement(){
   this.page;
   this.id;
+  this.fixedId;
   this.typeId;
   this.typeName;
   this.typeClass;
@@ -32,6 +33,7 @@ function JazzeeElement(){
 JazzeeElement.prototype.init = function(obj, page){
   this.page = page;
   this.id = obj.id;
+  this.fixedId = obj.fixedId;
   this.typeId = obj.typeId;
   this.typeName = obj.typeName;
   this.typeClass = obj.typeClass;
@@ -44,11 +46,11 @@ JazzeeElement.prototype.init = function(obj, page){
   this.max = obj.max;
   this.weight = obj.weight;
   this.listItems = [];
-  
+
   this.status = '';
   this.isModified = false;
 };
-  
+
 /**
  * Create a new element object with good default values
  * @param {String} id the id to use
@@ -63,6 +65,7 @@ JazzeeElement.prototype.init = function(obj, page){
 JazzeeElement.prototype.newElement = function(id,title,typeId,typeName,typeClass,status,page){
   var obj = {
     id: id,
+    fixedId: null,
     title: title,
     typeId: typeId,
     typeName: typeName,
@@ -119,6 +122,7 @@ JazzeeElement.prototype.setProperty = function(name, value){
 JazzeeElement.prototype.getDataObject = function(){
   var obj = {
     id: this.id,
+    fixedId: this.fixedId,
     typeId: this.typeId,
     typeName: this.typeName,
     typeClass: this.typeClass,
@@ -149,13 +153,13 @@ JazzeeElement.prototype.isRequiredButton = function(){
   span.append($('<input>').attr('type', 'radio').attr('name', 'isRequired').attr('id', 'required').attr('value', '1').attr('checked', this.isRequired==1)).append($('<label>').html('Required').attr('for', 'required'));
   span.append($('<input>').attr('type', 'radio').attr('name', 'isRequired').attr('id', 'optional').attr('value', '0').attr('checked', this.isRequired==0)).append($('<label>').html('Optional').attr('for', 'optional'));
   span.buttonset();
-  
+
   $('input', span).bind('change', function(e){
     elementClass.setProperty('isRequired', $(e.target).val());
     $('.qtip').qtip('api').hide();
     elementClass.workspace();
   });
-  
+
   return span;
 };
 
@@ -272,14 +276,14 @@ JazzeeElement.prototype.workspace = function(){
   var label = $('<div>').addClass('yui-u first label').append($('<label>').html(this.title + ':'));
   if(this.isRequired == 1) label.addClass('required');
   element.append(label);
-  
+
   var control = $('<div>').addClass('control yui-u').append(this.avatar());
   if(this.format != null){
     control.append($('<div>').append($('<p>').html(this.format).addClass('format')));
   }
   element.append(control);
   field.append(element);
-  
+
   var toolbar = $('<span>').addClass('ui-widget-header ui-corner-all toolbar');
   var button = $('<button>');
   button.button({
@@ -303,7 +307,7 @@ JazzeeElement.prototype.workspace = function(){
     });
   }
   toolbar.append(button);
-  
+
   var button = $('<button>').bind('click', function(e){
     $('.qtip').qtip('api').hide();
     elementClass.page.copyElement(elementClass);
@@ -316,7 +320,7 @@ JazzeeElement.prototype.workspace = function(){
     }
   });
   toolbar.append(button);
-  
+
   var button = $('<button>');
   button.button({
     text: false,
@@ -348,7 +352,7 @@ JazzeeElement.prototype.workspace = function(){
     }
   });
   toolbar.append(button);
-  
+
   $('.options', div).html(toolbar);
 };
 

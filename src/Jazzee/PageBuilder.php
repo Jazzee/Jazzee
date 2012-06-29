@@ -132,6 +132,7 @@ abstract class PageBuilder extends AdminController
     foreach ($page->getElements() as $element) {
       $e = array(
         'id' => $element->getId(),
+        'fixedId' => $element->getFixedId(),
         'weight' => $element->getWeight(),
         'title' => $element->getTitle(),
         'format' => $element->getFormat(),
@@ -349,6 +350,7 @@ abstract class PageBuilder extends AdminController
           $element = new \Jazzee\Entity\Element();
           $page->addElement($element);
           $element->setType($this->_em->getRepository('\Jazzee\Entity\ElementType')->find($e->typeId));
+          $element->setFixedId(empty($e->fixedId) ? null : $e->fixedId);
         default:
           if (!isset($element)) {
             $element = $page->getElementByID($e->id);
