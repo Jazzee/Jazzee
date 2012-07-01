@@ -14,8 +14,7 @@
 
   <target name="src" description="Prepares a clean source tree">
     <copy todir="${build}/jazzee">
-      <fileset dir="${source}" includes="etc/ src/ webroot/ setup/ var/ vendor/ lib/"/>
-      <fileset dir="${source}/etc" excludes="config.ini.php"/>
+      <fileset dir="${source}" includes="etc/ src/ webroot/ setup/ var/ vendor/ lib/" excludes="etc/config.ini.php"/>
     </copy>
  </target>
 
