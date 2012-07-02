@@ -269,6 +269,11 @@ class QASAddress extends Standard
         $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
         $this->_form->newHiddenElement('originalInput', base64_encode(serialize($input)));
           break;
+      case 'InteractionRequired':
+        $this->_controller->addMessage('error', 'We were unable to validate your address.');
+        $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
+        $this->_form->newHiddenElement('originalInput', base64_encode(serialize($input)));
+          break;
       case 'None':
         $this->_controller->addMessage('error', 'We were unable to validate your address.');
         $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
