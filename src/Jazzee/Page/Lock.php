@@ -29,6 +29,12 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
   protected $_applicant;
 
   /**
+   * The form
+   * @var \Foundation\Form
+   */
+  protected $_form;
+
+  /**
    * Contructor
    *
    * @param \Jazzee\Entity\ApplicationPage $applicationPage
@@ -58,23 +64,25 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
 
   public function getForm()
   {
-    $form = new \Foundation\Form;
-    $form->setCSRFToken($this->_controller->getCSRFToken());
-    $form->setAction($this->_controller->getActionPath());
-    $field = $form->newField();
-    $field->setLegend($this->_applicationPage->getTitle());
-    $field->setInstructions($this->_applicationPage->getInstructions());
+    if (is_null($this->_form)) {
+      $this->_form = new \Foundation\Form;
+      $this->_form->setCSRFToken($this->_controller->getCSRFToken());
+      $this->_form->setAction($this->_controller->getActionPath());
+      $field = $this->_form->newField();
+      $field->setLegend($this->_applicationPage->getTitle());
+      $field->setInstructions($this->_applicationPage->getInstructions());
 
-    $element = $field->newElement('RadioList', 'lock');
-    $element->setLabel('Do you wish to lock your application?');
-    $element->newItem(0, 'No');
-    $element->newItem(1, 'Yes');
+      $element = $field->newElement('RadioList', 'lock');
+      $element->setLabel('Do you wish to lock your application?');
+      $element->newItem(0, 'No');
+      $element->newItem(1, 'Yes');
 
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-    $form->newButton('submit', 'Submit Application');
+      $this->_form->newButton('submit', 'Submit Application');
+    }
 
-    return $form;
+    return $this->_form;
   }
 
   /**
@@ -88,7 +96,7 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
       return false;
     }
     if (!$input->get('lock')) {
-      $this->_form->getElementByName('lock')->addMessage('You must answer yes to submit your application.');
+      $this->getForm()->getElementByName('lock')->addMessage('You must answer yes to submit your application.');
 
       return false;
     }
@@ -166,7 +174,7 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
 
   public static function applyPageElement()
   {
-    return 'Standard-apply_page';
+    return 'Lock-apply_page';
   }
 
   public static function pageBuilderScriptPath()
