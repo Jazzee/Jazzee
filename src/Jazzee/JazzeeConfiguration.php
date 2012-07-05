@@ -260,6 +260,13 @@ class JazzeeConfiguration
 
   /**
    * @var string
+   * if ApiFormAuthentication is set as the adminAuthenticationClass this restricts what
+   * ip addresses can be used to authenticate.  Defaults to 127.0.0.1 (the localhost)
+   */
+  protected $_apiFormAuthenticationIpAddresses;
+
+  /**
+   * @var string
    * If SimpleSAML is set as the adminAuthenticationClass this is the path to the
    * autoloader so it can be included when needed.
    */
@@ -1148,6 +1155,24 @@ class JazzeeConfiguration
   public function setNoAuthIpAddresses($noAuthIpAddresses)
   {
     $this->_noAuthIpAddresses = $noAuthIpAddresses;
+  }
+
+  /**
+   * get noAuthIpAddresses
+   * @return string
+   */
+  public function getApiFormAuthenticationIpAddresses()
+  {
+    return $this->_apiFormAuthenticationIpAddresses;
+  }
+
+  /**
+   * set noAuthIpAddresses
+   * @var string $noAuthIpAddresses
+   */
+  public function setApiFormAuthenticationIpAddresses($addresses)
+  {
+    $this->_apiFormAuthenticationIpAddresses = $addresses;
   }
 
   /**
