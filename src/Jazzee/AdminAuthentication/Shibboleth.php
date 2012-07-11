@@ -1,5 +1,6 @@
 <?php
 namespace Jazzee\AdminAuthentication;
+
 /**
  * Shibboleth Admin Authentication Controller
  *
@@ -71,16 +72,23 @@ class Shibboleth implements \Jazzee\Interfaces\AdminAuthentication
     $lastName = isset($_SERVER[$config->getShibbolethLastNameAttribute()]) ? $_SERVER[$config->getShibbolethLastNameAttribute()] : null;
     $mail = isset($_SERVER[$config->getShibbolethEmailAddressAttribute()]) ? $_SERVER[$config->getShibbolethEmailAddressAttribute()] : null;
 
+    $this->_controller->getStore()->expire();
+    $this->_controller->getStore()->touchAuthentication();
+
     $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('uniqueName' => $uniqueName, 'isActive' => true));
-    if ($this->_user) {
-      $this->_user->setFirstName($firstName);
-      $this->_user->setLastName($lastName);
-      $this->_user->setEmail($mail);
-      $this->_controller->getStore()->expire();
-      $this->_controller->getStore()->touchAuthentication();
-      $this->_controller->getStore()->set(self::SESSION_VAR_ID, $this->_user->getId());
+    if (!$this->_user) {
+      //creat a new user
+      $this->_user = new \Jazzee\Entity\User;
+      $this->_user->setUniqueName($uniqueName);
+      //persist and flush a new user early so we get the ID for the authenticaiton logs
       $this->_controller->getEntityManager()->persist($this->_user);
+      $this->_controller->getEntityManager()->flush();
     }
+    $this->_controller->getStore()->set(self::SESSION_VAR_ID, $this->_user->getId());
+    $this->_controller->getEntityManager()->persist($this->_user);
+    $this->_user->setFirstName($firstName);
+    $this->_user->setLastName($lastName);
+    $this->_user->setEmail($mail);
   }
 
   /**
