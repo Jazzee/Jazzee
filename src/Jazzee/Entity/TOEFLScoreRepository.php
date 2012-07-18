@@ -36,13 +36,26 @@ class TOEFLScoreRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findByName($firstName, $lastName)
   {
-    $query = $this->_em->createQuery('SELECT s FROM Jazzee\Entity\TOEFLScore s WHERE s.firstName LIKE :firstName AND s.lastName LIKE :lastName order by s.lastName, s.firstName');
-    //ETS strips apostraphes from names
+    ////ETS strips apostraphes from names
     $search = array("'");
-    $query->setParameter('firstName', str_ireplace($search, '', $firstName));
-    $query->setParameter('lastName', str_ireplace($search, '', $lastName));
+    $firstName = str_ireplace($search, '', $firstName);
+    $lastName = str_ireplace($search, '', $lastName);
 
-    return $query->getResult();
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->add('select', 's')->from('Jazzee\Entity\TOEFLScore', 's');
+
+    if (!empty($firstName)) {
+      $queryBuilder->where('s.firstName LIKE :firstName');
+      $queryBuilder->setParameter('firstName', $firstName);
+    }
+
+    if (!empty($lastName)) {
+      $queryBuilder->where('s.lastName LIKE :lastName');
+      $queryBuilder->setParameter('lastName', $lastName);
+    }
+
+    $queryBuilder->orderBy('s.lastName, s.firstName');
+    return $queryBuilder->getQuery()->getResult();
   }
 
 }

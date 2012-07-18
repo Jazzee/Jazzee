@@ -34,7 +34,9 @@ class ScoresToeflController extends \Jazzee\AdminController
     $form->newButton('submit', 'Search');
     $this->setVar('form', $form);
     if ($input = $form->processInput($this->post)) {
-      $results = $this->_em->getRepository('\Jazzee\Entity\TOEFLScore')->findByName($input->get('firstName') . '%', $input->get('lastName') . '%');
+      $firstName = $input->get('firstName')?$input->get('firstName') . '%':null;
+      $lastName = $input->get('lastName')?$input->get('lastName') . '%':null;
+      $results = $this->_em->getRepository('\Jazzee\Entity\TOEFLScore')->findByName($firstName, $lastName);
       $this->setVar('results', $results);
     }
   }
