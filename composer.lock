@@ -19,7 +19,7 @@
         },
         {
             "package": "jazzee/foundation",
-            "version": "1.0.4"
+            "version": "1.0.5"
         },
         {
             "package": "monolog/monolog",
@@ -28,14 +28,15 @@
         {
             "package": "symfony/console",
             "version": "2.0.x-dev",
-            "source-reference": "v2.0.15"
+            "source-reference": "3d0d961fa4e721ca282f2aba05f6eb2b9d20ad14",
+            "commit-date": "1342761932"
         }
     ],
     "packages-dev": null,
     "aliases": [
 
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [
 
     ]
