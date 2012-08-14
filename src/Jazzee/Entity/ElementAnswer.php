@@ -6,7 +6,7 @@ namespace Jazzee\Entity;
  * Break down the response from each Element on a Page into an ElementAnswer
  * In cases where there are multiple answers (like checkboxes) a single answer gets multiple rows by position
  *
- * @Entity
+ * @Entity(repositoryClass="\Jazzee\Entity\ElementAnswerRepository")
  * @HasLifecycleCallbacks
  * @Table(name="element_answers")
  * @SuppressWarnings(PHPMD.ShortVariable)

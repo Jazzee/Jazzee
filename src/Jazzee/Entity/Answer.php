@@ -363,6 +363,23 @@ class Answer
   }
 
   /**
+   * Get ElementAnswers for Element by position
+   *
+   * @param \Jazzee\Entity\Element $element
+   * @param integer $position
+   * @return ElementAnswer
+   */
+  public function getElementAnswersForElementByPosition(Element $element, $position)
+  {
+    foreach ($this->getElementAnswersForElement($element) as $elementAnswer) {
+      if ($elementAnswer->getPosition() == $position) {
+        return $elementAnswer;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Set publicStatus
    *
    * @param Entity\AnswerStatusType $publicStatus

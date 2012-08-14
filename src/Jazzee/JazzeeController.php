@@ -264,6 +264,24 @@ class JazzeeController extends PageController
   }
 
   /**
+   * Remove a stored file
+   *
+   * @param string $filename
+   */
+  public function removeStoredFile($filename)
+  {
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    $safeName = md5($filename);
+    $path = $this->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
+    $session = new \Foundation\Session();
+    $store = $session->getStore('files');
+    if (is_readable($path) and isset($store->$safeName) and $store->$safeName == $filename) {
+      unlink($path);
+      $store->remove($safeName);
+    }
+  }
+
+  /**
    * Get a secret key for csrf validation
    * @return string
    */

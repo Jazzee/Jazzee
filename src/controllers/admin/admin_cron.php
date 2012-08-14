@@ -68,7 +68,16 @@ class AdminCronController extends \Jazzee\AdminController
           $this->_em->flush();
         }
       }
-      //Perform and applicant actions
+
+      foreach ($this->_em->getRepository('\Jazzee\Entity\ElementType')->findAll() as $elementType) {
+        $class = $elementType->getClass();
+        if (method_exists($class, 'runCron')) {
+          $class::runCron($this);
+          $this->_em->flush();
+        }
+      }
+
+      //Perform applicant actions
       \Foundation\VC\Config::includeController('apply_applicant');
       ApplyApplicantController::runCron($this);
 

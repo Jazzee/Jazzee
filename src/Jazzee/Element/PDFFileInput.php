@@ -52,29 +52,10 @@ class PDFFileInput extends AbstractElement
       $elementAnswer->setEBlob($input);
       $elementAnswers[] = $elementAnswer;
 
-      //create the preview image
-      try {
-        //use a temporary file so we can use the image magic shortcut [0]
-        //to load only the first page, otherwise the whole file gets loaded into memory and takes forever
-        $handle = tmpfile();
-        fwrite($handle, $input);
-        $arr = stream_get_meta_data($handle);
-        $imagick = new \imagick;
-        $imagick->readimage($arr['uri'] . '[0]');
-        $imagick->setImageFormat("png");
-        $imagick->thumbnailimage(100, 150, true);
-        fclose($handle);
-      } catch (ImagickException $e) {
-        $imagick = new \imagick;
-        $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-        $imagick->thumbnailimage(100, 150, true);
-      }
       $elementAnswer = new \Jazzee\Entity\ElementAnswer;
       $elementAnswer->setElement($this->_element);
       $elementAnswer->setPosition(1);
-      $elementAnswer->setEBlob($imagick->getimageblob());
       $elementAnswers[] = $elementAnswer;
-      unset($imagick);
     }
 
     return $elementAnswers;
@@ -91,7 +72,11 @@ class PDFFileInput extends AbstractElement
         $this->_controller->storeFile($pdfName, $elementAnswers[0]->getEBlob());
       }
       if (!$pngFile = $this->_controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
-        $this->_controller->storeFile($pngName, $elementAnswers[1]->getEBlob());
+        $blob = $elementAnswers[1]->getEBlob();
+        if(empty($blob)){
+          $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+        }
+        $this->_controller->storeFile($pngName, $blob);
       }
 
       return '<a href="' . $this->_controller->path('file/' . \urlencode($pdfName)) . '"><img src="' . $this->_controller->path('file/' . \urlencode($pngName)) . '" /></a>';
@@ -125,6 +110,48 @@ class PDFFileInput extends AbstractElement
   public function formValue(\Jazzee\Entity\Answer $answer)
   {
     return false;
+  }
+
+  /**
+   * Render PDF Previews
+   * @param AdminCronController $cron
+   */
+  public static function runCron(\AdminCronController $cron)
+  {
+    $count = 0;
+    $start = time();
+    $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class'=>'\Jazzee\Element\PDFFileInput'));
+    if($type){
+      $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position'=>1, 'eBlob'=>null), 200);
+      foreach ($blankPreviewElementAnswers as $blankPreviewElementAnswer) {
+        $blobElementAnswer = $blankPreviewElementAnswer->getAnswer()->getElementAnswersForElementByPosition($blankPreviewElementAnswer->getElement(), 0);
+        try {
+          $blob = $blobElementAnswer->getEBlob();
+          //use a temporary file so we can use the image magic shortcut [0]
+          //to load only the first page, otherwise the whole file gets loaded into memory and takes forever
+          $handle = tmpfile();
+          fwrite($handle, $blob);
+          $arr = stream_get_meta_data($handle);
+          $imagick = new \imagick;
+          $imagick->readimage($arr['uri'] . '[0]');
+          $imagick->setImageFormat("png");
+          $imagick->thumbnailimage(100, 150, true);
+          fclose($handle);
+        } catch (ImagickException $e) {
+          $imagick = new \imagick;
+          $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+          $imagick->thumbnailimage(100, 150, true);
+        }
+        $blankPreviewElementAnswer->setEBlob($imagick->getimageblob());
+        $cron->getEntityManager()->persist($blankPreviewElementAnswer);
+        $cachedFileName = $blankPreviewElementAnswer->getAnswer()->getApplicant()->getFullName() . ' ' . $blankPreviewElementAnswer->getElement()->getTitle() . '_' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . $blobElementAnswer->getId() . 'preview.png';
+        $cron->removeStoredFile($cachedFileName);
+        $count++;
+      }
+    }
+    if ($count) {
+      $cron->log("Generated {$count} PDFFileInput thumbnail(s) in " . (time() - $start) . ' seconds.');
+    }
   }
 
 }
