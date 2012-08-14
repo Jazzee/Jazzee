@@ -158,23 +158,23 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     switch ($status) {
       case '':
         $status = 'No Decision';
-          break;
+        break;
       case 'nominateAdmit':
         $status = 'Nominated for Admission';
-          break;
+        break;
       case 'nominateDeny':
         $status = 'Nominated for Deny';
-          break;
+        break;
       case 'finalDeny':
         $status = 'Denied ' . ($applicant->getDecision()->getDecisionViewed() ? '(decision viewed ' . $applicant->getDecision()->getDecisionViewed()->format('c') . ')' : '(decision not viewed)');
-          break;
+        break;
       case 'finalAdmit':
         $status = 'Admited ' . ($applicant->getDecision()->getDecisionViewed() ? '(decision viewed ' . $applicant->getDecision()->getDecisionViewed()->format('c') . ')' : '(decision not viewed)');
-          break;
+        break;
       case 'acceptOffer': $status = 'Accepted';
-          break;
+        break;
       case 'declineOffer': $status = 'Declined';
-          break;
+        break;
     }
     if ($applicant->isLocked()) {
       $decisions = array('status' => $status);
@@ -193,7 +193,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
    * Get an applicants pdfs
    * @param \Jazzee\Entity\Applicant $applicant
    */
-  protected function getAttachments(\Jazzee\Entity\Applicant $applicant)
+  public function getAttachments(\Jazzee\Entity\Applicant $applicant)
   {
     $attachments = array(
       'attachments' => array(),
@@ -207,7 +207,11 @@ class ApplicantsSingleController extends \Jazzee\AdminController
         $this->storeFile($pdfName, $attachment->getAttachment());
       }
       if (!$pngFile = $this->getStoredFile($pngName) or $pngFile->getLastModified() < $applicant->getUpdatedAt()) {
-        $this->storeFile($pngName, $attachment->getThumbnail());
+        $blob = $attachment->getThumbnail();
+        if (empty($blob)) {
+          $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+        }
+        $this->storeFile($pngName, $blob);
       }
       $attachments['attachments'][] = array(
         'id' => $attachment->getId(),
@@ -1431,6 +1435,53 @@ class ApplicantsSingleController extends \Jazzee\AdminController
   {
     $auditLog = new \Jazzee\Entity\AuditLog($this->_user, $applicant, $text);
     $this->_em->persist($auditLog);
+  }
+
+  /**
+   * Generate thumbnails for uploaded PDFs
+   *
+   * @param AdminCronController $cron
+   */
+  public static function runCron(AdminCronController $cron)
+  {
+    $attachments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Attachment')->findBy(array('thumbnail' => null), array(), 500);
+    $start = time();
+    $total = 0;
+    $generic = 0;
+    $imagick = new \imagick;
+    foreach ($attachments as $attachment) {
+      $total++;
+      try {
+        $blob = $attachment->getAttachment();
+        //use a temporary file so we can use the image magic shortcut [0]
+        //to load only the first page, otherwise the whole file gets loaded into memory and takes forever
+        $handle = tmpfile();
+        fwrite($handle, $blob);
+        $arr = stream_get_meta_data($handle);
+        $imagick->readimage($arr['uri'] . '[0]');
+        $imagick->setImageFormat("png");
+        $imagick->thumbnailimage(100, 150, true);
+        fclose($handle);
+      } catch (ImagickException $e) {
+        $imagick = new \imagick;
+        $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+        $imagick->thumbnailimage(100, 150, true);
+        $generic++;
+      }
+      $attachment->setThumbnail($imagick->getimageblob());
+      $imagick->clear();
+      $cron->getEntityManager()->persist($attachment);
+      $pngName = $attachment->getApplicant()->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
+      $cron->removeStoredFile($pngName);
+    }
+    unset($imagick);
+    if ($total) {
+      $message = "Generated {$total} Attachment thumbnail(s) in " . (time() - $start) . " seconds.";
+      if ($generic) {
+        $message .= "  Unable to create thumbnail for {$generic} attachments, so the generic one was used.";
+      }
+      $cron->log($message);
+    }
   }
 
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)

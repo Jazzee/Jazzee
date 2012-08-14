@@ -196,22 +196,15 @@
   </div>
   <div id="attachments">
     <?php
-      foreach ($applicant->getAttachments() as $attachment) {
-        $pdfName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . '.pdf';
-        $pngName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
-        if (!$pdfFile = $this->controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $applicant->getUpdatedAt()) {
-          $this->controller->storeFile($pdfName, $attachment->getAttachment());
-        }
-        if (!$pngFile = $this->controller->getStoredFile($pngName) or $pngFile->getLastModified() < $applicant->getUpdatedAt()) {
-          $this->controller->storeFile($pngName, $attachment->getThumbnail());
-        }
+      $attachments = $this->controller->getAttachments($applicant);
+      foreach ($attachments['attachments'] as $arr) {
         ?>
-        <div id='attachment<?php print $attachment->getId(); ?>'>
-          <a href='<?php print $this->path('file/' . \urlencode($pdfName)); ?>'>
-            <img src='<?php print $this->path('file/' . \urlencode($pngName)); ?>' /></a>
+        <div id='attachment<?php print $arr['id']; ?>'>
+          <a href='<?php print $arr['filePath']; ?>'>
+            <img src='<?php print $arr['previewPath']; ?>' /></a>
           <?php
             if ($this->controller->checkIsAllowed('applicants_single', 'deleteApplicantPdf')) { ?>
-              <a class='delete' href="<?php print $this->path("applicants/single/{$applicant->getId()}/deleteApplicantPdf/{$attachment->getId()}"); ?>">Delete PDF</a>
+              <a class='delete' href="<?php print $this->path("applicants/single/{$applicant->getId()}/deleteApplicantPdf/{$arr['id']}"); ?>">Delete PDF</a>
           <?php
             } ?>
         </div>

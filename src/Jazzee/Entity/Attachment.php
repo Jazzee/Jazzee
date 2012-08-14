@@ -37,7 +37,7 @@ class Attachment
   /** @Column(type="text") */
   private $attachment;
 
-  /** @Column(type="text") */
+  /** @Column(type="text", nullable=true) */
   private $thumbnail;
 
   /**
@@ -89,30 +89,11 @@ class Attachment
   /**
    * Convert the attachment to base64 and store it
    *
-   * @param blob $attachment
+   * @param blob $blob
    */
   public function setAttachment($blob)
   {
     $this->attachment = base64_encode($blob);
-    //create the preview image
-    try {
-      //use a temporary file so we can use the image magic shortcut [0]
-      //to load only the first page, otherwise the whole file gets loaded into memory and takes forever
-      $handle = tmpfile();
-      fwrite($handle, $blob);
-      $arr = stream_get_meta_data($handle);
-      $imagick = new \imagick;
-      $imagick->readimage($arr['uri'] . '[0]');
-      $imagick->setImageFormat("png");
-      $imagick->thumbnailimage(100, 150, true);
-      fclose($handle);
-    } catch (ImagickException $e) {
-      $imagick = new \imagick;
-      $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-      $imagick->thumbnailimage(100, 150, true);
-    }
-    $this->thumbnail = base64_encode($imagick->getimageblob());
-    unset($imagick);
   }
 
   /**
@@ -123,6 +104,16 @@ class Attachment
   public function getAttachment()
   {
     return base64_decode($this->attachment);
+  }
+
+  /**
+   * Convert the thumbnail to base64 and store it
+   *
+   * @param blob $blob
+   */
+  public function setThumbnail($blob)
+  {
+    $this->thumbnail = base64_encode($blob);
   }
 
   /**
