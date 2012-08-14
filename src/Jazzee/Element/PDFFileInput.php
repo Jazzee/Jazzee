@@ -122,7 +122,8 @@ class PDFFileInput extends AbstractElement
     $start = time();
     $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class'=>'\Jazzee\Element\PDFFileInput'));
     if($type){
-      $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position'=>1, 'eBlob'=>null), 200);
+      $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position'=>1, 'eBlob'=>null), 500);
+      $imagick = new \imagick;
       foreach ($blankPreviewElementAnswers as $blankPreviewElementAnswer) {
         $blobElementAnswer = $blankPreviewElementAnswer->getAnswer()->getElementAnswersForElementByPosition($blankPreviewElementAnswer->getElement(), 0);
         try {
@@ -132,7 +133,6 @@ class PDFFileInput extends AbstractElement
           $handle = tmpfile();
           fwrite($handle, $blob);
           $arr = stream_get_meta_data($handle);
-          $imagick = new \imagick;
           $imagick->readimage($arr['uri'] . '[0]');
           $imagick->setImageFormat("png");
           $imagick->thumbnailimage(100, 150, true);
@@ -147,7 +147,9 @@ class PDFFileInput extends AbstractElement
         $cachedFileName = $blankPreviewElementAnswer->getAnswer()->getApplicant()->getFullName() . ' ' . $blankPreviewElementAnswer->getElement()->getTitle() . '_' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . $blobElementAnswer->getId() . 'preview.png';
         $cron->removeStoredFile($cachedFileName);
         $count++;
+        $imagick->clear();
       }
+      unset($imagick);
     }
     if ($count) {
       $cron->log("Generated {$count} PDFFileInput thumbnail(s) in " . (time() - $start) . ' seconds.');
