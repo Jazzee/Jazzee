@@ -305,7 +305,7 @@ class ApplicationPage
     if (!$this->page->isGlobal()) {
       $this->page->required();
     } else {
-      $this->isRquired = true;
+      $this->isRequired = true;
     }
   }
 
