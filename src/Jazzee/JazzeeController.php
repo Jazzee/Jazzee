@@ -273,11 +273,8 @@ class JazzeeController extends PageController
     $ext = pathinfo($filename, PATHINFO_EXTENSION);
     $safeName = md5($filename);
     $path = $this->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
-    $session = new \Foundation\Session();
-    $store = $session->getStore('files');
-    if (is_readable($path) and isset($store->$safeName) and $store->$safeName == $filename) {
+    if (is_readable($path) ) {
       unlink($path);
-      $store->remove($safeName);
     }
   }
 
