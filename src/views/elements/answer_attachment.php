@@ -1,6 +1,7 @@
 <?php
 /**
- * Standard page LOR single applicant answer element
+ * render the attachment piece of a single answer
+ * Displayes the png preview and the delete link
  */
 if ($attachment = $answer->getAttachment()) {
   $pdfName = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId() . '.pdf';
@@ -9,13 +10,18 @@ if ($attachment = $answer->getAttachment()) {
     $this->controller->storeFile($pdfName, $attachment->getAttachment());
   }
   if (!$pngFile = $this->controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
-    $this->controller->storeFile($pngName, $attachment->getThumbnail());
+    $blob = $attachment->getThumbnail();
+    if (empty($blob)) {
+      $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+    }
+    $this->controller->storeFile($pngName, $blob);
   }
   ?>
-  <a href="<?php print $this->path('file/' . \urlencode($pdfName)); ?>"><img src="<?php print $this->path('file/' . \urlencode($pngName)); ?>" /></a><?php
-  if ($this->controller->checkIsAllowed('applicants_single', 'deleteAnswerPdf')) { ?>
+  <a href="<?php print $this->path('file/' . \urlencode($pdfName)); ?>"><img src="<?php print $this->path('file/' . \urlencode($pngName)); ?>" /></a>
+  <?php if ($this->controller->checkIsAllowed('applicants_single', 'deleteAnswerPdf')) { ?>
     <br /><a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswerPdf/' . $answer->getId()); ?>' class='action'>Delete PDF</a><?php
   }
-} else if ($this->controller->checkIsAllowed('applicants_single', 'attachAnswerPdf')) { ?>
+} else if ($this->controller->checkIsAllowed('applicants_single', 'attachAnswerPdf')) {
+  ?>
   <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/attachAnswerPdf/' . $answer->getId()); ?>' class='actionForm'>Attach PDF</a><?php
 }

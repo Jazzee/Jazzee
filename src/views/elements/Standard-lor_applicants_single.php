@@ -33,7 +33,7 @@
             <td><?php print $element->getJazzeeElement()->displayValue(($answer->getChildren()->first() ? $answer->getChildren()->first() : $answer)); ?></td><?php
           } ?>
           <td><?php $this->renderElement('Recommenders-applicants_single-status', array('answer' => $answer)); ?></td>
-          <td><?php $this->renderElement('Recommenders-applicants_single-attachment', array('answer' => $answer)); ?></td>
+          <td><?php $this->renderElement('answer_attachment', array('answer' => $answer)); ?></td>
           <td><?php $this->renderElement('Recommenders-applicants_single-tools', array('answer' => $answer)); ?></td>
         </tr><?php
       } ?>
