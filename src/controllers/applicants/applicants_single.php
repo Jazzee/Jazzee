@@ -1471,8 +1471,13 @@ class ApplicantsSingleController extends \Jazzee\AdminController
       $attachment->setThumbnail($imagick->getimageblob());
       $imagick->clear();
       $cron->getEntityManager()->persist($attachment);
-      $pngName = $attachment->getApplicant()->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
-      $cron->removeStoredFile($pngName);
+      if( $attachment->getAnswer() ) {
+        $pngName = $attachment->getAnswer()->getPage()->getTitle() . '_attachment_' . $attachment->getAnswer()->getId() . 'preview.png';
+        $cron->removeStoredFile($pngName);
+      } else {
+        $pngName = $attachment->getApplicant()->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
+        $cron->removeStoredFile($pngName);
+      }
     }
     unset($imagick);
     if ($total) {
