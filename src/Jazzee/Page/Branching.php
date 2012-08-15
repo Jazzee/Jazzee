@@ -46,7 +46,7 @@ class Branching extends Standard
     $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
-    $field->setInstructions($this->_applicationPage->getInstructions());
+    $field->setInstructions($page->getInstructions());
 
     foreach ($page->getElements() as $element) {
       $element->getJazzeeElement()->setController($this->_controller);
