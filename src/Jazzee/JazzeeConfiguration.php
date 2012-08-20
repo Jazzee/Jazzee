@@ -1,5 +1,4 @@
 <?php
-
 namespace Jazzee;
 
 /**
@@ -185,6 +184,14 @@ class JazzeeConfiguration
    * so you should set this to something sensible like 1M
    */
   protected $_maximumApplicantFileUploadSize;
+
+  /**
+   * @var string
+   * The default size for applicant file uploads if one is not set.
+   * Defaults to the value of PHP's builtin upload_max_filesize which is generally pretty large
+   * so you should set this to something sensible like 1M
+   */
+  protected $_defaultApplicantFileUploadSize;
 
   /**
    * @var string
@@ -469,6 +476,7 @@ class JazzeeConfiguration
       'applicantSessionLifetime' => '0',
       'mailServerType' => 'php',
       'maximumApplicantFileUploadSize' => \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize')),
+      'defaultApplicantFileUploadSize' => \Foundation\Utility::convertIniShorthandValue('1m'),
       'maximumAdminFileUploadSize' => \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize')),
       'varPath' => \realpath(__DIR__ . '/../../var'),
       'shibbolethUsernameAttribute' => 'eppn',
@@ -990,6 +998,31 @@ class JazzeeConfiguration
       throw new \Jazzee\Exception('Configured Applicant File Upload Size is larger than PHP upload_max_filesize');
     }
     $this->_maximumApplicantFileUploadSize = \Foundation\Utility::convertIniShorthandValue($maximumApplicantFileUploadSize);
+  }
+
+  /**
+   * get defaultimumApplicantFileUploadSize
+   * @return string
+   */
+  public function getDefaultApplicantFileUploadSize()
+  {
+    return $this->_defaultApplicantFileUploadSize;
+  }
+
+  /**
+   * set defaultApplicantFileUploadSize
+   * @var string $defaultApplicantFileUploadSize
+   */
+  public function setDefaultApplicantFileUploadSize($defaultApplicantFileUploadSize)
+  {
+    $size = \Foundation\Utility::convertIniShorthandValue($defaultApplicantFileUploadSize);
+    if ($size > \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize'))) {
+      throw new \Jazzee\Exception('Configured Applicant Default Upload Size is larger than PHP upload_max_filesize');
+    }
+    if ($size > $this->getMaximumApplicantFileUploadSize()) {
+      throw new \Jazzee\Exception('Configured Applicant Default Upload Size is larger than Configuraed Maximum applicant puload size');
+    }
+    $this->_defaultApplicantFileUploadSize = \Foundation\Utility::convertIniShorthandValue($defaultApplicantFileUploadSize);
   }
 
   /**

@@ -8,6 +8,17 @@ JazzeeElementPDFFileInput.prototype.constructor = JazzeeElementPDFFileInput;
 
 
 /**
+ * Override JazzeeElement new to set max default
+ * @param {String} id the id to use
+ * @returns {JazzeeElementPDFFileInput}
+ */
+JazzeeElementPDFFileInput.prototype.newElement = function(id,title,typeId,typeName,typeClass,status,page){
+  var element = FileInput.prototype.newElement.call(this,id,title,typeId,typeName,typeClass,status,page);
+  element.setProperty('max', page.pageBuilder.getElementType('PDFFileInput').configurationVariables.defaultApplicantFileUploadSize);
+  return element;
+};
+
+/**
  * Add maximum file size
  * @returns {jQuery}
  */
@@ -43,43 +54,3 @@ JazzeeElementPDFFileInput.prototype.elementProperties = function(){
   div.append(button);
   return div;
 };
-
-/**
- * Convert a file size in bytes to a nice format
- * @param float bytes
- * @return String
- */
-JazzeeElementPDFFileInput.prototype.convertBytesToString = function(bytes){
-  var units = ['b', 'k', 'm', 'g', 't'];
-
-  bytes = Math.max(bytes, 0);
-  var pow = Math.floor((bytes ? Math.log(bytes) : 0) / Math.log(1024));
-  pow = Math.min(pow, units.length - 1);
-
-  bytes /= Math.pow(1024, pow);
-
-  return Math.round(bytes, 2) + units[pow];
-};
-
-/**
- * Convert nice values like 2M into bytes
- * @param String string 
- * @return Integer
- */
-JazzeeElementPDFFileInput.prototype.convertShorrthandValue = function(value){
-  value = $.trim(value).toLowerCase();
-  var last = value.charAt(value.length - 1);
-  if($.inArray(last, ['g','m','k','b']) != -1){
-    value = value.substring(0, value.length-1);
-    switch(last) {
-      //go from top to bottom and multiply every time
-      case 'g':
-        value *= 1024;
-      case 'm':
-        value *= 1024;
-      case 'k':
-        value *= 1024;
-    }
-  }
-  return value;
-}

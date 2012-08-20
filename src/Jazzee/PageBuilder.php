@@ -212,10 +212,12 @@ abstract class PageBuilder extends AdminController
     ksort($elements);
     $arr = array();
     foreach ($elements as $id) {
+      $class = $elementTypes[$id]->getClass();
       $arr[] = array(
         'typeId' => $id,
         'typeName' => $elementTypes[$id]->getName(),
         'typeClass' => $this->getClassName($elementTypes[$id]->getClass()),
+        'configurationVariables' => $class::getConfigurationVariables($this->getConfig())
       );
     }
     $this->setVar('result', $arr);
@@ -298,7 +300,7 @@ abstract class PageBuilder extends AdminController
           $this->_em->remove($childPage);
           $page->getChildren()->removeElement($childPage);
           $this->addMessage('success', $childPage->getTitle() . ' page deleted.');
-            break;
+          break;
         case 'import':
           $childPage = new \Jazzee\Entity\Page();
           $childPage->setParent($page);
@@ -306,18 +308,18 @@ abstract class PageBuilder extends AdminController
           $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->typeId));
           $childPage->setUuid($child->uuid);
           $this->savePage($childPage, $child);
-            break;
+          break;
         case 'new':
           $childPage = new \Jazzee\Entity\Page();
           $childPage->setParent($page);
           $childPage->notGlobal();
           $childPage->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($child->typeId));
           $this->savePage($childPage, $child);
-            break;
+          break;
         default:
           $childPage = $page->getChildById($child->id);
           $this->savePage($childPage, $child);
-            break;
+          break;
       }
       unset($childPage);
     }
@@ -345,7 +347,7 @@ abstract class PageBuilder extends AdminController
               $page->getElements()->remove($element->getId());
             }
           }
-            break;
+          break;
         case 'new':
           $element = new \Jazzee\Entity\Element();
           $page->addElement($element);

@@ -280,3 +280,17 @@ PageBuilder.prototype.getPagePreview = function(page){
   });
   return div;
 };
+
+/**
+ * Get a preview of the page
+ * @param {String} type
+ * @returns {}
+ */
+PageBuilder.prototype.getElementType = function(typeName){
+  for(var i = 0; i < this.elementTypes.length; i++){
+    if(this.elementTypes[i].typeName == typeName ) {
+      return this.elementTypes[i];
+    }
+  }
+  return false;
+};

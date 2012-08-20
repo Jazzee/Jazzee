@@ -85,4 +85,12 @@ interface Element
    * @returns boolean
    */
   public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj);
+
+  /**
+   * Get Configuration Variables
+   * Allows an element to list any special configuration information for the page builder
+   * @param \Jazzee\Configuration $configuration
+   * @return array
+   */
+  public static function getConfigurationVariables(\Jazzee\Configuration $configuration);
 }

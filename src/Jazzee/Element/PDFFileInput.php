@@ -1,5 +1,4 @@
 <?php
-
 namespace Jazzee\Element;
 
 /**
@@ -36,6 +35,8 @@ class PDFFileInput extends AbstractElement
     $max = $config->getMaximumApplicantFileUploadSize();
     if ($this->_element->getMax() and \Foundation\Utility::convertIniShorthandValue($this->_element->getMax()) < $max) {
       $max = $this->_element->getMax();
+    } else {
+      $max = $config->getDefaultApplicantFileUploadSize();
     }
     $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $max));
 
@@ -73,7 +74,7 @@ class PDFFileInput extends AbstractElement
       }
       if (!$pngFile = $this->_controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
         $blob = $elementAnswers[1]->getEBlob();
-        if(empty($blob)){
+        if (empty($blob)) {
           $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
         }
         $this->_controller->storeFile($pngName, $blob);
@@ -120,9 +121,9 @@ class PDFFileInput extends AbstractElement
   {
     $count = 0;
     $start = time();
-    $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class'=>'\Jazzee\Element\PDFFileInput'));
-    if($type){
-      $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position'=>1, 'eBlob'=>null), 500);
+    $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class' => '\Jazzee\Element\PDFFileInput'));
+    if ($type) {
+      $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eBlob' => null), 500);
       $imagick = new \imagick;
       foreach ($blankPreviewElementAnswers as $blankPreviewElementAnswer) {
         $blobElementAnswer = $blankPreviewElementAnswer->getAnswer()->getElementAnswersForElementByPosition($blankPreviewElementAnswer->getElement(), 0);
@@ -154,6 +155,19 @@ class PDFFileInput extends AbstractElement
     if ($count) {
       $cron->log("Generated {$count} PDFFileInput thumbnail(s) in " . (time() - $start) . ' seconds.');
     }
+  }
+
+  /**
+   * PDF File configuration varialbes
+   * @param \Jazzee\Configuration $configuration
+   * @return array
+   */
+  public static function getConfigurationVariables(\Jazzee\Configuration $configuration)
+  {
+    return array(
+      'defaultApplicantFileUploadSize' => $configuration->getDefaultApplicantFileUploadSize(),
+      'maximumApplicantFileUploadSize' => $configuration->getMaximumApplicantFileUploadSize()
+    );
   }
 
 }

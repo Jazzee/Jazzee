@@ -1,5 +1,4 @@
 <?php
-
 namespace Jazzee\Element;
 
 /**
@@ -49,6 +48,16 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element
   public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj)
   {
     return false;
+  }
+
+  /**
+   * Default to an empty list of configuration variables
+   * @param \Jazzee\Configuration $configuration
+   * @return array
+   */
+  public static function getConfigurationVariables(\Jazzee\Configuration $configuration)
+  {
+    return array();
   }
 
 }
