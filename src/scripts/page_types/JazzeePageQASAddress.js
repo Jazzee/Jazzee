@@ -31,9 +31,10 @@ JazzeePageQASAddress.prototype.pageProperties = function(){
   var div = $('<div>');
 
   div.append(this.isRequiredButton());
-
-  if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editQASVariablesButton());
+  div.append(this.editNameButton());
   
+  if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editQASVariablesButton());
+
   var slider = $('<div>');
   slider.slider({
     value: this.min,

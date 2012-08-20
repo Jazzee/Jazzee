@@ -581,4 +581,21 @@ class Application
     return false;
   }
 
+  /**
+   * Get page by name
+   *
+   * @param string $name
+   * @return ApplicationPage
+   */
+  public function getApplicationPageByName($name)
+  {
+    foreach ($this->applicationPages as $applicationPage) {
+      if ($applicationPage->getName() == $name) {
+        return $applicationPage;
+      }
+    }
+
+    return false;
+  }
+
 }

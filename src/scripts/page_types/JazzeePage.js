@@ -15,6 +15,7 @@ function JazzeePage(){
   this.kind;
   this.isGlobal;
   this.title;
+  this.name;
   this.min = 0;
   this.max = 0;
   this.isRequired;
@@ -31,7 +32,7 @@ function JazzeePage(){
   this.deletedElements;
   this.children;
   this.deletedChildren;
-  
+
   this.globalPage = {};
   this.globalPage.title;
   this.globalPage.min;
@@ -41,10 +42,10 @@ function JazzeePage(){
   this.globalPage.leadingText;
   this.globalPage.trailingText;
   this.globalPage.answerStatusDisplay;
-  
+
   this.status;
   this.isModified;
-  
+
   this.editorDefaults = {
     rmUnusedControls: true,
     autoSave: true,
@@ -87,6 +88,7 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.typeClass = pageObject.typeClass;
   this.kind = pageObject.kind;
   this.title = pageObject.title;
+  this.name = pageObject.name;
   this.isGlobal = pageObject.isGlobal;
   this.min = pageObject.min;
   this.max = pageObject.max;
@@ -105,7 +107,7 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.children = {};
   this.deletedChildren = [];
   this.globalPage = {};
-  
+
   if(pageObject.globalPage != undefined){
     this.globalPage.title = pageObject.globalPage.title;
     this.globalPage.min = pageObject.globalPage.min;
@@ -133,10 +135,11 @@ JazzeePage.prototype.newPage = function(id,title,typeId,typeName,typeClass,statu
     typeName: typeName,
     typeClass: typeClass,
     title: title,
+    name: null,
     min: 0,
     max: 0,
     isRequired: 1,
-    answerStatusDisplay: 0,        
+    answerStatusDisplay: 0,
     instructions: null,
     leadingText: null,
     trailingText: null,
@@ -192,7 +195,7 @@ JazzeePage.prototype.addElement = function(element){
  */
 JazzeePage.prototype.deleteElement = function(element){
   for(var i = 0; i < this.elements.length; i++){
-    if(this.elements[i] == element){ 
+    if(this.elements[i] == element){
       this.elements.splice(i,1);
       break;
     }
@@ -200,7 +203,7 @@ JazzeePage.prototype.deleteElement = function(element){
   this.markModified();
   this.deletedElements.push(element);
 };
-  
+
 /**
  * Add a child to the page
  * @param {JazzeePage} page
@@ -222,8 +225,8 @@ JazzeePage.prototype.deleteChild = function(page){
   this.deletedChildren.push(page);
   console.log('delete child page '+ page.title);
 };
-  
-  
+
+
 /**
  * Set a page variable
  * @param {String} name
@@ -370,7 +373,7 @@ JazzeePage.prototype.exportPageButton = function(){
  */
 JazzeePage.prototype.createDialog = function(){
   var pageClass = this;
-  
+
   var div = $('<div>');
   div.css("overflow-y", "auto");
   div.dialog({
@@ -382,7 +385,7 @@ JazzeePage.prototype.createDialog = function(){
       div.dialog("destroy").remove();
     }
   });
-  
+
   return div;
 };
 
@@ -416,14 +419,49 @@ JazzeePage.prototype.isRequiredButton = function(){
   span.append($('<input>').attr('type', 'radio').attr('name', 'isRequired').attr('id', 'required').attr('value', '1').attr('checked', this.isRequired==1)).append($('<label>').html('Required').attr('for', 'required'));
   span.append($('<input>').attr('type', 'radio').attr('name', 'isRequired').attr('id', 'optional').attr('value', '0').attr('checked', this.isRequired==0)).append($('<label>').html('Optional').attr('for', 'optional'));
   span.buttonset();
-  
+
   $('input', span).bind('change', function(e){
     $('.qtip').qtip('api').hide();
     pageClass.setProperty('isRequired', $(e.target).val());
   });
-  
+
   return span;
 };
+
+/**
+ * Button for setting the name property
+ * @return {jQuery}
+ */
+JazzeePage.prototype.editNameButton = function(){
+  var pageClass = this;
+  var div = $('<div>');
+  if(!this.pageBuilder.editGlobal){
+    var button = $('<button>').html('Edit Name').bind('click', function(e){
+      $('.qtip').qtip('api').hide();
+      var obj = new FormObject();
+      var field = obj.newField({name: 'legend', value: 'Set Name'});
+      var element = field.newElement('TextInput', 'name');
+      element.label = 'Name';
+      element.format = 'Only letters, numbers and underscore are allowed.';
+      element.value = pageClass.name;
+      var dialog = pageClass.displayForm(obj);
+      pageClass.pageBuilder.addNameTest($('input[name="name"]', dialog));
+      $('form', dialog).bind('submit',function(e){
+        pageClass.setProperty('name', $('input[name="name"]', this).val());
+        dialog.dialog("destroy").remove();
+        return false;
+      });//end submit
+      dialog.dialog('open');
+    });
+    button.button({
+      icons: {
+        primary: 'ui-icon-pencil'
+      }
+    });
+    div.append(button);
+  }
+  return div;
+}
 
 /**
  * Button for setting the showAnswerStatus property
@@ -439,7 +477,7 @@ JazzeePage.prototype.showAnswerStatusButton = function(){
     $('.qtip').qtip('api').hide();
     pageClass.setProperty('answerStatusDisplay', $(e.target).val());
   });
-  
+
   return span;
 };
 
@@ -457,10 +495,11 @@ JazzeePage.prototype.getDataObject = function(){
     uuid: this.uuid,
     status: this.status,
     title: this.title,
+    name: this.name,
     min: this.min,
     max: this.max,
     isRequired: this.isRequired,
-    answerStatusDisplay: this.answerStatusDisplay,        
+    answerStatusDisplay: this.answerStatusDisplay,
     instructions: this.instructions,
     leadingText: this.leadingText,
     trailingText: this.trailingText,
@@ -532,7 +571,7 @@ JazzeePage.prototype.instructionsWorkspace = function(){
   if(this.isGlobal && !this.pageBuilder.editGlobal && this.instructions != this.globalPage.instructions){
     var text = $('<pre>').text(this.globalPage.instructions);
     dialog.prepend($('<div>').html('<h5>Global Instructions</h5>').append(text));
-  } 
+  }
   $('form', dialog).bind('submit',function(e){
     var value = $('textarea[name="instructions"]', this).val()==''?null:$('textarea[name="instructions"]', this).val();
     pageClass.setProperty('instructions', value);
@@ -569,7 +608,7 @@ JazzeePage.prototype.leadingTextWorkspace = function(){
   if(this.isGlobal && !this.pageBuilder.editGlobal && this.leadingText != this.globalPage.leadingText){
     var text = $('<pre>').text(this.globalPage.leadingText);
     dialog.prepend($('<div>').html('<h5>Global Text</h5>').append(text));
-  } 
+  }
   $('form', dialog).bind('submit',function(e){
     var value = $('textarea[name="text"]', this).val() == ''?null:$('textarea[name="text"]', this).val();
     pageClass.setProperty('leadingText', value);
@@ -606,7 +645,7 @@ JazzeePage.prototype.trailingTextWorkspace = function(){
   if(this.isGlobal && !this.pageBuilder.editGlobal && this.trailingText != this.globalPage.trailingText){
     var text = $('<pre>').text(this.globalPage.trailingText);
     dialog.prepend($('<div>').html('<h5>Global Text</h5>').append(text));
-  } 
+  }
   $('form', dialog).bind('submit',function(e){
     var value = $('textarea[name="text"]', this).val()==''?null:$('textarea[name="text"]', this).val();
     pageClass.setProperty('trailingText', value);
@@ -640,7 +679,7 @@ JazzeePage.prototype.pageInfo = function(){
   if(this.isGlobal && !this.pageBuilder.editGlobal){
     p.append('<br />Global Page: ' + this.globalPage.title);
   }
-  
+
   div.append(p);
   return div;
 };
@@ -697,7 +736,7 @@ JazzeePage.prototype.workspace = function(){
   $('#workspace').empty();
   $('#pageToolbar').empty();
   $('#pageInfo').empty();
-  
+
   $('#workspace').parent().addClass('form');
   $('#workspace').append(this.titleWorkspace());
   $('#workspace').append(this.leadingTextWorkspace());
@@ -710,7 +749,7 @@ JazzeePage.prototype.workspace = function(){
   $('#pageToolbar').append(this.previewPageButton());
   $('#pageToolbar').append(this.deletePageButton());
   $('#pageToolbar').append(this.exportPageButton());
-  
+
   $('#pageInfo').append(this.pageInfo());
   $('#editPage').show('slide');
 };

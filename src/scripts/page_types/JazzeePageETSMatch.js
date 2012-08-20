@@ -19,11 +19,11 @@ JazzeePageETSMatch.prototype.workspace = function(){
 */
 JazzeePageETSMatch.prototype.pageProperties = function(){
   var pageClass = this;
-  
+
   var div = $('<div>');
   div.append(this.isRequiredButton());
   div.append(this.showAnswerStatusButton());
- 
+  div.append(this.editNameButton());
   var slider = $('<div>');
   slider.slider({
     value: this.min,
@@ -37,7 +37,7 @@ JazzeePageETSMatch.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Minimum Scores Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
   div.append(slider);
-   
+
   var slider = $('<div>');
   slider.slider({
     value: this.max,
@@ -51,6 +51,6 @@ JazzeePageETSMatch.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Maximum Scores Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
   div.append(slider);
-  
+
   return div;
 };

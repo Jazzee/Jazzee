@@ -28,31 +28,10 @@ JazzeePageBranching.prototype.workspace = function(){
 */
 JazzeePageBranching.prototype.pageProperties = function(){
   var pageClass = this;
-  
+
   var div = $('<div>');
   div.append(this.isRequiredButton());
-//  div.append(this.showAnswerStatusButton());
-//  if(pageClass.answerStatusDisplay == 1){
-//    var button = $('<button>').html('Edit Answer Status Display').attr('id', 'editDisplayButton').bind('click', function(e){
-//      $('.qtip').qtip('api').hide();
-//      pageClass.displayAnswerStatusForm();
-//    });
-//    button.button({
-//      icons: {
-//        primary: 'ui-icon-newwin'
-//      }
-//    });
-//    div.append(button);
-//  }
-//  
-//  $('#answerStatusDisplayButton', div).bind('click',function(e){
-//    if(pageClass.answerStatusDisplay == 0){
-//      pageClass.setVariable('answerStatusTitle',  null);
-//      pageClass.setVariable('answerStatusText', null);
-//    }
-//    //rebuild the tooltip so the edit status display button will show up or be hidden
-//    div.replaceWith(pageClass.pageProperties());
-//  });
+  div.append(this.editNameButton());
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editBranchingElementLabelButton());
   var slider = $('<div>');
   slider.slider({
@@ -67,8 +46,8 @@ JazzeePageBranching.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Minimum Answers Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
   div.append(slider);
-  
-  
+
+
   var slider = $('<div>');
   slider.slider({
     value: this.max,
@@ -82,7 +61,7 @@ JazzeePageBranching.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Maximum Answers Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
   div.append(slider);
-  
+
   return div;
 };
 
@@ -109,7 +88,7 @@ JazzeePageBranching.prototype.listBranchesBlock = function(){
         }
       });
       $('#pageToolbar').prepend(button);
-      
+
       var button = $('<button>').html('Delete Branch').data('page', page).bind('click', function(e){
         pageClass.deleteChild($(this).data('page'));
         $('#editPage').effect('explode',500);
@@ -129,7 +108,7 @@ JazzeePageBranching.prototype.listBranchesBlock = function(){
     if(!this.isGlobal || this.pageBuilder.editGlobal) li.append(button);
     ol.append(li);
   }
-  
+
   var dropdown = $('<ul>');
   for(var i = 0; i < this.pageBuilder.pageTypes.length; i++){
     var item = $('<a>').html(this.pageBuilder.pageTypes[i].typeName).attr('href', '#').data('pageType', this.pageBuilder.pageTypes[i]);

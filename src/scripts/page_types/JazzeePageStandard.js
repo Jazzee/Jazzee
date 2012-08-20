@@ -90,6 +90,8 @@ JazzeePageStandard.prototype.pageProperties = function(){
     });
   }
 
+  div.append(this.editNameButton());
+  
   var slider = $('<div>');
   slider.slider({
     value: this.min,

@@ -37,10 +37,11 @@ JazzeePageRecommenders.prototype.workspace = function(){
 */
 JazzeePageRecommenders.prototype.pageProperties = function(){
   var pageClass = this;
-  
+
   var div = $('<div>');
   div.append(this.isRequiredButton());
   div.append(this.showAnswerStatusButton());
+  div.append(this.editNameButton());
   
   var slider = $('<div>');
   slider.slider({
@@ -55,7 +56,7 @@ JazzeePageRecommenders.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Minimum Recommendations Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
   div.append(slider);
-  
+
   var slider = $('<div>');
   slider.slider({
     value: this.max,
@@ -69,7 +70,7 @@ JazzeePageRecommenders.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Maximum Recommendations Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
   div.append(slider);
-  
+
   var slider = $('<div>');
   slider.slider({
     value: this.getVariable('lorWaitDays'),
@@ -83,7 +84,7 @@ JazzeePageRecommenders.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Days the applicant must wait to send reminder email ').append($('<span>').attr('id', 'lorWaitDays').html(this.getVariable('lorWaitDays') == 0?'No Wait':this.getVariable('lorWaitDays'))));
   div.append(slider);
-  
+
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editLOREmailButton());
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.deadlineEnforcedButton());
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.deadlineButton());
@@ -112,12 +113,12 @@ JazzeePageRecommenders.prototype.editLOREmailButton = function(){
   for(var i in replace){
     field.instructions += '<br />' + replace[i].replacement + ': ' + replace[i].title;
   }
-  
+
   var element = field.newElement('Textarea', 'recommenderEmailText');
   element.label = 'Email Text';
   element.required = true;
   element.value = this.getVariable('recommenderEmailText');
-  
+
   var dialog = this.displayForm(obj);
   $('form', dialog).bind('submit',function(e){
     pageClass.setVariable('recommenderEmailText', $('textarea[name="recommenderEmailText"]', this).val());
@@ -146,7 +147,7 @@ JazzeePageRecommenders.prototype.deadlineEnforcedButton = function(){
   span.append($('<input>').attr('type', 'radio').attr('name', 'lorDeadlineEnforced').attr('id', 'enforced').attr('value', '1').attr('checked', this.getVariable('lorDeadlineEnforced')==1)).append($('<label>').html('Enforced').attr('for', 'enforced'));
   span.append($('<input>').attr('type', 'radio').attr('name', 'lorDeadlineEnforced').attr('id', 'notenforced').attr('value', '0').attr('checked', this.getVariable('lorDeadlineEnforced')==0)).append($('<label>').html('Not Enforced').attr('for', 'notenforced'));
   span.buttonset();
-  
+
   $('input', span).bind('change', function(e){
     $('.qtip').qtip('api').hide();
     pageClass.setVariable('lorDeadlineEnforced', $(e.target).val());
@@ -206,7 +207,7 @@ JazzeePageRecommenders.prototype.deadlineForm = function(picker){
       placement: 'inline'
     });
   }
-  
+
   var span = $('<span>');
   span.append($('<input>').attr('type', 'radio').attr('name', 'hasDeadline').attr('id', 'seperate').attr('value', '1').attr('checked', picker)).append($('<label>').html('Seperate Deadline').attr('for', 'seperate'));
   span.append($('<input>').attr('type', 'radio').attr('name', 'hasDeadline').attr('id', 'same').attr('value', '0').attr('checked', !picker)).append($('<label>').html('Same As Application').attr('for', 'same'));
@@ -234,7 +235,7 @@ JazzeePageRecommenders.prototype.getRecommendationPage = function(){
 JazzeePageRecommenders.prototype.editLorPage = function(){
   var pageClass = this;
   var div = $('<div>');
-  
+
   var lorPage = this.getRecommendationPage();
   if(!lorPage){
     var dropdown = $('<ul>');
@@ -291,7 +292,7 @@ JazzeePageRecommenders.prototype.editLorPage = function(){
         }
       });
       $('#pageToolbar').prepend(button);
-      
+
       var button = $('<button>').html('Delete').data('page', page).bind('click', function(e){
         $('#editPage').effect('explode',500);
         pageClass.deleteChild($(e.target).parent().data('page'));

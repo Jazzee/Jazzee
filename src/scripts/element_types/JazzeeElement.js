@@ -12,6 +12,7 @@ function JazzeeElement(){
   this.typeName;
   this.typeClass;
   this.title;
+  this.name;
   this.format;
   this.instructions;
   this.defaultValue;
@@ -38,6 +39,7 @@ JazzeeElement.prototype.init = function(obj, page){
   this.typeName = obj.typeName;
   this.typeClass = obj.typeClass;
   this.title = obj.title;
+  this.name = obj.name;
   this.instructions = obj.instructions;
   this.format = obj.format;
   this.defaultValue = obj.defaultValue;
@@ -67,6 +69,7 @@ JazzeeElement.prototype.newElement = function(id,title,typeId,typeName,typeClass
     id: id,
     fixedId: null,
     title: title,
+    name: null,
     typeId: typeId,
     typeName: typeName,
     typeClass: typeClass,
@@ -128,6 +131,7 @@ JazzeeElement.prototype.getDataObject = function(){
     typeClass: this.typeClass,
     status: this.status,
     title: this.title,
+    name: this.name,
     format: this.format,
     instructions: this.instructions,
     defaultValue: this.defaultValue,
@@ -162,6 +166,40 @@ JazzeeElement.prototype.isRequiredButton = function(){
 
   return span;
 };
+
+/**
+ * Button for setting the name property
+ * @return {jQuery}
+ */
+JazzeeElement.prototype.editNameButton = function(){
+  var elementClass = this;
+  var div = $('<div>');
+  var button = $('<button>').html('Edit Name').bind('click', function(e){
+    $('.qtip').qtip('api').hide();
+    var obj = new FormObject();
+    var field = obj.newField({name: 'legend', value: 'Set Name'});
+    var element = field.newElement('TextInput', 'name');
+    element.label = 'Name';
+    element.required = true;
+    element.format = 'Only letters, numbers and underscore are allowed.';
+    element.value = elementClass.name;
+    var dialog = elementClass.page.displayForm(obj);
+    elementClass.page.pageBuilder.addNameTest($('input[name="name"]', dialog));
+    $('form', dialog).bind('submit',function(e){
+      elementClass.setProperty('name', $('input[name="name"]', this).val());
+      dialog.dialog("destroy").remove();
+      return false;
+    });//end submit
+    dialog.dialog('open');
+  });
+  button.button({
+    icons: {
+      primary: 'ui-icon-pencil'
+    }
+  });
+  div.append(button);
+  return div;
+}
 
 /**
  * Title editing button
@@ -363,6 +401,7 @@ JazzeeElement.prototype.workspace = function(){
 JazzeeElement.prototype.elementProperties = function(){
   var div = $('<div>').attr('id', 'element-properties-'+this.id).addClass('dropdown');
   div.append(this.editTitleButton());
+  div.append(this.editNameButton());
   div.append(this.editInstructionsButton());
   div.append(this.editFormatButton());
   div.append(this.isRequiredButton());

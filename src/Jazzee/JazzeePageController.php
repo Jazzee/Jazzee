@@ -160,6 +160,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $scripts->addFile('jquery.js', new \Foundation\Virtual\RealFile('jquery.js', $foundationPath . '/lib/jquery/jquery-1.7.1.min.js'));
     $scripts->addFile('jquery.json.js', new \Foundation\Virtual\RealFile('jquery.json.js', $foundationPath . '/lib/jquery/plugins/jquery.json-2.2.min.js'));
     $scripts->addFile('jquery.cookie.js', new \Foundation\Virtual\RealFile('jquery.cookie.js', $foundationPath . '/lib/jquery/plugins/jquery.cookie-1.min.js'));
+    $scripts->addFile('jquery.filter_input.js', new \Foundation\Virtual\RealFile('jquery.filter_input.js', $foundationPath . '/lib/jquery/plugins/jquery.filter_input.min.js'));
     $scripts->addFile('jqueryui.js', new \Foundation\Virtual\RealFile('jqueryui.js', $foundationPath . '/lib/jquery/jquery-ui-1.8.16.min.js'));
     $scripts->addFile('jquery.qtip.js', new \Foundation\Virtual\RealFile('jquery.qtip.min.js', $foundationPath . '/lib/jquery/plugins/qtip/jquery.qtip.min.js'));
     $scripts->addFile('jquery.wysiwyg.js', new \Foundation\Virtual\RealFile('jquery.wysiwyg.js', $foundationPath . '/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.full.min.js'));

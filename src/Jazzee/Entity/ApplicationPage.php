@@ -7,7 +7,10 @@ namespace Jazzee\Entity;
  *
  * @HasLifecycleCallbacks
  * @Entity
- * @Table(name="application_pages",uniqueConstraints={@UniqueConstraint(name="application_page", columns={"application_id", "page_id"})})
+ * @Table(name="application_pages",uniqueConstraints={
+ *   @UniqueConstraint(name="application_page", columns={"application_id", "page_id"}),
+ *   @UniqueConstraint(name="applicationpage_name", columns={"application_id", "name"})
+ * })
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
@@ -57,6 +60,9 @@ class ApplicationPage
 
   /** @Column(type="string", nullable=true) */
   private $title;
+
+  /** @Column(type="string", nullable=true) */
+  private $name;
 
   /** @Column(type="integer", nullable=true) */
   private $min;
@@ -223,6 +229,29 @@ class ApplicationPage
       $this->page->setTitle($value);
     } else {
       $this->title = $value;
+    }
+  }
+
+  /**
+   * Get the uniqueName
+   *
+   */
+  public function getName()
+  {
+    return $this->name;
+  }
+
+  /**
+   * Set the name
+   *
+   * @param string $value
+   */
+  public function setName($value)
+  {
+    if (empty($value)) {
+      $this->name = null;
+    } else {
+      $this->name = preg_replace('#[^a-zA_Z0-9_]#', '', $value);
     }
   }
 

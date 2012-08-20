@@ -35,6 +35,7 @@ JazzeePagePayment.prototype.pageProperties = function(){
   var div = $('<div>');
   div.append(this.isRequiredButton());
   div.append(this.showAnswerStatusButton());
+  div.append(this.editNameButton());
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.acceptedPaymentTypesButton());
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.editPaymentAmountButton());
   if(!this.isGlobal || this.pageBuilder.editGlobal) div.append(this.newPaymentAmountButton());
@@ -74,7 +75,7 @@ JazzeePagePayment.prototype.acceptedPaymentTypesButton = function(){
     });//end submit
     dialog.dialog('open');
   }).button();
-  
+
   return button;
 };
 

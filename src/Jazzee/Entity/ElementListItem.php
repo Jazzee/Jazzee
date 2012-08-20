@@ -7,7 +7,9 @@ namespace Jazzee\Entity;
  *
  * @Entity
  * @HasLifecycleCallbacks
- * @Table(name="element_list_items")
+ * @Table(name="element_list_items", uniqueConstraints={
+ *   @UniqueConstraint(name="item_name", columns={"element_id", "name"})
+ * })
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
@@ -36,6 +38,9 @@ class ElementListItem
 
   /** @Column(type="string") */
   private $value;
+
+  /** @Column(type="string", nullable=true) */
+  private $name;
 
   /**
    * Get id
@@ -152,6 +157,31 @@ class ElementListItem
   public function getValue()
   {
     return $this->value;
+  }
+
+  /**
+   * Set name
+   *
+   * @param string $name
+   */
+  public function setName($name)
+  {
+
+    if (empty($name)) {
+      $this->name = null;
+    } else {
+      $this->name = preg_replace('#[^a-zA_Z0-9_]#', '', $name);
+    }
+  }
+
+  /**
+   * Get name
+   *
+   * @return string
+   */
+  public function getname()
+  {
+    return $this->name;
   }
 
 }

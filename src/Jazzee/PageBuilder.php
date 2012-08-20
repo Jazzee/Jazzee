@@ -22,6 +22,7 @@ abstract class PageBuilder extends AdminController
 
     $this->addScript($this->path('resource/foundation/scripts/form.js'));
     $this->addScript($this->path('resource/foundation/scripts/jquery.wysiwyg.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jquery.filter_input.js'));
 
     $this->addCss($this->path('resource/foundation/styles/jquery.wysiwyg.css'));
 
@@ -104,6 +105,7 @@ abstract class PageBuilder extends AdminController
       $arr['weight'] = $page->getWeight();
       $arr['applicationPageId'] = $page->getId();
       $arr['kind'] = $page->getKind();
+      $arr['name'] = $page->getName();
       $page = $page->getPage();
       //for global pages also pass the global page info for reference
       if ($page->isGlobal()) {
@@ -135,6 +137,7 @@ abstract class PageBuilder extends AdminController
         'fixedId' => $element->getFixedId(),
         'weight' => $element->getWeight(),
         'title' => $element->getTitle(),
+        'name' => $element->getName(),
         'format' => $element->getFormat(),
         'min' => is_null($element->getMin()) ? 0 : $element->getMin(),
         'max' => is_null($element->getMax()) ? 0 : $element->getMax(),
@@ -150,6 +153,7 @@ abstract class PageBuilder extends AdminController
         $e['list'][] = array(
           'id' => $item->getId(),
           'value' => $item->getValue(),
+          'name' => $item->getName(),
           'weight' => $item->getWeight(),
           'isActive' => (int) $item->isActive()
         );
@@ -277,6 +281,7 @@ abstract class PageBuilder extends AdminController
 
     if ($page instanceof \Jazzee\Entity\ApplicationPage) {
       $page->setWeight($data->weight);
+      $page->setName($data->name);
       //if this is a global page then we are done
       //programs can't edit any of the remaining properties on a globa page
       if ($page->getPage()->isGlobal()) {
@@ -359,6 +364,7 @@ abstract class PageBuilder extends AdminController
           }
           $element->setWeight($e->weight);
           $element->setTitle($htmlPurifier->purify($e->title));
+          $element->setName(empty($e->name) ? null : $htmlPurifier->purify($e->name));
           $element->setFormat(empty($e->format) ? null : $htmlPurifier->purify($e->format));
           $element->setInstructions(empty($e->instructions) ? null : $htmlPurifier->purify($e->instructions));
           $element->setDefaultValue(empty($e->defaultValue) ? null : $htmlPurifier->purify($e->defaultValue));
@@ -376,6 +382,7 @@ abstract class PageBuilder extends AdminController
             }
             $item->setValue($htmlPurifier->purify($i->value));
             $item->setWeight($i->weight);
+            $item->setName($i->name);
             if ($i->isActive) {
               $item->activate();
             } else {

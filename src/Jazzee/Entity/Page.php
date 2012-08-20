@@ -552,6 +552,23 @@ class Page
   }
 
   /**
+   * Get element by name
+   * 
+   * @param string $name
+   * @return Element $element
+   */
+  public function getElementByName($name)
+  {
+    foreach ($this->elements as $element) {
+      if ($element->getName() == $name) {
+        return $element;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Get element by fixed ID
    * @param integer $fixedId
    * @return Entity\Element $element

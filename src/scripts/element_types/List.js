@@ -57,7 +57,7 @@ List.prototype.newListItemsButton = function(){
  */
 List.prototype.manageListItemsButton = function(){
   var elementClass = this;
-  
+
   var button = $('<button>').html('Manage Items').bind('click',function(){
     $('.qtip').qtip('api').hide();
     var div = elementClass.page.createDialog();
@@ -74,20 +74,20 @@ List.prototype.manageListItemsButton = function(){
     var activeDiv = $('<div>').html('<h5>Active Items</h5>').append(activeList).addClass('yui-u first');
     div.append(activeDiv);
     div.append($('<div>').html('<h5>Inactive Items</h5>').append(inactiveList).addClass('yui-u'));
-    
+
     $('ul',div).sortable({connectWith: '.connectedSortable'});
-    
+
     var text = $('<a>').attr('href','#').html(' (sort desc) ').bind('click',function(){
-      $('li',activeList).sort(function(a,b){  
-        return a.innerHTML.toUpperCase() < b.innerHTML.toUpperCase() ? 1 : -1;  
+      $('li',activeList).sort(function(a,b){
+        return a.innerHTML.toUpperCase() < b.innerHTML.toUpperCase() ? 1 : -1;
       }).appendTo(activeList);
       return false;
     });
     $('h5',activeDiv).append(text);
-    
+
     var text = $('<a>').attr('href','#').html(' (sort asc) ').bind('click',function(){
-      $('li',activeList).sort(function(a,b){  
-        return a.innerHTML.toUpperCase() > b.innerHTML.toUpperCase() ? 1 : -1;  
+      $('li',activeList).sort(function(a,b){
+        return a.innerHTML.toUpperCase() > b.innerHTML.toUpperCase() ? 1 : -1;
       }).appendTo(activeList);
       return false;
     });
@@ -121,7 +121,7 @@ List.prototype.manageListItemsButton = function(){
       }
     });
     div.append(button);
-    
+
     div.dialog('open');
   }).button({
     icons: {
@@ -150,9 +150,16 @@ List.prototype.editListItemButton = function(){
         element.label = 'Item Value';
         element.required = true;
         element.value = item.value;
+        var element = field.newElement('TextInput', 'name');
+        element.label = 'Item Name';
+        element.required = false;
+        element.format = 'Only letters, numbers and underscore are allowed.';
+        element.value = item.name;
         var dialog = elementClass.page.displayForm(obj);
+        elementClass.page.pageBuilder.addNameTest($('input[name="name"]', dialog));
         $('form', dialog).bind('submit',function(e){
           item.value = $('input[name="value"]', this).val();
+          item.name = $('input[name="name"]', this).val();
           elementClass.workspace();
           dialog.dialog("destroy").remove();
           elementClass.markModified();
@@ -201,7 +208,7 @@ List.prototype.editListItemButton = function(){
  */
 List.prototype.newListItem = function(value){
   var itemId = 'new-list-item' + this.page.pageBuilder.getUniqueId();
-  var item = {id: itemId, value: value, isActive: true, weight: this.listItems.length+1};
+  var item = {id: itemId, value: value, name: null, isActive: true, weight: this.listItems.length+1};
   this.addListItem(item);
   this.markModified();
   return item;

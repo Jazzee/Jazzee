@@ -294,3 +294,19 @@ PageBuilder.prototype.getElementType = function(typeName){
   }
   return false;
 };
+
+/**
+ * Test an element to ensure it is a valid name
+ * @param {jQuery}
+ */
+PageBuilder.prototype.addNameTest = function(element){
+    $(element).filter_input({
+      regex:'[a-zA-Z0-9_]',
+      feedback: function(wrongChar) {
+        var div = $(this).parent();
+        var message = $('<p>').addClass('message').appendTo(div);
+        message.html('"' + wrongChar + '" is not allowed.');
+        message.delay(1000).fadeOut(2000);
+      }
+  });
+};

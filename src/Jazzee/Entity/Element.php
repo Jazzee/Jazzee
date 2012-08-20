@@ -7,7 +7,10 @@ namespace Jazzee\Entity;
  *
  * @Entity
  * @HasLifecycleCallbacks
- * @Table(name="elements", uniqueConstraints={@UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"})})
+ * @Table(name="elements", uniqueConstraints={
+ *   @UniqueConstraint(name="element_fixedId", columns={"page_id", "fixedId"}),
+ *   @UniqueConstraint(name="element_name", columns={"page_id", "name"})
+ * })
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
@@ -42,6 +45,9 @@ class Element
 
   /** @Column(type="string") */
   private $title;
+
+  /** @Column(type="string", nullable=true) */
+  private $name;
 
   /** @Column(type="string", nullable=true) */
   private $format;
@@ -167,6 +173,30 @@ class Element
   public function getTitle()
   {
     return $this->title;
+  }
+
+  /**
+   * Set name
+   *
+   * @param string $value
+   */
+  public function setName($value)
+  {
+    if (empty($value)) {
+      $this->name = null;
+    } else {
+      $this->name = preg_replace('#[^a-zA_Z0-9_]#', '', $value);
+    }
+  }
+
+  /**
+   * Get name
+   *
+   * @return string
+   */
+  public function getName()
+  {
+    return $this->name;
   }
 
   /**
@@ -382,6 +412,23 @@ class Element
   {
     foreach ($this->listItems as $item) {
       if ($item->getValue() == $value) {
+        return $item;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Get list item by name
+   *
+   * @param string $name
+   * @return Entity\ElementListItem
+   */
+  public function getItemByName($name)
+  {
+    foreach ($this->listItems as $item) {
+      if ($item->getName() == $name) {
         return $item;
       }
     }
