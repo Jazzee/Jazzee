@@ -19,7 +19,7 @@ Status.prototype.end = function(){
 
 Status.prototype.updateBar = function(){
   if(this.counter > 0) $('#status-bar img').show();
-  if(this.counter == 0) $('#status-bar img').fadeOut(2000);
+  if(this.counter == 0) $('#status-bar img').delay(500).fadeOut(2000);
 };
 
 Status.prototype.addMessage = function(type, text){
@@ -44,11 +44,11 @@ Status.prototype.addMessage = function(type, text){
         ready: true, // Show it when ready (rendered)
         effect: function() {$(this).stop(0,1).fadeIn(400);}, // Matches the hide effect
         delay: 0 // Needed to prevent positioning issues
-        
+
       },
       hide: {
         event: false, // Don't hide it on a regular event
-        effect: function(api) { 
+        effect: function(api) {
             // Do a regular fadeOut, but add some spice!
             $(this).stop(0,1).hide('puff').queue(function() {
               // Destroy this tooltip after fading out
@@ -64,7 +64,7 @@ Status.prototype.addMessage = function(type, text){
         render: function(event, api) {
             // Trigger the timer (below) on render
             self.messageTimer(event);
-            
+
         }
       }
   })
