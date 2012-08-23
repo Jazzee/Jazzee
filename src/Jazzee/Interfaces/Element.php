@@ -87,6 +87,14 @@ interface Element
   public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj);
 
   /**
+   * Compare an element to another element
+   *
+   *
+   * @return array
+   */
+  public function compareWith(\Jazzee\Entity\Element $element);
+
+  /**
    * Get Configuration Variables
    * Allows an element to list any special configuration information for the page builder
    * @param \Jazzee\Configuration $configuration

@@ -598,4 +598,115 @@ class Application
     return false;
   }
 
+  /**
+   * Compare two application and list the differences
+   *
+   * @param \Jazzee\Entity\Application $application
+   * @return array
+   */
+  public function compareWith(Application $application)
+  {
+    $differences = array(
+      'properties' => array(),
+      'pages' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
+      )
+    );
+    $arr = array(
+      'contactName' => 'Contact Name',
+      'contactEmail' => 'Contact Email',
+      'welcome' => 'Welcome Message',
+      'admitLetter' => 'Admit Letter',
+      'denyLetter' => 'Deny Letter',
+      'statusIncompleteText' => 'Incomplete Status Text',
+      'statusNoDecisionText' => 'No Decision Status Text',
+      'statusAdmitText' => 'Admitted Status Text',
+      'statusDenyText' => 'Denied Status Text',
+      'statusAcceptText' => 'Accepted Status Text',
+      'statusDeclineText' => 'Declined Status Text'
+    );
+
+    foreach($arr as $name => $niceName){
+      $func = 'get' . ucfirst($name);
+      if($this->$func() != $application->$func()){
+        $differences['properties'][] = array(
+          'name' => $niceName,
+          'type' => 'textdiff',
+          'this' => $this->$func(),
+          'other' => $application->$func()
+        );
+      }
+    }
+    $arr = array(
+      'open' => 'Open Date',
+      'close' => 'Close Date',
+      'begin' => 'Classes Begin'
+    );
+
+    foreach($arr as $name => $niceName){
+      $func = 'get' . ucfirst($name);
+      if($this->$func() != $application->$func()){
+        $differences['properties'][] = array(
+          'name' => $niceName,
+          'type' => 'datediff',
+          'this' => $this->$func()->format('c'),
+          'other' => $application->$func()->format('c')
+        );
+      }
+    }
+    if($this->isPublished() != $application->isPublished()){
+      $differences['properties'][] = array(
+        'name' => 'Published',
+        'type' => 'booldiff',
+        'this' => $this->isPublished(),
+        'other' => $application->isPublished()
+      );
+    }
+    if($this->isVisible() != $application->isVisible()){
+      $differences['properties'][] = array(
+        'name' => 'Visible',
+        'type' => 'booldiff',
+        'this' => $this->isVisible(),
+        'other' => $application->isVisible()
+      );
+    }
+    $thisPages = array();
+    foreach($this->getApplicationPages(ApplicationPage::APPLICATION) as $applicationPage){
+      $thisPages[$applicationPage->getTitle()] = $applicationPage;
+    }
+    $otherPages = array();
+    foreach($application->getApplicationPages(ApplicationPage::APPLICATION) as $applicationPage){
+      $otherPages[$applicationPage->getTitle()] = $applicationPage;
+    }
+    foreach($thisPages as $title => $applicationPage){
+      $pageTitle = $title;
+      if($applicationPage->getPage()->isGlobal()){
+        $pageTitle .= '(' . $applicationPage->getPage()->getTitle() . ')';
+      }
+      if(!array_key_exists($title, $otherPages)){
+        $differences['pages']['new'][] = $pageTitle;
+      } else if($applicationPage->getPage()->getType()->getId() != $otherPages[$title]->getPage()->getType()->getId()){
+        $differences['pages']['new'][] = $pageTitle;
+        if($otherPages[$title]->getPage()->isGlobal()){
+          $pageTitle = $title . '(' . $otherPages[$title]->getPage()->getTitle() . ')';
+        }
+        $differences['pages']['removed'][] = $pageTitle;
+      } else {
+        $pageDifferences = $applicationPage->getJazzeePage()->compareWith($otherPages[$title]);
+        if($pageDifferences['different']){
+          $differences['pages']['changed'][] = $pageDifferences;
+        }
+      }
+    }
+    foreach($otherPages as $title => $array){
+      if(!array_key_exists($title, $thisPages)){
+        $differences['pages']['removed'][] = $title;
+      }
+    }
+    return $differences;
+  }
+
 }

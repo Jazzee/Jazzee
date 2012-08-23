@@ -234,3 +234,11 @@ legend {
 ul.nobullets, ol.nobullets, .nobullets li{
   list-style: none;
 }
+
+ins {
+  color: #008000;
+}
+
+del {
+  color: #990000;
+}

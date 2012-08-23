@@ -314,4 +314,118 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     throw new \Jazzee\Exception('Admin only action was called from a non admin controller');
   }
 
+  /**
+   * Compare this page to another page and list the differences
+   *
+   * @param \Jazzee\Entity\ApplicationPage $applicationPage
+   */
+  public function compareWith(\Jazzee\Entity\ApplicationPage $applicationPage)
+  {
+    $differences = array(
+      'different' => false,
+      'title' => $this->_applicationPage->getTitle(),
+      'properties' => array(),
+      'elements' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
+      )
+    );
+    $arr = array(
+      'title' => 'Title',
+      'name' => 'Name',
+      'min' => 'Minimum Answers',
+      'max' => 'Maximum Answers',
+      'instructions' => 'Instructions',
+      'leadingText' => 'Leading Text',
+      'trailingText' => 'Trailing Text'
+    );
+    foreach($arr as $name => $niceName){
+      $func = 'get' . ucfirst($name);
+      if($this->_applicationPage->$func() != $applicationPage->$func()){
+        $differences['different'] = true;
+        $differences['properties'][] = array(
+          'name' => $niceName,
+          'type' => 'textdiff',
+          'this' => $this->_applicationPage->$func(),
+          'other' => $applicationPage->$func()
+        );
+      }
+    }
+    $thisElements = array();
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $thisElements[$element->getTitle()] = $element;
+    }
+    $otherElements = array();
+    foreach($applicationPage->getPage()->getElements() as $element){
+      $otherElements[$element->getTitle()] = $element;
+    }
+    foreach($thisElements as $title => $element){
+      if(!array_key_exists($title, $otherElements)){
+        $differences['elements']['new'][] = $title;
+      } else if($element->getType()->getId() != $otherElements[$title]->getType()->getId()){
+        $differences['elements']['new'][] = $title;
+        $differences['elements']['removed'][] = $title;
+      } else {
+        $elementDifferences = $element->getJazzeeElement()->compareWith($otherElements[$title]);
+        if($elementDifferences['different']){
+          $differences['elements']['changed'][] = $elementDifferences;
+        }
+      }
+    }
+    foreach($otherElements as $title => $element){
+      if(!array_key_exists($title, $thisElements)){
+        $differences['elements']['removed'][] = $title;
+      }
+    }
+    return $differences;
+  }
+
+  /**
+   * Get page properties
+   *
+   * Lists all the properties of a page in an array so it can be compared to other
+   * pages and accross cycles
+   *
+   * @return array
+   */
+  public function listProperties()
+  {
+    $properties = array();
+    $arr = array(
+      'title',
+      'name',
+      'min',
+      'max',
+      'weight',
+      'instructions',
+      'leadingText',
+      'trailingText'
+    );
+    foreach ($arr as $name) {
+      $func = 'get' . ucfirst($name);
+      $properties[$name] = $this->_applicationPage->$func();
+    }
+    if ($this->_applicationPage->isRequired()) {
+      $properties['isRequired'] = true;
+    } else {
+      $properties['isRequired'] = false;
+    }
+    if ($this->_applicationPage->showAnswerStatus()) {
+      $properties['answerStatusDisplay'] = true;
+    } else {
+      $properties['answerStatusDisplay'] = false;
+    }
+    $properties['variables'] = array();
+    foreach ($this->_applicationPage->getPage()->getVariables() as $var) {
+      $properties['variables'][$var->getName()] = $var->getValue();
+    }
+    $properties['elements'] = array();
+    foreach ($this->_applicationPage->getPage()->getElements() as $element) {
+      $properties['elements'][$element->getTitle()] = $element->getJazzeeElement()->listProperties();
+    }
+    return $properties;
+  }
+
 }

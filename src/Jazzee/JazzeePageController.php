@@ -190,6 +190,9 @@ class JazzeePageController extends \Foundation\VC\Controller
     $vOpenID->addDirectory('css', new \Foundation\Virtual\ProxyDirectory($jazzeePath . '/lib/openid-selector/css'));
     $vOpenID->addDirectory('images', new \Foundation\Virtual\ProxyDirectory($jazzeePath . '/lib/openid-selector/images'));
     $this->_vfs->addDirectory('openid-selector', $vOpenID);
+
+    $jazzeePath = \Jazzee\Configuration::getSourcePath();
+    $this->_vfs->addFile('jsdiff.js', new \Foundation\Virtual\RealFile('jsdiff.js', $jazzeePath . '/lib/jsdiff.js'));
   }
 
   /**

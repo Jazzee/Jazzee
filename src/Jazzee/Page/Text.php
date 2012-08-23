@@ -94,4 +94,42 @@ class Text implements \Jazzee\Interfaces\Page
     $this->_controller->getEntityManager()->persist($var);
   }
 
+  /**
+   * Compare this page to another page and list the differences
+   *
+   * @param \Jazzee\Entity\ApplicationPage $applicationPage
+   */
+  public function compareWith(\Jazzee\Entity\ApplicationPage $applicationPage)
+  {
+    $differences = array(
+      'different' => false,
+      'title' => $this->_applicationPage->getTitle(),
+      'properties' => array(),
+      'elements' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
+      )
+    );
+    $arr = array(
+      'title' => 'Title',
+      'name' => 'Name',
+      'leadingText' => 'Test'
+    );
+    foreach($arr as $name => $niceName){
+      $func = 'get' . ucfirst($name);
+      if($this->_applicationPage->$func() != $applicationPage->$func()){
+        $differences['different'] = true;
+        $differences['properties'][] = array(
+          'name' => $niceName,
+          'type' => 'textdiff',
+          'this' => $this->_applicationPage->$func(),
+          'other' => $applicationPage->$func()
+        );
+      }
+    }
+    return $differences;
+  }
+
 }

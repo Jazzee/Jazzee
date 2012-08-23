@@ -72,4 +72,12 @@ interface Page
    * @throws \Jazzee\Exception
    */
   public function setVar($name, $value);
+
+  /**
+   * Compare a page to another page
+   *
+   *
+   * @return array
+   */
+  public function compareWith(\Jazzee\Entity\ApplicationPage $applicationPage);
 }
