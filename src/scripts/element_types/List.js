@@ -65,10 +65,11 @@ List.prototype.manageListItemsButton = function(){
     var inactiveList = $('<ul>').addClass('inactive connectedSortable').addClass('container');
     for(var i = 0; i< elementClass.listItems.length; i++){
       var item = elementClass.listItems[i];
+      var value = ($.trim(item.value).length > 0)?item.value:'[blank]';
       if(item.isActive){
-        activeList.append($('<li>').html(item.value).data('item', item).addClass('ui-state-default'));
+        activeList.append($('<li>').html(value).data('item', item).addClass('ui-state-default'));
       } else {
-        inactiveList.append($('<li>').html(item.value).data('item', item).addClass('ui-state-default'));
+        inactiveList.append($('<li>').html(value).data('item', item).addClass('ui-state-default'));
       }
     }
     var activeDiv = $('<div>').html('<h5>Active Items</h5>').append(activeList).addClass('yui-u first');
@@ -141,7 +142,8 @@ List.prototype.editListItemButton = function(){
   for(var i = 0; i < this.listItems.length; i++){
     var item = this.listItems[i];
     if(item.isActive){
-      var a = $('<a>').attr('href','#').html(item.value).data('item', item).bind('click', function(e){
+      var value = ($.trim(item.value).length > 0)?item.value:'[blank]';
+      var a = $('<a>').attr('href','#').html(value).data('item', item).bind('click', function(e){
         $('.qtip').qtip('api').hide();
         var item = $(e.target).data('item');
         var obj = new FormObject();
