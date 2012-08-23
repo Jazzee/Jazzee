@@ -2,12 +2,12 @@
  * Javascript for the setup_pages controller
  */
 $(document).ready(function(){
-  
+
   var status = new Status($('#status'), $('#content'));
   $(document).ajaxError(function(e, xhr, settings, exception) {
     status.addMessage('error','There was an error with your request, please try again.');
   });
-  
+
   $(document).ajaxComplete(function(e, xhr, settings) {
     if(xhr.getResponseHeader('Content-Type') == 'application/json'){
       eval("var json="+xhr.responseText);
@@ -75,7 +75,7 @@ ApplicationPageBuilder.prototype.synchronizePageList = function(){
   div.append(this.addNewPageControl('New Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
   div.append(this.addNewGlobalPageControl('Add Gobal Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
   div.append(this.importPageControl());
-  
+
   div.append($('<h5>').html('SIR Accept Page'));
   var ol = this.getPagesList(this.applicationPageKinds.sirAccept);
   div.append(ol);
@@ -83,7 +83,7 @@ ApplicationPageBuilder.prototype.synchronizePageList = function(){
     ol.append(this.addNewPageControl('Set Page', this.applicationPageKinds.sirAccept, 'Jazzee\\Interfaces\\SirPage'));
     ol.append(this.addNewGlobalPageControl('Set Gobal Page', this.applicationPageKinds.sirAccept, 'Jazzee\\Interfaces\\SirPage'));
   }
-  
+
   div.append($('<h5>').html('SIR Decline Page'));
   var ol = this.getPagesList(this.applicationPageKinds.sirDecline);
   div.append(ol);
@@ -93,8 +93,8 @@ ApplicationPageBuilder.prototype.synchronizePageList = function(){
   }
   $('ol', div).each(function(i){
     var ol = $(this);
-    $('li',ol).sort(function(a,b){  
-      return $(a).data('page').weight > $(b).data('page').weight ? 1 : -1;  
+    $('li',ol).sort(function(a,b){
+      return $(a).data('page').weight > $(b).data('page').weight ? 1 : -1;
     }).appendTo(ol);
     ol.sortable();
     ol.bind("sortupdate", function(e, ui) {
@@ -180,7 +180,7 @@ ApplicationPageBuilder.prototype.addNewGlobalPageControl = function(title, kind,
         page.leadingText = globalPage.leadingText;
         page.trailingText = globalPage.trailingText;
         page.weight = parseInt($('#pages li').last().data('page').weight)+1;
-        
+
         pageBuilder.addPage(page);
         return false;
       });
@@ -219,21 +219,21 @@ ApplicationPageBuilder.prototype.addNewGlobalPageControl = function(title, kind,
  */
 ApplicationPageBuilder.prototype.importPageControl = function(){
   var pageBuilder = this;
-  
+
   var button = $('<button>').html('Import Page').button();
   button.click(function(e){
-    
+
     var obj = new FormObject();
     var field = obj.newField({name: 'legend', value: 'Import Page'});
 
     var element = field.newElement('Textarea', 'pageJson');
     element.label = 'Page';
     element.required = true;
-    
+
     var form = new Form();
     var formObject = form.create(obj);
     $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
-    
+
     var div = $('<div>');
     div.css("overflow-y", "auto");
     div.dialog({
@@ -246,9 +246,13 @@ ApplicationPageBuilder.prototype.importPageControl = function(){
     $('form', div).unbind().bind('submit',function(e){
       e.preventDefault();
       var json = $('textarea[name=pageJson]', this).val();
-      var obj = $.parseJSON(json);
-      pageBuilder.copyPage(obj);
-      div.dialog("close");
+      try{
+        var obj = $.parseJSON(json);
+        pageBuilder.copyPage(obj);
+        div.dialog("close");
+      } catch(e){
+        alert('Cannot import this page, there is something wrong with the exported page structure.  You will need to re-export and try importing this page again.');
+      }
       return false;
     });//end submit
     div.dialog('open');

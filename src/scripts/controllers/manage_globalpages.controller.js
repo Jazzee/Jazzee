@@ -130,9 +130,13 @@ GlobalPageBuilder.prototype.importPageControl = function(){
     $('form', div).unbind().bind('submit',function(e){
       e.preventDefault();
       var json = $('textarea[name=pageJson]', this).val();
-      var obj = $.parseJSON(json);
-      pageBuilder.importPage(obj);
-      div.dialog("close");
+      try{
+        var obj = $.parseJSON(json);
+        pageBuilder.importPage(obj);
+        div.dialog("close");
+      } catch(e){
+        alert('Cannot import this page, there is something wrong with the exported page structure.  You will need to re-export and try importing this page again.');
+      }
       return false;
     });//end submit
     div.dialog('open');
