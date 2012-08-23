@@ -59,6 +59,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController
     if ($page instanceof \Jazzee\Entity\ApplicationPage) {
       $pxml->setAttribute('weight', $page->getWeight());
       $pxml->setAttribute('kind', $page->getKind());
+      $pxml->setAttribute('name', $page->getName());
       $page = $page->getPage();
       if ($page->isGlobal()) {
         $pxml->setAttribute('globalPageUuid', $page->getUuid());
@@ -72,6 +73,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController
     foreach ($page->getElements() as $element) {
       $exml = $dom->createElement('element');
       $exml->setAttribute('title', $element->getTitle());
+      $exml->setAttribute('name', $element->getName());
       $exml->setAttribute('class', $element->getType()->getClass());
       $exml->setAttribute('fixedId', $element->getFixedId());
       $exml->setAttribute('weight', $element->getWeight());
@@ -89,6 +91,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController
           $ixml->nodeValue = htmlentities($item->getValue(), ENT_COMPAT, 'utf-8');
           $ixml->setAttribute('active', (integer) $item->isActive());
           $ixml->setAttribute('weight', $item->getWeight());
+          $ixml->setAttribute('name', $item->getName());
           $listItems->appendChild($ixml);
           unset($ixml);
         }

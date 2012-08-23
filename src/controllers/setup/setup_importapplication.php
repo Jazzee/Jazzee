@@ -77,6 +77,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController
         $applicationPage->setApplication($this->_application);
         $applicationPage->setPage($page);
         $applicationPage->setKind((string) $attributes['kind']);
+        $applicationPage->setName((string) $attributes['name']);
         $applicationPage->setTitle(html_entity_decode((string) $attributes['title']));
         $applicationPage->setMin((string) $attributes['min']);
         $applicationPage->setMax((string) $attributes['max']);
@@ -149,6 +150,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController
           $element->setFixedId((string) $attributes['fixedId']);
         }
         $element->setTitle((string) $attributes['title']);
+        $element->setName((string) $attributes['name']);
         $element->setMin((string) $attributes['min']);
         $element->setMax((string) $attributes['max']);
         if ((string) $attributes['required']) {
@@ -165,6 +167,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController
           $listItem = new \Jazzee\Entity\ElementListItem();
           $listItem->setValue((string) $listElement);
           $listItem->setWeight((string) $attributes['weight']);
+          $listItem->setName((string) $attributes['name']);
 
           if ((string) $attributes['active']) {
             $listItem->activate();
