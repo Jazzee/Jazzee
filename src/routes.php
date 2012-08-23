@@ -198,5 +198,16 @@ $advancedRouter->addRoute('#^admin/([^/]+)/?([^/]+)?$#i', array(
 ));
 
 $fc->addRouter($advancedRouter);
+try{
+  $fc->processRequest(new Lvc_HttpRequest());
+} catch (\Lvc_Exception $e){
+  $request = new \Lvc_Request();
+  $request->setControllerName('error');
+  $request->setActionName('index');
+  $request->setActionParams(array('error' => '404', 'message' => 'Sorry the page you are looking for could not be found.'));
 
-$fc->processRequest(new Lvc_HttpRequest());
+  // Get a new front controller without any routers, and have it process our handmade request.
+  $frontController = new \Lvc_FrontController();
+  $frontController->processRequest($request);
+  exit(1);
+}
