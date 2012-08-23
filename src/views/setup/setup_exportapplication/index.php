@@ -23,6 +23,7 @@ $preferences->appendChild($this->controller->createCdataElement($xml, 'statusAdm
 $preferences->appendChild($this->controller->createCdataElement($xml, 'statusDenyText', $application->getStatusDenyText()));
 $preferences->appendChild($this->controller->createCdataElement($xml, 'statusAcceptText', $application->getStatusAcceptText()));
 $preferences->appendChild($this->controller->createCdataElement($xml, 'statusDeclineText', $application->getStatusDeclineText()));
+$preferences->appendChild($xml->createElement('visible', $application->isVisible()?'1':'0'));
 
 $app->appendChild($preferences);
 
