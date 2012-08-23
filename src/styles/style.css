@@ -142,9 +142,8 @@ div.form div.required div.control div.control{
   background: none;
 }
 
-div.form div.control{
+div.form div.control, div.form div.control ol div.control{
   padding-left: 16px;
-  margin-left: -16px;
 }
 div.form div.required div.control, div.form div.control.required{
   background-image: url(resource/foundation/media/icons/asterisk_yellow.png);
