@@ -29,6 +29,7 @@ class PDFFileInput extends AbstractElement
     }
     $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
+    $element->addValidator(new \Foundation\Form\Validator\PDFNotEncrypted($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
 
     $config = $this->_controller->getConfig();

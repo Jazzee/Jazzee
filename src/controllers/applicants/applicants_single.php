@@ -1054,6 +1054,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
     $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
+    $element->addValidator(new \Foundation\Form\Validator\PDFNotEncrypted($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
 
     if ($this->_config->getMaximumAdminFileUploadSize()) {
@@ -1122,6 +1123,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $element->setLabel('File');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
+    $element->addValidator(new \Foundation\Form\Validator\PDFNotEncrypted($element));
     $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
 
