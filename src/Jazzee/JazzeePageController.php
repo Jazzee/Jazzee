@@ -49,6 +49,12 @@ class JazzeePageController extends \Foundation\VC\Controller
   protected $_authLog;
 
   /**
+   * Pear log instance for 404 logging
+   * @var \Log
+   */
+  protected $_404Log;
+
+  /**
    * Virtual File system root directory
    * @var \Foundation\Virtual\Directory
    */
@@ -311,6 +317,10 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->_authLog = new \Monolog\Logger('authentication');
     $this->_authLog->pushHandler(new \Monolog\Handler\StreamHandler($path . '/authentication_log'));
 
+    //create an authenticationLog
+    $this->_404Log = new \Monolog\Logger('404');
+    $this->_404Log->pushHandler(new \Monolog\Handler\StreamHandler($path . '/404_log'));
+
     $this->_log = new \Monolog\Logger('jazzee');
     $this->_log->pushProcessor(new \Monolog\Processor\WebProcessor());
     $this->_log->pushProcessor(new \Monolog\Processor\IntrospectionProcessor());
@@ -384,9 +394,11 @@ class JazzeePageController extends \Foundation\VC\Controller
     $message = $exception->getMessage();
     $userMessage = 'Unspecified Technical Difficulties';
     $code = 500;
+    $log = $this->_log;
     if ($exception instanceof \Lvc_Exception) {
       $code = 404;
-      $userMessage = 'Page not found.';
+      $log = $this->_404Log;
+      $userMessage = 'Sorry the page you are looking for could not be found.';
     }
     if ($exception instanceof \PDOException) {
       $message = 'Problem with database connection. PDO says: ' . $message;
@@ -398,6 +410,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     if ($exception instanceof \Foundation\Virtual\Exception) {
       $userMessage = $exception->getUserMessage();
       $code = $exception->getHttpErrorCode();
+      $log = $this->_404Log;
     }
     /* Map the PHP error to a Log priority. */
     switch ($exception->getCode()) {
@@ -416,7 +429,7 @@ class JazzeePageController extends \Foundation\VC\Controller
       default:
         $priority = \Monolog\Logger::INFO;
     }
-    $this->_log->addRecord($priority, $message);
+    $log->addRecord($priority, $message);
     //send the error to PHP as well
     error_log($message);
     // Get a request for the error page
