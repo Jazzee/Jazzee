@@ -337,7 +337,6 @@ JazzeeElement.prototype.workspace = function(){
     button.qtip();
   } else {
     button.bind('click', function(e){
-      $('.qtip').qtip('api').hide();
       $('#element-' + elementClass.id).effect('explode',500);
       elementClass.status = 'delete';
       elementClass.page.deleteElement(elementClass);
@@ -347,7 +346,6 @@ JazzeeElement.prototype.workspace = function(){
   toolbar.append(button);
 
   var button = $('<button>').bind('click', function(e){
-    $('.qtip').qtip('api').hide();
     elementClass.page.copyElement(elementClass);
   });
   button.button({

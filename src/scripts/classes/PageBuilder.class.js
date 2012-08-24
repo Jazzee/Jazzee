@@ -199,7 +199,7 @@ PageBuilder.prototype.markModified = function(){
  * @param {Object} obj
  */
 PageBuilder.prototype.copyPage = function(obj){
-  this.addPage(this.pageFromObject(obj, 'Copy of '+ obj.title, 'new'));
+  this.addPage(this.pageFromObject(obj, 'Copy of '+ obj.title, 'copy'));
 };
 
 /**

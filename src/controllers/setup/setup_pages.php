@@ -69,7 +69,7 @@ class SetupPagesController extends \Jazzee\PageBuilder
             $this->addMessage('success', $applicationPage->getTitle() . ' deleted');
           }
         }
-          break;
+        break;
       case 'new-global':
         $applicationPage = new \Jazzee\Entity\ApplicationPage();
         $applicationPage->setPage($this->_em->getRepository('\Jazzee\Entity\Page')->findOneBy(array('id' => $pageId, 'isGlobal' => true)));
@@ -89,8 +89,9 @@ class SetupPagesController extends \Jazzee\PageBuilder
         $applicationPage->setTrailingText($data->trailingText);
         $this->_em->persist($applicationPage);
         $this->addMessage('success', $data->title . ' created.');
-          break;
+        break;
       case 'new':
+      case 'copy':
         $page = new \Jazzee\Entity\Page();
         $page->notGlobal();
         $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
@@ -101,7 +102,10 @@ class SetupPagesController extends \Jazzee\PageBuilder
         $applicationPage->setWeight($data->weight);
         $applicationPage->setApplication($this->_application);
         $applicationPage->getJazzeePage()->setController($this);
-        $applicationPage->getJazzeePage()->setupNewPage();
+        //only do setup for new pages, copies lready ahve elements
+        if ($data->status == 'new') {
+          $applicationPage->getJazzeePage()->setupNewPage();
+        }
         $this->addMessage('success', $data->title . ' created.');
       default:
         if (!isset($applicationPage)) {

@@ -315,6 +315,7 @@ abstract class PageBuilder extends AdminController
           $this->savePage($childPage, $child);
           break;
         case 'new':
+        case 'copy':
           $childPage = new \Jazzee\Entity\Page();
           $childPage->setParent($page);
           $childPage->notGlobal();
