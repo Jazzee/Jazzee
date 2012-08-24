@@ -35,11 +35,11 @@ try{
     'host' => $jazzeeConfiguration->getDbHost(),
     'port' => $jazzeeConfiguration->getDbPort(),
     'driver' => $jazzeeConfiguration->getDbDriver(),
-    'charset' => 'utf8'
+    'charset' => $jazzeeConfiguration->getDbCharset()
   );
 
   $em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
-  $em->getConnection()->setCharset('utf8');
+  $em->getConnection()->setCharset($jazzeeConfiguration->getDbCharset());
 }catch(Exception $e){
   print $e->getMessage() . PHP_EOL;
   exit(1);
@@ -51,7 +51,7 @@ $helpers = array(
 
 /**
  * We need to be able to call AdminDirectory adn AdminAuthentication functions
- * from different Console commands.  This Lets that happen 
+ * from different Console commands.  This Lets that happen
  */
 class AdminStub implements \Jazzee\Interfaces\AdminController{
   public $em;

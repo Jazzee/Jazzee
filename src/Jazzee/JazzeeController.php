@@ -183,11 +183,11 @@ class JazzeeController extends PageController
       'host' => $this->_config->getDbHost(),
       'port' => $this->_config->getDbPort(),
       'driver' => $this->_config->getDbDriver(),
-      'charset' => 'utf8'
+      'charset' => $this->_config->getDbCharset()
     );
 
     $this->_em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
-    $this->_em->getConnection()->setCharset('utf8');
+    $this->_em->getConnection()->setCharset($this->_config->getDbCharset());
   }
 
   /**

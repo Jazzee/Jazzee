@@ -89,6 +89,12 @@ class JazzeeConfiguration
 
   /**
    * @var string
+   * The database character set
+   */
+  protected $_dbCharset;
+
+  /**
+   * @var string
    * What to name the PHP session.  Defaults to 'JAZZEE'
    */
   protected $_sessionName;
@@ -471,6 +477,7 @@ class JazzeeConfiguration
       'mode' => 'LIVE',
       'status' => 'PRODUCTION',
       'dbHost' => 'localhost',
+      'dbCharset' => 'utf8',
       'sessionName' => 'JAZZEE',
       'adminSessionLifetime' => '7200',
       'applicantSessionLifetime' => '0',
@@ -705,6 +712,24 @@ class JazzeeConfiguration
   public function setDbDriver($dbDriver)
   {
     $this->_dbDriver = $dbDriver;
+  }
+
+  /**
+   * get dbSharset
+   * @return string
+   */
+  public function getDbCharset()
+  {
+    return $this->_dbCharset;
+  }
+
+  /**
+   * set dbCharset
+   * @var string $dhCharset
+   */
+  public function setDbCharset($dbCharset)
+  {
+    $this->_dbCharset = $dbCharset;
   }
 
   /**

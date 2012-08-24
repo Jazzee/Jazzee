@@ -12,6 +12,7 @@ dbName=
 dbUser=
 dbPassword=
 dbDriver=
+dbCharset=
 
 ;#The FROM email address to apply by default and to messages without a sender (like logs)
 ;#if blank mail server will probably apply a default based on your hostname
