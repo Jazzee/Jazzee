@@ -176,6 +176,7 @@ JazzeePage.prototype.checkIsModified = function(){
 JazzeePage.prototype.markModified = function(){
   this.isModified = true;
   this.pageBuilder.markModified();
+  $('#exportbutton').replaceWith(this.exportPageButton());
 };
 
 /**
@@ -346,21 +347,30 @@ JazzeePage.prototype.previewPageButton = function(){
  */
 JazzeePage.prototype.exportPageButton = function(){
   var pageClass = this;
-  var button = $('<button>').html('Export').addClass('export').bind('click', function(e){
-    var dialog = pageClass.createDialog();
-    var obj = pageClass.getDataObject();
-    obj.id = null;
-    var textarea = $('<textarea>').val($.toJSON(obj));
-    dialog.append(textarea);
-    dialog.append($('<p>').html('Copy this text into the import utility.'));
-    dialog.dialog('open');
-    textarea.select();
-  });
+  var button = $('<button>').html('Export').addClass('export').attr('id', 'exportbutton');
+
   button.button({
     icons: {
       primary: 'ui-icon-clipboard'
     }
   });
+
+  if(this.checkIsModified()){
+    button.addClass('ui-button-disabled ui-state-disabled');
+    button.attr('title', 'This page cannot be exported until it is saved.');
+    button.qtip();
+  } else {
+    button.bind('click', function(e){
+      var dialog = pageClass.createDialog();
+      var obj = pageClass.getDataObject();
+      obj.id = null;
+      var textarea = $('<textarea>').val($.toJSON(obj));
+      dialog.append(textarea);
+      dialog.append($('<p>').html('Copy this text into the import utility.'));
+      dialog.dialog('open');
+      textarea.select();
+    });
+  }
   return button;
 };
 
