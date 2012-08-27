@@ -34,7 +34,9 @@ List.prototype.newListItemsButton = function(){
   $('form', dialog).bind('submit',function(e){
     var values = $('textarea[name="text"]', this).val().split("\n");
     for(var i = 0;i<values.length; i++){
-      elementClass.newListItem(values[i]);
+      if($.trim(values[i]).length > 0){
+        elementClass.newListItem(values[i]);
+      }
     }
     dialog.dialog("destroy").remove();
     elementClass.workspace();
