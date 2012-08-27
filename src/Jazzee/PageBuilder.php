@@ -556,4 +556,19 @@ abstract class PageBuilder extends AdminController
     return $purifier;
   }
 
+  /**
+   * Search the directory
+   */
+  public function actionSearchDirectory()
+  {
+    $data = json_decode($this->post['data']);
+    $directory = $this->getAdminDirectory();
+
+    $results = array();  //array of all the users who match the search
+    $results = $directory->search($data->firstName, $data->lastName);
+
+    $this->setVar('result', $results);
+    $this->loadView($this->controllerName . '/result');
+  }
+
 }
