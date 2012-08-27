@@ -85,9 +85,25 @@ div.listItems li.inactive{
   background-position:top right;
 }
 
-.ui-sortable {
-  border:1px solid #7799bb;
-  padding-bottom: 1em;
+ul.elementListItems li span.handle {
+  float: left;
+}
+
+ul.elementListItems li{
+  text-align: left;
+  overflow: auto;
+}
+
+ul.elementListItems li.inactive{
+  text-decoration: line-through;
+}
+
+ul.elementListItems span.tools{
+  float: right;
+}
+
+ul.elementListItems li span.tools button span.ui-button-text{
+  padding: 0 0 0 1.5em;
 }
 
 div.form textarea {

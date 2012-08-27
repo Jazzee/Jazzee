@@ -13,7 +13,6 @@ List.prototype.elementProperties = function(){
   var element = this;
   var div = JazzeeElement.prototype.elementProperties.call(this);
   div.append(this.newListItemsButton());
-  div.append(this.editListItemButton());
   div.append(this.manageListItemsButton());
 
   return div;
@@ -63,53 +62,38 @@ List.prototype.manageListItemsButton = function(){
   var button = $('<button>').html('Manage Items').bind('click',function(){
     $('.qtip').qtip('api').hide();
     var div = elementClass.page.createDialog();
-    var activeList = $('<ul>').addClass('active connectedSortable').addClass('container');
-    var inactiveList = $('<ul>').addClass('inactive connectedSortable').addClass('container');
+    var list = $('<ul>').addClass('elementListItems');
     for(var i = 0; i< elementClass.listItems.length; i++){
       var item = elementClass.listItems[i];
-      var value = ($.trim(item.value).length > 0)?item.value:'[blank]';
-      if(item.isActive){
-        activeList.append($('<li>').html(value).data('item', item).addClass('ui-state-default'));
-      } else {
-        inactiveList.append($('<li>').html(value).data('item', item).addClass('ui-state-default'));
-      }
+      list.append(elementClass.singleItem(item));
     }
-    var activeDiv = $('<div>').html('<h5>Active Items</h5>').append(activeList).addClass('yui-u first');
-    div.append(activeDiv);
-    div.append($('<div>').html('<h5>Inactive Items</h5>').append(inactiveList).addClass('yui-u'));
+    var listDiv = $('<div>').html('<h5>List Items</h5>').append(list).addClass('yui-u first');
+    div.append(listDiv);
+    $('ul',listDiv).sortable({handle: '.handle'});
 
-    $('ul',div).sortable({connectWith: '.connectedSortable'});
+    $('h5', listDiv).after(elementClass.filterItemsInput(list));
 
     var text = $('<a>').attr('href','#').html(' (sort desc) ').bind('click',function(){
-      $('li',activeList).sort(function(a,b){
+      $('li',list).sort(function(a,b){
         return a.innerHTML.toUpperCase() < b.innerHTML.toUpperCase() ? 1 : -1;
-      }).appendTo(activeList);
+      }).appendTo(list);
       return false;
     });
-    $('h5',activeDiv).append(text);
+    $('h5',listDiv).append(text);
 
     var text = $('<a>').attr('href','#').html(' (sort asc) ').bind('click',function(){
-      $('li',activeList).sort(function(a,b){
+      $('li',list).sort(function(a,b){
         return a.innerHTML.toUpperCase() > b.innerHTML.toUpperCase() ? 1 : -1;
-      }).appendTo(activeList);
+      }).appendTo(list);
       return false;
     });
-    $('h5',activeDiv).append(text);
-
+    $('h5',listDiv).append(text);
 
     var button = $('<button>').html('Save').bind('click',function(){
       var orderedItems = [];
-      $('ul.active li', div).each(function(i){
+      $('li', listDiv).each(function(i){
         var item = $(this).data('item');
         item.weight = i+1;
-        item.isActive = true;
-        orderedItems.push(item);
-      });
-
-      $('ul.inactive li', div).each(function(i){
-        var item = $(this).data('item');
-        item.weight = i+100;
-        item.isActive = false;
         orderedItems.push(item);
       });
 
@@ -136,74 +120,137 @@ List.prototype.manageListItemsButton = function(){
 
 /**
  * Edit List Item button
+ * @param obj item
+ * @return {jQuery}
+ */
+List.prototype.singleItem = function(item){
+  var elementClass = this;
+  var value = ($.trim(item.value).length > 0)?item.value:'[blank]';
+  var name = ($.trim(item.name).length > 0)?' (' + item.name + ')':'';
+  var li = $('<li>').html(value+name).data('item', item).addClass('ui-state-default');
+  var handle = $('<span>').addClass('handle ui-icon ui-icon-arrowthick-2-n-s');
+  li.prepend(handle);
+  var tools = $('<span>').addClass('tools');
+  if(item.isActive){
+    tools.append(this.hideListItemButton());
+  } else {
+    li.addClass('inactive');
+    tools.append(this.displayListItemButton());
+  }
+  tools.append(this.editListItemButton());
+  li.append(tools)
+
+  return li;
+};
+
+/**
+ * Edit List Item button
  * @return {jQuery}
  */
 List.prototype.editListItemButton = function(){
   var elementClass = this;
-  var ul = $('<ul>');
-  for(var i = 0; i < this.listItems.length; i++){
-    var item = this.listItems[i];
-    if(item.isActive){
-      var value = ($.trim(item.value).length > 0)?item.value:'[blank]';
-      var a = $('<a>').attr('href','#').html(value).data('item', item).bind('click', function(e){
-        $('.qtip').qtip('api').hide();
-        var item = $(e.target).data('item');
-        var obj = new FormObject();
-        var field = obj.newField({name: 'legend', value: 'Edit Item'});
-        var element = field.newElement('TextInput', 'value');
-        element.label = 'Item Value';
-        element.required = true;
-        element.value = item.value;
-        var element = field.newElement('TextInput', 'name');
-        element.label = 'Item Name';
-        element.required = false;
-        element.format = 'Only letters, numbers and underscore are allowed.';
-        element.value = item.name;
-        var dialog = elementClass.page.displayForm(obj);
-        elementClass.page.pageBuilder.addNameTest($('input[name="name"]', dialog));
-        $('form', dialog).bind('submit',function(e){
-          item.value = $('input[name="value"]', this).val();
-          item.name = $('input[name="name"]', this).val();
-          elementClass.workspace();
-          dialog.dialog("destroy").remove();
-          elementClass.markModified();
-          return false;
-        });//end submit
-        dialog.dialog('open');
-        return false;
-      });
-      ul.append($('<li>').append(a));
-    }
-  }
-  var button = $('<button>').html('Edit List Item');
-  button.button({
-    icons: {
-      primary: 'ui-icon-pencil',
-      secondary: 'ui-icon-carat-1-s'
-    }
-  });
-    button.qtip({
-    position: {
-      my: 'top-left',
-      at: 'bottom-left'
-    },
-    show: {
-      event: 'click'
-    },
-    hide: {
-      event: 'unfocus click mouseleave',
-      delay: 500,
-      fixed: true
-    },
-    content: {
-      text: ul,
-      title: {
-        text: 'Choose an item to edit',
-        button: true
-      }
-    }
-  });
+  var button = $('<button>').html('Edit').bind('click',function(){
+    var li = $(this).parent().parent();
+    var item = li.data('item');
+    var obj = new FormObject();
+    var field = obj.newField({name: 'legend', value: 'Edit Item'});
+    var element = field.newElement('TextInput', 'value');
+    element.label = 'Item Value';
+    element.required = true;
+    element.value = item.value;
+    var element = field.newElement('TextInput', 'name');
+    element.label = 'Item Name';
+    element.required = false;
+    element.format = 'Only letters, numbers and underscore are allowed.';
+    element.value = item.name;
+    var dialog = elementClass.page.displayForm(obj);
+    elementClass.page.pageBuilder.addNameTest($('input[name="name"]', dialog));
+    $('form', dialog).bind('submit',function(e){
+      item.value = $('input[name="value"]', this).val();
+      item.name = $('input[name="name"]', this).val();
+      elementClass.workspace();
+      dialog.dialog("destroy").remove();
+      elementClass.markModified();
+      li.replaceWith(elementClass.singleItem(item));
+      return false;
+    });//end submit
+    dialog.dialog('open');
+    return false;
+  }).button({icons: {primary: 'ui-icon-pencil'}});
   return button;
+};
+
+/**
+ * Active List Item button
+ * @return {jQuery}
+ */
+List.prototype.displayListItemButton = function(){
+  var elementClass = this;
+  var button = $('<button>').html('Display').bind('click',function(){
+    var li = $(this).parent().parent();
+    var item = li.data('item');
+    item.isActive = true;
+    elementClass.markModified();
+    li.replaceWith(elementClass.singleItem(item));
+    return false;
+  }).button({icons: {primary: 'ui-icon-plus'}});
+  return button;
+};
+
+/**
+ * Active List Item button
+ * @return {jQuery}
+ */
+List.prototype.hideListItemButton = function(){
+  var elementClass = this;
+  var button = $('<button>').html('Hide').bind('click',function(){
+    var li = $(this).parent().parent();
+    var item = li.data('item');
+    item.isActive = false;
+    elementClass.markModified();
+    li.replaceWith(elementClass.singleItem(item));
+    return false;
+  }).button({icons: {primary: 'ui-icon-cancel'}});
+  return button;
+};
+
+/**
+ * Filter list items input
+ * @return {jQuery}
+ */
+List.prototype.filterItemsInput = function(list){
+    jQuery.expr[':'].Contains = function(a,i,m){
+        return (a.textContent || a.innerText || "").toUpperCase().indexOf(m[3].toUpperCase())>=0;
+    };
+    var input = $('<input>').attr('type', 'text').bind('change keyup', function(){
+      var filter = $(this).val();
+      if (filter) {
+        $(list).find("li:not(:Contains(" + filter + "))").slideUp();
+        $(list).find("li:Contains(" + filter + ")").slideDown();
+      } else {
+        $(list).find("li").slideDown();
+      }
+    });
+
+    var defaultValue = 'filter input';
+    input.val(defaultValue);
+    input.css('color', '#bbb');
+    input.focus(function() {
+        var actualValue = input.val();
+        input.css('color', '#000');
+        if (actualValue == defaultValue) {
+            input.val('');
+        }
+    });
+    input.blur(function() {
+        var actualValue = input.val();
+        if (!actualValue) {
+            input.val(defaultValue);
+            input.css('color', '#bbb');
+        }
+    });
+
+    return $('<form>').attr('action', '#').append(input);
 };
 
 /**
@@ -226,4 +273,3 @@ List.prototype.addListItem = function(item){
   this.listItems.push(item);
   return item;
 };
-
