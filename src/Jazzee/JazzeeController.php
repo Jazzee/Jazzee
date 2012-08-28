@@ -118,7 +118,10 @@ class JazzeeController extends PageController
     } else {
       $messages = array();
     }
-    $messages[] = array('type' => $type, 'text' => $text);
+    $hash = md5($type . $text);
+    if(!array_key_exists($hash, $messages)){
+      $messages[$hash] = array('type' => $type, 'text' => $text);
+    }
     $this->_session->getStore('messages')->messages = $messages;
   }
 
