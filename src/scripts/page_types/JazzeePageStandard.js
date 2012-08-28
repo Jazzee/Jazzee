@@ -91,7 +91,7 @@ JazzeePageStandard.prototype.pageProperties = function(){
   }
 
   div.append(this.editNameButton());
-  
+
   var slider = $('<div>');
   slider.slider({
     value: this.min,
@@ -155,7 +155,7 @@ JazzeePageStandard.prototype.synchronizeElementList = function(){
     $(this).data('element').setProperty('weight',i+1);
   });
   var list = $('#elements');
-  list.sortable();
+  list.sortable({handle: '.handle', placeholder: 'ui-state-highlight'});
   list.bind("sortupdate", function(event, ui) {
     pageClass.markModified();
     pageClass.synchronizeElementList();

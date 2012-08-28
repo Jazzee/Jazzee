@@ -304,6 +304,7 @@ JazzeeElement.prototype.workspace = function(){
     div.data('element', this);
     div.append($('<div>').addClass('yui-u first field'));
     div.append($('<div>').addClass('yui-u options'));
+    div.prepend($('<span>').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
   }
   var field = $('.field', div);
   field.empty();
