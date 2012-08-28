@@ -352,7 +352,7 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
    *
    * @return \Jazzee\AdminDirectory
    */
-  protected function getAdminDirectory()
+  public function getAdminDirectory()
   {
     if (!$this->_adminDirectory) {
       $class = $this->_config->getAdminDirectoryClass();
