@@ -28,7 +28,7 @@ class JazzeeConfiguration
    * @var string
    * Message displayed to anyone who cannot access the system becuase of a mode setting
    */
-  protected $_maintenancbodbessage;
+  protected $_maintenanceModeMessage;
 
   /**
    * @var string

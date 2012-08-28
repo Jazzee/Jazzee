@@ -43,12 +43,8 @@ class JazzeeController extends PageController
     parent::__construct();
     if ($this->_config->getMode() == 'MAINTENANCE') {
       $request = new \Lvc_Request();
-      $request->setControllerName('error');
+      $request->setControllerName('maintenance');
       $request->setActionName('index');
-      if (!$message = $this->_config->getMaintenanceModeMessage()) {
-        $message = 'The application is currently down for maintenance';
-      }
-      $request->setActionParams(array('error' => '503', 'message' => $message));
 
       // Get a new front controller without any routers, and have it process our handmade request.
       $frontController = new \Lvc_FrontController();
