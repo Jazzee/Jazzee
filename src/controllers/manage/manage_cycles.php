@@ -140,8 +140,9 @@ class ManageCyclesController extends \Jazzee\AdminController
         $cycle->setStart($input->get('start'));
         $cycle->setEnd($input->get('end'));
         $this->_em->persist($cycle);
+        $this->_em->flush();
         $this->addMessage('success', "New Cycle Saved");
-        $this->redirectPath('manage/cycles');
+        $this->redirectPath("manage/cycles/edit/{$cycle->getId()}");
       }
     }
   }

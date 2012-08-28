@@ -11,6 +11,12 @@ if ($cycles) {?>
         if ($this->controller->checkIsAllowed('manage_cycles', 'edit')) { ?>
           (<a href='<?php print $this->path('manage/cycles/edit/') . $cycle->getId() ?>'>Edit</a>)<?php
         }?>
+          <br /><strong>Required Pages:</strong>
+          <ul>
+        <?php foreach($cycle->getRequiredPages() as $requiredPage){?>
+            <li><?php print $requiredPage->getTitle(); ?></li>
+        <?php } ?>
+          </ul>
       </li><?php
     }?>
   </ul><?php
