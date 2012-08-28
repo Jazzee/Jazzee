@@ -557,17 +557,40 @@ abstract class PageBuilder extends AdminController
   }
 
   /**
-   * Search the directory
+   * Pass off input to a jazzee page function
+   * @param integer $pageId
    */
-  public function actionSearchDirectory()
+  public function actionSpecialPageAction()
   {
     $data = json_decode($this->post['data']);
-    $directory = $this->getAdminDirectory();
+    $className = $this->post['className'];
+    $result = null;
 
-    $results = array();  //array of all the users who match the search
-    $results = $directory->search($data->firstName, $data->lastName);
+    //prepend build so its harder to expose functionality accidentally
+    $methodName = 'build' . $this->post['actionName'];
+    if(is_subclass_of($className, '\Jazzee\Interfaces\Page') and method_exists($className, $methodName)){
+      $result = $className::$methodName($this, $data);
+    }
+    $this->setVar('result', $result);
+    $this->loadView($this->controllerName . '/result');
+  }
 
-    $this->setVar('result', $results);
+  /**
+   * Pass off input to a jazzee element function
+   * @param integer $pageId
+   */
+  public function actionSpecialElementAction()
+  {
+    $data = json_decode($this->post['data']);
+    $className = $this->post['className'];
+    $result = null;
+
+    //prepend build so its harder to expose functionality accidentally
+    $methodName = 'build' . $this->post['actionName'];
+    if(is_subclass_of($className, '\Jazzee\Interfaces\Element') and method_exists($className, $methodName)){
+      $result = $className::$methodName($this, $data);
+    }
+    $this->setVar('result', $result);
     $this->loadView($this->controllerName . '/result');
   }
 

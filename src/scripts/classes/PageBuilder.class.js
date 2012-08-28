@@ -310,3 +310,72 @@ PageBuilder.prototype.addNameTest = function(element){
       }
   });
 };
+
+/**
+ * Test an element to ensure it is a valid name
+ * @param String firstName
+ * @param String lastName
+ * @return {}
+ */
+PageBuilder.prototype.searchDirectory = function(firstName, lastName){
+  var results = null;
+  var obj = {firstName: firstName, lastName: lastName};
+  $.ajax({
+    type: 'POST',
+    url: this.controllerPath + '/searchDirectory',
+    data: {data: $.toJSON(obj)},
+    async: false,
+    success: function(json){
+      results = json.data.results;
+    }
+  });
+  return results;
+};
+
+/**
+ * Test an element to ensure it is a valid name
+ * @param String pageId
+ * @param String actionName
+ * @param {} data
+ * @return {}
+ */
+PageBuilder.prototype.specialPageAction = function(pageClass, actionName, data){
+  var result = null;
+  $.ajax({
+    type: 'POST',
+    url: this.controllerPath + '/specialPageAction',
+    data: {
+      data: $.toJSON(data),
+      actionName: actionName,
+      className: pageClass},
+    async: false,
+    success: function(json){
+      result = json.data.result;
+    }
+  });
+  return result;
+};
+
+/**
+ * Test an element to ensure it is a valid name
+ * @param String elementClass
+ * @param String actionName
+ * @param {} data
+ * @return {}
+ */
+PageBuilder.prototype.specialElementAction = function(elementClass, actionName, data){
+  var result = null;
+  $.ajax({
+    type: 'POST',
+    url: this.controllerPath + '/specialElementAction',
+    data: {
+      data: $.toJSON(data),
+      className: elementClass,
+      actionName: actionName},
+    async: false,
+    success: function(json){
+      result = json.data.result;
+    }
+  });
+  return result;
+};
