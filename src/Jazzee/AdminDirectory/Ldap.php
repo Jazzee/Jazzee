@@ -15,13 +15,19 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory
    * Our directory Server resource
    * @var resource
    */
-  private $_directoryServer;
+  protected $_directoryServer;
 
   /**
    * Controller instance
    * @var \Jazzee\AdminController
    */
-  private $_controller;
+  protected $_controller;
+
+  /**
+   * Limited Attributes
+   * @var array
+   */
+  protected $_limitedAttributes;
 
   public function __construct(\Jazzee\Interfaces\AdminController $controller)
   {
@@ -32,6 +38,13 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory
     if (!ldap_bind($this->_directoryServer, $this->_controller->getConfig()->getLdapBindRdn(), $this->_controller->getConfig()->getLdapBindPassword())) {
       throw new \Jazzee\Exception('Unable to bind to ldap server');
     }
+    //limit the LDAP attributes for efficiency
+    $this->_limitedAttributes = array(
+      $this->_controller->getConfig()->getLdapUsernameAttribute(),
+      $this->_controller->getConfig()->getLdapFirstNameAttribute(),
+      $this->_controller->getConfig()->getLdapLastNameAttribute(),
+      $this->_controller->getConfig()->getLdapEmailAddressAttribute()
+    );
   }
 
   public function search($firstName, $lastName)
@@ -57,14 +70,8 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory
       }
       $filter .= ')';
     }
-    //limit the LDAP attributes for efficiency
-    $limitAttributes = array(
-      $this->_controller->getConfig()->getLdapUsernameAttribute(),
-      $this->_controller->getConfig()->getLdapFirstNameAttribute(),
-      $this->_controller->getConfig()->getLdapLastNameAttribute(),
-      $this->_controller->getConfig()->getLdapEmailAddressAttribute()
-    );
-    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter, $limitAttributes);
+
+    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter, $this->_limitedAttributes);
 
     return $this->parseSearchResult($searchResult);
   }
@@ -72,13 +79,7 @@ class Ldap implements \Jazzee\Interfaces\AdminDirectory
   public function findByUniqueName($uniqueName)
   {
     $filter = "{$this->_controller->getConfig()->getLdapUsernameAttribute()}={$uniqueName}";
-    $limitAttributes = array(
-      $this->_controller->getConfig()->getLdapUsernameAttribute(),
-      $this->_controller->getConfig()->getLdapFirstNameAttribute(),
-      $this->_controller->getConfig()->getLdapLastNameAttribute(),
-      $this->_controller->getConfig()->getLdapEmailAddressAttribute()
-    );
-    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter, $limitAttributes);
+    $searchResult = ldap_search($this->_directoryServer, $this->_controller->getConfig()->getLdapSearchBase(), $filter, $this->_limitedAttributes);
 
     return $this->parseSearchResult($searchResult);
   }
