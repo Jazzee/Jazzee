@@ -200,6 +200,24 @@ class JazzeeConfiguration
   protected $_defaultApplicantFileUploadSize;
 
   /**
+   * @var boolean
+   * Is the applicant allowed to change their name
+   */
+  protected $_allowApplicantNameChange;
+
+  /**
+   * @var boolean
+   * Is the applicant allowed to change their email address
+   */
+  protected $_allowApplicantEmailChange;
+
+  /**
+   * @var boolean
+   * Is the applicant allowed to change their password
+   */
+  protected $_allowApplicantPasswordChange;
+
+  /**
    * @var string
    * The maximum size for administrator file uploads.
    * Defaults to the value of PHP's builtin upload_max_filesize which is generally pretty large
@@ -485,6 +503,9 @@ class JazzeeConfiguration
       'maximumApplicantFileUploadSize' => \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize')),
       'defaultApplicantFileUploadSize' => \Foundation\Utility::convertIniShorthandValue('1m'),
       'maximumAdminFileUploadSize' => \Foundation\Utility::convertIniShorthandValue(\ini_get('upload_max_filesize')),
+      'allowApplicantNameChange' => false,
+      'allowApplicantEmailChange' => false,
+      'allowApplicantPasswordChange' => false,
       'varPath' => \realpath(__DIR__ . '/../../var'),
       'shibbolethUsernameAttribute' => 'eppn',
       'shibbolethFirstNameAttribute' => 'givenName',
@@ -1069,6 +1090,60 @@ class JazzeeConfiguration
       throw new \Jazzee\Exception('Configured Admin File Upload Size is larger than PHP upload_max_filesize');
     }
     $this->_maximumAdminFileUploadSize = \Foundation\Utility::convertIniShorthandValue($maximumAdminFileUploadSize);
+  }
+
+  /**
+   * get allowApplicantNameChange
+   * @return string
+   */
+  public function getAllowApplicantNameChange()
+  {
+    return $this->_allowApplicantNameChange;
+  }
+
+  /**
+   * set allowApplicantNameChange
+   * @var string $value
+   */
+  public function setAllowApplicantNameChange($value)
+  {
+    $this->_allowApplicantNameChange = (bool)$value;
+  }
+
+  /**
+   * get allowApplicantEmailChange
+   * @return string
+   */
+  public function getAllowApplicantEmailChange()
+  {
+    return $this->_allowApplicantEmailChange;
+  }
+
+  /**
+   * set allowApplicantEmailChange
+   * @var string $value
+   */
+  public function setAllowApplicantEmailChange($value)
+  {
+    $this->_allowApplicantEmailChange = (bool)$value;
+  }
+
+  /**
+   * get allowApplicantPasswordChange
+   * @return string
+   */
+  public function getAllowApplicantPasswordChange()
+  {
+    return $this->_allowApplicantPasswordChange;
+  }
+
+  /**
+   * set allowApplicantPasswordChange
+   * @var string $value
+   */
+  public function setAllowApplicantPasswordChange($value)
+  {
+    $this->_allowApplicantPasswordChange = (bool)$value;
   }
 
   /**

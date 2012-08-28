@@ -124,6 +124,16 @@ $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/status/?([^/]+)?$#i', array(
 ));
 
 //applicant status
+$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/account/?([^/]+)?$#i', array(
+  'controller' => 'apply_account',
+  'action' => 3,
+  'action_params' => array(
+    'programShortName' => 1,
+    'cycleName' => 2
+  )
+));
+
+//applicant status
 $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/status/do/([^/]+)/([0-9]+)/?([0-9]+)?$#i', array(
   'controller' => 'apply_status',
   'action' => 'do',
