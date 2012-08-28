@@ -152,6 +152,7 @@ abstract class PageBuilder extends AdminController
       foreach ($element->getListItems() as $item) {
         $e['list'][] = array(
           'id' => $item->getId(),
+          'status' => '',
           'value' => $item->getValue(),
           'name' => $item->getName(),
           'weight' => $item->getWeight(),
@@ -376,24 +377,53 @@ abstract class PageBuilder extends AdminController
           }
           $element->setMin(empty($e->min) ? null : $e->min);
           $element->setMax(empty($e->max) ? null : $e->max);
-          foreach ($e->list as $i) {
-            if (!$item = $element->getItemById($i->id)) {
-              $item = new \Jazzee\Entity\ElementListItem();
-              $element->addItem($item);
-            }
-            $item->setValue($htmlPurifier->purify($i->value));
-            $item->setWeight($i->weight);
-            $item->setName($i->name);
-            if ($i->isActive) {
-              $item->activate();
-            } else {
-              $item->deActivate();
-            }
-            $this->_em->persist($item);
-          }
+          $this->saveElementListItems($element, $e->list);
           $this->_em->persist($element);
       }
       unset($element); //this isn't for memory management if it stays set it gets re-used at the begning of the default switch
+    }
+  }
+
+  /**
+   * Update all of the elements on a page with an array of elements passed in
+   * @param \Jazzee\Entity\Element $element
+   * @param array $items
+   */
+  protected function saveElementListItems(\Jazzee\Entity\Element $element, array $items)
+  {
+    $htmlPurifier = $this->getFilter();
+    foreach ($items as $i) {
+      switch ($i->status) {
+        case 'delete':
+          //don't try and delete temporary elements
+          if ($item = $element->getItemById($i->id)) {
+            if ($this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($element->getPage())) {
+              $this->setLayoutVar('status', 'error');
+              $this->addMessage('error', $item->getValue() . ' could not be deleted becuase it has applicant information associated with it.');
+            } else {
+              $this->_em->remove($item);
+              $element->getListItems()->remove($item->getId());
+            }
+          }
+          break;
+        case 'new':
+          $item = new \Jazzee\Entity\ElementListItem;
+          $element->addItem($item);
+        default:
+          if (!isset($item)) {
+            $item = $element->getItemById($i->id);
+          }
+          $item->setValue($htmlPurifier->purify($i->value));
+          $item->setWeight($i->weight);
+          $item->setName($i->name);
+          if ($i->isActive) {
+            $item->activate();
+          } else {
+            $item->deActivate();
+          }
+          $this->_em->persist($item);
+      }
+      unset($item); //this isn't for memory management if it stays set it gets re-used at the begning of the default switch
     }
   }
 
@@ -568,7 +598,7 @@ abstract class PageBuilder extends AdminController
 
     //prepend build so its harder to expose functionality accidentally
     $methodName = 'build' . $this->post['actionName'];
-    if(is_subclass_of($className, '\Jazzee\Interfaces\Page') and method_exists($className, $methodName)){
+    if (is_subclass_of($className, '\Jazzee\Interfaces\Page') and method_exists($className, $methodName)) {
       $result = $className::$methodName($this, $data);
     }
     $this->setVar('result', $result);
@@ -587,7 +617,7 @@ abstract class PageBuilder extends AdminController
 
     //prepend build so its harder to expose functionality accidentally
     $methodName = 'build' . $this->post['actionName'];
-    if(is_subclass_of($className, '\Jazzee\Interfaces\Element') and method_exists($className, $methodName)){
+    if (is_subclass_of($className, '\Jazzee\Interfaces\Element') and method_exists($className, $methodName)) {
       $result = $className::$methodName($this, $data);
     }
     $this->setVar('result', $result);

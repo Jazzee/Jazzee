@@ -138,6 +138,7 @@ List.prototype.singleItem = function(item){
     tools.append(this.displayListItemButton());
   }
   tools.append(this.editListItemButton());
+  tools.append(this.deleteListItemButton());
   li.append(tools)
 
   return li;
@@ -215,6 +216,31 @@ List.prototype.hideListItemButton = function(){
 };
 
 /**
+ * Delete List Item button
+ * @return {jQuery}
+ */
+List.prototype.deleteListItemButton = function(){
+  var elementClass = this;
+  var button = $('<button>').html('Delete').button({icons: {primary: 'ui-icon-trash'}});
+  if(this.page.hasAnswers){
+    button.addClass('ui-button-disabled ui-state-disabled');
+    button.attr('title', 'This item cannot be deleted because there is applicant information associated with it.');
+    button.qtip();
+  } else {
+    button.bind('click', function(e){
+      var li = $(this).parent().parent();
+      var item = li.data('item');
+      item.isActive = false;
+      item.status = 'delete';
+      elementClass.markModified();
+      li.hide('explode');
+      return false;
+    });
+  }
+  return button;
+};
+
+/**
  * Filter list items input
  * @return {jQuery}
  */
@@ -259,7 +285,7 @@ List.prototype.filterItemsInput = function(list){
  */
 List.prototype.newListItem = function(value){
   var itemId = 'new-list-item' + this.page.pageBuilder.getUniqueId();
-  var item = {id: itemId, value: value, name: null, isActive: true, weight: this.listItems.length+1};
+  var item = {id: itemId, status: 'new', value: value, name: null, isActive: true, weight: this.listItems.length+1};
   this.addListItem(item);
   this.markModified();
   return item;
