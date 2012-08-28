@@ -207,7 +207,17 @@ PageBuilder.prototype.copyPage = function(obj){
  * @param {Object} obj
  */
 PageBuilder.prototype.importPage = function(obj){
-  this.addPage(this.pageFromObject(obj, obj.title, 'import'));
+  var error = false;
+  for(var i in this.pages){
+    var page = this.pages[i];
+    if(obj.uuid == page.uuid){
+      error = true;
+      alert('That page cannot be imported, it has the same UUID as ' + page.title + '.  It should be copied instead.');
+    }
+  }
+  if(!error){
+    this.addPage(this.pageFromObject(obj, obj.title, 'import'));
+  }
 };
 
 /**
