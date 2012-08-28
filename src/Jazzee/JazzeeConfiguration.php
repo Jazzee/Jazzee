@@ -444,6 +444,12 @@ class JazzeeConfiguration
   protected $_adminCronAllowed;
 
   /**
+   *  @var boolean
+   * Can the scramble command be run on the console
+   */
+  protected $_allowScramble;
+
+  /**
    * Construct
    * Load data from the ini file
    */
@@ -527,6 +533,7 @@ class JazzeeConfiguration
       'ldapFirstNameAttribute' => 'givenName',
       'ldapLastNameAttribute' => 'sn',
       'ldapEmailAddressAttribute' => 'mail',
+      'allowScramble' => false
     );
     foreach ($defaults as $name => $value) {
       $method = 'set' . ucfirst($name);
@@ -1649,6 +1656,24 @@ class JazzeeConfiguration
   public function setAdminCronAllowed($adminCronAllowed)
   {
     $this->_adminCronAllowed = $adminCronAllowed;
+  }
+
+  /**
+   * get allowScramble
+   * @return string
+   */
+  public function getAllowScramble()
+  {
+    return $this->_allowScramble;
+  }
+
+  /**
+   * set allowScramble
+   * @var string $allowScramble
+   */
+  public function setAllowScramble($allowScramble)
+  {
+    $this->_allowScramble = (bool)$allowScramble;
   }
 
   /**

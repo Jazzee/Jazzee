@@ -31,6 +31,8 @@ class Scramble extends \Symfony\Component\Console\Command\Command
     $jazzeeConfiguration = new \Jazzee\Configuration;
     if ($jazzeeConfiguration->getStatus() == 'PRODUCTION') {
       $output->write('<error>You cannot scramble in production.</error>' . PHP_EOL);
+    } else if(!$jazzeeConfiguration->getAllowScramble()){
+      $output->write('<error>Scramble must be explicitly allowed by setting the allowScramble configuration setting.</error>' . PHP_EOL);
     } else {
       $start = time();
       $entityManager = $this->getHelper('em')->getEntityManager();
