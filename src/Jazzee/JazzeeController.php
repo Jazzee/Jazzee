@@ -115,9 +115,7 @@ class JazzeeController extends PageController
       $messages = array();
     }
     $hash = md5($type . $text);
-    if(!array_key_exists($hash, $messages)){
-      $messages[$hash] = array('type' => $type, 'text' => $text);
-    }
+    $messages[$hash] = array('type' => $type, 'text' => $text);
     $this->_session->getStore('messages')->messages = $messages;
   }
 
@@ -129,7 +127,7 @@ class JazzeeController extends PageController
   {
     $messages = array();
     if (isset($this->_session->getStore('messages')->messages)) {
-      $messages = $this->_session->getStore('messages')->messages;
+      $messages = array_values($this->_session->getStore('messages')->messages);
       $this->_session->getStore('messages')->messages = array();
     }
 

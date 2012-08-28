@@ -24,51 +24,53 @@ Status.prototype.updateBar = function(){
 
 Status.prototype.addMessage = function(type, text){
   var self = this;
-  console.log(text);
-  // Use the last visible jGrowl qtip as our positioning target
-  var target = $('.qtip.jgrowl:visible:last');
-  // Create your jGrowl qTip...
-  $(document.body).qtip({
-      // Any content config you want here really.... go wild!
-      content: {
-        text: text
-      },
-      position: {
-        my: 'top right', // Not really important...
-        at: (target.length ? 'bottom' : 'top') + ' right', // If target is window use 'top right' instead of 'bottom right'
-        target: target.length ? target : $(self.messageCanvas), // Use our target declared above
-        adjust: {y: 1} // Add some vertical spacing
-      },
-      show: {
-        event: false, // Don't show it on a regular event
-        ready: true, // Show it when ready (rendered)
-        effect: function() {$(this).stop(0,1).fadeIn(400);}, // Matches the hide effect
-        delay: 0 // Needed to prevent positioning issues
+  console.log('Message: ' + text);
+  if(text.length > 0){
+    // Use the last visible jGrowl qtip as our positioning target
+    var target = $('.qtip.jgrowl:visible:last');
+    // Create your jGrowl qTip...
+    $(document.body).qtip({
+        // Any content config you want here really.... go wild!
+        content: {
+          text: text
+        },
+        position: {
+          my: 'top right', // Not really important...
+          at: (target.length ? 'bottom' : 'top') + ' right', // If target is window use 'top right' instead of 'bottom right'
+          target: target.length ? target : $(self.messageCanvas), // Use our target declared above
+          adjust: {y: 1} // Add some vertical spacing
+        },
+        show: {
+          event: false, // Don't show it on a regular event
+          ready: true, // Show it when ready (rendered)
+          effect: function() {$(this).stop(0,1).fadeIn(400);}, // Matches the hide effect
+          delay: 0 // Needed to prevent positioning issues
 
-      },
-      hide: {
-        event: false, // Don't hide it on a regular event
-        effect: function(api) {
-            // Do a regular fadeOut, but add some spice!
-            $(this).stop(0,1).hide('puff').queue(function() {
-              // Destroy this tooltip after fading out
-              api.destroy();
-            })
-        }
-      },
-      style: {
-        classes: 'jgrowl ui-tooltip-light ui-tooltip-rounded '+type, // Some nice visual classes
-        tip: false // No tips for this one (optional ofcourse)
-      },
-      events: {
-        render: function(event, api) {
-            // Trigger the timer (below) on render
-            self.messageTimer(event);
+        },
+        hide: {
+          event: false, // Don't hide it on a regular event
+          effect: function(api) {
+              // Do a regular fadeOut, but add some spice!
+              $(this).stop(0,1).hide('puff').queue(function() {
+                // Destroy this tooltip after fading out
+                api.destroy();
+              })
+          }
+        },
+        style: {
+          classes: 'jgrowl ui-tooltip-light ui-tooltip-rounded '+type, // Some nice visual classes
+          tip: false // No tips for this one (optional ofcourse)
+        },
+        events: {
+          render: function(event, api) {
+              // Trigger the timer (below) on render
+              self.messageTimer(event);
 
+          }
         }
-      }
-  })
-  .removeData('qtip');
+    })
+    .removeData('qtip');
+  }
 };
 
 /**
