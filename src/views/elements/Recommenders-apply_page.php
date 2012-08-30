@@ -62,7 +62,7 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
               <br /><strong>Status:</strong> This recommendation was received on <?php print $child->getUpdatedAt()->format('l F jS Y g:ia');
             } else if ($answer->isLocked()) { ?>
               <strong>Invitation Sent:</strong> <?php print $answer->getUpdatedAt()->format('l F jS Y g:ia'); ?><br />
-              <strong>Status:</strong> You cannot make changes to this recommendation becuase the invitation has already been sent.<?php
+              <strong>Status:</strong> You cannot make changes to this recommendation because the invitation has already been sent.<?php
               if ($answer->getUpdatedAt()->diff(new DateTime('now'))->days < $answer->getPage()->getVar('lorWaitDays')) { ?>
                 You will be able to send the invitation to your recommender again in <?php print ($answer->getPage()->getVar('lorWaitDays') - $answer->getUpdatedAt()->diff(new DateTime('now'))->days); ?> days.<?php
               }
