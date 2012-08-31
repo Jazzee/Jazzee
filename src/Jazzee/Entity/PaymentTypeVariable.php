@@ -5,7 +5,7 @@ namespace Jazzee\Entity;
  * PaymentTypeVariable
  * Allow developers to store arbitrary data as a PaymentTypeVariable so we don't need new tables for every new ApplyPaymentType type
  *
- * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variables", columns={"type_id", "name"})})
+ * @Entity @Table(name="payment_type_variables",uniqueConstraints={@UniqueConstraint(name="payment_type_variable_name", columns={"type_id", "name"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause

@@ -102,6 +102,19 @@ $basicRouter->addRoute('#^lor/([^/]+)$#i', array(
   )
 ));
 
+//preview requests
+$basicRouter->addRoute('#^preview/(start|end)/?([a-z0-9-]+)?$#i', array(
+  'controller' => 'preview',
+  'action' => 1,
+  'action_params' => array(
+    'key' => 2
+  )
+));
+
+$basicRouter->addRoute('#^admin/preview/([a-z]/?[a-z0-9-]+)?$#', array(
+  'redirect' => 'index.php?url=preview/$1'
+));
+
 //applicant support
 $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/support/?([^/]+)?/?([0-9]+)?$#i', array(
   'controller' => 'apply_support',

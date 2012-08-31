@@ -7,7 +7,7 @@ namespace Jazzee\Entity;
  *
  * @Entity
  * @HasLifecycleCallbacks
- * @Table(name="payment_variables",uniqueConstraints={@UniqueConstraint(name="payment_variables", columns={"payment_id", "name"})})
+ * @Table(name="payment_variables",uniqueConstraints={@UniqueConstraint(name="payment_variable_name", columns={"payment_id", "name"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
