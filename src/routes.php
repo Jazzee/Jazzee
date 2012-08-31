@@ -170,6 +170,16 @@ $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/?(index|login|logout|n
 ));
 
 //applicant status
+$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/preview/([a-z]+)$#i', array(
+  'controller' => 'apply_preview',
+  'action' => 3,
+  'action_params' => array(
+    'programShortName' => 1,
+    'cycleName' => 2
+  )
+));
+
+//applicant status
 $basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/applicant/resetpassword/([a-z0-9]+)$#i', array(
   'controller' => 'apply_applicant',
   'action' => 'resetpassword',

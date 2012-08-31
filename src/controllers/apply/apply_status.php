@@ -284,6 +284,19 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
 
     $navigation->addMenu($menu);
 
+
+
+    if($this->isPreviewMode()){
+      $menu = new \Foundation\Navigation\Menu();
+      $navigation->addMenu($menu);
+
+      $menu->setTitle('Preview Functions');
+      $link = new \Foundation\Navigation\Link('Unlock Application');
+      $link->setHref($this->applyPath('preview/unlock'));
+      $menu->addLink($link);
+
+    }
+
     return $navigation;
   }
 
