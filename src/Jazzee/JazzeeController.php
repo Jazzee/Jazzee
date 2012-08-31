@@ -1,5 +1,4 @@
 <?php
-
 namespace Jazzee;
 
 /**
@@ -32,6 +31,12 @@ class JazzeeController extends PageController
   protected $_em;
 
   /**
+   * Are we in preview mode
+   * @var boolean
+   */
+  protected $_previewMode;
+
+  /**
    * Constructor
    * Set up configuration containers
    * Start session handling
@@ -41,6 +46,7 @@ class JazzeeController extends PageController
   public function __construct()
   {
     parent::__construct();
+    $this->_previewMode = false;
     if ($this->_config->getMode() == 'MAINTENANCE') {
       $request = new \Lvc_Request();
       $request->setControllerName('maintenance');
@@ -51,8 +57,8 @@ class JazzeeController extends PageController
       $frontController->processRequest($request);
       exit();
     }
-    $this->setupDoctrine();
     $this->setupSession();
+    $this->setupDoctrine();
   }
 
   /**
@@ -182,9 +188,20 @@ class JazzeeController extends PageController
       'driver' => $this->_config->getDbDriver(),
       'charset' => $this->_config->getDbCharset()
     );
+    $previewStore = $this->_session->getStore('preview', 3600);
+    if ($previewStore->check('previewdbpath')) {
+      $this->_previewMode = true;
+      $connectionParams['driver'] = 'pdo_sqlite';
+      $connectionParams['path'] = $previewStore->get('previewdbpath');
+      $connectionParams['charset'] = false;
+      $exitLink = $this->path('preview/end');
+      $this->addMessage('info', "You are in preview mode, the changes you make will not be saved.  You can exit preview mode by visiting <a href='{$exitLink}'>{$exitLink}</a>");
+    }
 
     $this->_em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
-    $this->_em->getConnection()->setCharset($this->_config->getDbCharset());
+    if ($connectionParams['charset']) {
+      $this->_em->getConnection()->setCharset($connectionParams['charset']);
+    }
   }
 
   /**
@@ -270,7 +287,7 @@ class JazzeeController extends PageController
     $ext = pathinfo($filename, PATHINFO_EXTENSION);
     $safeName = md5($filename);
     $path = $this->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
-    if (is_readable($path) ) {
+    if (is_readable($path)) {
       unlink($path);
     }
   }
@@ -287,6 +304,15 @@ class JazzeeController extends PageController
     }
 
     return $store->token;
+  }
+
+  /**
+   * Check if the user is in preview mode
+   * @return boolean
+   */
+  public function isPreviewMode()
+  {
+    return $this->_previewMode;
   }
 
 }
