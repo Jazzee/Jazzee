@@ -70,7 +70,7 @@ class SetupImportApplicationController extends \Jazzee\AdminController
       $this->_application->setStatusDenyText($arr['statusDenyText']);
       $this->_application->setStatusAcceptText($arr['statusAcceptText']);
       $this->_application->setStatusDeclineText($arr['statusDeclineText']);
-      if($arr['visible'] === '1'){
+      if($arr['visible'] == '1'){
         $this->_application->visible();
       }
       foreach ($xml->xpath('/response/application/pages/page') as $element) {
