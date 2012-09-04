@@ -108,7 +108,7 @@ class ManagePaymenttypesController extends \Jazzee\AdminController
       //if that fails we use class exists with no auto_load so it just looks in existing includes
       if (\Doctrine\Common\ClassLoader::classExists(ltrim($className, '\\')) or class_exists($className, false)) {
         $paymentType = new \Jazzee\Entity\PaymentType();
-        $paymentClass = new $className($paymentType);
+        $paymentClass = new $className($paymentType, $this);
         $form = $paymentClass->getSetupForm();
         $form->setAction($this->path("manage/paymenttypes/new"));
         $form->newHiddenElement('className', $className);
