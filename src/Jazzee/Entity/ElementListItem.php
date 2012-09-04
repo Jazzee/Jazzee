@@ -170,7 +170,7 @@ class ElementListItem
     if (empty($name)) {
       $this->name = null;
     } else {
-      $this->name = preg_replace('#[^a-zA_Z0-9_]#', '', $name);
+      $this->name = preg_replace('#[^a-zA-Z0-9_]#', '', $name);
     }
   }
 

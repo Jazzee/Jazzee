@@ -185,7 +185,7 @@ class Element
     if (empty($value)) {
       $this->name = null;
     } else {
-      $this->name = preg_replace('#[^a-zA_Z0-9_]#', '', $value);
+      $this->name = preg_replace('#[^a-zA-Z0-9_]#', '', $value);
     }
   }
 
