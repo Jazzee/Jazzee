@@ -97,6 +97,8 @@ class AuthorizeNetDPM extends AuthorizeNetAIM
         $payment->setVar('rejectedReasonCode', $response->response_reason_code);
         $payment->setVar('rejectedReason', $response->response_reason_text);
         $payment->rejected();
+
+        return true;
       }
     }
 
@@ -115,10 +117,6 @@ class AuthorizeNetDPM extends AuthorizeNetAIM
    */
   public static function transaction($controller)
   {
-    $applicant = $controller->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->find($_POST['x_cust_id']);
-    if (!$applicant) {
-      throw new \Jazzee\Exception("{$_POST['x_cust_id']} is not a valid applicant id.  Anet post: " . var_export($_POST, true));
-    }
     $matches = array();
     preg_match('#page/(\d{1,})/?#', $_POST['redirect_url'], $matches);
     if (!isset($matches[1])) {
@@ -128,23 +126,29 @@ class AuthorizeNetDPM extends AuthorizeNetAIM
     if (!$applicationPage) {
       throw new \Jazzee\Exception("{$matches[1]} is not a valid applicationPage id");
     }
-    $answer = new \Jazzee\Entity\Answer();
-    $answer->setPage($applicationPage->getPage());
-    $applicant->addAnswer($answer);
-
-    $payment = new \Jazzee\Entity\Payment();
-    $payment->setType($controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($_POST['paymentType']));
-    $answer->setPayment($payment);
-    $fakeInput = new \Foundation\Form\Input(array());
-    if ($payment->getType()->getJazzeePaymentType($controller)->pendingPayment($payment, $fakeInput)) {
-      $controller->getEntityManager()->persist($applicant);
-      $controller->getEntityManager()->persist($answer);
-      $controller->getEntityManager()->persist($payment);
-      foreach ($payment->getVariables() as $var) {
-        $controller->getEntityManager()->persist($var);
+    if(!empty($_POST['x_cust_id'])){
+      $applicant = $controller->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->find($_POST['x_cust_id']);
+      if (!$applicant) {
+        throw new \Jazzee\Exception("{$_POST['x_cust_id']} is not a valid applicant id.  Anet post: " . var_export($_POST, true));
       }
-      $controller->getEntityManager()->flush();
-      print \AuthorizeNetDPM::getRelayResponseSnippet($_POST['redirect_url']);
+      $answer = new \Jazzee\Entity\Answer();
+      $answer->setPage($applicationPage->getPage());
+      $applicant->addAnswer($answer);
+
+      $payment = new \Jazzee\Entity\Payment();
+      $payment->setType($controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($_POST['paymentType']));
+      $answer->setPayment($payment);
+      $fakeInput = new \Foundation\Form\Input(array());
+      if ($payment->getType()->getJazzeePaymentType($controller)->pendingPayment($payment, $fakeInput)) {
+        $controller->getEntityManager()->persist($applicant);
+        $controller->getEntityManager()->persist($answer);
+        $controller->getEntityManager()->persist($payment);
+        foreach ($payment->getVariables() as $var) {
+          $controller->getEntityManager()->persist($var);
+        }
+        $controller->getEntityManager()->flush();
+        print \AuthorizeNetDPM::getRelayResponseSnippet($_POST['redirect_url']);
+      }
     }
   }
 
