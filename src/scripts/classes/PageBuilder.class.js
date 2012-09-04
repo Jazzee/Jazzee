@@ -249,6 +249,8 @@ PageBuilder.prototype.pageFromObject = function(obj, title, status){
       var item = Element.newListItem(e.list[j].value);
       item.isActive = e.list[j].isActive;
       item.weight = e.list[j].weight;
+      item.name = e.list[j].name;
+      item.status = 'new';
     }
     page.addElement(Element);
   }
