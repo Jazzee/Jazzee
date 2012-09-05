@@ -27,6 +27,7 @@ class FileController extends \Jazzee\Controller
     // Get a new front controller without any routers, and have it process our handmade request.
     $frontController = new Lvc_FrontController();
     $frontController->processRequest($request);
+    exit(0);
   }
 
 }
