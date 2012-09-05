@@ -1,9 +1,9 @@
 {
-    "hash": "40c2d15de120bf23faba92e1f4448901",
+    "hash": "9c70687383aeda052d5b41c8c4cd40ed",
     "packages": [
         {
             "package": "doctrine/common",
-            "version": "2.2.2"
+            "version": "2.2.3"
         },
         {
             "package": "doctrine/dbal",
@@ -23,11 +23,11 @@
         },
         {
             "package": "monolog/monolog",
-            "version": "1.1.0"
+            "version": "1.2.1"
         },
         {
             "package": "symfony/console",
-            "version": "v2.0.16"
+            "version": "v2.0.17"
         }
     ],
     "packages-dev": null,

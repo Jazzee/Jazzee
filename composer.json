@@ -19,7 +19,7 @@
     "jazzee/foundation": "1.0.*",
     "doctrine/orm": "2.2.1",
     "symfony/console": "2.0.*",
-    "monolog/monolog": "1.1.*",
+    "monolog/monolog": "1.2.*",
     "ezyang/htmlpurifier": "4.4.0.1"
   },
   "autoload": {
