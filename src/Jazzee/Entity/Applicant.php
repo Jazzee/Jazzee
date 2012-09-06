@@ -904,6 +904,7 @@ class Applicant
         $page = $dom->createElement("page");
         $page->setAttribute('title', \htmlentities($applicationPage->getTitle(), ENT_COMPAT, 'utf-8'));
         $page->setAttribute('type', \htmlentities($applicationPage->getPage()->getType()->getClass(), ENT_COMPAT, 'utf-8'));
+        $page->setAttribute('name', \htmlentities($applicationPage->getName(), ENT_COMPAT, 'utf-8'));
         $page->setAttribute('pageId', $applicationPage->getPage()->getId());
         $answersXml = $dom->createElement('answers');
         $applicationPage->getJazzeePage()->setApplicant($this);

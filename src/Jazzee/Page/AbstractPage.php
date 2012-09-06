@@ -237,15 +237,9 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     $answerXml->setAttribute('privateStatus', ($answer->getPrivateStatus() ? $answer->getPrivateStatus()->getName() : ''));
     foreach ($answer->getPage()->getElements() as $element) {
       $element->getJazzeeElement()->setController($this->_controller);
-      $eXml = $dom->createElement('element');
-      $eXml->setAttribute('elementId', $element->getId());
-      $eXml->setAttribute('title', htmlentities($element->getTitle(), ENT_COMPAT, 'utf-8'));
-      $eXml->setAttribute('type', htmlentities($element->getType()->getClass(), ENT_COMPAT, 'utf-8'));
-      $eXml->setAttribute('weight', $element->getWeight());
-      if ($value = $element->getJazzeeElement()->rawValue($answer)) {
-        $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+      if($element->getJazzeeElement() instanceof \Jazzee\Interfaces\XmlElement){
+        $answerXml->appendChild($element->getJazzeeElement()->getXmlAnswer($dom, $answer));
       }
-      $answerXml->appendChild($eXml);
     }
     $attachment = $dom->createElement('attachment');
     if ($answer->getAttachment()) {

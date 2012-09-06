@@ -2,7 +2,7 @@
 
 /**
  * XML layout
- * 
+ *
  */
 header("Content-type: application/xml; charset=UTF-8");
 header('Content-Disposition: attachment; filename=' . $filename);

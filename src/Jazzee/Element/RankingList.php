@@ -75,6 +75,37 @@ class RankingList extends AbstractElement
   }
 
   /**
+   * Get the answer value as an xml element
+   * @param \DomDocument $dom
+   * @param \Jazzee\Entity\Answer $answer
+   * @return \DomElement
+   */
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  {
+    $eXml = $dom->createElement('element');
+    $eXml->setAttribute('elementId', $this->_element->getId());
+    $eXml->setAttribute('title', htmlentities($this->_element->getTitle(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('name', htmlentities($this->_element->getName(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('type', htmlentities($this->_element->getType()->getClass(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('weight', $this->_element->getWeight());
+
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    foreach ($elementsAnswers as $elementsAnswer) {
+      $value = $this->_element->getItemById($elementsAnswer->getEInteger())->getValue();
+      $name = $this->_element->getItemById($elementsAnswer->getEInteger())->getName();
+      $id = $this->_element->getItemById($elementsAnswer->getEInteger())->getId();
+      $rank = $elementsAnswer->getPosition() +1;
+      $vXml = $dom->createElement('value');
+      $vXml->setAttribute('valueId', $id);
+      $vXml->setAttribute('rank', $rank);
+      $vXml->setAttribute('name', htmlentities($name, ENT_COMPAT, 'utf-8'));
+      $vXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+      $eXml->appendChild($vXml);
+    }
+    return $eXml;
+  }
+
+  /**
    * Perform a regular expression match on each value
    * @param \Jazzee\Entity\Answer $answer
    * @param \stdClass $obj

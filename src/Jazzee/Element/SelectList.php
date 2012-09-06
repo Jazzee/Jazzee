@@ -87,4 +87,36 @@ class SelectList extends AbstractElement
     return preg_match($obj->pattern, $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getValue());
   }
 
+  /**
+   * Get the answer value as an xml element
+   * @param \DomDocument $dom
+   * @param \Jazzee\Entity\Answer $answer
+   * @return \DomElement
+   */
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  {
+    $eXml = $dom->createElement('element');
+    $eXml->setAttribute('elementId', $this->_element->getId());
+    $eXml->setAttribute('title', htmlentities($this->_element->getTitle(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('name', htmlentities($this->_element->getName(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('type', htmlentities($this->_element->getType()->getClass(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('weight', $this->_element->getWeight());
+
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+    $value = null;
+    if (isset($elementsAnswers[0])) {
+      $value = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getValue();
+      $name = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getName();
+      $id = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getId();
+    }
+    if ($value) {
+      $vXml = $dom->createElement('value');
+      $vXml->setAttribute('valueId', $id);
+      $vXml->setAttribute('name', htmlentities($name, ENT_COMPAT, 'utf-8'));
+      $vXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+      $eXml->appendChild($vXml);
+    }
+    return $eXml;
+  }
+
 }

@@ -115,6 +115,28 @@ class PDFFileInput extends AbstractElement
   }
 
   /**
+   * Get the answer value as an xml element
+   * Add the PDF size as an attribute
+   * @param \DomDocument $dom
+   * @param \Jazzee\Entity\Answer $answer
+   * @return \DomElement
+   */
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  {
+    $eXml = $dom->createElement('element');
+    $eXml->setAttribute('elementId', $this->_element->getId());
+    $eXml->setAttribute('title', htmlentities($this->_element->getTitle(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('name', htmlentities($this->_element->getName(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('type', htmlentities($this->_element->getType()->getClass(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('weight', $this->_element->getWeight());
+    if ($value = $this->rawValue($answer)) {
+      $eXml->setAttribute('size', strlen($value));
+      $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+    }
+    return $eXml;
+  }
+
+  /**
    * Render PDF Previews
    * @param AdminCronController $cron
    */

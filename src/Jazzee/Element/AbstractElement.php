@@ -7,7 +7,7 @@ namespace Jazzee\Element;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-abstract class AbstractElement implements \Jazzee\Interfaces\Element
+abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\Interfaces\XmlElement
 {
 
   /**
@@ -95,6 +95,26 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element
     }
 
     return $differences;
+  }
+
+  /**
+   * Get the answer value as an xml element
+   * @param \DomDocument $dom
+   * @param \Jazzee\Entity\Answer $answer
+   * @return \DomElement
+   */
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  {
+    $eXml = $dom->createElement('element');
+    $eXml->setAttribute('elementId', $this->_element->getId());
+    $eXml->setAttribute('title', htmlentities($this->_element->getTitle(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('name', htmlentities($this->_element->getName(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('type', htmlentities($this->_element->getType()->getClass(), ENT_COMPAT, 'utf-8'));
+    $eXml->setAttribute('weight', $this->_element->getWeight());
+    if ($value = $this->rawValue($answer)) {
+      $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+    }
+    return $eXml;
   }
 
   /**
