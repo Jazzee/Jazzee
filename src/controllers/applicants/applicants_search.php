@@ -53,7 +53,7 @@ class ApplicantsSearchController extends \Jazzee\AdminController
       $applicants = array();
       if ($input->get('applicantId')) {
         $applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($input->get('applicantId'));
-        if ($applicant) {
+        if ($applicant and $applicant->getApplication()->getCycle() == $this->_cycle) {
           $applicants[] = $applicant;
         }
       } else {
