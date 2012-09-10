@@ -32,7 +32,6 @@ class Page
 
   /**
    * @ManyToOne(targetEntity="PageType")
-   * @JoinColumn(onDelete="SET NULL")
    */
   private $type;
 
@@ -553,7 +552,7 @@ class Page
 
   /**
    * Get element by name
-   * 
+   *
    * @param string $name
    * @return Element $element
    */
