@@ -329,7 +329,7 @@ PageBuilder.prototype.getElementType = function(typeName){
  */
 PageBuilder.prototype.addNameTest = function(element){
     $(element).filter_input({
-      regex:'[a-zA-Z0-9_]',
+      regex:'[a-zA-Z0-9_\r]',
       feedback: function(wrongChar) {
         var div = $(this).parent();
         var message = $('<p>').addClass('message').appendTo(div);
