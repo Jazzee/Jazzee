@@ -193,7 +193,6 @@ CompareApplications.prototype.processChangedElement = function(obj){
   var lists = {};
   lists['this'] = obj.thisListItems;
   lists['other'] = obj.otherListItems;
-  console.log(lists);
   div.append(compare.displaytextdiff(lists));
 
   return div;
@@ -206,7 +205,7 @@ CompareApplications.prototype.processChangedElement = function(obj){
  */
 CompareApplications.prototype.displaytextdiff = function(obj){
   var div = $('<div>').addClass('textdiff');
-  var diff = diffString(String(obj['this']), String(obj['other']));
+  var diff = diffString(String(obj['other']), String(obj['this']));
   div.html(diff);
   return div;
 };
