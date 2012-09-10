@@ -22,7 +22,7 @@ $(document).ready(function(){
   }).ajaxStop(function(){
     status.end();
   });
-  var pageBuilder = new GlobalPageBuilder($('#canvas'));
+  var pageBuilder = new GlobalPageBuilder($('#canvas'), status);
   pageBuilder.setup();
 });
 
@@ -30,8 +30,8 @@ $(document).ready(function(){
  * The GlobalPageBuilder class
   @extends PageBuilder
  */
-function GlobalPageBuilder(canvas){
-  PageBuilder.call(this, canvas);
+function GlobalPageBuilder(canvas, status){
+  PageBuilder.call(this, canvas, status);
   this.controllerPath = this.services.getControllerPath('manage_globalpages');
   this.editGlobal = true;
 }

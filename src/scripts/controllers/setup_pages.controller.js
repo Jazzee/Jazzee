@@ -22,7 +22,7 @@ $(document).ready(function(){
   }).ajaxStop(function(){
     status.end();
   });
-  var pageBuilder = new ApplicationPageBuilder($('#canvas'));
+  var pageBuilder = new ApplicationPageBuilder($('#canvas'), status);
   pageBuilder.setup();
 });
 
@@ -30,8 +30,8 @@ $(document).ready(function(){
  * The ApplicationPageBuilder class
   @extends PageBuilder
  */
-function ApplicationPageBuilder(canvas){
-  PageBuilder.call(this, canvas);
+function ApplicationPageBuilder(canvas, status){
+  PageBuilder.call(this, canvas, status);
   this.controllerPath = this.services.getControllerPath('setup_pages');
   this.editGlobal = false;
   this.globalPages = {};

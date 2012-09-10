@@ -1,9 +1,10 @@
 /**
  * Clientside page builder
  * Gets extended by the page builder controllers to provide specific functionality
- * @param {jQuery} workspace
+ * @param {jQuery} canvas
+ * @param {Status} status
  */
-function PageBuilder(canvas){
+function PageBuilder(canvas, status){
   this.services = new Services;
   this.deletedPages = [];
   this.pages = {};
@@ -12,6 +13,7 @@ function PageBuilder(canvas){
   this.paymentTypes = [];
   this.isModified = false;
   this.canvas = canvas;
+  this.status = status;
   //make sure we don't have any collisions with new page and element Ids
   this.IdCounter = 0;
   this.controllerPath = '';
@@ -68,20 +70,22 @@ PageBuilder.prototype.setup = function(){
   var button = $('<button>').html('Save Changes');
   button.button({'disabled': true});
   button.bind('click', function(){
-    var toSave = [];
-    for(var i in pageBuilder.pages){
-      if(pageBuilder.pages[i].checkIsModified()){
-        toSave.push(pageBuilder.pages[i].getDataObject());
+    if(pageBuilder.checkNames()){
+      var toSave = [];
+      for(var i in pageBuilder.pages){
+        if(pageBuilder.pages[i].checkIsModified()){
+          toSave.push(pageBuilder.pages[i].getDataObject());
+        }
       }
+      for(var i = 0; i < pageBuilder.deletedPages.length; i++){
+        toSave.push(pageBuilder.deletedPages[i].getDataObject());
+      }
+      pageBuilder.deletedPages = [];
+      for(var i = 0; i < toSave.length; i++){
+        $.post(pageBuilder.controllerPath + '/savePage/' + toSave[i].id,{data: $.toJSON(toSave[i])});
+      }
+      pageBuilder.setup();
     }
-    for(var i = 0; i < pageBuilder.deletedPages.length; i++){
-      toSave.push(pageBuilder.deletedPages[i].getDataObject());
-    }
-    pageBuilder.deletedPages = [];
-    for(var i = 0; i < toSave.length; i++){
-      $.post(pageBuilder.controllerPath + '/savePage/' + toSave[i].id,{data: $.toJSON(toSave[i])});
-    }
-    pageBuilder.setup();
     return false;
   });
   $('#save', this.canvas).empty().append(button);
