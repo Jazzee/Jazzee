@@ -324,28 +324,7 @@ PageBuilder.prototype.addNameTest = function(element){
 };
 
 /**
- * Test an element to ensure it is a valid name
- * @param String firstName
- * @param String lastName
- * @return {}
- */
-PageBuilder.prototype.searchDirectory = function(firstName, lastName){
-  var results = null;
-  var obj = {firstName: firstName, lastName: lastName};
-  $.ajax({
-    type: 'POST',
-    url: this.controllerPath + '/searchDirectory',
-    data: {data: $.toJSON(obj)},
-    async: false,
-    success: function(json){
-      results = json.data.results;
-    }
-  });
-  return results;
-};
-
-/**
- * Test an element to ensure it is a valid name
+ * Complete a special page action
  * @param String pageId
  * @param String actionName
  * @param {} data
@@ -369,7 +348,7 @@ PageBuilder.prototype.specialPageAction = function(pageClass, actionName, data){
 };
 
 /**
- * Test an element to ensure it is a valid name
+ * Complete a special element action
  * @param String elementClass
  * @param String actionName
  * @param {} data
