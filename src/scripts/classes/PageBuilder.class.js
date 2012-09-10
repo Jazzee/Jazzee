@@ -203,7 +203,10 @@ PageBuilder.prototype.markModified = function(){
  * @param {Object} obj
  */
 PageBuilder.prototype.copyPage = function(obj){
-  this.addPage(this.pageFromObject(obj, 'Copy of '+ obj.title, 'copy'));
+  var copiedPage = this.pageFromObject(obj, 'Copy of '+ obj.title, 'copy');
+  if(copiedPage !== false){
+    this.addPage(copiedPage);
+  }
 };
 
 /**
@@ -216,11 +219,14 @@ PageBuilder.prototype.importPage = function(obj){
     var page = this.pages[i];
     if(obj.uuid == page.uuid){
       error = true;
-      alert('That page cannot be imported, it has the same UUID as ' + page.title + '.  It should be copied instead.');
+      this.status.addMessage('error', 'That page cannot be imported, it has the same UUID as ' + page.title + '.  It should be copied instead.');
     }
   }
   if(!error){
-    this.addPage(this.pageFromObject(obj, obj.title, 'import'));
+    var newPageObj = this.pageFromObject(obj, obj.title, 'import');
+    if(newPageObj !== false){
+      this.addPage(newPageObj);
+    }
   }
 };
 
@@ -233,7 +239,8 @@ PageBuilder.prototype.importPage = function(obj){
  */
 PageBuilder.prototype.pageFromObject = function(obj, title, status){
   if(window[obj.typeClass] == undefined){
-    alert('Canot create this page becuase ' + obj.typeName + ' is not a recognized page type.');
+    this.status.addMessage('error','Canot create this page becuase ' + obj.typeName + ' is not a recognized page type.');
+    return false;
   }
   var id = 'newpage' + this.getUniqueId();
   obj.id = id;
@@ -262,7 +269,12 @@ PageBuilder.prototype.pageFromObject = function(obj, title, status){
     page.setVariable(property, obj.variables[property].value);
   }
   for(var i=0; i<obj.children.length; i++){
-    page.addChild(this.pageFromObject(obj.children[i], obj.children[i].title, status));
+    var childPageObj = this.pageFromObject(obj.children[i], obj.children[i].title, status);
+    if(childPageObj === false ){
+      return false;
+    } else {
+      page.addChild(childPageObj);
+    }
   }
   return page;
 };

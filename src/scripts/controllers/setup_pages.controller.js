@@ -251,7 +251,7 @@ ApplicationPageBuilder.prototype.importPageControl = function(){
         pageBuilder.copyPage(obj);
         div.dialog("close");
       } catch(e){
-        alert('Cannot import this page, there is something wrong with the exported page structure.  You will need to re-export and try importing this page again.');
+        pageBuilder.status.addMessage('error', 'Cannot import this page, there is something wrong with the exported page structure.  You will need to re-export and try importing this page again.');
       }
       return false;
     });//end submit
