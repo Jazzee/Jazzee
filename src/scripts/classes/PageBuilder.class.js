@@ -328,6 +328,61 @@ PageBuilder.prototype.addNameTest = function(element){
 };
 
 /**
+ * Check all pages elements and lists to ensure there are no name collisions
+ * @return boolean
+ */
+PageBuilder.prototype.checkNames = function(){
+  var pageNames = [];
+  var messages = [];
+  var conflict = false;
+  for(var i in this.pages){
+    var page = this.pages[i];
+
+    if(page.name != null){
+      if($.inArray(page.name, pageNames) > -1 ){
+        conflict = true;
+        messages.push('The name "' + page.name + '" is used for more than one page.');
+      }
+      pageNames.push(page.name);
+    }
+    var elementNames = [];
+    for(var j in page.elements){
+      var element = page.elements[j];
+      if(element.name != null){
+        if($.inArray(element.name, elementNames) > -1 ){
+          conflict = true;
+          messages.push('The name "' + element.name + '" is used in more than once on the ' + page.title + ' page.');
+        }
+        elementNames.push(element.name);
+      }
+      var itemNames = [];
+      for(var k in element.listItems){
+        var item = element.listItems[k];
+        if(item.name != null){
+          if($.inArray(item.name, itemNames) > -1 ){
+            conflict = true;
+            messages.push('The name "' + item.name + '" is used more than once in the ' + element.title + ' element on the ' + page.title + ' page.');
+          }
+          itemNames.push(item.name);
+        }
+      }
+    }
+  }
+
+  if(conflict){
+    var unique = [];
+    for(var i = 0; i < messages.length; ++i){
+      if($.inArray(messages[i], unique) == -1 ){
+        unique.push(messages[i]);
+        this.status.addMessage('error', 'There was an error saving: ' + messages[i]);
+      }
+    }
+    return false;
+  }
+  return true;
+};
+
+/**
  * Complete a special page action
  * @param String pageId
  * @param String actionName
