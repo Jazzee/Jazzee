@@ -166,43 +166,7 @@ class Payment extends AbstractPage
    */
   public function renderPdfSection(\Jazzee\ApplicantPDF $pdf)
   {
-//    if($this->getAnswers()){
-//      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
-//      $pdf->write();
-//      $pdf->startTable();
-//      $pdf->startTableRow();
-//      $pdf->addTableCell('Payment');
-//      $pdf->addTableCell('Status');
-//      foreach($this->getAnswers() as $answer){
-//        $pdf->startTableRow();
-//        $payment = $answer->getPayment();
-//        $string  = 'Type: ' . $payment->getType()->getName() . "\n";
-//        $string .= 'Amount: $' . $payment->getAmount();
-//        $pdf->addTableCell($string);
-//
-//        $class = $payment->getType()->getClass();
-//        switch($payment->getStatus()){
-//          case \Jazzee\Entity\Payment::PENDING:
-//            $applicantStatus = $class::PENDING_TEXT;
-//            break;
-//          case \Jazzee\Entity\Payment::SETTLED:
-//            $applicantStatus = $class::SETTLED_TEXT;
-//            break;
-//          case \Jazzee\Entity\Payment::REJECTED:
-//            $applicantStatus = $class::REJECTED_TEXT;
-//            $applicantStatus .= "\nReason: " . $payment->getVar('rejectedReason');
-//            break;
-//          case \Jazzee\Entity\Payment::REFUNDED:
-//            $applicantStatus = $class::REFUNDED_TEXT;
-//            $applicantStatus .= "\nReason: " . $payment->getVar('refundReason');
-//            break;
-//        }
-//        $pdf->addTableCell($applicantStatus);
-//      }
-//      $pdf->writeTable();
-//    }
-//
-    //probably better if we just do nothing for payment
+    //payments aren't recorded in PDFs
   }
 
   public function getStatus()

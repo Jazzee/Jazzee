@@ -221,30 +221,41 @@ class Branching extends Standard
    */
   public function renderPdfSection(\Jazzee\ApplicantPDF $pdf)
   {
-    if ($this->getAnswers()) {
-      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
-      $pdf->write();
-      $pdf->startTable();
-      $pdf->startTableRow();
-      $pdf->addTableCell($this->_applicationPage->getPage()->getVar('branchingElementLabel'));
-      $pdf->addTableCell('Answer');
+    $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
+    if($this->getStatus() == \Jazzee\Interfaces\Page::SKIPPED){
+      $pdf->addText("Applicant Skipped this page.\n", 'p');
+    } else {
       foreach ($this->getAnswers() as $answer) {
-        $pdf->startTableRow();
-        $child = $answer->getChildren()->first();
-        $pdf->addTableCell($child->getPage()->getTitle());
-        $string = '';
-        foreach ($child->getPage()->getElements() as $element) {
-          $element->getJazzeeElement()->setController($this->_controller);
-          $string .= $element->getTitle() . ': ' . $element->getJazzeeElement()->pdfValue($child, $pdf) . "\n";
-        }
-        $pdf->addTableCell($string);
+        $childAnswer = $answer->getChildren()->first();
+        $childPage = $childAnswer->getPage();
+        $pdf->addText("{$this->_applicationPage->getPage()->getVar('branchingElementLabel')}: ", 'b');
+        $pdf->addText("{$childPage->getTitle()}\n", 'p');
+        $this->renderPdfAnswer($pdf, $childPage, $childAnswer);
         if ($attachment = $answer->getAttachment()) {
           $pdf->addPdf($attachment->getAttachment());
         }
+        $pdf->addText("\n", 'p');
       }
-      $pdf->writeTable();
     }
+    $pdf->write();
   }
+
+  /**
+   * Render branching LOR pdf section
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  public function renderLorPdfAnswer(\Jazzee\ApplicantPDF $pdf, \Jazzee\Entity\Page $page, \Jazzee\Entity\Answer $answer)
+  {
+    $childAnswer = $answer->getChildren()->first();
+    $childPage = $childAnswer->getPage();
+    $pdf->addText($page->getTitle() . "\n", 'h5');
+    $pdf->addText("{$page->getVar('branchingElementLabel')}: ", 'b');
+    $pdf->addText("{$childPage->getTitle()}\n", 'p');
+    $this->renderPdfAnswer($pdf, $childPage, $childAnswer);
+  }
+
 
   public function newLorAnswer(\Foundation\Form\Input $input, \Jazzee\Entity\Answer $parent)
   {

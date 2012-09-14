@@ -153,6 +153,18 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\QueryPage, \Ja
     }
   }
 
+  /**
+   * Render standrad LOR pdf section
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  public function renderLorPdfAnswer(\Jazzee\ApplicantPDF $pdf, \Jazzee\Entity\Page $page, \Jazzee\Entity\Answer $answer)
+  {
+    $pdf->addText($page->getTitle() . "\n", 'h5');
+    $this->renderPdfAnswer($pdf, $page, $answer);
+  }
+
   public static function applyPageElement()
   {
     return 'Standard-apply_page';

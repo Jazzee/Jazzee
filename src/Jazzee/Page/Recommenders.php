@@ -337,35 +337,28 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
    */
   public function renderPdfSection(\Jazzee\ApplicantPDF $pdf)
   {
-    if ($this->getAnswers()) {
-      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
-      $pdf->write();
-      $pdf->startTable();
-      $pdf->startTableRow();
-      $pdf->addTableCell('Recommender');
-      foreach ($this->_applicationPage->getPage()->getChildren()->first()->getElements() as $element) {
-        $pdf->addTableCell($element->getTitle());
-      }
+      $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
       foreach ($this->getAnswers() as $answer) {
-        $pdf->startTableRow();
-        $string = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_FIRST_NAME)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
-        $string .= $this->_applicationPage->getPage()->getElementByFixedId(self::FID_LAST_NAME)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
-        $string .= $this->_applicationPage->getPage()->getElementByFixedId(self::FID_INSTITUTION)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
-        $string .= $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EMAIL)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
-        $string .= $this->_applicationPage->getPage()->getElementByFixedId(self::FID_PHONE)->getJazzeeElement()->pdfValue($answer, $pdf) . "\n";
-        $pdf->addTableCell($string);
-        if ($child = $answer->getChildren()->first()) {
-          foreach ($this->_applicationPage->getPage()->getChildren()->first()->getElements() as $element) {
-            $element->getJazzeeElement()->setController($this->_controller);
-            $pdf->addTableCell($element->getJazzeeElement()->pdfValue($child, $pdf));
+        foreach ($this->_applicationPage->getPage()->getElements() as $element) {
+          $element->getJazzeeElement()->setController($this->_controller);
+          $value = $element->getJazzeeElement()->pdfValue($answer, $pdf);
+          if(!empty($value)){
+            $pdf->addText("{$element->getTitle()}: ", 'b');
+            $pdf->addText("{$value}\n", 'p');
           }
+        }
+        if ($child = $answer->getChildren()->first()) {
+          $jazzeePage = $this->_applicationPage->getPage()->getChildren()->first()->getApplicationPageJazzeePage();
+          $jazzeePage->setApplicant($this->_applicant);
+          $jazzeePage->setController($this->_controller);
+          $jazzeePage->renderLorPdfAnswer($pdf, $this->_applicationPage->getPage()->getChildren()->first(), $child);
         }
         if ($attachment = $answer->getAttachment()) {
           $pdf->addPdf($attachment->getAttachment());
         }
+        $pdf->addText("\n", 'p');
       }
-      $pdf->writeTable();
-    }
+      $pdf->write();
   }
 
   public static function applyPageElement()

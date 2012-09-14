@@ -99,6 +99,7 @@ class ApplicantPDF
     $this->fonts = array(
       'h1' => array('face' => 'Helvetica-Bold', 'size' => '16.0', 'leading' => '100%', 'color' => array(207, 102, 0)),
       'h3' => array('face' => 'Helvetica-Bold', 'size' => 12.0, 'leading' => '100%', 'color' => array(119, 153, 187)),
+      'h5' => array('face' => 'Helvetica-Bold', 'size' => 10.0, 'leading' => '100%', 'color' => array(119, 153, 187)),
       'p' => array('face' => 'Helvetica', 'size' => 10.0, 'leading' => '100%', 'color' => array(0, 0, 0)),
       'b' => array('face' => 'Helvetica-Bold', 'size' => 10.0, 'leading' => '100%', 'color' => array(0, 0, 0)),
       'th' => array('face' => 'Helvetica-Bold', 'size' => 9.0, 'leading' => '100%', 'rowheight' => '10', 'color' => array(0, 0, 0)),
@@ -240,6 +241,9 @@ class ApplicantPDF
       }
     } while ($continue);
     $this->currentY = $this->pdf->info_textflow($this->currentText, 'textendy');
+    if ($this->currentY < 25) {
+      $this->newPage();
+    }
     $this->pdf->delete_textflow($this->currentText);
     $this->currentText = $this->pdf->create_textflow('', '');
   }
@@ -337,7 +341,7 @@ class ApplicantPDF
           //TOO CLOSE
           $this->newPage();
         }
-        $return = $this->pdf->fit_table($table, 25, 25, $this->pageWidth - 20, $this->currentY, 'stroke={{line=other}} vertshrinklimit=20%');
+        $return = $this->pdf->fit_table($table, 25, 25, $this->pageWidth - 20, $this->currentY, 'stroke={{line=other}}');
         if ($return == '_boxfull') {
           $this->newPage();
           $continue = true;

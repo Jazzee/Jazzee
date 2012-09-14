@@ -7,7 +7,7 @@ namespace Jazzee\Element;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\Interfaces\XmlElement
+abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\Interfaces\XmlElement, \Jazzee\Interfaces\PdfElement
 {
 
   /**

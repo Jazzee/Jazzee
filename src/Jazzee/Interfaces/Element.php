@@ -69,15 +69,6 @@ interface Element
   function rawValue(\Jazzee\Entity\Answer $answer);
 
   /**
-   * Get the pdf value of the element
-   *
-   * @param \Jazzee\Entity\Answer $answer
-   * @param \Jazzee\ApplicantPDF $pdf
-   * @return mixed
-   */
-  function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf);
-
-  /**
    * Test a query
    * Checks if answer meets query parameters
    * @param \Jazzee\Entity\Answer $answer

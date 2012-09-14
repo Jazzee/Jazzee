@@ -283,35 +283,26 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
    */
   public function renderPdfSection(\Jazzee\ApplicantPDF $pdf)
   {
-    if ($this->getAnswers()) {
-      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
-      $pdf->write();
-      $pdf->startTable();
-      $pdf->startTableRow();
-      foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-        $pdf->addTableCell($element->getTitle());
-      }
-      $pdf->addTableCell('Score');
+    $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
+    if($this->getStatus() == \Jazzee\Interfaces\Page::SKIPPED){
+      $pdf->addText("Applicant Skipped this page.\n", 'p');
+    } else {
       foreach ($this->getAnswers() as $answer) {
-        $pdf->startTableRow();
-        foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-          $element->getJazzeeElement()->setController($this->_controller);
-          $pdf->addTableCell($element->getJazzeeElement()->pdfValue($answer, $pdf));
-        }
+        $this->renderPdfAnswer($pdf, $this->_applicationPage->getPage(), $answer);
         if ($answer->getMatchedScore()) {
-          $string = '';
           foreach ($answer->getMatchedScore()->getSummary() as $key => $value) {
-            $string .= "{$key}: {$value}\n";
+            $pdf->addText("{$key}: ", 'b');
+            $pdf->addText("{$value}\n", 'p');
           }
-          $pdf->addTableCell($string);
         } else {
-          $pdf->addTableCell('This score has not been received from ETS.');
+          $pdf->addText('This score has not been received from ETS.', 'p');
         }
         if ($attachment = $answer->getAttachment()) {
           $pdf->addPdf($attachment->getAttachment());
         }
+        $pdf->addText("\n", 'p');
       }
-      $pdf->writeTable();
+      $pdf->write();
     }
   }
 

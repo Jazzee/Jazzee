@@ -42,6 +42,15 @@ interface LorPage
   function fillLorForm(\Jazzee\Entity\Answer $answer);
 
   /**
+   * Build the pdf section
+   *
+   * @param \Jazzee\ApplicantPDF
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  function renderLorPdfAnswer(\Jazzee\ApplicantPDF $pdf, \Jazzee\Entity\Page $page, \Jazzee\Entity\Answer $answer);
+
+  /**
    * Get the element for the LOR page view
    * @return string
    */

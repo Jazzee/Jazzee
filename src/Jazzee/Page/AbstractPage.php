@@ -237,7 +237,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     $answerXml->setAttribute('privateStatus', ($answer->getPrivateStatus() ? $answer->getPrivateStatus()->getName() : ''));
     foreach ($answer->getPage()->getElements() as $element) {
       $element->getJazzeeElement()->setController($this->_controller);
-      if($element->getJazzeeElement() instanceof \Jazzee\Interfaces\XmlElement){
+      if ($element->getJazzeeElement() instanceof \Jazzee\Interfaces\XmlElement) {
         $answerXml->appendChild($element->getJazzeeElement()->getXmlAnswer($dom, $answer));
       }
     }
@@ -263,25 +263,36 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
    */
   public function renderPdfSection(\Jazzee\ApplicantPDF $pdf)
   {
-    if ($this->getAnswers()) {
-      $pdf->addText($this->_applicationPage->getTitle(), 'h3');
-      $pdf->write();
-      $pdf->startTable();
-      $pdf->startTableRow();
-      foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-        $pdf->addTableCell($element->getTitle());
-      }
+    $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
+    if ($this->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) {
+      $pdf->addText("Applicant Skipped this page.\n", 'p');
+    } else {
       foreach ($this->getAnswers() as $answer) {
-        $pdf->startTableRow();
-        foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-          $element->getJazzeeElement()->setController($this->_controller);
-          $pdf->addTableCell($element->getJazzeeElement()->pdfValue($answer, $pdf));
-        }
-        if ($attachment = $answer->getAttachment()) {
-          $pdf->addPdf($attachment->getAttachment());
-        }
+        $this->renderPdfAnswer($pdf, $this->_applicationPage->getPage(), $answer);
+        $pdf->addText("\n", 'p');
       }
-      $pdf->writeTable();
+    }
+    $pdf->write();
+  }
+
+  /**
+   * Render a single answer in the PDF
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  protected function renderPdfAnswer(\Jazzee\ApplicantPDF $pdf, \Jazzee\Entity\Page $page, \Jazzee\Entity\Answer $answer)
+  {
+    foreach ($page->getElements() as $element) {
+      $element->getJazzeeElement()->setController($this->_controller);
+      $value = $element->getJazzeeElement()->pdfValue($answer, $pdf);
+      if (!empty($value)) {
+        $pdf->addText("{$element->getTitle()}: ", 'b');
+        $pdf->addText("{$value}\n", 'p');
+      }
+    }
+    if ($attachment = $answer->getAttachment()) {
+      $pdf->addPdf($attachment->getAttachment());
     }
   }
 
@@ -335,9 +346,9 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
       'leadingText' => 'Leading Text',
       'trailingText' => 'Trailing Text'
     );
-    foreach($arr as $name => $niceName){
+    foreach ($arr as $name => $niceName) {
       $func = 'get' . ucfirst($name);
-      if($this->_applicationPage->$func() != $applicationPage->$func()){
+      if ($this->_applicationPage->$func() != $applicationPage->$func()) {
         $differences['different'] = true;
         $differences['properties'][] = array(
           'name' => $niceName,
@@ -348,28 +359,28 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
       }
     }
     $thisElements = array();
-    foreach($this->_applicationPage->getPage()->getElements() as $element){
+    foreach ($this->_applicationPage->getPage()->getElements() as $element) {
       $thisElements[$element->getTitle()] = $element;
     }
     $otherElements = array();
-    foreach($applicationPage->getPage()->getElements() as $element){
+    foreach ($applicationPage->getPage()->getElements() as $element) {
       $otherElements[$element->getTitle()] = $element;
     }
-    foreach($thisElements as $title => $element){
-      if(!array_key_exists($title, $otherElements)){
+    foreach ($thisElements as $title => $element) {
+      if (!array_key_exists($title, $otherElements)) {
         $differences['elements']['new'][] = $title;
-      } else if($element->getType()->getId() != $otherElements[$title]->getType()->getId()){
+      } else if ($element->getType()->getId() != $otherElements[$title]->getType()->getId()) {
         $differences['elements']['new'][] = $title;
         $differences['elements']['removed'][] = $title;
       } else {
         $elementDifferences = $element->getJazzeeElement()->compareWith($otherElements[$title]);
-        if($elementDifferences['different']){
+        if ($elementDifferences['different']) {
           $differences['elements']['changed'][] = $elementDifferences;
         }
       }
     }
-    foreach($otherElements as $title => $element){
-      if(!array_key_exists($title, $thisElements)){
+    foreach ($otherElements as $title => $element) {
+      if (!array_key_exists($title, $thisElements)) {
         $differences['elements']['removed'][] = $title;
       }
     }
