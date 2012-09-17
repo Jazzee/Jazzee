@@ -14,6 +14,7 @@ List.prototype.elementProperties = function(){
   var div = JazzeeElement.prototype.elementProperties.call(this);
   div.append(this.newListItemsButton());
   div.append(this.manageListItemsButton());
+  div.append(this.exportListItemsButton());
 
   return div;
 };
@@ -109,6 +110,28 @@ List.prototype.manageListItemsButton = function(){
     });
     div.append(button);
 
+    div.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-arrow-1-nw'
+    }
+  });
+  return button;
+};
+
+/**
+ * Export List Items button
+ * @return {jQuery}
+ */
+List.prototype.exportListItemsButton = function(){
+  var elementClass = this;
+
+  var button = $('<button>').html('Export Items').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    var div = elementClass.page.createDialog();
+    var string = elementClass.getListItemsCsv();
+    var textarea = $('<textarea>').val(string);
+    div.append(textarea);
     div.dialog('open');
   }).button({
     icons: {
@@ -298,4 +321,19 @@ List.prototype.newListItem = function(value){
 List.prototype.addListItem = function(item){
   this.listItems.push(item);
   return item;
+};
+
+/**
+ * Get the list items as a string
+ * @return {String}
+ */
+List.prototype.getListItemsCsv = function(){
+  var string = '"Value","Name"' + "\n";
+  for(var i = 0; i< this.listItems.length; i++){
+    var item = this.listItems[i];
+    var value = '"' + (($.trim(item.value).length > 0)?item.value.replace(/"/g,'""'):'') + '"';
+    var name = '"' + (($.trim(item.name).length > 0)?item.name:'') + '"';
+    string += value + ',' + name + "\n";
+  }
+  return string;
 };
