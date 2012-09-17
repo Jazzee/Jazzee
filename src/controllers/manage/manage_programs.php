@@ -15,6 +15,8 @@ class ManageProgramsController extends \Jazzee\AdminController
   const ACTION_INDEX = 'View Programs';
   const ACTION_EDIT = 'Edit Program';
   const ACTION_NEW = 'New Program';
+  const ACTION_ACTIVATE = 'Activate Expired Program';
+  const ACTION_EXPIRE = 'Expire Program';
   const REQUIRE_APPLICATION = false;
 
   /**
@@ -22,7 +24,8 @@ class ManageProgramsController extends \Jazzee\AdminController
    */
   public function actionIndex()
   {
-    $this->setVar('programs', $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array(), array('name' => 'ASC')));
+    $this->setVar('activePrograms', $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array('isExpired'=>false), array('name' => 'ASC')));
+    $this->setVar('expiredPrograms', $this->_em->getRepository('\Jazzee\Entity\Program')->findBy(array('isExpired'=>true), array('name' => 'ASC')));
   }
 
   /**
@@ -102,6 +105,40 @@ class ManageProgramsController extends \Jazzee\AdminController
         $this->_em->persist($this->_user);
       }
       $this->redirectPath('manage/programs');
+    }
+  }
+
+  /**
+   * Activate a program
+   * @param integer $programID
+   */
+  public function actionActivate($programID)
+  {
+    if ($program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($programID)) {
+      $program->unExpire();
+      $this->addMessage('success', "{$program->getName()} activated.");
+      $this->_em->persist($program);
+      $this->redirectPath('manage/programs');
+
+    } else {
+      $this->addMessage('error', "Error: Program #{$programID} does not exist.");
+    }
+  }
+
+  /**
+   * Expire a program
+   * @param integer $programID
+   */
+  public function actionExpire($programID)
+  {
+    if ($program = $this->_em->getRepository('\Jazzee\Entity\Program')->find($programID)) {
+      $program->expire();
+      $this->addMessage('success', "{$program->getName()} expired.");
+      $this->_em->persist($program);
+      $this->redirectPath('manage/programs');
+
+    } else {
+      $this->addMessage('error', "Error: Program #{$programID} does not exist.");
     }
   }
 
