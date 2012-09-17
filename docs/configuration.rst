@@ -61,6 +61,12 @@ The default size for applicant file uploads.  This will be initially set for any
 often not be overridden so it has a normative effect on file upload sizes.
 Defaults to the value of PHP's builtin upload_max_filesize which is generally pretty large so you should set this to something sensible like 1M
 
+virusScanUploads
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Should uploaded files be scanned for viruses.  User ClamAV which must be installed.  This is a pretty
+substantial performance hit so if you're experiencing problems with load this should be deactivated.
+Defaults to true.
+
 allowApplicantNameChange
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Are applicant allowed to change their own name.  Defaults to false.

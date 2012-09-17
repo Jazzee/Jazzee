@@ -450,6 +450,12 @@ class JazzeeConfiguration
   protected $_allowScramble;
 
   /**
+   *  @var boolean
+   * Should uploaded files be scanned for viruses
+   */
+  protected $_virusScanUploads;
+
+  /**
    * Construct
    * Load data from the ini file
    */
@@ -533,7 +539,8 @@ class JazzeeConfiguration
       'ldapFirstNameAttribute' => 'givenName',
       'ldapLastNameAttribute' => 'sn',
       'ldapEmailAddressAttribute' => 'mail',
-      'allowScramble' => false
+      'allowScramble' => false,
+      'virusScanUploads' => true
     );
     foreach ($defaults as $name => $value) {
       $method = 'set' . ucfirst($name);
@@ -1674,6 +1681,24 @@ class JazzeeConfiguration
   public function setAllowScramble($allowScramble)
   {
     $this->_allowScramble = (bool)$allowScramble;
+  }
+
+  /**
+   * get virusScanUploads
+   * @return string
+   */
+  public function getVirusScanUploads()
+  {
+    return $this->_virusScanUploads;
+  }
+
+  /**
+   * set virusScanUploads
+   * @var string $allowScramble
+   */
+  public function setVirusScanUploads($virusScanUploads)
+  {
+    $this->_virusScanUploads = (bool)$virusScanUploads;
   }
 
   /**

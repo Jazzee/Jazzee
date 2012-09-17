@@ -27,17 +27,19 @@ class PDFFileInput extends AbstractElement
       $validator = new \Foundation\Form\Validator\NotEmpty($element);
       $element->addValidator($validator);
     }
-    $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
+
+    if ($this->_controller->getConfig()->getVirusScanUploads()) {
+      $element->addValidator(new \Foundation\Form\Validator\Virusscan($element));
+    }
     $element->addValidator(new \Foundation\Form\Validator\PDF($element));
     $element->addValidator(new \Foundation\Form\Validator\PDFNotEncrypted($element));
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
 
-    $config = $this->_controller->getConfig();
-    $max = $config->getMaximumApplicantFileUploadSize();
+    $max = $this->_controller->getConfig()->getMaximumApplicantFileUploadSize();
     if ($this->_element->getMax() and \Foundation\Utility::convertIniShorthandValue($this->_element->getMax()) < $max) {
       $max = $this->_element->getMax();
     } else {
-      $max = $config->getDefaultApplicantFileUploadSize();
+      $max = $this->_controller->getConfig()->getDefaultApplicantFileUploadSize();
     }
     $element->addValidator(new \Foundation\Form\Validator\MaximumFileSize($element, $max));
 
