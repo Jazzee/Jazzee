@@ -65,7 +65,7 @@ p.skip {
 }
 
 /* make room for the status icon */
-#bar li a {
+#bar li.link a {
   padding-left: 12px;
 }
 
