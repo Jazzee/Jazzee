@@ -36,7 +36,7 @@ class PDFFileInput extends AbstractElement
     $element->addFilter(new \Foundation\Form\Filter\Blob($element));
 
     $max = $this->_controller->getConfig()->getMaximumApplicantFileUploadSize();
-    if ($this->_element->getMax() and \Foundation\Utility::convertIniShorthandValue($this->_element->getMax()) < $max) {
+    if ($this->_element->getMax() and \Foundation\Utility::convertIniShorthandValue($this->_element->getMax()) <= $max) {
       $max = $this->_element->getMax();
     } else {
       $max = $this->_controller->getConfig()->getDefaultApplicantFileUploadSize();
