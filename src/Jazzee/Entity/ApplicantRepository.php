@@ -1,5 +1,6 @@
 <?php
 namespace Jazzee\Entity;
+
 /**
  * ApplicantRepository
  * Special Repository methods for Applicants
@@ -87,6 +88,62 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->setParameter('lastName', $lastName);
 
     return $queryBuilder->getQuery()->getResult();
+  }
+
+  /**
+   * All the applicants in an application
+   * @param Application $application
+   * @param boolean $deep should we load the full data for each applicant
+   * @return Application
+   */
+  public function findByApplication(Application $application, $deep = false)
+  {
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
+
+    if (!$deep) {
+      $queryBuilder->add('select', 'applicant');
+    } else {
+      $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers');
+      $queryBuilder->leftJoin('applicant.answers', 'answers');
+      $queryBuilder->leftJoin('applicant.attachments', 'attachments');
+      $queryBuilder->leftJoin('applicant.decision', 'decision');
+      $queryBuilder->leftJoin('applicant.tags', 'tags');
+      $queryBuilder->leftJoin('answers.elements', 'element_answers');
+    }
+
+    $queryBuilder->where('applicant.application = :applicationId');
+    $queryBuilder->setParameter('applicationId', $application->getId());
+
+    return $queryBuilder->getQuery()->getResult();
+  }
+
+  /**
+   * Find a single application
+   * @param integer id of the applicant
+   * @param boolean $deep should we load the full data for each applicant
+   * @return Application
+   */
+  public function find($id, $deep = false)
+  {
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
+
+    if (!$deep) {
+      $queryBuilder->add('select', 'applicant');
+    } else {
+      $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers');
+      $queryBuilder->leftJoin('applicant.answers', 'answers');
+      $queryBuilder->leftJoin('applicant.attachments', 'attachments');
+      $queryBuilder->leftJoin('applicant.decision', 'decision');
+      $queryBuilder->leftJoin('applicant.tags', 'tags');
+      $queryBuilder->leftJoin('answers.elements', 'element_answers');
+    }
+
+    $queryBuilder->where('applicant.id = :applicantId');
+    $queryBuilder->setParameter('applicantId', $id);
+
+    return $queryBuilder->getQuery()->getSingleResult();
   }
 
   /**
