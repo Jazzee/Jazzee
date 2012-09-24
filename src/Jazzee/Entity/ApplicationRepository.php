@@ -4,7 +4,7 @@ namespace Jazzee\Entity;
 /**
  * ApplicationRepository
  * Special Repository methods for Application to make searchign for special conditions easier
- * 
+ *
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
@@ -43,6 +43,24 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
     $query->setParameter('programId', $program->getId());
 
     return $query->getResult();
+  }
+
+  /**
+   * Get the answer counts for each page.
+   * @param Application $application
+   * @return array
+   */
+  public function getPageAnswerCounts(Application $application)
+  {
+    $query = $this->_em->createQuery('SELECT page.id as pageId, count(answer.id) as answers FROM Jazzee\Entity\Answer answer JOIN answer.page page JOIN answer.applicant applicant WHERE answer.applicant IN (SELECT app1.id FROM Jazzee\Entity\Applicant app1 WHERE app1.application = :applicationId) GROUP BY answer.applicant, answer.page');
+    $query->setParameter('applicationId', $application->getId());
+    $pages = array();
+    foreach ($query->getResult() as $arr) {
+      if (!array_key_exists($arr['pageId'], $pages) or $pages[$arr['pageId']] < $arr['answers']) {
+        $pages[$arr['pageId']] = $arr['answers'];
+      }
+    }
+    return $pages;
   }
 
   /**
