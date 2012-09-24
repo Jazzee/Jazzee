@@ -1,7 +1,6 @@
 <?php
 
-ini_set('memory_limit', '1g');
-set_time_limit('120');
+set_time_limit(600);
 
 /**
  * Download Applicants in csv format
@@ -53,7 +52,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         $applicationPages[$pageEntity->getId()] = $pageEntity;
       }
       $applicantsArray = array();
-      $applicants = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application);
+      $applicants = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findByApplication($this->_application, false);
       foreach ($applicants as $applicant) {
         if ((!$applicant->isLocked() and in_array('unlocked', $filters))
                 or ($applicant->isLocked() and in_array('locked', $filters))
@@ -62,17 +61,17 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
                 or ($applicant->isLocked() and $applicant->getDecision()->getAcceptOffer() and in_array('accepted', $filters))
                 or ($applicant->isLocked() and $applicant->getDecision()->getDeclineOffer() and in_array('declined', $filters))
         ) {
-          $applicantsArray[] = $applicant;
+          $applicantsArray[] = $applicant->getId();
         } //end if filter
       } //end foreach applicants
       unset($applicants);
       switch ($input->get('type')) {
         case 'xls':
           $this->makeXls($applicantsArray);
-            break;
+          break;
         case 'xml':
           $this->makeXml($applicantsArray);
-            break;
+          break;
       }
     }
     $this->setVar('form', $form);
@@ -85,22 +84,8 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
   protected function makeXls(array $applicants)
   {
     $applicationPages = array();
-    $pageAnswerCount = array();
-    foreach ($this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application' => $this->_application->getId(), 'kind' => \Jazzee\Entity\ApplicationPage::APPLICATION), array('weight' => 'asc')) as $applicationPage) {
-      if ($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\CsvPage) {
-        $applicationPages[] = $applicationPage;
-      }
-    }
-    foreach ($applicationPages as $applicationPage) {
-      $pageAnswerCount[$applicationPage->getPage()->getId()] = 1;
-    }
-    foreach ($applicants as $applicant) {
-      foreach ($applicationPages as $applicationPage) {
-        if (count($applicant->findAnswersByPage($applicationPage->getPage())) > $pageAnswerCount[$applicationPage->getPage()->getId()]) {
-          $pageAnswerCount[$applicationPage->getPage()->getId()] = count($applicant->findAnswersByPage($applicationPage->getPage()));
-        }
-      }
-    }
+    $pageAnswerCount = $this->_em->getRepository('Jazzee\Entity\Application')->getPageAnswerCounts($this->_application);
+
     $rows = array();
     $header = array(
       'ID',
@@ -117,7 +102,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
       'Progress',
       'Tags'
     );
-    foreach ($applicationPages as $applicationPage) {
+    foreach ($this->getApplicationPages() as $applicationPage) {
       for ($i = 1; $i <= $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
         foreach ($applicationPage->getJazzeePage()->getCsvHeaders() as $title) {
           $header[] = $applicationPage->getTitle() . ' ' . $i . ' ' . $title;
@@ -125,7 +110,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
       }
     }
     $rows[] = $header;
-    foreach ($applicants as $applicant) {
+    $count = 0;
+    foreach ($applicants as $id) {
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
       $arr = array(
         $applicant->getId(),
         $applicant->getFirstName(),
@@ -145,16 +132,20 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         $tags[] = $tag->getTitle();
       }
       $arr[] = implode(' ', $tags);
-      foreach ($applicationPages as $applicationPage) {
+      foreach ($this->getApplicationPages() as $applicationPage) {
         $applicationPage->getJazzeePage()->setApplicant($applicant);
         for ($i = 0; $i < $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
           $arr = array_merge($arr, $applicationPage->getJazzeePage()->getCsvAnswer($i));
         }
       }
       $rows[] = $arr;
+      if ($count > 50) {
+        $count = 0;
+        $this->_em->clear();
+        gc_collect_cycles();
+      }
+      $count++;
     }
-    unset($applicants);
-    unset($applicationPages);
     $string = '';
     foreach ($rows as $row) {
       foreach ($row as $value) {
@@ -169,6 +160,22 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
   }
 
   /**
+   * Get application pages
+   * @return array
+   */
+  protected function getApplicationPages()
+  {
+    $applicationPages = array();
+    foreach ($this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application' => $this->_application->getId(), 'kind' => \Jazzee\Entity\ApplicationPage::APPLICATION), array('weight' => 'asc')) as $applicationPage) {
+      if ($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\CsvPage) {
+        $applicationPage->getJazzeePage()->setController($this);
+        $applicationPages[] = $applicationPage;
+      }
+    }
+    return $applicationPages;
+  }
+
+  /**
    * XML file type
    * @param array \Jazzee\Entity\Applicant $applicants
    */
@@ -178,7 +185,8 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $xml->formatOutput = true;
     $applicantsXml = $xml->createElement("applicants");
 
-    foreach ($applicants as $applicant) {
+    foreach ($applicants as $id) {
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
       $appXml = $applicant->toXml($this);
       $node = $xml->importNode($appXml->documentElement, true);
       $applicantsXml->appendChild($node);
