@@ -41,6 +41,14 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     $this->_applicationPage = $applicationPage;
   }
 
+  public function __destruct()
+  {
+    $this->_applicationPage = null;
+    $this->_applicant = null;
+    $this->_controller = null;
+    $this->_form = null;
+  }
+
   public function setController(\Jazzee\Controller $controller)
   {
     $this->_controller = $controller;
