@@ -841,7 +841,7 @@ class Applicant
    * @param integer $version the XML version
    * @return \DOMDocument
    */
-  public function toXml($controller, $partial = false, $version = 1)
+  public function toXml($controller, $partial = false, $version = 2)
   {
     $dom = new \DOMDocument('1.0', 'UTF-8');
     $applicantXml = $dom->createElement("applicant");
