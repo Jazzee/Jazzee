@@ -74,9 +74,9 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
       'instructions' => 'Instructions',
       'defaultValue' => 'Default Value'
     );
-    foreach($arr as $name => $niceName){
+    foreach ($arr as $name => $niceName) {
       $func = 'get' . ucfirst($name);
-      if($this->_element->$func() != $element->$func()){
+      if ($this->_element->$func() != $element->$func()) {
         $differences['different'] = true;
         $differences['properties'][] = array(
           'name' => $niceName,
@@ -87,10 +87,10 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
       }
     }
 
-    foreach($this->_element->getListItems() as $item){
+    foreach ($this->_element->getListItems() as $item) {
       $differences['thisListItems'][] = $item->getValue();
     }
-    foreach($element->getListItems() as $item){
+    foreach ($element->getListItems() as $item) {
       $differences['otherListItems'][] = $item->getValue();
     }
 
@@ -101,9 +101,10 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
    * Get the answer value as an xml element
    * @param \DomDocument $dom
    * @param \Jazzee\Entity\Answer $answer
+   * @param integer $version
    * @return \DomElement
    */
-  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer, $version)
   {
     $eXml = $dom->createElement('element');
     $eXml->setAttribute('elementId', $this->_element->getId());
@@ -111,9 +112,21 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
     $eXml->setAttribute('name', htmlentities($this->_element->getName(), ENT_COMPAT, 'utf-8'));
     $eXml->setAttribute('type', htmlentities($this->_element->getType()->getClass(), ENT_COMPAT, 'utf-8'));
     $eXml->setAttribute('weight', $this->_element->getWeight());
+
+    $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if ($value = $this->rawValue($answer)) {
-      $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+      switch ($version) {
+        case 1:
+          $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+          break;
+        case 2:
+          $vXml = $dom->createElement('value');
+          $vXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+          $eXml->appendChild($vXml);
+          break;
+      }
     }
+    
     return $eXml;
   }
 

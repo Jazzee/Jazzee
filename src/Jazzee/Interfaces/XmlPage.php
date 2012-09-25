@@ -14,7 +14,8 @@ interface XmlPage
   /**
    * Get the current answers as an xml element
    * @param \DOMDocument $dom
+   * @param integer $version the XML version to generate
    * @return array DOMElement
    */
-  function getXmlAnswers(\DOMDocument $dom);
+  function getXmlAnswers(\DOMDocument $dom, $version);
 }

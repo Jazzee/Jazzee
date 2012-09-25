@@ -1,5 +1,4 @@
 <?php
-
 namespace Jazzee\Element;
 
 /**
@@ -91,9 +90,10 @@ class SelectList extends AbstractElement
    * Get the answer value as an xml element
    * @param \DomDocument $dom
    * @param \Jazzee\Entity\Answer $answer
+   * @param integer $version
    * @return \DomElement
    */
-  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer, $version)
   {
     $eXml = $dom->createElement('element');
     $eXml->setAttribute('elementId', $this->_element->getId());
@@ -103,18 +103,27 @@ class SelectList extends AbstractElement
     $eXml->setAttribute('weight', $this->_element->getWeight());
 
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
-    $value = null;
-    if (isset($elementsAnswers[0])) {
-      $value = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getValue();
-      $name = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getName();
-      $id = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getId();
-    }
-    if ($value) {
-      $vXml = $dom->createElement('value');
-      $vXml->setAttribute('valueId', $id);
-      $vXml->setAttribute('name', htmlentities($name, ENT_COMPAT, 'utf-8'));
-      $vXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
-      $eXml->appendChild($vXml);
+    switch ($version) {
+      case 1:
+        if ($value = $this->rawValue($answer)) {
+          $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+        }
+        break;
+      case 2:
+        $value = null;
+        if (isset($elementsAnswers[0])) {
+          $value = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getValue();
+          $name = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getName();
+          $id = $this->_element->getItemById($elementsAnswers[0]->getEInteger())->getId();
+        }
+        if ($value) {
+          $vXml = $dom->createElement('value');
+          $vXml->setAttribute('valueId', $id);
+          $vXml->setAttribute('name', htmlentities($name, ENT_COMPAT, 'utf-8'));
+          $vXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value)));
+          $eXml->appendChild($vXml);
+        }
+        break;
     }
     return $eXml;
   }

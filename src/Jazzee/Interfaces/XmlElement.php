@@ -14,7 +14,9 @@ interface XmlElement
   /**
    * Get the current answers as an xml element
    * @param \DOMDocument $dom
+   * @param \Jazzee\Entity\Answer $answer
+   * @param integer $version
    * @return array DOMElement
    */
-  function getXmlAnswer(\DOMDocument $dom, \Jazzee\Entity\Answer $answer);
+  function getXmlAnswer(\DOMDocument $dom, \Jazzee\Entity\Answer $answer, $version);
 }

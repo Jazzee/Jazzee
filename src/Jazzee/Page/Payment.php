@@ -125,7 +125,7 @@ class Payment extends AbstractPage
     return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
 
-  public function getXmlAnswers(\DOMDocument $dom)
+  public function getXmlAnswers(\DOMDocument $dom, $version)
   {
     $answers = array();
     foreach ($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer) {

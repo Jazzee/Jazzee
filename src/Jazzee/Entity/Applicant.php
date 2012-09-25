@@ -838,9 +838,10 @@ class Applicant
    *
    * @param \Jazzee\Controller $controller
    * @param boolean $partial
+   * @param integer $version the XML version
    * @return \DOMDocument
    */
-  public function toXml($controller, $partial = false)
+  public function toXml($controller, $partial = false, $version = 1)
   {
     $dom = new \DOMDocument('1.0', 'UTF-8');
     $applicantXml = $dom->createElement("applicant");
@@ -909,7 +910,7 @@ class Applicant
         $answersXml = $dom->createElement('answers');
         $applicationPage->getJazzeePage()->setApplicant($this);
         $applicationPage->getJazzeePage()->setController($controller);
-        foreach ($applicationPage->getJazzeePage()->getXmlAnswers($dom) as $answerXml) {
+        foreach ($applicationPage->getJazzeePage()->getXmlAnswers($dom, $version) as $answerXml) {
           $answersXml->appendChild($answerXml);
         }
         $page->appendChild($answersXml);

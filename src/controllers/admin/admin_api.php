@@ -41,7 +41,7 @@ class AdminApiController extends \Jazzee\AdminController
     $this->dom = new DOMDocument('1.0', 'UTF-8');
     $this->setVar('xml', $this->dom);
 
-    $versions = array(1);
+    $versions = array(1,2);
     if (empty($this->post['version']) or !in_array($this->post['version'], $versions)) {
       $this->setLayoutVar('status', 'error');
       $this->addMessage('error', 'Invalid API Version');
@@ -199,7 +199,7 @@ class AdminApiController extends \Jazzee\AdminController
    */
   protected function singleApplicant(\Jazzee\Entity\Applicant $applicant, $partial = true)
   {
-    $xml = $applicant->toXml($this, $partial);
+    $xml = $applicant->toXml($this, $partial, $this->version);
     $node = $this->dom->importNode($xml->documentElement, true);
 
     return $node;

@@ -137,12 +137,12 @@ class Branching extends Standard
     }
   }
 
-  public function getXmlAnswers(\DOMDocument $dom)
+  public function getXmlAnswers(\DOMDocument $dom, $version)
   {
     $answers = array();
     foreach ($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer) {
       $child = $answer->getChildren()->first();
-      $xmlAnswer = $this->xmlAnswer($dom, $child);
+      $xmlAnswer = $this->xmlAnswer($dom, $child, $version);
       $eXml = $dom->createElement('element');
       $eXml->setAttribute('elementId', 'branching');
 

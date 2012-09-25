@@ -78,9 +78,10 @@ class RankingList extends AbstractElement
    * Get the answer value as an xml element
    * @param \DomDocument $dom
    * @param \Jazzee\Entity\Answer $answer
+   * @param integer $version
    * @return \DomElement
    */
-  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer, $version)
   {
     $eXml = $dom->createElement('element');
     $eXml->setAttribute('elementId', $this->_element->getId());

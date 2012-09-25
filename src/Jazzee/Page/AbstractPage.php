@@ -174,11 +174,11 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     return $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
   }
 
-  public function getXmlAnswers(\DOMDocument $dom)
+  public function getXmlAnswers(\DOMDocument $dom, $version)
   {
     $answers = array();
     foreach ($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer) {
-      $answers[] = $this->xmlAnswer($dom, $answer);
+      $answers[] = $this->xmlAnswer($dom, $answer, $version);
     }
 
     return $answers;
@@ -232,9 +232,10 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
    * Convert an answer to an xml element
    * @param \DomDocument $dom
    * @param \Jazzee\Entity\Answer $answer
+   * @param integer $version the XML version to create
    * @return \DomElement
    */
-  protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer, $version)
   {
     $answerXml = $dom->createElement('answer');
     $answerXml->setAttribute('answerId', $answer->getId());
@@ -246,7 +247,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     foreach ($answer->getPage()->getElements() as $element) {
       $element->getJazzeeElement()->setController($this->_controller);
       if ($element->getJazzeeElement() instanceof \Jazzee\Interfaces\XmlElement) {
-        $answerXml->appendChild($element->getJazzeeElement()->getXmlAnswer($dom, $answer));
+        $answerXml->appendChild($element->getJazzeeElement()->getXmlAnswer($dom, $answer, $version));
       }
     }
     $attachment = $dom->createElement('attachment');
@@ -257,7 +258,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
 
     $children = $dom->createElement('children');
     foreach ($answer->getChildren() as $child) {
-      $children->appendChild($this->xmlAnswer($dom, $child));
+      $children->appendChild($this->xmlAnswer($dom, $child, $version));
     }
     $answerXml->appendChild($children);
 

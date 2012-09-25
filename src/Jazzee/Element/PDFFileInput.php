@@ -121,9 +121,10 @@ class PDFFileInput extends AbstractElement
    * Add the PDF size as an attribute
    * @param \DomDocument $dom
    * @param \Jazzee\Entity\Answer $answer
+   * @param integer $version
    * @return \DomElement
    */
-  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  public function getXmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer, $version)
   {
     $eXml = $dom->createElement('element');
     $eXml->setAttribute('elementId', $this->_element->getId());

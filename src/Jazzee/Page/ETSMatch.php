@@ -259,9 +259,9 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
    * Add Scores to the answer
    * @see jazzee/src/Jazzee/Entity/Page/Jazzee\Entity\Page.AbstractPage::xmlAnswer()
    */
-  protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer)
+  protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer, $version)
   {
-    $xml = parent::xmlAnswer($dom, $answer);
+    $xml = parent::xmlAnswer($dom, $answer, $version);
     if ($answer->getMatchedScore()) {
       $scoreXml = $dom->createElement('score');
       foreach ($answer->getMatchedScore()->getSummary() as $name => $value) {
