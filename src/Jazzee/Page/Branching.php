@@ -149,7 +149,16 @@ class Branching extends Standard
 
       $eXml->setAttribute('title', htmlentities($answer->getPage()->getVar('branchingElementLabel'), ENT_COMPAT, 'utf-8'));
       $eXml->setAttribute('type', null);
-      $eXml->appendChild($dom->createCDATASection($child->getPage()->getTitle()));
+      switch ($version) {
+        case 1:
+          $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $child->getPage()->getTitle())));
+          break;
+        case 2:
+          $vXml = $dom->createElement('value');
+          $vXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $child->getPage()->getTitle())));
+          $eXml->appendChild($vXml);
+          break;
+      }
       $xmlAnswer->appendChild($eXml);
       $answers[] = $xmlAnswer;
     }
