@@ -79,15 +79,6 @@ JazzeePageBranching.prototype.listBranchesBlock = function(){
       $('#pageToolbar .copy').remove();
       $('#pageToolbar .delete').remove();
       $('#pageToolbar .properties').remove();
-      var button = $('<button>').html('Back to parent').bind('click', function(){
-        pageClass.workspace();
-      });
-      button.button({
-        icons: {
-          primary: 'ui-icon-arrowreturnthick-1-s'
-        }
-      });
-      $('#pageToolbar').prepend(button);
 
       var button = $('<button>').html('Delete Branch').data('page', page).bind('click', function(e){
         pageClass.deleteChild($(this).data('page'));

@@ -42,7 +42,7 @@ JazzeePageRecommenders.prototype.pageProperties = function(){
   div.append(this.isRequiredButton());
   div.append(this.showAnswerStatusButton());
   div.append(this.editNameButton());
-  
+
   var slider = $('<div>');
   slider.slider({
     value: this.min,
@@ -283,15 +283,6 @@ JazzeePageRecommenders.prototype.editLorPage = function(){
       $('#pageToolbar .copy').remove();
       $('#pageToolbar .delete').remove();
       $('#pageToolbar .properties').remove();
-      var button = $('<button>').html('Back to '+pageClass.title).bind('click', function(){
-        pageClass.workspace();
-      });
-      button.button({
-        icons: {
-          primary: 'ui-icon-arrowreturnthick-1-s'
-        }
-      });
-      $('#pageToolbar').prepend(button);
 
       var button = $('<button>').html('Delete').data('page', page).bind('click', function(e){
         $('#editPage').effect('explode',500);

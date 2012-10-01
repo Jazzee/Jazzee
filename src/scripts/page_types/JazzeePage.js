@@ -9,6 +9,7 @@ function JazzeePage(){
   this.pageId;
   this.uuid;
   this.applicationPageId;
+  this.parentId;
   this.typeName;
   this.typeId;
   this.typeClass;
@@ -83,6 +84,7 @@ function JazzeePage(){
 JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.pageBuilder = pageBuilder;
   this.id = pageObject.id;
+  this.parentId = pageObject.parentId;
   this.uuid = pageObject.uuid;
   this.typeId = pageObject.typeId;
   this.typeName = pageObject.typeName;
@@ -132,6 +134,7 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
 JazzeePage.prototype.newPage = function(id,title,typeId,typeName,typeClass,status,pageBuilder){
   var obj = {
     id: id,
+    parentId: null,
     uuid: null,
     typeId: typeId,
     typeName: typeName,
@@ -215,6 +218,7 @@ JazzeePage.prototype.deleteElement = function(element){
  */
 JazzeePage.prototype.addChild = function(page){
   this.children[page.id] = page;
+  page.parentId = this.id;
   return page;
 };
 
@@ -322,6 +326,29 @@ JazzeePage.prototype.copyPageButton = function(){
     }
   });
   return button;
+};
+
+/**
+ * Button for returning the parent page
+ * @returns {jQuery}
+ */
+JazzeePage.prototype.parentPageButton = function(){
+  var pageClass = this;
+  if(this.parentId != null){
+    var parentPage = pageClass.pageBuilder.getPageById(this.parentId);
+    if(parentPage){
+      var button = $('<button>').html('Back to '+parentPage.title).bind('click', function(){
+        parentPage.workspace();
+      });
+      button.button({
+        icons: {
+          primary: 'ui-icon-arrowreturnthick-1-s'
+        }
+      });
+      return button;
+    }
+  }
+  return '';
 };
 
 /**
@@ -758,6 +785,7 @@ JazzeePage.prototype.workspace = function(){
   formDiv.append($('<div>').attr('id', 'elements'));
   $('#workspace').append(formDiv);
   $('#workspace').append(this.trailingTextWorkspace());
+  $('#pageToolbar').append(this.parentPageButton());
   $('#pageToolbar').append(this.copyPageButton());
   $('#pageToolbar').append(this.previewPageButton());
   $('#pageToolbar').append(this.deletePageButton());

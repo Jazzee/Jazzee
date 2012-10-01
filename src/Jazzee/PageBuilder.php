@@ -123,6 +123,7 @@ abstract class PageBuilder extends AdminController
     }
     $arr['id'] = $page->getId();
     $arr['uuid'] = $page->getUuid();
+    $arr['parentId'] = ($parent = $page->getParent())?$parent->getId():null;
     $arr['typeClass'] = $this->getClassName($page->getType()->getClass());
     $arr['typeName'] = $this->getClassName($page->getType()->getName());
     $arr['typeId'] = $page->getType()->getId();

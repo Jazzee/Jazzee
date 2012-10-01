@@ -441,3 +441,33 @@ PageBuilder.prototype.specialElementAction = function(elementClass, actionName, 
   });
   return result;
 };
+
+/**
+ * Get a page by id
+ * @param integer pageId
+ * @return {JazzeePage}
+ */
+PageBuilder.prototype.getPageById = function(id){
+  return this.findPageId(id, this.pages);
+};
+
+/**
+ * Look for a page ID in child pages
+ * @param integer pageId
+ * @param {} children
+ * @return {JazzeePage}
+ */
+PageBuilder.prototype.findPageId = function(id, obj){
+  if(typeof obj[id] != 'undefined'){
+    return obj[id];
+  }
+  var page;
+  for(var i in obj){
+    if(typeof obj[i].children == 'object'){
+      if(page = this.findPageId(id, obj[i].children)){
+        return page;
+      }
+    }
+  }
+  return false;
+};
