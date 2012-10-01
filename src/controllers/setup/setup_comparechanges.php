@@ -30,14 +30,12 @@ class SetupComparechangesController extends \Jazzee\AdminController
   public function actionIndex()
   {
     $cycles = array();
-    $applications = $this->_em->getRepository('\Jazzee\Entity\Application')->findByProgram($this->_program);
+    $applications = $this->_em->getRepository('\Jazzee\Entity\Application')->findByProgram($this->_program, false, false, array($this->_application->getId()));
     foreach ($applications as $application) {
-      if ($application->getId() != $this->_application->getId()) {
-        $cycles[] = array(
-          'id' => $application->getId(),
-          'name' => $application->getCycle()->getName()
-        );
-      }
+      $cycles[] = array(
+        'id' => $application->getId(),
+        'name' => $application->getCycle()->getName()
+      );
     }
     $this->setVar('cycles', $cycles);
   }
