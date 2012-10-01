@@ -160,7 +160,7 @@ class AdminApiController extends \Jazzee\AdminController
       }
     }
     foreach ($programs as $program) {
-      foreach ($this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($program) as $application) {
+      foreach ($this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($program, true) as $application) {
         $applicationXml = $this->dom->createElement('application', $application->getId());
         $applicationXml->setAttribute('cycle', $application->getCycle()->getName());
         $applicationXml->setAttribute('program', $application->getProgram()->getShortName());
