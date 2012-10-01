@@ -32,17 +32,41 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
   }
 
   /**
-   * findByProgram
    * Search for all the Applications belonging to a program
    * @param Program $program
+   * @param boolean $onlyPublished only find publisehd applications
+   * @param boolean $onlyVisible only find visible applications
+   * @param array   $excludedIds any application ids to exclude
    * @return Doctrine\Common\Collections\Collection $applications
    */
-  public function findByProgram(Program $program)
+  public function findByProgram(Program $program, $onlyPublished = false, $onlyVisible = false, array $excludedIds = array())
   {
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a JOIN a.cycle c WHERE a.program = :programId ORDER BY c.start DESC');
-    $query->setParameter('programId', $program->getId());
+//    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a JOIN a.cycle c WHERE a.program = :programId ORDER BY c.start DESC');
+//    $query->setParameter('programId', $program->getId());
+//
+//    return $query->getResult();
 
-    return $query->getResult();
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->add('select', 'a')
+            ->from('Jazzee\Entity\Application', 'a');
+
+    $queryBuilder->where('a.program = :programId');
+    $queryBuilder->setParameter('programId', $program->getId());
+
+    if (($onlyPublished)) {
+      $queryBuilder->andWhere('a.published = true');
+    }
+    if (($onlyVisible)) {
+      $queryBuilder->andWhere('a.visible = true');
+    }
+    if(!empty($excludedIds)){
+      //force integers from the values
+      $safeids = array_map('intval',$excludedIds);
+      $ids = implode(',', $safeids);
+      $queryBuilder->andWhere("a.id NOT IN ({$ids})");
+    }
+
+    return $queryBuilder->getQuery()->getResult();
   }
 
   /**
