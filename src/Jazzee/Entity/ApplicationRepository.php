@@ -41,11 +41,6 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findByProgram(Program $program, $onlyPublished = false, $onlyVisible = false, array $excludedIds = array())
   {
-//    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a JOIN a.cycle c WHERE a.program = :programId ORDER BY c.start DESC');
-//    $query->setParameter('programId', $program->getId());
-//
-//    return $query->getResult();
-
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->add('select', 'a')
             ->from('Jazzee\Entity\Application', 'a');
