@@ -56,9 +56,7 @@ class SetupPagesController extends \Jazzee\PageBuilder
     switch ($data->status) {
       case 'delete':
         if ($applicationPage = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page' => $pageId, 'application' => $this->_application->getId()))) {
-          if (
-                  ($applicationPage->getPage()->isGlobal() and $this->_em->getRepository('\Jazzee\Entity\Page')->hasCycleAnswers($applicationPage->getPage(), $this->_cycle)) OR
-                  (!$applicationPage->getPage()->isGlobal() and $this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($applicationPage->getPage()))) {
+          if ($this->_em->getRepository('\Jazzee\Entity\Page')->hasApplicationAnswers($applicationPage->getPage(), $this->_application)) {
             $this->setLayoutVar('status', 'error');
             $this->addMessage('error', $applicationPage->getTitle() . ' could not be deleted becuase it has applicant information associated with it.');
           } else {

@@ -332,7 +332,7 @@ JazzeeElement.prototype.workspace = function(){
       primary: 'ui-icon-trash'
     }
   });
-  if(this.page.hasAnswers){
+  if((this.page.isGlobal && this.page.pageBuilder.editGlobal && this.page.hasAnswers) || (!this.page.isGlobal && this.page.hasApplicationAnswers)){
     button.addClass('ui-button-disabled ui-state-disabled');
     button.attr('title', 'This element cannot be deleted because there is applicant information associated with it.');
     button.qtip();
