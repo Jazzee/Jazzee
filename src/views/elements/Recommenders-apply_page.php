@@ -19,25 +19,7 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
         }
       }?>
       <p>
-        <?php
-        if (is_null($page->getMax())) {
-          if ($completedAnswers >= $page->getMin()) {
-            print 'You may add as many additional recommenders as you wish to this page, but it is not required.';
-          } else {
-            print 'You have invited ' . $completedAnswers . ' of the ' . $page->getMin() . ' required recommenders on this page.';
-          }
-        } else {
-          if ($page->getMax() - $completedAnswers == 0) {
-            print 'You cannot invite any more recommenders to this page.';
-          } else if ($completedAnswers >= $page->getMin()) {
-            print 'You may invite an additional ' . ($page->getMax() - $completedAnswers) . ' recommenders on this page, but it is not required.';
-          } else {
-            print 'You have invited ' . $completedAnswers . ' of the ' . $page->getMin() . ' required recommenders on this page.';
-          }
-        }
-        if ($completedAnswers < $totalAnswers) {
-          print '&nbsp;You have not invited ' . ($totalAnswers - $completedAnswers) . ' of the recommenders you added to the page.  Click &lsquo;Send Invitation Email&rsquo; to invite each recommender.';
-        }?>
+        You have invited <?php print $completedAnswers;?> recommender(s); a minimum of <?php print $page->getMin(); ?> are required. Click ‘Send Invitation Email’ to invite each recommender.
       </p><?php
     } ?>
   </div><?php
