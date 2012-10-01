@@ -4,7 +4,7 @@
  */
 $page->getJazzeePage()->setApplicant($applicant);
 ?>
-<div class='page' id='page<?php print $page->getPage()->getId() ?>'>
+<div class='page' id='page<?php print $page->getPage()->getId(); ?>'>
   <h4><?php print $page->getTitle(); ?></h4><?php
   if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?>
     <p>Applicant Skipped this page.
@@ -14,13 +14,31 @@ $page->getJazzeePage()->setApplicant($applicant);
         <a class='action' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/doPageAction/unskip/' . $page->getPage()->getId()) ?>'>Complete this page.</a><?php
       } ?>
     </p><?php
-  } else if (count($page->getJazzeePage()->getAnswers())) { ?>
+  } else if (count($page->getJazzeePage()->getAnswers())) {
+    //preparse the branching answers into an array so we can make a nice table
+    $answers = array();
+    $headers = array();
+    foreach ($page->getJazzeePage()->getAnswers() as $answer) {
+      $arr = array();
+      $child = $answer->getChildren()->first();
+      $arr[$page->getPage()->getVar('branchingElementLabel')] = $child->getPage()->getTitle();
+      foreach ($child->getPage()->getElements() as $element) {
+        $element->getJazzeeElement()->setController($this->controller);
+        $arr[$element->getTitle()] = $element->getJazzeeElement()->displayValue($child);
+      }
+      $headers = array_unique(array_merge($headers, array_keys($arr)));
+      $arr['answer'] = $answer;
+      $answers[] = $arr;
+    }
+  }
+  if(!empty($answers)){?>
     <div class='answers'>
       <table class='answer'>
         <thead>
           <tr>
-            <th><?php print $page->getPage()->getVar('branchingElementLabel') ?></th>
-            <th>Answer</th>
+            <?php foreach($headers as $th){ ?>
+              <th><?php print $th;?></th>
+            <?php } ?>
             <th>Status</th>
             <th>Attachment</th><?php
             if ($this->controller->checkIsAllowed('applicants_single', 'editAnswer') or $this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')) { ?>
@@ -29,16 +47,16 @@ $page->getJazzeePage()->setApplicant($applicant);
           </tr>
         </thead>
         <tbody><?php
-          foreach ($page->getJazzeePage()->getAnswers() as $answer) { ?>
-            <tr id='answer<? print $answer->getId() ?>'>
-              <?php $child = $answer->getChildren()->first(); ?>
-              <td><?php print $child->getPage()->getTitle(); ?></td>
-              <td><?php
-                foreach ($child->getPage()->getElements() as $element) {
-                  $element->getJazzeeElement()->setController($this->controller);
-                  print '<strong>' . $element->getTitle() . ':</strong>&nbsp;' . $element->getJazzeeElement()->displayValue($child) . '<br />';
-                }?>
-              </td>
+          foreach ($answers as $arr) {
+            $answer = $arr['answer'];?>
+            <tr id='answer<? print $answer->getId(); ?>'>
+              <?php foreach($headers as $key){?>
+                <td><?php
+                  if(array_key_exists($key, $arr)){
+                    print $arr[$key];
+                  }
+                  ?></td>
+              <?php } ?>
               <td>
                 <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a'); ?><?php
                 if ($answer->getPublicStatus()) { ?>
