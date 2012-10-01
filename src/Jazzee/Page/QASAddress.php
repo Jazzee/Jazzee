@@ -263,7 +263,7 @@ class QASAddress extends Standard
           break;
       case 'StreetPartial':
       case 'PremisesPartial':
-        $this->_controller->addMessage('error', 'We were unable to validate your address.');
+        $this->_controller->addMessage('error', 'We were unable to validate your address.  If you are sure this address is correct then click the "Confirm Address as Entered" button.');
         $this->getForm()->getElementByName('address1')->addMessage('Your address is incomplete');
         $this->getForm()->getElementByName('address2')->addMessage('Your address is incomplete');
         $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
