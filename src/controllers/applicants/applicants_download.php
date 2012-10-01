@@ -41,6 +41,11 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $element->newItem('denied', 'Denied');
     $element->newItem('accepted', 'Accepted');
     $element->newItem('declined', 'Declined');
+
+    $tags = $this->_em->getRepository('\Jazzee\Entity\Tag')->findByApplication($this->_application);
+    foreach ($tags as $tag) {
+      $element->newItem($tag->getId(), $tag->getTitle());
+    }
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Download Applicants');
@@ -54,15 +59,38 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
       $applicantsArray = array();
       $applicants = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findByApplication($this->_application, false);
       foreach ($applicants as $applicant) {
-        if ((!$applicant->isLocked() and in_array('unlocked', $filters))
-                or ($applicant->isLocked() and in_array('locked', $filters))
-                or ($applicant->isLocked() and $applicant->getDecision()->getFinalAdmit() and in_array('admitted', $filters))
-                or ($applicant->isLocked() and $applicant->getDecision()->getFinalDeny() and in_array('denied', $filters))
-                or ($applicant->isLocked() and $applicant->getDecision()->getAcceptOffer() and in_array('accepted', $filters))
-                or ($applicant->isLocked() and $applicant->getDecision()->getDeclineOffer() and in_array('declined', $filters))
-        ) {
+        $selected = false;
+        if (!$applicant->isLocked() and in_array('unlocked', $filters)) {
+          $selected = true;
+        }
+        if ($applicant->isLocked()) {
+          if (in_array('locked', $filters)) {
+            $selected = true;
+          }
+          if ($applicant->getDecision()->getFinalAdmit() and in_array('admitted', $filters)) {
+            $selected = true;
+          }
+          if ($applicant->getDecision()->getFinalDeny() and in_array('denied', $filters)) {
+            $selected = true;
+          }
+          if ($applicant->getDecision()->getAcceptOffer() and in_array('accepted', $filters)) {
+            $selected = true;
+          }
+          if ($applicant->getDecision()->getDeclineOffer() and in_array('declined', $filters)) {
+            $selected = true;
+          }
+        }
+        foreach ($filters as $value) {
+          if(!$selected AND array_key_exists($value, $tags)){
+            $tag = $tags[$value];
+            if ($applicant->hasTag($tag)) {
+              $selected = true;
+            }
+          }
+        }
+        if ($selected) {
           $applicantsArray[] = $applicant->getId();
-        } //end if filter
+        }
       } //end foreach applicants
       unset($applicants);
       switch ($input->get('type')) {

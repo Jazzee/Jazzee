@@ -702,6 +702,17 @@ class Applicant
   }
 
   /**
+   * Check if an applicant has a tag
+   *
+   * @param Tag $checkTag
+   * @return boolean
+   */
+  public function hasTag($checkTag)
+  {
+    return $this->tags->contains($checkTag);
+  }
+
+  /**
    * Add thread
    *
    * @param \Jazzee\Entity\Thread $thread

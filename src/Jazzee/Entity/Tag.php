@@ -5,7 +5,8 @@ namespace Jazzee\Entity;
  * Tag
  * Applicants can be tagged with a string to group them - we store all these strings in the tags table and then link them to applicants when they are requested
  *
- * @Entity @Table(name="tags",
+ * @Entity(repositoryClass="\Jazzee\Entity\TagRepository")
+ * @Table(name="tags",
  * uniqueConstraints={@UniqueConstraint(name="tag_title",columns={"title"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
