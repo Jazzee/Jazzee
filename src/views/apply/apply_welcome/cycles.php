@@ -13,7 +13,6 @@ $dateFormat = 'm/d/Y';
   <ul class='nobullets'>
     <?php
     foreach ($applications as $application) {
-      if ($application->isVisible()) {
         echo '<li>';
         if ($application->isPublished()) {
           if ($application->getOpen() < new DateTime('now')) {
@@ -39,7 +38,6 @@ $dateFormat = 'm/d/Y';
           }
         }
         echo '</li><hr />';
-      }
     }
     ?>
   </ul>

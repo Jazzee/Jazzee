@@ -87,7 +87,7 @@ class ApplyWelcomeController extends \Jazzee\Controller
     }
     if (empty($this->application)) {
       $this->setLayoutVar('layoutTitle', $this->program->getName() . ' Application');
-      $this->setVar('applications', $this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($this->program));
+      $this->setVar('applications', $this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($this->program, false, true));
       $this->loadView($this->controllerName . '/cycles');
 
       return true;
@@ -122,12 +122,15 @@ class ApplyWelcomeController extends \Jazzee\Controller
       $link = new \Foundation\Navigation\Link('Welcome');
       $link->setHref($this->path($path));
       $link->setCurrent(true);
-
-      $menu->addLink($link);
-      $link = new \Foundation\Navigation\Link('Other Cycles');
-      $link->setHref($this->path('apply/' . $this->program->getShortName()));
       $menu->addLink($link);
 
+      //Only show the other cycles link if there are other published visible cycles
+      $applications = $this->_em->getRepository('Jazzee\Entity\Application')->findByProgram($this->program, false, true, array($this->application->getId()));
+      if(count($applications) > 0){
+        $link = new \Foundation\Navigation\Link('Other Cycles');
+        $link->setHref($this->path('apply/' . $this->program->getShortName()));
+        $menu->addLink($link);
+      }
       $link = new \Foundation\Navigation\Link('Returning Applicants');
       $link->setHref($this->path($path . '/applicant/login'));
       $menu->addLink($link);
