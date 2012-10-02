@@ -31,6 +31,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $element->setLabel('Type of Download');
     $element->newItem('xls', 'Excel');
     $element->newItem('xml', 'XML');
+    $element->newItem('pdfarchive', 'Archive of Multiple PDFs');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $element = $field->newElement('CheckboxList', 'filters');
@@ -99,6 +100,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           break;
         case 'xml':
           $this->makeXml($applicantsArray);
+          break;
+        case 'pdfarchive':
+          $this->makePdfArchive($applicantsArray);
           break;
       }
     }
@@ -212,7 +216,6 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $xml = new DOMDocument();
     $xml->formatOutput = true;
     $applicantsXml = $xml->createElement("applicants");
-
     foreach ($applicants as $id) {
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
       $appXml = $applicant->toXml($this);
@@ -224,6 +227,40 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $this->setLayout('xml');
     $this->setLayoutVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy'));
     $this->setVar('xml', $xml);
+  }
+
+  /**
+   * PDF file type
+   * Create a single large PDF of all applicants
+   * @param array \Jazzee\Entity\Applicant $applicants
+   */
+  protected function makePdfArchive(array $applicants)
+  {
+    $directoryName = $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy');
+    $zipFile = $this->getVarPath() . '/tmp/' . uniqid() . '.zip';
+    $zip = new ZipArchive;
+    $zip->open($zipFile, ZipArchive::CREATE);
+    $zip->addEmptyDir($directoryName);
+    $count = 0;
+    foreach ($applicants as $key => $id) {
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
+      $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
+      $zip->addFromString($directoryName . '/' . $applicant->getFullName() . '.pdf', $pdf->pdf($applicant));
+      if ($count > 50) {
+        $count = 0;
+        $this->_em->clear();
+        gc_collect_cycles();
+      }
+      $count++;
+    }
+    $zip->close();
+    header('Content-Type: ' . 'application/zip');
+    header('Content-Disposition: attachment; filename='. $directoryName . '.zip');
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Length: ' . filesize($zipFile));
+    readfile($zipFile);
+    unlink($zipFile);
+    exit(0);
   }
 
 }
