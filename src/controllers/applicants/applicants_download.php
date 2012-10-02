@@ -216,11 +216,18 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $xml = new DOMDocument();
     $xml->formatOutput = true;
     $applicantsXml = $xml->createElement("applicants");
+    $count = 0;
     foreach ($applicants as $id) {
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
       $appXml = $applicant->toXml($this);
       $node = $xml->importNode($appXml->documentElement, true);
       $applicantsXml->appendChild($node);
+      if ($count > 50) {
+        $count = 0;
+        $this->_em->clear();
+        gc_collect_cycles();
+      }
+      $count++;
     }
     $xml->appendChild($applicantsXml);
     $this->setVar('outputType', 'xml');
