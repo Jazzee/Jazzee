@@ -20,6 +20,8 @@ class ApplicantsSingleController extends \Jazzee\AdminController
   const ACTION_EXTENDDEADLINE = 'Extend Deadline';
   const ACTION_LOCK = 'Lock';
   const ACTION_UNLOCK = 'UnLock';
+  const ACTION_ACTIVATE = 'Activate';
+  const ACTION_DEACTIVATE = 'Deactivate';
   const ACTION_ADDTAG = 'Tag';
   const ACTION_REMOVETAG = 'Remove Tag';
   const ACTION_IGNOREDUPLICATE = 'Mark a duplicate applicant as ignored';
@@ -813,6 +815,39 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $this->_em->persist($applicant);
     $this->auditLog($applicant, 'Lock Application');
     $this->setVar('result', array('decisions' => $this->getDecisions($applicant)));
+    $this->loadView($this->controllerName . '/result');
+  }
+
+  /**
+   * Activate an applicant
+   * @param integer $applicantId
+   */
+  public function actionActivate($applicantId)
+  {
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->activate();
+    $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Activated Applicant');
+    $this->setLayoutVar('status', 'success');
+    $this->setVar('result', array('path' => $this->path('applicants/single/' . $applicant->getId()), 'message'=>$applicant->getFullName() . ' activated.'));
+    $this->loadView($this->controllerName . '/result');
+  }
+
+  /**
+   * Deactivate an applicant
+   * @param integer $applicantId
+   */
+  public function actionDeactivate($applicantId)
+  {
+    $applicant = $this->getApplicantById($applicantId);
+    $applicant->deactivate();
+    $this->_em->persist($applicant);
+    $this->auditLog($applicant, 'Deactivated Applicant');
+    $this->setLayoutVar('status', 'success');
+    $this->setVar('result', array(
+      'path' => $this->path('applicants/single/' . $applicant->getId()),
+      'message' => $applicant->getFullName() . ' deactivated.'
+    ));
     $this->loadView($this->controllerName . '/result');
   }
 

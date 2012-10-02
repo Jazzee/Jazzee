@@ -25,6 +25,7 @@ $dateFormat = 'l F jS Y g:ia';
 <?php
 $statusMessages = array(
   'StatusIncomplete' => 'Message for applicants who missed the deadline',
+  'StatusDeactivated' => 'Message for applicants who have been deactivated',
   'StatusNoDecision' => 'Message for locked applicants with no decision',
   'StatusAdmit' => 'Message for admitted applicants',
   'StatusDeny' => 'Message for denied applicants',

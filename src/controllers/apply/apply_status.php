@@ -20,7 +20,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
     parent::beforeAction();
     //if the applicant hasn't locked and the application isn't closed
     if (
-            !$this->_applicant->isLocked() AND
+            !($this->_applicant->isLocked() or $this->_applicant->isDeactivated()) AND
             ($this->_application->getClose() > new DateTime('now') or ($this->_applicant->getDeadlineExtension() and $this->_applicant->getDeadlineExtension() > new \DateTime('now')))
     ) {
       $this->addMessage('notice', "You have not completed your application.");
@@ -33,7 +33,9 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
    */
   public function actionIndex()
   {
-    if (!$this->_applicant->isLocked()) {
+    if ($this->_applicant->isDeactivated()) {
+      $statusPageText = $this->_application->getStatusDeactivatedText();
+    } else if (!$this->_applicant->isLocked()) {
       $statusPageText = $this->_application->getStatusIncompleteText();
     } else {
       switch ($this->_applicant->getDecision()->status()) {

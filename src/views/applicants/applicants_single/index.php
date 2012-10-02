@@ -45,9 +45,18 @@
               } ?>
             <?php
               if ($this->controller->checkIsAllowed('applicants_single', 'move')) { ?>
-                <a id='move' href="<?php print $this->path("applicants/single/{$applicant->getId()}/move"); ?>">Move applicant</a>
+                <a id='move' href="<?php print $this->path("applicants/single/{$applicant->getId()}/move"); ?>">Move applicant</a><br />
             <?php
               } ?>
+            <?php
+              if ($applicant->isDeactivated() and $this->controller->checkIsAllowed('applicants_single', 'activate')) { ?>
+                <a class='reload' href="<?php print $this->path("applicants/single/{$applicant->getId()}/activate"); ?>">Activate Applicant</a><br />
+            <?php
+            }
+            if (!$applicant->isDeactivated() and $this->controller->checkIsAllowed('applicants_single', 'deactivate')) { ?>
+              <a class='reload' href="<?php print $this->path("applicants/single/{$applicant->getId()}/deactivate"); ?>">Deactivate Applicant</a><br />
+            <?php
+            }?>
           </td>
           <td id="actions">
             Account Created: <?php print $applicant->getCreatedAt()->format('c'); ?><br />
@@ -126,7 +135,7 @@
               ?>
               <a class='action' href="<?php print $this->path("applicants/single/{$applicant->getId()}/lock"); ?>">Lock Application</a>
             <?php
-            } ?>
+            }?>
           </td>
           <td id="tags"></td>
         </tr>

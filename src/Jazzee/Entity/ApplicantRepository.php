@@ -41,7 +41,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findByCycle(Cycle $cycle)
   {
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a.application IN (SELECT app FROM Jazzee\Entity\Application app WHERE app.cycle = :cycleId)');
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a.application IN (SELECT app FROM Jazzee\Entity\Application app WHERE app.cycle = :cycleId) AND a.deactivated=false');
     $query->setParameter('cycleId', $cycle->getId());
 
     return $query->getResult();
@@ -55,7 +55,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findDuplicates(Applicant $applicant)
   {
-    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a != :applicantId AND a.email = :email AND a.application IN (SELECT app FROM Jazzee\Entity\Application app WHERE app.cycle = :cycleId)');
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE a != :applicantId AND a.email = :email AND a.application IN (SELECT app FROM Jazzee\Entity\Application app WHERE app.cycle = :cycleId) AND a.deactivated=false');
     $query->setParameter('applicantId', $applicant->getId());
     $query->setParameter('cycleId', $applicant->getApplication()->getCycle()->getId());
     $query->setParameter('email', $applicant->getEmail());
@@ -84,6 +84,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->andWhere('a.firstName LIKE :firstName')
             ->andWhere('a.lastName LIKE :lastName')
             ->orderBy('a.lastName, a.firstName');
+    $queryBuilder->andWhere('a.deactivated=false');
     $queryBuilder->setParameter('firstName', $firstName);
     $queryBuilder->setParameter('lastName', $lastName);
 
@@ -94,7 +95,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    * All the applicants in an application
    * @param Application $application
    * @param boolean $deep should we load the full data for each applicant
-   * @return Application
+   * @return array
    */
   public function findByApplication(Application $application, $deep = false)
   {
@@ -113,6 +114,25 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     }
 
     $queryBuilder->where('applicant.application = :applicationId');
+    $queryBuilder->andWhere('applicant.deactivated=false');
+    $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
+    $queryBuilder->setParameter('applicationId', $application->getId());
+
+    return $queryBuilder->getQuery()->getResult();
+  }
+
+  /**
+   * All the deactivated applicants in an application
+   * @param Application $application
+   * @return array
+   */
+  public function findDeactivatedByApplication(Application $application)
+  {
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
+    $queryBuilder->add('select', 'applicant');
+    $queryBuilder->where('applicant.application = :applicationId');
+    $queryBuilder->andWhere('applicant.deactivated=true');
     $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
     $queryBuilder->setParameter('applicationId', $application->getId());
 
@@ -192,6 +212,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
         }
       }
     }
+    $queryBuilder->andWhere('a.deactivated=false');
     $queryBuilder->orderBy('a.lastName, a.firstName');
     $applicants = $queryBuilder->getQuery()->getResult();
 

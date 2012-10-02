@@ -86,6 +86,9 @@ class Applicant
   /** @Column(type="boolean") */
   private $hasPaid;
 
+  /** @Column(type="boolean") */
+  private $deactivated;
+
   /**
    * @OneToMany(targetEntity="Answer",mappedBy="applicant")
    */
@@ -140,6 +143,7 @@ class Applicant
     $this->isLocked = false;
     $this->percentComplete = 0;
     $this->hasPaid = false;
+    $this->deactivated = false;
   }
 
   /**
@@ -842,6 +846,32 @@ class Applicant
   public function hasPaid()
   {
     return $this->hasPaid;
+  }
+
+  /**
+   * Deactivate the Applicant
+   */
+  public function deactivate()
+  {
+    $this->deactivated = true;
+  }
+
+  /**
+   * Activate the Applicant
+   */
+  public function activate()
+  {
+    $this->deactivated = false;
+  }
+
+  /**
+   * Get deactivate
+   *
+   * @return boolean
+   */
+  public function isDeactivated()
+  {
+    return $this->deactivated;
   }
 
   /**

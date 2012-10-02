@@ -94,6 +94,9 @@ class Application
   /** @Column(type="text", nullable=true) */
   private $statusDeclineText;
 
+  /** @Column(type="text", nullable=true) */
+  private $statusDeactivatedText;
+
   public function __construct()
   {
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
@@ -371,6 +374,26 @@ class Application
   public function getStatusIncompleteText()
   {
     return $this->statusIncompleteText;
+  }
+
+  /**
+   * Set statusDeactivatedText
+   *
+   * @param string $text
+   */
+  public function setStatusDeactivatedText($text)
+  {
+    $this->statusDeactivatedText = $text;
+  }
+
+  /**
+   * Get statusDeactivatedText
+   *
+   * @return string
+   */
+  public function getStatusDeactivatedText()
+  {
+    return $this->statusDeactivatedText;
   }
 
   /**

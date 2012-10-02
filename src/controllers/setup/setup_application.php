@@ -16,6 +16,7 @@ class SetupApplicationController extends \Jazzee\AdminController
   const ACTION_EDITCONTACT = 'Edit Contact Information';
   const ACTION_EDITWELCOME = 'Edit Welcome Page';
   const ACTION_EDITSTATUSINCOMPLETE = 'Edit message for applicants who missed the deadline';
+  const ACTION_EDITSTATUSDEACTIVATED = 'Edit message for applicants who have been deactivated';
   const ACTION_EDITSTATUSNODECISION = 'Edit message for locked applicants with no decision';
   const ACTION_EDITSTATUSADMIT = 'Edit message for admitted applicants';
   const ACTION_EDITSTATUSDENY = 'Edit message for denied applicants';
@@ -152,6 +153,17 @@ class SetupApplicationController extends \Jazzee\AdminController
   {
     $form = $this->getStatusForm('Incomplete');
     $this->processStatusForm('Incomplete', $form);
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+
+  /**
+   * Edit Message for Deactivated Applicants
+   */
+  public function actionEditStatusDeactivated()
+  {
+    $form = $this->getStatusForm('Deactivated');
+    $this->processStatusForm('Deactivated', $form);
     $this->setVar('form', $form);
     $this->loadView($this->controllerName . '/form');
   }

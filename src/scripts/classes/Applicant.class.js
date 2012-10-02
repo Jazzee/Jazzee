@@ -11,6 +11,7 @@ Applicant.prototype.init = function(){
   var self = this;
   this.parseBio();
   this.parseActions();
+  this.parseReloads();
   this.parseDecisions();
   this.parseDuplicates();
   $('a#actas').click(function(e){
@@ -46,7 +47,7 @@ Applicant.prototype.init = function(){
 };
 /**
  * Create a form from json and display it
- * 
+ *
  * @param {Object} the json for the form
  * @param {String} the location we will post to
  * @param {String} the callback function when we succeed
@@ -146,7 +147,7 @@ Applicant.prototype.datePicker = function(input){
           hideInput: true,
           placement: "inline"}
   );
-  
+
 };
 
 /**
@@ -194,7 +195,7 @@ Applicant.prototype.parseDuplicates = function(){
     return false;
   });
 };
-  
+
 /**
  * Display Biographic information
  * @param Object json
@@ -238,8 +239,8 @@ Applicant.prototype.refreshActions = function(json){
   $('#actions').empty();
   var self = this;
   $('#actions').html(
-    'Account Created: ' + json.createdAt.date + '<br />' + 
-    'Last Update: ' + json.updatedAt.date + '<br />' + 
+    'Account Created: ' + json.createdAt.date + '<br />' +
+    'Last Update: ' + json.updatedAt.date + '<br />' +
     'Last Login: ' + json.lastLogin.date + '<br />'
   );
   var text = json.deadlineExtension?json.deadlineExtension.date:'none';
@@ -277,7 +278,7 @@ Applicant.prototype.parseDecisions = function(){
     });
     return false;
   });
-    
+
   $('#decisions a.action').click(function(e){
     $.get($(e.target).attr('href'),function(json){
       var id = $(e.target).attr('id');
@@ -302,16 +303,16 @@ Applicant.prototype.refreshDecisions = function(json){
     var types = [
       {title: 'Nominate for Admission', action: 'nominateAdmit', className: 'action'},
       {title: 'Undo Nomination', action: 'undoNominateAdmit', className: 'action'},
-      {title: 'Nominate for Deny', action: 'nominateDeny', className: 'action'}, 
-      {title: 'Undo Nomination', action: 'undoNominateDeny', className: 'action'}, 
-      {title: 'Admit Applicant', action: 'finalAdmit', className: 'actionForm'}, 
-      {title: 'Undo Decision', action: 'undoFinalAdmit', className: 'action'}, 
-      {title: 'Deny Applicant', action: 'finalDeny', className: 'actionForm'}, 
-      {title: 'Undo Decision', action: 'undoFinalDeny', className: 'action'}, 
-      {title: 'Accept Offer', action: 'acceptOffer', className: 'actionForm'}, 
+      {title: 'Nominate for Deny', action: 'nominateDeny', className: 'action'},
+      {title: 'Undo Nomination', action: 'undoNominateDeny', className: 'action'},
+      {title: 'Admit Applicant', action: 'finalAdmit', className: 'actionForm'},
+      {title: 'Undo Decision', action: 'undoFinalAdmit', className: 'action'},
+      {title: 'Deny Applicant', action: 'finalDeny', className: 'actionForm'},
+      {title: 'Undo Decision', action: 'undoFinalDeny', className: 'action'},
+      {title: 'Accept Offer', action: 'acceptOffer', className: 'actionForm'},
       {title: 'Decline Offer', action: 'declineOffer', className: 'actionForm'},
-      {title: 'Undo Offer Response', action: 'undoAcceptOffer', className: 'action'}, 
-      {title: 'Undo Offer Response', action: 'undoDeclineOffer', className: 'action'}        
+      {title: 'Undo Offer Response', action: 'undoAcceptOffer', className: 'action'},
+      {title: 'Undo Offer Response', action: 'undoDeclineOffer', className: 'action'}
     ];
     for(var i = 0; i < types.length; i++){
       if(json['allow'+types[i].action]){
@@ -354,7 +355,7 @@ Applicant.prototype.refreshTags = function(json){
     $.post(self.baseUrl + '/removeTag',{tagId: tagId},function(json){
       self.refreshTags(json.data.result.tags);
     });
-    return false;  
+    return false;
   });
 
   var input = $('<input name="tag" type="text" value="add tag">');
@@ -453,7 +454,7 @@ Applicant.prototype.refreshAttachments = function(json){
     var a = $('<a>').attr('href', this.baseUrl + '/attachApplicantPdf').html('Attach Pdf').addClass('attach');
     $('#attachments').append(a);
   }
-  this.parseAttachments();  
+  this.parseAttachments();
 };
 
 /**
@@ -476,6 +477,43 @@ Applicant.prototype.parseAttachments = function(){
         }
       };
       self.createForm(json.data.form, obj);
+    });
+    return false;
+  });
+};
+
+/**
+ * Parse Reloads
+ * Some links do something and then reload the page
+ */
+Applicant.prototype.parseReloads = function(){
+  var self = this;
+  $('a.reload').click(function(e){
+    $.get($(e.target).attr('href'),function(json){
+      if(json.data.result.message.length > 0){
+        var div = $('<div>');
+        div.append($('<p>').html(json.data.result.message));
+        div.dialog({
+          modal: true,
+          autoOpen: true,
+          position: 'center',
+          width: 800,
+          overlay: {
+            backgroundColor: '#fff',
+            opacity: 0.8
+          },
+          buttons: {
+            "OK": function() {
+                $( this ).dialog( "close" );
+            }
+          },
+          close: function() {
+            div.dialog("destroy").remove();
+            $('#container').fadeOut(500);
+            window.location.href = json.data.result.path;
+          }
+        });
+      }
     });
     return false;
   });
