@@ -79,29 +79,36 @@ class Payment extends AbstractPage
     return $this->_form->processInput($input);
   }
 
+  /**
+   * Only process payments if there is not already a pending payment
+   * @param array $input
+   * @return type
+   */
   public function newAnswer($input)
   {
-    $answer = new \Jazzee\Entity\Answer();
-    $answer->setPage($this->_applicationPage->getPage());
-    $this->_applicant->addAnswer($answer);
-    $payment = new \Jazzee\Entity\Payment();
-    $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
-    $answer->setPayment($payment);
-    $result = $payment->getType()->getJazzeePaymentType($this->_controller)->pendingPayment($payment, $input);
+    if ($this->getStatus() == self::INCOMPLETE) {
+      $answer = new \Jazzee\Entity\Answer();
+      $answer->setPage($this->_applicationPage->getPage());
+      $this->_applicant->addAnswer($answer);
+      $payment = new \Jazzee\Entity\Payment();
+      $payment->setType($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->find($input->get('paymentType')));
+      $answer->setPayment($payment);
+      $result = $payment->getType()->getJazzeePaymentType($this->_controller)->pendingPayment($payment, $input);
 
-    if ($result) {
-      $this->_controller->addMessage('success', 'Your payment has been recorded.');
-      $this->_form = null;
-    } else {
-      $this->_controller->addMessage('error', 'There was a problem processing your payment.');
-    }
-    $this->_controller->getEntityManager()->persist($answer);
-    $this->_controller->getEntityManager()->persist($payment);
-    foreach ($payment->getVariables() as $var) {
-      $this->_controller->getEntityManager()->persist($var);
-    }
+      if ($result) {
+        $this->_controller->addMessage('success', 'Your payment has been recorded.');
+        $this->_form = null;
+      } else {
+        $this->_controller->addMessage('error', 'There was a problem processing your payment.');
+      }
+      $this->_controller->getEntityManager()->persist($answer);
+      $this->_controller->getEntityManager()->persist($payment);
+      foreach ($payment->getVariables() as $var) {
+        $this->_controller->getEntityManager()->persist($var);
+      }
 
-    return $result;
+      return $result;
+    }
   }
 
   public function updateAnswer($input, $answerID)
