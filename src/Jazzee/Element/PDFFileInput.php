@@ -147,12 +147,14 @@ class PDFFileInput extends AbstractElement
   {
     if($cron->getConfig()->getGeneratePDFPreviews()){
       $count = 0;
+      $generic = 0;
       $start = time();
       $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class' => '\Jazzee\Element\PDFFileInput'));
       if ($type) {
-        $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eBlob' => null), 500);
+        $blankPreviewElementAnswers = $this->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eBlob' => null), 100);
         $imagick = new \imagick;
         foreach ($blankPreviewElementAnswers as $blankPreviewElementAnswer) {
+          $thumbnailBlob = false;
           $blobElementAnswer = $blankPreviewElementAnswer->getAnswer()->getElementAnswersForElementByPosition($blankPreviewElementAnswer->getElement(), 0);
           try {
             $blob = $blobElementAnswer->getEBlob();
@@ -161,26 +163,36 @@ class PDFFileInput extends AbstractElement
             $handle = tmpfile();
             fwrite($handle, $blob);
             $arr = stream_get_meta_data($handle);
-            $imagick->readimage($arr['uri'] . '[0]');
-            $imagick->setImageFormat("png");
-            $imagick->thumbnailimage(100, 150, true);
+            if(@$imagick->readimage($arr['uri'] . '[0]') AND @$imagick->setImageFormat("png") AND @$imagick->thumbnailimage(100, 150, true)){
+              $thumbnailBlob = $imagick->getimageblob();
+            }
             fclose($handle);
           } catch (ImagickException $e) {
+            $thumbnailBlob = false;
+            $cron->log('Unable to create thumbnail for ' . $blankPreviewElementAnswer->getElement()->getTitle() . ' for applicant #' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . ' answer #' . $blankPreviewElementAnswer->getAnswer()->getId() . '.  Error: ' . $e->getMessage());
+          }
+          if(!$thumbnailBlob){
+            $generic++;
             $imagick = new \imagick;
             $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
             $imagick->thumbnailimage(100, 150, true);
+            $thumbnailBlob = $imagick->getimageblob();
           }
-          $blankPreviewElementAnswer->setEBlob($imagick->getimageblob());
-          $cron->getEntityManager()->persist($blankPreviewElementAnswer);
+          $blankPreviewElementAnswer->setEBlob($thumbnailBlob);
+
           $cachedFileName = $blankPreviewElementAnswer->getAnswer()->getApplicant()->getFullName() . ' ' . $blankPreviewElementAnswer->getElement()->getTitle() . '_' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . $blobElementAnswer->getId() . 'preview.png';
-          $cron->removeStoredFile($cachedFileName);
+          $this->removeStoredFile($cachedFileName);
           $count++;
           $imagick->clear();
         }
         unset($imagick);
       }
       if ($count) {
-        $cron->log("Generated {$count} PDFFileInput thumbnail(s) in " . (time() - $start) . ' seconds.');
+        $message = "Generated {$count} PDFFileInput thumbnail(s) in " . (time() - $start) . ' seconds.';
+        if ($generic) {
+          $message .= "  Unable to create thumbnail for {$generic} answers, so the generic one was used.";
+        }
+        $cron->log($message);
       }
     }
   }

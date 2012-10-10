@@ -1452,12 +1452,13 @@ class ApplicantsSingleController extends \Jazzee\AdminController
   {
 
     if($cron->getConfig()->getGeneratePDFPreviews()){
-      $attachments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Attachment')->findBy(array('thumbnail' => null), array(), 500);
+      $attachments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Attachment')->findBy(array('thumbnail' => null), array(), 100);
       $start = time();
       $total = 0;
       $generic = 0;
       $imagick = new \imagick;
       foreach ($attachments as $attachment) {
+        $thumbnailBlob = false;
         $total++;
         try {
           $blob = $attachment->getAttachment();
@@ -1466,17 +1467,22 @@ class ApplicantsSingleController extends \Jazzee\AdminController
           $handle = tmpfile();
           fwrite($handle, $blob);
           $arr = stream_get_meta_data($handle);
-          $imagick->readimage($arr['uri'] . '[0]');
-          $imagick->setImageFormat("png");
-          $imagick->thumbnailimage(100, 150, true);
+          if(@$imagick->readimage($arr['uri'] . '[0]') AND @$imagick->setImageFormat("png") AND @$imagick->thumbnailimage(100, 150, true)){
+            $thumbnailBlob = $imagick->getimageblob();
+          }
           fclose($handle);
         } catch (ImagickException $e) {
+          $thumbnailBlob = false;
+          $cron->log('Unable to create thumbnail for attachment #' . $attachment->getId() . '.  Error: ' . $e->getMessage());
+        }
+        if(!$thumbnailBlob){
+          $generic++;
           $imagick = new \imagick;
           $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
           $imagick->thumbnailimage(100, 150, true);
-          $generic++;
+          $thumbnailBlob = $imagick->getimageblob();
         }
-        $attachment->setThumbnail($imagick->getimageblob());
+        $attachment->setThumbnail($thumbnailBlob);
         $imagick->clear();
         $cron->getEntityManager()->persist($attachment);
         if ($attachment->getAnswer()) {
@@ -1495,6 +1501,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
         }
         $cron->log($message);
       }
+
     }
   }
 
