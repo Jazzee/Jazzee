@@ -113,6 +113,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     }
 
     $queryBuilder->where('applicant.application = :applicationId');
+    $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
     $queryBuilder->setParameter('applicationId', $application->getId());
 
     return $queryBuilder->getQuery()->getResult();
