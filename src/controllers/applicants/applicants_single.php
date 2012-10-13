@@ -104,7 +104,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
       'allTags' => array()
     );
     if ($this->checkIsAllowed($this->controllerName, 'addTag')) {
-      foreach ($this->_em->getRepository('\Jazzee\Entity\Tag')->findAll() as $tag) {
+      foreach ($this->_em->getRepository('\Jazzee\Entity\Tag')->findByApplication($this->_application) as $tag) {
         $tags['allTags'][] = $tag->getTitle();
       }
     }
