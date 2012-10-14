@@ -122,6 +122,31 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   }
 
   /**
+   * All the applicants in an application
+   * @param Application $application
+   * @param Tag $tag
+   * @return array
+   */
+  public function findTaggedByApplication(Application $application, Tag $tag)
+  {
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
+    $queryBuilder->add('select', 'applicant');
+    $queryBuilder->leftJoin('applicant.tags', 'tags');
+
+    $queryBuilder->where('applicant.application = :applicationId');
+    $queryBuilder->setParameter('applicationId', $application->getId());
+    $queryBuilder->andWhere('applicant.deactivated=false');
+
+    $queryBuilder->andWhere(':tagId MEMBER OF applicant.tags');
+    $queryBuilder->setParameter('tagId', $tag->getId());
+
+    $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
+
+    return $queryBuilder->getQuery()->getResult();
+  }
+
+  /**
    * All the deactivated applicants in an application
    * @param Application $application
    * @return array

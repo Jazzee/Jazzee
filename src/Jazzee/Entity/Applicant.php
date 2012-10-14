@@ -680,8 +680,10 @@ class Applicant
    */
   public function addTag(Tag $tag)
   {
-    $this->tags[] = $tag;
-    $this->markLastUpdate();
+    if(!$this->tags->contains($tag)){
+      $this->tags[] = $tag;
+      $this->markLastUpdate();
+    }
   }
 
   /**
