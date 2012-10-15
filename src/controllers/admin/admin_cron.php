@@ -1,8 +1,5 @@
 <?php
 
-ini_set('memory_limit', '1G');
-set_time_limit(600);
-
 /**
  * Run admin cron tasks
  *
@@ -18,6 +15,8 @@ class AdminCronController extends \Jazzee\AdminController
   const MAX_INTERVAL = 3600;
   const REQUIRE_AUTHORIZATION = false;
   const REQUIRE_APPLICATION = false;
+  const MAX_EXECUTION_TIME = 600;
+  const MEMORY_LIMIT = '2G';
 
   /**
    * Check to see if this host is allowed to run cron
@@ -48,6 +47,7 @@ class AdminCronController extends \Jazzee\AdminController
   public function actionIndex()
   {
     if ($this->semaphore()) {
+      $this->setLimits();
       $this->log('Cron run started');
       foreach ($this->listControllers() as $controller) {
         \Foundation\VC\Config::includeController($controller);
@@ -57,8 +57,7 @@ class AdminCronController extends \Jazzee\AdminController
           $this->_em->flush();
         }
         //reset the max execution time and memory limit after every admin script is included because some override this
-        set_time_limit(600);
-        ini_set('memory_limit', '1G');
+        $this->setLimits();
       }
 
       foreach ($this->_em->getRepository('\Jazzee\Entity\PageType')->findAll() as $pageType) {
@@ -67,6 +66,7 @@ class AdminCronController extends \Jazzee\AdminController
           $class::runCron($this);
           $this->_em->flush();
         }
+        $this->setLimits();
       }
 
       foreach ($this->_em->getRepository('\Jazzee\Entity\ElementType')->findAll() as $elementType) {
@@ -75,6 +75,7 @@ class AdminCronController extends \Jazzee\AdminController
           $class::runCron($this);
           $this->_em->flush();
         }
+        $this->setLimits();
       }
 
       //Perform applicant actions
@@ -140,6 +141,12 @@ class AdminCronController extends \Jazzee\AdminController
     $this->setVar('adminCronLastRun', time());
 
     return true;
+  }
+
+  protected function setLimits()
+  {
+    ini_set('memory_limit', self::MEMORY_LIMIT);
+    set_time_limit(self::MAX_EXECUTION_TIME);
   }
 
 }
