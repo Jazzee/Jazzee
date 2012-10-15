@@ -17,6 +17,7 @@ class AdminCronController extends \Jazzee\AdminController
   const REQUIRE_APPLICATION = false;
   const MAX_EXECUTION_TIME = 600;
   const MEMORY_LIMIT = '2G';
+  const VERBOSE_LOGS = false;
 
   /**
    * Check to see if this host is allowed to run cron
@@ -53,6 +54,9 @@ class AdminCronController extends \Jazzee\AdminController
         \Foundation\VC\Config::includeController($controller);
         $class = \Foundation\VC\Config::getControllerClassName($controller);
         if (method_exists($class, 'runCron')) {
+          if(self::VERBOSE_LOGS){
+            $this->log("Admin controller {$controller} job started");
+          }
           $class::runCron($this);
           $this->_em->flush();
         }
@@ -63,6 +67,9 @@ class AdminCronController extends \Jazzee\AdminController
       foreach ($this->_em->getRepository('\Jazzee\Entity\PageType')->findAll() as $pageType) {
         $class = $pageType->getClass();
         if (method_exists($class, 'runCron')) {
+          if(self::VERBOSE_LOGS){
+            $this->log("Page type {$class} job started");
+          }
           $class::runCron($this);
           $this->_em->flush();
         }
@@ -72,6 +79,9 @@ class AdminCronController extends \Jazzee\AdminController
       foreach ($this->_em->getRepository('\Jazzee\Entity\ElementType')->findAll() as $elementType) {
         $class = $elementType->getClass();
         if (method_exists($class, 'runCron')) {
+          if(self::VERBOSE_LOGS){
+            $this->log("Element type {$class} job started");
+          }
           $class::runCron($this);
           $this->_em->flush();
         }
@@ -80,6 +90,9 @@ class AdminCronController extends \Jazzee\AdminController
 
       //Perform applicant actions
       \Foundation\VC\Config::includeController('apply_applicant');
+      if(self::VERBOSE_LOGS){
+        $this->log("Controller apply_applicant job started");
+      }
       ApplyApplicantController::runCron($this);
 
 
@@ -143,6 +156,9 @@ class AdminCronController extends \Jazzee\AdminController
     return true;
   }
 
+  /**
+   * Set the execution and memory limit for the script
+   */
   protected function setLimits()
   {
     ini_set('memory_limit', self::MEMORY_LIMIT);
