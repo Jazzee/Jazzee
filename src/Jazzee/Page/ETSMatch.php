@@ -316,6 +316,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $allETSMatchPages = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Page')->findBy(array('type' => $pageType->getId()));
     $countGre = 0;
     $countToefl = 0;
+    $flushCount = 0;
     foreach ($allETSMatchPages as $page) {
       //get all the answers without a matching score.
       $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findBy(array('pageStatus' => null, 'page' => $page->getId(), 'greScore' => null, 'toeflScore' => null), array('updatedAt' => 'desc'));
@@ -337,6 +338,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
               $score = $cron->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findOneBy($parameters);
               if ($score) {
                 $countGre++;
+                $flushCount++;
                 $answer->setGreScore($score);
                 $cron->getEntityManager()->persist($answer);
               }
@@ -345,6 +347,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
               $score = $cron->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findOneBy($parameters);
               if ($score) {
                 $countToefl++;
+                $flushCount++;
                 $answer->setTOEFLScore($score);
                 $cron->getEntityManager()->persist($answer);
               }
@@ -352,6 +355,10 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
             default:
               throw new \Jazzee\Exception("Unknown test type: {$testType} when trying to match a score");
           }
+        }
+        if($flushCount > 100){
+          $flushCount = 0;
+          $cron->getEntityManager()->flush();
         }
       }
     }
