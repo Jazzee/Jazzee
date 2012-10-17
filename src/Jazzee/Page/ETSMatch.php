@@ -316,10 +316,9 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $allETSMatchPages = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Page')->findBy(array('type' => $pageType->getId()));
     $countGre = 0;
     $countToefl = 0;
-    $flushCount = 0;
     foreach ($allETSMatchPages as $page) {
       //get all the answers without a matching score.
-      $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findBy(array('pageStatus' => null, 'page' => $page->getId(), 'greScore' => null, 'toeflScore' => null), array('updatedAt' => 'desc'));
+      $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findBy(array('pageStatus' => null, 'page' => $page->getId(), 'greScore' => null, 'toeflScore' => null), array('updatedAt' => 'desc'), 100);
       foreach ($answers as $answer) {
         if (is_null($answer->getGREScore()) and is_null($answer->getTOEFLScore())) {
           $testType = $page->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer);
@@ -356,11 +355,8 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
               throw new \Jazzee\Exception("Unknown test type: {$testType} when trying to match a score");
           }
         }
-        if($flushCount > 100){
-          $flushCount = 0;
-          $cron->getEntityManager()->flush();
-        }
       }
+      $cron->getEntityManager()->flush();
     }
     if ($countGre) {
       $cron->log("Found {$countGre} new GRE score matches");
