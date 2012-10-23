@@ -1,0 +1,25 @@
+Vagrant::Config.run do |config|
+  config.vm.box = "precise64"
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
+  config.vm.define :web do |web_config|
+      web_config.vm.host_name = "web"
+      web_config.vm.network :hostonly, "10.10.11.4"
+      web_config.vm.forward_port 80, 8080
+      web_config.vm.provision  :puppet do  |puppet|
+        puppet.manifests_path = "dev/puppet/manifests"
+        puppet.manifest_file = "web.pp"
+        puppet.module_path  = "dev/puppet/modules"
+      end
+  end
+  config.vm.define :db do |db_config|
+      db_config.vm.host_name = "db"
+      db_config.vm.network :hostonly, "10.10.11.5"
+      db_config.vm.forward_port 3306, 13306
+      db_config.vm.provision  :puppet do  |puppet|
+        puppet.manifests_path = "dev/puppet/manifests"
+        puppet.manifest_file = "db.pp"
+        puppet.module_path  = "dev/puppet/modules"
+      end
+  end
+end

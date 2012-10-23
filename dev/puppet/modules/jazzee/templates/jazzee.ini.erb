@@ -1,0 +1,37 @@
+;### DATABASE CONNECTION ###;
+dbName=<%= scope.lookupvar('jazzee::data::db_name') %>
+dbUser=<%= scope.lookupvar('jazzee::data::db_user') %>
+dbPassword=<%= scope.lookupvar('jazzee::data::db_password') %>
+dbHost=<%= scope.lookupvar('jazzee::data::db_host') %>
+dbDriver=pdo_mysql
+dbCharset=utf8
+
+adminAuthenticationClass='\Jazzee\AdminAuthentication\NoAuthentication'
+noAuthIpAddresses='<%= scope.lookupvar('jazzee::data::host_address') %>'
+
+adminDirectoryClass='\Jazzee\AdminDirectory\Local'
+
+maximumApplicantFileUploadSize=4M
+defaultApplicantFileUploadSize=2M
+maximumAdminFileUploadSize=5M
+
+allowApplicantNameChange=true
+allowApplicantEmailChange=true
+allowApplicantPasswordChange=true
+
+;#Public OPENSSL PKI certificate is used to encrypt applicant input for especially sensitive data like SSNs
+;#For security only the public key should be stored on the Jazzee System and decryption should happen offline
+publicKeyCertificatePath='/var/www/webapps/etc/oar.crt'
+
+;### DEVELOPMENT OPTIONS ###;
+status=DEVELOPMENT
+
+adminCronAllowed='<%= scope.lookupvar('jazzee::data::web_host') %>'
+
+varPath=<%= scope.lookupvar('jazzee::data::var_path') %>
+
+mailOverrideToAddress='<%= scope.lookupvar('jazzee::data::mail_override') %>'
+
+virusScanUploads=true
+
+allowScramble=true

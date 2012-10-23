@@ -6,3 +6,5 @@ var/cache/*
 var/log/*
 var/sesion/*
 var/tmp/*
+.vagrant
+Vagrantfile
