@@ -285,8 +285,14 @@ class JazzeePageController extends \Foundation\VC\Controller
     } else {
       $protocol = 'https';
     }
+    
+    if(in_array($_SERVER['SERVER_PORT'], array('80', '443'))){
+        $port = '';
+    } else {
+        $port = ':' . $_SERVER['SERVER_PORT'];
+    }
 
-    $this->_serverPath = $protocol . '://' . $_SERVER['SERVER_NAME'];
+    $this->_serverPath = $protocol . '://' . $_SERVER['SERVER_NAME'] . $port;
   }
 
   /**
