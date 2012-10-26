@@ -589,6 +589,22 @@ class Application
   }
 
   /**
+   * Get an application page by its page ID
+   * @param integer $id
+   * @return ApplicationPage
+   */
+  public function getApplicationPageByPageId($id)
+  {
+    foreach ($this->applicationPages as $applicationPage) {
+      if ($applicationPage->getPage()->getId() == $id) {
+        return $applicationPage;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Get page by tile
    * @param string $title
    * @return ApplicationPage

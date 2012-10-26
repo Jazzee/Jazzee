@@ -28,7 +28,7 @@ class JazzeePageController extends \Foundation\VC\Controller
   /**
    * @var \Foundation\Cache
    */
-  protected $_cache;
+  protected static $_cache;
 
   /**
    * Absolute server path
@@ -275,10 +275,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->_foundationConfig->setMailServerUsername($this->_config->getMailServerUsername());
     $this->_foundationConfig->setMailServerPassword($this->_config->getMailServerPassword());
 
-
-    $this->_cache = new \Foundation\Cache('Jazzee' . __DIR__, $this->_foundationConfig);
-
-    \Foundation\VC\Config::setCache($this->_cache);
+    \Foundation\VC\Config::setCache(self::getCache());
 
     if ((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] == 'off')) {
       $protocol = 'http';
@@ -448,6 +445,27 @@ class JazzeePageController extends \Foundation\VC\Controller
     $frontController = new \Lvc_FrontController();
     $frontController->processRequest($request);
     exit(1);
+  }
+  
+  /**
+   * Get the cache
+   * We use a static method here so the cache is always available
+   * 
+   * @return \Foundation\Cache
+   */
+  public static function getCache(){
+    if(!isset(self::$_cache)){
+      $config = new \Jazzee\Configuration();
+      $foundationConfig = new \Foundation\Configuration();
+      if ($config->getStatus() == 'DEVELOPMENT') {
+        $foundationConfig->setCacheType('array');
+      } else {
+        $foundationConfig->setCacheType('apc');
+      }
+      //use the path as a namespace so multiple installs on the same system dont conflict
+      self::$_cache = new \Foundation\Cache('JAZZEE-' . str_ireplace(array('/', ' '), '', __DIR__), $foundationConfig);
+    }
+    return self::$_cache;
   }
 
 }

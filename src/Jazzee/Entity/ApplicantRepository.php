@@ -193,6 +193,51 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   }
 
   /**
+   * Find a single applicant in an array format
+   * @param integer $id of the applicant
+   * @param \Jazzee\Controller $controller
+   * 
+   * @return array
+   */
+  public function findArray($id)
+  {
+    $cache = \Jazzee\Controller::getCache();
+    $cacheId = Applicant::ARRAY_CACHE_PREFIX . $id;
+    if($cache->contains($cacheId)){
+      return $cache->fetch($cacheId);
+    }
+    $queryBuilder = $this->deepApplicantQuery();
+    $queryBuilder->andWhere('applicant = :applicantId');
+    $queryBuilder->setParameter('applicantId', $id);
+    
+    $query = $queryBuilder->getQuery();
+    $query->setHint(\Doctrine\ORM\Query::HINT_INCLUDE_META_COLUMNS, true);
+    $applicantArray = $query->getSingleResult('ApplicantArrayHydrator');
+    $cache->save($cacheId, $applicantArray);
+    return $applicantArray;
+  }
+  
+  /**
+   * Get a deep application query builder
+   * @return type
+   */
+  protected function deepApplicantQuery(){
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
+    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, children, children_element_answers');
+    $queryBuilder->leftJoin('applicant.answers', 'answers');
+    $queryBuilder->leftJoin('answers.elements', 'element_answers');
+    $queryBuilder->leftJoin('applicant.attachments', 'attachments');
+    $queryBuilder->leftJoin('applicant.decision', 'decision');
+    $queryBuilder->leftJoin('applicant.tags', 'tags');
+    $queryBuilder->leftJoin('answers.children', 'children');
+    $queryBuilder->leftJoin('children.elements', 'children_element_answers');
+    $queryBuilder->where('answers.parent IS NULL');
+    
+    return $queryBuilder;
+  }
+
+  /**
    * Find applicants by name
    *
    * @param \stdClass $obj

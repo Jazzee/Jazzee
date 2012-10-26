@@ -23,6 +23,12 @@ class Applicant
 {
 
   /**
+   * The prefix to use for applicant caching
+   * @var string
+   */
+  const ARRAY_CACHE_PREFIX = 'JazzeeApplicantArray-';
+  
+  /**
    * @Id
    * @Column(type="bigint")
    * @GeneratedValue(strategy="AUTO")
@@ -512,6 +518,16 @@ class Applicant
     }
     $this->percentComplete = $this->calculatePercentComplete();
     $this->hasPaid = $this->checkIfPaid();
+    $this->clearCache();
+  }
+
+  /**
+   * Delete any references to the applicant in the cache
+   * 
+   */
+  public function clearCache()
+  {
+    \Jazzee\Controller::getCache()->delete(self::ARRAY_CACHE_PREFIX . $this->id);
   }
 
   /**

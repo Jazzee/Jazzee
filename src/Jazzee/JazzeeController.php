@@ -161,23 +161,20 @@ class JazzeeController extends PageController
     if ($this->_config->getStatus() == 'DEVELOPMENT') {
       $doctrineConfig->setAutoGenerateProxyClasses(true);
       $doctrineConfig->setProxyDir($this->getVarPath() . '/tmp');
-      $cache = new \Doctrine\Common\Cache\ArrayCache;
     } else {
       $doctrineConfig->setAutoGenerateProxyClasses(false);
       $doctrineConfig->setProxyDir(__DIR__ . '/Entity/Proxy');
       if (!extension_loaded('apc')) {
         throw new Exception('APC cache is required, but was not available.');
       }
-      $cache = new \Doctrine\Common\Cache\ApcCache;
-      //use the path as a namespace so multiple installs on the same system dont conflict
-      $cache->setNamespace('JAZZEE-' . str_ireplace(array('/', ' '), '', __DIR__));
     }
     $driver = $doctrineConfig->newDefaultAnnotationDriver(array(__DIR__ . "/Entity"));
     $doctrineConfig->setMetadataDriverImpl($driver);
 
     $doctrineConfig->setProxyNamespace('Jazzee\Entity\Proxy');
-    $doctrineConfig->setMetadataCacheImpl($cache);
-    $doctrineConfig->setQueryCacheImpl($cache);
+    $doctrineConfig->setMetadataCacheImpl(self::getCache());
+    $doctrineConfig->setQueryCacheImpl(self::getCache());
+    $doctrineConfig->setResultCacheImpl(self::getCache());
 
     $connectionParams = array(
       'dbname' => $this->_config->getDbName(),
@@ -202,6 +199,7 @@ class JazzeeController extends PageController
     if ($connectionParams['charset']) {
       $this->_em->getConnection()->setCharset($connectionParams['charset']);
     }
+    $this->_em->getConfiguration()->addCustomHydrationMode('ApplicantArrayHydrator', 'Jazzee\Entity\ApplicantArrayHydrator');
   }
 
   /**
