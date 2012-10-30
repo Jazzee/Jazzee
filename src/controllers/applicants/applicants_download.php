@@ -31,6 +31,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $element->setLabel('Type of Download');
     $element->newItem('xls', 'Excel');
     $element->newItem('xml', 'XML');
+    $element->newItem('json', 'JSON');
     $element->newItem('pdfarchive', 'Archive of Multiple PDFs');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
@@ -100,6 +101,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           break;
         case 'xml':
           $this->makeXml($applicantsArray);
+          break;
+        case 'json':
+          $this->makeJson($applicantsArray);
           break;
         case 'pdfarchive':
           $this->makePdfArchive($applicantsArray);
@@ -234,6 +238,25 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $this->setLayout('xml');
     $this->setLayoutVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy'));
     $this->setVar('xml', $xml);
+  }
+
+  /**
+   * JSON file type
+   * @param array \Jazzee\Entity\Applicant $applicants
+   */
+  protected function makeJson(array $applicants)
+  {
+    $applicants = array_slice($applicants, 0, 50);
+    $arr = array();
+    $count = 0;
+    foreach ($applicants as $id) {
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, true);
+      $arr[] = $this->_application->formatApplicantArray($applicant);
+      $count++;
+    }
+    $this->setVar('outputType', 'json');
+    $this->setVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy') . '.json');
+    $this->setVar('output', array('applicants' => $arr));
   }
 
   /**
