@@ -224,14 +224,18 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   protected function deepApplicantQuery(){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
-    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, children, children_element_answers');
+    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, children, children_element_answers, children_publicStatus, children_privateStatus');
     $queryBuilder->leftJoin('applicant.answers', 'answers');
     $queryBuilder->leftJoin('answers.elements', 'element_answers');
+    $queryBuilder->leftJoin('answers.publicStatus', 'publicStatus');
+    $queryBuilder->leftJoin('answers.privateStatus', 'privateStatus');
     $queryBuilder->leftJoin('applicant.attachments', 'attachments');
     $queryBuilder->leftJoin('applicant.decision', 'decision');
     $queryBuilder->leftJoin('applicant.tags', 'tags');
     $queryBuilder->leftJoin('answers.children', 'children');
     $queryBuilder->leftJoin('children.elements', 'children_element_answers');
+    $queryBuilder->leftJoin('children.publicStatus', 'children_publicStatus');
+    $queryBuilder->leftJoin('children.privateStatus', 'children_privateStatus');
     $queryBuilder->where('answers.parent IS NULL');
     
     return $queryBuilder;
