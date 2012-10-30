@@ -58,6 +58,14 @@ class Date extends AbstractElement
 
     return null;
   }
+  
+  protected function arrayValue(array $elementAnswer){
+    $value = array(
+      'value' => $elementAnswer['eDate']->format('c')
+    );
+
+    return $value;
+  }
 
   public function formValue(\Jazzee\Entity\Answer $answer)
   {

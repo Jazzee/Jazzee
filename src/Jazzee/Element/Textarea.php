@@ -65,6 +65,14 @@ class Textarea extends AbstractElement
 
     return null;
   }
+  
+  protected function arrayValue(array $elementAnswer){
+    $value = array(
+      'value' => $elementAnswer['eText']
+    );
+
+    return $value;
+  }
 
   public function formValue(\Jazzee\Entity\Answer $answer)
   {

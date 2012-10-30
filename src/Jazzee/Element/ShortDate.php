@@ -53,6 +53,14 @@ class ShortDate extends AbstractElement
 
     return null;
   }
+  
+  protected function arrayValue(array $elementAnswer){
+    $value = array(
+      'value' => $elementAnswer['eDate']->format('F Y')
+    );
+
+    return $value;
+  }
 
   public function formValue(\Jazzee\Entity\Answer $answer)
   {

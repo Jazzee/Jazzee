@@ -129,6 +129,38 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
     
     return $eXml;
   }
+  
+  /**
+   * Format element answer data into an array
+   * 
+   * @param array $elementAnswers
+   * 
+   * @return array
+   */
+  public function formatApplicantArray(array $elementAnswers)
+  {
+    $arr = array(
+      'id' => $this->_element->getId(),
+      'title' => $this->_element->getTitle(),
+      'name' => $this->_element->getName(),
+      'type' => $this->_element->getType()->getClass(),
+      'weight' => $this->_element->getWeight(),
+      'values' => array()
+    );
+    foreach($elementAnswers as $elementAnswer){
+      $arr['values'][] = $this->arrayValue($elementAnswer);
+    }
+    
+    return $arr;
+  }
+  
+  /**
+   * Format a single element answer into an array
+   * 
+   * @param array $elementAnswer
+   * @return array
+   */
+  abstract protected function arrayValue(array $elementAnswer);
 
   /**
    * Default to an empty list of configuration variables

@@ -8,7 +8,7 @@ namespace Jazzee\Interfaces;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-interface XmlPage
+interface XmlPage extends DataPage
 {
 
   /**

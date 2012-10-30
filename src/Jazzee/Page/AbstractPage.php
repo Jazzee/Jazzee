@@ -264,6 +264,54 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
 
     return $answerXml;
   }
+  
+  /**
+   * Format a page array
+   * @param array $answers
+   * 
+   * @return array
+   */
+  public function formatApplicantArray(array $answers)
+  {
+    $page = array(
+      'title' => $this->_applicationPage->getTitle(),
+      'type' => $this->_applicationPage->getPage()->getType()->getClass(),
+      'name' => $this->_applicationPage->getName(),
+      'id' => $this->_applicationPage->getId(),
+      'answers' => array()
+    );
+    foreach($answers as $answer){
+      $page['answers'][] = $this->arrayAnswer($answer, $this->_applicationPage->getPage());
+    }
+
+    return $page;
+  }
+
+  /**
+   * Format an answer array
+   * @param \array $answer
+   * @param \Jazzee\Entity\Page $page
+   * 
+   * @return array
+   */
+  protected function arrayAnswer(array $answer, \Jazzee\Entity\Page $page)
+  {
+    $elements = $answer['elements'];
+    $answer['elements'] = array();
+    foreach ($elements as $elementId => $elementAnswers) {
+      $element = $page->getElementById($elementId);
+      $answer['elements'][] = $element->getJazzeeElement()->formatApplicantArray($elementAnswers);
+    }
+    
+    $children = $answer['children'];
+    $answer['children'] = array();
+
+    foreach ($children as $child) {
+      $answer['children'][] = $this->arrayAnswer($child, $page->getChildById($child['page_id']));
+    }
+
+    return $answer;
+  }
 
   /**
    * Create a table from answers

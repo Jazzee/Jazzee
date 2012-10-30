@@ -167,6 +167,37 @@ class Branching extends Standard
   }
 
   /**
+   * Format an answer array
+   * @param \array $answer
+   * @param \Jazzee\Entity\Page $page
+   * 
+   * @return array
+   */
+  protected function arrayAnswer(array $answer, \Jazzee\Entity\Page $page)
+  {
+    $child = $answer['children'][0];
+    unset($answer['children']);
+    $childPage = $page->getChildById($child['page_id']);
+    $elements = $child['elements'];
+    $answer['elements'] = array();
+    $answer['elements'][] = array(
+      'id' => 'branching',
+      'title' => $page->getVar('branchingElementLabel'),
+      'type' => null,
+      'name' => null,
+      'weight' => 0,
+      'values' => array(
+        array('value' => $childPage->getTitle(), 'name' => null, 'id'=>null)
+      )
+    );
+    foreach ($elements as $elementId => $elementAnswers) {
+      $element = $childPage->getElementById($elementId);
+      $answer['elements'][] = $element->getJazzeeElement()->formatApplicantArray($elementAnswers);
+    }
+    return $answer;
+  }
+
+  /**
    * Branchign pages get special CSV headers so all the branches are reprsented
    * @return array
    */

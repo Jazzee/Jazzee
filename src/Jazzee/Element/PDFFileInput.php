@@ -88,6 +88,14 @@ class PDFFileInput extends AbstractElement
 
     return null;
   }
+  
+  protected function arrayValue(array $elementAnswer){
+    $value = array(
+      'value' => $elementAnswer['eBlob']
+    );
+
+    return $value;
+  }
 
   public function rawValue(\Jazzee\Entity\Answer $answer)
   {

@@ -59,6 +59,18 @@ class SelectList extends AbstractElement
 
     return null;
   }
+  
+  protected function arrayValue(array $elementAnswer)
+  {
+    $item = $this->_element->getItemById($elementAnswer['eInteger']);
+    $value = array(
+      'value' => $item->getValue(),
+      'name' => $item->getName(),
+      'id' => $item->getId(),
+    );
+
+    return $value;
+  }
 
   public function formValue(\Jazzee\Entity\Answer $answer)
   {

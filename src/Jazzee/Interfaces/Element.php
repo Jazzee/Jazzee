@@ -76,6 +76,15 @@ interface Element
    * @returns boolean
    */
   public function testQuery(\Jazzee\Entity\Answer $answer, \stdClass $obj);
+  
+  /**
+   * Format element answer data into an array
+   * 
+   * @param array $elementAnswers
+   * 
+   * @return array
+   */
+  public function formatApplicantArray(array $elementAnswers);
 
   /**
    * Compare an element to another element

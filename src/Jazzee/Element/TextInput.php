@@ -64,6 +64,14 @@ class TextInput extends AbstractElement
 
     return null;
   }
+  
+  protected function arrayValue(array $elementAnswer){
+    $value = array(
+      'value' => $elementAnswer['eShortString']
+    );
+
+    return $value;
+  }
 
   public function formValue(\Jazzee\Entity\Answer $answer)
   {

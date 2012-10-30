@@ -747,5 +747,26 @@ class Application
     }
     return $differences;
   }
+  
+  /**
+   * Format applicant Array
+   *
+   * @param array $applicant
+   * 
+   * @return array
+   */
+  public function formatApplicantArray(array $applicant)
+  {
+    $answers = $applicant['answers'];
+    unset($applicant['answers']);
+    $applicant['pages'] = array();
+    foreach($answers as $pageId => $answers){
+      if($applicationPage = $this->getApplicationPageByPageId($pageId)){
+        $applicant['pages'][] = $applicationPage->getJazzeePage()->formatApplicantArray($answers);
+      }
+    }
+
+    return $applicant;
+  }
 
 }
