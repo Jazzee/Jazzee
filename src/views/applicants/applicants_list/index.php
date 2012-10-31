@@ -12,7 +12,7 @@ foreach ($tags as $title => $applicants) { ?>
   <?php
   if (count($applicants)) { ?>
     <table id='<?php print strtolower(preg_replace('#[^a-z0-9]#i', '', $title)); ?>'>
-      <caption><?php print $title; ?> (<?php print count($applicants); ?>)</caption>
+      <caption><span><?php print $title; ?></span> (<?php print count($applicants); ?>)</caption>
       <thead>
         <tr><th>View</th><th>Last Name</th><th>First Name</th><th>Last Update</th><th>Progress</th><th>Tags</th><th>Last Login</th><th>Account Created</th></tr>
       </thead>

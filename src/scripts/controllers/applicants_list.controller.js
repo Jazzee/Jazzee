@@ -3,55 +3,94 @@
  * Everything in hear needs to be value added so JS isn't necessary for applicants
  */
 $(document).ready(function(){
+  var services = new Services;
+  var cookieName = 'applicant_list_tags' + services.getCurrentApplicationId();
   var tags = [];
   $('table').each(function(i){
     var id = $(this).attr('id');
-    var title = $('caption', this).text();
-    tags.push({id: id, title: title});
+    var title = $('caption span', this).text();
+    var volume = $('tr', this).length;
+    //put a modifier on Not Locked otherwise it gums up the cloud
+    if(title == 'Not Locked'){
+      var volume = volume / 10;
+    }
+    tags.push({id: id, title: title, volume: volume});
   });
-  var table = $('<table>');
-  var cookie = $.cookie('applicant_list_tags');
-  if(null == cookie){
-    cookie = '';
-    $.cookie('applicant_list_tags', cookie);
+  var list = $('<ul>');
+  var selectedTags = $.cookie(cookieName);
+  if(selectedTags){
+    selectedTags = selectedTags.split('&;&');
   }
-  var selectedTags = cookie.split(';');
+  var cloud = $('<div>');
   for(var i=0; i < tags.length; i++){
-    var tr = $('<tr>');
-    var input = $('<input>').attr('id', 'selectTag_'+tags[i].id).attr('type', 'checkbox').data('tableId', tags[i].id);
-    if(selectedTags.length <= 1 || $.inArray(tags[i].id, selectedTags) > -1){
-      input.attr('checked', true);
+    var piece = $('<span>')
+      .css('margin', '.5em')
+      .css('cursor', 'pointer')
+      .html(tags[i].title)
+      .attr('rel', tags[i].volume)
+      .data('tableId', tags[i].id);
+    if(!selectedTags || $.inArray(tags[i].id, selectedTags) > -1){
+      piece.css('color', 'blue');
+      piece.data('selected', true);
       $('#'+tags[i].id).show();
     } else {
-      input.attr('checked', false);
+      piece.css('color', 'grey');
+      piece.data('selected', false);
       $('#'+tags[i].id).hide();
     }
-    tr.append($('<td>').append(input));
-    tr.append($('<td>').html(tags[i].title));
-    table.append(tr);
-  }
-  $('#selectors').append(table);
-  $('#selectors tr>td>input').bind('change', function(e){
-    if($(e.target).is(':checked')){
-      $('#' + $(e.target).data('tableId')).show();
-    } else {
-      $('#' + $(e.target).data('tableId')).hide();
-    }
+    piece.bind('click', function(){
+      var selected = !$(this).data('selected');
+      if(selected){
+        $(this).css('color', 'blue');
+        $('#'+$(this).data('tableId')).show();
+      } else {
+        $(this).css('color', 'grey');
+        $('#'+$(this).data('tableId')).hide();
+      }
+      $(this).data('selected', selected);
     var arr = [];
-    $('#selectors tr>td>input:checked').each(function(){
-      arr.push($(this).data('tableId'));
+    $('#selectors span[rel]').each(function(){
+      if($(this).data('selected')){
+        arr.push($(this).data('tableId'));
+      }
     });
-    var str = arr.join(';');
-    $.cookie('applicant_list_tags', str);
-  });
-  var tr = $('<tr>');
-  var input = $('<input>').attr('type', 'checkbox').bind('click', function(e){
-    $('#selectors tr>td>input').each(function(){
-      $(this).attr('checked', ($(e.target).is(':checked')));
+    if(arr.length > 0){
+      $.cookie(cookieName, arr.join('&;&'));
+    } else {
+      $.cookie(cookieName, null);
+    }
     });
-    $('#selectors tr>td>input').trigger('change');
+    cloud.append(piece);
+  }
+  
+  var piece = $('<span>')
+    .css('margin', '.5em')
+    .css('cursor', 'pointer')
+    .css('color', 'grey')
+    .html('Select None');
+  piece.bind('click', function(){
+    $('#selectors span[rel]').each(function(){
+      if($(this).data('selected')){
+        $(this).click();
+      }
+    });
   });
-  tr.append($('<th>').append(input));
-  tr.append($('<th>').html('Tags'));
-  table.prepend(tr);
+  cloud.prepend(piece);
+  
+  var piece = $('<span>')
+    .css('margin', '.5em')
+    .css('cursor', 'pointer')
+    .css('color', 'blue')
+    .html('Select All');
+  piece.bind('click', function(){
+    $('#selectors span[rel]').each(function(){
+      if(!$(this).data('selected')){
+        $(this).click();
+      }
+    });
+  });
+  cloud.prepend(piece);
+  
+  $('#selectors').append(cloud);
+  $('#selectors span').tagcloud({size: {start: .9, end: 2, unit: 'em'}})
 });

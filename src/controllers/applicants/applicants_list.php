@@ -20,6 +20,7 @@ class ApplicantsListController extends \Jazzee\AdminController
   protected function setUp()
   {
     parent::setUp();
+    $this->addScript($this->path('resource/jquery.tagcloud.js'));
     $this->addScript($this->path('resource/scripts/controllers/applicants_list.controller.js'));
   }
 
@@ -35,14 +36,12 @@ class ApplicantsListController extends \Jazzee\AdminController
     $tags['Declined'] = array();
     $tags['Locked'] = array();
     $tags['Paid'] = array();
-    $tags['Not Locked'] = array();
-    $tags['All Applicants'] = array();
+    $notLocked = array();
     foreach ($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant) {
-      $tags['All Applicants'][] = $applicant;
       if ($applicant->isLocked()) {
         $tags['Locked'][] = $applicant;
       } else {
-        $tags['Not Locked'][] = $applicant;
+        $notLocked[] = $applicant;
       }
       if ($applicant->hasPaid()) {
         $tags['Paid'][] = $applicant;
@@ -66,6 +65,8 @@ class ApplicantsListController extends \Jazzee\AdminController
         $tags[$tag->getTitle()][] = $applicant;
       }
     }
+    ksort($tags);
+    $tags['Not Locked'] = $notLocked;
     $this->setVar('tags', $tags);
   }
 
