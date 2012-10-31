@@ -31,3 +31,7 @@ Services.prototype.getBasepath = function(){
 Services.prototype.getControllerPath = function(controller){
   return this.request('pathToController', {'controller': controller});
 };
+
+Services.prototype.getCurrentApplicationId = function(){
+  return this.request('currentApplicationId', {});
+};

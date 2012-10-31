@@ -38,6 +38,9 @@ class AdminServicesController extends \Jazzee\AdminController
             $result = $this->path($class::PATH);
           }
             break;
+        case 'currentApplicationId':
+          $result = $this->_application->getId();
+            break;
         default:
           $this->addMessage('error', 'Invalid service requested');
       }
