@@ -199,6 +199,7 @@ class JazzeePageController extends \Foundation\VC\Controller
 
     $jazzeePath = \Jazzee\Configuration::getSourcePath();
     $this->_vfs->addFile('jsdiff.js', new \Foundation\Virtual\RealFile('jsdiff.js', $jazzeePath . '/lib/jsdiff.js'));
+    $this->_vfs->addFile('jquery.tagcloud.js', new \Foundation\Virtual\RealFile('jquery.tagcloud.js', $jazzeePath . '/lib/addywaddy-jquery.tagcloud/jquery.tagcloud.js'));
   }
 
   /**
