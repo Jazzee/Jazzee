@@ -237,7 +237,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
    */
   public function getActionPath()
   {
-    return $this->applyPath('status/sir');
+    return $this->applyPath('status');
   }
 
   /**
