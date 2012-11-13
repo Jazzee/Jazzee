@@ -4,8 +4,11 @@
  * Displayes the png preview and the delete link
  */
 if ($attachment = $answer->getAttachment()) {
-  $pdfName = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId() . '.pdf';
-  $pngName = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId() . 'preview.png';
+  $base = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId();
+  //remove slashes in path to fix an apache issues with encoding slashes in redirects
+  $base = str_replace(array('/', '\\'),'slash' , $base);
+  $pdfName = $base . '.pdf';
+  $pngName = $base . 'preview.png';
   if (!$pdfFile = $this->controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
     $this->controller->storeFile($pdfName, $attachment->getAttachment());
   }

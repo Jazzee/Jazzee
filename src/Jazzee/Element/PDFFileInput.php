@@ -70,6 +70,8 @@ class PDFFileInput extends AbstractElement
     $elementAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementAnswers[0])) {
       $base = $answer->getApplicant()->getFullName() . ' ' . $this->_element->getTitle() . '_' . $answer->getApplicant()->getId() . $elementAnswers[0]->getId();
+      //remove slashes in path to fix an apache issues with encoding slashes in redirects
+      $base = str_replace(array('/', '\\'),'slash' , $base);
       $pdfName = $base . '.pdf';
       $pngName = $base . 'preview.png';
       if (!$pdfFile = $this->_controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {

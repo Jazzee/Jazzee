@@ -203,8 +203,11 @@ class ApplicantsSingleController extends \Jazzee\AdminController
       'allowDelete' => $this->checkIsAllowed($this->controllerName, 'deleteApplicantPdf')
     );
     foreach ($applicant->getAttachments() as $attachment) {
-      $pdfName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . '.pdf';
-      $pngName = $applicant->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
+      $base = $applicant->getFullName() . '_attachment_' . $attachment->getId();
+      //remove slashes in path to fix an apache issues with encoding slashes in redirects
+      $base = str_replace(array('/', '\\'),'slash' , $base);
+      $pdfName = $base . '.pdf';
+      $pngName = $base . 'preview.png';
       if (!$pdfFile = $this->getStoredFile($pdfName) or $pdfFile->getLastModified() < $applicant->getUpdatedAt()) {
         $this->storeFile($pdfName, $attachment->getAttachment());
       }
