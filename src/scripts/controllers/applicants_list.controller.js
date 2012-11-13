@@ -12,7 +12,7 @@ $(document).ready(function(){
     var volume = $('tr', this).length;
     //put a modifier on Not Locked otherwise it gums up the cloud
     if(title == 'Not Locked'){
-      var volume = volume / 10;
+      var volume = volume = 1;
     }
     tags.push({id: id, title: title, volume: volume});
   });
@@ -66,20 +66,6 @@ $(document).ready(function(){
   var piece = $('<span>')
     .css('margin', '.5em')
     .css('cursor', 'pointer')
-    .css('color', 'grey')
-    .html('Select None');
-  piece.bind('click', function(){
-    $('#selectors span[rel]').each(function(){
-      if($(this).data('selected')){
-        $(this).click();
-      }
-    });
-  });
-  cloud.prepend(piece);
-  
-  var piece = $('<span>')
-    .css('margin', '.5em')
-    .css('cursor', 'pointer')
     .css('color', 'blue')
     .html('Select All');
   piece.bind('click', function(){
@@ -89,7 +75,21 @@ $(document).ready(function(){
       }
     });
   });
-  cloud.prepend(piece);
+  cloud.append(piece);
+  
+  var piece = $('<span>')
+    .css('margin', '.5em')
+    .css('cursor', 'pointer')
+    .css('color', 'grey')
+    .html('Select None');
+  piece.bind('click', function(){
+    $('#selectors span[rel]').each(function(){
+      if($(this).data('selected')){
+        $(this).click();
+      }
+    });
+  });
+  cloud.append(piece);
   
   $('#selectors').append(cloud);
   $('#selectors span').tagcloud({size: {start: .9, end: 2, unit: 'em'}})

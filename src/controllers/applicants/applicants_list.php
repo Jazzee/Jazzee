@@ -65,7 +65,7 @@ class ApplicantsListController extends \Jazzee\AdminController
         $tags[$tag->getTitle()][] = $applicant;
       }
     }
-    ksort($tags);
+    uksort($tags, "strnatcasecmp");
     $tags['Not Locked'] = $notLocked;
     $this->setVar('tags', $tags);
   }
