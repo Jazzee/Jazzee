@@ -32,5 +32,5 @@ class jazzee::data {
   
   $web_host = '10.10.11.4'
   
-  $host_address = '10.10.11.1'
+  $host_addresses = '10.10.11.1,10.0.2.2'
 }
