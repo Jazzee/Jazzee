@@ -108,9 +108,7 @@ class JazzeePageController extends \Foundation\VC\Controller
    */
   public function path($path)
   {
-    $prefix = $this->_serverPath . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\.');
-
-    return $prefix . '/' . $path;
+    return rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\.') . '/' . $path;
   }
 
   /**
