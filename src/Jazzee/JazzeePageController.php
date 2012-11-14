@@ -467,4 +467,11 @@ class JazzeePageController extends \Foundation\VC\Controller
     return self::$_cache;
   }
 
+  /**
+   * Get the absolute server path
+   * @return string
+   */
+  public function getServerPath(){
+    return $this->_serverPath;
+  }
 }

@@ -34,8 +34,8 @@ class AuthorizeNetDPM extends AuthorizeNetAIM
       $form->newHiddenElement('x_fp_hash', \AuthorizeNetDPM::getFingerprint($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'), $amount, $fpSequence, $time));
       $form->newHiddenElement('x_fp_timestamp', $time);
       $form->newHiddenElement('x_relay_response', "TRUE");
-      $form->newHiddenElement('x_relay_url', $this->_controller->getActionPath() . '/../../../../../transaction/' . \urlencode(get_class($this)));
-      $form->newHiddenElement('redirect_url', $this->_controller->getActionPath());
+      $form->newHiddenElement('x_relay_url', $this->_controller->getServerPath() . $this->_controller->getActionPath() . '/../../../../../transaction/' . \urlencode(get_class($this)));
+      $form->newHiddenElement('redirect_url', $this->_controller->getServerPath() . $this->_controller->getActionPath());
       $form->newHiddenElement('x_login', $this->_paymentType->getVar('gatewayId'));
 
       $form->newHiddenElement('x_cust_id', $applicant->getId());
