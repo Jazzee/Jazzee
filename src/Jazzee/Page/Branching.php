@@ -374,6 +374,11 @@ class Branching extends Standard
     return 'Branching-applicants_single';
   }
 
+  public static function lorPageElement()
+  {
+    return 'Branching-lor_page';
+  }
+
   public static function lorApplicantsSingleElement()
   {
     return 'Branching-lor_applicants_single';
