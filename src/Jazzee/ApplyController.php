@@ -88,6 +88,16 @@ class ApplyController extends Controller
   }
 
   /**
+   * Add the programa and cycle to the path
+   * @param string $path
+   * @return string
+   */
+  public function absoluteApplyPath($path)
+  {
+    return $this->absolutePath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/' . $path);
+  }
+
+  /**
    * Redirect from an appliy path
    * @param string $path
    * @return string

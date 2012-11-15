@@ -81,7 +81,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
   {
     if ($answer = $this->_applicant->findAnswerById($answerId)) {
       if (!$answer->isLocked() OR (!$answer->getChildren()->count() AND $answer->getUpdatedAt()->diff(new \DateTime('now'))->days >= $answer->getPage()->getVar('lorWaitDays'))) {
-        $message = $this->getMessage($answer, $this->_controller->path('lor/' . $answer->getUniqueId()));
+        $message = $this->getMessage($answer, $this->_controller->absolutePath('lor/' . $answer->getUniqueId()));
         $message->Send();
         $answer->lock();
         $answer->markLastUpdate();
@@ -100,7 +100,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
   {
     $this->checkIsAdmin();
     if ($answer = $this->_applicant->findAnswerById($answerId)) {
-      $path = $this->_controller->path('lor/' . $answer->getUniqueId());
+      $path = $this->_controller->absolutePath('lor/' . $answer->getUniqueId());
       $link = str_ireplace('admin/', '', $path);
       $message = $this->getMessage($answer, $link);
       $form = new \Foundation\Form;
@@ -146,7 +146,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
       $field->setLegend('Recommendation Link');
       $element = $field->newElement('Plaintext', 'link');
       if ($answer->isLocked()) {
-        $path = $this->_controller->path('lor/' . $answer->getUniqueId());
+        $path = $this->_controller->absolutePath('lor/' . $answer->getUniqueId());
         $path = str_ireplace('admin/', '', $path);
         $element->setValue($path);
       } else {

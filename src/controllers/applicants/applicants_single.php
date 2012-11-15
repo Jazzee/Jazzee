@@ -301,7 +301,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $store = $this->_session->getStore('apply', $this->_config->getApplicantSessionLifetime());
     $store->applicantID = $applicant->getId();
     $pages = $this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION);
-    $link = $this->applyPath('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $pages[0]->getId());
+    $link = $this->path('apply/' . $this->_application->getProgram()->getShortName() . '/' . $this->_application->getCycle()->getName() . '/page/' . $pages[0]->getId());
     $this->setVar('result', array('link' => $link));
     $this->setLayoutVar('status', 'success');
     $this->auditLog($applicant, 'Became applicant');

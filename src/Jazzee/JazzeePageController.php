@@ -112,13 +112,23 @@ class JazzeePageController extends \Foundation\VC\Controller
   }
 
   /**
+   * Fully qualified path to a resource
+   * @param string $path
+   * @return string
+   */
+  public function absolutePath($path)
+  {
+    return $this->getServerPath() . $this->path($path);
+  }
+
+  /**
    * Call any after action properties, redirect, and exit
    * @param string $path
    * @SuppressWarnings(PHPMD.ExitExpression)
    */
   public function redirectPath($path)
   {
-    $this->redirect($this->path($path));
+    $this->redirect($this->absolutePath($path));
     $this->afterAction();
     exit(0);
   }

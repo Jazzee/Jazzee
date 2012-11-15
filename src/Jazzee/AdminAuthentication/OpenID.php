@@ -63,8 +63,8 @@ class OpenID implements \Jazzee\Interfaces\AdminAuthentication
    */
   public function loginUser()
   {
-    $returnTo = $this->_controller->path('login');
-    $realm    = $this->_controller->path('');
+    $returnTo = $this->_controller->absoluetPath('login');
+    $realm    = $this->_controller->absoluetPath('');
     if (!empty($_POST['openid_identifier'])) {
       $identifier = $_POST['openid_identifier'];
       $relayParty = new \OpenID_RelyingParty($returnTo, $realm, $identifier);
