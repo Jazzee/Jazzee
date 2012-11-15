@@ -314,55 +314,63 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
   {
     $pageType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PageType')->findOneBy(array('class' => '\Jazzee\Page\ETSMatch'));
     $allETSMatchPages = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Page')->findBy(array('type' => $pageType->getId()));
-    $countGre = 0;
-    $countToefl = 0;
+    $count = array(
+        '\Jazzee\Entity\GREScore' => 0,
+        '\Jazzee\Entity\TOEFLScore' => 0
+    );
+    $scores = array(
+      '\Jazzee\Entity\GREScore' => $cron->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findAllArray(),
+      '\Jazzee\Entity\TOEFLScore' => $cron->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findAllArray()
+    );
+    
     foreach ($allETSMatchPages as $page) {
       //get all the answers without a matching score.
-      $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findBy(array('pageStatus' => null, 'page' => $page->getId(), 'greScore' => null, 'toeflScore' => null), array('updatedAt' => 'desc'), 100);
-      foreach ($answers as $answer) {
-        if (is_null($answer->getGREScore()) and is_null($answer->getTOEFLScore())) {
-          $testType = $page->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer);
-          $registrationNumber = $page->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer);
-          $testDate = $page->getElementByFixedId(self::FID_TEST_DATE)->getJazzeeElement()->formValue($answer);
-          $testMonth = date('m', strtotime($testDate));
-          $testYear = date('Y', strtotime($testDate));
-
-          $parameters = array(
-            'registrationNumber' => $registrationNumber,
-            'testMonth' => $testMonth,
-            'testYear' => $testYear
-          );
-          switch ($testType) {
-            case 'GRE/GRE Subject':
-              $score = $cron->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findOneBy($parameters);
-              if ($score) {
-                $countGre++;
-                $flushCount++;
-                $answer->setGreScore($score);
-                $cron->getEntityManager()->persist($answer);
-              }
-                break;
-            case 'TOEFL':
-              $score = $cron->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findOneBy($parameters);
-              if ($score) {
-                $countToefl++;
-                $flushCount++;
-                $answer->setTOEFLScore($score);
-                $cron->getEntityManager()->persist($answer);
-              }
-                break;
-            default:
-              throw new \Jazzee\Exception("Unknown test type: {$testType} when trying to match a score");
+      $answers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Answer')->findUnmatchedScores($page);
+      $elements = array();
+      $elements['testType'] = $page->getElementByFixedId(self::FID_TEST_TYPE);
+      $elements['registrationNumber'] = $page->getElementByFixedId(self::FID_REGISTRATION_NUMBER);
+      $elements['testDate'] = $page->getElementByFixedId(self::FID_TEST_DATE);
+      $unmatchedScores = array(
+        '\Jazzee\Entity\GREScore' => array(),
+        '\Jazzee\Entity\TOEFLScore' => array()
+      );
+      foreach ($answers as $arr) {
+        $answerElements = array();
+        foreach($arr['elements'] as $eArr){
+          $answerElements[$eArr['element_id']] = array($eArr);
+        }
+        $value = $elements['testType']->getJazzeeElement()->formatApplicantArray($answerElements[$elements['testType']->getId()]);
+        $value = $value['values'][0]['value'];
+        if($value == 'GRE/GRE Subject'){
+          $testType = '\Jazzee\Entity\GREScore';
+        } else if ($value == 'TOEFL'){
+          $testType = '\Jazzee\Entity\TOEFLScore';
+        } else {
+          throw new \Jazzee\Exception("Unknown test type: {$value} when trying to match a score");
+        }
+        
+        $value = $elements['registrationNumber']->getJazzeeElement()->formatApplicantArray($answerElements[$elements['registrationNumber']->getId()]);
+        $registrationNumber = $value['values'][0]['value'];
+        
+        $value = $elements['testDate']->getJazzeeElement()->formatApplicantArray($answerElements[$elements['testDate']->getId()]);
+        $testDate = $value['values'][0]['value'];
+        $testMonth = date('m', strtotime($testDate));
+        $testYear = date('Y', strtotime($testDate));
+        $unmatchedScores[$testType][$registrationNumber . $testMonth . $testYear] = $arr['id'];
+      }
+      foreach($unmatchedScores as $scoreEntityType => $arr){
+        foreach($arr as $uniqueId => $answerId){
+          if(array_key_exists($uniqueId, $scores[$scoreEntityType])){
+            $count[$scoreEntityType] += $cron->getEntityManager()->getRepository($scoreEntityType)->matchScore($answerId, $scores[$scoreEntityType][$uniqueId]);
           }
         }
       }
-      $cron->getEntityManager()->flush();
     }
-    if ($countGre) {
-      $cron->log("Found {$countGre} new GRE score matches");
+    if ($count['\Jazzee\Entity\GREScore']) {
+      $cron->log("Found {$count['\Jazzee\Entity\GREScore']} new GRE score matches");
     }
-    if ($countToefl) {
-      $cron->log("Found {$countToefl} new TOEFL score matches");
+    if ($count['\Jazzee\Entity\TOEFLScore']) {
+      $cron->log("Found {$count['\Jazzee\Entity\TOEFLScore']} new TOEFL score matches");
     }
   }
 

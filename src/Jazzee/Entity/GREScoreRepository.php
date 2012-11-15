@@ -51,4 +51,33 @@ class GREScoreRepository extends \Doctrine\ORM\EntityRepository
     return $query->getResult();
   }
 
+  /**
+   * Find all the ets scores in an array indexed by the reg-testdate
+   *
+   * @param array $registrationNumbers an option array of registration numbers to limit the results to
+   * @return array
+   */
+  public function findAllArray()
+  {
+    $dql = "SELECT CONCAT(CONCAT(s.registrationNumber, s.testMonth),s.testYear) as uniqueIdentifier, s.id FROM Jazzee\Entity\GREScore s";
+    $query = $this->_em->createQuery($dql);
+    $results = array();
+    foreach($query->getArrayResult() as $arr){
+      $results[$arr['uniqueIdentifier']] = $arr['id'];
+    }
+
+    return $results;
+  }
+  
+  /**
+   * Match a scores to an answer by their IDs
+   * 
+   * @param integer $answerId
+   * @param integer $scoreId
+   */
+  public function matchScore($answerId, $scoreId){ 
+    $query = $this->_em->createQuery('UPDATE Jazzee\Entity\Answer a SET a.greScore = :scoreId WHERE a.id = :answerId');
+    return $query->execute(array('answerId' => $answerId, 'scoreId' => $scoreId));
+  }
+
 }

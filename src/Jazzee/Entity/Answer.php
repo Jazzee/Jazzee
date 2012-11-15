@@ -5,7 +5,7 @@ namespace Jazzee\Entity;
  * Answer
  * Applicant answer to a page
  *
- * @Entity
+ * @Entity(repositoryClass="\Jazzee\Entity\AnswerRepository")
  * @HasLifecycleCallbacks
  * @Table(name="answers",
  * uniqueConstraints={@UniqueConstraint(name="answer_uniqueId",columns={"uniqueId"})})

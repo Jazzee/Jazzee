@@ -58,4 +58,31 @@ class TOEFLScoreRepository extends \Doctrine\ORM\EntityRepository
     return $queryBuilder->getQuery()->getResult();
   }
 
+  /**
+   * Find all the ets scores in an array indexed by the reg-testdate
+   *
+   * @return array
+   */
+  public function findAllArray()
+  {
+    $query = $this->_em->createQuery("SELECT CONCAT(CONCAT(s.registrationNumber, s.testMonth),s.testYear) as uniqueIdentifier, s.id FROM Jazzee\Entity\TOEFLScore s");
+    $results = array();
+    foreach($query->getArrayResult() as $arr){
+      $results[$arr['uniqueIdentifier']] = $arr['id'];
+    }
+
+    return $results;
+  }
+  
+  /**
+   * Match a scores to an answer by their IDs
+   * 
+   * @param integer $answerId
+   * @param integer $scoreId
+   */
+  public function matchScore($answerId, $scoreId){ 
+    $query = $this->_em->createQuery('UPDATE Jazzee\Entity\Answer a SET a.toeflScore = :scoreId WHERE a.id = :answerId');
+    return $query->execute(array('answerId' => $answerId, 'scoreId' => $scoreId));
+  }
+
 }
