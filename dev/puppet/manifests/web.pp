@@ -50,6 +50,9 @@ class host {
 			name => "rewrite",
 			ensure => "present"
 	}	
+	package { "postfix": 
+		ensure => "installed",
+	}
 	
 	class {'apache::mod::php': } 
 	package { "php5-mysql": 
@@ -68,6 +71,9 @@ class host {
 		ensure => "installed",
 	}
 	package { "php5-imagick": 
+		ensure => "installed",
+	}
+	package { "php-mail": 
 		ensure => "installed",
 	}
 }
