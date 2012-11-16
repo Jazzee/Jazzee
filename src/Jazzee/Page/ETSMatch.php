@@ -153,15 +153,30 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $field = $form->newField();
     $field->setLegend('Find Matching Scores');
     $element = $field->newElement('CheckboxList', 'greMatches');
+    
+    $existingScores = array();
+    foreach($this->getAnswers() as $answer){
+      $date = strtotime($this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getJazzeeElement()->displayValue($answer));
+      $existingScores[] = 
+        $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer) .
+        $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer) .
+        date('m', $date) . date('Y', $date); 
+    }
     $element->setLabel('Possible GRE');
     foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score) {
-      $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleInitial() . ' ' . $score->getTestDate()->format('m/d/Y'));
+      $uniqueId = $score->getRegistrationNumber() . 'GRE/GRE Subject' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
+      if(!in_array($uniqueId, $existingScores)){
+        $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleInitial() . ' ' . $score->getTestDate()->format('m/d/Y'));
+      }
     }
 
     $element = $field->newElement('CheckboxList', 'toeflMatches');
     $element->setLabel('Possible TOEFL');
     foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score) {
-      $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleName() . ' ' . $score->getTestDate()->format('m/d/Y'));
+      $uniqueId = $score->getRegistrationNumber() . 'TOEFL' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
+      if(!in_array($uniqueId, $existingScores)){
+        $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleName() . ' ' . $score->getTestDate()->format('m/d/Y'));
+      }
     }
     $form->newButton('submit', 'Match Scores');
     if (!empty($postData)) {
