@@ -111,7 +111,7 @@ class AdminApiController extends \Jazzee\AdminController
     }
 
     $applicantsXml = $this->dom->createElement("applicants");
-    foreach ($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant) {
+    foreach ($this->_em->getRepository('\Jazzee\Entity\Applicant')->findByApplication($this->_application, false) as $applicant) {
       $applicantsXml->appendChild($this->singleApplicant($applicant, true));
     }
     $this->dom->appendChild($applicantsXml);
@@ -137,7 +137,7 @@ class AdminApiController extends \Jazzee\AdminController
     }
     $applicantsXml = $this->dom->createElement("applicants");
     foreach (explode(',', $post['list']) as $id) {
-      if ($applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($id)) {
+      if ($applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($id, true)) {
         $applicantsXml->appendChild($this->singleApplicant($applicant, false));
       }
     }

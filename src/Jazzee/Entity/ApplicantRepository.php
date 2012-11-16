@@ -99,21 +99,15 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findByApplication(Application $application, $deep = false)
   {
-    $queryBuilder = $this->_em->createQueryBuilder();
-    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
-
     if (!$deep) {
+      $queryBuilder = $this->_em->createQueryBuilder();
+      $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
       $queryBuilder->add('select', 'applicant');
     } else {
-      $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers');
-      $queryBuilder->leftJoin('applicant.answers', 'answers');
-      $queryBuilder->leftJoin('applicant.attachments', 'attachments');
-      $queryBuilder->leftJoin('applicant.decision', 'decision');
-      $queryBuilder->leftJoin('applicant.tags', 'tags');
-      $queryBuilder->leftJoin('answers.elements', 'element_answers');
+      $queryBuilder = $this->deepApplicantQuery();
     }
 
-    $queryBuilder->where('applicant.application = :applicationId');
+    $queryBuilder->andWhere('applicant.application = :applicationId');
     $queryBuilder->andWhere('applicant.deactivated=false');
     $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
     $queryBuilder->setParameter('applicationId', $application->getId());
@@ -172,21 +166,15 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    */
   public function find($id, $deep = false)
   {
-    $queryBuilder = $this->_em->createQueryBuilder();
-    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
-
     if (!$deep) {
+      $queryBuilder = $this->_em->createQueryBuilder();
+      $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
       $queryBuilder->add('select', 'applicant');
     } else {
-      $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers');
-      $queryBuilder->leftJoin('applicant.answers', 'answers');
-      $queryBuilder->leftJoin('applicant.attachments', 'attachments');
-      $queryBuilder->leftJoin('applicant.decision', 'decision');
-      $queryBuilder->leftJoin('applicant.tags', 'tags');
-      $queryBuilder->leftJoin('answers.elements', 'element_answers');
+      $queryBuilder = $this->deepApplicantQuery();
     }
 
-    $queryBuilder->where('applicant.id = :applicantId');
+    $queryBuilder->andWhere('applicant.id = :applicantId');
     $queryBuilder->setParameter('applicantId', $id);
 
     return $queryBuilder->getQuery()->getSingleResult();
