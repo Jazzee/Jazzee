@@ -14,6 +14,7 @@ $cli->addCommands(array(
   new \Jazzee\Console\AddUser(),
   new \Jazzee\Console\FindUser(),
   new \Jazzee\Console\UserRole(),
+  new \Jazzee\Console\EveryoneRole(),
   new \Jazzee\Console\Preflight(),
   new \Jazzee\Console\MailLogs(),
   new \Jazzee\Console\CreateDemo(),
