@@ -1000,7 +1000,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $pageEntity->getJazzeePage()->setController($this);
     $pageEntity->getJazzeePage()->fill($answerId);
     $pageEntity->getJazzeePage()->deleteAnswer($answerId);
-    $this->auditLog($applicant, 'Delted answer from page ' . $pageEntity->getTitle());
+    $this->auditLog($applicant, 'Deleted answer from page ' . $pageEntity->getTitle());
     $this->setVar('result', true);
     $this->loadView($this->controllerName . '/result');
   }
