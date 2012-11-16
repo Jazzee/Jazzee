@@ -228,11 +228,10 @@ class QASAddress extends Standard
 
     $search[0] = $input->get('address1');
     $search[1] = $input->get('address2');
-    $search[2] = $input->get('address3');
-    $search[3] = $input->get('city');
-    $search[4] = $input->get('state');
-    $search[5] = $input->get('country');
-
+    $search[2] = $input->get('city');
+    $search[3] = $input->get('state');
+    $search[4] = $input->get('postalCode');
+    
     //Create the QuickAddress Object and set the engine and picklist type
     $qas = new \QuickAddress($this->_applicationPage->getPage()->getVar('wsdlAddress'));
     $qas->setEngineType(QAS_VERIFICATION_ENGINE);
