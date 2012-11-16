@@ -146,13 +146,12 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
    * @param integer $answerID
    * @param array $postData
    */
-  public function do_findScores($postData)
+  public function do_findPossibleScores($postData)
   {
     $this->checkIsAdmin();
     $form = new \Foundation\Form;
     $field = $form->newField();
-    $field->setLegend('Find Matching Scores');
-    $element = $field->newElement('CheckboxList', 'greMatches');
+    $field->setLegend('Find Matching Scores for ' . $this->_applicant->getFullName());
     
     $existingScores = array();
     foreach($this->getAnswers() as $answer){
@@ -164,27 +163,33 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
       $existingScores[$uniqueId] = $answer;
         
     }
+    
+    $element = $field->newElement('CheckboxList', 'greMatches');
     $element->setLabel('Possible GRE');
-    $matchedExistingScore = false;
-    foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score) {
+    
+    foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findByName(substr($this->_applicant->getFirstName(), 0, 2) . '%', substr($this->_applicant->getLastName(), 0, 3) . '%') as $score) {
       $uniqueId = $score->getRegistrationNumber() . 'GRE/GRE Subject' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
       if(!array_key_exists($uniqueId, $existingScores)){
         $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleInitial() . ' ' . $score->getTestDate()->format('m/d/Y'));
       } else {
-        $element->addMessage('The system found at least one match for a GRE score the applicant had previously entered.  You may need to refresh this page to view that match.');
-        $this->matchScore($existingScores[$uniqueId]);
+        if(!$existingScores[$uniqueId]->getGREScore()) {
+          $element->addMessage('The system found at least one match for a GRE score the applicant had previously entered.  You may need to refresh this page to view that match.');
+          $this->matchScore($existingScores[$uniqueId]);
+        }
       }
     }
 
     $element = $field->newElement('CheckboxList', 'toeflMatches');
     $element->setLabel('Possible TOEFL');
-    foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score) {
+    foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findByName(substr($this->_applicant->getFirstName(), 0, 2) . '%', substr($this->_applicant->getLastName(), 0, 3) . '%') as $score) {
       $uniqueId = $score->getRegistrationNumber() . 'TOEFL' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
       if(!array_key_exists($uniqueId, $existingScores)){
         $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleName() . ' ' . $score->getTestDate()->format('m/d/Y'));
       } else {
-        $element->addMessage('The system found at least one match for a TOEFL score the applicant had previously entered.  You may need to refresh this page to view that match.');
-        $this->matchScore($existingScores[$uniqueId]);
+        if(!$existingScores[$uniqueId]->getTOEFLScore()) {
+          $element->addMessage('The system found at least one match for a TOEFL score the applicant had previously entered.  You may need to refresh this page to view that match.');
+          $this->matchScore($existingScores[$uniqueId]);
+        }
       }
     }
     $form->newButton('submit', 'Match Scores');
@@ -219,6 +224,128 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
         $this->_controller->setLayoutVar('status', 'success');
       } else {
         $this->_controller->setLayoutVar('status', 'error');
+      }
+    }
+
+    return $form;
+  }
+
+  /**
+   * Find Possible gre score matches
+   * @param integer $answerID
+   * @param array $postData
+   */
+  public function do_searchScores($postData)
+  {
+    $this->checkIsAdmin();
+    $searchForm = new \Foundation\Form;
+    $field = $searchForm->newField();
+    $field->setLegend('Search Scores');
+    
+    $element = $field->newElement('TextInput', 'firstName');
+    $element->setLabel('First Name');
+    $element->setValue($this->_applicant->getFirstName());
+    $element = $field->newElement('TextInput', 'lastName');
+    $element->setLabel('Last Name');
+    $element->setValue($this->_applicant->getLastName());
+    $searchForm->newHiddenElement('level', 'search');
+    $searchForm->newButton('submit', 'Search Scores');
+    
+    $matchForm = new \Foundation\Form;
+    $field = $matchForm->newField();
+    $field->setLegend('Select scores to match');
+    
+    $greElement = $field->newElement('CheckboxList', 'greMatches');
+    $greElement->setLabel('Possible GRE');
+    
+    $toeflElement = $field->newElement('CheckboxList', 'toeflMatches');
+    $toeflElement->setLabel('Possible TOEFL');
+    
+    $matchForm->newHiddenElement('level', 'match');
+    $matchForm->newButton('submit', 'Match Scores');
+    
+    $form = $searchForm;
+    if (!empty($postData)) {
+      if($postData['level'] == 'search'){
+        if($input = $searchForm->processInput($postData)){
+          $matchForm->newHiddenElement('firstName', $input->get('firstName'));
+          $matchForm->newHiddenElement('lastName', $input->get('lastName'));
+          
+          $existingScores = array();
+          foreach($this->getAnswers() as $answer){
+            $date = strtotime($this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getJazzeeElement()->displayValue($answer));
+            $uniqueId = 
+              $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer) .
+              $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer) .
+              date('m', $date) . date('Y', $date); 
+            $existingScores[$uniqueId] = $answer;
+          }
+          foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findByName($input->get('firstName') . '%', $input->get('lastName') . '%') as $score) {
+            $uniqueId = $score->getRegistrationNumber() . 'GRE/GRE Subject' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
+            if(!array_key_exists($uniqueId, $existingScores)){
+              $greElement->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleInitial() . ' ' . $score->getTestDate()->format('m/d/Y'));
+            } else {
+              if(!$existingScores[$uniqueId]->getGREScore()) {
+                $greElement->addMessage('The system found at least one match for a GRE score the applicant had previously entered.  You may need to refresh this page to view that match.');
+                $this->matchScore($existingScores[$uniqueId]);
+              }
+            }
+          }
+
+
+          foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findByName($input->get('firstName') . '%', $input->get('lastName') . '%') as $score) {
+            $uniqueId = $score->getRegistrationNumber() . 'TOEFL' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
+            if(!array_key_exists($uniqueId, $existingScores)){
+              $toeflElement->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleName() . ' ' . $score->getTestDate()->format('m/d/Y'));
+            } else {
+              if(!$existingScores[$uniqueId]->getTOEFLScore()) {
+                $toeflElement->addMessage('The system found at least one match for a TOEFL score the applicant had previously entered.  You may need to refresh this page to view that match.');
+                $this->matchScore($existingScores[$uniqueId]);
+              }
+            }
+          }
+          $form = $matchForm;
+        }
+      } else if($postData['level'] == 'match'){
+        $form = $matchForm;
+        
+        //Re add all the matches to the elements so they will validate
+        foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findByName($postData['firstName'] . '%', $postData['lastName'] . '%') as $score) {
+          $greElement->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleInitial() . ' ' . $score->getTestDate()->format('m/d/Y'));
+        }
+        foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findByName($postData['firstName'] . '%', $postData['lastName'] . '%') as $score) {
+          $toeflElement->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleName() . ' ' . $score->getTestDate()->format('m/d/Y'));
+        }
+
+        if($input = $matchForm->processInput($postData)){
+          //create a blank for so it can get values from parent::newAnswer
+          $this->_form = new \Foundation\Form();
+          if ($input->get('greMatches')) {
+            foreach ($input->get('greMatches') as $scoreId) {
+              $score = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->find($scoreId);
+              $arr = array(
+                'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getId() => $score->getRegistrationNumber(),
+                'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getId() => $score->getTestDate()->format('c'),
+                'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getId() => $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getItemByValue('GRE/GRE Subject')->getId()
+              );
+              $newInput = new \Foundation\Form\Input($arr);
+              $this->newAnswer($newInput);
+            }
+          }
+          if ($input->get('toeflMatches')) {
+            foreach ($input->get('toeflMatches') as $scoreId) {
+              $score = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->find($scoreId);
+              $arr = array(
+                'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getId() => $score->getRegistrationNumber(),
+                'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getId() => $score->getTestDate()->format('c'),
+                'el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getId() => $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getItemByValue('TOEFL')->getId()
+              );
+              $newInput = new \Foundation\Form\Input($arr);
+              $this->newAnswer($newInput);
+            }
+          }
+          $this->_controller->setLayoutVar('status', 'success');
+        }
       }
     }
 

@@ -77,7 +77,8 @@ $page->getJazzeePage()->setApplicant($applicant);
   <p class='pageTools'><?php
     if ($this->controller->checkIsAllowed('applicants_single', 'addAnswer') and $page->getJazzeePage()->getStatus() != \Jazzee\Interfaces\Page::SKIPPED and (is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax())) { ?>
       <a class='actionForm' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/addAnswer/' . $page->getPage()->getId()); ?>'>Add Answer</a>
-      <a class='actionForm' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/pageDo/findScores/' . $page->getPage()->getId()); ?>'>Find Scores</a><?php
+      &nbsp;<a class='actionForm' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/pageDo/findPossibleScores/' . $page->getPage()->getId()); ?>'>Possible Scores</a>
+      &nbsp;<a class='actionForm' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/pageDo/searchScores/' . $page->getPage()->getId()); ?>'>Search Scores</a><?php
     }
     if ($this->controller->checkIsAllowed('applicants_single', 'doPageAction') and !$page->isRequired() and !count($page->getJazzeePage()->getAnswers())) { ?>
       <a class='action' href='<?php print $this->path('applicants/single/' . $applicant->getId() . '/doPageAction/skip/' . $page->getPage()->getId()); ?>'>Skip Page</a><?php
