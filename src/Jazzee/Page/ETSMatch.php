@@ -157,16 +157,22 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $existingScores = array();
     foreach($this->getAnswers() as $answer){
       $date = strtotime($this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_DATE)->getJazzeeElement()->displayValue($answer));
-      $existingScores[] = 
+      $uniqueId = 
         $this->_applicationPage->getPage()->getElementByFixedId(self::FID_REGISTRATION_NUMBER)->getJazzeeElement()->displayValue($answer) .
         $this->_applicationPage->getPage()->getElementByFixedId(self::FID_TEST_TYPE)->getJazzeeElement()->displayValue($answer) .
         date('m', $date) . date('Y', $date); 
+      $existingScores[$uniqueId] = $answer;
+        
     }
     $element->setLabel('Possible GRE');
+    $matchedExistingScore = false;
     foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\GREScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score) {
       $uniqueId = $score->getRegistrationNumber() . 'GRE/GRE Subject' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
-      if(!in_array($uniqueId, $existingScores)){
+      if(!array_key_exists($uniqueId, $existingScores)){
         $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleInitial() . ' ' . $score->getTestDate()->format('m/d/Y'));
+      } else {
+        $element->addMessage('The system found at least one match for a GRE score the applicant had previously entered.  You may need to refresh this page to view that match.');
+        $this->matchScore($existingScores[$uniqueId]);
       }
     }
 
@@ -174,8 +180,11 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $element->setLabel('Possible TOEFL');
     foreach ($this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\TOEFLScore')->findByName(substr($this->_applicant->getFirstName(), 0, 1) . '%', substr($this->_applicant->getLastName(), 0, 2) . '%') as $score) {
       $uniqueId = $score->getRegistrationNumber() . 'TOEFL' . $score->getTestDate()->format('m') . $score->getTestDate()->format('Y');
-      if(!in_array($uniqueId, $existingScores)){
+      if(!array_key_exists($uniqueId, $existingScores)){
         $element->newItem($score->getId(), $score->getLastName() . ',  ' . $score->getFirstName() . ' ' . $score->getMiddleName() . ' ' . $score->getTestDate()->format('m/d/Y'));
+      } else {
+        $element->addMessage('The system found at least one match for a TOEFL score the applicant had previously entered.  You may need to refresh this page to view that match.');
+        $this->matchScore($existingScores[$uniqueId]);
       }
     }
     $form->newButton('submit', 'Match Scores');
