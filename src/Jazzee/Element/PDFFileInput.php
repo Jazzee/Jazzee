@@ -161,7 +161,7 @@ class PDFFileInput extends AbstractElement
       $start = time();
       $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class' => '\Jazzee\Element\PDFFileInput'));
       if ($type) {
-        $blankPreviewElementAnswers = $this->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eBlob' => null), 100);
+        $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eBlob' => null), 100);
         $imagick = new \imagick;
         foreach ($blankPreviewElementAnswers as $blankPreviewElementAnswer) {
           $thumbnailBlob = false;
@@ -191,7 +191,7 @@ class PDFFileInput extends AbstractElement
           $blankPreviewElementAnswer->setEBlob($thumbnailBlob);
 
           $cachedFileName = $blankPreviewElementAnswer->getAnswer()->getApplicant()->getFullName() . ' ' . $blankPreviewElementAnswer->getElement()->getTitle() . '_' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . $blobElementAnswer->getId() . 'preview.png';
-          $this->removeStoredFile($cachedFileName);
+          $cron->removeStoredFile($cachedFileName);
           $count++;
           $imagick->clear();
         }
