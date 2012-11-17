@@ -432,6 +432,7 @@ Applicant.prototype.parsePage = function(pageId){
     });
     return false;
   });
+  this.parseLonganswertext($('#page'+pageId));
 };
 
 /**
@@ -516,5 +517,31 @@ Applicant.prototype.parseReloads = function(){
       }
     });
     return false;
+  });
+};
+
+/**
+ * Parse long text
+ * Look in applican answers for long text and format it for easier reading
+ * @param {jQuery} obj
+ */
+Applicant.prototype.parseLonganswertext = function(obj){
+  var self = this;
+  $('div.answers tbody td', obj).each(function(i){
+    var td = $(this);
+    var string = td.html();
+    if(string.length > 400){
+      var shortString = string.substr(0, 350);
+      td.data('fullText', string);
+      td.addClass('truncated-text');
+      td.html(shortString + '&hellip;').append($('<br>'));
+      td.append($('<a>').attr('href', '#').html('(click for more)').bind('click', function(e){
+        //expand all the string on this row
+        $('td.truncated-text', $(e.target).parent().parent()).each(function(i){
+          $(this).html($(this).data('fullText'));
+        });
+        return false;
+      }));
+    }
   });
 };
