@@ -329,6 +329,14 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
   }
 
   /**
+   * Prepend admin/ to all the paths
+   * @param string $path
+   */
+  public function absolutePath($path) {
+    return parent::absolutePath('admin/' . $path);
+  }
+
+  /**
    * Create a path to the apply side
    * @param string $path
    * @return string
@@ -336,6 +344,16 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
   public function applyPath($path)
   {
     return parent::path($path);
+  }
+
+  /**
+   * Create a path to the apply side
+   * @param string $path
+   * @return string
+   */
+  public function absoluteApplyPath($path)
+  {
+    return parent::absolutePath($path);
   }
 
   /**

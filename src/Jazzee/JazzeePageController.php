@@ -118,7 +118,7 @@ class JazzeePageController extends \Foundation\VC\Controller
    */
   public function absolutePath($path)
   {
-    return $this->getServerPath() . $this->path($path);
+    return $this->getServerPath() . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\.') . '/' . $path;
   }
 
   /**
