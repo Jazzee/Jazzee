@@ -432,7 +432,7 @@ Applicant.prototype.parsePage = function(pageId){
     });
     return false;
   });
-  this.parseLonganswertext($('#page'+pageId));
+//  this.parseLonganswertext($('#page'+pageId));
 };
 
 /**
