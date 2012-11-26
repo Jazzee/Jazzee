@@ -213,7 +213,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController
           $message->AddAddress($arr['applicant']->getEmail(), $arr['applicant']->getFullName());
           $message->Subject = 'New Message from ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName();
           $body = 'You have ' . $arr['count'] . ' unread message(s) from the ' . $arr['applicant']->getApplication()->getCycle()->getName() . ' ' . $arr['applicant']->getApplication()->getProgram()->getName() . ' program.' .
-                  "\nYou can review your message(s) by logging into the application at: " . $cron->absolutePath('apply/' . $arr['applicant']->getApplication()->getProgram()->getShortName() . '/' . $arr['applicant']->getApplication()->getCycle()->getName() . '/applicant/login');
+                  "\nYou can review your message(s) by logging into the application at: " . $cron->absoluteApplyPath('apply/' . $arr['applicant']->getApplication()->getProgram()->getShortName() . '/' . $arr['applicant']->getApplication()->getCycle()->getName() . '/applicant/login');
           $body .= "\nOnce you have logged into the application choose support in the upper right hand corner of the screen.";
           $message->Body = $body;
           $message->Send();
