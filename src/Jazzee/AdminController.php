@@ -312,7 +312,7 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
    */
   protected function getApplicantById($applicantId)
   {
-    if (!$applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($applicantId, true) or $applicant->getApplication() != $this->_application) {
+    if (!$applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->find($applicantId, false) or $applicant->getApplication() != $this->_application) {
       throw new Exception($this->_user->getFirstName() . ' ' . $this->_user->getLastName() . ' (#' . $this->_user->getId() . ") attempted to access applicant {$applicantId} who is not in their current program", E_USER_ERROR, 'That applicant does not exist or is not in your current program');
     }
 
