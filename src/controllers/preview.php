@@ -16,7 +16,7 @@ class PreviewController extends \Jazzee\Controller
    */
   public function actionStart($key)
   {
-    $path = $this->getVarPath() . '/tmp/' . $key . '.previewdb.db';
+    $path = $this->_config->getVarPath() . '/tmp/' . $key . '.previewdb.db';
     if(!is_writable($path)){
       throw new \Jazzee\Exception("Preview database at {$path} does not exist.", E_USER_ERROR, 'This application preview no longer exists.');
     }

@@ -41,6 +41,19 @@ class AdminServicesController extends \Jazzee\AdminController
         case 'currentApplicationId':
           $result = $this->_application->getId();
             break;
+        case 'listDisplays':
+          $this->setLayoutVar('status', 'success');
+          $result = $this->listDisplays();
+          break;
+        case 'currentApplication':
+          if($this->_application){
+            $this->setLayoutVar('status', 'success');
+            $result = $this->_em->getRepository('Jazzee\Entity\Application')->findArray($this->_application->getId());
+          } else {
+            $this->setLayoutVar('status', 'error');
+            $this->addMessage('error', 'You do not have an application in this program and cycle.  Or you have not selected a program or cycle.');
+          }
+          break;
         default:
           $this->addMessage('error', 'Invalid service requested');
       }
@@ -48,6 +61,31 @@ class AdminServicesController extends \Jazzee\AdminController
       $this->addMessage('error', 'No service requested');
     }
     $this->setVar('result', $result);
+  }
+
+  /**
+   * Save a users preferences
+   */
+  public function actionSavePreferences()
+  {
+    $this->setLayoutVar('status', 'success');
+    $applicationId = $this->_application?$this->_application->getId():0;
+    $preferences = json_decode($this->post['preferences']);
+    $this->_user->setPreferences($applicationId, $preferences);
+    $this->_em->persist($this->_user);
+    $this->setVar('result', false);
+    $this->loadView('admin_services/index');
+  }
+
+  /**
+   * Save a users preferences
+   */
+  public function actionGetPreferences()
+  {
+    $this->setLayoutVar('status', 'success');
+    $applicationId = $this->_application?$this->_application->getId():0;
+    $this->setVar('result', $this->_user->getPreferences($applicationId));
+    $this->loadView('admin_services/index');
   }
 
   /**
@@ -60,7 +98,7 @@ class AdminServicesController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('index')) AND $user) {
+    if (in_array($action, array('index', 'savePreferences', 'getPreferences')) AND $user) {
       return true;
     }
 

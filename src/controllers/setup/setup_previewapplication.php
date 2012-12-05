@@ -271,7 +271,7 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
    */
   protected function getPathString($key)
   {
-    $pathPrefix = $this->getVarPath() . '/tmp/';
+    $pathPrefix = $this->_config->getVarPath() . '/tmp/';
     $pathSuffix = '.previewdb.db';
     return $pathPrefix . $key . $pathSuffix;
   }
@@ -283,7 +283,7 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
    */
   protected function getKeyFromPath($path)
   {
-    $pathPrefix = $this->getVarPath() . '/tmp/';
+    $pathPrefix = $this->_config->getVarPath() . '/tmp/';
     $pathSuffix = '.previewdb.db';
     return substr($path, strlen($pathPrefix), -strlen($pathSuffix));
   }

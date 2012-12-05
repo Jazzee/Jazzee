@@ -158,6 +158,7 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
    * Format a single element answer into an array
    * 
    * @param array $elementAnswer
+   * 
    * @return array
    */
   abstract protected function arrayValue(array $elementAnswer);

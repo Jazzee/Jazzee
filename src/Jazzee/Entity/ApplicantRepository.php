@@ -118,6 +118,31 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   /**
    * All the applicants in an application
    * @param Application $application
+   * @param boolean $deep should we load the full data for each applicant
+   * @return array
+   */
+  public function findIdsByApplication(Application $application)
+  {
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
+    $queryBuilder->add('select', 'applicant.id');
+    
+
+    $queryBuilder->andWhere('applicant.application = :applicationId');
+    $queryBuilder->andWhere('applicant.deactivated=false');
+    $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
+    $queryBuilder->setParameter('applicationId', $application->getId());
+
+    $applicants = array();
+    foreach($queryBuilder->getQuery()->getArrayResult() as $app){
+      $applicants[] = $app['id'];
+    }
+    return $applicants;
+  }
+
+  /**
+   * All the applicants in an application
+   * @param Application $application
    * @param Tag $tag
    * @return array
    */
@@ -162,16 +187,17 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    * Find a single application
    * @param integer id of the applicant
    * @param boolean $deep should we load the full data for each applicant
+   * @pram Display $display
    * @return Application
    */
-  public function find($id, $deep = false)
+  public function find($id, $deep = false, Display $display = null)
   {
     if (!$deep) {
       $queryBuilder = $this->_em->createQueryBuilder();
       $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
       $queryBuilder->add('select', 'applicant');
     } else {
-      $queryBuilder = $this->deepApplicantQuery();
+      $queryBuilder = $this->deepApplicantQuery($display);
     }
 
     $queryBuilder->andWhere('applicant.id = :applicantId');
@@ -183,18 +209,18 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   /**
    * Find a single applicant in an array format
    * @param integer $id of the applicant
-   * @param \Jazzee\Controller $controller
+   * @param \Jazzee\Interfaces\Display $display
    * 
    * @return array
    */
-  public function findArray($id)
+  public function findArray($id, \Jazzee\Interfaces\Display $display = null)
   {
     $cache = \Jazzee\Controller::getCache();
     $cacheId = Applicant::ARRAY_CACHE_PREFIX . $id;
     if($cache->contains($cacheId)){
       return $cache->fetch($cacheId);
     }
-    $queryBuilder = $this->deepApplicantQuery();
+    $queryBuilder = $this->deepApplicantQuery($display);
     $queryBuilder->andWhere('applicant = :applicantId');
     $queryBuilder->setParameter('applicantId', $id);
     
@@ -207,13 +233,29 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   
   /**
    * Get a deep application query builder
-   * @return type
+   * @param \Jazzee\Interfaces\Display $display
+   * 
+   * @return \Doctrine\ORM\QueryBuilder
    */
-  protected function deepApplicantQuery(){
+  protected function deepApplicantQuery(\Jazzee\Interfaces\Display $display = null){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
     $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, children, children_element_answers, children_publicStatus, children_privateStatus');
-    $queryBuilder->leftJoin('applicant.answers', 'answers');
+    if($display){
+      $expression = $queryBuilder->expr()->orX();
+      //this one is the default - if there are no pages in the display then this 
+      //expression is the only one that will load and not pages will be loaded
+      $expression->add($queryBuilder->expr()->eq("answers.page", ":nothing"));
+      $queryBuilder->setParameter('nothing', 'nothing');
+      foreach($display->getPageIds() as $key => $pageId){
+        $paramKey = 'displayPage' . $key;
+        $expression->add($queryBuilder->expr()->eq("answers.page", ":{$paramKey}"));
+        $queryBuilder->setParameter($paramKey, $pageId);
+      }
+      $queryBuilder->leftJoin('applicant.answers', 'answers', 'WITH', $expression);
+    } else {
+      $queryBuilder->leftJoin('applicant.answers', 'answers');
+    }
     $queryBuilder->leftJoin('answers.elements', 'element_answers');
     $queryBuilder->leftJoin('answers.publicStatus', 'publicStatus');
     $queryBuilder->leftJoin('answers.privateStatus', 'privateStatus');
@@ -225,6 +267,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->leftJoin('children.publicStatus', 'children_publicStatus');
     $queryBuilder->leftJoin('children.privateStatus', 'children_privateStatus');
     $queryBuilder->where('answers.parent IS NULL');
+    
     
     return $queryBuilder;
   }

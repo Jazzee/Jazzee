@@ -225,9 +225,10 @@ $advancedRouter->addRoute('#^admin/(manage|setup|applicants|scores)/([^/]+)/?([^
   'additional_params' => '$4'
 ));
 
-$advancedRouter->addRoute('#^admin/([^/]+)/?([^/]+)?$#i', array(
+$advancedRouter->addRoute('#^admin/([^/]+)/?([^/]+)?/?(.*)$#i', array(
   'controller' => 'admin_$1',
-  'action' => '$2'
+  'action' => '$2',
+  'additional_params' => '$3'
 ));
 
 $fc->addRouter($advancedRouter);

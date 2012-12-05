@@ -15,7 +15,6 @@ namespace Jazzee\Entity;
  */
 class Application
 {
-
   /**
    * @Id
    * @Column(type="bigint")
@@ -605,6 +604,22 @@ class Application
   }
 
   /**
+   * Get an application page by its page ID
+   * @param integer $id
+   * @return ApplicationPage
+   */
+  public function getApplicationPageById($id)
+  {
+    foreach ($this->applicationPages as $applicationPage) {
+      if ($applicationPage->getId() == $id) {
+        return $applicationPage;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Get page by tile
    * @param string $title
    * @return ApplicationPage
@@ -747,8 +762,7 @@ class Application
     }
     return $differences;
   }
-  
-  /**
+    /**
    * Format applicant Array
    *
    * @param array $applicant

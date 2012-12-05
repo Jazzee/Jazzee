@@ -101,5 +101,52 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
 
     return false;
   }
+  
+  /**
+   * Find application as an array
+   * @param interger $id
+   * 
+   * @return array
+   */
+  public function findArray($id)
+  {
+    $queryBuilder = $this->makeQuery();
+    $queryBuilder->andWhere('application.id = :id');
+    $queryBuilder->setParameter('id', $id);
+    
+    $query = $queryBuilder->getQuery();
+    if($result = $query->getArrayResult()){
+      $application = $result[0];
+      $keys = array('title', 'min', 'max', 'isRequired', 'answerStatusDisplay', 'instructions', 'leadingText', 'trailingText');
+      foreach($application['applicationPages'] as &$appPage){
+        foreach($keys as $key){
+          if(is_null($appPage[$key])){
+            $appPage[$key] = $appPage['page'][$key];
+          }
+        }
+      }
+      return $application;
+    } 
+
+    return false;
+  }
+  
+  /**
+   * Create a QueryBuilder to use elsewhere
+   * @return \Doctrine\ORM\QueryBuilder
+   */
+  protected function makeQuery(){
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->from('Jazzee\Entity\Application', 'application');
+    $queryBuilder->add('select', 'application, applicationPages, pages, elements, elementListItems, pageType, elementType');
+    $queryBuilder->leftJoin('application.applicationPages', 'applicationPages');
+    $queryBuilder->leftJoin('applicationPages.page', 'pages');
+    $queryBuilder->leftJoin('pages.elements', 'elements');
+    $queryBuilder->leftJoin('pages.type', 'pageType');
+    $queryBuilder->leftJoin('elements.listItems', 'elementListItems');
+    $queryBuilder->leftJoin('elements.type', 'elementType');
+    
+    return $queryBuilder;
+  }
 
 }

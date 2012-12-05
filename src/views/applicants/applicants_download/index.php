@@ -19,7 +19,7 @@ if (isset($outputType)) {
       break;
     case 'json':
       header("Content-type: application/json");
-      header("Content-Disposition: attachment; filename={$filename}");
+//      header("Content-Disposition: attachment; filename={$filename}");
       ob_end_clean();
       print json_encode($output, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
       exit(0);

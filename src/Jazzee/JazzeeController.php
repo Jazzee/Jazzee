@@ -160,7 +160,7 @@ class JazzeeController extends PageController
     //We use different caching and proxy settings in Development status
     if ($this->_config->getStatus() == 'DEVELOPMENT') {
       $doctrineConfig->setAutoGenerateProxyClasses(true);
-      $doctrineConfig->setProxyDir($this->getVarPath() . '/tmp');
+      $doctrineConfig->setProxyDir($this->_config->getVarPath() . '/tmp');
     } else {
       $doctrineConfig->setAutoGenerateProxyClasses(false);
       $doctrineConfig->setProxyDir(__DIR__ . '/Entity/Proxy');
@@ -229,7 +229,7 @@ class JazzeeController extends PageController
     $this->_session->setConfigVariable('gc_maxlifetime', 86400);
     $this->_session->setConfigVariable('use_only_cookies', true);
     $this->_session->setConfigVariable('hash_function', 1);
-    $this->_session->setConfigVariable('save_path', $this->getVarPath() . '/session/');
+    $this->_session->setConfigVariable('save_path', $this->_config->getVarPath() . '/session/');
     if (!empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] == 'on') {
       $this->_session->setConfigVariable('cookie_secure', true);
     }
@@ -237,57 +237,6 @@ class JazzeeController extends PageController
     //browsers give inconsisten results when the domain is used to set the cookie, instead use an empty string to restrict the cookie to this domain
     $this->_session->setConfigVariable('cookie_domain', '');
     $this->_session->start();
-  }
-
-  /**
-   * Store a file
-   *
-   * @param string $filename
-   * @param blob $blob
-   */
-  public function storeFile($filename, $blob)
-  {
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-    $safeName = md5($filename);
-    file_put_contents($this->getVarPath() . '/tmp/' . $safeName . '.' . $ext, $blob);
-    $session = new \Foundation\Session();
-    $store = $session->getStore('files');
-    $store->$safeName = $filename;
-  }
-
-  /**
-   * Get a stored file
-   *
-   * @param string $filename
-   * @return \Foundation\Virtual\RealFile
-   */
-  public function getStoredFile($filename)
-  {
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-    $safeName = md5($filename);
-    $path = $this->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
-    $session = new \Foundation\Session();
-    $store = $session->getStore('files');
-    if (is_readable($path) and isset($store->$safeName) and $store->$safeName == $filename) {
-      return new \Foundation\Virtual\RealFile($filename, $path);
-    }
-
-    return false;
-  }
-
-  /**
-   * Remove a stored file
-   *
-   * @param string $filename
-   */
-  public function removeStoredFile($filename)
-  {
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-    $safeName = md5($filename);
-    $path = $this->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
-    if (is_readable($path)) {
-      unlink($path);
-    }
   }
 
   /**

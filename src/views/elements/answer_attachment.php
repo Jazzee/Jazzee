@@ -9,15 +9,15 @@ if ($attachment = $answer->getAttachment()) {
   $base = str_replace(array('/', '\\'),'slash' , $base);
   $pdfName = $base . '.pdf';
   $pngName = $base . 'preview.png';
-  if (!$pdfFile = $this->controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
-    $this->controller->storeFile($pdfName, $attachment->getAttachment());
+  if (!$pdfFile = \Jazzee\Globals::getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
+    \Jazzee\Globals::storeFile($pdfName, $attachment->getAttachment());
   }
-  if (!$pngFile = $this->controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
+  if (!$pngFile = \Jazzee\Globals::getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
     $blob = $attachment->getThumbnail();
     if (empty($blob)) {
       $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
     }
-    $this->controller->storeFile($pngName, $blob);
+    \Jazzee\Globals::storeFile($pngName, $blob);
   }
   ?>
   <a href="<?php print $this->path('file/' . \urlencode($pdfName)); ?>"><img src="<?php print $this->path('file/' . \urlencode($pngName)); ?>" /></a>

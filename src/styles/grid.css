@@ -1,0 +1,284 @@
+#grid {
+  width: 99%;
+  overflow: scroll;
+}
+
+#grid #help {
+  background: #555;
+  color: white;
+  width: 400px;
+  height: 25px;
+
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+#grid th, #grid td, #grid table, #grid thead, #grid tbody{
+  border: none;
+}
+
+#grid .data-table{
+  /*background: #DDD; */
+  border-spacing: 0;
+  border: 1px solid #CCC;
+}
+
+#grid .data-table td, .data-table th {
+  margin: 0;
+  border-bottom: 1px solid #EEE;
+  padding: 5px;
+  /*background: #EEE; */
+}
+
+#grid tr .page, .data-table td{
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+#grid .data-table>tbody>tr>.page>.all-answers {
+  max-height:30px;
+
+  /**
+   * if this max-width is enabled the horizontal expansion and shrinking
+   * of cells can be disorienting.
+   * without it the page is much wider.
+     max-width: 200px;
+  */
+  overflow: hidden;
+
+  /* this is fired when the  hover ends */
+  -webkit-transition:max-height 0.5s ease-in-out;
+  -moz-transition:max-height 0.5s ease-in-out;
+}
+
+#grid .data-table>tbody>tr.hover>.page>.all-answers:hover,
+#grid .data-table>tbody>tr.hover.focus>.page>.all-answers {
+  /*
+  .data-table>tbody>tr>.page>.all-answers:hover,
+  .data-table>tbody>tr.focus>.page>.all-answers {
+  */
+  /*background: red; */
+  max-height:9999px;
+  max-width: 200px;
+
+  -webkit-transition:max-height 2s ease-in-out;
+  -moz-transition:max-height 2s ease-in-out;
+}
+
+
+#grid tr .page .all-answers.withSubTable {
+
+
+}
+
+/*tr .page .all-answers.withSubTable:hover,*/
+#grid tr.hover .page .all-answers.withSubTable{
+  max-width: 999px !important; 
+  /*
+  -webkit-transition:max-width 5s ease-in-out;
+  -moz-transition:max-width 5s ease-in-out;
+  */
+}
+
+#grid tr .page .all-answers.withSubTable .sub-table-header-row{
+  opacity: 0;
+  /*visibility: hidden;*/
+  display: none;
+  -webkit-transition:opacity 0.5s ease-in-out;
+  -moz-transition:opacity 0.5s ease-in-out;
+}
+
+
+/*tr .page .all-answers.withSubTable:hover  .sub-table-header-row,*/
+#grid tr.hover .page .all-answers.withSubTable  .sub-table-header-row{
+  /*visibility: visible;*/
+  display:table-row;
+  opacity: 1;
+  -webkit-transition:opacity 0.5s ease-in-out;
+  -moz-transition:opacity 0.5s ease-in-out;
+}
+
+
+#grid .all-answers ul {
+  margin: 0;
+  list-style-type: none;
+  padding:0;
+}
+
+/* .all-answers ul:nth-child(odd) { background: #EEE; } */
+#grid .all-answers ul:nth-child(even){ 
+  border-top: 2px solid #AAA; 
+  padding-top:5px;
+}
+
+#grid .page .element
+{
+  vertical-align: top;
+  white-space: normal;
+}
+
+#grid .page-title, .element-title {
+  font-weight: bold;
+}
+
+#grid .page .element {
+  font-size: 12px;
+  min-width: 50px;
+  margin-bottom: 5px;
+}
+
+#grid .highlighted {
+  background: yellow !important;
+}
+
+
+/* tables */
+#grid table.tablesorter {
+  font-family:arial;
+  /*		  background-color: #CDCDCD; */
+  margin:10px 0pt 15px;
+  font-size: 8pt;
+  width: 100%;
+  text-align: left;
+}
+#grid table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+  background-color: #e6EEEE;
+  border: 1px solid #FFF;
+  font-size: 8pt;
+  padding: 4px;
+  vertical-align: top;
+
+}
+
+#grid table.tablesorter thead tr .tablesorter-header {
+  background-image: url(images/sort.gif);
+  background-repeat: no-repeat;
+  background-position: center right; 
+
+  padding-right: 20px;
+  cursor: pointer;
+}
+
+
+#grid .withSubTable .tablesorter-header-inner {
+  /*background: blue; */
+  display: block;
+  max-height: 10px;
+  overflow: hidden;
+}
+
+#grid .withSubTable:hover .tablesorter-header-inner {
+  max-width: 99px !important;
+  max-height: 9999px !important;
+  /*
+  -webkit-transition:max-width 5s ease-in-out;
+  -moz-transition:max-width 5s ease-in-out;
+  */
+  /*width: 100% !important;*/
+  overflow: visible;
+  /*background: red;
+  white-space: nowrap;  */
+}
+
+#grid table.tablesorter tbody td {
+  color: #3D3D3D;
+  padding: 4px;
+  /*  background-color: #FFF; */
+  vertical-align: top;
+}
+#grid table.tablesorter tbody tr.odd td {
+  /*  background-color:#F0F0F6; */
+}
+
+#grid table.tablesorter thead tr .tablesorter-headerSortUp {
+  background-image: url(images/asc.gif);
+}
+#grid table.tablesorter thead tr .tablesorter-headerSortDown {
+  background-image: url(images/desc.gif);
+}
+
+#grid table.tablesorter thead tr .tablesorter-headerSortDown, table.tablesorter thead tr .tablesorter-headerSortUp {
+  background-color: #8dbdd8;
+}
+
+
+#grid tr.focus {
+  /*background: orange !important;*/
+
+  -webkit-transition:max-height 2s ease-in-out;
+  -moz-transition:max-height 2s ease-in-out;
+
+}
+
+#grid tr.hover, tr.shadow-hover {
+  /*
+  background: #DFEFFF !important;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#e6e3e3)) !important; 
+  background: #ffd49e;
+  */
+  background: #ffeec2;
+}
+
+#grid tr.hover.focus {
+  background: #ffeec2 !important;
+}
+
+/*
+ this is very slow
+#ApplicantTable>colgroup:nth-child(even) {
+background: #EEE;
+}
+*/
+
+#grid colgroup.hover {
+  /*
+  background: #CFDFFF !important;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#e6e3e3)) !important;*/
+  background: #ffd49e;
+}
+
+#grid .bio-element {
+  background-image: url(images/1351009740_Person.png);
+  background-position: left center;
+  background-repeat:no-repeat;
+  padding-left: 15px;
+
+}
+
+#grid .sub-table-header-row{
+  font-size: 11px;
+  padding: 0;
+  margin: 0;
+
+  max-height: 10px;
+  height: 10px;
+  min-height: 10px;
+
+}
+
+#grid .sub-table-header-row th{
+  max-width: 30px;
+  max-height: 10px;
+  height: 10px;
+  min-height: 10px;
+  overflow: hidden;
+
+
+  /*position: absolute;*/
+  border: 1px solid red;
+}
+
+#grid .answer-table, .answer-table.tablesorter {
+
+  border-spacing: 0;
+  margin: 0; padding: 0;
+}
+
+#grid .answer-table tr:nth-child(even){
+  background: #ffd49e !important;
+  /* ffeec2 */
+}
+
+#grid .page.GoalStatement>div,.page.CurriculumVitae>div  {
+  display: none;
+}

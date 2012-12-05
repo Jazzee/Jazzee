@@ -60,6 +60,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $this->setLayoutVar('status', 'error');  //default to an error
     $this->addScript($this->path('resource/foundation/scripts/form.js'));
     $this->addScript($this->path('resource/scripts/classes/Applicant.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/DisplayChooser.class.js'));
     $this->addScript($this->path('resource/scripts/controllers/applicants_single.controller.js'));
   }
 
@@ -208,15 +209,15 @@ class ApplicantsSingleController extends \Jazzee\AdminController
       $base = str_replace(array('/', '\\'),'slash' , $base);
       $pdfName = $base . '.pdf';
       $pngName = $base . 'preview.png';
-      if (!$pdfFile = $this->getStoredFile($pdfName) or $pdfFile->getLastModified() < $applicant->getUpdatedAt()) {
-        $this->storeFile($pdfName, $attachment->getAttachment());
+      if (!$pdfFile = \Jazzee\Globals::getStoredFile($pdfName) or $pdfFile->getLastModified() < $applicant->getUpdatedAt()) {
+        \Jazzee\Globals::storeFile($pdfName, $attachment->getAttachment());
       }
-      if (!$pngFile = $this->getStoredFile($pngName) or $pngFile->getLastModified() < $applicant->getUpdatedAt()) {
+      if (!$pngFile = \Jazzee\Globals::getStoredFile($pngName) or $pngFile->getLastModified() < $applicant->getUpdatedAt()) {
         $blob = $attachment->getThumbnail();
         if (empty($blob)) {
           $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
         }
-        $this->storeFile($pngName, $blob);
+        \Jazzee\Globals::storeFile($pngName, $blob);
       }
       $attachments['attachments'][] = array(
         'id' => $attachment->getId(),
@@ -1525,10 +1526,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController
         $cron->getEntityManager()->persist($attachment);
         if ($attachment->getAnswer()) {
           $pngName = $attachment->getAnswer()->getPage()->getTitle() . '_attachment_' . $attachment->getAnswer()->getId() . 'preview.png';
-          $cron->removeStoredFile($pngName);
+          \Jazzee\Globals::removeStoredFile($pngName);
         } else {
           $pngName = $attachment->getApplicant()->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
-          $cron->removeStoredFile($pngName);
+          \Jazzee\Globals::removeStoredFileremoveStoredFile($pngName);
         }
       }
       unset($imagick);

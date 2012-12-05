@@ -98,7 +98,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->addCss($this->path('resource/styles/style.css'));
 
     //Set HTML purifier cache location
-    \Foundation\Form\Filter\Safe::setCachePath($this->getVarPath() . '/tmp/');
+    \Foundation\Form\Filter\Safe::setCachePath($this->_config->getVarPath() . '/tmp/');
   }
 
   /**
@@ -208,6 +208,14 @@ class JazzeePageController extends \Foundation\VC\Controller
     $jazzeePath = \Jazzee\Configuration::getSourcePath();
     $this->_vfs->addFile('jsdiff.js', new \Foundation\Virtual\RealFile('jsdiff.js', $jazzeePath . '/lib/jsdiff.js'));
     $this->_vfs->addFile('jquery.tagcloud.js', new \Foundation\Virtual\RealFile('jquery.tagcloud.js', $jazzeePath . '/lib/addywaddy-jquery.tagcloud/jquery.tagcloud.js'));
+    $this->_vfs->addFile('jquery.scrollto.js', new \Foundation\Virtual\RealFile('jquery.scrollto.js', $jazzeePath . '/lib/jquery.scrollto-1.4/jquery.scrollto.js'));
+    $this->_vfs->addFile('jquery.tablesorter.js', new \Foundation\Virtual\RealFile('jquery.tablesorter.js', $jazzeePath . '/lib/jquery.tablesorter-2.4/jquery.tablesorter.js'));
+    $this->_vfs->addFile('jquery.jsrender.js', new \Foundation\Virtual\RealFile('jquery.jsrender.js', $jazzeePath . '/lib/jquery.jsrender-pre21/jquery.jsrender.js'));
+    $this->_vfs->addFile('jquery.uuid.js', new \Foundation\Virtual\RealFile('jquery.uuid.js', $jazzeePath . '/lib/jquery.uuid-2.0/jquery.uuid.js'));
+    
+    $jsClass = new \Foundation\Virtual\VirtualDirectory();
+    $jsClass->addDirectory('js', new \Foundation\Virtual\ProxyDirectory($jazzeePath . '/lib/jsclass-3.0.8/min'));
+    $this->_vfs->addDirectory('jsclass', $jsClass);
   }
 
   /**
@@ -223,7 +231,7 @@ class JazzeePageController extends \Foundation\VC\Controller
    */
   protected function setupVarPath()
   {
-    $var = $this->getVarPath();
+    $var = $this->_config->getVarPath();
     //check to see if all the directories exist and are writable
     $varDirectories = array('log', 'session', 'cache', 'tmp', 'uploads', 'cache/public');
     foreach ($varDirectories as $dir) {
@@ -237,23 +245,6 @@ class JazzeePageController extends \Foundation\VC\Controller
         throw new Exception("Invalid path to 'var/{$dir}' {$path} is not writable by the webserver");
       }
     }
-  }
-
-  /**
-   * Get the path to the var directory
-   * @return string
-   */
-  protected function getVarPath()
-  {
-    $path = $this->_config->getVarPath();
-    if (!$realPath = \realpath($path) or !\is_dir($realPath) or !\is_writable($realPath)) {
-      if ($realPath) {
-        $path = $realPath; //nicer error message if the path exists
-      }
-      throw new Exception("{$path} is not readable by the webserver so we cannot use it as the 'var' directory");
-    }
-
-    return $realPath;
   }
 
   /**
@@ -315,7 +306,7 @@ class JazzeePageController extends \Foundation\VC\Controller
    */
   protected function setupLogging()
   {
-    $path = $this->getVarPath() . '/log';
+    $path = $this->_config->getVarPath() . '/log';
     //create an access log with browser information
     $accessLog = new \Monolog\Logger('access');
     $accessLog->pushHandler(new \Monolog\Handler\StreamHandler($path . '/access_log'));

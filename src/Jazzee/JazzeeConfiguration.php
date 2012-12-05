@@ -991,9 +991,8 @@ class JazzeeConfiguration
   }
 
   /**
-   * get varPath
+   * Get varPath
    *
-   * If there is no path defined return the default one
    * @return string
    */
   public function getVarPath()
@@ -1002,12 +1001,20 @@ class JazzeeConfiguration
   }
 
   /**
-   * set varPath
-   * @var string varPath
+   * set the var path and ensure it is correct
+   * 
+   * @var string $path
    */
-  public function setVarPath($varPath)
+  public function setVarPath($path)
   {
-    $this->_varPath = $varPath;
+    if (!$realPath = \realpath($path) or !\is_dir($realPath) or !\is_writable($realPath)) {
+      if ($realPath) {
+        $path = $realPath; //nicer error message if the path exists
+      }
+      throw new Exception("{$path} is not readable by the webserver so we cannot use it as the 'var' directory");
+    }
+
+    $this->_varPath = $realPath;
   }
 
   /**

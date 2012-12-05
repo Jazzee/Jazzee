@@ -382,5 +382,59 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
 
     return $this->_adminDirectory;
   }
+  
+  /**
+   * List the displays for a user
+   * 
+   * @return array
+   */
+  protected function listDisplays(){
+    $displays = array();
+    foreach($this->_em->getRepository('Jazzee\Entity\Display')->findBy(array('user'=>$this->_user, 'application'=>$this->_application)) as $userDisplay){
+      $displays[] = array(
+        'type' => 'user',
+        'id'  => $userDisplay->getId(),
+        'name' => $userDisplay->getName(),
+        'pages' => $userDisplay->getPageIds(),
+        'elements' => $userDisplay->getElementIds()
+      );
+    }
+    //add the full application system display
+    $display = new \Jazzee\Display\Minimal($this->_application);
+    $displays[] = array(
+      'id' => 'min',
+      'type' => 'system',
+      'class'  => '\Jazzee\Display\Minimal',
+      'name'  =>  'Minimal',
+      'pages' => $display->getPageIds(),
+      'elements' => $display->getElementIds()
+    );
+    
+    //add the full application system display
+    $display = new \Jazzee\Display\FullApplication($this->_application);
+    $displays[] = array(
+      'id' => 'full',
+      'type' => 'system',
+      'class'  => '\Jazzee\Display\FullApplication',
+      'name'  =>  'Full Application',
+      'pages' => $display->getPageIds(),
+      'elements' => $display->getElementIds()
+    );
+    
+    return $displays;
+  }
+  
+  protected function getDisplay(array $arr){
+    switch($arr['type']){
+      case 'user':
+        return $this->_em->getRepository('Jazzee\Entity\Display')->findOneBy(array('id'=>$arr['id'], 'user'=>$this->_user));
+        break;
+      case 'system':
+        return new $arr['class']($this->_application);
+        break;
+      default:
+        throw new Exception('Unkown display type ' . $arr['type']);
+    }
+  }
 
 }

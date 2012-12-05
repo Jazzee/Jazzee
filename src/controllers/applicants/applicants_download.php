@@ -35,6 +35,15 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $element->newItem('pdfarchive', 'Archive of Multiple PDFs');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
+    $element = $field->newElement('RadioList', 'display');
+    $element->setLabel('Display');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $displays = array();
+    foreach($this->listDisplays() as $key => $display){
+      $displays[$key] = $display;
+      $element->newItem($key, $display['name']);
+    }
+
     $element = $field->newElement('CheckboxList', 'filters');
     $element->setLabel('Types of applicants');
     $element->newItem('unlocked', 'Incomplete');
@@ -94,6 +103,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           $applicantsArray[] = $applicant->getId();
         }
       } //end foreach applicants
+      $display = $this->getDisplay($displays[$input->get('display')]);
       unset($applicants);
       switch ($input->get('type')) {
         case 'xls':
@@ -103,7 +113,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           $this->makeXml($applicantsArray);
           break;
         case 'json':
-          $this->makeJson($applicantsArray);
+          $this->makeJson($applicantsArray, $display);
           break;
         case 'pdfarchive':
           $this->makePdfArchive($applicantsArray);
@@ -243,14 +253,15 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
   /**
    * JSON file type
    * @param array \Jazzee\Entity\Applicant $applicants
+   * @param \Jazzee\Entity\Display $display
    */
-  protected function makeJson(array $applicants)
+  protected function makeJson(array $applicants, \Jazzee\Interfaces\Display $display)
   {
     $applicants = array_slice($applicants, 0, 50);
     $arr = array();
     $count = 0;
     foreach ($applicants as $id) {
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, true);
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display);
       $arr[] = $this->_application->formatApplicantArray($applicant);
       $count++;
     }
@@ -267,7 +278,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
   protected function makePdfArchive(array $applicants)
   {
     $directoryName = $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy');
-    $zipFile = $this->getVarPath() . '/tmp/' . uniqid() . '.zip';
+    $zipFile = $this->_config->getVarPath() . '/tmp/' . uniqid() . '.zip';
     $zip = new ZipArchive;
     $zip->open($zipFile, ZipArchive::CREATE);
     $zip->addEmptyDir($directoryName);

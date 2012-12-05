@@ -570,7 +570,7 @@ abstract class PageBuilder extends AdminController
 
   protected function getFilter()
   {
-    $cachePath = $this->getVarPath() . '/tmp/htmlpurifiercache';
+    $cachePath = $this->_config->getVarPath() . '/tmp/htmlpurifiercache';
     if (!is_dir($cachePath)) {
       mkdir($cachePath, 0755, true);
     }

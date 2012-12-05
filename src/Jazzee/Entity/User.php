@@ -42,6 +42,9 @@ class User
 
   /** @Column(type="boolean") */
   private $isActive;
+  
+  /** @Column(type="array", nullable=true) */
+  private $preferences;
 
   /**
    * @ManyToOne(targetEntity="Program")
@@ -65,6 +68,11 @@ class User
    * @OneToMany(targetEntity="AuditLog", mappedBy="user")
    */
   protected $auditLogs;
+
+  /**
+   * @OneToMany(targetEntity="Display", mappedBy="user")
+   */
+  protected $displays;
 
   public function __construct()
   {
@@ -319,6 +327,32 @@ class User
     array_unique($programs);
 
     return $programs;
+  }
+
+  /**
+   * Add log
+   *
+   * @param int $applicationId
+   * @param \stdClass $preferences
+   */
+  public function setPreferences($applicationId, \stdClass $preferences)
+  {
+    $this->preferences[$applicationId] = $preferences;
+  }
+
+  /**
+   * Get preferences
+   * @param int $applicationId
+   * 
+   * @return \stdClass
+   */
+  public function getPreferences($applicationId)
+  {
+    if(!is_null($this->preferences) AND array_key_exists($applicationId, $this->preferences)){
+      return $this->preferences[$applicationId];
+    }
+
+    return new \stdClass();
   }
 
   /**

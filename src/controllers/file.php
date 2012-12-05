@@ -15,7 +15,7 @@ class FileController extends \Jazzee\Controller
    */
   public function actionGet($name)
   {
-    if ($file = $this->getStoredFile($name)) {
+    if ($file = \Jazzee\Globals::getStoredFile($name)) {
       $file->output();
     }
     //send a 404

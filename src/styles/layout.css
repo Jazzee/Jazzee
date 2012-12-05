@@ -35,6 +35,15 @@ body {
   margin: 10px;
 }
 
+
+#widgets {
+  text-align: right;
+}
+
+#widgets div {
+  padding: 5px;
+}
+
 #ft {
   clear: both;
 }

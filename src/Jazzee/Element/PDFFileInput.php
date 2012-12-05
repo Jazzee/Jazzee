@@ -74,15 +74,15 @@ class PDFFileInput extends AbstractElement
       $base = str_replace(array('/', '\\'),'slash' , $base);
       $pdfName = $base . '.pdf';
       $pngName = $base . 'preview.png';
-      if (!$pdfFile = $this->_controller->getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
-        $this->_controller->storeFile($pdfName, $elementAnswers[0]->getEBlob());
+      if (!$pdfFile = \Jazzee\Globals::getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
+        \Jazzee\Globals::storeFile($pdfName, $elementAnswers[0]->getEBlob());
       }
-      if (!$pngFile = $this->_controller->getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
+      if (!$pngFile = \Jazzee\Globals::getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
         $blob = $elementAnswers[1]->getEBlob();
         if (empty($blob)) {
           $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
         }
-        $this->_controller->storeFile($pngName, $blob);
+        \Jazzee\Globals::storeFile($pngName, $blob);
       }
 
       return '<a href="' . $this->_controller->path('file/' . \urlencode($pdfName)) . '"><img src="' . $this->_controller->path('file/' . \urlencode($pngName)) . '" /></a>';
@@ -90,12 +90,53 @@ class PDFFileInput extends AbstractElement
 
     return null;
   }
+
+  /**
+   * Format element answer data into an array
+   * Include links in PDF files for the file and thumbnail
+   * 
+   * @param array $elementAnswers
+   * 
+   * @return array
+   */
+  public function formatApplicantArray(array $elementAnswers)
+  {
+    $arr = parent::formatApplicantArray($elementAnswers);
+    $arr['filePath'] = false;
+    $arr['thumbnailPath'] = false;
+    
+    foreach($elementAnswers as $elementAnswer){
+      $arr['values'][] = $this->arrayValue($elementAnswer);
+    }
+    
+    if($arr['values'][0]['value']){
+      $base = $this->_element->getTitle() . '_' . $elementAnswer['id'];
+      //remove slashes in path to fix an apache issues with encoding slashes in redirects
+      $base = str_replace(array('/', '\\'),'slash' , $base);
+
+      $name = $base . '.pdf';
+      \Jazzee\Globals::storeFile($name, base64_decode($arr['values'][0]['value']));
+      $arr['filePath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
+
+      $name = $base . '.png';
+      $blob = $arr['values'][1]['value'];
+      if (empty($blob)) {
+        $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+      } else {
+        $blob = base64_decode($blob);
+      }
+      \Jazzee\Globals::storeFile($name, $blob);
+      $arr['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
+    }
+
+    return $arr;
+  }
   
   protected function arrayValue(array $elementAnswer){
     $value = array(
       'value' => $elementAnswer['eBlob']
     );
-
+    
     return $value;
   }
 
@@ -191,7 +232,7 @@ class PDFFileInput extends AbstractElement
           $blankPreviewElementAnswer->setEBlob($thumbnailBlob);
 
           $cachedFileName = $blankPreviewElementAnswer->getAnswer()->getApplicant()->getFullName() . ' ' . $blankPreviewElementAnswer->getElement()->getTitle() . '_' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . $blobElementAnswer->getId() . 'preview.png';
-          $cron->removeStoredFile($cachedFileName);
+          \Jazzee\Globals::removeStoredFile($cachedFileName);
           $count++;
           $imagick->clear();
         }
