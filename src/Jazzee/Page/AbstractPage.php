@@ -277,7 +277,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
       'title' => $this->_applicationPage->getTitle(),
       'type' => $this->_applicationPage->getPage()->getType()->getClass(),
       'name' => $this->_applicationPage->getName(),
-      'id' => $this->_applicationPage->getId(),
+      'id' => $this->_applicationPage->getPage()->getId(),
       'answers' => array()
     );
     foreach($answers as $answer){
