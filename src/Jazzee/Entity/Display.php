@@ -28,6 +28,30 @@ class Display implements \Jazzee\Interfaces\Display
   /** @Column(type="string", length=255) */
   private $name;
 
+  /** @Column(type="boolean") */
+  private $showFirstName;
+
+  /** @Column(type="boolean") */
+  private $showLastName;
+
+  /** @Column(type="boolean") */
+  private $showEmail;
+
+  /** @Column(type="boolean") */
+  private $showCreatedAt;
+
+  /** @Column(type="boolean") */
+  private $showUpdatedAt;
+
+  /** @Column(type="boolean") */
+  private $showLastLogin;
+
+  /** @Column(type="boolean") */
+  private $showPercentComplete;
+
+  /** @Column(type="boolean") */
+  private $showHasPaid;
+
   /**
    * @ManyToOne(targetEntity="User",inversedBy="displays")
    * @JoinColumn(onDelete="CASCADE")
@@ -211,24 +235,100 @@ class Display implements \Jazzee\Interfaces\Display
     return false;
   }
   
-  public function toArray(){
-    $display = array('pages'=>array());
-    foreach($this->pages as $displayPage){
-      $pageArr = array(
-        'id' => $displayPage->getApplicationPage()->getPage()->getId(),
-        'title' => $displayPage->getApplicationPage()->getTitle(),
-        'elements' => array()
-      );
-      foreach($displayPage->getElements() as $displayElement){
-        $pageArr['elements'][] = array(
-          'id' => $displayElement->getElement()->getId(),
-          'title' => $displayElement->getElement()->getTitle(),  
-        );
-      }
-      $display['pages'][] = $pageArr;
-    }
-    
-    return $display;
+  public function showCreatedAt(){
+    $this->showCreatedAt = true;
+  }
+  
+  public function hideCreatedAt(){
+    $this->showCreatedAt = false;
+  }
+
+  public function isCreatedAtDisplayed() {
+    return $this->showCreatedAt;
+  }
+  
+  public function showEmail(){
+    $this->showEmail = true;
+  }
+  
+  public function hideEmail(){
+    $this->showEmail = false;
+  }
+
+  public function isEmailDisplayed() {
+    return $this->showEmail;
+  }
+  
+  public function showFirstName(){
+    $this->showFirstName = true;
+  }
+  
+  public function hideFirstName(){
+    $this->showFirstName = false;
+  }
+
+  public function isFirstNameDisplayed() {
+    return $this->showFirstName;
+  }
+  
+  public function showHasPaid(){
+    $this->showHasPaid = true;
+  }
+  
+  public function hideHasPaid(){
+    $this->showHasPaid = false;
+  }
+
+  public function isHasPaidDisplayed() {
+    return $this->showHasPaid;
+  }
+  
+  public function showLastLogin(){
+    $this->showLastLogin = true;
+  }
+  
+  public function hideLastLogin(){
+    $this->showLastLogin = false;
+  }
+
+  public function isLastLoginDisplayed() {
+    return $this->showLastLogin;
+  }
+  
+  public function showLastName(){
+    $this->showLastName = true;
+  }
+  
+  public function hideLastName(){
+    $this->showLastName = false;
+  }
+
+  public function isLastNameDisplayed() {
+    return $this->showLastName;
+  }
+  
+  public function showPercentComplete(){
+    $this->showPercentComplete = true;
+  }
+  
+  public function hidePercentComplete(){
+    $this->showPercentComplete = false;
+  }
+
+  public function isPercentCompleteDisplayed() {
+    return $this->showPercentComplete;
+  }
+  
+  public function showUpdatedAt(){
+    $this->showUpdatedAt = true;
+  }
+  
+  public function hideUpdatedAt(){
+    $this->showUpdatedAt = false;
+  }
+
+  public function isUpdatedAtDisplayed() {
+    return $this->showUpdatedAt;
   }
 
 }

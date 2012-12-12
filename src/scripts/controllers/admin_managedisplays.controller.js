@@ -24,6 +24,7 @@ $(document).ready(function(){
   });
   var displayForm = $('#displayManager');
   if(displayForm.length){
+    $('#account input').button();
     $('#pages input').button();
     $('input[type=submit]').button();
     $('#pages > ol > li').each(function(){

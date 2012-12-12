@@ -66,8 +66,36 @@ class Minimal implements \Jazzee\Interfaces\Display
   public function displayElement(\Jazzee\Entity\Element $element){
     return false;
   }
-  
-  public function toArray(){
-    return array('pages'=>array());
+
+  public function isCreatedAtDisplayed() {
+    return true;
+  }
+
+  public function isEmailDisplayed() {
+    return true;
+  }
+
+  public function isFirstNameDisplayed() {
+    return true;
+  }
+
+  public function isHasPaidDisplayed() {
+    return true;
+  }
+
+  public function isLastLoginDisplayed() {
+    return true;
+  }
+
+  public function isLastNameDisplayed() {
+    return true;
+  }
+
+  public function isPercentCompleteDisplayed() {
+    return true;
+  }
+
+  public function isUpdatedAtDisplayed() {
+    return true;
   }
 }

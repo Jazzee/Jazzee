@@ -50,9 +50,58 @@ interface Display
   function displayElement(\Jazzee\Entity\Element $element);
   
   /**
-   * Convert the display to an array
+   * Is the first name displayed
    * 
-   * @return array
+   * @return boolean
    */
-  function toArray();
+  function isFirstNameDisplayed();
+  
+  /**
+   * Is the last name displayed
+   * 
+   * @return boolean
+   */
+  function isLastNameDisplayed();
+  
+  /**
+   * Is the email address displayed
+   * 
+   * @return boolean
+   */
+  function isEmailDisplayed();
+  
+  /**
+   * Is the lastupdate time shown
+   * 
+   * @return boolean
+   */
+  function isUpdatedAtDisplayed();
+  
+  /**
+   * Is the createdAt time shown
+   * 
+   * @return boolean
+   */
+  function isCreatedAtDisplayed();
+  
+  /**
+   * Is the lastLogin time shown
+   * 
+   * @return boolean
+   */
+  function isLastLoginDisplayed();
+  
+  /**
+   * Is the percent complete displayed
+   * 
+   * @return boolean
+   */
+  function isPercentCompleteDisplayed();
+  
+  /**
+   * Is the percent complete displayed
+   * 
+   * @return boolean
+   */
+  function isHasPaidDisplayed();
 }

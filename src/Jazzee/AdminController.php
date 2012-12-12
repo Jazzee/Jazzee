@@ -396,7 +396,15 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'id'  => $userDisplay->getId(),
         'name' => $userDisplay->getName(),
         'pages' => $userDisplay->getPageIds(),
-        'elements' => $userDisplay->getElementIds()
+        'elements' => $userDisplay->getElementIds(),
+        'showFirstName' => $userDisplay->showFirstName(),
+        'showLastName' => $userDisplay->showLastName(),
+        'showEmail' => $userDisplay->showEmail(),
+        'showCreatedAt' => $userDisplay->showCreatedAt(),
+        'showUpdatedAt' => $userDisplay->showUpdatedAt(),
+        'showLastLogin' => $userDisplay->showLastLogin(),
+        'showPercentComplete' => $userDisplay->showPercentComplete(),
+        'showHasPaid' => $userDisplay->showHasPaid()
       );
     }
     //add the full application system display
@@ -407,7 +415,15 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
       'class'  => '\Jazzee\Display\Minimal',
       'name'  =>  'Minimal',
       'pages' => $display->getPageIds(),
-      'elements' => $display->getElementIds()
+      'elements' => $display->getElementIds(),
+        'showFirstName' => $userDisplay->showFirstName(),
+        'showLastName' => $userDisplay->showLastName(),
+        'showEmail' => $userDisplay->showEmail(),
+        'showCreatedAt' => $userDisplay->showCreatedAt(),
+        'showUpdatedAt' => $userDisplay->showUpdatedAt(),
+        'showLastLogin' => $userDisplay->showLastLogin(),
+        'showPercentComplete' => $userDisplay->showPercentComplete(),
+        'showHasPaid' => $userDisplay->showHasPaid()
     );
     
     //add the full application system display
@@ -418,7 +434,15 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
       'class'  => '\Jazzee\Display\FullApplication',
       'name'  =>  'Full Application',
       'pages' => $display->getPageIds(),
-      'elements' => $display->getElementIds()
+      'elements' => $display->getElementIds(),
+      'showFirstName' => $userDisplay->showFirstName(),
+      'showLastName' => $userDisplay->showLastName(),
+      'showEmail' => $userDisplay->showEmail(),
+      'showCreatedAt' => $userDisplay->showCreatedAt(),
+      'showUpdatedAt' => $userDisplay->showUpdatedAt(),
+      'showLastLogin' => $userDisplay->showLastLogin(),
+      'showPercentComplete' => $userDisplay->showPercentComplete(),
+      'showHasPaid' => $userDisplay->showHasPaid()
     );
     
     return $displays;

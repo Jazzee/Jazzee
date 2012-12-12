@@ -51,26 +51,43 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
 
       if($this->post){
         $display->setName($this->post['displayName']);
+        
         foreach ($display->getPages() as $app) {
           $display->getPages()->removeElement($app);
           $this->getEntityManager()->remove($app);
         }
-        foreach($this->post['pages'] as $pageId){
-          $applicationPage = $this->_application->getApplicationPageByPageId($pageId);
-          $displayPage = new \Jazzee\Entity\DisplayPage;
-          $display->addPage($displayPage);
-          $displayPage->setApplicationPage($applicationPage);
-          if(array_key_exists("page{$pageId}elements", $this->post)){
-            foreach($this->post["page{$pageId}elements"] as $elementId){
-              $element = $applicationPage->getPage()->getElementById($elementId);
-              $displayElement = new \Jazzee\Entity\DisplayElement;
-              $displayPage->addElement($displayElement);
-              $displayElement->setElement($element);
-              $this->getEntityManager()->persist($displayElement);
+        if(array_key_exists('pages', $this->post)){
+          foreach($this->post['pages'] as $pageId){
+            $applicationPage = $this->_application->getApplicationPageByPageId($pageId);
+            $displayPage = new \Jazzee\Entity\DisplayPage;
+            $display->addPage($displayPage);
+            $displayPage->setApplicationPage($applicationPage);
+            if(array_key_exists("page{$pageId}elements", $this->post)){
+              foreach($this->post["page{$pageId}elements"] as $elementId){
+                $element = $applicationPage->getPage()->getElementById($elementId);
+                $displayElement = new \Jazzee\Entity\DisplayElement;
+                $displayPage->addElement($displayElement);
+                $displayElement->setElement($element);
+                $this->getEntityManager()->persist($displayElement);
+              }
             }
+            $this->_em->persist($displayPage);
           }
-          $this->_em->persist($displayPage);
         }
+        if(!array_key_exists('account', $this->post)){
+          $this->post['account'] = array();
+        }
+        $accountPieces = array('FirstName', 'LastName', 'Email', 'CreatedAt', 'UpdatedAt', 'LastLogin', 'PercentComplete', 'HasPaid');
+
+        foreach($accountPieces as $name){
+          if(in_array('show'.$name, $this->post['account'])){
+            $method = 'show'.$name;
+          } else {
+            $method = 'hide'.$name;
+          }
+          $display->$method();
+        }
+        
         $this->_em->persist($display);
         $this->addMessage('success', $display->getName() . ' saved');
       }

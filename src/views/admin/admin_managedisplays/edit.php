@@ -12,6 +12,44 @@
 <div>
   <form id='displayManager' method="post" action="<?print $this->path('managedisplays/edit/'.$display->getId());?>">
     <input id='displayName' name='displayName' type='text' value='<?php print $display->getName();?>'/>
+    <div id='account'>
+      <h5>Applicant Info</h5>
+      <ol>
+        <li>
+          <input id='showFirstName' value='showFirstName' type='checkbox' name='account[]' <?php if($display->isFirstNameDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showFirstName'>First Name</label>
+        </li>
+        <li>
+          <input id='showLastName' value='showLastName' type='checkbox' name='account[]' <?php if($display->isLastNameDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showLastName'>Last Name</label>
+        </li>
+        <li>
+          <input id='showEmail' value='showEmail' type='checkbox' name='account[]' <?php if($display->isEmailDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showEmail'>Email</label>
+        </li>
+        <li>
+          <input id='showLastLogin' value='showLastLogin' type='checkbox' name='account[]' <?php if($display->isLastLoginDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showLastLogin'>Last Login</label>
+        </li>
+        <li>
+          <input id='showUpdatedAt' value='showUpdatedAt' type='checkbox' name='account[]' <?php if($display->isUpdatedAtDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showUpdatedAt'>Last Update</label>
+        </li>
+        <li>
+          <input id='showCreatedAt' value='showCreatedAt' type='checkbox' name='account[]' <?php if($display->isCreatedAtDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showCreatedAt'>Account Created</label>
+        </li>
+        <li>
+          <input id='showPercentComplete' value='showPercentComplete' type='checkbox' name='account[]' <?php if($display->isPercentCompleteDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showPercentComplete'>Percent Complete</label>
+        </li>
+        <li>
+          <input id='showHasPaid' value='showHasPaid' type='checkbox' name='account[]' <?php if($display->isHasPaidDisplayed()){ print 'checked="true" '; } ?>/>
+          <label for='showHasPaid'>Payment Status</label>
+        </li>
+
+      </ol>
+    </div>
     <div id='pages'>
       <h5>Display Pages</h5>
       <ol>
