@@ -330,6 +330,24 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     }
   }
 
+  public function getArrayStatus(array $answers)
+  {
+    if (!$this->_applicationPage->isRequired() and count($answers) and $answers[0]['pageStatus'] == self::SKIPPED) {
+      return self::SKIPPED;
+    }
+    $completedAnswers = 0;
+    foreach ($answers as $answer) {
+      if ($answer['locked']) {
+        $completedAnswers++;
+      }
+    }
+    if (is_null($this->_applicationPage->getMin()) or $completedAnswers < $this->_applicationPage->getMin()) {
+      return self::INCOMPLETE;
+    } else {
+      return self::COMPLETE;
+    }
+  }
+
   /**
    * Create a table from answers
    * and append any attached PDFs

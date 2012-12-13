@@ -63,6 +63,21 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     return self::INCOMPLETE;
   }
 
+  public function getArrayStatus(array $answers)
+  {
+    if (!$this->_applicationPage->isRequired() and count($answers) and $answers[0]['pageStatus'] == self::SKIPPED) {
+      return self::SKIPPED;
+    }
+    if (is_null($this->_applicationPage->getMin()) and count($answers)) {
+      return self::COMPLETE;
+    }
+    if (!is_null($this->_applicationPage->getMin()) and count($answers) >= $this->_applicationPage->getMin()) {
+      return self::COMPLETE;
+    }
+
+    return self::INCOMPLETE;
+  }
+
   /**
    * Try and match a score to an answer
    *

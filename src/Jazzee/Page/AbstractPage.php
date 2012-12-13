@@ -278,8 +278,10 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
       'type' => $this->_applicationPage->getPage()->getType()->getClass(),
       'name' => $this->_applicationPage->getName(),
       'id' => $this->_applicationPage->getPage()->getId(),
+      'status' => $this->getArrayStatus($answers),
       'answers' => array()
     );
+    
     foreach($answers as $answer){
       $page['answers'][] = $this->arrayAnswer($answer, $this->_applicationPage->getPage());
     }
@@ -312,6 +314,13 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
 
     return $answer;
   }
+  
+  /**
+   * Get the status of the page from the answer array
+   * @param array $answers
+   * @return int
+   */
+  abstract protected function getArrayStatus(array $answers);
 
   /**
    * Create a table from answers

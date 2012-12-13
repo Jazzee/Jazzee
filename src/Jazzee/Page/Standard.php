@@ -56,6 +56,21 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\QueryPage, \Ja
     return self::INCOMPLETE;
   }
 
+  public function getArrayStatus(array $answers)
+  {
+    if (!$this->_applicationPage->isRequired() and count($answers) and $answers[0]['pageStatus'] == self::SKIPPED) {
+      return self::SKIPPED;
+    }
+    if (is_null($this->_applicationPage->getMin()) and count($answers)) {
+      return self::COMPLETE;
+    }
+    if (!is_null($this->_applicationPage->getMin()) and count($answers) >= $this->_applicationPage->getMin()) {
+      return self::COMPLETE;
+    }
+
+    return self::INCOMPLETE;
+  }
+
   /**
    * Standard pages query by elements finding values that match
    *

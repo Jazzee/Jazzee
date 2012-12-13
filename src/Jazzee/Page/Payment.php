@@ -185,6 +185,16 @@ class Payment extends AbstractPage
         return self::COMPLETE;
       }
     }
+  }
+  
+  public function getArrayStatus(array $answers)
+  {
+    //Only complete for pendign and settled payments
+    foreach ($answers as $answer) {
+      if ($answer['payment']['status'] == \Jazzee\Entity\Payment::SETTLED OR $answer['payment']['status'] == \Jazzee\Entity\Payment::PENDING) {
+        return self::COMPLETE;
+      }
+    }
 
     //if none of the payments are pending or settled we are incomplete
     return self::INCOMPLETE;
