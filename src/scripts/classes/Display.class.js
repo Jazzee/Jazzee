@@ -16,38 +16,32 @@ Display.prototype.showApplicantLink = function(){
 };
 
 Display.prototype.showFirstName = function(){
-    //  console.log("no first name!");
-  return false;
+  return this.display.isFirstNameDisplayed;
 };
 
 Display.prototype.showLastName = function(){
-  return true;
+  return this.display.isLastNameDisplayed;
 };
 
 Display.prototype.showEmail = function(){
-  return true;
-  return false;
+  return this.display.isEmailDisplayed;
 };
 
 Display.prototype.showLastUpdate = function(){
-  return true;
-  return false;
+  return this.display.isUpdatedAtDisplayed;
 };
 
 
 Display.prototype.showProgress = function(){
-
-  return true;
+  return this.display.isPercentCompleteDisplayed;
 };
 
 Display.prototype.showLastLogin = function(){
-  return true;
-  return false;
+  return this.display.isLastLoginDisplayed;
 };
 
 Display.prototype.showAccountCreated = function(){
-  return true;
- return false;
+  return this.display.isCreatedAtDisplayed;
 };
 
 /**
