@@ -29,28 +29,28 @@ class Display implements \Jazzee\Interfaces\Display
   private $name;
 
   /** @Column(type="boolean") */
-  private $showFirstName;
+  private $isFirstNameDislayed;
 
   /** @Column(type="boolean") */
-  private $showLastName;
+  private $isLastNameDislayed;
 
   /** @Column(type="boolean") */
-  private $showEmail;
+  private $isEmailDislayed;
 
   /** @Column(type="boolean") */
-  private $showCreatedAt;
+  private $isCreatedAtDislayed;
 
   /** @Column(type="boolean") */
-  private $showUpdatedAt;
+  private $isUpdatedAtDislayed;
 
   /** @Column(type="boolean") */
-  private $showLastLogin;
+  private $isLastLoginDislayed;
 
   /** @Column(type="boolean") */
-  private $showPercentComplete;
+  private $isPercentCompleteDislayed;
 
   /** @Column(type="boolean") */
-  private $showHasPaid;
+  private $isHasPaidDislayed;
 
   /**
    * @ManyToOne(targetEntity="User",inversedBy="displays")
@@ -73,6 +73,14 @@ class Display implements \Jazzee\Interfaces\Display
   {
     $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
     $this->attributes = array();
+    $this->isFirstNameDislayed = true;
+    $this->isLastNameDislayed = true;
+    $this->isEmailDislayed = true;
+    $this->isCreatedAtDislayed = true;
+    $this->isUpdatedAtDislayed = true;
+    $this->isLastLoginDislayed = true;
+    $this->isPercentCompleteDislayed = true;
+    $this->isHasPaidDislayed = true;
   }
 
   /**
@@ -236,99 +244,99 @@ class Display implements \Jazzee\Interfaces\Display
   }
   
   public function showCreatedAt(){
-    $this->showCreatedAt = true;
+    $this->isCreatedAtDislayed = true;
   }
   
   public function hideCreatedAt(){
-    $this->showCreatedAt = false;
+    $this->isCreatedAtDislayed = false;
   }
 
   public function isCreatedAtDisplayed() {
-    return $this->showCreatedAt;
+    return $this->isCreatedAtDislayed;
   }
   
   public function showEmail(){
-    $this->showEmail = true;
+    $this->isEmailDislayed = true;
   }
   
   public function hideEmail(){
-    $this->showEmail = false;
+    $this->isEmailDislayed = false;
   }
 
   public function isEmailDisplayed() {
-    return $this->showEmail;
+    return $this->isEmailDislayed;
   }
   
   public function showFirstName(){
-    $this->showFirstName = true;
+    $this->isFirstNameDislayed = true;
   }
   
   public function hideFirstName(){
-    $this->showFirstName = false;
+    $this->isFirstNameDislayed = false;
   }
 
   public function isFirstNameDisplayed() {
-    return $this->showFirstName;
+    return $this->isFirstNameDislayed;
   }
   
   public function showHasPaid(){
-    $this->showHasPaid = true;
+    $this->isHasPaidDislayed = true;
   }
   
   public function hideHasPaid(){
-    $this->showHasPaid = false;
+    $this->isHasPaidDislayed = false;
   }
 
   public function isHasPaidDisplayed() {
-    return $this->showHasPaid;
+    return $this->isHasPaidDislayed;
   }
   
   public function showLastLogin(){
-    $this->showLastLogin = true;
+    $this->isLastLoginDislayed = true;
   }
   
   public function hideLastLogin(){
-    $this->showLastLogin = false;
+    $this->isLastLoginDislayed = false;
   }
 
   public function isLastLoginDisplayed() {
-    return $this->showLastLogin;
+    return $this->isLastLoginDislayed;
   }
   
   public function showLastName(){
-    $this->showLastName = true;
+    $this->isLastNameDislayed = true;
   }
   
   public function hideLastName(){
-    $this->showLastName = false;
+    $this->isLastNameDislayed = false;
   }
 
   public function isLastNameDisplayed() {
-    return $this->showLastName;
+    return $this->isLastNameDislayed;
   }
   
   public function showPercentComplete(){
-    $this->showPercentComplete = true;
+    $this->isPercentCompleteDislayed = true;
   }
   
   public function hidePercentComplete(){
-    $this->showPercentComplete = false;
+    $this->isPercentCompleteDislayed = false;
   }
 
   public function isPercentCompleteDisplayed() {
-    return $this->showPercentComplete;
+    return $this->isPercentCompleteDislayed;
   }
   
   public function showUpdatedAt(){
-    $this->showUpdatedAt = true;
+    $this->isUpdatedAtDislayed = true;
   }
   
   public function hideUpdatedAt(){
-    $this->showUpdatedAt = false;
+    $this->isUpdatedAtDislayed = false;
   }
 
   public function isUpdatedAtDisplayed() {
-    return $this->showUpdatedAt;
+    return $this->isUpdatedAtDislayed;
   }
 
 }
