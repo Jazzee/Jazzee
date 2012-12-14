@@ -127,7 +127,7 @@ class PDFFileInput extends AbstractElement
       }
       \Jazzee\Globals::storeFile($name, $blob);
       $arr['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
-      $arr['displayValue'] = "<a href='{$arr['thumbnailPath']}'><img src='{$arr['filePath']}' /></a>";
+      $arr['displayValue'] = "<a href='{$arr['filePath']}'><img src='{$arr['thumbnailPath']}' /></a>";
     }
 
     return $arr;
