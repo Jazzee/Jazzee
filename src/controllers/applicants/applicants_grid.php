@@ -56,11 +56,9 @@ class ApplicantsGridController extends \Jazzee\AdminController
     
     foreach ($this->post['applicantIds'] as $id) {
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display);
-      if($applicant['isLocked']){
-        $arr = $this->_application->formatApplicantArray($applicant);
-        $arr['link'] = $this->path("applicants/single/{$arr['id']}");
-        $results[] = $arr;
-      }
+      $arr = $this->_application->formatApplicantArray($applicant);
+      $arr['link'] = $this->path("applicants/single/{$arr['id']}");
+      $results[] = $arr;
     }
     $this->setVar('result', array('applicants' => $results));
     $this->loadView('applicants_single/result');
