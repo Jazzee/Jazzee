@@ -87,7 +87,7 @@
 
 <script id="ColumnTableTemplate" type="text/x-jquery-tmpl">
 {{if ~checkReal(values[0].value)}}
-<td answer="{{:answerNumber}}" class="answer-{{:answerNumber}} element element-{{cssClass:answerNumber}}" title="{{:answerNumber}}">{{:values[0].value}}</td>
+<td answer="{{:answerNumber}}" class="answer-{{:answerNumber}} element element-{{cssClass:answerNumber}}" title="{{:answerNumber}}">{{:displayValue}}</td>
 {{/if}}
 </script>
 
