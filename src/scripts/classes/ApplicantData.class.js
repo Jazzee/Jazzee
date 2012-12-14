@@ -16,8 +16,9 @@ function ApplicantData(obj){
  */
 ApplicantData.prototype.getAnswersForPage = function(pageId){
   for(var i = 0; i < this.applicant.pages.length; i++){
-    var page = this.applicant.pages[i];
-    if(page.id = pageId){
+      var page = this.applicant.pages[i];
+    if(page.id == pageId){
+
       return page.answers;
     }
   }
@@ -25,13 +26,26 @@ ApplicantData.prototype.getAnswersForPage = function(pageId){
   return [];
 };
 
+ApplicantData.prototype.getPage = function(pageId){
+  for(var i = 0; i < this.applicant.pages.length; i++){
+    var page = this.applicant.pages[i];
+    //        console.log("testing page id ["+page.id+":"+page["id"]+"] vs. "+pageId);
+    //        console.log("testing page id ["+page+":"+page.id+"] vs. "+pageId);
+    if(page.id == pageId){
+      return page;
+    }
+  }
+  
+  return null;
+};
+
 /**
  * Get answers for an applicant page
  */
 ApplicantData.prototype.hasAnswersForPage = function(pageId){
   for(var i = 0; i < this.applicant.pages.length; i++){
-    var page = this.applicant.pages[i];
-    if(page.id = pageId){
+      var page = this.applicant.pages[i];
+    if(page.id == pageId){
       return page.answers.length > 0;
     }
   }

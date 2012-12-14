@@ -29,6 +29,7 @@ $(document).ready(function(){
      file(services.getBasepath() + 'resource/jquery.tablesorter.js').provides('jQuery.tablesorter');
      file(services.getBasepath() + 'resource/jquery.scrollto.js').provides('jQuery.scrollTo');
      file(services.getBasepath() + 'resource/jquery.uuid.js').provides('jQuery.uidGen');
+     file(services.getBasepath() + 'resource/scripts/classes/Display.class.js').provides('Display');
      file(services.getBasepath() + 'resource/scripts/classes/Grid.class.js')
       .provides('Grid')
       .requires('JS.Class')
@@ -36,7 +37,8 @@ $(document).ready(function(){
       .requires('jQuery.views')
       .requires('jQuery.tablesorter')
       .requires('jQuery.uidGen')
-      .requires('jQuery.scrollTo');
+      .requires('jQuery.scrollTo')
+	 .requires('Display') ;
   }});
 
   var displayChooser = new DisplayChooser('applicant_grid');
@@ -46,7 +48,7 @@ $(document).ready(function(){
     JS.require('Grid', function(){
       $('#ApplicantTable').empty();
       var path = services.getControllerPath('applicants_grid');
-      var grid = new ApplicantGrid("#ApplicantTable");
+      var grid = new ApplicantGrid("#ApplicantTable", null, display);
       var applicantLimit = 50;
       $.get(path + '/listApplicants', function(json){
         var applicants = json.data.result;      

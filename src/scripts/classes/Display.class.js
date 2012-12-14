@@ -11,6 +11,45 @@ function Display(obj, application){
   this.application = application;
 };
 
+Display.prototype.showApplicantLink = function(){
+  return true;
+};
+
+Display.prototype.showFirstName = function(){
+    //  console.log("no first name!");
+  return false;
+};
+
+Display.prototype.showLastName = function(){
+  return true;
+};
+
+Display.prototype.showEmail = function(){
+  return true;
+  return false;
+};
+
+Display.prototype.showLastUpdate = function(){
+  return true;
+  return false;
+};
+
+
+Display.prototype.showProgress = function(){
+
+  return true;
+};
+
+Display.prototype.showLastLogin = function(){
+  return true;
+  return false;
+};
+
+Display.prototype.showAccountCreated = function(){
+  return true;
+ return false;
+};
+
 /**
  * List the pages
  */
@@ -35,6 +74,18 @@ Display.prototype.getPages = function(){
   });
   
   return pages;
+};
+
+Display.prototype.getPageTitle = function(pageId){
+  var self = this;
+  var title = null;
+  $.each(this.application.listApplicationPages(), function(){
+    if(pageId == this.page.id){
+	  title = this.page.title;
+    }
+  });
+  
+  return title;
 };
 
 /**

@@ -1,6 +1,7 @@
 #grid {
   width: 99%;
-  overflow: scroll;
+/*  overflow: scroll; */
+overflow:auto;
 }
 
 #grid #help {
@@ -96,6 +97,14 @@
   opacity: 1;
   -webkit-transition:opacity 0.5s ease-in-out;
   -moz-transition:opacity 0.5s ease-in-out;
+}
+
+tr table.answer-table tr.sub-table-header-row {
+display: none;
+}
+
+tr.initialized-sub-tables table.answer-table tr.sub-table-header-row {
+display: table-row;
 }
 
 

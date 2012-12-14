@@ -10,7 +10,8 @@ $.views.helpers({
 
 $.views.converters({
   cssClass: function(value){
-    return value.replace(/ /g,"_").replace(/[^a-zA-Z 0-9]+/g,'');
+	    return ((value && value.replace) ? value.replace(/ /g,"_").replace(/[^a-zA-Z 0-9]+/g,'')
+		    : "NULL");
   },
   percent: function(value){
     return (value*100)+'%';
@@ -140,10 +141,9 @@ Grid = new JS.Class({
 
     // this fills our map 
     this.getColumnDefinitions(data, this.colDefs);
-    //	    console.log("COLDEFS:"+this.colDefs.keys()+", email: "+colDefs.get("Email"));
-    this.addHeader(this.getHeaderTemplate(), {
-      names: this.colDefs.keys()
-      });
+    console.log("COLDEFS:"+this.colDefs.keys());
+
+    this.addHeaders();
 
     var newRow = this.addRow.bind(this, "#RowTemplate", this.colDefs);
     $.each(data, newRow);
@@ -185,10 +185,13 @@ Grid = new JS.Class({
         $(this).parent().removeClass("hover");
       }else{
         $(this).parent().addClass("hover");
-
-        if(!$(e.target).id){
-          $(e.target).attr("id", $.uidGen("grid-"));
+	try{
+        if(!e.target.getAttribute("id")){
+	    e.target.setAttribute("id", $.uidGen("grid-"));
         }
+	}catch(noId){
+	    console.log("unable to assign/check ["+e.target+":"+$(e.target)+"] for id: "+noId);
+	}
         setTimeout( function(){
           console.log("scrolling to #"+$(e.target).id);
           //			    $(e.target).scrollTo();
@@ -210,6 +213,14 @@ Grid = new JS.Class({
 	    
     console.log("created tablesorter");
   },
+
+  addHeaders: function(){
+
+    this.addHeader(this.getHeaderTemplate(), {
+      names: this.colDefs.keys()
+	});
+
+	},
 
   help: function(e){
     var trigger = $(e.target);
@@ -375,11 +386,12 @@ SubTableGrid = new JS.Class(Grid, {
 
 ApplicantGrid = new JS.Class(Grid, {
 	
-  initialize: function(){
+	initialize: function(selector, dataurl, display){
     // JS.Class apparently automatically passed the args:
     // http://jsclass.jcoglan.com/classes.html
     this.callSuper(); 
-    console.log("finished call to super");
+    console.log("ApplicantGrid: have display '"+display.getName()+"'");
+    this.display = display;
     this.filterElem.keyup(this.doFilter.bind(this));
 
   //	 var tip =   $(this.tableSelector).tipTip({defaultPosition: "top",
@@ -389,6 +401,14 @@ ApplicantGrid = new JS.Class(Grid, {
 
 
   },
+
+	attrs: function(obj){
+	    var dump = "";
+	    for(x in obj){
+		dump += x+" => "+obj[x]+"\n\n";
+	    }
+	    return dump;
+	},
 	
   /**
 	 *  Extract data from the json response
@@ -401,17 +421,18 @@ ApplicantGrid = new JS.Class(Grid, {
 
     // the default template
     var def = hash.getDefault();
-    hash.store("Applicant", def);
-    hash.store("Last Name", def);
-    hash.store("First Name", def);
-    hash.store("Email Address", def);
-    hash.store("Last Update", '#DateTemplate');
-    hash.store("Progress", def);
-    hash.store("Last Login", def);
-    hash.store("Account Created", def);
+    if(this.display.showApplicantLink())  hash.store("Applicant", def);
+    if(this.display.showLastName())    hash.store("Last Name", def);
+    if(this.display.showFirstName())     hash.store("First Name", def);
+    if(this.display.showEmail())     hash.store("Email Address", def);
+    if(this.display.showLastUpdate())     hash.store("Last Update", '#DateTemplate');
+    if(this.display.showProgress())     hash.store("Progress", def);
+    if(this.display.showLastLogin())     hash.store("Last Login", def);
+       if(this.display.showAccountCreated())  hash.store("Account Created", def);
     
     // ISSUE: we loop through all the data in orde to find all columns.
     // this is obviously expensive and probably necessary
+    /*
     $.each(data, function(key, row){
 
       $.each(row["pages"], function(key, page){
@@ -421,9 +442,44 @@ ApplicantGrid = new JS.Class(Grid, {
       });
       return false;
     });
+    */
+
+    
+    $.each(this.display.getPages(), function(key, page){
+	    //if(!hash.hasKey(page.title)){
+	    //hash.store(page.title, def);
+	    //}
+
+	    if(!hash.hasKey(page.id)){
+		hash.store(page.id, def);
+	    }
+    });
   },
 
-  addRow: function(rowTemplate, colDefs, key, row) {
+
+  addHeaders: function(){
+
+    var headerTitles = [];
+    $.each(this.colDefs.keys(), function(idx, col){
+	    // check if this is a non-numeric string. if so, we will assume
+	    // it's one of our non-page columns -> not one identified by a page id
+	    var hack = col.replace(/[^0-9]+/g,'');
+	    if(hack.length != col.length){
+		headerTitles.push(col);
+	    }else{
+		// lookup title
+		headerTitles.push(this.display.getPageTitle(col));
+
+	    }
+
+	}.bind(this));
+    this.addHeader(this.getHeaderTemplate(), {
+	    names: headerTitles
+		});
+    
+	},
+
+	addRow: function(rowTemplate, colDefs, key, row) {
     try{
 
       // break up row into multiple templates: row, then page, then element
@@ -432,50 +488,119 @@ ApplicantGrid = new JS.Class(Grid, {
 		
       var pages = "";
       var rowFrag = $(string);
-      $.each(row["pages"], function(key, page){
-        var pageFrag = $($(PAGE_CONTAINER_TEMPLATE).render(page));
-        // var allAnswers = pageFrag.find("div.all-answers");
-        var eList = pageFrag.find(".element-list");
-        //console.log("found #"+eList.length+" element lists");
-        if(page.title && colDefs.get(page.title)){
-          PAGE_ITEM_TEMPLATE = colDefs.get(page.title);
-        }
-        var answerCount = 0;
-        $.each(page["answers"], function(key2, answer){
-          answerCount++;
-          var answerFrag = null;
-          try{
-            answerFrag = $($(PAGE_ANSWER_TEMPLATE).render(page));
-            //    console.log("answer: "+answerFrag.html());
-            eList.append(answerFrag);
-            answerFrag.addClass("answer-item");
-          }catch(noa){
-          // ignore
-          }
-          $.each(answer["elements"], function(key3, element){
-            element.answerNumber = answerCount;
-            var elem = $(PAGE_ITEM_TEMPLATE).render(element);
 
-            if(answerFrag != null){
-              answerFrag.append(elem);
+      var applData = new ApplicantData(row);
+      var thisG = this;
+      // this is the order of pages in the data
+      //      $.each(row["pages"], function(key, page){
+      // this is the order specified by the  column definitions
+      $.each(colDefs.keys(), function(key, col){ //page){
+	      // check if this is a non-numeric string. if so, we will assume
+	      // it's one of our non-page columns -> not one identified by a page id
+	      var hack = col.replace(/[^0-9]+/g,'');
+	      if(hack.length != col.length){
+		  //  console.log("skipping col ["+col+"]");
+		  if(colDefs.get(col) != null){
+		      PAGE_ITEM_TEMPLATE = colDefs.get(col);
+		  }
+		  pages += "<td>";
+		  if(col == "First Name"){
+		      pages += row.firstName;
+		  }else if(col == "Last Name"){
+		      pages += row.lastName;
+		  
+		  }else if(col == "Applicant"){
+		      pages += "<a href='"+row.link+"'>View</a>";
+		  
+		  }else if(col == "Email Address"){
+		      pages += row.email;
+		  }else if(col == "Last Update"){
+		      pages += row.updatedAt.date;
+		  }else if(col == "Progress"){
+		      pages += row.percentComplete;
+		  }else if(col == "Last Login"){
+		      pages += row.lastLogin.date;
+		  }else if(col == "Account Created"){
+		      pages += row.createdAt.date;
+		      
 
-            }else{
-              //console.log("rendered element: "+elem);
-              eList.append(elem);
-            }
-          });
-				
-        });
+		  }
 
-        pages += pageFrag[0].outerHTML; //pageFrag.html();
-      });
-		
+		  pages += "</td>";
+		  return true;
+	      }
+	      if(!col){
+		  console.log("have undefined column in col defs!");
+		  return true;
+	      }
+
+	      var page = applData.getPage(col);
+	      //	      console.log("have page ["+col+":"+page+":"+page.title+"] => "+thisG.attrs(page));
+	      if((page == null)){
+		  console.log("ERROR: unable to find page for pageId: "+col);
+		  return true;
+	      }
+	      //	      console.log("FOUND PAGE ID: "+col);
+
+	      var pageFrag = $($(PAGE_CONTAINER_TEMPLATE).render(page));
+	      // var allAnswers = pageFrag.find("div.all-answers");
+	      var eList = pageFrag.find(".element-list");
+	      //console.log("found #"+eList.length+" element lists");
+	      if(colDefs.get(page.id) != null){
+		  PAGE_ITEM_TEMPLATE = colDefs.get(page.id);
+	      }
+	      var answerCount = 0;
+	//        $.each(page["answers"], function(key2, answer){
+	      if(true){//applData.hasAnswersForPage(col)){
+		  var answers = null;
+		  try{
+		      answers = applData.getAnswersForPage(col);
+		  }catch(noa2){
+		      console.log("Unable to get answers for page ["+col+"]: "+noa2);
+		  }
+		  //	    console.log("have answers: "+answers+", #"+answers.length);
+		  $.each(answers, function(key2, answer){
+			  answerCount++;
+			  var answerFrag = null;
+			  try{
+			      answerFrag = $($(PAGE_ANSWER_TEMPLATE).render(page));
+			      //    console.log("answer: "+answerFrag.html());
+			      eList.append(answerFrag);
+			      answerFrag.addClass("answer-item");
+			  }catch(noa){
+			      // ignore
+			  }
+			  
+			  $.each(answer["elements"], function(key3, element){
+				  
+				  element.answerNumber = answerCount;
+
+				  var elem = $(PAGE_ITEM_TEMPLATE).render(element);
+				  
+				  if(answerFrag != null){
+				      answerFrag.append(elem);
+				      
+				  }else{
+				      //console.log("rendered element: "+elem);
+				      eList.append(elem);
+				  }
+				  
+			      });
+		    
+		      });
+	      }
+	      pages += pageFrag[0].outerHTML; //pageFrag.html();
+	  });
+      
       var found = rowFrag.find("td.pages-placeholder");
       //		console.log("found placeholder: "+found);
       var realColumns = $(pages);
       found.replaceWith(realColumns);
       $(this.tableSelector+">tbody").append(rowFrag);
 
+      rowFrag.on("mouseover", this.initializeSubTables.bind(this, rowFrag));
+      /*
+	// making subtables for all table cells on initial load is too slow
       $.each(realColumns.find(".answer-table"), function(idx, subTable){
 
         // add class to the all-answers parent field so we can
@@ -487,10 +612,28 @@ ApplicantGrid = new JS.Class(Grid, {
         }
         new SubTableGrid("#"+subTable.id);
       });
-		
+      */	
     }catch(ex){
       console.log("Unable to add row: "+ex);
     }
-  }
+	},
 
-});
+	initializeSubTables: function(row){
+	    if(row.hasClass("initialized-sub-tables")) return;
+
+	    $.each(row.find(".answer-table"), function(idx, subTable){
+
+		    // add class to the all-answers parent field so we can
+		    // style this table differently to the other grid tables
+		    $(subTable.parentNode).addClass("withSubTable");
+		    if(subTable.getAttribute("id") == null){
+			$(subTable).attr("id", $.uidGen("subtable-"));
+			//console.log(" ==[generated new]==> "+subTable.id);
+		    }
+		    new SubTableGrid("#"+subTable.id);
+
+		});
+	    row.addClass("initialized-sub-tables");
+	}
+
+    });

@@ -35,6 +35,7 @@
 <script id="RowTemplate" type="text/x-jquery-tmpl">
 
   <tr>
+<!--
     <td><a href='{{:link}}'>View</a></td>
     <td>{{:lastName}}</td>
     <td>{{:firstName}}</td>
@@ -43,7 +44,7 @@
     <td>{{percent:percentComplete}}</td>
     <td>{{:lastLogin.date}}</td>
     <td>{{:createdAt.date}}</td>
-
+-->
     <td class="pages-placeholder"></td>
   </tr>
   
@@ -86,10 +87,17 @@
 
 <script id="ColumnTableTemplate" type="text/x-jquery-tmpl">
 {{if ~checkReal(values[0].value)}}
-<td answer="{{:answerNumber}}" class="answer-{{:answerNumber}} element element-{{cssClass:title}}" title="{{:title}}">{{:values[0].value}}</td>
+<td answer="{{:answerNumber}}" class="answer-{{:answerNumber}} element element-{{cssClass:answerNumber}}" title="{{:answerNumber}}">{{:values[0].value}}</td>
 {{/if}}
 </script>
 
+<!--
+<script id="ColumnTableTemplate" type="text/x-jquery-tmpl">
+{{if ~checkReal(values[0].value)}}
+<td answer="{{:answerNumber}}" class="answer-{{:answerNumber}} element element-{{cssClass:title}}" title="{{:title}}">{{:values[0].value}}</td>
+{{/if}}
+</script>
+-->
 
 <span>Filter: <input type="text" name="filter" id="filter" value=""/></span>
 <div id="grid">
