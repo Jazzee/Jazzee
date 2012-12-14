@@ -62,6 +62,15 @@ class EncryptedTextInput extends TextInput
 
     return null;
   }
+  
+  protected function arrayDisplayValue(array $values)
+  {
+    if (isset($values[0])) {
+      return 'encrypted';
+    }
+
+    return '';
+  }
 
   public function formValue(\Jazzee\Entity\Answer $answer)
   {

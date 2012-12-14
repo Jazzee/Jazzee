@@ -75,6 +75,16 @@ class RankingList extends AbstractElement
     return $value;
   }
 
+  public function arrayDisplayValue(array $values)
+  {
+    $arr = array();
+    foreach ($values as $position => $value) {
+      $arr[] = \Foundation\Utility::ordinalValue($position + 1) . ' ' . $value['value'];
+    }
+
+    return empty($arr) ? null : implode(', ', $arr);
+  }
+
   public function formValue(\Jazzee\Entity\Answer $answer)
   {
     $arr = array();

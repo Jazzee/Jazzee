@@ -150,7 +150,7 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
     foreach($elementAnswers as $elementAnswer){
       $arr['values'][] = $this->arrayValue($elementAnswer);
     }
-    
+    $arr['displayValue'] = $this->arrayDisplayValue($arr['values']);
     return $arr;
   }
   
@@ -162,6 +162,22 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
    * @return array
    */
   abstract protected function arrayValue(array $elementAnswer);
+  
+  /**
+   * Format values into a display value
+   * 
+   * @param array $values
+   * 
+   * @return string
+   */
+  protected function arrayDisplayValue(array $values)
+  {
+    if (isset($values[0])) {
+      return htmlentities($values[0]['value'], ENT_COMPAT, 'utf-8');
+    }
+
+    return '';
+  }
 
   /**
    * Default to an empty list of configuration variables

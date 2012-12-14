@@ -71,6 +71,16 @@ class CheckboxList extends AbstractElement
     return $value;
   }
 
+  public function arrayDisplayValue(array $values)
+  {
+    $arr = array();
+    foreach ($values as $value) {
+      $arr[] = $value['value'];
+    }
+
+    return empty($arr) ? null : implode(', ', $arr);
+  }
+
   public function formValue(\Jazzee\Entity\Answer $answer)
   {
     $arr = array();

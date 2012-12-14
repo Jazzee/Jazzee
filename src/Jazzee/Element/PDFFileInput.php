@@ -104,7 +104,7 @@ class PDFFileInput extends AbstractElement
     $arr = parent::formatApplicantArray($elementAnswers);
     $arr['filePath'] = false;
     $arr['thumbnailPath'] = false;
-    
+
     foreach($elementAnswers as $elementAnswer){
       $arr['values'][] = $this->arrayValue($elementAnswer);
     }
@@ -127,6 +127,7 @@ class PDFFileInput extends AbstractElement
       }
       \Jazzee\Globals::storeFile($name, $blob);
       $arr['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
+      $arr['displayValue'] = "<a href='{$arr['thumbnailPath']}'><img src='{$arr['filePath']}' /></a>";
     }
 
     return $arr;
