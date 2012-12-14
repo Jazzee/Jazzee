@@ -209,20 +209,24 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
 
   /**
    * Defaults to just usign the element display values
+   * @param array $pageArr
    * @param int $position
    * @return array
    */
-  public function getCsvAnswer($position)
+  public function getCsvAnswer(array $pageArr, $position)
   {
     $arr = array();
-    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
     foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-      $element->getJazzeeElement()->setController($this->_controller);
-      if (isset($answers[$position])) {
-        $arr[] = $element->getJazzeeElement()->displayValue($answers[$position]);
-      } else {
-        $arr[] = '';
+      $value = '';
+      if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
+        foreach($pageArr['answers'][$position]['elements'] as $eArr){
+          if($eArr['id'] == $element->getId()){
+            $value = $eArr['displayValue'];
+            break;
+          }
+        }
       }
+      $arr[] = $value;
     }
 
     return $arr;

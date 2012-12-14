@@ -107,7 +107,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
       unset($applicants);
       switch ($input->get('type')) {
         case 'xls':
-          $this->makeXls($applicantsArray);
+          $this->makeXls($applicantsArray, $display);
           break;
         case 'xml':
           $this->makeXml($applicantsArray);
@@ -127,7 +127,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
    * XLS file type
    * @param array \Jazzee\Entity\Applicant $applicants
    */
-  protected function makeXls(array $applicants)
+  protected function makeXls(array $applicants, \Jazzee\Interfaces\Display $display)
   {
     $applicationPages = array();
     $pageAnswerCount = $this->_em->getRepository('Jazzee\Entity\Application')->getPageAnswerCounts($this->_application);
@@ -148,49 +148,52 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
       'Progress',
       'Tags'
     );
+    $applicationPages = array();
     foreach ($this->getApplicationPages() as $applicationPage) {
-      for ($i = 1; $i <= $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
-        foreach ($applicationPage->getJazzeePage()->getCsvHeaders() as $title) {
-          $header[] = $applicationPage->getTitle() . ' ' . $i . ' ' . $title;
+      if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\CsvPage){
+        $applicationPages[] = $applicationPage;
+        for ($i = 1; $i <= $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
+          foreach ($applicationPage->getJazzeePage()->getCsvHeaders() as $title) {
+            $header[] = $applicationPage->getTitle() . ' ' . $i . ' ' . $title;
+          }
         }
       }
     }
     $rows[] = $header;
-    $count = 0;
     foreach ($applicants as $id) {
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
+      $applicant = $this->_application->formatApplicantArray($this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display));
       $arr = array(
-        $applicant->getId(),
-        $applicant->getFirstName(),
-        $applicant->getMiddleName(),
-        $applicant->getLastName(),
-        $applicant->getSuffix(),
-        $applicant->getEmail(),
-        $applicant->isLocked() ? 'yes' : 'no',
-        $applicant->getLastLogin()->format('c'),
-        $applicant->getUpdatedAt()->format('c'),
-        $applicant->getCreatedAt()->format('c'),
-        $applicant->getDecision() ? $applicant->getDecision()->status() : 'none',
-        $applicant->getPercentComplete() * 100 . '%'
+        $applicant['id'],
+        $applicant['firstName'],
+        $applicant['middleName'],
+        $applicant['lastName'],
+        $applicant['suffix'],
+        $applicant['email'],
+        $applicant['isLocked']? 'yes':'no',
+        $applicant['lastLogin']->format('c'),
+        $applicant['updatedAt']->format('c'),
+        $applicant['createdAt']->format('c'),
+        $applicant['decision'] ? $applicant['decision']['status'] : 'none',
+        $applicant['percentComplete'] * 100 . '%'
       );
       $tags = array();
-      foreach ($applicant->getTags() as $tag) {
-        $tags[] = $tag->getTitle();
+      foreach ($applicant['tags'] as $tag) {
+        $tags[] = $tag['title'];
       }
       $arr[] = implode(' ', $tags);
-      foreach ($this->getApplicationPages() as $applicationPage) {
-        $applicationPage->getJazzeePage()->setApplicant($applicant);
+      $pages = array();
+      foreach($applicationPages as $applicationPage){
+        $pages[$applicationPage->getPage()->getId()] = array();
+      }
+      foreach($applicant['pages'] as $page){
+        $pages[$page['id']] = $page;
+      }
+      foreach ($applicationPages as $applicationPage) {
         for ($i = 0; $i < $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
-          $arr = array_merge($arr, $applicationPage->getJazzeePage()->getCsvAnswer($i));
+          $arr = array_merge($arr, $applicationPage->getJazzeePage()->getCsvAnswer($pages[$applicationPage->getPage()->getId()], $i));
         }
       }
       $rows[] = $arr;
-      if ($count > 50) {
-        $count = 0;
-        $this->_em->clear();
-        gc_collect_cycles();
-      }
-      $count++;
     }
     $string = '';
     foreach ($rows as $row) {

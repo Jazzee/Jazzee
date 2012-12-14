@@ -26,8 +26,9 @@ interface CsvPage extends DataPage
    * CSV Answers have to be linear so we use a counter when asking for the answers
    * and return only the answer for that counter.  If there is no answer return a
    * blank array with the right number of blank elements
+   * @param array $pageArr
    * @param int $position
    * @return array
    */
-  function getCsvAnswer($position);
+  function getCsvAnswer(array $pageArr, $position);
 }

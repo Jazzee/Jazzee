@@ -216,24 +216,28 @@ class Branching extends Standard
 
   /**
    * Branching pages return elements for every page
+   * @param array $pageArr
    * @param int $position
    * @return array
    */
-  public function getCsvAnswer($position)
+  public function getCsvAnswer(array $pageArr, $position)
   {
     $arr = array();
-    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
-    if (isset($answers[$position])) {
-      $arr[] = $answers[$position]->getChildren()->first()->getPage()->getTitle();
+    if (isset($pageArr['answers']) AND array_key_exists($position, $pageArr['answers'])) {
+      $arr[] = $pageArr['answers'][$position]['elements'][0]['values'][0]['value'];
     }
-    foreach ($this->_applicationPage->getPage()->getChildren() as $child) {
+    foreach($this->_applicationPage->getPage()->getChildren() as $child){
       foreach ($child->getElements() as $element) {
-        $element->getJazzeeElement()->setController($this->_controller);
-        if (isset($answers[$position]) and $child == $answers[$position]->getChildren()->first()->getPage()) {
-          $arr[] = $element->getJazzeeElement()->displayValue($answers[$position]->getChildren()->first());
-        } else {
-          $arr[] = '';
+        $value = '';
+        if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
+          foreach($pageArr['answers'][$position]['elements'] as $eArr){
+            if($eArr['id'] == $element->getId()){
+              $value = $eArr['displayValue'];
+              break;
+            }
+          }
         }
+        $arr[] = $value;
       }
     }
 
