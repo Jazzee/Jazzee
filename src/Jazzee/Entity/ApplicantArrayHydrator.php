@@ -29,6 +29,23 @@ class ApplicantArrayHydrator extends \Doctrine\ORM\Internal\Hydration\ArrayHydra
         }
         $applicant['answers'][$pageId][] = $this->hydrateAnswer($answer);
       }
+      if($applicant['decision']){
+        $decisions = array(
+          'nominateAdmit',
+          'nominateDeny',
+          'finalAdmit',
+          'finalDeny',
+          'acceptOffer',
+          'declineOffer'
+        );
+        $final = '';
+        foreach ($decisions as $decision) {
+          if ($applicant['decision'][$decision]) {
+            $final = $decision;
+          }
+        }
+        $applicant['decision']['status'] = $final;
+      }
       $result[$key] = $applicant;
     }
     
