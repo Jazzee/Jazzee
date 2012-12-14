@@ -517,7 +517,7 @@ ApplicantGrid = new JS.Class(Grid, {
 		  }else if(col == "Last Update"){
 		      pages += row.updatedAt.date;
 		  }else if(col == "Progress"){
-		      pages += row.percentComplete;
+		      pages += Math.round(row.percentComplete*100) + '%';
 		  }else if(col == "Last Login"){
 		      pages += row.lastLogin.date;
 		  }else if(col == "Account Created"){
