@@ -397,14 +397,14 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'name' => $userDisplay->getName(),
         'pages' => $userDisplay->getPageIds(),
         'elements' => $userDisplay->getElementIds(),
-        'showFirstName' => $userDisplay->showFirstName(),
-        'showLastName' => $userDisplay->showLastName(),
-        'showEmail' => $userDisplay->showEmail(),
-        'showCreatedAt' => $userDisplay->showCreatedAt(),
-        'showUpdatedAt' => $userDisplay->showUpdatedAt(),
-        'showLastLogin' => $userDisplay->showLastLogin(),
-        'showPercentComplete' => $userDisplay->showPercentComplete(),
-        'showHasPaid' => $userDisplay->showHasPaid()
+        'isFirstNameDisplayed' => $userDisplay->isFirstNameDisplayed(),
+        'isLastNameDisplayed' => $userDisplay->isLastNameDisplayed(),
+        'isEmailDisplayed' => $userDisplay->isEmailDisplayed(),
+        'isCreatedAtDisplayed' => $userDisplay->isCreatedAtDisplayed(),
+        'isUpdatedAtDisplayed' => $userDisplay->isUpdatedAtDisplayed(),
+        'isLastLoginDisplayed' => $userDisplay->isLastLoginDisplayed(),
+        'isPercentCompleteDisplayed' => $userDisplay->isPercentCompleteDisplayed(),
+        'isHasPaidDisplayed' => $userDisplay->isHasPaidDisplayed()
       );
     }
     //add the full application system display
@@ -416,14 +416,14 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
       'name'  =>  'Minimal',
       'pages' => $display->getPageIds(),
       'elements' => $display->getElementIds(),
-        'showFirstName' => $userDisplay->showFirstName(),
-        'showLastName' => $userDisplay->showLastName(),
-        'showEmail' => $userDisplay->showEmail(),
-        'showCreatedAt' => $userDisplay->showCreatedAt(),
-        'showUpdatedAt' => $userDisplay->showUpdatedAt(),
-        'showLastLogin' => $userDisplay->showLastLogin(),
-        'showPercentComplete' => $userDisplay->showPercentComplete(),
-        'showHasPaid' => $userDisplay->showHasPaid()
+      'isFirstNameDisplayed' => $display->isFirstNameDisplayed(),
+      'isLastNameDisplayed' => $display->isLastNameDisplayed(),
+      'isEmailDisplayed' => $display->isEmailDisplayed(),
+      'isCreatedAtDisplayed' => $display->isCreatedAtDisplayed(),
+      'isUpdatedAtDisplayed' => $display->isUpdatedAtDisplayed(),
+      'isLastLoginDisplayed' => $display->isLastLoginDisplayed(),
+      'isPercentCompleteDisplayed' => $display->isPercentCompleteDisplayed(),
+      'isHasPaidDisplayed' => $display->isHasPaidDisplayed()
     );
     
     //add the full application system display
@@ -435,14 +435,14 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
       'name'  =>  'Full Application',
       'pages' => $display->getPageIds(),
       'elements' => $display->getElementIds(),
-      'showFirstName' => $userDisplay->showFirstName(),
-      'showLastName' => $userDisplay->showLastName(),
-      'showEmail' => $userDisplay->showEmail(),
-      'showCreatedAt' => $userDisplay->showCreatedAt(),
-      'showUpdatedAt' => $userDisplay->showUpdatedAt(),
-      'showLastLogin' => $userDisplay->showLastLogin(),
-      'showPercentComplete' => $userDisplay->showPercentComplete(),
-      'showHasPaid' => $userDisplay->showHasPaid()
+      'isFirstNameDisplayed' => $display->isFirstNameDisplayed(),
+      'isLastNameDisplayed' => $display->isLastNameDisplayed(),
+      'isEmailDisplayed' => $display->isEmailDisplayed(),
+      'isCreatedAtDisplayed' => $display->isCreatedAtDisplayed(),
+      'isUpdatedAtDisplayed' => $display->isUpdatedAtDisplayed(),
+      'isLastLoginDisplayed' => $display->isLastLoginDisplayed(),
+      'isPercentCompleteDisplayed' => $display->isPercentCompleteDisplayed(),
+      'isHasPaidDisplayed' => $display->isHasPaidDisplayed()
     );
     
     return $displays;
