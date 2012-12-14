@@ -113,6 +113,26 @@ Display.prototype.listPageElementTitles = function(pageId){
 };
 
 /**
+ * Get the elements on a page
+ * @param int pageId
+ * @return []
+ */
+Display.prototype.getPageElements = function(pageId){
+  var self = this;
+  var elements = [];
+  $.each(this.application.listPageElements(pageId), function(){
+    if(self.displayElement(this.id)){
+      elements.push(
+        {title: this.title,
+        id: this.id}
+      );
+    }
+  });
+  
+  return elements;
+};
+
+/**
  * Get the display name
  */
 Display.prototype.getName = function(){
