@@ -40,3 +40,10 @@ Application.prototype.getApplicationPageByPageId = function(pageId){
 
   return false;
 };
+
+/**
+ * List all of the tags
+ */
+Application.prototype.listTags = function(){
+  return this.application.tags;
+};
