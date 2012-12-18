@@ -66,3 +66,31 @@ ApplicantData.prototype.listTags = function(){
   
   return tags;
 };
+
+/**
+ * List the tags for an applicant
+ * 
+ * @return []
+ */
+ApplicantData.prototype.listTagIds = function(){
+  var tags = [];
+  $.each(this.applicant.tags, function(){
+    tags.push(this.id);
+  });
+  
+  return tags;
+};
+
+/**
+ * List the tags for an applicant
+ * 
+ * @return []
+ */
+ApplicantData.prototype.listTagTitles = function(){
+  var tags = [];
+  $.each(this.applicant.tags, function(){
+    tags.push(this.title);
+  });
+  
+  return tags;
+};
