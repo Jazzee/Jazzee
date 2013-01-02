@@ -222,7 +222,7 @@ class JazzeeController extends PageController
     $this->_session = new \Foundation\Session();
 
     //if the session name variable is empty then there is no way to login and fix it so look for an empty session name and default to the ini value if it is blank
-    $this->_session->setConfigVariable('name', $this->_config->getSessionName() ? ini_get('session.name') : $this->_config->getSessionName());
+    $this->_session->setConfigVariable('name', $this->_config->getSessionName());
     //cookies last forever (until browser is closed) which takes the users local clock out of the picture
     //Timeouts are handled By Session internally by expiring the Session_Store
     $this->_session->setConfigVariable('cookie_lifetime', 0);
