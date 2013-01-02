@@ -51,6 +51,15 @@ class FullApplication implements \Jazzee\Interfaces\Display
   public function getName(){
     return 'Full Application';
   }
+
+  /**
+   * Get id
+   * 
+   * @return string
+   */
+  public function getId(){
+    return 'full';
+  }
   
   /**
    * Get an array of page ids that are shown by the display

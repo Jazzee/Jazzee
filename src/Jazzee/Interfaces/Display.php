@@ -19,6 +19,13 @@ interface Display
   function getName();
   
   /**
+   * Get the unique id of the display
+   * 
+   * @return string
+   */
+  function getId();
+  
+  /**
    * Get an array of page ids that are shown by the display
    * 
    * @return array

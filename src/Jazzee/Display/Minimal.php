@@ -27,6 +27,15 @@ class Minimal implements \Jazzee\Interfaces\Display
   public function getName(){
     return 'Minimal';
   }
+
+  /**
+   * Get id
+   * 
+   * @return string
+   */
+  public function getId(){
+    return 'min';
+  }
   
   /**
    * Get an array of page ids that are shown by the display

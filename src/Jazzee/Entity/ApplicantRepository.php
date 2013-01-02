@@ -217,6 +217,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   {
     $cache = \Jazzee\Controller::getCache();
     $cacheId = Applicant::ARRAY_CACHE_PREFIX . $id;
+    $cacheId .= is_null($display)?'nodisplay':$display->getId();
     if($cache->contains($cacheId)){
       return $cache->fetch($cacheId);
     }
