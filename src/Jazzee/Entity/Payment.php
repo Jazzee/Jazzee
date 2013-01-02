@@ -5,7 +5,7 @@ namespace Jazzee\Entity;
  * Payment
  * Records all applicant payment attempts
  *
- * @Entity
+ * @Entity(repositoryClass="\Jazzee\Entity\PaymentRepository")
  * @Table(name="payments")
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>

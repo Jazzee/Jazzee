@@ -15,7 +15,7 @@ class AuthorizeNetAIM extends AbstractPaymentType
 
   const APPLY_PAGE_ELEMENT = 'AuthorizeNetPayment-apply_page';
   const APPLICANTS_SINGLE_ELEMENT = 'AuthorizeNetPayment-applicants_single';
-  const MIN_CRON_INTERVAL = 86000; //24 hours minus a bit
+  const MIN_CRON_INTERVAL = 21500; //6 hours minus a bit
 
   /**
    * Credit card payment form
@@ -360,16 +360,16 @@ class AuthorizeNetAIM extends AbstractPaymentType
    */
   public static function runCron(\AdminCronController $cron)
   {
-    if (time() - (int) $cron->getVar('authorizeNetAimPaymentLastRun') > self::MIN_CRON_INTERVAL) {
-      $cron->setVar('authorizeNetAimPaymentLastRun', time());
-      $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class' => '\Jazzee\PaymentType\AuthorizeNetAIM'));
+    if (time() - (int) $cron->getVar('authorizeNetPaymentLastRun') > self::MIN_CRON_INTERVAL) {
+      $cron->setVar('authorizeNetPaymentLastRun', time());
+      $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class' => '\\' . get_called_class()));
       $count = 0;
       if ($paymentType) {
-        $payments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findBy(array('type' => $paymentType->getId(), 'status' => \Jazzee\Entity\Payment::PENDING), array(), 100);
-        $class = new AuthorizeNetAIM($paymentType);
+        $unsettledIds = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findIdByStatusAndTypeArray(\Jazzee\Entity\Payment::PENDING, $paymentType);
         $fakeInput = new \Foundation\Form\Input(array());
-        foreach ($payments as $payment) {
-          $result = $class->settlePayment($payment, $fakeInput);
+        foreach ($unsettledIds as $id) {
+          $payment = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->find($id);
+          $result = $paymentType->getJazzeePaymentType($cron)->settlePayment($payment, $fakeInput);
           if ($result === true) {
             $count++;
             $cron->getEntityManager()->persist($payment);
@@ -377,10 +377,11 @@ class AuthorizeNetAIM extends AbstractPaymentType
               $cron->getEntityManager()->persist($var);
             }
           }
+          unset($payment);
         }
       }
       if ($count) {
-        $cron->log("Settled {$count} AuthorizeNetAim Payments.");
+        $cron->log("Settled {$count} {$paymentType->getClass()} Payments.");
       }
     }
   }
