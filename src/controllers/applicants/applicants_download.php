@@ -1,6 +1,6 @@
 <?php
 
-set_time_limit(600);
+set_time_limit(1200);
 
 /**
  * Download Applicants in csv format
