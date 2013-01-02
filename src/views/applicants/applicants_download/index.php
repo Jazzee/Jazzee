@@ -14,6 +14,13 @@ if (isset($outputType)) {
       ob_end_clean();
       print $string;
       exit(0);
+    case 'file':
+      header("Content-type: {$type}");
+      header("Content-Disposition: attachment; filename={$filename}");
+      ob_end_clean();
+      print file_get_contents($filePath);
+      unlink($filePath);
+      exit(0);
     case 'xml':
       echo $xml->saveXML();
       break;

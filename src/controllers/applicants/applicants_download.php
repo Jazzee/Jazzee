@@ -68,43 +68,51 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         $applicationPages[$pageEntity->getId()] = $pageEntity;
       }
       $applicantsArray = array();
-      $applicants = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findByApplication($this->_application, false);
-      foreach ($applicants as $applicant) {
+      $minimalDisplay = new \Jazzee\Display\Minimal($this->_application);
+      $ids = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findIdsByApplication($this->_application);
+      foreach ($ids as $id) {
+        $applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findArray($id, $minimalDisplay);
         $selected = false;
-        if (!$applicant->isLocked() and in_array('unlocked', $filters)) {
+        if (!$applicant['isLocked'] and in_array('unlocked', $filters)) {
           $selected = true;
         }
-        if ($applicant->isLocked()) {
+        if ($applicant['isLocked']) {
           if (in_array('locked', $filters)) {
             $selected = true;
           }
-          if ($applicant->getDecision()->getFinalAdmit() and in_array('admitted', $filters)) {
+          if ($applicant['decision']['finalAdmit'] and in_array('admitted', $filters)) {
             $selected = true;
           }
-          if ($applicant->getDecision()->getFinalDeny() and in_array('denied', $filters)) {
+          if ($applicant['decision']['finalDeny'] and in_array('denied', $filters)) {
             $selected = true;
           }
-          if ($applicant->getDecision()->getAcceptOffer() and in_array('accepted', $filters)) {
+          if ($applicant['decision']['acceptOffer'] and in_array('accepted', $filters)) {
             $selected = true;
           }
-          if ($applicant->getDecision()->getDeclineOffer() and in_array('declined', $filters)) {
+          if ($applicant['decision']['declineOffer'] and in_array('declined', $filters)) {
             $selected = true;
           }
         }
-        foreach ($filters as $value) {
-          if(!$selected AND array_key_exists($value, $tags)){
-            $tag = $tags[$value];
-            if ($applicant->hasTag($tag)) {
-              $selected = true;
+        if(!$selected){
+          $tagIds = array();
+          foreach($applicant['tags'] as $arr){
+            $tagIds[] = $arr['id'];
+          }
+          foreach ($filters as $value) {
+            if(array_key_exists($value, $tags)){
+              $tag = $tags[$value];
+              if (in_array($tag->getId(), $tagIds)) {
+                $selected = true;
+              }
             }
           }
         }
         if ($selected) {
-          $applicantsArray[] = $applicant->getId();
+          $applicantsArray[] = $applicant['id'];
         }
       } //end foreach applicants
       $display = $this->getDisplay($displays[$input->get('display')]);
-      unset($applicants);
+      unset($ids);
       switch ($input->get('type')) {
         case 'xls':
           $this->makeXls($applicantsArray, $display);
@@ -159,7 +167,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         }
       }
     }
-    $rows[] = $header;
+    $fileName = tempnam($this->_config->getVarPath() . '/tmp/', 'applicants_download');
+    $handle = fopen($fileName, 'w+');
+    $this->writeXlsFile($header, $handle);
     foreach ($applicants as $id) {
       $applicant = $this->_application->formatApplicantArray($this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display));
       $arr = array(
@@ -193,19 +203,28 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           $arr = array_merge($arr, $applicationPage->getJazzeePage()->getCsvAnswer($pages[$applicationPage->getPage()->getId()], $i));
         }
       }
-      $rows[] = $arr;
+      $this->writeXlsFile($arr, $handle);
     }
-    $string = '';
-    foreach ($rows as $row) {
-      foreach ($row as $value) {
-        $string .= '"' . $value . '"' . "\t";
-      }
-      $string .= "\n";
-    }
-    $this->setVar('outputType', 'string');
+    rewind($handle);
+    fclose($handle);
+    $this->setVar('outputType', 'file');
     $this->setVar('type', 'text/xls');
     $this->setVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy') . '.xls');
-    $this->setVar('string', $string);
+    $this->setVar('filePath', $fileName);
+  }
+  
+  /**
+   * Write array data to csv file
+   * @param array $data
+   * @param resource $handle
+   */
+  protected function writeXlsFile(array $data, $handle){
+    $string = '';
+    foreach ($data as $value) {
+      $string .= '"' . $value . '"' . "\t";
+    }
+    $string .= "\n";
+    fwrite($handle, $string);
   }
 
   /**
