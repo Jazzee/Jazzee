@@ -6,7 +6,6 @@ namespace Jazzee\Entity;
  * Individual applicants are tied to an Application - but a single person can be multiple Applicants
  *
  * @Entity
- * @HasLifecycleCallbacks
  * @Table(name="decisions")
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
@@ -69,15 +68,6 @@ class Decision
   public function setApplicant(Applicant $applicant)
   {
     $this->applicant = $applicant;
-  }
-
-  /**
-   * Mark the lastUpdate automatically
-   * @PreUpdate @PreUpdate
-   */
-  public function markLastUpdate()
-  {
-    $this->applicant->markLastUpdate();
   }
 
   /**

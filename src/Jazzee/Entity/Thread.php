@@ -56,15 +56,6 @@ class Thread
   }
 
   /**
-   * Mark the lastUpdate automatically
-   * @PrePersist
-   */
-  public function markLastUpdate()
-  {
-    $this->applicant->markLastUpdate();
-  }
-
-  /**
    * Set subject
    *
    * @param string $subject

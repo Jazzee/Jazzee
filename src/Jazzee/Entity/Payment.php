@@ -6,7 +6,6 @@ namespace Jazzee\Entity;
  * Records all applicant payment attempts
  *
  * @Entity
- * @HasLifecycleCallbacks
  * @Table(name="payments")
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
@@ -66,15 +65,6 @@ class Payment
   public function getId()
   {
     return $this->id;
-  }
-
-  /**
-   * Mark the lastUpdate automatically
-   * @PrePersist @PreUpdate
-   */
-  public function markLastUpdate()
-  {
-    $this->answer->markLastUpdate();
   }
 
   /**

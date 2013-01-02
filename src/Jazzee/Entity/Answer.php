@@ -6,7 +6,6 @@ namespace Jazzee\Entity;
  * Applicant answer to a page
  *
  * @Entity(repositoryClass="\Jazzee\Entity\AnswerRepository")
- * @HasLifecycleCallbacks
  * @Table(name="answers",
  * uniqueConstraints={@UniqueConstraint(name="answer_uniqueId",columns={"uniqueId"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
@@ -251,7 +250,7 @@ class Answer
   /**
    * Get applicant
    *
-   * @return Entity\Applicant $applicant
+   * @return \Jazzee\Entity\Applicant $applicant
    */
   public function getApplicant()
   {
@@ -437,20 +436,11 @@ class Answer
 
   /**
    * Mark the lastUpdate automatically
-   * @PrePersist @PreUpdate @PreRemove
    */
   public function markLastUpdate()
   {
     if (!$this->updatedAtOveridden) {
       $this->updatedAt = new \DateTime();
-    }
-    if ($this->applicant) {
-      //child pages dont have direct links to the application
-      $this->applicant->markLastUpdate();
-    }
-    if ($this->parent) {
-      //child pages should update their parents
-      $this->parent->markLastUpdate();
     }
   }
 

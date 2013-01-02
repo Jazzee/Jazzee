@@ -5,7 +5,6 @@ namespace Jazzee\Entity;
  * Applicant
  * Individual applicants are tied to an Application - but a single person can be multiple Applicants
  *
- * @HasLifecycleCallbacks
  * @Entity(repositoryClass="\Jazzee\Entity\ApplicantRepository")
  * @Table(name="applicants",
  *   uniqueConstraints={
@@ -509,7 +508,6 @@ class Applicant
 
   /**
    * Mark the lastUpdate automatically
-   * @PrePersist @PreUpdate
    */
   public function markLastUpdate()
   {

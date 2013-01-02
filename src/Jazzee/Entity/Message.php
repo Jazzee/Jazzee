@@ -7,7 +7,6 @@ namespace Jazzee\Entity;
  * Messages between applicants and programs
  *
  * @Entity
- * @HasLifecycleCallbacks
  * @Table(name="messages")
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
@@ -61,15 +60,6 @@ class Message
   public function getId()
   {
     return $this->id;
-  }
-
-  /**
-   * Mark the lastUpdate automatically
-   * @PrePersist @PreUpdate
-   */
-  public function markLastUpdate()
-  {
-    $this->thread->markLastUpdate();
   }
 
   /**

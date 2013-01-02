@@ -7,7 +7,6 @@ namespace Jazzee\Entity;
  * In cases where there are multiple answers (like checkboxes) a single answer gets multiple rows by position
  *
  * @Entity(repositoryClass="\Jazzee\Entity\ElementAnswerRepository")
- * @HasLifecycleCallbacks
  * @Table(name="element_answers")
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
@@ -64,15 +63,6 @@ class ElementAnswer
   public function getId()
   {
     return $this->id;
-  }
-
-  /**
-   * Mark the lastUpdate automatically
-   * @PrePersist @PreUpdate
-   */
-  public function markLastUpdate()
-  {
-    $this->answer->markLastUpdate();
   }
 
   /**
@@ -218,7 +208,7 @@ class ElementAnswer
   /**
    * Set element
    *
-   * @param Entity\Element $element
+   * @param \Jazzee\Entity\Element $element
    */
   public function setElement(Element $element)
   {
@@ -228,7 +218,7 @@ class ElementAnswer
   /**
    * Get element
    *
-   * @return Entity\Element
+   * @return \Jazzee\Entity\Element
    */
   public function getElement()
   {
@@ -238,17 +228,17 @@ class ElementAnswer
   /**
    * Set answer
    *
-   * @param Entity\Answer $answer
+   * @param \Jazzee\Entity\Answer $answer
    */
   public function setAnswer(Answer $answer)
   {
     $this->answer = $answer;
   }
-
+  
   /**
    * Get answer
-   *
-   * @return Entity\Answer $answer
+   * 
+   * @return \Jazzee\Entity\Answer
    */
   public function getAnswer()
   {

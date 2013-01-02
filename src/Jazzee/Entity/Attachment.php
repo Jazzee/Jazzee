@@ -130,13 +130,4 @@ class Attachment
     return false;
   }
 
-  /**
-   * Mark the lastUpdate automatically
-   * @PrePersist @PreUpdate
-   */
-  public function markLastUpdate()
-  {
-    $this->applicant->markLastUpdate();
-  }
-
 }
