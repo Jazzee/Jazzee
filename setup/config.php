@@ -39,7 +39,6 @@ try{
   );
 
   $em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
-  $em->getConnection()->setCharset($jazzeeConfiguration->getDbCharset());
 }catch(Exception $e){
   print $e->getMessage() . PHP_EOL;
   exit(1);
