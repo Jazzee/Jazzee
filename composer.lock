@@ -1,33 +1,39 @@
 {
-    "hash": "9c70687383aeda052d5b41c8c4cd40ed",
+    "hash": "02cdd6dfc2d351798f2e6f961e2b9fd0",
     "packages": [
         {
             "name": "doctrine/common",
-            "version": "2.2.3",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/common",
-                "reference": "2.2.3"
+                "reference": "2.3.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/common/zipball/2.2.3",
-                "reference": "2.2.3",
+                "url": "https://github.com/doctrine/common/zipball/2.3.0",
+                "reference": "2.3.0",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2"
             },
-            "time": "2012-08-29 22:04:14",
+            "time": "2012-09-19 22:55:18",
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3.x-dev"
+                }
+            },
             "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Doctrine\\Common": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL"
+                "MIT"
             ],
             "authors": [
                 {
@@ -37,7 +43,8 @@
                 },
                 {
                     "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com"
+                    "email": "guilhermeblanco@gmail.com",
+                    "homepage": "http://www.instaclick.com"
                 },
                 {
                     "name": "Roman Borschel",
@@ -50,7 +57,7 @@
                 {
                     "name": "Johannes Schmitt",
                     "email": "schmittjoh@gmail.com",
-                    "homepage": "http://jmsyst.com",
+                    "homepage": "https://github.com/schmittjoh",
                     "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
@@ -66,32 +73,38 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "2.2.2",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal",
-                "reference": "2.2.2"
+                "reference": "2.3.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/dbal/zipball/2.2.2",
-                "reference": "2.2.2",
+                "url": "https://github.com/doctrine/dbal/archive/2.3.1.zip",
+                "reference": "2.3.1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2",
-                "doctrine/common": ">=2.2.0,<=2.2.99"
+                "doctrine/common": "2.3.*"
             },
-            "time": "2012-04-13 21:56:12",
+            "time": "2012-12-04 21:06:56",
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3.x-dev"
+                }
+            },
             "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Doctrine\\DBAL": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL"
+                "MIT"
             ],
             "authors": [
                 {
@@ -101,7 +114,8 @@
                 },
                 {
                     "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com"
+                    "email": "guilhermeblanco@gmail.com",
+                    "homepage": "http://www.instaclick.com"
                 },
                 {
                     "name": "Roman Borschel",
@@ -123,34 +137,47 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "2.2.1",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "git://github.com/doctrine/doctrine2.git",
-                "reference": "2.2.1"
+                "reference": "2.3.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/doctrine2/zipball/2.2.1",
-                "reference": "2.2.1",
+                "url": "https://github.com/doctrine/doctrine2/archive/2.3.1.zip",
+                "reference": "2.3.1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2",
                 "ext-pdo": "*",
-                "doctrine/common": ">=2.2.0,<2.2.99",
-                "doctrine/dbal": ">=2.2.1,<2.2.99"
+                "doctrine/dbal": "2.3.*",
+                "symfony/console": "2.*"
             },
-            "time": "2012-03-04 13:26:27",
+            "suggest": {
+                "symfony/yaml": "If you want to use YAML Metadata Mapping Driver"
+            },
+            "time": "2012-12-04 22:04:25",
+            "bin": [
+                "bin/doctrine",
+                "bin/doctrine.php"
+            ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3.x-dev"
+                }
+            },
             "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Doctrine\\ORM": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL"
+                "MIT"
             ],
             "authors": [
                 {
@@ -160,7 +187,8 @@
                 },
                 {
                     "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com"
+                    "email": "guilhermeblanco@gmail.com",
+                    "homepage": "http://www.instaclick.com"
                 },
                 {
                     "name": "Roman Borschel",
@@ -224,16 +252,16 @@
         },
         {
             "name": "jazzee/foundation",
-            "version": "1.0.10",
+            "version": "1.0.11",
             "source": {
                 "type": "git",
                 "url": "git@github.com:Jazzee/Foundation.git",
-                "reference": "1.0.10"
+                "reference": "1.0.11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Jazzee/Foundation/archive/1.0.10.zip",
-                "reference": "1.0.10",
+                "url": "https://github.com/Jazzee/Foundation/archive/1.0.11.zip",
+                "reference": "1.0.11",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +281,7 @@
                 "ext-dom": "PHP DOM",
                 "ext-clamav": "Clamav Extension, http://php-clamav.sourceforge.net/"
             },
-            "time": "2012-11-13 18:58:07",
+            "time": "2013-01-02 16:54:25",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -266,6 +294,7 @@
                     "lib/phpmailer"
                 ]
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -340,23 +369,23 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.0.18",
+            "version": "v2.0.21",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "v2.0.18"
+                "reference": "v2.0.21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/zipball/v2.0.18",
-                "reference": "v2.0.18",
+                "url": "https://github.com/symfony/Console/archive/v2.0.21.zip",
+                "reference": "v2.0.21",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2"
             },
-            "time": "2012-09-28 07:21:46",
+            "time": "2012-11-05 19:52:03",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -364,6 +393,7 @@
                     "Symfony\\Component\\Console": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
