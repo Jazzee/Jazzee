@@ -39,6 +39,9 @@ try{
   );
 
   $em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
+  if ($connectionParams['charset']) {
+    $em->getConnection()->setCharset($connectionParams['charset']);
+  }
 }catch(Exception $e){
   print $e->getMessage() . PHP_EOL;
   exit(1);
