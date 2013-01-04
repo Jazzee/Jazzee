@@ -61,7 +61,8 @@ Display.prototype.getPages = function(){
     if(self.displayPage(this.page.id)){
       var page = {
         id: this.page.id,
-        title: this.title
+        title: this.title,
+        type: this.page.type['class']
       };
       pages.push(page);
     }
@@ -123,8 +124,11 @@ Display.prototype.getPageElements = function(pageId){
   $.each(this.application.listPageElements(pageId), function(){
     if(self.displayElement(this.id)){
       elements.push(
-        {title: this.title,
-        id: this.id}
+        {
+          title: this.title,
+          type: this.type['class'],
+          id: this.id
+        }
       );
     }
   });
