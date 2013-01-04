@@ -49,26 +49,22 @@ $(document).ready(function(){
       $('#ApplicantTable').empty();
       var path = services.getControllerPath('applicants_grid');
       var grid = new ApplicantGrid("#ApplicantTable", null, display);
-      var applicantLimit = 50;
       $.get(path + '/listApplicants', function(json){
-        var applicants = json.data.result;      
-        status.start();
-        while(applicants.length > 0){
-          if(applicants.length < applicantLimit){
-            var ids = applicants;
-            applicants = [];
-          } else {
-            var ids = applicants.slice(0,applicantLimit);
-            applicants = applicants.slice(applicantLimit);
-          }
-          $.post(path + '/getApplicants',{applicantIds: ids, display: display.getObj()
-          }, function(json){
-            grid.append(json.data.result);
-          });
-        }
-        status.end();
+        loadApps(grid, json.data.result, displayChooser.getCurrentDisplay(), path);
       });
     });
+  };
+  
+  //seperate function so it can call itself back
+  var loadApps = function(grid, applicantIds, display, path){
+    if(applicantIds.length){
+      var limitedIds = applicantIds.splice(0, 50);
+      $.post(path + '/getApplicants',{applicantIds: limitedIds, display: display.getObj()
+      }, function(json){
+        grid.append(json.data.result);
+        loadApps(grid, applicantIds, display, path);
+      });
+    }
   };
   replaceGrid(displayChooser.getCurrentDisplay());
   
