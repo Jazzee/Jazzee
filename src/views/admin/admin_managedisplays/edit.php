@@ -10,7 +10,7 @@
 ?>
 <a href="<?php print $this->path('managedisplays');?>">Return to display list</a>
 <div>
-  <form id='displayManager' method="post" action="<?print $this->path('managedisplays/edit/'.$display->getId());?>">
+  <form id='displayManager' method="post" action="<?php print $this->path('managedisplays/edit/'.$display->getId());?>">
     <input id='displayName' name='displayName' type='text' value='<?php print $display->getName();?>'/>
     <div id='account'>
       <h5>Applicant Info</h5>
