@@ -407,43 +407,26 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'isHasPaidDisplayed' => $userDisplay->isHasPaidDisplayed()
       );
     }
-    //add the full application system display
-    $display = new \Jazzee\Display\Minimal($this->_application);
-    $displays[] = array(
-      'id' => 'min',
-      'type' => 'system',
-      'class'  => '\Jazzee\Display\Minimal',
-      'name'  =>  'Minimal',
-      'pages' => $display->getPageIds(),
-      'elements' => $display->getElementIds(),
-      'isFirstNameDisplayed' => $display->isFirstNameDisplayed(),
-      'isLastNameDisplayed' => $display->isLastNameDisplayed(),
-      'isEmailDisplayed' => $display->isEmailDisplayed(),
-      'isCreatedAtDisplayed' => $display->isCreatedAtDisplayed(),
-      'isUpdatedAtDisplayed' => $display->isUpdatedAtDisplayed(),
-      'isLastLoginDisplayed' => $display->isLastLoginDisplayed(),
-      'isPercentCompleteDisplayed' => $display->isPercentCompleteDisplayed(),
-      'isHasPaidDisplayed' => $display->isHasPaidDisplayed()
-    );
-    
-    //add the full application system display
-    $display = new \Jazzee\Display\FullApplication($this->_application);
-    $displays[] = array(
-      'id' => 'full',
-      'type' => 'system',
-      'class'  => '\Jazzee\Display\FullApplication',
-      'name'  =>  'Full Application',
-      'pages' => $display->getPageIds(),
-      'elements' => $display->getElementIds(),
-      'isFirstNameDisplayed' => $display->isFirstNameDisplayed(),
-      'isLastNameDisplayed' => $display->isLastNameDisplayed(),
-      'isEmailDisplayed' => $display->isEmailDisplayed(),
-      'isCreatedAtDisplayed' => $display->isCreatedAtDisplayed(),
-      'isUpdatedAtDisplayed' => $display->isUpdatedAtDisplayed(),
-      'isLastLoginDisplayed' => $display->isLastLoginDisplayed(),
-      'isPercentCompleteDisplayed' => $display->isPercentCompleteDisplayed(),
-      'isHasPaidDisplayed' => $display->isHasPaidDisplayed()
-    );
+    $systemDisplays = array('\Jazzee\Display\Minimal','\Jazzee\Display\NoAttachments','\Jazzee\Display\FullApplication');
+    foreach($systemDisplays as $class){
+      $display = new $class($this->_application);
+      $displays[] = array(
+        'id' => $display->getId(),
+        'type' => 'system',
+        'class'  => get_class($display),
+        'name'  =>  $display->getName(),
+        'pages' => $display->getPageIds(),
+        'elements' => $display->getElementIds(),
+        'isFirstNameDisplayed' => $display->isFirstNameDisplayed(),
+        'isLastNameDisplayed' => $display->isLastNameDisplayed(),
+        'isEmailDisplayed' => $display->isEmailDisplayed(),
+        'isCreatedAtDisplayed' => $display->isCreatedAtDisplayed(),
+        'isUpdatedAtDisplayed' => $display->isUpdatedAtDisplayed(),
+        'isLastLoginDisplayed' => $display->isLastLoginDisplayed(),
+        'isPercentCompleteDisplayed' => $display->isPercentCompleteDisplayed(),
+        'isHasPaidDisplayed' => $display->isHasPaidDisplayed()
+      );
+    }
     
     return $displays;
   }
