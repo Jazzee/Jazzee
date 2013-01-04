@@ -42,8 +42,8 @@ class NoAuthentication implements \Jazzee\Interfaces\AdminAuthentication
   public function __construct(\Jazzee\Interfaces\AdminController $controller)
   {
     $this->_controller = $controller;
-    if ($controller->getConfig()->getStatus() != 'DEVELOPMENT') {
-      throw new \Jazzee\Exception('Attmpted to use NoAuthentication in a non development environment.');
+    if (!in_array($controller->getConfig()->getStatus(), array('DEVELOPMENT', 'PREVIEW'))) {
+      throw new \Jazzee\Exception('Attmpted to use NoAuthentication in a non development/preview environment.');
     }
     if ($this->_controller->getStore()->check(self::SESSION_VAR_ID)) {
       $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->find($this->_controller->getStore()->get(self::SESSION_VAR_ID));
