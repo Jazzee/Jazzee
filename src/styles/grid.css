@@ -177,14 +177,16 @@ display: table-row;
 }
 
 #grid .withSubTable:hover .tablesorter-header-inner {
-  max-width: 99px !important;
+/*
+  overflow: visible; */
+  max-width: 99px !important; 
   max-height: 9999px !important;
   /*
   -webkit-transition:max-width 5s ease-in-out;
   -moz-transition:max-width 5s ease-in-out;
   */
   /*width: 100% !important;*/
-  overflow: visible;
+
   /*background: red;
   white-space: nowrap;  */
 }
@@ -288,6 +290,19 @@ background: #EEE;
   /* ffeec2 */
 }
 
+/*
 #grid .page.GoalStatement>div,.page.CurriculumVitae>div  {
   display: none;
+}
+*/
+
+.pdf-icon {
+  width: 16px;
+  height: 16px;
+  background-image: url(images/pdficon_small.png);
+  background-repeat: no-repeat;
+  background-position: center right; 
+display:inline-block;
+  padding-right: 20px;
+  cursor: pointer;
 }
