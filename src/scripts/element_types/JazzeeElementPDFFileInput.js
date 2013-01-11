@@ -25,32 +25,58 @@ JazzeeElementPDFFileInput.prototype.newElement = function(id,title,typeId,typeNa
 JazzeeElementPDFFileInput.prototype.elementProperties = function(){
   var elementClass = this;
   var div = JazzeeElement.prototype.elementProperties.call(this);
-  var obj = new FormObject();
-  var field = obj.newField({
-    legend: 'Maximum File Size',
-    instructions: 'Enter the maximum size for this PDF.  If you select a size that is greater than the system maximum, the system maximum will be used.'
-  });
-  var element = field.newElement('TextInput', 'max');
-  element.label = 'Maximum File Size';
-  element.legend = 'Value in bytes, or with optional b,k,m,g suffix';
-  element.required = true;
-  element.value = this.convertBytesToString(this.max);
-  var dialog = this.page.displayForm(obj);
-  $('form', dialog).bind('submit',function(e){
-    var value = elementClass.convertShorthandValue($('input[name="max"]', this).val());
-    elementClass.setProperty('max', value);
-    elementClass.workspace();
-    dialog.dialog("destroy").remove();
+  div.append(this.createSlider('max', 'Maximum'));
+  return div;
+};
+
+/**
+ * Seperate out the slider function
+ * @returns {jQuery}
+ */
+JazzeeElementPDFFileInput.prototype.createSlider = function(property, title){
+  var elementClass = this;
+  var div = $('<div>').attr('id', property + 'slider');
+  var value = (elementClass[property]/1048576).toFixed(1);
+  var link = $('<a>').attr('href', '#').attr('id', property + 'Value').html(value).bind('click', function(){
+    $('#' + property + 'slider').replaceWith(elementClass.createInput(property, title));
     return false;
-  });//end submit
-  var button = $('<button>').html('Maxium File Size').bind('click',function(){
-    $('.qtip').qtip('api').hide();
-    dialog.dialog('open');
-  }).button({
-    icons: {
-      primary: 'ui-icon-pencil'
+  });
+  div.append($('<p>').html(title + ' File Size ').append(link).append('mb'));
+  
+  var slider = $('<div>');
+  slider.slider({
+    value: value,
+    min: 0,
+    max: 25,
+    step: .5,
+    slide: function( event, ui ) {
+      elementClass.setProperty(property, ui.value * 1048576);
+      $('#' + property + 'Value').html(ui.value);
     }
   });
-  div.append(button);
+  div.append(slider);
+  return div;
+};
+
+/**
+ * Seeprate out the inptu function
+ * @returns {jQuery}
+ */
+JazzeeElementPDFFileInput.prototype.createInput = function(property, title){
+  var elementClass = this;
+  var div = $('<div>').attr('id', property + 'slider');
+  var link = $('<a>').attr('href', '#').attr('id', property + 'Value').html(elementClass[property]).bind('click', function(){
+    $('#' + property + 'slider').replaceWith(elementClass.createSlider(property, title));
+    return false;
+  });
+  div.append($('<p>').html(title + ' File Size ').append(link).append('bytes'));
+  
+  var input = $('<input>').attr('type', 'text'). attr('size', 7).attr('id', property + 'Input').attr('value', elementClass[property]);
+  input.bind('change', function(){
+    elementClass.setProperty(property, $(this).val());
+    $('#' + property + 'Value').html(elementClass[property]);
+  });
+  div.append(input);
+  this.page.pageBuilder.addNumberTest(input);
   return div;
 };
