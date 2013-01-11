@@ -340,6 +340,22 @@ PageBuilder.prototype.addNameTest = function(element){
 };
 
 /**
+ * Test an element to ensure it is a valid name
+ * @param {jQuery}
+ */
+PageBuilder.prototype.addNumberTest = function(element){
+    $(element).filter_input({
+      regex:'[0-9\r]',
+      feedback: function(wrongChar) {
+        var div = $(this).parent();
+        var message = $('<p>').addClass('message').appendTo(div);
+        message.html('"' + wrongChar + '" is not allowed.');
+        message.delay(1000).fadeOut(2000);
+      }
+  });
+};
+
+/**
  * Check all pages elements and lists to ensure there are no name collisions
  * @return boolean
  */

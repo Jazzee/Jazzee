@@ -39,7 +39,7 @@ JazzeeElementTextarea.prototype.createSlider = function(property, title){
   
   var slider = $('<div>');
   slider.slider({
-    value: elementClass.min,
+    value: elementClass[property],
     min: 0,
     max: 50000,
     step: 100,
@@ -71,5 +71,6 @@ JazzeeElementTextarea.prototype.createInput = function(property, title){
     $('#' + property + 'Value').html(elementClass[property]);
   });
   div.append(minInput);
+  this.page.pageBuilder.addNumberTest(minInput);
   return div;
 };
