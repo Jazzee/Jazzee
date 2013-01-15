@@ -8,3 +8,4 @@ var/sesion/*
 var/tmp/*
 .vagrant
 Vagrantfile
+.box

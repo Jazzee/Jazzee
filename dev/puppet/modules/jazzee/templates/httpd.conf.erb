@@ -1,0 +1,110 @@
+ServerTokens Full
+ServerRoot "/etc/httpd"
+PidFile run/httpd.pid
+Timeout 60
+KeepAlive On
+MaxKeepAliveRequests 10
+KeepAliveTimeout 2
+Listen 80
+
+<IfModule prefork.c>
+StartServers       5
+MinSpareServers    2
+MaxSpareServers   10
+ServerLimit       50
+MaxClients        50
+MaxRequestsPerChild  1000
+</IfModule>
+
+LoadModule authz_host_module modules/mod_authz_host.so
+LoadModule authz_user_module modules/mod_authz_user.so
+LoadModule authz_owner_module modules/mod_authz_owner.so
+LoadModule authz_groupfile_module modules/mod_authz_groupfile.so
+LoadModule authz_default_module modules/mod_authz_default.so
+LoadModule include_module modules/mod_include.so
+LoadModule log_config_module modules/mod_log_config.so
+LoadModule logio_module modules/mod_logio.so
+LoadModule env_module modules/mod_env.so
+LoadModule ext_filter_module modules/mod_ext_filter.so
+LoadModule mime_magic_module modules/mod_mime_magic.so
+LoadModule expires_module modules/mod_expires.so
+LoadModule deflate_module modules/mod_deflate.so
+LoadModule headers_module modules/mod_headers.so
+LoadModule setenvif_module modules/mod_setenvif.so
+LoadModule mime_module modules/mod_mime.so
+LoadModule status_module modules/mod_status.so
+LoadModule dir_module modules/mod_dir.so
+LoadModule alias_module modules/mod_alias.so
+LoadModule rewrite_module modules/mod_rewrite.so
+
+LoadModule cgi_module modules/mod_cgi.so
+
+Include conf.d/*.conf
+
+ExtendedStatus On
+
+User apache
+Group apache
+
+### Section 2: 'Main' server configuration
+UseCanonicalName On 
+TraceEnable off
+
+<IfModule mod_userdir.c>
+    UserDir disabled
+</IfModule>
+
+<Directory />
+    Options FollowSymLinks
+    AllowOverride None
+</Directory>
+DocumentRoot "/vagrant/webroot"
+ServerName localhost
+ServerAdmin root@localhost
+<Directory "/vagrant/webroot/">
+    Options FollowSymLinks
+    AllowOverride Fileinfo
+</Directory>
+
+AccessFileName .htaccess
+<Files ~ "^\.ht">
+    Order allow,deny
+    Deny from all
+    Satisfy All
+</Files>
+TypesConfig /etc/mime.types
+DefaultType text/plain
+MIMEMagicFile conf/magic
+
+HostnameLookups Off
+EnableMMAP On
+EnableSendfile On
+
+ErrorLog logs/error_log
+LogLevel warn
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+LogFormat "%h %l %u %t \"%r\" %>s %b" common
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+CustomLog logs/access_log combined
+
+
+ServerSignature On
+
+AddDefaultCharset UTF-8
+
+AddType application/x-compress .Z
+AddType application/x-gzip .gz .tgz
+
+AddType application/x-x509-ca-cert .crt
+AddType application/x-pkcs7-crl    .crl
+
+#
+# The following directives modify normal HTTP response behavior to
+# handle known problems with browser implementations.
+#
+BrowserMatch "Mozilla/2" nokeepalive
+BrowserMatch "MSIE 4\.0b2;" nokeepalive downgrade-1.0 force-response-1.0
+BrowserMatch "RealPlayer 4\.0" force-response-1.0
+BrowserMatch "Java/1\.0" force-response-1.0
+BrowserMatch "JDK/1\.0" force-response-1.0

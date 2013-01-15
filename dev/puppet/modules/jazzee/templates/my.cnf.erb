@@ -1,0 +1,32 @@
+[mysqld]
+datadir=/var/lib/mysql/data
+server-id=99
+
+socket=/var/lib/mysql/mysql.sock
+user=mysql
+old_passwords=0
+symbolic-links=0
+max_allowed_packet=20M
+
+#innodb tables all get their own file
+innodb_file_per_table
+
+# Set buffer pool size to 50-80% of your computer's memory
+innodb_buffer_pool_size=<%= (@memorysize.to_i*0.50).floor %>M
+
+# Additional memeory for tables doesn't need to be huge
+innodb_additional_mem_pool_size=128M
+
+innodb_log_file_size=256M
+innodb_log_buffer_size=16M
+
+#utf8
+character-set-server=utf8
+collation-server=utf8_general_ci
+
+[mysqld_safe]
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+[mysql]
+default-character-set=utf8
