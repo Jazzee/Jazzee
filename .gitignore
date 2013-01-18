@@ -7,5 +7,5 @@ var/log/*
 var/sesion/*
 var/tmp/*
 .vagrant
-.box
+*.box
 *~
