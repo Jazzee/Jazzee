@@ -149,6 +149,7 @@ Grid = new JS.Class({
     $.each(data, newRow);
 
     $(this.tableSelector).tablesorter({
+      debug: false,
       selectorHeaders: '> thead > tr > th'
     });
     // not bound to this grid, so we don't have access to the other 
@@ -192,12 +193,13 @@ Grid = new JS.Class({
 	}catch(noId){
 	    console.log("unable to assign/check ["+e.target+":"+$(e.target)+"] for id: "+noId);
 	}
+	/*
         setTimeout( function(){
           console.log("scrolling to #"+$(e.target).id);
           //			    $(e.target).scrollTo();
           $.scrollTo("#"+$(e.target).id, 800);
         }, 3000);
-
+	*/
         //   if(e.shiftKey)
         $(this).parent().addClass("focus");
 
@@ -256,15 +258,12 @@ Grid = new JS.Class({
       var newRow = this.addRow.bind(this, "#RowTemplate", this.colDefs);
       $.each(data, newRow);
 
-      //	    console.log("inserting fragment: "+html+" into "+this.tableSelector);
-      // append the "ajax'd" data to the table body 
-      //$(this.tableSelector+" tbody").append("<tr><td>test!</td></tr>") //); 
       // let the plugin know that we made a update 
       $(this.tableSelector).trigger("update"); 
-    // set sorting column and direction, this will sort on the first and third column 
-    //    var sorting = [[2,1],[0,0]]; 
-    // sort on the first column 
-    //$(this.tableSelector).trigger("sorton",[sorting]); 
+      // set sorting column and direction, this will sort on the first and third column 
+      //    var sorting = [[2,1],[0,0]]; 
+      // sort on the first column 
+      //$(this.tableSelector).trigger("sorton",[sorting]); 
     }
   },
 
@@ -324,20 +323,24 @@ SubTableGrid = new JS.Class(Grid, {
   },
 
   activate: function(){
+	    if(this.subActivated) throw new Error("this subtable has already been activated!");
 
+	    this.subActivated = true;
     $(this.tableSelector).tablesorter({
-      debug: false,
+	          debug: false,
       //selectorHeaders: '> thead > tr > th',
       selectorHeaders: '.sub-table-header-row > th',
       textExtraction: myTextExtraction
     });
 
     var thisGrid = this;
+    /*
     var activateSub = function(e){
 
     }
     $(this.tableSelector).delegate('th,td','mouseover mouseleave', activateSub);  
-    //	    $(this.tableSelector).delegate('td','mouseover mouseleave', activateSub);  
+    */
+    // $(this.tableSelector).delegate('td','mouseover mouseleave', activateSub);  
     var thisTable = $(this.tableSelector);
     var focus = function(e){
       console.log("SUBTABLE: click!"+e+", elem:"+e.target+", classes: "+e.target.className);
@@ -360,19 +363,29 @@ SubTableGrid = new JS.Class(Grid, {
       }catch(noreset){
         console.log("unable to reset colgroup backgrounds: "+noreset);
       }
-      // update the colgroup to show the sorted columns
-      if($(e.target.parentNode).hasClass("tablesorter-headerSortUp")
-        || $(e.target.parentNode).hasClass("tablesorter-headerSortDown")
 
-        ){// && (e.shiftKey)) {
-        //$(this).parent().addClass("hover-subtable");
-        thisTable.find("colgroup").eq($(this).index()).addClass("hover-subtable");
-      }else {
-        //			$(this).parent().removeClass("hover-subtable");
-        thisTable.find("colgroup").eq($(this).index()).removeClass("hover-subtable");
+      try{
+	  var colIdx = $(this).index();
+	  console.log("checking index: "+colIdx+", target is "+e.target.className+", is header? "+$(e.target).hasClass("tablesorter-header"));
+	  //	  var thisHeader = $(e.target.parentNode);
+	  var thisHeader = $(e.target).hasClass("tablesorter-header")
+	  ? $(e.target) : $(e.target.parentNode); //closest(".tablesorter-header")[0];
 
+	  // update the colgroup to show the sorted columns
+	  if(thisHeader.hasClass("tablesorter-headerSortUp")
+	     || thisHeader.hasClass("tablesorter-headerSortDown")
+	     
+	     ){// && (e.shiftKey)) {
+	      //$(this).parent().addClass("hover-subtable");
+	      thisTable.find("colgroup").eq(colIdx).addClass("hover-subtable");
+	  }else {
+	      //$(this).parent().removeClass("hover-subtable");
+	      thisTable.find("colgroup").eq(colIdx).removeClass("hover-subtable");
+
+	  }
+      }catch(noupdate){
+	  console.log("Unable to update header: "+noupdate);
       }
-
 
       e.stopPropagation();
 
@@ -386,7 +399,7 @@ SubTableGrid = new JS.Class(Grid, {
 
 ApplicantGrid = new JS.Class(Grid, {
 	
-	initialize: function(selector, dataurl, display){
+  initialize: function(selector, dataurl, display){
     // JS.Class apparently automatically passed the args:
     // http://jsclass.jcoglan.com/classes.html
     this.callSuper(); 
@@ -394,25 +407,19 @@ ApplicantGrid = new JS.Class(Grid, {
     this.display = display;
     this.filterElem.keyup(this.doFilter.bind(this));
 
-  //	 var tip =   $(this.tableSelector).tipTip({defaultPosition: "top",
-  //			maxWidth: "auto", edgeOffset: 10
-  //			,			content: "hold shift to expand rows"
-  //});
-
-
   },
 
-	attrs: function(obj){
-	    var dump = "";
-	    for(x in obj){
-		dump += x+" => "+obj[x]+"\n\n";
-	    }
-	    return dump;
-	},
+  attrs: function(obj){
+    var dump = "";
+    for(x in obj){
+	dump += x+" => "+obj[x]+"\n\n";
+    }
+    return dump;
+  },
 	
   /**
-	 *  Extract data from the json response
-	 */
+   *  Extract data from the json response
+   */
   getData: function(jsonResponse){
     return jsonResponse["applicants"];
   },
@@ -444,16 +451,21 @@ ApplicantGrid = new JS.Class(Grid, {
     });
     */
 
-    
+    this.pageItemDefs = new JS.OrderedHash();
+    this.pageItemDefs.setDefault(PAGE_ITEM_TEMPLATE);
+
     $.each(this.display.getPages(), function(key, page){
 	    //if(!hash.hasKey(page.title)){
 	    //hash.store(page.title, def);
 	    //}
-
+	    //    console.log("col ["+page.title+"] is type ["+page.type+"]");
 	    if(!hash.hasKey(page.id)){
 		hash.store(page.id, def);
 	    }
-    });
+
+	    var elems = this.display.getPageElements(page.id);
+	    this.pageItemDefs.store(page.id, elems);
+	}.bind(this));
   },
 
 
@@ -479,9 +491,8 @@ ApplicantGrid = new JS.Class(Grid, {
     
 	},
 
-	addRow: function(rowTemplate, colDefs, key, row) {
+  addRow: function(rowTemplate, colDefs, key, row) {
     try{
-
       // break up row into multiple templates: row, then page, then element
       var string = $(rowTemplate).render(row);
       // console.log("ROW: "+string);
@@ -537,21 +548,26 @@ ApplicantGrid = new JS.Class(Grid, {
 	      var page = applData.getPage(col);
 	      //	      console.log("have page ["+col+":"+page+":"+page.title+"] => "+thisG.attrs(page));
 	      if((page == null)){
-		  console.log("ERROR: unable to find page for pageId: "+col);
-		  return true;
+	      //  console.log("ERROR: unable to find page for pageId: "+col);
+	      //  return true;
+		  page = {title: thisG.display.getPageTitle(col),
+			  answers: [{elements:[]}],
+			  elements: []};
 	      }
 	      //	      console.log("FOUND PAGE ID: "+col);
 
 	      var pageFrag = $($(PAGE_CONTAINER_TEMPLATE).render(page));
-	      // var allAnswers = pageFrag.find("div.all-answers");
 	      var eList = pageFrag.find(".element-list");
 	      //console.log("found #"+eList.length+" element lists");
 	      if(colDefs.get(page.id) != null){
 		  PAGE_ITEM_TEMPLATE = colDefs.get(page.id);
 	      }
+
+	      var elemDefs = thisG.pageItemDefs.get(page.id);
+
 	      var answerCount = 0;
 	//        $.each(page["answers"], function(key2, answer){
-	      if(true){//applData.hasAnswersForPage(col)){
+	      if(applData.hasAnswersForPage(col)){
 		  var answers = null;
 		  try{
 		      answers = applData.getAnswersForPage(col);
@@ -575,8 +591,20 @@ ApplicantGrid = new JS.Class(Grid, {
 				  
 				  element.answerNumber = answerCount;
 
-				  var elem = $(PAGE_ITEM_TEMPLATE).render(element);
-				  
+				  var elem = null;
+				  //				  console.log("elem: "+element["id"]+" is type ["+element["type"]+"]");
+				  if(element["type"] && element["type"].indexOf("PDFFile") > -1){
+				      //				       console.log("==[IS PDF]==> page ["+page.title+"], answer ["+answer.title+"]");
+				      //				      return true;
+				      // replace the displayValue
+				      
+				      element["displayValue"] = "PDF: <div class=\"pdf-icon\"></div>";
+				  }
+				      //}else{
+
+				  elem = $(PAGE_ITEM_TEMPLATE).render(element);
+				      //}
+				   
 				  if(answerFrag != null){
 				      answerFrag.append(elem);
 				      
@@ -584,6 +612,7 @@ ApplicantGrid = new JS.Class(Grid, {
 				      //console.log("rendered element: "+elem);
 				      eList.append(elem);
 				  }
+				  
 				  
 			      });
 		    
@@ -598,7 +627,8 @@ ApplicantGrid = new JS.Class(Grid, {
       found.replaceWith(realColumns);
       $(this.tableSelector+">tbody").append(rowFrag);
 
-      rowFrag.on("mouseover", this.initializeSubTables.bind(this, rowFrag));
+      // this was on mouseover but scrolling down the page caused problems
+      rowFrag.on("click", this.initializeSubTables.bind(this, rowFrag));
       /*
 	// making subtables for all table cells on initial load is too slow
       $.each(realColumns.find(".answer-table"), function(idx, subTable){
@@ -616,9 +646,12 @@ ApplicantGrid = new JS.Class(Grid, {
     }catch(ex){
       console.log("Unable to add row: "+ex);
     }
+
+    //    throw new Error("debugging elems");
 	},
 
 	initializeSubTables: function(row){
+	    try{
 	    if(row.hasClass("initialized-sub-tables")) return;
 
 	    $.each(row.find(".answer-table"), function(idx, subTable){
@@ -633,7 +666,11 @@ ApplicantGrid = new JS.Class(Grid, {
 		    new SubTableGrid("#"+subTable.id);
 
 		});
+
 	    row.addClass("initialized-sub-tables");
+	    }catch(noInitSub){
+		console.log("Unable to initialize subtable: "+noInitSub);
+	    }
 	}
 
     });

@@ -58,7 +58,7 @@ $(document).ready(function(){
   //seperate function so it can call itself back
   var loadApps = function(grid, applicantIds, display, path){
     if(applicantIds.length){
-      var limitedIds = applicantIds.splice(0, 50);
+	var limitedIds = applicantIds.splice(0, 50);
       $.post(path + '/getApplicants',{applicantIds: limitedIds, display: display.getObj()
       }, function(json){
         grid.append(json.data.result);
