@@ -1,10 +1,10 @@
 class jazzee::apache {
   case $operatingsystem {
     centos, redhat: { 
-      $httpd = 'httpd'
-      $service_name = 'httpd'
+      $httpd            = 'httpd'
+      $service_name     = 'httpd'
       $conf_template    = 'httpd.conf.erb'
-      $conf_path    = '/etc/httpd/conf/httpd.conf'
+      $conf_path        = '/etc/httpd/conf/httpd.conf'
     }
   }
 
@@ -17,7 +17,7 @@ class jazzee::apache {
     name      => $service_name,
     ensure    => running,
     enable    => true,
-    subscribe => File[$conf_path],
+    subscribe => File['httpd.conf'],
     require   => Package['apache'],
   }
 
