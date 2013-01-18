@@ -53,6 +53,8 @@ VAR directory permissions
 --------------------------
 Modify the permissions of JAZZEESRC/var to be writable by the webserver
 
+.. _installation_initial-setup:
+
 Initial Setup
 ---------------
 
