@@ -64,8 +64,7 @@ class NoAuthentication implements \Jazzee\Interfaces\AdminAuthentication
   {
     $form = $this->getLoginForm();
     if ($form->processInput($_POST)) {
-      $allowedIps = explode(',', $this->_controller->getConfig()->getNoAuthIpAddresses());
-      if (in_array($_SERVER['REMOTE_ADDR'], $allowedIps)) {
+      if ($this->isAllowedIp($_SERVER['REMOTE_ADDR'])) {
         $this->_user = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\User')->findOneBy(array('id'=>$_POST['userid'], 'isActive'=>true));
         $this->_controller->getStore()->expire();
         $this->_controller->getStore()->touchAuthentication();
@@ -110,5 +109,25 @@ class NoAuthentication implements \Jazzee\Interfaces\AdminAuthentication
   {
     $this->_user = null;
     $this->_controller->getStore()->expire();
+  }
+
+  /**
+   * Check an IP address against the allowed address list
+   * @param string $clientIp
+   * @return boolean
+   */
+  protected function isAllowedIp($clientIp)
+  {
+    $allowedIps = explode(',', $this->_controller->getConfig()->getNoAuthIpAddresses());
+    if (in_array($clientIp, $allowedIps)) {
+      return true;
+    }
+    foreach($allowedIps as $allowedIp){
+      if(\Foundation\Utility::ipInRange($clientIp, $allowedIp)){
+        return true;
+      }
+    }
+
+    return false;
   }
 }
