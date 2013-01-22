@@ -7,7 +7,7 @@ class jazzee {
   $dbPassword = 'jazzee'
   $dbHost     = 'localhost'
   $varPath    = '/var/tmp/jazzee'
-  $safeIps    = '10.10.10.*'
+  $safeIps    = '10.0.0.0/8,127.0.0.1'
   $sslCert    = "${varPath}/snakeoil.crt"
 
   file {'/vagrant/etc/config.ini.php':
