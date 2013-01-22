@@ -5,7 +5,7 @@ Timeout 60
 KeepAlive On
 MaxKeepAliveRequests 10
 KeepAliveTimeout 2
-Listen 80
+Listen 8080
 
 <IfModule prefork.c>
 StartServers       5
@@ -49,6 +49,9 @@ Group apache
 ### Section 2: 'Main' server configuration
 UseCanonicalName On 
 TraceEnable off
+
+##fix for disrupted $_SERVER['SERVER_PORT'] in PHP from rewrites.
+UseCanonicalPhysicalPort on
 
 <IfModule mod_userdir.c>
     UserDir disabled
