@@ -281,7 +281,6 @@ class Branching extends Standard
         $pdf->addText("\n", 'p');
       }
     }
-    $pdf->write();
   }
 
   /**

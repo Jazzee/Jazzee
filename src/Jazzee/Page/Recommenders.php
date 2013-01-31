@@ -376,7 +376,6 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
         }
         $pdf->addText("\n", 'p');
       }
-      $pdf->write();
   }
 
   public static function applyPageElement()

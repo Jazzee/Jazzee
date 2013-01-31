@@ -468,7 +468,6 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
         }
         $pdf->addText("\n", 'p');
       }
-      $pdf->write();
     }
   }
 

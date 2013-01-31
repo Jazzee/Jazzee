@@ -342,7 +342,6 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
         $pdf->addText("\n", 'p');
       }
     }
-    $pdf->write();
   }
 
   /**
