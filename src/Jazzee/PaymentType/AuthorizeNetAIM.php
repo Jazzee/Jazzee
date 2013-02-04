@@ -360,26 +360,26 @@ class AuthorizeNetAIM extends AbstractPaymentType
    */
   public static function runCron(\AdminCronController $cron)
   {
-    if (time() - (int) $cron->getVar('authorizeNetPaymentLastRun') > self::MIN_CRON_INTERVAL) {
-      $cron->setVar('authorizeNetPaymentLastRun', time());
-      $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class' => '\\' . get_called_class()));
+    $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class' => '\\' . get_called_class()));
+    $cronIntervalVar = 'authorizeNetPaymentLastRun-id-' . $paymentType->getId();
+    if (time() - (int) $cron->getVar($cronIntervalVar) > self::MIN_CRON_INTERVAL) {
+      $cron->setVar($cronIntervalVar, time());
       $count = 0;
-      if ($paymentType) {
-        $unsettledIds = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findIdByStatusAndTypeArray(\Jazzee\Entity\Payment::PENDING, $paymentType);
-        $fakeInput = new \Foundation\Form\Input(array());
-        foreach ($unsettledIds as $id) {
-          $payment = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->find($id);
-          $result = $paymentType->getJazzeePaymentType($cron)->settlePayment($payment, $fakeInput);
-          if ($result === true) {
-            $count++;
-            $cron->getEntityManager()->persist($payment);
-            foreach ($payment->getVariables() as $var) {
-              $cron->getEntityManager()->persist($var);
-            }
+      $unsettledIds = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findIdByStatusAndTypeArray(\Jazzee\Entity\Payment::PENDING, $paymentType);
+      $fakeInput = new \Foundation\Form\Input(array());
+      foreach ($unsettledIds as $id) {
+        $payment = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->find($id);
+        $result = $paymentType->getJazzeePaymentType($cron)->settlePayment($payment, $fakeInput);
+        if ($result === true) {
+          $count++;
+          $cron->getEntityManager()->persist($payment);
+          foreach ($payment->getVariables() as $var) {
+            $cron->getEntityManager()->persist($var);
           }
-          unset($payment);
         }
+        unset($payment);
       }
+
       if ($count) {
         $cron->log("Settled {$count} {$paymentType->getClass()} Payments.");
       }
