@@ -71,6 +71,16 @@ class Decision
   }
 
   /**
+   * Get applicant
+   *
+   * @return Applicant
+   */
+  public function getApplicant()
+  {
+    return $this->applicant;
+  }
+
+  /**
    * Format a decision time stamp
    * @param string $dateString
    */
