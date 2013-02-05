@@ -195,7 +195,8 @@ class JazzeeController extends PageController
       $this->addMessage('info', "You are in preview mode, the changes you make will not be saved.  You can exit preview mode by visiting <a href='{$exitLink}'>{$exitLink}</a>");
     }
     $eventManager = new \Doctrine\Common\EventManager();
-    $eventManager->addEventListener(array(\Doctrine\ORM\Events::prePersist, \Doctrine\ORM\Events::preRemove), new \Jazzee\Entity\ApplicantEventListener());
+    $eventManager->addEventListener(array(\Doctrine\ORM\Events::onFlush), new \Jazzee\Entity\ApplicantEventListener());
+    $eventManager->addEventListener(array(\Doctrine\ORM\Events::onFlush), new \Jazzee\Entity\AnswerEventListener());
     $this->_em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig, $eventManager);
     if ($connectionParams['charset']) {
       $this->_em->getConnection()->setCharset($connectionParams['charset']);

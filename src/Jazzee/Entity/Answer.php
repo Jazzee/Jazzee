@@ -105,6 +105,7 @@ class Answer
     $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
     $this->generateUniqueId();
     $this->locked = false;
+    $this->updatedAt = new \DateTime();
   }
 
   /**

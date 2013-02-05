@@ -15,139 +15,56 @@ namespace Jazzee\Entity;
 class ApplicantEventListener
 {
   /**
-   * Before persisting anything check if we should mark last update on the applicant
-   * @param \Doctrine\ORM\Event\LifecycleEventArgs $eventArgs
+   * Reverse Cascade applicant and answer entities up the chain so we can mark
+   * updatedAt or call special methods consitently
+   * 
+   * We have to do this operation usign onFlush so we can catch inserts, updated
+   * and deletes for all associations
+   * 
+   * @param \Doctrine\ORM\Event\OnFlushEventArgs $eventArgs
    */
-  public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
+  public function onFlush(\Doctrine\ORM\Event\OnFlushEventArgs $eventArgs)
   {
-    $events = array(
-      'Jazzee\Entity\Answer' => 'handleAnswer',
-      'Jazzee\Entity\Applicant'=> 'handleApplicant',
-      'Jazzee\Entity\Attachment' => 'handleAttachment',
-      'Jazzee\Entity\Decision' => 'handleDecision',
-      'Jazzee\Entity\Thread' => 'handleThread',
-      'Jazzee\Entity\Message' => 'handleMessage',
-      'Jazzee\Entity\Payment' => 'handlePayment',
-      'Jazzee\Entity\PaymentVariable' => 'handlePaymentVariable'
+    $entityManager = $eventArgs->getEntityManager();
+    $uow = $entityManager->getUnitOfWork();
+    $entities = array_merge(
+      $uow->getScheduledEntityInsertions(),
+      $uow->getScheduledEntityUpdates(),
+      $uow->getScheduledEntityDeletions()
     );
-    
-    foreach($events as $entityType => $methodName){
-      if($eventArgs->getEntity() instanceof $entityType){
-        $this->$methodName($eventArgs->getEntity());
+    $applicantMetadata = $entityManager->getClassMetadata('Jazzee\Entity\Applicant');
+    foreach($entities as $entity){
+      $applicant = false;
+      switch(get_class($entity)){
+        case 'Jazzee\Entity\Applicant':
+          $applicant = $entity;
+          break;
+        case 'Jazzee\Entity\Answer':
+        case 'Jazzee\Entity\Attachment':
+        case 'Jazzee\Entity\Decision':
+        case 'Jazzee\Entity\Thread':
+        case 'Jazzee\Entity\Decision':
+          $applicant = $entity->getApplicant();
+          break;
+        case 'Jazzee\Entity\Message':
+          $applicant = $entity->getThread()->getApplicant();
+          break;
+        case 'Jazzee\Entity\ElementAnswer':
+          $applicant = $entity->getAnswer()->getApplicant();
+          break;
+        case 'Jazzee\Entity\Payment':
+          $applicant = $entity->getAnswer()->getApplicant();
+          break;
+        case 'Jazzee\Entity\Message':
+          $entity = new \Jazzee\Entity\PaymentVariable();
+          $applicant = $entity->getPayment()->getAnswer()->getApplicant();
+          break;
+      }
+      if($applicant and !$uow->isScheduledForDelete($applicant)){
+        $applicant->markLastUpdate();
+        $entityManager->persist($applicant);
+        $uow->computeChangeSet($applicantMetadata, $applicant);
       }
     }
-  }
-  
-  /**
-   * Whenever any of these are deleted update the applicant
-   * @param \Doctrine\ORM\Event\LifecycleEventArgs $eventArgs
-   */
-  public function preRemove(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
-  {
-    $events = array(
-      'Jazzee\Entity\Answer' => 'handleAnswer',
-      'Jazzee\Entity\Attachment' => 'handleAttachment',
-      'Jazzee\Entity\Decision' => 'handleDecision',
-      'Jazzee\Entity\Thread' => 'handleThread',
-      'Jazzee\Entity\Message' => 'handleMessage',
-      'Jazzee\Entity\Payment' => 'handlePayment',
-      'Jazzee\Entity\PaymentVariable' => 'handlePaymentVariable'
-    );
-    
-    foreach($events as $entityType => $methodName){
-      if($eventArgs->getEntity() instanceof $entityType){
-        $this->$methodName($eventArgs->getEntity());
-      }
-    }
-  }
-  
-  /**
-   * Mark updates for an answer
-   * @param \Jazzee\Entity\Answer $answer
-   */
-  protected function handleAnswer(Answer $answer){
-    if ($parent = $answer->getParent()) {
-      //child pages should update their parents
-      $parent->markLastUpdate();
-    }
-    if($applicant = $answer->getApplicant()){
-      $this->handleApplicant($applicant);
-    }
-    $answer->markLastUpdate();
-  }
-  
-  /**
-   * Mark updates for an attachment
-   * @param \Jazzee\Entity\Attachment $attachment
-   */
-  protected function handleAttachment(Attachment $attachment){
-    if($applicant = $attachment->getApplicant()){
-      $this->handleApplicant($applicant);
-    }
-  }
-  
-  /**
-   * Mark updates for an decision
-   * @param \Jazzee\Entity\Decision $decision
-   */
-  protected function handleDecision(Decision $decision){
-    if($applicant = $decision->getApplicant()){
-      $this->handleApplicant($applicant);
-    }
-  }
-  
-  /**
-   * Mark updates for an thread
-   * @param \Jazzee\Entity\Thread $threa
-   */
-  protected function handleThread(Thread $thread){
-    if($applicant = $thread->getApplicant()){
-      $this->handleApplicant($applicant);
-    }
-  }
-  
-  /**
-   * Mark updates for an message
-   * @param \Jazzee\Entity\Message $message
-   */
-  protected function handleMessage(Message $message){
-    if($applicant = $message->getThread()->getApplicant()){
-      $this->handleApplicant($applicant);
-    }
-  }
-  
-  /**
-   * Mark updates for an applicant
-   * @param \Jazzee\Entity\Applicant $applicant
-   */
-  protected function handleApplicant(Applicant $applicant){
-    $applicant->markLastUpdate();
-  }
-  
-  /**
-   * Mark updates for an elementAnswer
-   * @param \Jazzee\Entity\ElementAnswer $elementAnswer
-   */
-  protected function handleElementAnswer(ElementAnswer $elementAnswer){
-    $elementAnswer->getAnswer()->markLastUpdate();
-    $this->handleApplicant($elementAnswer->getAnswer()->getApplicant());
-  }
-  
-  /**
-   * Mark updates for an payment
-   * @param \Jazzee\Entity\Payment $payment
-   */
-  protected function handlePayment(Payment $payment){
-    $payment->getAnswer()->markLastUpdate();
-    $this->handleApplicant($payment->getAnswer()->getApplicant());
-  }
-  
-  /**
-   * Mark updates for an payment variable
-   * @param \Jazzee\Entity\PaymentVariable $var
-   */
-  protected function handlePaymentVariable(PaymentVariable $var){
-    $var->getPayment()->getAnswer()->markLastUpdate();
-    $this->handleApplicant($var->getPayment()->getAnswer()->getApplicant());
   }
 }
