@@ -25,4 +25,5 @@ class jazzee::php {
   class {'jazzee::php::mysql': }
   class {'jazzee::php::xdebug': }
   class {'jazzee::php::imagick': }
+  class {'jazzee::php::domxml': }
 }

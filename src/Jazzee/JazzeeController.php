@@ -182,15 +182,13 @@ class JazzeeController extends PageController
       'password' => $this->_config->getDbPassword(),
       'host' => $this->_config->getDbHost(),
       'port' => $this->_config->getDbPort(),
-      'driver' => $this->_config->getDbDriver(),
-      'charset' => $this->_config->getDbCharset()
+      'driver' => $this->_config->getDbDriver()
     );
     $previewStore = $this->_session->getStore('preview', 3600);
     if ($previewStore->check('previewdbpath')) {
       $this->_previewMode = true;
       $connectionParams['driver'] = 'pdo_sqlite';
       $connectionParams['path'] = $previewStore->get('previewdbpath');
-      $connectionParams['charset'] = false;
       $exitLink = $this->path('preview/end');
       $this->addMessage('info', "You are in preview mode, the changes you make will not be saved.  You can exit preview mode by visiting <a href='{$exitLink}'>{$exitLink}</a>");
     }
@@ -198,9 +196,6 @@ class JazzeeController extends PageController
     $eventManager->addEventListener(array(\Doctrine\ORM\Events::onFlush), new \Jazzee\Entity\ApplicantEventListener());
     $eventManager->addEventListener(array(\Doctrine\ORM\Events::onFlush), new \Jazzee\Entity\AnswerEventListener());
     $this->_em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig, $eventManager);
-    if ($connectionParams['charset']) {
-      $this->_em->getConnection()->setCharset($connectionParams['charset']);
-    }
     $this->_em->getConfiguration()->addCustomHydrationMode('ApplicantArrayHydrator', 'Jazzee\Entity\ApplicantArrayHydrator');
   }
 

@@ -34,14 +34,10 @@ try{
     'password' => $jazzeeConfiguration->getDbPassword(),
     'host' => $jazzeeConfiguration->getDbHost(),
     'port' => $jazzeeConfiguration->getDbPort(),
-    'driver' => $jazzeeConfiguration->getDbDriver(),
-    'charset' => $jazzeeConfiguration->getDbCharset()
+    'driver' => $jazzeeConfiguration->getDbDriver()
   );
 
   $em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
-  if ($connectionParams['charset']) {
-    $em->getConnection()->setCharset($connectionParams['charset']);
-  }
 }catch(Exception $e){
   print $e->getMessage() . PHP_EOL;
   exit(1);
