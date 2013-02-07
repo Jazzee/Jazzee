@@ -183,7 +183,7 @@ JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
   element.instructions = 'The following will be replaced with the applicant input on this answer:';
   for(var i in pageClass.elements){
     var el = pageClass.elements[i];
-    var text = el.title.replace(/\s+/, '_');
+    var text = el.title.replace(/\s+/g, '_');
     text = '_' + text.toUpperCase() + '_';
     element.instructions += '<br />' + text + ': ' + el.title;
   }
