@@ -208,14 +208,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $jazzeePath = \Jazzee\Configuration::getSourcePath();
     $this->_vfs->addFile('jsdiff.js', new \Foundation\Virtual\RealFile('jsdiff.js', $jazzeePath . '/lib/jsdiff.js'));
     $this->_vfs->addFile('jquery.tagcloud.js', new \Foundation\Virtual\RealFile('jquery.tagcloud.js', $jazzeePath . '/lib/addywaddy-jquery.tagcloud/jquery.tagcloud.js'));
-    $this->_vfs->addFile('jquery.scrollto.js', new \Foundation\Virtual\RealFile('jquery.scrollto.js', $jazzeePath . '/lib/jquery.scrollto-1.4/jquery.scrollto.js'));
-    $this->_vfs->addFile('jquery.tablesorter.js', new \Foundation\Virtual\RealFile('jquery.tablesorter.js', $jazzeePath . '/lib/jquery.tablesorter-2.4/jquery.tablesorter.js'));
-    $this->_vfs->addFile('jquery.jsrender.js', new \Foundation\Virtual\RealFile('jquery.jsrender.js', $jazzeePath . '/lib/jquery.jsrender-pre21/jquery.jsrender.js'));
-    $this->_vfs->addFile('jquery.uuid.js', new \Foundation\Virtual\RealFile('jquery.uuid.js', $jazzeePath . '/lib/jquery.uuid-2.0/jquery.uuid.js'));
     
-    $jsClass = new \Foundation\Virtual\VirtualDirectory();
-    $jsClass->addDirectory('js', new \Foundation\Virtual\ProxyDirectory($jazzeePath . '/lib/jsclass-3.0.8/min'));
-    $this->_vfs->addDirectory('jsclass', $jsClass);
   }
 
   /**

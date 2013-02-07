@@ -94,3 +94,30 @@ ApplicantData.prototype.listTagTitles = function(){
   
   return tags;
 };
+
+/**
+ * Get values for a page element
+ * @param pageId
+ * @param elementId
+ * 
+ * @return []
+ */
+ApplicantData.prototype.getDisplayValuesForPageElement = function(pageId, elementId){
+  var values = [];
+  for(var i = 0; i < this.applicant.pages.length; i++){
+    var page = this.applicant.pages[i];
+    if(page.id == pageId){
+      for(var j = 0; j < page.answers.length; j++){
+        var answer = page.answers[j];
+        for(var k = 0; k < answer.elements.length; k++){
+          var element = answer.elements[k];
+          if(element.id == elementId){
+            values.push(element.displayValue);
+          }
+        }
+      }
+    }
+  }
+
+  return values;
+};

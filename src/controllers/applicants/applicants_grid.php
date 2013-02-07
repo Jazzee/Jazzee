@@ -21,13 +21,17 @@ class ApplicantsGridController extends \Jazzee\AdminController
   {
     parent::setUp();
     $this->layout = 'json';
-    $this->addCss($this->path('resource/styles/grid.css'));
-    $this->addScript($this->path('resource/jsclass/js/loader-browser.js'));
+    $this->addCss('https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css');
+    $this->addCss('https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css');
+    $this->addScript('https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js');
+    
     $this->addScript($this->path('resource/scripts/classes/Display.class.js'));
     $this->addScript($this->path('resource/scripts/classes/Application.class.js'));
     $this->addScript($this->path('resource/scripts/classes/ApplicantData.class.js'));
     $this->addScript($this->path('resource/scripts/classes/DisplayChooser.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/Grid.class.js'));
     $this->addScript($this->path('resource/scripts/controllers/applicants_grid.controller.js'));
+    $this->addCss($this->path('resource/styles/grid.css'));
   }
 
   /**
@@ -42,7 +46,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    * Get applicant JSON
    */
   public function actionListApplicants(){
-    $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findIdsByApplication($this->_application);
+    $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findIdsByApplication($this->_application, true);
     $this->setVar('result', $applicants);
     $this->loadView('applicants_single/result');
   }
@@ -56,7 +60,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
     
     foreach ($this->post['applicantIds'] as $id) {
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display);
-      $arr = $this->_application->formatApplicantArray($applicant);
+      $arr = $this->_application->formatApplicantDisplayArray($applicant, $display);
       $arr['link'] = $this->path("applicants/single/{$arr['id']}");
       $results[] = $arr;
     }

@@ -20,6 +20,11 @@ class ApplicantArrayHydrator extends \Doctrine\ORM\Internal\Hydration\ArrayHydra
   {
     $result = parent::hydrateAll($stmt, $resultSetMapping, $hints);
     foreach($result as $key => $applicant){
+      $name = array($applicant['firstName'], $applicant['middleName'], $applicant['lastName'], $applicant['suffix']);
+      //remove blanks
+      $name = array_filter( $name, 'strlen' );
+      $applicant['fullName'] = implode(' ', $name);
+
       $answers = $applicant['answers'];
       $applicant['answers'] = array();
       foreach($answers as $answer){
@@ -45,6 +50,11 @@ class ApplicantArrayHydrator extends \Doctrine\ORM\Internal\Hydration\ArrayHydra
           }
         }
         $applicant['decision']['status'] = $final;
+      }
+      foreach($applicant['attachments'] as $attachmentKey => $attachment){
+        if(array_key_exists('answer_id', $attachment) and !empty($attachment['answer_id'])){
+          unset($applicant['attachments'][$attachmentKey]);
+        }
       }
       $result[$key] = $applicant;
     }

@@ -44,6 +44,14 @@ Display.prototype.showAccountCreated = function(){
   return this.display.isCreatedAtDisplayed;
 };
 
+Display.prototype.showIsLocked = function(){
+  return true;
+};
+
+Display.prototype.showIsPaid = function(){
+  return true;
+};
+
 /**
  * List the pages
  */
@@ -64,14 +72,6 @@ Display.prototype.getPages = function(){
         title: this.title,
         type: this.page.type['class']
       };
-      /*
-var dump = "";
-	    for(x in this.page){
-		dump += x+" => "+this.page[x]+"\n\n";
-	    }
-	    console.log("DUMP: "+dump);
-	    throw new Error("debug");
-      */
       pages.push(page);
     }
   });

@@ -762,7 +762,8 @@ class Application
     }
     return $differences;
   }
-    /**
+  
+  /**
    * Format applicant Array
    *
    * @param array $applicant
@@ -777,6 +778,59 @@ class Application
     foreach($answers as $pageId => $answers){
       if($applicationPage = $this->getApplicationPageByPageId($pageId)){
         $applicant['pages'][] = $applicationPage->getJazzeePage()->formatApplicantArray($answers);
+      }
+    }
+
+    return $applicant;
+  }
+  
+  /**
+   * Format applicant Array removing non-display values so the resulting array 
+   * is smaller
+   *
+   * @param array $applicant
+   * 
+   * @return array
+   */
+  public function formatApplicantDisplayArray(array $applicant)
+  {
+    $applicant = $this->formatApplicantArray($applicant);
+
+    foreach($applicant['attachments'] as $key => $arr){
+      $arr['filePath'] = false;
+      $arr['thumbnailPath'] = false;
+      $base = $applicant['fullName'] . '_attachment_' . '_' . $arr['id'];
+      //remove slashes in path to fix an apache issues with encoding slashes in redirects
+      $base = str_replace(array('/', '\\'),'slash' , $base);
+
+      $name = $base . '.pdf';
+      \Jazzee\Globals::storeFile($name, base64_decode($arr['attachment']));
+      $arr['filePath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
+
+      $name = $base . '.png';
+      $blob = $arr['thumbnail'];
+      if (empty($blob)) {
+        $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+      } else {
+        $blob = base64_decode($blob);
+      }
+      \Jazzee\Globals::storeFile($name, $blob);
+      $arr['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
+      $arr['displayValue'] = "<a href='{$arr['filePath']}'><img src='{$arr['thumbnailPath']}' /></a>";
+      unset($arr['attachment']);
+      unset($arr['thumbnail']);
+      $applicant['attachments'][$key] = $arr;
+    }
+    
+    foreach($applicant['pages'] as $pageKey => $page){
+      foreach($page['answers'] as $answerKey => $answer){
+        if($applicant['pages'][$pageKey]['answers'][$answerKey]['attachment']){
+          unset($applicant['pages'][$pageKey]['answers'][$answerKey]['attachment']['attachment']);
+          unset($applicant['pages'][$pageKey]['answers'][$answerKey]['attachment']['thumbnail']);
+        }
+        foreach($answer['elements'] as $elementKey => $element){
+          unset($applicant['pages'][$pageKey]['answers'][$answerKey]['elements'][$elementKey]['values']);
+        }
       }
     }
 

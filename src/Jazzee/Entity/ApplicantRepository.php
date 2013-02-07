@@ -118,10 +118,10 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   /**
    * All the applicants in an application
    * @param Application $application
-   * @param boolean $deep should we load the full data for each applicant
+   * @param boolean $onlyLocked
    * @return array
    */
-  public function findIdsByApplication(Application $application)
+  public function findIdsByApplication(Application $application, $onlyLocked = false)
   {
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
@@ -130,6 +130,9 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
 
     $queryBuilder->andWhere('applicant.application = :applicationId');
     $queryBuilder->andWhere('applicant.deactivated=false');
+    if($onlyLocked){
+      $queryBuilder->andWhere('applicant.isLocked=true');
+    }
     $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
     $queryBuilder->setParameter('applicationId', $application->getId());
 
@@ -241,7 +244,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   protected function deepApplicantQuery(\Jazzee\Interfaces\Display $display = null){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
-    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, payment, children, children_element_answers, children_publicStatus, children_privateStatus, children_payment');
+    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, payment, children, answer_attachment, children_element_answers, children_publicStatus, children_privateStatus, children_payment, children_attachment');
     if($display){
       $expression = $queryBuilder->expr()->orX();
       //this one is the default - if there are no pages in the display then this 
@@ -265,13 +268,14 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->leftJoin('applicant.tags', 'tags');
     $queryBuilder->leftJoin('answers.payment', 'payment');
     $queryBuilder->leftJoin('answers.children', 'children');
+    $queryBuilder->leftJoin('answers.attachment', 'answer_attachment');
     $queryBuilder->leftJoin('children.elements', 'children_element_answers');
     $queryBuilder->leftJoin('children.publicStatus', 'children_publicStatus');
     $queryBuilder->leftJoin('children.privateStatus', 'children_privateStatus');
     $queryBuilder->leftJoin('children.payment', 'children_payment');
+    $queryBuilder->leftJoin('children.attachment', 'children_attachment');
     $queryBuilder->where('answers.parent IS NULL');
-    
-    
+
     return $queryBuilder;
   }
 
