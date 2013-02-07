@@ -1,7 +1,7 @@
-class jazzee::php::imagick {
+class jazzee::php::xml {
   case $operatingsystem {
     centos, redhat: { 
-      package { 'php-domxml':
+      package { 'php-xml':
         ensure => latest,
         notify => Service['httpd']
       }
