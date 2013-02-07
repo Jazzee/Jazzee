@@ -62,8 +62,12 @@ class ApplicantEventListener
       }
       if($applicant and !$uow->isScheduledForDelete($applicant)){
         $applicant->markLastUpdate();
-        $entityManager->persist($applicant);
-        $uow->computeChangeSet($applicantMetadata, $applicant);
+        if($uow->isScheduledForUpdate($applicant)){
+          $uow->recomputeSingleEntityChangeSet($applicantMetadata, $applicant);
+        } else {
+          $entityManager->persist($applicant);
+          $uow->computeChangeSet($applicantMetadata, $applicant);
+        }
       }
     }
   }
