@@ -407,7 +407,7 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'isHasPaidDisplayed' => $userDisplay->isHasPaidDisplayed()
       );
     }
-    $systemDisplays = array('\Jazzee\Display\Minimal','\Jazzee\Display\NoAttachments','\Jazzee\Display\FullApplication');
+    $systemDisplays = array('\Jazzee\Display\Minimal');
     foreach($systemDisplays as $class){
       $display = new $class($this->_application);
       $displays[] = array(
