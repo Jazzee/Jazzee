@@ -653,6 +653,24 @@ class Application
   }
 
   /**
+   * Get an element by its ID
+   * search all the pages to find it
+   * 
+   * @param integer $id
+   * @return Element
+   */
+  public function getElementById($id)
+  {
+    foreach ($this->applicationPages as $applicationPage) {
+      if ($element = $applicationPage->getPage()->getElementById($id)) {
+        return $element;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Compare two application and list the differences
    *
    * @param \Jazzee\Entity\Application $application

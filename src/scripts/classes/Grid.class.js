@@ -56,43 +56,43 @@ Grid.prototype.getColumns = function(){
       return data.fullName + ' ' + data.email;
     }
   });
-  if(this.display.showFirstName()){
+  if(this.display.isFirstNameDisplayed()){
     columns.push({sTitle: "First",
     mData: 'firstName'});
   }
-  if(this.display.showLastName()){
+  if(this.display.isLastNameDisplayed()){
     columns.push({sTitle: "Last",
     mData: 'lastName'});
   }
-  if(this.display.showEmail()){
+  if(this.display.isEmailDisplayed()){
     columns.push({sTitle: "Email",
     mData: 'email'});
   }
-  if(this.display.showLastUpdate()){
+  if(this.display.isUpdatedAtDisplayed()){
     columns.push({sTitle: "Last Update",
     mData: 'updatedAt',
     mRender: Grid.formatDate});
   }
-  if(this.display.showProgress()){
+  if(this.display.isPercentCompleteDisplayed()){
     columns.push({sTitle: "Progress",
     mData: 'percentComplete'});
   }
-  if(this.display.showLastLogin()){
+  if(this.display.isLastLoginDisplayed()){
     columns.push({sTitle: "Last Login",
     mData: 'lastLogin',
     mRender: Grid.formatDate});
   }
-  if(this.display.showAccountCreated()){
+  if(this.display.isCreatedAtDisplayed()){
     columns.push({sTitle: "Created At",
     mData: 'createdAt',
     mRender: Grid.formatDate});
   }
-  if(this.display.showIsLocked()){
+  if(this.display.isIsLockedDisplayed()){
     columns.push({sTitle: "Locked",
     mData: 'isLocked',
     mRender: Grid.formatCheckmark});
   }
-  if(this.display.showIsPaid()){
+  if(this.display.isHasPaidDisplayed()){
     columns.push({sTitle: "Paid",
     mData: 'hasPaid',
     mRender: Grid.formatCheckmark});

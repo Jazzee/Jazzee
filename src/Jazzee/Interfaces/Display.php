@@ -111,4 +111,11 @@ interface Display
    * @return boolean
    */
   function isHasPaidDisplayed();
+  
+  /**
+   * Is the lock status displayed
+   * 
+   * @return boolean
+   */
+  function isIsLockedDisplayed();
 }

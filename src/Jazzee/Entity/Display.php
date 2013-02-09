@@ -29,28 +29,31 @@ class Display implements \Jazzee\Interfaces\Display
   private $name;
 
   /** @Column(type="boolean") */
-  private $isFirstNameDislayed;
+  private $isFirstNameDisplayed;
 
   /** @Column(type="boolean") */
-  private $isLastNameDislayed;
+  private $isLastNameDisplayed;
 
   /** @Column(type="boolean") */
-  private $isEmailDislayed;
+  private $isEmailDisplayed;
 
   /** @Column(type="boolean") */
-  private $isCreatedAtDislayed;
+  private $isCreatedAtDisplayed;
 
   /** @Column(type="boolean") */
-  private $isUpdatedAtDislayed;
+  private $isUpdatedAtDisplayed;
 
   /** @Column(type="boolean") */
-  private $isLastLoginDislayed;
+  private $isLastLoginDisplayed;
 
   /** @Column(type="boolean") */
-  private $isPercentCompleteDislayed;
+  private $isPercentCompleteDisplayed;
 
   /** @Column(type="boolean") */
-  private $isHasPaidDislayed;
+  private $isHasPaidDisplayed;
+
+  /** @Column(type="boolean") */
+  private $isIsLockedDisplayed;
 
   /**
    * @ManyToOne(targetEntity="User",inversedBy="displays")
@@ -73,14 +76,15 @@ class Display implements \Jazzee\Interfaces\Display
   {
     $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
     $this->attributes = array();
-    $this->isFirstNameDislayed = true;
-    $this->isLastNameDislayed = true;
-    $this->isEmailDislayed = true;
-    $this->isCreatedAtDislayed = true;
-    $this->isUpdatedAtDislayed = true;
-    $this->isLastLoginDislayed = true;
-    $this->isPercentCompleteDislayed = true;
-    $this->isHasPaidDislayed = true;
+    $this->isFirstNameDisplayed = true;
+    $this->isLastNameDisplayed = true;
+    $this->isEmailDisplayed = true;
+    $this->isCreatedAtDisplayed = true;
+    $this->isUpdatedAtDisplayed = true;
+    $this->isLastLoginDisplayed = true;
+    $this->isPercentCompleteDisplayed = true;
+    $this->isHasPaidDisplayed = true;
+    $this->isIsLockedDisplayed = true;
   }
 
   /**
@@ -209,6 +213,21 @@ class Display implements \Jazzee\Interfaces\Display
   }
   
   /**
+   * Search for a DisplayPage for this Page
+   * @param \Jazzee\Entity\Page $page
+   * @return DisplayPage
+   */
+  public function getDisplayPageByPage(Page $page) {
+    foreach($this->pages as $displayPage){
+      if($displayPage->getApplicationPage()->getPage() == $page){
+        return $displayPage;
+      }
+    }
+    
+    return false;
+  }
+  
+  /**
    * Get a list or all the elements in the display for limiting
    * 
    * @return array
@@ -244,99 +263,111 @@ class Display implements \Jazzee\Interfaces\Display
   }
   
   public function showCreatedAt(){
-    $this->isCreatedAtDislayed = true;
+    $this->isCreatedAtDisplayed = true;
   }
   
   public function hideCreatedAt(){
-    $this->isCreatedAtDislayed = false;
+    $this->isCreatedAtDisplayed = false;
   }
 
   public function isCreatedAtDisplayed() {
-    return $this->isCreatedAtDislayed;
+    return $this->isCreatedAtDisplayed;
   }
   
   public function showEmail(){
-    $this->isEmailDislayed = true;
+    $this->isEmailDisplayed = true;
   }
   
   public function hideEmail(){
-    $this->isEmailDislayed = false;
+    $this->isEmailDisplayed = false;
   }
 
   public function isEmailDisplayed() {
-    return $this->isEmailDislayed;
+    return $this->isEmailDisplayed;
   }
   
   public function showFirstName(){
-    $this->isFirstNameDislayed = true;
+    $this->isFirstNameDisplayed = true;
   }
   
   public function hideFirstName(){
-    $this->isFirstNameDislayed = false;
+    $this->isFirstNameDisplayed = false;
   }
 
   public function isFirstNameDisplayed() {
-    return $this->isFirstNameDislayed;
+    return $this->isFirstNameDisplayed;
   }
   
   public function showHasPaid(){
-    $this->isHasPaidDislayed = true;
+    $this->isHasPaidDisplayed = true;
   }
   
   public function hideHasPaid(){
-    $this->isHasPaidDislayed = false;
+    $this->isHasPaidDisplayed = false;
   }
 
   public function isHasPaidDisplayed() {
-    return $this->isHasPaidDislayed;
+    return $this->isHasPaidDisplayed;
   }
   
   public function showLastLogin(){
-    $this->isLastLoginDislayed = true;
+    $this->isLastLoginDisplayed = true;
   }
   
   public function hideLastLogin(){
-    $this->isLastLoginDislayed = false;
+    $this->isLastLoginDisplayed = false;
   }
 
   public function isLastLoginDisplayed() {
-    return $this->isLastLoginDislayed;
+    return $this->isLastLoginDisplayed;
   }
   
   public function showLastName(){
-    $this->isLastNameDislayed = true;
+    $this->isLastNameDisplayed = true;
   }
   
   public function hideLastName(){
-    $this->isLastNameDislayed = false;
+    $this->isLastNameDisplayed = false;
   }
 
   public function isLastNameDisplayed() {
-    return $this->isLastNameDislayed;
+    return $this->isLastNameDisplayed;
   }
   
   public function showPercentComplete(){
-    $this->isPercentCompleteDislayed = true;
+    $this->isPercentCompleteDisplayed = true;
   }
   
   public function hidePercentComplete(){
-    $this->isPercentCompleteDislayed = false;
+    $this->isPercentCompleteDisplayed = false;
   }
 
   public function isPercentCompleteDisplayed() {
-    return $this->isPercentCompleteDislayed;
+    return $this->isPercentCompleteDisplayed;
   }
   
   public function showUpdatedAt(){
-    $this->isUpdatedAtDislayed = true;
+    $this->isUpdatedAtDisplayed = true;
   }
   
   public function hideUpdatedAt(){
-    $this->isUpdatedAtDislayed = false;
+    $this->isUpdatedAtDisplayed = false;
   }
 
   public function isUpdatedAtDisplayed() {
-    return $this->isUpdatedAtDislayed;
+    return $this->isUpdatedAtDisplayed;
+  }
+  
+  public function showIsLocked(){
+    $this->isIsLockedDisplayed = true;
+  }
+  
+  public function hideIsLocked(){
+    $this->isIsLockedDisplayed = false;
+  }
+
+  public function isIsLockedDisplayed() {
+    return $this->isIsLockedDisplayed;
   }
 
 }

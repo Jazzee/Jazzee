@@ -11,49 +11,116 @@ function Display(obj, application){
   this.application = application;
 };
 
-Display.prototype.showApplicantLink = function(){
-  return true;
+Display.prototype.showCreatedAt = function(){
+  this.display.isCreatedAtDisplayed = true;
 };
 
-Display.prototype.showFirstName = function(){
-  return this.display.isFirstNameDisplayed;
+Display.prototype.hideCreatedAt = function(){
+  this.display.isCreatedAtDisplayed = false;
 };
 
-Display.prototype.showLastName = function(){
-  return this.display.isLastNameDisplayed;
-};
-
-Display.prototype.showEmail = function(){
-  return this.display.isEmailDisplayed;
-};
-
-Display.prototype.showLastUpdate = function(){
-  return this.display.isUpdatedAtDisplayed;
-};
-
-
-Display.prototype.showProgress = function(){
-  return this.display.isPercentCompleteDisplayed;
-};
-
-Display.prototype.showLastLogin = function(){
-  return this.display.isLastLoginDisplayed;
-};
-
-Display.prototype.showAccountCreated = function(){
+Display.prototype.isCreatedAtDisplayed = function(){
   return this.display.isCreatedAtDisplayed;
 };
 
-Display.prototype.showIsLocked = function(){
-  return true;
+Display.prototype.showEmail = function(){
+  this.display.isEmailDisplayed = true;
 };
 
-Display.prototype.showIsPaid = function(){
-  return true;
+Display.prototype.hideEmail = function(){
+  this.display.isEmailDisplayed = false;
+};
+
+Display.prototype.isEmailDisplayed = function(){
+  return this.display.isEmailDisplayed;
+};
+
+Display.prototype.showFirstName = function(){
+  this.display.isFirstNameDisplayed = true;
+};
+
+Display.prototype.hideFirstName = function(){
+  this.display.isFirstNameDisplayed = false;
+};
+
+Display.prototype.isFirstNameDisplayed = function(){
+  return this.display.isFirstNameDisplayed;
+};
+
+Display.prototype.showHasPaid = function(){
+  this.display.isHasPaidDisplayed = true;
+};
+
+Display.prototype.hideHasPaid = function(){
+  this.display.isHasPaidDisplayed = false;
+};
+
+Display.prototype.isHasPaidDisplayed = function(){
+  return this.display.isHasPaidDisplayed;
+};
+
+Display.prototype.showLastLogin = function(){
+  this.display.isLastLoginDisplayed = true;
+};
+
+Display.prototype.hideLastLogin = function(){
+  this.display.isLastLoginDisplayed = false;
+};
+
+Display.prototype.isLastLoginDisplayed = function(){
+  return this.display.isLastLoginDisplayed;
+};
+
+Display.prototype.showLastName = function(){
+  this.display.isLastNameDisplayed = true;
+};
+
+Display.prototype.hideLastName = function(){
+  this.display.isLastNameDisplayed = false;
+};
+
+Display.prototype.isLastNameDisplayed = function(){
+  return this.display.isLastNameDisplayed;
+};
+
+Display.prototype.showPercentComplete = function(){
+  this.display.isPercentCompleteDisplayed = true;
+};
+
+Display.prototype.hidePercentComplete = function(){
+  this.display.isPercentCompleteDisplayed = false;
+};
+
+Display.prototype.isPercentCompleteDisplayed = function(){
+  return this.display.isPercentCompleteDisplayed;
+};
+
+Display.prototype.showUpdatedAt = function(){
+  this.display.isUpdatedAtDisplayed = true;
+};
+
+Display.prototype.hideUpdatedAt = function(){
+  this.display.isUpdatedAtDisplayed = false;
+};
+
+Display.prototype.isUpdatedAtDisplayed = function(){
+  return this.display.isUpdatedAtDisplayed;
+};
+
+Display.prototype.showIsLocked = function(){
+  this.display.isIsLockedDisplayed = true;
+};
+
+Display.prototype.hideIsLocked = function(){
+  this.display.isIsLockedDisplayed = false;
+};
+
+Display.prototype.isIsLockedDisplayed = function(){
+  return this.display.isIsLockedDisplayed;
 };
 
 /**
- * List the pages
+ * Get the display objext
  */
 Display.prototype.getObj = function(){
   return this.display;
@@ -152,6 +219,13 @@ Display.prototype.getName = function(){
 };
 
 /**
+ * Get the display type
+ */
+Display.prototype.getType = function(){
+  return this.display.type;
+};
+
+/**
  * Get the display name
  */
 Display.prototype.getId = function(){
@@ -166,8 +240,28 @@ Display.prototype.displayPage = function(pageId){
 };
 
 /**
- * Check if a page should be displayed
+ * Check if an element should be displayed
  */
 Display.prototype.displayElement = function(elementId){
   return ($.inArray(elementId, this.display.elements) > -1);
+};
+
+/**
+ * Check if an element should be displayed
+ */
+Display.prototype.addElement = function(elementId){
+  if(!this.displayElement(elementId)){
+    this.display.elements.push(elementId);
+  }
+};
+
+/**
+ * Check if an element should be displayed
+ */
+Display.prototype.removeElement = function(elementId){
+  if(this.displayElement(elementId)){
+    this.display.elements = $.grep(this.display.elements, function(value) {
+      return value != elementId;
+    });
+  }
 };

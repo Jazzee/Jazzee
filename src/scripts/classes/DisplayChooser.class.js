@@ -19,21 +19,29 @@ function DisplayChooser(displayTypeName){
  */
 DisplayChooser.prototype.init = function(){
   var self = this;
+  this.div.empty();
+  this.div.append($('<label>').html('Display: ').attr('for', 'displayChooserSelect'));
+  this.div.append(this.dropdown());
+  this.chooseDisplay(this.services.getPreference(this.preferenceName));
+};
+
+/**
+ * Initialize the display
+ */
+DisplayChooser.prototype.dropdown = function(){
+  var self = this;
   var displays = this.services.getDisplays();
   var dropdown = $('<select>').attr('id', 'displayChooserSelect');
   $.each(displays, function(){
     dropdown.append($('<option>').html(this.getName()).attr('value', this.getId()).data('display', this));
   });
-  this.div.append($('<label>').html('Display: ').attr('for', 'displayChooserSelect'));
-  this.div.append(dropdown);
-  
-  $('#displayChooserSelect').val(this.services.getPreference(this.preferenceName));
-
   dropdown.bind('change', function(e){
-    self.services.setPreference(self.preferenceName, $(e.target).val());
-    self.callbacks.fire(self.getCurrentDisplay());
+    var display = self.getCurrentDisplay();
+    self.services.setPreference(self.preferenceName, display.getId());
+    self.chooseDisplay(display.getId());
   });
-
+  
+  return dropdown;
 };
 
 /**
@@ -50,4 +58,90 @@ DisplayChooser.prototype.bind = function(fn){
  */
 DisplayChooser.prototype.getCurrentDisplay = function(){
   return $('option', this.div).filter(':selected').data('display');
+};
+
+/**
+ * Create the link to edit a display
+ * 
+ * @return {jQuery}
+ */
+DisplayChooser.prototype.editLink = function(){
+  var self = this;
+  var a = $('<a>').attr('href', '#').html('edit');
+  a.data('chooser', this);
+  a.bind('click', function(){
+    var div = $('<div>');
+    div.css("overflow-y", "auto");
+    div.dialog({
+      modal: true,
+      autoOpen: true,
+      position: 'center',
+      width: '90%',
+      height: 500,
+      close: function() {
+        div.dialog("destroy").remove();
+      },
+      buttons: [ 
+        {
+          text: "Save", click: function() { 
+            var display = self.getCurrentDisplay();
+            DisplayManager.save(self.services.getControllerPath('admin_managedisplays'),display);
+            $('#displayChooserSelect').replaceWith(self.dropdown());
+            $(this).dialog("destroy").remove();
+            self.chooseDisplay(display.getId());
+        }},
+        {
+          text: "Delete Display", click: function() { 
+            DisplayManager.remove(self.services.getControllerPath('admin_managedisplays'),self.getCurrentDisplay());
+            $('#displayChooserSelect').replaceWith(self.dropdown());
+            self.chooseDisplay('min');
+            $(this).dialog("destroy").remove();
+        }}
+      ]
+    });
+    var displayManager = new DisplayManager($(this).data('chooser').getCurrentDisplay(), self.services.getCurrentApplication());
+    displayManager.init(div);
+    return false;
+  });
+  
+  return a;
+};
+
+/**
+ * Choose a display programatically
+ * 
+ * @param Integer displayId
+ */
+DisplayChooser.prototype.chooseDisplay = function(displayId){
+  if($('#displayChooserSelect').val() != displayId){
+    $('#displayChooserSelect').val(displayId);
+  };
+  var display = this.getCurrentDisplay();
+  this.callbacks.fire(display);
+  $('a', this.div).remove();
+  if(display.getType() == 'user'){
+    this.div.append(this.editLink());
+  }
+  this.div.append(this.newLink());
+};
+
+/**
+ * Create a new display
+ * 
+ * @return {jQuery}
+ */
+DisplayChooser.prototype.newLink = function(){
+  var self = this;
+  var a = $('<a>').attr('href', '#').html('new');
+  a.data('chooser', this);
+  a.bind('click', function(){
+    $.get(self.services.getControllerPath('admin_managedisplays') + '/new', function(json){
+      self.init();
+      self.chooseDisplay(json.data.result);
+      $('a', self.div).first().click();
+    });
+    return false;
+  });
+
+  return a;
 };

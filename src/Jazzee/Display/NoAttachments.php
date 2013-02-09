@@ -135,4 +135,8 @@ class NoAttachments implements \Jazzee\Interfaces\Display
   public function isUpdatedAtDisplayed() {
     return true;
   }
+  
+  public function isIsLockedDisplayed() {
+    return true;
+  }
 }

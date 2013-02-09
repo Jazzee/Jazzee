@@ -1,0 +1,53 @@
+.shrink_button {
+	width: '100%';
+	cursor: pointer;
+	background-color: #7799bb;
+	color: #FFFFFF;
+	padding: 8px;
+	margin: 10px 0 0 0;
+	font-size: 1em;
+	font-weight: bold;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.shrink_button:before
+{
+	float: left;     
+	width: 1em;
+	text-align: center;
+	font-size: 1em;
+        content: "\271A";
+}
+
+.shrink_button p {
+  margin:0;
+  padding: 0 0 0 28px;
+}
+.shrink_list {
+  margin: 10px 0 10px 20px;
+  padding: 0;
+}
+
+.block_list, .block_list li {
+  list-style-type: none;
+}
+
+.block_list .item {
+  width: '60%';
+  cursor: pointer;
+  background-color: #FFFFFF;
+  color: #7799bb;
+  padding: 8px;
+  margin-top: 2px;
+  font-size: .8em;
+  font-weight: normal;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+}
+
+.block_list .item.selected {
+  background-color: #3C9600;
+  color: #ffffff;
+}

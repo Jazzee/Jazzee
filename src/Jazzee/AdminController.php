@@ -404,7 +404,8 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'isUpdatedAtDisplayed' => $userDisplay->isUpdatedAtDisplayed(),
         'isLastLoginDisplayed' => $userDisplay->isLastLoginDisplayed(),
         'isPercentCompleteDisplayed' => $userDisplay->isPercentCompleteDisplayed(),
-        'isHasPaidDisplayed' => $userDisplay->isHasPaidDisplayed()
+        'isHasPaidDisplayed' => $userDisplay->isHasPaidDisplayed(),
+        'isIsLockedDisplayed' => $userDisplay->isIsLockedDisplayed()
       );
     }
     $systemDisplays = array('\Jazzee\Display\Minimal');
@@ -424,7 +425,8 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'isUpdatedAtDisplayed' => $display->isUpdatedAtDisplayed(),
         'isLastLoginDisplayed' => $display->isLastLoginDisplayed(),
         'isPercentCompleteDisplayed' => $display->isPercentCompleteDisplayed(),
-        'isHasPaidDisplayed' => $display->isHasPaidDisplayed()
+        'isHasPaidDisplayed' => $display->isHasPaidDisplayed(),
+        'isIsLockedDisplayed' => $display->isIsLockedDisplayed()
       );
     }
     
