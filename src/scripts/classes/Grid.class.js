@@ -56,58 +56,33 @@ Grid.prototype.getColumns = function(){
       return data.fullName + ' ' + data.email;
     }
   });
-  if(this.display.isFirstNameDisplayed()){
-    columns.push({sTitle: "First",
-    mData: 'firstName'});
-  }
-  if(this.display.isLastNameDisplayed()){
-    columns.push({sTitle: "Last",
-    mData: 'lastName'});
-  }
-  if(this.display.isEmailDisplayed()){
-    columns.push({sTitle: "Email",
-    mData: 'email'});
-  }
-  if(this.display.isUpdatedAtDisplayed()){
-    columns.push({sTitle: "Last Update",
-    mData: 'updatedAt',
-    mRender: Grid.formatDate});
-  }
-  if(this.display.isPercentCompleteDisplayed()){
-    columns.push({sTitle: "Progress",
-    mData: 'percentComplete'});
-  }
-  if(this.display.isLastLoginDisplayed()){
-    columns.push({sTitle: "Last Login",
-    mData: 'lastLogin',
-    mRender: Grid.formatDate});
-  }
-  if(this.display.isCreatedAtDisplayed()){
-    columns.push({sTitle: "Created At",
-    mData: 'createdAt',
-    mRender: Grid.formatDate});
-  }
-  if(this.display.isIsLockedDisplayed()){
-    columns.push({sTitle: "Locked",
-    mData: 'isLocked',
-    mRender: Grid.formatCheckmark});
-  }
-  if(this.display.isHasPaidDisplayed()){
-    columns.push({sTitle: "Paid",
-    mData: 'hasPaid',
-    mRender: Grid.formatCheckmark});
-  }
-  
-  $.each(this.display.getPages(), function(){
-    $.each(self.display.getPageElements(this.id), function(){
-      columns.push({
-        sTitle: this.title,
-        mData: 'values.' + this.id,
-        mRender: Grid.formatAnswers
-      });
-    });
+  $.each(this.display.listElements(), function(){
+    switch(this.type){
+      case 'applicant':
+        var column = {
+          sTitle: this.title,
+          mData: this.name
+        };
+
+        if(this.name == 'updatedAt' || this.name == 'createdAt' || this.name == 'lastLogin'){
+          column.mRender = Grid.formatDate;
+          column.sType = 'date';
+        }
+        if(this.name == 'isLocked' || this.name == 'hasPaid'){
+          column.mRender = Grid.formatCheckmark;
+        }
+        columns.push(column);
+        break;
+      case 'page':
+        columns.push({
+          sTitle: this.title,
+          mData: 'values.element' + this.name,
+          mRender: Grid.formatAnswers
+        });
+        break;
+    }
   });
-  
+  console.log(columns);
   return columns;
 };
 
@@ -118,15 +93,16 @@ Grid.prototype.loadapps = function(applicantIds, grid){
     $.post(self.controllerPath + '/getApplicants',{applicantIds: limitedIds, display: self.display.getObj()
     }, function(json){
       $.each(json.data.result.applicants, function(i){
+        console.log(this);
         var applicant = new ApplicantData(this);
         var obj = applicant;
         obj.percentComplete = Math.round(obj.percentComplete * 100);
         obj.values = {};
-        $.each(self.display.getPages(), function(){
-          var page = this;
-          $.each(self.display.getPageElements(this.id), function(){
+        $.each(self.display.getApplication().listApplicationPages(), function(){
+          var applicationPage = this;
+          $.each(self.display.getApplication().listPageElements(applicationPage.page.id), function(){
             var element = this;
-            obj.values[element.id] = applicant.getDisplayValuesForPageElement(page.id, element.id);
+            obj.values['element'+element.id] = applicant.getDisplayValuesForPageElement(applicationPage.page.id, element.id);
           });
         });
         grid.fnAddData(obj);
@@ -145,6 +121,10 @@ Grid.prototype.loadapps = function(applicantIds, grid){
  * Format date objects
  */
 Grid.formatDate = function(data, type, full){
+  if(type == 'filter' || type == 'display'){
+    var date = new Date(data.date);
+    return date.toLocaleDateString();
+  }
   return data.date;
 };
 
@@ -191,7 +171,8 @@ Grid.prototype.bindApplicantLinks = function(){
       autoOpen: false,
       position: 'center',
       width: '90%',
-      height: 500,
+      closeOnEscape: true,
+      height: ($(window).height()*0.9),
       close: function() {
         div.dialog("destroy").remove();
       }

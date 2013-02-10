@@ -26,7 +26,7 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
   public function actionNew()
   {
     $display = new \Jazzee\Entity\Display;
-    $display->setName('New Display');
+    $display->setName('New');
     $display->setUser($this->_user);
     $display->setApplication($this->_application);
     $this->_em->persist($display);
@@ -57,38 +57,27 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
     $obj = json_decode($this->post['display']);
     if($display = $this->_em->getRepository('Jazzee\Entity\Display')->findOneBy(array('id'=>$obj->id, 'user'=>$this->_user))){
       $display->setName($obj->name);
-      $applicantElements = array(
-        'FirstName',
-        'LastName',
-        'Email',
-        'CreatedAt',
-        'UpdatedAt',
-        'LastLogin',
-        'PercentComplete',
-        'IsLocked',
-        'HasPaid'
-      );
-      foreach($applicantElements as $name){
-        $property = 'is' . $name . 'Displayed';
-        $method = ($obj->$property?'show':'hide') . $name;
-        $display->$method();
+      foreach ($display->getElements() as $displayElement) {
+        $display->getElements()->removeElement($displayElement);
+        $this->getEntityManager()->remove($displayElement);
       }
-      foreach ($display->getPages() as $app) {
-        $display->getPages()->removeElement($app);
-        $this->getEntityManager()->remove($app);
-      }
-      foreach($obj->elements as $elementId){
-        $element = $this->_application->getElementById($elementId);
-        if(!$displayPage = $display->getDisplayPageByPage($element->getPage())){
-          $applicationPage = $this->_application->getApplicationPageByPageId($element->getPage()->getId());
-          $displayPage = new \Jazzee\Entity\DisplayPage;
-          $display->addPage($displayPage);
-          $displayPage->setApplicationPage($applicationPage);
-          $this->getEntityManager()->persist($displayPage);
+      foreach($obj->elements as $eObj){
+        switch($eObj->type){
+          case 'applicant':
+            $displayElement = new \Jazzee\Entity\DisplayElement('applicant');
+            $displayElement->setName($eObj->name);
+            break;
+          case 'page':
+            $displayElement = new \Jazzee\Entity\DisplayElement('page');
+            $element = $this->_application->getElementById($eObj->name);
+            $displayElement->setElement($element);
+            break;
+          default:
+            throw new \Jazzee\Exception("{$eObj->type} is not a valid DisplayElement type");
         }
-        $displayElement = new \Jazzee\Entity\DisplayElement;
-        $displayPage->addElement($displayElement);
-        $displayElement->setElement($element);
+        $displayElement->setTitle($eObj->title);
+        $displayElement->setWeight($eObj->weight);
+        $display->addElement($displayElement);
         $this->getEntityManager()->persist($displayElement);
       }
       $this->_em->persist($display);

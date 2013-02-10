@@ -395,17 +395,9 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'type' => 'user',
         'id'  => $userDisplay->getId(),
         'name' => $userDisplay->getName(),
-        'pages' => $userDisplay->getPageIds(),
-        'elements' => $userDisplay->getElementIds(),
-        'isFirstNameDisplayed' => $userDisplay->isFirstNameDisplayed(),
-        'isLastNameDisplayed' => $userDisplay->isLastNameDisplayed(),
-        'isEmailDisplayed' => $userDisplay->isEmailDisplayed(),
-        'isCreatedAtDisplayed' => $userDisplay->isCreatedAtDisplayed(),
-        'isUpdatedAtDisplayed' => $userDisplay->isUpdatedAtDisplayed(),
-        'isLastLoginDisplayed' => $userDisplay->isLastLoginDisplayed(),
-        'isPercentCompleteDisplayed' => $userDisplay->isPercentCompleteDisplayed(),
-        'isHasPaidDisplayed' => $userDisplay->isHasPaidDisplayed(),
-        'isIsLockedDisplayed' => $userDisplay->isIsLockedDisplayed()
+        'pageIds' => $userDisplay->getPageIds(),
+        'elementIds' => $userDisplay->getElementIds(),
+        'elements' => $userDisplay->listElements()
       );
     }
     $systemDisplays = array('\Jazzee\Display\Minimal');
@@ -416,17 +408,9 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
         'type' => 'system',
         'class'  => get_class($display),
         'name'  =>  $display->getName(),
-        'pages' => $display->getPageIds(),
-        'elements' => $display->getElementIds(),
-        'isFirstNameDisplayed' => $display->isFirstNameDisplayed(),
-        'isLastNameDisplayed' => $display->isLastNameDisplayed(),
-        'isEmailDisplayed' => $display->isEmailDisplayed(),
-        'isCreatedAtDisplayed' => $display->isCreatedAtDisplayed(),
-        'isUpdatedAtDisplayed' => $display->isUpdatedAtDisplayed(),
-        'isLastLoginDisplayed' => $display->isLastLoginDisplayed(),
-        'isPercentCompleteDisplayed' => $display->isPercentCompleteDisplayed(),
-        'isHasPaidDisplayed' => $display->isHasPaidDisplayed(),
-        'isIsLockedDisplayed' => $display->isIsLockedDisplayed()
+        'pageIds' => $display->getPageIds(),
+        'elementIds' => $display->getElementIds(),
+        'elements' => $display->listElements()
       );
     }
     

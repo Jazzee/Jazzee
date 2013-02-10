@@ -15,7 +15,6 @@
 {
 	float: left;     
 	width: 1em;
-	text-align: center;
 	font-size: 1em;
         content: "\271A";
 }
@@ -44,10 +43,15 @@
   font-weight: normal;
   border-radius: 4px;
   -webkit-border-radius: 4px;
+  text-align: left;
   -moz-border-radius: 4px;
 }
 
 .block_list .item.selected {
   background-color: #3C9600;
   color: #ffffff;
+}
+
+.ui-sortable .handle {
+  float: left;
 }

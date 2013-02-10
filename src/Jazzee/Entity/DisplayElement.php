@@ -23,13 +23,28 @@ class DisplayElement
   private $id;
 
   /**
-   * @ManyToOne(targetEntity="DisplayPage",inversedBy="elements")
+   * @Column(type="string")
+   */
+  private $type;
+
+  /**
+   * @Column(type="string")
+   */
+  private $title;
+
+  /**
+   * @Column(type="string", nullable=true)
+   */
+  private $name;
+
+  /** @Column(type="integer") */
+  private $weight;
+
+  /**
+   * @ManyToOne(targetEntity="Display",inversedBy="elements")
    * @JoinColumn(onDelete="CASCADE")
    */
-  private $page;
-
-  /** @Column(type="array") */
-  private $attributes;
+  private $display;
 
   /**
    * @ManyToOne(targetEntity="Element")
@@ -37,9 +52,12 @@ class DisplayElement
    */
   private $element;
 
-  public function __construct()
+  public function __construct($type)
   {
-    $this->attributes = array();
+    if(!in_array($type, array('applicant', 'page'))){
+      throw new \Jazzee\Exception("{$type} is not a valid type for DisplayElements");
+    }
+    $this->type = $type;
   }
 
   /**
@@ -53,42 +71,85 @@ class DisplayElement
   }
 
   /**
-   * Get display page
+   * Set weight
    *
-   * @return DisplayPage
+   * @param integer $weight
    */
-  public function getDisplayPage()
+  public function setWeight($weight)
   {
-    return $this->page;
+    $this->weight = $weight;
   }
 
   /**
-   * Set display page
+   * Get weight
    *
-   * @param DisplayPage $page
+   * @return integer $weight
    */
-  public function setDisplayPage(DisplayPage $page)
+  public function getWeight()
   {
-    $this->page = $page;
+    return $this->weight;
   }
 
   /**
-   * Set attributes
-   * @param array $attributes
+   * Set title
+   *
+   * @param string $title
    */
-  public function setAttributes(array $attributes)
+  public function setTitle($title)
   {
-    $this->attributes = $attributes;
+    $this->title = $title;
   }
 
   /**
-   * Get attributes
+   * Get title
    *
    * @return string
    */
-  public function getAttributes()
+  public function getTitle()
   {
-    return $this->attributes;
+    return $this->title;
+  }
+
+  /**
+   * Set name
+   *
+   * @param string $name
+   */
+  public function setName($name)
+  {
+    if($this->type != 'applicant'){
+      throw new \Jazzee\Exception("You cannot set name for DisplayElements that do not have the type 'applicant'");
+    }
+    $this->name = $name;
+  }
+
+  /**
+   * Get name
+   *
+   * @return string
+   */
+  public function getName()
+  {
+    switch($this->type){
+      case 'applicant':
+        return $this->name;
+        break;
+      case 'page':
+        return $this->element->getId();
+        break;
+    }
+    
+    throw new \Jazzee\Exception("Cannot get name for {$this->type} DisplayElement type");
+  }
+
+  /**
+   * Get type
+   *
+   * @return string $type
+   */
+  public function getType()
+  {
+    return $this->type;
   }
 
   /**
@@ -108,7 +169,31 @@ class DisplayElement
    */
   public function setElement(Element $element)
   {
+    if($this->type != 'page'){
+      throw new \Jazzee\Excption("You cannot set Element for DisplayElements that do not have the type 'element'");
+    }
     $this->element = $element;
+    $this->name = $this->element->getId();
+  }
+
+  /**
+   * Get display
+   *
+   * @return \Jazzee\Entity\Display
+   */
+  public function getDisplay()
+  {
+    return $this->display;
+  }
+  
+  /**
+   * Set the display
+   * 
+   * @param \Jazzee\Entity\Display $display
+   */
+  public function setDisplay(\Jazzee\Entity\Display $display)
+  {
+    $this->display = $display;
   }
 
 }

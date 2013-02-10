@@ -22,38 +22,8 @@ class Display implements \Jazzee\Interfaces\Display
    */
   private $id;
 
-  /** @Column(type="array") */
-  private $attributes;
-
   /** @Column(type="string", length=255) */
   private $name;
-
-  /** @Column(type="boolean") */
-  private $isFirstNameDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isLastNameDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isEmailDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isCreatedAtDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isUpdatedAtDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isLastLoginDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isPercentCompleteDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isHasPaidDisplayed;
-
-  /** @Column(type="boolean") */
-  private $isIsLockedDisplayed;
 
   /**
    * @ManyToOne(targetEntity="User",inversedBy="displays")
@@ -68,23 +38,14 @@ class Display implements \Jazzee\Interfaces\Display
   protected $application;
 
   /**
-   * @OneToMany(targetEntity="DisplayPage",mappedBy="display")
+   * @OneToMany(targetEntity="DisplayElement", mappedBy="display")
+   * @OrderBy({"weight" = "ASC"})
    */
-  protected $pages;
+  private $elements;
 
   public function __construct()
   {
-    $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->attributes = array();
-    $this->isFirstNameDisplayed = true;
-    $this->isLastNameDisplayed = true;
-    $this->isEmailDisplayed = true;
-    $this->isCreatedAtDisplayed = true;
-    $this->isUpdatedAtDisplayed = true;
-    $this->isLastLoginDisplayed = true;
-    $this->isPercentCompleteDisplayed = true;
-    $this->isHasPaidDisplayed = true;
-    $this->isIsLockedDisplayed = true;
+    $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
   }
 
   /**
@@ -155,219 +116,89 @@ class Display implements \Jazzee\Interfaces\Display
   {
     return $this->application;
   }
-
-  /**
-   * Add page
-   *
-   * @param DisplayPage $page
-   */
-  public function addPage(DisplayPage $page)
-  {
-    $this->pages[] = $page;
-    if ($page->getDisplay() != $this) {
-      $page->setDisplay($this);
-    }
-  }
-
-  /**
-   * Get pages
-   *
-   * @return array DisplayPage
-   */
-  public function getPages()
-  {
-    return $this->pages;
-  }
-
-  /**
-   * Set attributes
-   * @param array $attributes
-   */
-  public function setAttributes(array $attributes)
-  {
-    $this->attributes = $attributes;
-  }
-
-  /**
-   * Get attributes
-   *
-   * @return string
-   */
-  public function getAttributes()
-  {
-    return $this->attributes;
-  }
   
   /**
    * Get a list or all the pages in the display for limiting
    * 
    * @return array
    */
-  public function getPageIds(){
+  public function getPageIds()
+  {
     $arr = array();
-    foreach($this->pages as $displayPage){
-      $arr[] = $displayPage->getApplicationPage()->getPage()->getId();
-    }
-    
-    return $arr;
-  }
-  
-  /**
-   * Search for a DisplayPage for this Page
-   * @param \Jazzee\Entity\Page $page
-   * @return DisplayPage
-   */
-  public function getDisplayPageByPage(Page $page) {
-    foreach($this->pages as $displayPage){
-      if($displayPage->getApplicationPage()->getPage() == $page){
-        return $displayPage;
+    foreach($this->elements as $displayElement){
+      if($displayElement->getType() == 'page'){
+        $arr[] = $displayElement->getElement()->getPage()->getId();
       }
     }
-    
-    return false;
+
+    return array_unique($arr);
   }
-  
+
   /**
-   * Get a list or all the elements in the display for limiting
-   * 
+   * Add element
+   *
+   * @param DisplayElement $element
+   */
+  public function addElement(DisplayElement $element)
+  {
+    $this->elements[] = $element;
+    if ($element->getDisplay() != $this) {
+      $element->setDisplay($this);
+    }
+  }
+
+  /**
+   * Get DisplayElement elements
+   *
+   * @return array DisplayElement
+   */
+  public function getElements()
+  {
+    return $this->elements;
+  }
+
+  /**
+   * List elements as an array
+   *
+   * @return array \Jazzee\Display\Element
+   */
+  public function listElements()
+  {
+    $elements = array();
+    foreach($this->elements as $displayElement){
+      $elements[] = new \Jazzee\Display\Element($displayElement->getType(), $displayElement->getTitle(), $displayElement->getWeight(), $displayElement->getName());
+    }
+
+    return $elements;
+  }
+
+  /**
+   * Get elements
+   *
    * @return array
    */
-  public function getElementIds() {
-    $arr = array();
-    foreach($this->pages as $displayPage){
-      $arr = array_merge($arr, $displayPage->getElementIds());
-    }
-    
-    return $arr;
-  }
-  
-  public function displayPage(Page $page) {
-    foreach($this->pages as $displayPage){
-      if($displayPage->getApplicationPage()->getPage() == $page){
-        return true;
+  public function getElementIds()
+  {
+    $ids = array();
+    foreach($this->elements as $element){
+      if($element->getType() == 'element'){
+        $ids[] = $element->getElement()->getId();
       }
     }
-    return false;
-  }
-  
-  public function displayElement(Element $element) {
-    foreach($this->pages as $displayPage){
-      foreach($displayPage->getElements() as $displayElement){
-        if($displayElement->getElement() == $element){
-          return true;
-        }
-      }
-    }
-    
-    return false;
-  }
-  
-  public function showCreatedAt(){
-    $this->isCreatedAtDisplayed = true;
-  }
-  
-  public function hideCreatedAt(){
-    $this->isCreatedAtDisplayed = false;
-  }
 
-  public function isCreatedAtDisplayed() {
-    return $this->isCreatedAtDisplayed;
+    return $ids;
   }
   
-  public function showEmail(){
-    $this->isEmailDisplayed = true;
+  public function displayPage(Page $page)
+  {
+    $pageIds = $this->getPageIds();
+    return in_array($page->getId(), $pageIds);
   }
   
-  public function hideEmail(){
-    $this->isEmailDisplayed = false;
-  }
-
-  public function isEmailDisplayed() {
-    return $this->isEmailDisplayed;
-  }
-  
-  public function showFirstName(){
-    $this->isFirstNameDisplayed = true;
-  }
-  
-  public function hideFirstName(){
-    $this->isFirstNameDisplayed = false;
-  }
-
-  public function isFirstNameDisplayed() {
-    return $this->isFirstNameDisplayed;
-  }
-  
-  public function showHasPaid(){
-    $this->isHasPaidDisplayed = true;
-  }
-  
-  public function hideHasPaid(){
-    $this->isHasPaidDisplayed = false;
-  }
-
-  public function isHasPaidDisplayed() {
-    return $this->isHasPaidDisplayed;
-  }
-  
-  public function showLastLogin(){
-    $this->isLastLoginDisplayed = true;
-  }
-  
-  public function hideLastLogin(){
-    $this->isLastLoginDisplayed = false;
-  }
-
-  public function isLastLoginDisplayed() {
-    return $this->isLastLoginDisplayed;
-  }
-  
-  public function showLastName(){
-    $this->isLastNameDisplayed = true;
-  }
-  
-  public function hideLastName(){
-    $this->isLastNameDisplayed = false;
-  }
-
-  public function isLastNameDisplayed() {
-    return $this->isLastNameDisplayed;
-  }
-  
-  public function showPercentComplete(){
-    $this->isPercentCompleteDisplayed = true;
-  }
-  
-  public function hidePercentComplete(){
-    $this->isPercentCompleteDisplayed = false;
-  }
-
-  public function isPercentCompleteDisplayed() {
-    return $this->isPercentCompleteDisplayed;
-  }
-  
-  public function showUpdatedAt(){
-    $this->isUpdatedAtDisplayed = true;
-  }
-  
-  public function hideUpdatedAt(){
-    $this->isUpdatedAtDisplayed = false;
-  }
-
-  public function isUpdatedAtDisplayed() {
-    return $this->isUpdatedAtDisplayed;
-  }
-  
-  public function showIsLocked(){
-    $this->isIsLockedDisplayed = true;
-  }
-  
-  public function hideIsLocked(){
-    $this->isIsLockedDisplayed = false;
-  }
-
-  public function isIsLockedDisplayed() {
-    return $this->isIsLockedDisplayed;
+  public function displayElement(Element $element)
+  {
+    $elementIds = $this->getElementIds();
+    return in_array($element->getId(), $elementIds);
   }
 
 }

@@ -51,38 +51,30 @@ DisplayManager.prototype.drawChooser = function(){
 /**
  * Draw the displayed
  * 
- * @param {jQuery} canvas
  */
-DisplayManager.prototype.drawChosen = function(canvas){
+DisplayManager.prototype.drawChosen = function(){
   var div = $('<div>');
   div.append($('<h3>').html('Selected Items for ' + this.display.getName() + ' Display'));
   var self = this;
   var list = $('<ol>').addClass('block_list');
-  var arr = DisplayManager.listApplicantElements();
-  $.each(arr,function(){
-    if(self.display['is' + this.control + 'Displayed']()){
-      var li = $('<li>').addClass('item').html(this.title).data('page', 'applicant').data('element', this.element).data('control', this.control);
-      li.addClass('selected');
-      li.bind('click', function(){
-        self.display['hide' + $(this).data('control')]();
-        self.drawChosen();
-      });
-      list.append(li);
-    }
+  $.each(this.display.listElements(),function(){
+    var li = $('<li>').addClass('item').html(this.title).data('element', this);
+    li.prepend($('<span>').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
+    li.bind('click', function(){
+      self.drawChosen();
+    });
+    list.append(li);
   });
-
-  $.each(self.application.listApplicationPages(), function(){
-    var applicationPage = this;
-    $.each(self.application.listPageElements(applicationPage.page.id), function(){
-      if(self.display.displayElement(this.id)){
-        var li = $('<li>').addClass('item').html(this.title).data('page', applicationPage.page.id).data('element', this);
-        li.addClass('selected');
-        li.bind('click', function(){
-          self.display.removeElement($(this).data('element').id);
-          self.drawChosen();
-        });
-        list.append(li);
-      }
+  $('li',list).sort(function(a,b){
+    return $(a).data('element').weight > $(b).data('element').weight ? 1 : -1;
+  }).appendTo(list);
+  list.sortable({
+    handle: '.handle'
+  });
+  list.bind("sortupdate", function(e, ui) {
+    $('li',$(ui.item).parent()).each(function(i){
+      var element = $(this).data('element');
+      self.display.addElement(element.type, element.title, i, element.name);
     });
   });
   div.append(list);
@@ -97,42 +89,37 @@ DisplayManager.prototype.drawChosen = function(canvas){
 DisplayManager.prototype.applicantBox = function(){
   var self = this;
   var list = $('<ul>').addClass('block_list');
-  var arr = DisplayManager.listApplicantElements();
+  var arr = [
+    {title: 'First Name', name: 'firstName'},
+    {title: 'Last Name', name: 'lastName'},
+    {title: 'Email', name: 'email'},
+    {title: 'Last Update', name: 'updatedAt'},
+    {title: 'Progress', name: 'percentComplete'},
+    {title: 'Last Login', name: 'lastLogin'},
+    {title: 'Account Created', name: 'createdAt'},
+    {title: 'Locked', name: 'isLocked'},
+    {title: 'Paid', name: 'hasPaid'}
+  ];
   $.each(arr,function(){
-    var li = $('<li>').addClass('item').html(this.title).data('page', 'applicant').data('element', this.element).data('control', this.control);
-    if(self.display['is' + this.control + 'Displayed']()){
+    var li = $('<li>').addClass('item').html(this.title).data('element',this);
+    if(self.display.displayElement('applicant',this.name)){
       li.addClass('selected');
       li.bind('click', function(){
-        self.display['hide' + $(this).data('control')]();
+        self.display.removeElement('applicant',$(this).data('element').name);
         list.replaceWith(self.applicantBox());
         self.drawChosen();
       });
     } else {
       li.bind('click', function(){
-        self.display['show' + $(this).data('control')]();
+        self.display.addElement('applicant',$(this).data('element').title,self.nextWeight(),$(this).data('element').name);
         list.replaceWith(self.applicantBox());
         self.drawChosen();
       });
     }
     list.append(li);
   });
-  
   return $('<div>').append(list);
 };
-
-DisplayManager.listApplicantElements = function(){
-  return [
-    {title: 'First Name', element: 'firstName', control: 'FirstName'},
-    {title: 'Last Name', element: 'lastName', control: 'LastName'},
-    {title: 'Email', element: 'email', control: 'Email'},
-    {title: 'Last Update', element: 'updatedAt', control: 'UpdatedAt'},
-    {title: 'Progress', element: 'percentComplete', control: 'PercentComplete'},
-    {title: 'Last Login', element: 'lastLogin', control: 'LastLogin'},
-    {title: 'Account Created', element: 'createdAt', control: 'CreatedAt'},
-    {title: 'Locked', element: 'isLocked', control: 'IsLocked'},
-    {title: 'Paid', element: 'hasPaid', control: 'HasPaid'}
-  ];
-}
 
 /**
  * Draw the applicant box
@@ -156,19 +143,18 @@ DisplayManager.prototype.shrinkButton = function(title, content){
 DisplayManager.prototype.pageBox = function(applicationPage){
   var self = this;
   var list = $('<ul>').addClass('block_list');
-  var arr = DisplayManager.listApplicantElements();
   $.each(this.application.listPageElements(applicationPage.page.id), function(){
-    var li = $('<li>').addClass('item').html(this.title).data('page', applicationPage.page.id).data('element', this);
-    if(self.display.displayElement(this.id)){
+    var li = $('<li>').addClass('item').html(this.title).data('element', this);
+    if(self.display.displayElement('page', this.id)){
       li.addClass('selected');
       li.bind('click', function(){
-        self.display.removeElement($(this).data('element').id);
+        self.display.removeElement('page',$(this).data('element').id);
         list.replaceWith(self.pageBox(applicationPage));
         self.drawChosen();
       });
     } else {
       li.bind('click', function(){
-        self.display.addElement($(this).data('element').id);
+        self.display.addElement('page',$(this).data('element').title,self.nextWeight(),$(this).data('element').id);
         list.replaceWith(self.pageBox(applicationPage));
         self.drawChosen();
       });
@@ -182,7 +168,8 @@ DisplayManager.prototype.pageBox = function(applicationPage){
 /**
  * Draw the applicant box
  * 
- * @param {} applicationPage
+ * @param url string
+ * @param display Display
  */
 DisplayManager.save = function(url, display){
   $.ajax({
@@ -205,4 +192,13 @@ DisplayManager.remove = function(url, display){
     data: {display: $.toJSON(display.getObj())},
     async: false
   });
+};
+
+/**
+ * Get the weight for the next piece
+ * 
+ * @return integer
+ */
+DisplayManager.prototype.nextWeight = function(){
+  return $('#chosen li').length+1;
 };

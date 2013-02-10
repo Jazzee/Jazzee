@@ -470,5 +470,28 @@ class Element
 
     return $this->jazzeeElement;
   }
+  
+  /**
+   * Convert the object to an array
+   * 
+   * @return array
+   */
+  public function toArray()
+  {
+    $arr = array();
+    $arr['id'] = $this->id;
+    $arr['defaultValue'] = $this->defaultValue;
+    $arr['fixedId'] = $this->fixedId;
+    $arr['format'] = $this->format;
+    $arr['instructions'] = $this->instructions;
+    $arr['max'] = $this->max;
+    $arr['min'] = $this->min;
+    $arr['name'] = $this->name;
+    $arr['required'] = $this->required;
+    $arr['title'] = $this->title;
+    $arr['weight'] = $this->weight;
+
+    return $arr;
+  }
 
 }

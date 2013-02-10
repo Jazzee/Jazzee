@@ -14,6 +14,8 @@ class FullApplication implements \Jazzee\Interfaces\Display
   
   protected $_elementIds = array();
   
+  protected $_elements = array();
+  
   protected $_displayArray = array();
   
   /**
@@ -21,6 +23,22 @@ class FullApplication implements \Jazzee\Interfaces\Display
    * @param \Jazzee\Entity\Application $application
    */
   public function __construct(\Jazzee\Entity\Application $application) {
+    $applicantElements = array(
+      'firstName' => 'First Name',
+      'lastName' => 'Last Name',
+      'email' => 'Email',
+      'createdAt' => 'Created At',
+      'updatedAt' => 'Updated At',
+      'lastLogin' => 'Last Login',
+      'percentComplete' => 'Progress',
+      'isLocked' => 'Locked',
+      'hasPaid' => 'Paid'
+    );
+    $elements = array();
+    $weight = 0;
+    foreach($applicantElements as $name => $title){
+      $elements[] = new \Jazzee\Display\Element('applicant', $title, $weight++, $name);
+    }
     $pages = array();
     foreach($application->getApplicationPages() as $applicationPage){
       if(is_subclass_of($applicationPage->getPage()->getType()->getClass(), 'Jazzee\Interfaces\DataPage')){
@@ -36,6 +54,7 @@ class FullApplication implements \Jazzee\Interfaces\Display
             'title' => $element->getTitle(),
           );
           $this->_elementIds[] = $element->getId();
+          $this->_elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++);
         }
         $pages[] = $pageArr;
       }
@@ -79,6 +98,11 @@ class FullApplication implements \Jazzee\Interfaces\Display
     return $this->_elementIds;
   }
   
+  public function listElements()
+  {
+    return $this->_elements;
+  }
+  
   /**
    * Should a page be displayed
    * 
@@ -98,41 +122,5 @@ class FullApplication implements \Jazzee\Interfaces\Display
    */
   public function displayElement(\Jazzee\Entity\Element $element){
     return in_array($element->getId(), $this->_elementIds);
-  }
-
-  public function isCreatedAtDisplayed() {
-    return true;
-  }
-
-  public function isEmailDisplayed() {
-    return true;
-  }
-
-  public function isFirstNameDisplayed() {
-    return true;
-  }
-
-  public function isHasPaidDisplayed() {
-    return true;
-  }
-
-  public function isLastLoginDisplayed() {
-    return true;
-  }
-
-  public function isLastNameDisplayed() {
-    return true;
-  }
-
-  public function isPercentCompleteDisplayed() {
-    return true;
-  }
-
-  public function isUpdatedAtDisplayed() {
-    return true;
-  }
-  
-  public function isIsLockedDisplayed() {
-    return true;
   }
 }
