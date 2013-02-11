@@ -218,12 +218,6 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findArray($id, \Jazzee\Interfaces\Display $display = null)
   {
-    $cache = \Jazzee\Controller::getCache();
-    $cacheId = Applicant::ARRAY_CACHE_PREFIX . $id;
-    $cacheId .= is_null($display)?'nodisplay':$display->getId();
-    if($cache->contains($cacheId)){
-      return $cache->fetch($cacheId);
-    }
     $queryBuilder = $this->deepApplicantQuery($display);
     $queryBuilder->andWhere('applicant = :applicantId');
     $queryBuilder->setParameter('applicantId', $id);
@@ -231,7 +225,6 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $query = $queryBuilder->getQuery();
     $query->setHint(\Doctrine\ORM\Query::HINT_INCLUDE_META_COLUMNS, true);
     $applicantArray = $query->getSingleResult('ApplicantArrayHydrator');
-    $cache->save($cacheId, $applicantArray);
     return $applicantArray;
   }
   

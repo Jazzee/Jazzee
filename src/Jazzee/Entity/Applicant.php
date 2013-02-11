@@ -516,16 +516,6 @@ class Applicant
     }
     $this->percentComplete = $this->calculatePercentComplete();
     $this->hasPaid = $this->checkIfPaid();
-    $this->clearCache();
-  }
-
-  /**
-   * Delete any references to the applicant in the cache
-   * 
-   */
-  public function clearCache()
-  {
-    \Jazzee\Controller::getCache()->delete(self::ARRAY_CACHE_PREFIX . $this->id);
   }
 
   /**
