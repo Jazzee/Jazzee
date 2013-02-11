@@ -94,7 +94,7 @@ class ApplicantPDF
     }
     //This means we must check return values of load_font() etc.
     $this->pdf->set_parameter("errorpolicy", "exception");
-    $this->pdf->set_parameter("hypertextencoding", "winansi");
+    $this->pdf->set_parameter("hypertextencoding", "unicode");
 
     $this->fonts = array(
       'h1' => array('face' => 'Helvetica-Bold', 'size' => '16.0', 'leading' => '100%', 'color' => array(207, 102, 0)),
@@ -205,7 +205,7 @@ class ApplicantPDF
    */
   protected function fontOptions($type)
   {
-    return 'fontname=' . $this->fonts[$type]['face'] . ' fontsize=' . $this->fonts[$type]['size'] . ' leading=' . $this->fonts[$type]['leading'] . ' encoding=winansi fillcolor={rgb ' . $this->fonts[$type]['color'][0] / 255 . ' ' . $this->fonts[$type]['color'][1] / 255 . ' ' . $this->fonts[$type]['color'][2] / 255 . '}';
+    return 'fontname=' . $this->fonts[$type]['face'] . ' fontsize=' . $this->fonts[$type]['size'] . ' leading=' . $this->fonts[$type]['leading'] . ' encoding=unicode fillcolor={rgb ' . $this->fonts[$type]['color'][0] / 255 . ' ' . $this->fonts[$type]['color'][1] / 255 . ' ' . $this->fonts[$type]['color'][2] / 255 . '}';
   }
 
   /**
@@ -214,7 +214,7 @@ class ApplicantPDF
    */
   protected function setFont($type)
   {
-    $this->pdf->setfont($this->pdf->load_font($this->fonts[$type]['face'], "winansi", ""), $this->fonts[$type]['size']);
+    $this->pdf->setfont($this->pdf->load_font($this->fonts[$type]['face'], "unicode", ""), $this->fonts[$type]['size']);
     $this->pdf->setcolor('fillstroke', 'rgb', $this->fonts[$type]['color'][0] / 255, $this->fonts[$type]['color'][1] / 255, $this->fonts[$type]['color'][2] / 255, 0);
   }
 
@@ -225,7 +225,7 @@ class ApplicantPDF
    */
   public function addText($text, $type)
   {
-    $this->pdf->add_textflow($this->currentText, $text, $this->fontOptions($type));
+    $this->pdf->add_textflow($this->currentText, $this->pdf->utf8_to_utf16($text, ''), $this->fontOptions($type));
   }
 
   /**
@@ -318,7 +318,7 @@ class ApplicantPDF
    */
   public function addTableCell($string)
   {
-    $this->currentTable[$this->tableRow][] = $string;
+    $this->currentTable[$this->tableRow][] = $this->pdf->utf8_to_utf16($string, '');
   }
 
   /**
