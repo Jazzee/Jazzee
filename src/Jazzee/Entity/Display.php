@@ -181,7 +181,7 @@ class Display implements \Jazzee\Interfaces\Display
   {
     $ids = array();
     foreach($this->elements as $element){
-      if($element->getType() == 'element'){
+      if($element->getType() == 'page'){
         $ids[] = $element->getElement()->getId();
       }
     }

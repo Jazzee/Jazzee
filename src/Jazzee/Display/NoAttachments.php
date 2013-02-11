@@ -48,7 +48,7 @@ class NoAttachments extends FullApplication
               'title' => $element->getTitle(),
             );
             $this->_elementIds[] = $element->getId();
-            $this->_elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++);
+            $this->_elements[] = new \Jazzee\Display\Element('page', $element->getTitle(), $weight++, $element->getId());
           }
         }
         $pages[] = $pageArr;
