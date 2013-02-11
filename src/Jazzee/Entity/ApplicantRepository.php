@@ -247,7 +247,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, payment, children, answer_attachment, children_element_answers, children_publicStatus, children_privateStatus, children_payment, children_attachment');
     $expression = $queryBuilder->expr()->orX();
     //this one is the default - if there are no pages in the display then this 
-    //expression is the only one that will load and not pages will be loaded
+    //expression is the only one that will load and no pages will be loaded
     $expression->add($queryBuilder->expr()->eq("answers.page", ":nothing"));
     $queryBuilder->setParameter('nothing', 'nothing');
     foreach($display->getPageIds() as $key => $pageId){
@@ -256,8 +256,19 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
       $queryBuilder->setParameter($paramKey, $pageId);
     }
     $queryBuilder->leftJoin('applicant.answers', 'answers', 'WITH', $expression);
-   
-    $queryBuilder->leftJoin('answers.elements', 'element_answers');
+    
+    $expression = $queryBuilder->expr()->orX();
+    //this one is the default - if there are no elements in the display then this 
+    //expression is the only one that will load and no elements will be loaded
+    $expression->add($queryBuilder->expr()->eq("element_answers.element", ":nothing"));
+    $queryBuilder->setParameter('nothing', 'nothing');
+    foreach($display->getElementIds() as $key => $elementId){
+      $paramKey = 'displayElement' . $key;
+      $expression->add($queryBuilder->expr()->eq("element_answers.element", ":{$paramKey}"));
+      $queryBuilder->setParameter($paramKey, $elementId);
+    }
+    $queryBuilder->leftJoin('answers.elements', 'element_answers', 'WITH', $expression);
+
     $queryBuilder->leftJoin('answers.publicStatus', 'publicStatus');
     $queryBuilder->leftJoin('answers.privateStatus', 'privateStatus');
     $queryBuilder->leftJoin('applicant.attachments', 'attachments');
