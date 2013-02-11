@@ -101,6 +101,19 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
 
     return false;
   }
+
+  /**
+   * Find an application by applicant id
+   *
+   * @param integer applicantId
+   * @return Application
+   */
+  public function findForApplicant($applicantId)
+  {
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a JOIN a.applicants applicant WHERE applicant.id = :applicantId');
+    $query->setParameter('applicantId', $applicantId);
+    return $query->getSingleResult();
+  }
   
   /**
    * Find application as an array
