@@ -48,7 +48,9 @@ Grid.prototype.getColumns = function(){
   columns.push({
     sTitle: "Applicant",
     sWidth: '30px',
-    mData: 'applicant',
+    mData: function(obj, type, set){
+      return {lastName: obj.lastName, firstName: obj.firstName, fullName: obj.fullName, email: obj.email};
+    },
     mRender: function( data, type, full ) {
       if(type == 'sort'){
         return data.lastName + data.firstName;
@@ -82,31 +84,30 @@ Grid.prototype.getColumns = function(){
         break;
     }
   });
-  console.log(columns);
   return columns;
 };
 
 Grid.prototype.loadapps = function(applicantIds, grid){
   var self = this;
   if(applicantIds.length){
-      var limitedIds = applicantIds.splice(0, 25);
+      var limitedIds = applicantIds.splice(0, 200);
     $.post(self.controllerPath + '/getApplicants',{applicantIds: limitedIds, display: self.display.getObj()
     }, function(json){
-      $.each(json.data.result.applicants, function(i){
-        console.log(this);
-        var applicant = new ApplicantData(this);
-        var obj = applicant;
-        obj.percentComplete = Math.round(obj.percentComplete * 100);
-        obj.values = {};
+      var applicants = [];
+      var length = json.data.result.applicants.length;
+      while (length--) {
+        var applicant = new ApplicantData(json.data.result.applicants.splice(length, 1)[0]);
+        applicant.values = {};
         $.each(self.display.getApplication().listApplicationPages(), function(){
           var applicationPage = this;
           $.each(self.display.getApplication().listPageElements(applicationPage.page.id), function(){
             var element = this;
-            obj.values['element'+element.id] = applicant.getDisplayValuesForPageElement(applicationPage.page.id, element.id);
+            applicant.values['element'+element.id] = applicant.getDisplayValuesForPageElement(applicationPage.page.id, element.id);
           });
         });
-        grid.fnAddData(obj);
-      });
+        applicants.push(applicant);
+      }
+      grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();
       self.bindApplicantLinks();
       self.loadapps(applicantIds, grid);

@@ -5,7 +5,6 @@
  * @param {} obj
  */
 function ApplicantData(obj){
-  this.applicant = obj;
   for(var key in obj){
     this[key] = obj[key];
   }
@@ -15,8 +14,8 @@ function ApplicantData(obj){
  * Get answers for an applicant page
  */
 ApplicantData.prototype.getAnswersForPage = function(pageId){
-  for(var i = 0; i < this.applicant.pages.length; i++){
-      var page = this.applicant.pages[i];
+  for(var i = 0; i < this.pages.length; i++){
+      var page = this.pages[i];
     if(page.id == pageId){
 
       return page.answers;
@@ -27,10 +26,8 @@ ApplicantData.prototype.getAnswersForPage = function(pageId){
 };
 
 ApplicantData.prototype.getPage = function(pageId){
-  for(var i = 0; i < this.applicant.pages.length; i++){
-    var page = this.applicant.pages[i];
-    //        console.log("testing page id ["+page.id+":"+page["id"]+"] vs. "+pageId);
-    //        console.log("testing page id ["+page+":"+page.id+"] vs. "+pageId);
+  for(var i = 0; i < this.pages.length; i++){
+    var page = this.pages[i];
     if(page.id == pageId){
       return page;
     }
@@ -43,8 +40,8 @@ ApplicantData.prototype.getPage = function(pageId){
  * Get answers for an applicant page
  */
 ApplicantData.prototype.hasAnswersForPage = function(pageId){
-  for(var i = 0; i < this.applicant.pages.length; i++){
-      var page = this.applicant.pages[i];
+  for(var i = 0; i < this.pages.length; i++){
+      var page = this.pages[i];
     if(page.id == pageId){
       return page.answers.length > 0;
     }
@@ -60,7 +57,7 @@ ApplicantData.prototype.hasAnswersForPage = function(pageId){
  */
 ApplicantData.prototype.listTags = function(){
   var tags = [];
-  $.each(this.applicant.tags, function(){
+  $.each(this.tags, function(){
     tags.push(this.title);
   });
   
@@ -74,7 +71,7 @@ ApplicantData.prototype.listTags = function(){
  */
 ApplicantData.prototype.listTagIds = function(){
   var tags = [];
-  $.each(this.applicant.tags, function(){
+  $.each(this.tags, function(){
     tags.push(this.id);
   });
   
@@ -88,7 +85,7 @@ ApplicantData.prototype.listTagIds = function(){
  */
 ApplicantData.prototype.listTagTitles = function(){
   var tags = [];
-  $.each(this.applicant.tags, function(){
+  $.each(this.tags, function(){
     tags.push(this.title);
   });
   
@@ -104,8 +101,8 @@ ApplicantData.prototype.listTagTitles = function(){
  */
 ApplicantData.prototype.getDisplayValuesForPageElement = function(pageId, elementId){
   var values = [];
-  for(var i = 0; i < this.applicant.pages.length; i++){
-    var page = this.applicant.pages[i];
+  for(var i = 0; i < this.pages.length; i++){
+    var page = this.pages[i];
     if(page.id == pageId){
       for(var j = 0; j < page.answers.length; j++){
         var answer = page.answers[j];
