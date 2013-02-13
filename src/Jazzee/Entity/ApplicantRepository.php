@@ -234,6 +234,49 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $applicantArray = $query->getSingleResult('ApplicantArrayHydrator');
     return $applicantArray;
   }
+
+  /**
+   * All the applicants in an application
+   * @param Application $application
+   * @param \Jazzee\Interfaces\Display $display
+   * @param array $applicantIds
+   * @return array
+   */
+  public function findDisplayArrayByApplication(Application $application, \Jazzee\Interfaces\Display $display, array $applicantIds)
+  {
+    $queryBuilder = $this->deepApplicantQuery($display);
+    $queryBuilder->andWhere('applicant.application = :applicationId');
+    $queryBuilder->andWhere('applicant.deactivated=false');
+    $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
+    $queryBuilder->setParameter('applicationId', $application->getId());
+    $expression = $queryBuilder->expr()->orX();
+    foreach($applicantIds as $key => $value){
+      $paramKey = 'applicantId' . $key;
+      $expression->add($queryBuilder->expr()->eq("applicant.id", ":{$paramKey}"));
+      $queryBuilder->setParameter($paramKey, $value);
+    }
+    $queryBuilder->andWhere($expression);
+
+    $query = $queryBuilder->getQuery();
+    $query->setHint(\Doctrine\ORM\Query::HINT_INCLUDE_META_COLUMNS, true);
+    $query->setHydrationMode('ApplicantDisplayHydrator');
+    
+    $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, true);
+    $results = array();
+    $length = 20;
+    $start = 0;
+    $total = count($paginator);
+    while($total > $start){
+      $paginator->getQuery()->setMaxResults($length);
+      $paginator->getQuery()->setFirstResult($start);
+      $start += $length;      
+      foreach ($paginator as $applicant) {
+        $results[] = $applicant;
+      }
+    }
+
+    return $results;
+  }
   
   /**
    * Get a deep application query builder

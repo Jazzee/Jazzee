@@ -59,14 +59,8 @@ class ApplicantsGridController extends \Jazzee\AdminController
   public function actionGetApplicants(){
     $results = array();
     $display = $this->getDisplay($this->post['display']);
-    
-    foreach ($this->post['applicantIds'] as $id) {
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display);
-      $arr = $this->_application->formatApplicantDisplayArray($applicant, $display);
-      $arr['link'] = $this->path("applicants/single/{$arr['id']}");
-      $results[] = $arr;
-    }
-    $this->setVar('result', array('applicants' => $results));
+    $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $this->post['applicantIds']);
+    $this->setVar('result', array('applicants' => $applicants));
     $this->loadView('applicants_single/result');
   }
 

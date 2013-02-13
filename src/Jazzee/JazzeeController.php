@@ -197,6 +197,7 @@ class JazzeeController extends PageController
     $eventManager->addEventListener(array(\Doctrine\ORM\Events::onFlush), new \Jazzee\Entity\AnswerEventListener());
     $this->_em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig, $eventManager);
     $this->_em->getConfiguration()->addCustomHydrationMode('ApplicantArrayHydrator', 'Jazzee\Entity\ApplicantArrayHydrator');
+    $this->_em->getConfiguration()->addCustomHydrationMode('ApplicantDisplayHydrator', 'Jazzee\Entity\ApplicantDisplayHydrator');
   }
 
   /**

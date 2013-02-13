@@ -40,7 +40,7 @@ Grid.prototype.getColumns = function(){
     bSortable: false,
     bSearchable: false,
     sWidth: '8px',
-    mData: 'link',
+    mData: 'id',
     mRender: function( data, type, full ) {
       return '<a class="applicantlink" href="' + data + '">' + "<img src='resource/foundation/media/icons/user_go.png'>" + '</a>';
     }
@@ -90,7 +90,7 @@ Grid.prototype.getColumns = function(){
 Grid.prototype.loadapps = function(applicantIds, grid){
   var self = this;
   if(applicantIds.length){
-      var limitedIds = applicantIds.splice(0, 200);
+    var limitedIds = applicantIds.splice(0, 100);
     $.post(self.controllerPath + '/getApplicants',{applicantIds: limitedIds, display: self.display.getObj()
     }, function(json){
       var applicants = [];
@@ -169,7 +169,6 @@ Grid.prototype.bindApplicantLinks = function(){
     div.css("overflow-y", "auto");
     div.dialog({
       modal: true,
-      autoOpen: false,
       position: 'center',
       width: '90%',
       closeOnEscape: true,
@@ -178,10 +177,10 @@ Grid.prototype.bindApplicantLinks = function(){
         div.dialog("destroy").remove();
       }
     });
-    $.get($(this).attr('href'),function(html){
-      div.html(html);
-      div.dialog('open');
-    });
+//    $.get($(this).attr('href'),function(html){
+//      div.html(html);
+//    });
+    div.html('applicant data');
     return false;
   });
 };
