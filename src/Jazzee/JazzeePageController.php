@@ -91,7 +91,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     //anytime css has to go before jquery ui theme
     $this->addCss($this->path('resource/foundation/styles/anytime.css'));
     //default jquery theme
-    $this->addCss($this->path('resource/foundation/styles/jquerythemes/ui-lightness/style.css'));
+    $this->addCss('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/ui-lightness/jquery-ui.css');
 
     //our css
     $this->addCss($this->path('resource/styles/layout.css'));
