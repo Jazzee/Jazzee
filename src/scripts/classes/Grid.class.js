@@ -24,7 +24,7 @@ Grid.prototype.init = function(){
     sScrollX: "95%",
     sPaginationType: 'full_numbers',
     aaSorting: [[ 1, "asc" ]],
-    bDeferRender: true,
+    fnDrawCallback: Grid.processDraw,
     aaData: data,
     aoColumns: columns,
     bJQueryUI: true
@@ -111,7 +111,6 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       }
       grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();
-      self.bindApplicantLinks();
       self.loadapps(applicantIds, grid);
     });
   } else {
@@ -148,18 +147,22 @@ Grid.formatAnswers = function(data, type, full){
   return data.elementClass.gridData(data.data, type, full);
 };
 
+Grid.processDraw = function(){
+  Grid.bindApplicantLinks();
+  Grid.bindDialogLinks();
+};
+
 /**
  * Overlay applicants when they are clicked
  */
-Grid.prototype.bindApplicantLinks = function(){
-  $('a.applicantlink').bind('click', function(){
+Grid.bindApplicantLinks = function(){
+  $('a.applicantlink').unbind().bind('click', function(){
     var div = $('<div>');
     div.css("overflow-y", "auto");
     div.dialog({
       modal: true,
       position: 'center',
       width: '90%',
-      closeOnEscape: true,
       height: ($(window).height()*0.9),
       close: function() {
         div.dialog("destroy").remove();
@@ -169,6 +172,32 @@ Grid.prototype.bindApplicantLinks = function(){
 //      div.html(html);
 //    });
     div.html('applicant data');
+    return false;
+  });
+};
+
+/**
+ * Overlay file links when they are clicked
+ */
+Grid.bindDialogLinks = function(){
+  $('a.dialog_file').unbind().bind('click', function(){
+    var div = $('<div>');
+    div.css("overflow-y", "auto");
+    div.dialog({
+      modal: true,
+      position: 'center',
+      width: '90%',
+      height: ($(window).height()*0.8),
+      close: function() {
+        div.dialog("destroy").remove();
+      }
+    });
+    var src = $(this).attr('href');
+    var object = $('<object>').attr('data', src);
+    object.append($('<param>').attr('name', 'src').attr('value', src));
+    object.attr('height', '100%');
+    object.attr('width', '100%');
+    div.append(object);
     return false;
   });
 };

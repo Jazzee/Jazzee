@@ -435,7 +435,7 @@ JazzeeElement.prototype.gridData = function(data, type, full){
     $.each(values, function(){
       ol.append($('<li>').html(this.toString()));
     });
-    return $('<span>').append(ol).html();
+    return ol.clone().wrap('<p>').parent().html();
   }
   //forsorting and filtering return the raw data
   return values.join(' ');

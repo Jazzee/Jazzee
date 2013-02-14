@@ -166,8 +166,9 @@ class JazzeePageController extends \Foundation\VC\Controller
     $foundationPath = \Foundation\Configuration::getSourcePath();
     $virtualFoundation->addDirectory('javascript', new \Foundation\Virtual\ProxyDirectory($foundationPath . '/src/javascript'));
     $media = new \Foundation\Virtual\VirtualDirectory();
-    $media->addFile('blank.gif', new \Foundation\Virtual\RealFile('blank.gif,', $foundationPath . '/src/media/blank.gif'));
-    $media->addFile('ajax-bar.gif', new \Foundation\Virtual\RealFile('ajax-bar.gif,', $foundationPath . '/src/media/ajax-bar.gif'));
+    $media->addFile('blank.gif', new \Foundation\Virtual\RealFile('blank.gif', $foundationPath . '/src/media/blank.gif'));
+    $media->addFile('ajax-bar.gif', new \Foundation\Virtual\RealFile('ajax-bar.gif', $foundationPath . '/src/media/ajax-bar.gif'));
+    $media->addFile('default_pdf_logo.png', new \Foundation\Virtual\RealFile('default_pdf_logo.png', $foundationPath . '/src/media/default_pdf_logo.png'));
     $media->addDirectory('icons', new \Foundation\Virtual\ProxyDirectory($foundationPath . '/src/media/famfamfam_silk_icons_v013/icons'));
 
     $scripts = new \Foundation\Virtual\VirtualDirectory();

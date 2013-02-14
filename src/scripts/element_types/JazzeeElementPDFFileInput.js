@@ -80,3 +80,31 @@ JazzeeElementPDFFileInput.prototype.createInput = function(property, title){
   this.page.pageBuilder.addNumberTest(input);
   return div;
 };
+
+/**
+ * Dispaly applicant data in a grid
+ */
+JazzeeElementPDFFileInput.prototype.gridData = function(data, type, full){
+  var values = [];
+  
+  var img = $('<img>').attr('src', 'resource/foundation/media/default_pdf_logo.png').attr('title', 'Download ' + this.title + ' PDF').attr('alt', 'PDF Logo');
+  $.each(data, function(){
+    var a = $('<a>').attr('href', this.filePath).addClass('dialog_file').append(img);
+    values.push(a);
+  });
+  if(values.length == 0){
+    return '';
+  }
+  if(values.length == 1){
+    return values[0].clone().wrap('<p>').parent().html();
+  }
+  if(type == 'display'){
+    var ol = $('<ol>');
+    $.each(values, function(){
+      ol.append($('<li>').append(this));
+    });
+    return ol.clone().wrap('<p>').parent().html();
+  }
+  //forsorting and filtering return a blank 
+  return '';
+};
