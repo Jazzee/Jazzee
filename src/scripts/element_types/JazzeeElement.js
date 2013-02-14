@@ -420,10 +420,7 @@ JazzeeElement.prototype.avatar = function(){
  * Dispaly applicant data in a grid
  */
 JazzeeElement.prototype.gridData = function(data, type, full){
-  var values = [];
-  $.each(data, function(){
-    values.push(this.displayValue);
-  });
+  var values = this.getDisplayValues(data);
   if(values.length == 0){
     return '';
   }
@@ -433,10 +430,21 @@ JazzeeElement.prototype.gridData = function(data, type, full){
   if(type == 'display'){
     var ol = $('<ol>');
     $.each(values, function(){
-      ol.append($('<li>').html(this.toString()));
+      ol.append($('<li>').append(this));
     });
     return ol.clone().wrap('<p>').parent().html();
   }
   //forsorting and filtering return the raw data
   return values.join(' ');
+};
+
+/**
+ * Dispaly applicant data in a grid
+ */
+JazzeeElement.prototype.getDisplayValues = function(data){
+  var values = [];
+  $.each(data, function(){
+    values.push(this.displayValue);
+  });
+  return values;
 };
