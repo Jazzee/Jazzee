@@ -34,6 +34,23 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->addScript($this->path('resource/scripts/controllers/applicants_grid.controller.js'));
     $this->addCss($this->path('resource/styles/grid.css'));
     $this->addCss($this->path('resource/styles/displaymanager.css'));
+
+    //add all of the Jazzee element scripts for data rendering
+    $scripts = array();
+    $this->addScript($this->path('resource/scripts/element_types/JazzeeElement.js'));
+
+    $types = $this->_em->getRepository('\Jazzee\Entity\ElementType')->findAll();
+    $scripts[] = $this->path(\Jazzee\Interfaces\Element::PAGEBUILDER_SCRIPT);
+    $scripts[] = $this->path('resource/scripts/element_types/List.js');
+    $scripts[] = $this->path('resource/scripts/element_types/FileInput.js');
+    foreach ($types as $type) {
+      $class = $type->getClass();
+      $scripts[] = $this->path($class::PAGEBUILDER_SCRIPT);
+    }
+    $scripts = array_unique($scripts);
+    foreach ($scripts as $path) {
+      $this->addScript($path);
+    }
   }
 
   /**

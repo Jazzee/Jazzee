@@ -415,3 +415,28 @@ JazzeeElement.prototype.elementProperties = function(){
 JazzeeElement.prototype.avatar = function(){
   return $('<span>').html('default avatar');
 };
+
+/**
+ * Dispaly applicant data in a grid
+ */
+JazzeeElement.prototype.gridData = function(data, type, full){
+  var values = [];
+  $.each(data, function(){
+    values.push(this.displayValue);
+  });
+  if(values.length == 0){
+    return '';
+  }
+  if(values.length == 1){
+    return values[0];
+  }
+  if(type == 'display'){
+    var ol = $('<ol>');
+    $.each(values, function(){
+      ol.append($('<li>').html(this.toString()));
+    });
+    return $('<span>').append(ol).html();
+  }
+  //forsorting and filtering return the raw data
+  return values.join(' ');
+};

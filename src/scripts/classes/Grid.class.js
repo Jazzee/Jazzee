@@ -78,7 +78,7 @@ Grid.prototype.getColumns = function(){
       case 'page':
         columns.push({
           sTitle: this.title,
-          mData: 'values.element' + this.name,
+          mData: 'elements.element' + this.name,
           mRender: Grid.formatAnswers
         });
         break;
@@ -97,12 +97,14 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       var length = json.data.result.applicants.length;
       while (length--) {
         var applicant = new ApplicantData(json.data.result.applicants.splice(length, 1)[0]);
-        applicant.values = {};
+        applicant.elements = {};
         $.each(self.display.getApplication().listApplicationPages(), function(){
           var applicationPage = this;
           $.each(self.display.getApplication().listPageElements(applicationPage.page.id), function(){
-            var element = this;
-            applicant.values['element'+element.id] = applicant.getDisplayValuesForPageElement(applicationPage.page.id, element.id);
+            applicant.elements['element' + this.id] = {
+              data: applicant.getAnswersForPageElement(applicationPage.page.id, this.id),
+              elementClass: self.display.getApplication().getElementClassById(this.id)
+            };
           });
         });
         applicants.push(applicant);
@@ -140,24 +142,10 @@ Grid.formatCheckmark = function(data, type, full){
 };
 
 /**
- * Display a checkmark if true
+ * Format page element grid data
  */
 Grid.formatAnswers = function(data, type, full){
-  if(data.length == 0){
-    return '-';
-  }
-  if(data.length == 1){
-    return data[0];
-  }
-  if(type == 'display'){
-    var ol = $('<ol>');
-    $.each(data, function(){
-      ol.append($('<li>').html(this.toString()));
-    });
-    return $('<span>').append(ol).html();
-  }
-  //forsorting and filtering return the raw data
-  return data.join(' ');
+  return data.elementClass.gridData(data.data, type, full);
 };
 
 /**

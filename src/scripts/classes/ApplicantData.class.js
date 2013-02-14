@@ -99,8 +99,8 @@ ApplicantData.prototype.listTagTitles = function(){
  * 
  * @return []
  */
-ApplicantData.prototype.getDisplayValuesForPageElement = function(pageId, elementId){
-  var values = [];
+ApplicantData.prototype.getAnswersForPageElement = function(pageId, elementId){
+  var answers = [];
   for(var i = 0; i < this.pages.length; i++){
     var page = this.pages[i];
     if(page.id == pageId){
@@ -109,12 +109,12 @@ ApplicantData.prototype.getDisplayValuesForPageElement = function(pageId, elemen
         for(var k = 0; k < answer.elements.length; k++){
           var element = answer.elements[k];
           if(element.id == elementId){
-            values.push(element.displayValue);
+            answers.push(element);
           }
         }
       }
     }
   }
 
-  return values;
+  return answers;
 };
