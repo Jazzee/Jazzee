@@ -11,6 +11,7 @@ function Grid(display, applicantIds, target, controllerPath){
   this.applicantIds = applicantIds;
   this.target = target;
   this.controllerPath = controllerPath;
+  this.maxLoad = 100;
 };
 
 Grid.prototype.init = function(){
@@ -18,7 +19,17 @@ Grid.prototype.init = function(){
   var columns = this.getColumns();
   
   var data = [];
-  $('#grid').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="grid-table" width="100%"></table>' );
+  $(this.target).empty();
+  $(this.target).append($('<div>').css({
+    position: 'relative',
+    top:0,
+    left: 0,
+    width: '100%',
+    height: '500px',
+    padding: '10px 10px',
+    'z-index': 5
+  }));
+  $(this.target).append($('<table cellpadding="0" cellspacing="0" border="0" class="display" id="grid-table" width="100%"></table>' ));
   var grid = $('#grid-table').dataTable( {
     sScrollY: "500",
     sScrollX: "95%",
@@ -28,6 +39,12 @@ Grid.prototype.init = function(){
     aaData: data,
     aoColumns: columns,
     bJQueryUI: true
+  });
+  var progressbar = $('<div>').attr('id', 'progress').css('width', '250px').append($('<div>').addClass('progressLabel').css({'float': 'left','margin-left': '10px','margin-top': '5px'}).html('Loading Grid...'));
+  $('div:first', this.target).append(progressbar);
+  progressbar.progressbar({
+    max: this.applicantIds.length,
+    value: 1
   });
   this.loadapps(this.applicantIds, grid);
 };
@@ -90,7 +107,7 @@ Grid.prototype.getColumns = function(){
 Grid.prototype.loadapps = function(applicantIds, grid){
   var self = this;
   if(applicantIds.length){
-    var limitedIds = applicantIds.splice(0, 100);
+    var limitedIds = applicantIds.splice(0, self.maxLoad);
     $.post(self.controllerPath + '/getApplicants',{applicantIds: limitedIds, display: self.display.getObj()
     }, function(json){
       var applicants = [];
@@ -108,6 +125,7 @@ Grid.prototype.loadapps = function(applicantIds, grid){
           });
         });
         applicants.push(applicant);
+        $('#progress', self.target).progressbar("value", $('#progress', self.target).progressbar('value')+1);
       }
       grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();
@@ -116,6 +134,7 @@ Grid.prototype.loadapps = function(applicantIds, grid){
   } else {
     //after all of the data is loaded then fix the left column in place
     new FixedColumns(grid,  {iLeftColumns: 2});
+    $('div:first', this.target).fadeOut();
   }
 };
 
