@@ -430,7 +430,7 @@ JazzeeElement.prototype.gridData = function(data, type, full){
   if(type == 'display'){
     var ol = $('<ol>');
     $.each(values, function(){
-      ol.append($('<li>').append(this));
+      ol.append($('<li>').html(this.toString()));
     });
     return ol.clone().wrap('<p>').parent().html();
   }

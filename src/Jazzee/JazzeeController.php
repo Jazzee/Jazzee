@@ -83,7 +83,7 @@ class JazzeeController extends PageController
     }
 
     //add jquery
-    $this->addScript('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js');
+    $this->addScript('//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js');
     $this->addScript('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js');
     $this->addScript($this->path('resource/foundation/scripts/jquery.json.js'));
     $this->addScript($this->path('resource/foundation/scripts/jquery.cookie.js'));
