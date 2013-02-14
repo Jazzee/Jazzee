@@ -37,6 +37,8 @@ class EncryptedTextInput extends TextInput
     $element = parent::addToField($field);
     $filter = new \Foundation\Form\Filter\Encrypt($element, $this->_pki);
     $element->addFilter($filter);
+
+    return $element;
   }
 
   public function getElementAnswers($input)
