@@ -20,17 +20,11 @@ Grid.prototype.init = function(){
   
   var data = [];
   $(this.target).empty();
-  $(this.target).append($('<div>').css({
-    position: 'relative',
-    top:0,
-    left: 0,
-    width: '100%',
-    height: '500px',
-    padding: '10px 10px',
-    'z-index': 5
-  }));
-  $(this.target).append($('<table cellpadding="0" cellspacing="0" border="0" class="display" id="grid-table" width="100%"></table>' ));
-  var grid = $('#grid-table').dataTable( {
+  $(this.target).addClass('applicant_grid');
+  $(this.target).append($('<div>').addClass('overlay'));
+  var table = $('<table>').addClass('grid');
+  $(this.target).append(table);
+  var grid = table.dataTable( {
     sScrollY: "500",
     sScrollX: "95%",
     sPaginationType: 'full_numbers',
@@ -40,8 +34,8 @@ Grid.prototype.init = function(){
     aoColumns: columns,
     bJQueryUI: true
   });
-  var progressbar = $('<div>').attr('id', 'progress').css('width', '250px').append($('<div>').addClass('progressLabel').css({'float': 'left','margin-left': '10px','margin-top': '5px'}).html('Loading Grid...'));
-  $('div:first', this.target).append(progressbar);
+  var progressbar = $('<div>').addClass('progress').append($('<div>').addClass('label').html('Loading Grid...'));
+  $('div.overlay', this.target).append(progressbar);
   progressbar.progressbar({
     max: this.applicantIds.length,
     value: 1
@@ -125,7 +119,7 @@ Grid.prototype.loadapps = function(applicantIds, grid){
           });
         });
         applicants.push(applicant);
-        $('#progress', self.target).progressbar("value", $('#progress', self.target).progressbar('value')+1);
+        $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
       }
       grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();
