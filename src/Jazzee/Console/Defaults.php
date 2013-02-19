@@ -8,7 +8,7 @@ namespace Jazzee\Console;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-class Install extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand
+class Defaults extends \Symfony\Component\Console\Command\Command
 {
 
   /**
@@ -18,27 +18,19 @@ class Install extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateComma
   protected function configure()
   {
     $this
-            ->setName('install')
-            ->setDescription('Install the database')
-            ->setHelp('Installs a new jazzee dataabse and default components.');
+      ->setName('defaults')
+      ->setDescription('Installs default components')
+      ->setHelp('Create all of the necessary default pages,elements,roles,etc');
   }
 
   /**
-   * @see Console\Command\Command
    * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    * @SuppressWarnings(PHPMD.ExitExpression)
    */
-  protected function executeSchemaCommand(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output, \Doctrine\ORM\Tools\SchemaTool $schemaTool, array $metadatas)
+  protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output)
   {
-    $schemaManager = $this->getHelper('em')->getEntityManager()->getConnection()->getSchemaManager();
-    $tables = $schemaManager->listTableNames();
-    if (!empty($tables)) {
-      $output->write('<error>ATTENTION: You are attempting to install jazzee on a database that is not empty..</error>' . PHP_EOL . PHP_EOL);
-      exit(1);
-    }
-    $output->write('<comment>Creating database schema and installing default components...</comment>' . PHP_EOL);
-    $schemaTool->createSchema($metadatas);
-    $output->write('<info>Database schema created successfully</info>' . PHP_EOL);
+    $entityManager = $this->getHelper('em')->getEntityManager();
+    $output->write('<comment>Installing default components...</comment>' . PHP_EOL);
     $pageTypes = array(
       '\Jazzee\Page\Branching' => 'Branching',
       '\Jazzee\Page\ETSMatch' => 'ETS Score Matching',
@@ -52,9 +44,9 @@ class Install extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateComma
       $pageType = new \Jazzee\Entity\PageType();
       $pageType->setName($name);
       $pageType->setClass($class);
-      $this->getHelper('em')->getEntityManager()->persist($pageType);
+      $entityManager->persist($pageType);
     }
-    $this->getHelper('em')->getEntityManager()->flush();
+    $entityManager->flush();
     $output->write('<info>Default Page types added</info>' . PHP_EOL);
 
     $elementTypes = array(
@@ -75,16 +67,15 @@ class Install extends \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateComma
       $elementType = new \Jazzee\Entity\ElementType();
       $elementType->setName($name);
       $elementType->setClass($class);
-      $this->getHelper('em')->getEntityManager()->persist($elementType);
+      $entityManager->persist($elementType);
     }
-    $this->getHelper('em')->getEntityManager()->flush();
+    $entityManager->flush();
     $output->write('<info>Default Element types added</info>' . PHP_EOL);
 
-    $entityManager = $this->getHelper('em')->getEntityManager();
     $role = new \Jazzee\Entity\Role();
     $role->makeGlobal();
-    $entityManager->persist($role);
     $role->setName('Administrator');
+    $entityManager->persist($role);
     \Foundation\VC\Config::addControllerPath(__DIR__ . '/../../controllers/');
     foreach (array('admin', 'applicants', 'manage', 'scores', 'setup') as $path) {
       $path = \realpath(__DIR__ . '/../../controllers/' . $path);

@@ -9,8 +9,8 @@ foreach ($helpers as $name => $helper) {
 }
 
 $cli->addCommands(array(
-  new \Jazzee\Console\Install(),
   new \Jazzee\Console\Update(),
+  new \Jazzee\Console\Defaults(),
   new \Jazzee\Console\AddUser(),
   new \Jazzee\Console\FindUser(),
   new \Jazzee\Console\UserRole(),
@@ -18,12 +18,6 @@ $cli->addCommands(array(
   new \Jazzee\Console\Preflight(),
   new \Jazzee\Console\MailLogs(),
   new \Jazzee\Console\CreateDemo(),
-  new \Jazzee\Console\Scramble(),
-  new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand(),
-  new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
-  new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
-  new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
-  new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
-  new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
+  new \Jazzee\Console\Scramble()
 ));
 $cli->run();

@@ -64,8 +64,9 @@ change to the JAZZEESRC/setup directory and run these.
 
 First build the database and set everything up::
 
-  $./setup install
-  Creating database schema and installing default components...
+  $./setup update
+  $./setup defaults
+  Installing default components...
   Database schema created successfully
   Default Page types added
   Default Element types added
