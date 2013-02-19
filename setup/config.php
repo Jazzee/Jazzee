@@ -44,7 +44,8 @@ try{
 }
 $helpers = array(
     'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($em->getConnection()),
-    'em' => new \Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper($em)
+    'em' => new \Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper($em),
+    'dialog' => new \Symfony\Component\Console\Helper\DialogHelper(),
 );
 
 /**

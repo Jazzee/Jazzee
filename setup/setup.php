@@ -19,6 +19,11 @@ $cli->addCommands(array(
   new \Jazzee\Console\MailLogs(),
   new \Jazzee\Console\CreateDemo(),
   new \Jazzee\Console\Scramble(),
-
+  new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand(),
+  new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
+  new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
+  new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
+  new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
+  new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
 ));
 $cli->run();
