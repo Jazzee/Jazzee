@@ -8,9 +8,6 @@ class Version20130101000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
 {
     public function up(\Doctrine\DBAL\Schema\Schema $schema)
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        
-        // Create table: answers
         $table = $schema->createTable('answers');
         $table->addColumn('id', 'bigint', array('autoincrement' => true));
         $table->addColumn('applicant_id', 'bigint', array(
@@ -316,7 +313,16 @@ class Version20130101000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
             'precision' => 10,
             'notNull' => false,
         ));
+        $table->addColumn('attributes', 'array', array());
         $table->addColumn('name', 'string', array('length' => 255));
+        $table->addColumn('isFirstNameDislayed', 'boolean', array());
+        $table->addColumn('isLastNameDislayed', 'boolean', array());
+        $table->addColumn('isEmailDislayed', 'boolean', array());
+        $table->addColumn('isCreatedAtDislayed', 'boolean', array());
+        $table->addColumn('isUpdatedAtDislayed', 'boolean', array());
+        $table->addColumn('isLastLoginDislayed', 'boolean', array());
+        $table->addColumn('isPercentCompleteDislayed', 'boolean', array());
+        $table->addColumn('isHasPaidDislayed', 'boolean', array());
         $table->addIndex(array('user_id'), 'IDX_54DDEC2BA76ED395');
         $table->addIndex(array('application_id'), 'IDX_54DDEC2B3E030ACD');
         $table->setPrimaryKey(array('id'), 'primary');
@@ -326,7 +332,7 @@ class Version20130101000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
         // Create table: display_elements
         $table = $schema->createTable('display_elements');
         $table->addColumn('id', 'bigint', array('autoincrement' => true));
-        $table->addColumn('display_id', 'bigint', array(
+        $table->addColumn('page_id', 'bigint', array(
             'precision' => 10,
             'notNull' => false,
         ));
@@ -334,18 +340,30 @@ class Version20130101000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
             'precision' => 10,
             'notNull' => false,
         ));
-        $table->addColumn('type', 'string', array('length' => 255));
-        $table->addColumn('title', 'string', array('length' => 255));
-        $table->addColumn('name', 'string', array(
-            'length' => 255,
-            'notNull' => false,
-        ));
-        $table->addColumn('weight', 'integer', array());
-        $table->addIndex(array('display_id'), 'IDX_23A0A27351A2DF33');
+        $table->addColumn('attributes', 'array', array());
+        $table->addIndex(array('page_id'), 'IDX_23A0A273C4663E4');
         $table->addIndex(array('element_id'), 'IDX_23A0A2731F1F2A24');
         $table->setPrimaryKey(array('id'), 'primary');
-        $table->addForeignKeyConstraint('displays', array('display_id'), array('id'), array('onDelete' => 'CASCADE'), 'FK_23A0A27351A2DF33');
+        $table->addForeignKeyConstraint('display_pages', array('page_id'), array('id'), array('onDelete' => 'CASCADE'), 'FK_23A0A273C4663E4');
         $table->addForeignKeyConstraint('elements', array('element_id'), array('id'), array('onDelete' => 'CASCADE'), 'FK_23A0A2731F1F2A24');
+        
+        // Create table: display_pages
+        $table = $schema->createTable('display_pages');
+        $table->addColumn('id', 'bigint', array('autoincrement' => true));
+        $table->addColumn('display_id', 'bigint', array(
+            'precision' => 10,
+            'notNull' => false,
+        ));
+        $table->addColumn('attributes', 'array', array());
+        $table->addColumn('applicationPage_id', 'bigint', array(
+            'precision' => 10,
+            'notNull' => false,
+        ));
+        $table->addIndex(array('display_id'), 'IDX_2124FE9E51A2DF33');
+        $table->addIndex(array('applicationPage_id'), 'IDX_2124FE9E8AFBB13E');
+        $table->setPrimaryKey(array('id'), 'primary');
+        $table->addForeignKeyConstraint('displays', array('display_id'), array('id'), array('onDelete' => 'CASCADE'), 'FK_2124FE9E51A2DF33');
+        $table->addForeignKeyConstraint('application_pages', array('applicationPage_id'), array('id'), array('onDelete' => 'CASCADE'), 'FK_2124FE9E8AFBB13E');
         
         // Create table: duplicates
         $table = $schema->createTable('duplicates');
