@@ -7,6 +7,7 @@ namespace Jazzee\Entity;
  */
 class ApplicantDisplayHydrator extends ApplicantArrayHydrator
 {
+  private static $_applications = array();
   /**
    * Hydrate applicant records
    * 
@@ -18,13 +19,12 @@ class ApplicantDisplayHydrator extends ApplicantArrayHydrator
   public function hydrateAll($stmt, $resultSetMapping, array $hints = array()) 
   {
     $result = parent::hydrateAll($stmt, $resultSetMapping, $hints);
-    $applications = array();
     foreach($result as $key => $applicant){
       $applicationId = $applicant['application_id'];
-      if(!array_key_exists($applicationId, $applications)){
-        $applications[$applicationId] = $this->_em->getRepository('Jazzee\Entity\Application')->find($applicationId);
+      if(!array_key_exists($applicationId, self::$_applications)){
+        self::$_applications[$applicationId] = $this->_em->getRepository('Jazzee\Entity\Application')->find($applicationId);
       }
-      $result[$key] = $applications[$applicationId]->formatApplicantDisplayArray($applicant);
+      $result[$key] = self::$_applications[$applicationId]->formatApplicantDisplayArray($applicant);
     }
     
     return $result;

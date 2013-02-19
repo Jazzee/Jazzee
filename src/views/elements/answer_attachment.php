@@ -9,18 +9,15 @@ if ($attachment = $answer->getAttachment()) {
   $base = str_replace(array('/', '\\'),'slash' , $base);
   $pdfName = $base . '.pdf';
   $pngName = $base . 'preview.png';
-  if (!$pdfFile = \Jazzee\Globals::getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
-    \Jazzee\Globals::storeFile($pdfName, $attachment->getAttachment());
-  }
-  if (!$pngFile = \Jazzee\Globals::getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
-    $blob = $attachment->getThumbnail();
-    if (empty($blob)) {
-      $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-    }
-    \Jazzee\Globals::storeFile($pngName, $blob);
+  \Jazzee\Globals::getFileStore()->createSessionFile($pdfName, $attachment->getAttachmentHash());
+  if($attachment->getThumbnailHash() != null){
+    \Jazzee\Globals::getFileStore()->createSessionFile($pngName, $attachment->getThumbnailHash());
+    $thumbnailPath = \Jazzee\Globals::path('file/' . \urlencode($pngName));
+  } else {
+    $thumbnailPath = \Jazzee\Globals::path('resource/foundation/media/default_pdf_logo.png');
   }
   ?>
-  <a href="<?php print $this->path('file/' . \urlencode($pdfName)); ?>"><img src="<?php print $this->path('file/' . \urlencode($pngName)); ?>" /></a>
+  <a href="<?php print $this->path('file/' . \urlencode($pdfName)); ?>"><img src="<?php print $thumbnailPath; ?>" /></a>
   <?php if ($this->controller->checkIsAllowed('applicants_single', 'deleteAnswerPdf')) { ?>
     <br /><a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswerPdf/' . $answer->getId()); ?>' class='action'>Delete PDF</a><?php
   }

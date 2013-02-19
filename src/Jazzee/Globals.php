@@ -17,6 +17,18 @@ class Globals
   protected $_jazzeeConfiguration;
   
   /**
+   * The Jazzee entity manager
+   * @var \Doctrine\ORM\EntityManager
+   */
+  protected $_entityManager;
+  
+  /**
+   *
+   * @var \Jazzee\FileStore
+   */
+  protected $_fileStore;
+  
+  /**
    * This instance
    * @var \Jazzee\Global
    */
@@ -26,8 +38,11 @@ class Globals
    * Protected constructor for singleton
    * 
    */
-  protected function __construct(){
-    $this->_jazzeeConfiguration = new \Jazzee\Configuration();
+  protected function __construct()
+  {
+      $this->_jazzeeConfiguration = null;
+      $this->_entityManager = null;
+      $this->_fileStore = null;
   }
   
   /**
@@ -48,58 +63,58 @@ class Globals
    * @return \Jazzee\Configuration
    */
   public function getConfig(){
+    if(is_null($this->_jazzeeConfiguration)){
+      throw new \Jazzee\Exception('Attempted to get the configuration from \Jazzee\Globals before it was set.');
+    }
     return $this->_jazzeeConfiguration;
   }
-
+  
   /**
-   * Store a file
-   *
-   * @param string $filename
-   * @param blob $blob
+   * Get the entity manager
+   * @return \Doctrine\ORM\EntityManager
    */
-  public static function storeFile($filename, $blob)
+  public function getEntityManager()
   {
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-    $safeName = md5($filename);
-    file_put_contents(\Jazzee\Globals::getInstance()->getConfig()->getVarPath() . '/tmp/' . $safeName . '.' . $ext, $blob);
-    $session = new \Foundation\Session();
-    $store = $session->getStore('files');
-    $store->set($safeName, $filename);
-  }
-
-  /**
-   * Get a stored file
-   *
-   * @param string $filename
-   * @return \Foundation\Virtual\RealFile
-   */
-  public static function getStoredFile($filename)
-  {
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-    $safeName = md5($filename);
-    $path = \Jazzee\Globals::getInstance()->getConfig()->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
-    $session = new \Foundation\Session();
-    $store = $session->getStore('files');
-    if (is_readable($path) and $store->check($safeName) and $store->get($safeName) == $filename) {
-      return new \Foundation\Virtual\RealFile($filename, $path);
+    if(is_null($this->_entityManager)){
+      throw new \Jazzee\Exception('Attempted to get the entity manager from \Jazzee\Globals before it was set.');
     }
-
-    return false;
+    return $this->_entityManager;
   }
-
+  
   /**
-   * Remove a stored file
-   *
-   * @param string $filename
+   * Set the configuration
+   * @param \Jazzee\Configuration $config
    */
-  public static function removeStoredFile($filename)
+  protected function setThisConfig(\Jazzee\Configuration $config)
   {
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-    $safeName = md5($filename);
-    $path = \Jazzee\Globals::getInstance()->getConfig()->getVarPath() . '/tmp/' . $safeName . '.' . $ext;
-    if (is_writable($path)) {
-      unlink($path);
-    }
+    $this->_jazzeeConfiguration = $config;
+  }
+  
+  /**
+   * Set the entity manager
+   * @param \Doctrine\ORM\EntityManager $entityManager
+   */
+  protected function setThisEntityManager(\Doctrine\ORM\EntityManager $entityManager)
+  {
+    $this->_entityManager = $entityManager;
+  }
+  
+  /**
+   * Set the configuration
+   * @param \Jazzee\Configuration $config
+   */
+  public static function setConfig(\Jazzee\Configuration $config)
+  {
+    \Jazzee\Globals::getInstance()->setThisConfig($config);
+  }
+  
+  /**
+   * Set the entity manager
+   * @param \Doctrine\ORM\EntityManager $entityManager
+   */
+  public static function setEntityManager(\Doctrine\ORM\EntityManager $entityManager)
+  {
+    \Jazzee\Globals::getInstance()->setThisEntityManager($entityManager);
   }
 
   /**
@@ -111,5 +126,19 @@ class Globals
   public static function path($path)
   {
     return rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\.') . '/' . $path;
+  }
+
+  public static function getFileStore()
+  {
+    return \Jazzee\Globals::getInstance()->getThisFileStore();
+  }
+
+  protected function getThisFileStore()
+  {
+    if(is_null($this->_fileStore)){
+      $this->_fileStore = new \Jazzee\FileStore($this->_entityManager, $this->_jazzeeConfiguration->getVarPath() . '/cache/');
+    }
+
+    return $this->_fileStore;
   }
 }

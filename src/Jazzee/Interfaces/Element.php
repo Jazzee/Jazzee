@@ -45,6 +45,13 @@ interface Element
   function getElementAnswers($input);
 
   /**
+   * Remove element answers
+   *
+   * @param \Jazzee\Entity\ElementAnswer $elementAnswer
+   */
+  function removeElementAnswer(\Jazzee\Entity\ElementAnswer $elementAnswer);
+
+  /**
    * Get the value of the element formated for display
    *
    * @param \Jazzee\Entity\Answer $answer

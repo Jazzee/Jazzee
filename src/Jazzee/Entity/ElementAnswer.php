@@ -7,6 +7,7 @@ namespace Jazzee\Entity;
  * In cases where there are multiple answers (like checkboxes) a single answer gets multiple rows by position
  *
  * @Entity(repositoryClass="\Jazzee\Entity\ElementAnswerRepository")
+ * @HasLifecycleCallbacks
  * @Table(name="element_answers")
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
@@ -243,6 +244,15 @@ class ElementAnswer
   public function getAnswer()
   {
     return $this->answer;
+  }
+
+  /**
+   * Ensure any special elemetn actions get taken
+   * @PreRemove
+   */
+  public function preRemove()
+  {
+    $this->element->getJazzeeElement()->removeElementAnswer($this);
   }
 
 }

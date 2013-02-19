@@ -34,11 +34,11 @@ class Attachment
    */
   private $applicant;
 
-  /** @Column(type="text") */
-  private $attachment;
+  /** @Column(type="string", length=128) */
+  private $attachmentHash;
 
-  /** @Column(type="text", nullable=true) */
-  private $thumbnail;
+  /** @Column(type="string", length=128, nullable=true) */
+  private $thumbnailHash;
 
   /**
    * Get id
@@ -93,7 +93,7 @@ class Attachment
    */
   public function setAttachment($blob)
   {
-    $this->attachment = base64_encode($blob);
+    $this->attachmentHash = \Jazzee\Globals::getFileStore()->storeFile($blob);
   }
 
   /**
@@ -103,7 +103,7 @@ class Attachment
    */
   public function getAttachment()
   {
-    return base64_decode($this->attachment);
+    return \Jazzee\Globals::getFileStore()->getFileContents($this->attachmentHash);
   }
 
   /**
@@ -113,7 +113,7 @@ class Attachment
    */
   public function setThumbnail($blob)
   {
-    $this->thumbnail = base64_encode($blob);
+    $this->thumbnailHash = \Jazzee\Globals::getFileStore()->storeFile($blob);
   }
 
   /**
@@ -123,11 +123,38 @@ class Attachment
    */
   public function getThumbnail()
   {
-    if ($this->thumbnail) {
-      return base64_decode($this->thumbnail);
+    if ($this->thumbnailHash) {
+      return \Jazzee\Globals::getFileStore()->getFileContents($this->thumbnailHash);
     }
 
     return false;
+  }
+  
+  /**
+   * Get the attachment hash
+   * @return string
+   */
+  public function getAttachmentHash(){
+    return $this->attachmentHash;
+  }
+  
+  /**
+   * Get the thumbnail hash
+   * @return string
+   */
+  public function getThumbnailHash(){
+    return $this->thumbnailHash;
+  }
+  
+  /**
+   * Remove any attachmetn file pointers
+   * @PreRemove
+   */
+  public function preRemove(){
+    if ($this->thumbnailHash) {
+      \Jazzee\Globals::getFileStore()->removeFile($this->thumbnailHash);
+    }
+    \Jazzee\Globals::getFileStore()->removeFile($this->attachmentHash);
   }
 
 }

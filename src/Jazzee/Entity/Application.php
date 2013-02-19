@@ -813,45 +813,24 @@ class Application
   public function formatApplicantDisplayArray(array $applicant)
   {
     $applicant = $this->formatApplicantArray($applicant);
-
-    foreach($applicant['attachments'] as $key => $arr){
-      $arr['filePath'] = false;
-      $arr['thumbnailPath'] = false;
-      $base = $applicant['fullName'] . '_attachment_' . '_' . $arr['id'];
+    $fileStore = \Jazzee\Globals::getFileStore();
+    foreach($applicant['attachments'] as $key => $attachment){
+      $base = $applicant['fullName'] . '_attachment_' . '_' . $attachment['id'];
       //remove slashes in path to fix an apache issues with encoding slashes in redirects
       $base = str_replace(array('/', '\\'),'slash' , $base);
-
       $name = $base . '.pdf';
-      \Jazzee\Globals::storeFile($name, base64_decode($arr['attachment']));
-      $arr['filePath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
-
-      $name = $base . '.png';
-      $blob = $arr['thumbnail'];
-      if (empty($blob)) {
-        $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+      $fileStore->createSessionFile($name, $attachment['attachmentHash']);
+      $attachment['filePath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
+      if ($attachment['thumbnailHash'] != null) {
+        $name = $base . '.png';
+        $fileStore->createSessionFile($name, $attachment['thumbnailHash']);
+        $attachment['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
       } else {
-        $blob = base64_decode($blob);
+        $attachment['thumbnailPath'] = \Jazzee\Globals::path('resource/foundation/media/default_pdf_logo.png');
       }
-      \Jazzee\Globals::storeFile($name, $blob);
-      $arr['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
-      $arr['displayValue'] = "<a href='{$arr['filePath']}'><img src='{$arr['thumbnailPath']}' /></a>";
-      unset($arr['attachment']);
-      unset($arr['thumbnail']);
-      $applicant['attachments'][$key] = $arr;
+      $attachment['displayValue'] = "<a href='{$attachment['filePath']}'><img src='{$attachment['thumbnailPath']}' /></a>";
+      $applicant['attachments'][$key] = $attachment;
     }
-    
-    foreach($applicant['pages'] as $pageKey => $page){
-      foreach($page['answers'] as $answerKey => $answer){
-        if($applicant['pages'][$pageKey]['answers'][$answerKey]['attachment']){
-          unset($applicant['pages'][$pageKey]['answers'][$answerKey]['attachment']['attachment']);
-          unset($applicant['pages'][$pageKey]['answers'][$answerKey]['attachment']['thumbnail']);
-        }
-        foreach($answer['elements'] as $elementKey => $element){
-          unset($applicant['pages'][$pageKey]['answers'][$answerKey]['elements'][$elementKey]['values']);
-        }
-      }
-    }
-
     return $applicant;
   }
 

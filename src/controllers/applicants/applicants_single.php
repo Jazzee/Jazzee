@@ -209,20 +209,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController
       $base = str_replace(array('/', '\\'),'slash' , $base);
       $pdfName = $base . '.pdf';
       $pngName = $base . 'preview.png';
-      if (!$pdfFile = \Jazzee\Globals::getStoredFile($pdfName) or $pdfFile->getLastModified() < $applicant->getUpdatedAt()) {
-        \Jazzee\Globals::storeFile($pdfName, $attachment->getAttachment());
-      }
-      if (!$pngFile = \Jazzee\Globals::getStoredFile($pngName) or $pngFile->getLastModified() < $applicant->getUpdatedAt()) {
-        $blob = $attachment->getThumbnail();
-        if (empty($blob)) {
-          $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-        }
-        \Jazzee\Globals::storeFile($pngName, $blob);
+      \Jazzee\Globals::getFileStore()->createSessionFile($pdfName, $attachment->getAttachmentHash());
+      if($attachment->getThumbnailHash() != null){
+        \Jazzee\Globals::getFileStore()->createSessionFile($pngName, $attachment->getThumbnailHash());
+        $thumbnailPath = \Jazzee\Globals::path('file/' . \urlencode($pngName));
+      } else {
+        $thumbnailPath = \Jazzee\Globals::path('resource/foundation/media/default_pdf_logo.png');
       }
       $attachments['attachments'][] = array(
         'id' => $attachment->getId(),
         'filePath' => $this->path('file/' . \urlencode($pdfName)),
-        'previewPath' => $this->path('file/' . \urlencode($pngName))
+        'previewPath' => $this->path('file/' . $thumbnailPath)
       );
     }
 
@@ -1524,13 +1521,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController
         $attachment->setThumbnail($thumbnailBlob);
         $imagick->clear();
         $cron->getEntityManager()->persist($attachment);
-        if ($attachment->getAnswer()) {
-          $pngName = $attachment->getAnswer()->getPage()->getTitle() . '_attachment_' . $attachment->getAnswer()->getId() . 'preview.png';
-          \Jazzee\Globals::removeStoredFile($pngName);
-        } else {
-          $pngName = $attachment->getApplicant()->getFullName() . '_attachment_' . $attachment->getId() . 'preview.png';
-          \Jazzee\Globals::removeStoredFileremoveStoredFile($pngName);
-        }
       }
       unset($imagick);
       if ($total) {

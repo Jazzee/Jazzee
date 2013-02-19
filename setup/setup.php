@@ -18,6 +18,7 @@ $cli->addCommands(array(
   new \Jazzee\Console\Preflight(),
   new \Jazzee\Console\MailLogs(),
   new \Jazzee\Console\CreateDemo(),
-  new \Jazzee\Console\Scramble()
+  new \Jazzee\Console\Scramble(),
+  new \Jazzee\Console\SeedFilesCache()
 ));
 $cli->run();

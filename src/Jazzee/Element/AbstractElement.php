@@ -189,4 +189,13 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
     return array();
   }
 
+  /**
+   * By default no special processing needs to take place when removing element answers
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  public function removeElementAnswer(\Jazzee\Entity\ElementAnswer $elementAnswer)
+  {
+    return;
+  }
+
 }

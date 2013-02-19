@@ -57,4 +57,25 @@ class AnswerEventListener
       }
     }
   }
+  
+  /**
+   * When element answers are deleted they need to notify thier jazzee elements
+   * 
+   * @param \Doctrine\ORM\Event\OnFlushEventArgs $eventArgs
+   */
+  public function preRemove(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
+  {
+    switch(get_class($eventArgs->getEntity())){
+      case 'Jazzee\Entity\Answer':
+        $answer = $eventArgs->getEntity();
+        foreach($answer->getElementAnswers() as $elementAnswer){
+          $elementAnswer->preRemove();
+        }
+        if($attachment = $answer->getAttachment()){
+          $attachment->preRemove();
+        }
+        break;
+    }
+  }
+  
 }

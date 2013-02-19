@@ -315,26 +315,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     foreach ($children as $child) {
       $answer['children'][] = $this->arrayAnswer($child, $page->getChildById($child['page_id']));
     }
-    if($answer['attachment']){
-      $base = $this->_applicationPage->getTitle() . '_attachment_' . '_' . $answer['id'];
-      //remove slashes in path to fix an apache issues with encoding slashes in redirects
-      $base = str_replace(array('/', '\\'),'slash' , $base);
 
-      $name = $base . '.pdf';
-      \Jazzee\Globals::storeFile($name, base64_decode($answer['attachment']['attachment']));
-      $answer['attachment']['filePath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
-
-      $name = $base . '.png';
-      $blob = $answer['attachment']['thumbnail'];
-      if (empty($blob)) {
-        $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-      } else {
-        $blob = base64_decode($blob);
-      }
-      \Jazzee\Globals::storeFile($name, $blob);
-      $answer['attachment']['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
-      $answer['attachment']['displayValue'] = "<a href='{$answer['attachment']['filePath']}'><img src='{$answer['attachment']['thumbnailPath']}' /></a>";
-    }
     return $answer;
   }
   

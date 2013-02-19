@@ -284,6 +284,8 @@ class JazzeePageController extends \Foundation\VC\Controller
     }
 
     $this->_serverPath = $protocol . '://' . $_SERVER['SERVER_NAME'] . $port;
+
+    \Jazzee\Globals::setConfig($this->_config);
   }
 
   /**

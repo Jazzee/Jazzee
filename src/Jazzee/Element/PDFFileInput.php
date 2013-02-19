@@ -50,10 +50,11 @@ class PDFFileInput extends AbstractElement
   {
     $elementAnswers = array();
     if (!is_null($input)) {
+      $fileHash = \Jazzee\Globals::getFileStore()->storeFile($input);
       $elementAnswer = new \Jazzee\Entity\ElementAnswer;
       $elementAnswer->setElement($this->_element);
       $elementAnswer->setPosition(0);
-      $elementAnswer->setEBlob($input);
+      $elementAnswer->setEShortString($fileHash);
       $elementAnswers[] = $elementAnswer;
 
       $elementAnswer = new \Jazzee\Entity\ElementAnswer;
@@ -74,18 +75,15 @@ class PDFFileInput extends AbstractElement
       $base = str_replace(array('/', '\\'),'slash' , $base);
       $pdfName = $base . '.pdf';
       $pngName = $base . 'preview.png';
-      if (!$pdfFile = \Jazzee\Globals::getStoredFile($pdfName) or $pdfFile->getLastModified() < $answer->getUpdatedAt()) {
-        \Jazzee\Globals::storeFile($pdfName, $elementAnswers[0]->getEBlob());
-      }
-      if (!$pngFile = \Jazzee\Globals::getStoredFile($pngName) or $pngFile->getLastModified() < $answer->getUpdatedAt()) {
-        $blob = $elementAnswers[1]->getEBlob();
-        if (empty($blob)) {
-          $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-        }
-        \Jazzee\Globals::storeFile($pngName, $blob);
+      \Jazzee\Globals::getFileStore()->createSessionFile($pdfName, $elementAnswers[0]->getEShortString());
+      if($elementAnswers[1]->getEShortString() != null){
+        \Jazzee\Globals::getFileStore()->createSessionFile($pngName, $elementAnswers[0]->getEShortString());
+        $thumbnailPath = \Jazzee\Globals::path('file/' . \urlencode($pngName));
+      } else {
+        $thumbnailPath = \Jazzee\Globals::path('resource/foundation/media/default_pdf_logo.png');
       }
 
-      return '<a href="' . $this->_controller->path('file/' . \urlencode($pdfName)) . '"><img src="' . $this->_controller->path('file/' . \urlencode($pngName)) . '" /></a>';
+      return '<a href="' . $this->_controller->path('file/' . \urlencode($pdfName)) . '"><img src="' . $thumbnailPath . '" /></a>';
     }
 
     return null;
@@ -108,34 +106,29 @@ class PDFFileInput extends AbstractElement
     foreach($elementAnswers as $elementAnswer){
       $arr['values'][] = $this->arrayValue($elementAnswer);
     }
-    
     if($arr['values'][0]['value']){
       $base = $this->_element->getTitle() . '_' . $elementAnswer['id'];
       //remove slashes in path to fix an apache issues with encoding slashes in redirects
       $base = str_replace(array('/', '\\'),'slash' , $base);
 
       $name = $base . '.pdf';
-      \Jazzee\Globals::storeFile($name, base64_decode($arr['values'][0]['value']));
+      \Jazzee\Globals::getFileStore()->createSessionFile($name, $arr['values'][0]['value']);
       $arr['filePath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
-
-      $name = $base . '.png';
-      $blob = $arr['values'][1]['value'];
-      if (empty($blob)) {
-        $blob = file_get_contents(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
+      if (!empty($arr['values'][1]['value'])) {
+        $name = $base . '.png';
+        \Jazzee\Globals::getFileStore()->createSessionFile($name, $arr['values'][1]['value']);
+        $arr['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
       } else {
-        $blob = base64_decode($blob);
+        $arr['thumbnailPath'] = \Jazzee\Globals::path('resource/foundation/media/default_pdf_logo.png');
       }
-      \Jazzee\Globals::storeFile($name, $blob);
-      $arr['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($name));
       $arr['displayValue'] = "<a href='{$arr['filePath']}'><img src='{$arr['thumbnailPath']}' /></a>";
     }
-
     return $arr;
   }
   
   protected function arrayValue(array $elementAnswer){
     $value = array(
-      'value' => $elementAnswer['eBlob']
+      'value' => $elementAnswer['eShortString']
     );
     
     return $value;
@@ -145,7 +138,7 @@ class PDFFileInput extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      return base64_encode($elementsAnswers[0]->getEBlob());
+      return base64_encode(\Jazzee\Globals::getFileStore()->getFileContents($elementsAnswers[0]->getEShortString()));
     }
 
     return null;
@@ -155,7 +148,7 @@ class PDFFileInput extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      $pdf->addPdf($elementsAnswers[0]->getEBlob());
+      $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($elementsAnswers[0]->getEShortString()));
 
       return 'Attached';
     }
@@ -203,22 +196,21 @@ class PDFFileInput extends AbstractElement
       $start = time();
       $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class' => '\Jazzee\Element\PDFFileInput'));
       if ($type) {
-        $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eBlob' => null), 100);
+        $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eShortString' => null), 100);
         $imagick = new \imagick;
         foreach ($blankPreviewElementAnswers as $blankPreviewElementAnswer) {
           $thumbnailBlob = false;
           $blobElementAnswer = $blankPreviewElementAnswer->getAnswer()->getElementAnswersForElementByPosition($blankPreviewElementAnswer->getElement(), 0);
           try {
-            $blob = $blobElementAnswer->getEBlob();
             //use a temporary file so we can use the image magic shortcut [0]
             //to load only the first page, otherwise the whole file gets loaded into memory and takes forever
-            $handle = tmpfile();
-            fwrite($handle, $blob);
-            $arr = stream_get_meta_data($handle);
-            if(@$imagick->readimage($arr['uri'] . '[0]') AND @$imagick->setImageFormat("png") AND @$imagick->thumbnailimage(100, 150, true)){
-              $thumbnailBlob = $imagick->getimageblob();
+            if($handle = \Jazzee\Globals::getFileStore()->getFileHandle($blobElementAnswer->getEShortString())){
+              $arr = stream_get_meta_data($handle);
+              if(@$imagick->readimage($arr['uri'] . '[0]') AND @$imagick->setImageFormat("png") AND @$imagick->thumbnailimage(100, 150, true)){
+                $thumbnailBlob = $imagick->getimageblob();
+              }
+              fclose($handle);
             }
-            fclose($handle);
           } catch (ImagickException $e) {
             $thumbnailBlob = false;
             $cron->log('Unable to create thumbnail for ' . $blankPreviewElementAnswer->getElement()->getTitle() . ' for applicant #' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . ' answer #' . $blankPreviewElementAnswer->getAnswer()->getId() . '.  Error: ' . $e->getMessage());
@@ -230,7 +222,7 @@ class PDFFileInput extends AbstractElement
             $imagick->thumbnailimage(100, 150, true);
             $thumbnailBlob = $imagick->getimageblob();
           }
-          $blankPreviewElementAnswer->setEBlob($thumbnailBlob);
+          $blankPreviewElementAnswer->setEShortString(\Jazzee\Globals::getFileStore()->storeFile($thumbnailBlob));
 
           $cachedFileName = $blankPreviewElementAnswer->getAnswer()->getApplicant()->getFullName() . ' ' . $blankPreviewElementAnswer->getElement()->getTitle() . '_' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . $blobElementAnswer->getId() . 'preview.png';
           \Jazzee\Globals::removeStoredFile($cachedFileName);
@@ -246,6 +238,17 @@ class PDFFileInput extends AbstractElement
         }
         $cron->log($message);
       }
+    }
+  }
+
+  /**
+   * When removing an element answer remove its file association as well
+   * @param \Jazzee\Entity\ElementAnswer $elementAnswer
+   */
+  public function removeElementAnswer(\Jazzee\Entity\ElementAnswer $elementAnswer)
+  {
+    if($elementAnswer->getEShortString()){
+      \Jazzee\Globals::getFileStore()->removeFile($elementAnswer->getEShortString());
     }
   }
 

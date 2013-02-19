@@ -95,6 +95,8 @@ class AdminCronController extends \Jazzee\AdminController
       }
       ApplyApplicantController::runCron($this);
 
+      //File store actions
+      \Jazzee\FileStore::runCron($this);
 
       //clear the semephore
       $this->setVar('adminCronSemephore', false);
