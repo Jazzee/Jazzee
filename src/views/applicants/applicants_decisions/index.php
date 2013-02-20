@@ -130,3 +130,45 @@
     }
   ?>
 </fieldset>
+
+<fieldset>
+  <legend>Accepted Offer</legend>
+  <?php
+    if (empty($list['acceptOffer'])) { ?>
+      <p>There are no admitted applicants who have accepted.</p>
+  <?php
+    } else {
+  ?>
+    <ul>
+      <?php
+        foreach ($list['acceptOffer'] as $applicant) { ?>
+          <li><?php print $applicant->getLastName() . ', ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></li>
+      <?php
+        }
+      ?>
+    </ul>
+  <?php
+    }
+  ?>
+</fieldset>
+
+<fieldset>
+  <legend>Declined Offer</legend>
+  <?php
+    if (empty($list['declineOffer'])) { ?>
+      <p>There are no admitted applicants who have declined.</p>
+  <?php
+    } else {
+  ?>
+    <ul>
+      <?php
+        foreach ($list['declineOffer'] as $applicant) { ?>
+          <li><?php print $applicant->getLastName() . ', ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></li>
+      <?php
+        }
+      ?>
+    </ul>
+  <?php
+    }
+  ?>
+</fieldset>

@@ -42,13 +42,19 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController
       'finalDeny' => array(),
       'finalAdmit' => array(),
       'nominateDeny' => array(),
-      'nominateAdmit' => array()
+      'nominateAdmit' => array(),
+      'acceptOffer' => array(),
+      'declineOffer' => array()
     );
     foreach ($this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsByName('%', '%', $this->_application) as $applicant) {
       if ($applicant->isLocked()) {
-        if ($applicant->getDecision()->getFinalDeny()) {
+        if($applicant->getDecision()->getAcceptOffer()){
+          $list['acceptOffer'][] = $applicant;
+        } else if($applicant->getDecision()->getDeclineOffer()){
+          $list['declineOffer'][] = $applicant;
+        } else if ($applicant->getDecision()->getFinalDeny()) {
           $list['finalDeny'][] = $applicant;
-        } else if ($applicant->getDecision()->getFinalAdmit() and !($applicant->getDecision()->getAcceptOffer() or $applicant->getDecision()->getDeclineOffer())) {
+        } else if ($applicant->getDecision()->getFinalAdmit()) {
           $list['finalAdmit'][] = $applicant;
         } else if ($applicant->getDecision()->getNominateDeny()) {
           $list['nominateDeny'][] = $applicant;
