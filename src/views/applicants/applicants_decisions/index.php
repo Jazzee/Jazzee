@@ -132,6 +132,27 @@
 </fieldset>
 
 <fieldset>
+  <legend>Denied</legend>
+  <?php
+    if (empty($list['finalDeny'])) { ?>
+      <p>There are no denied applicants.</p>
+  <?php
+    } else {
+  ?>
+    <ul>
+      <?php
+        foreach ($list['finalDeny'] as $applicant) { ?>
+          <li><?php print $applicant->getLastName() . ', ' . $applicant->getFirstName() . ' ' . $applicant->getMiddleName() ?></li>
+      <?php
+        }
+      ?>
+    </ul>
+  <?php
+    }
+  ?>
+</fieldset>
+
+<fieldset>
   <legend>Accepted Offer</legend>
   <?php
     if (empty($list['acceptOffer'])) { ?>
