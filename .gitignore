@@ -8,4 +8,6 @@ var/sesion/*
 var/tmp/*
 .vagrant
 *.box
+dev/iso/*
+*.iso
 *~
