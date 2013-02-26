@@ -53,11 +53,13 @@ class Answer
 
   /**
    * @ManyToOne(targetEntity="AnswerStatusType")
+   * @JoinColumn(onDelete="SET NULL")
    */
   protected $publicStatus;
 
   /**
    * @ManyToOne(targetEntity="AnswerStatusType")
+   * @JoinColumn(onDelete="SET NULL")
    */
   protected $privateStatus;
 
