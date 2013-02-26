@@ -79,5 +79,23 @@ class GREScoreRepository extends \Doctrine\ORM\EntityRepository
     $query = $this->_em->createQuery('UPDATE Jazzee\Entity\Answer a SET a.greScore = :scoreId WHERE a.id = :answerId');
     return $query->execute(array('answerId' => $answerId, 'scoreId' => $scoreId));
   }
+  
+  /**
+   * Prune unmatched scores older than a date
+   * 
+   * @param \DateTime $olderThan
+   */
+  public function pruneUnmatchedScores(\DateTime $olderThan)
+  {
+    //since mysql subselect performance is so bad we do this as two queries
+    $query = $this->_em->createQuery('SELECT DISTINCT score.id FROM Jazzee\Entity\Answer a JOIN a.greScore score WHERE score IS NOT NULL');
+    $existingIds = array();
+    foreach($query->getScalarResult() as $arr){
+      $existingIds[] = $arr['id'];
+    }
+    $existingIds = implode(',', $existingIds);
+    $query = $this->_em->createQuery("DELETE FROM \Jazzee\Entity\GREScore s WHERE s.id NOT IN ({$existingIds}) AND s.testDate < :olderThan");
+    return $query->execute(array('olderThan' => $olderThan));
+  }
 
 }

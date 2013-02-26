@@ -14,6 +14,7 @@ class ManageScoresController extends \Jazzee\AdminController
   const TITLE = 'Scores';
   const PATH = 'manage/scores';
   const ACTION_INDEX = 'Manage Scores';
+  const ACTION_PRUNE = 'Remove Old Scores';
   const REQUIRE_APPLICATION = false;
 
   /**
@@ -55,6 +56,47 @@ class ManageScoresController extends \Jazzee\AdminController
     if ($input = $form->processInput($this->post)) {
       $method = $input->get('type') . 'Scores';
       $this->$method($input);
+    }
+  }
+
+  /**
+   * Prune Old scores not mathced to any applicant
+   */
+  public function actionPrune()
+  {
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path('manage/scores/prune'));
+    $field = $form->newField();
+    $field->setLegend('Remove Old Scores');
+
+    $element = $field->newElement('SelectList', 'type');
+    $element->setLabel('Score Type');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->newItem('etsgre', 'GRE Scores');
+    $element->newItem('etstoefl', 'TOEFL Scores');
+    $element = $field->newElement('ShortDateInput', 'olderthan');
+    $element->setLabel('Older Than');
+    $element->setValue('5 years ago');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\DateBefore($element, 'last year'));
+    
+    $form->newButton('submit', 'Remove Scores');
+    $this->setVar('form', $form);
+    
+    if ($input = $form->processInput($this->post)) {
+      switch($input->get('type')){
+        case 'etsgre':
+          $count = $this->_em->getRepository('Jazzee\Entity\GREScore')->pruneUnmatchedScores(new \DateTime($input->get('olderthan')));
+          $this->addMessage('success', "{$count} GRE scores deleted.");
+          $this->redirectPath('manage/scores');
+          break;
+        case 'etstoefl':
+          $count = $this->_em->getRepository('Jazzee\Entity\TOEFLScore')->pruneUnmatchedScores(new \DateTime($input->get('olderthan')));
+          $this->addMessage('success', "{$count} TOEFL scores deleted.");
+          $this->redirectPath('manage/scores');
+          break;
+      }
     }
   }
 

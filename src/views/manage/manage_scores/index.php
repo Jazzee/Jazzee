@@ -6,7 +6,9 @@
 if (isset($form)) {
   $this->renderElement('form', array('form' => $form));
 }
-?>
+if ($this->controller->checkIsAllowed('manage_scores', 'prune')) { ?>
+  <a href='<?php print $this->path('manage/scores/prune/');?>'>Remove Old Scores</a><?php
+}?>
 <table><caption>Score Statistics</caption>
   <thead><tr><th>Score Type</th><th>Total in the system</th><th>Matched to applicant</th><th>Entered by applicants and not in the system</th></tr></thead>
   <tbody>
