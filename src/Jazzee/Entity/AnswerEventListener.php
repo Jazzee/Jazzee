@@ -48,12 +48,16 @@ class AnswerEventListener
           break;
       }
       while(!is_null($answer)) {
-        if(!$uow->isScheduledForInsert($answer) AND !$uow->isScheduledForDelete($answer)){
+        if(!$uow->isScheduledForDelete($answer)){
           $answer->markLastUpdate();
-          $entityManager->persist($answer);
-          $uow->computeChangeSet($answerMetadata, $answer);
+          if($uow->isScheduledForUpdate($answer) or $uow->isScheduledForInsert($answer)){
+            $uow->recomputeSingleEntityChangeSet($answerMetadata, $answer);
+          } else {
+            $entityManager->persist($answer);
+            $uow->computeChangeSet($answerMetadata, $answer);
+          }
+          $answer = $answer->getParent();
         }
-        $answer = $answer->getParent();
       }
     }
   }
