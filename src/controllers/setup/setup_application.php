@@ -31,6 +31,8 @@ class SetupApplicationController extends \Jazzee\AdminController
   protected function setUp()
   {
     parent::setUp();
+    $this->addScript($this->path('resource/foundation/scripts/jquery.wysiwyg.js'));
+    $this->addCss($this->path('resource/foundation/styles/jquery.wysiwyg.css'));
     $this->addScript($this->path('resource/scripts/controllers/setup_application.controller.js'));
   }
 

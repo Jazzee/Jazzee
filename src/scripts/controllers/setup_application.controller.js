@@ -10,6 +10,32 @@ $(document).ready(function(){
       jazzeeSetupApplicationDatePicker(input);
     }
   });
+  $('textarea').wysiwyg({
+    rmUnusedControls: true,
+    autoSave: true,
+    autoGrow: true,
+    controls: {
+        bold: {visible: true},
+        italic: {visible: true},
+        underline: {visible: true},
+        subscript: {visible: true},
+        superscript: {visible: true},
+        undo: {visible: true},
+        redo: {visible: true},
+        insertOrderedList: {visible: true},
+        insertUnorderedList: {visible: true},
+        createLink: {visible: true},
+        h2: {visible: true},
+        h3: {visible: true},
+        paragraph: {visible: true},
+        cut: {visible: true},
+        copy: {visible: true},
+        paste: {visible: true},
+        html: {visible: true},
+        removeFormat: {visible: true},
+        insertTable: {visible: true}
+    }
+  });
 });
 
 /**
