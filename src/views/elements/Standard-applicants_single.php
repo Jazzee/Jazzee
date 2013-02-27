@@ -40,7 +40,7 @@ $page->getJazzeePage()->setApplicant($applicant);
               <?php
               foreach ($page->getPage()->getElements() as $element) {
                 $element->getJazzeeElement()->setController($this->controller);
-                ?><td><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php
+                ?><td class='answerElement element_<?php print $element->getType()->getNiceClass() ?>'><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php
               } ?>
               <td>
                 <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a'); ?>

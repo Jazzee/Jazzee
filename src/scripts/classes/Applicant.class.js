@@ -432,7 +432,7 @@ Applicant.prototype.parsePage = function(pageId){
     });
     return false;
   });
-//  this.parseLonganswertext($('#page'+pageId));
+  this.parseLonganswertext($('#page'+pageId));
 };
 
 /**
@@ -527,11 +527,11 @@ Applicant.prototype.parseReloads = function(){
  */
 Applicant.prototype.parseLonganswertext = function(obj){
   var self = this;
-  $('div.answers tbody td', obj).each(function(i){
+  $('div.answers tbody td.answerElement', obj).each(function(i){
     var td = $(this);
     var string = td.html();
-    if(string.length > 400){
-      var shortString = string.substr(0, 350);
+    if(string.length > 125){
+      var shortString = string.substr(0, 100);
       td.data('fullText', string);
       td.addClass('truncated-text');
       td.html(shortString + '&hellip;').append($('<br>'));

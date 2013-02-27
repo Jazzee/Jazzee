@@ -81,4 +81,14 @@ class ElementType
     return $this->class;
   }
 
+  /**
+   * Get nice class name usable by CSS
+   *
+   * @return string
+   */
+  public function getNiceClass()
+  {
+    return str_replace('\\', '', $this->class);
+  }
+
 }

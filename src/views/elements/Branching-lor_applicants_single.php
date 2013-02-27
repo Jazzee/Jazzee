@@ -29,7 +29,7 @@
           foreach ($page->getPage()->getChildren()->first()->getChildren() as $branch) {
             foreach ($branch->getElements() as $element) {
               $element->getJazzeeElement()->setController($this->controller);?>
-              <td><?php print $element->getJazzeeElement()->displayValue(($answer->getChildren()->first() ? $answer->getChildren()->first()->getChildren()->first() : $answer)); ?></td><?php
+              <td class='answerElement element_<?php print $element->getType()->getNiceClass() ?>'><?php print $element->getJazzeeElement()->displayValue(($answer->getChildren()->first() ? $answer->getChildren()->first()->getChildren()->first() : $answer)); ?></td><?php
             }
           } ?>
           <td><?php $this->renderElement('Recommenders-applicants_single-status', array('answer' => $answer)); ?></td>
