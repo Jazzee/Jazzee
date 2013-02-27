@@ -529,7 +529,7 @@ Applicant.prototype.parseLonganswertext = function(obj){
   var self = this;
   $('div.answers tbody td.answerElement', obj).each(function(i){
     var td = $(this);
-    var string = td.html();
+    var string = td.text();
     if(string.length > 125){
       var shortString = string.substr(0, 100);
       td.data('fullText', string);
