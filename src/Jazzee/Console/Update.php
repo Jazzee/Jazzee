@@ -36,10 +36,13 @@ class Update extends \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCom
       $output->writeln(sprintf('<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.  You will need to use the migrations tool directly to fix this.</error>', count($executedUnavailableMigrations)));
       return 1;
     }
-    $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>This migration may result in lost data, you should test it first.  Are you sure you want to continue? (y/n)</question>', false);
-    if (!$confirmation) {
-      $output->writeln('<error>Migration cancelled!</error>');
-      return 1;
+    $noInteraction = $input->getOption('no-interaction') ? true : false;
+    if (!$noInteraction) {
+      $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>This migration may result in lost data, you should test it first.  Are you sure you want to continue? (y/n)</question>', false);
+      if (!$confirmation) {
+        $output->writeln('<error>Migration cancelled!</error>');
+        return 1;
+      }
     }
     $sql = $migration->migrate(null, false);
     if (!$sql) {
