@@ -22,8 +22,8 @@ class jazzee::php {
     content  => template("jazzee/${conf_template}"),
   }
 
-  class {'jazzee::php::mysql': }
-  class {'jazzee::php::xdebug': }
-  class {'jazzee::php::imagick': }
-  class {'jazzee::php::xml': }
+  class {'jazzee::php::mysql': require => Package['php']}
+  class {'jazzee::php::xdebug': require => Package['php']}
+  class {'jazzee::php::imagick': require => Package['php']}
+  class {'jazzee::php::xml': require => Package['php']}
 }
