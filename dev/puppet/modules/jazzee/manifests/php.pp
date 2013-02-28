@@ -26,4 +26,8 @@ class jazzee::php {
   class {'jazzee::php::xdebug': require => Package['php']}
   class {'jazzee::php::imagick': require => Package['php']}
   class {'jazzee::php::xml': require => Package['php']}
+  class {'jazzee::php::ldap': require => Package['php']}
+  class {'jazzee::php::mbstring': require => Package['php']}
+  class {'jazzee::php::soap': require => Package['php']}
+  class {'jazzee::php::apc': require => Package['php']}
 }
