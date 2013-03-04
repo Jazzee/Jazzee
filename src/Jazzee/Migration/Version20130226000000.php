@@ -11,7 +11,7 @@ class Version20130226000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
   {
     $table = $schema->getTable('answers');
     foreach($table->getForeignKeys() as $fk){
-      if($fk->getForeignTableName() == 'answer_status_types'){
+      if(strtolower($fk->getForeignTableName()) == 'answer_status_types'){
         $table->removeForeignKey($fk->getName());
       }
     }
@@ -23,7 +23,7 @@ class Version20130226000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
   {
     $table = $schema->getTable('answers');
     foreach($table->getForeignKeys() as $fk){
-      if($fk->getForeignTableName() == 'answer_status_types'){
+      if(strtolower($fk->getForeignTableName()) == 'answer_status_types'){
         $table->removeForeignKey($fk->getName());
       }
     }
