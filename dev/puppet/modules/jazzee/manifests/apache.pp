@@ -1,11 +1,12 @@
 class jazzee::apache {
   case $operatingsystem {
-    centos, redhat: { 
+    centos, redhat, oraclelinux: { 
       $httpd            = 'httpd'
       $service_name     = 'httpd'
       $conf_template    = 'httpd.conf.erb'
       $conf_path        = '/etc/httpd/conf/httpd.conf'
     }
+    default: {fail("$operatingsystem is not defined.")}
   }
 
   package { $httpd:

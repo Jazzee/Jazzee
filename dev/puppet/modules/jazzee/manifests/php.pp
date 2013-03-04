@@ -1,12 +1,13 @@
 class jazzee::php {
   case $operatingsystem {
-    centos, redhat: { 
+    centos, redhat, oraclelinux: { 
       $php                  = 'php'
       $service_name         = 'php'
       $apache               = 'httpd'
       $conf_template        = 'php.ini.erb'
       $conf_path            = '/etc/php.ini'
     }
+    default: {fail("$operatingsystem is not defined.")}
   }
 
   package { $php:

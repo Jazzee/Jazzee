@@ -6,6 +6,7 @@ var/cache/*
 var/log/*
 var/sesion/*
 var/tmp/*
+Vagrantfile
 .vagrant
 *.box
 dev/iso/*

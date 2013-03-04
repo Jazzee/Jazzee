@@ -29,21 +29,42 @@ Vagrant       http://www.vagrantup.com
 Veewee        https://github.com/jedi4ever/veewee
 ============ =======================================
 
-Once you have those installed you can run::
+There are currently two types of VM supported, most development is done on the centOS based box, 
+however there is also an Oracle Linux option for testing and working with an Oracle Database.
+
+CentOS
+^^^^^^^
+With Virtualbox, Vagrant, and Veewee installed run::
 
   cd JAZZEE_SRC/dev
-  vagrant basebox build Jazzee_CentOS64
-  vagrant basebox export Jazzee_CentOS64
-  vagrant box add Jazzee_CentOS64 Jazzee_CentOS64.box
-
-A lot of stuff will happen there - ISO files for Centos will be downloaded, a new installation will be built 
-and then packaged for export.  Depending on your connection speed it can take anywhere from a few minutes to a few hours.
-
-Once that is complete you can go to JAZZEE_SRC and use vagrant to start a new VM run::
-
+  vagrant basebox build -f Jazzee_CentOS64
+  vagrant basebox export -f Jazzee_CentOS64
+  vagrant box add -f Jazzee_CentOS64 Jazzee_CentOS64.box
+  cd JAZZEE_SRC
+  cp dev/Vagrantfile.centos Vagrantfile
   vagrant up
 
-and Jazzee will be available at http://localhost:8080
+Oracle
+^^^^^^^
+With Virtualbox, Vagrant, and Veewee installed run::
+
+  cd JAZZEE_SRC/dev
+  vagrant basebox build -f Jazzee_Oracle63
+  vagrant basebox export -f Jazzee_Oracle63
+  vagrant box add -f Jazzee_Oracle63 Jazzee_Oracle63.box
+  cd JAZZEE_SRC
+  cp dev/Vagrantfile.oracle Vagrantfile
+  vagrant up
+
+
+Final Setup
+^^^^^^^^^^^^
+
+A lot of stuff will happen there - ISO files will be downloaded, a new installation will be built
+and then packaged for export.  Packages will be installed and a new VM setup.  
+Depending on your connection speed it can take anywhere from a few minutes to a few hours.
+
+Jazzee will be available at http://localhost:8080
 
 You will need to run some initial setup for Jazzee to get the database 
 initialized.  Those directions are at :ref:`installation_initial-setup`.  You 
@@ -53,6 +74,9 @@ should run them from the virtual machine by doing::
   vagrant up
   vagrant ssh
 
-This will log you into the vagrant virtual machine where you can find jazzee at::
+This will log you into the vagrant virtual machine where you can setup the database with::
 
-  cd /vagrant
+  cd /vagrant/setup
+  ./setup update
+  ./setup defaults
+  ./setup create-demo

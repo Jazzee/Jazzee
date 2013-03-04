@@ -1,11 +1,12 @@
 class jazzee::mysql {
   case $operatingsystem {
-    centos, redhat: { 
+    centos, redhat, oraclelinux: { 
       $mysql              = 'mysql-server'
       $service_name     = 'mysqld'
       $conf_template    = 'my.cnf.erb'
       $conf_path        = '/etc/my.cnf'
     }
+    default: {fail("$operatingsystem is not defined.")}
   }
 
   package { $mysql:

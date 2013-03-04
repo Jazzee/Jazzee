@@ -1,9 +1,10 @@
 class jazzee::php::mysql {
   case $operatingsystem {
-    centos, redhat: { 
+    centos, redhat, oraclelinux: { 
       $phpmysql                  = 'php-mysql'
       $apache               = 'httpd'
     }
+    default: {fail("$operatingsystem is not defined.")}
   }
 
   package { $phpmysql:

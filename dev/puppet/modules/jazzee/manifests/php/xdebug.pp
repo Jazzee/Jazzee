@@ -1,6 +1,6 @@
 class jazzee::php::xdebug {
   case $operatingsystem {
-    centos, redhat: { 
+    centos, redhat, oraclelinux: { 
       package { 'php-pecl-xdebug':
         ensure => latest,
         notify => Service['httpd']
@@ -12,5 +12,6 @@ class jazzee::php::xdebug {
         require   => Package['php-pecl-xdebug']
       }
     }
+    default: {fail("$operatingsystem is not defined.")}
   }
 }

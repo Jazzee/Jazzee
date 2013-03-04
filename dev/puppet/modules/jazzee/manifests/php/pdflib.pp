@@ -1,6 +1,6 @@
 class jazzee::php::pdflib {
   case $operatingsystem {
-    centos, redhat: {
+    centos, redhat, oraclelinux: {
       $modulePath = '/usr/lib64/php/modules/php_pdflib.so'
       file {$modulePath:
         source => 'puppet:///modules/jazzee/php_pdflib.so',
@@ -11,5 +11,6 @@ class jazzee::php::pdflib {
         ensure    => present
       }
     }
+    default: {fail("$operatingsystem is not defined.")}
   }
 }
