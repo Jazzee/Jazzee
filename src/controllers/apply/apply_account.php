@@ -15,7 +15,9 @@ class ApplyAccountController extends \Jazzee\AuthenticatedApplyController
     $restricted = array(
       'changeEmail' => 'getAllowApplicantEmailChange',
       'changePassword' => 'getAllowApplicantPasswordChange',
-      'changeName' => 'getAllowApplicantNameChange'
+      'changeName' => 'getAllowApplicantNameChange',
+
+      'printApplication' => 'getAllowApplicantNameChange'//'getAllowApplicantPrintApplication'
     );
     if(array_key_exists($this->actionName, $restricted)){
       if(!$this->_config->$restricted[$this->actionName]()){
@@ -24,6 +26,7 @@ class ApplyAccountController extends \Jazzee\AuthenticatedApplyController
       }
     }
     $layoutContentTop = '<p class="links">';
+//    $layoutContentTop .= '<a href="' . $this->applyPath('/account/printApplication') . '">Print Application</a>';
     $layoutContentTop .= '<a href="' . $this->applyPath('/account') . '">My Account</a>';
     $layoutContentTop .= '<a href="' . $this->applyPath('/support') . '">Support</a>';
     if ($count = $this->_applicant->unreadMessageCount()) {
@@ -42,6 +45,44 @@ class ApplyAccountController extends \Jazzee\AuthenticatedApplyController
     $this->setVar('allowNameChange', $this->getConfig()->getAllowApplicantNameChange());
     $this->setVar('allowEmailChange', $this->getConfig()->getAllowApplicantEmailChange());
     $this->setVar('allowPasswordChange', $this->getConfig()->getAllowApplicantPasswordChange());
+    $this->setVar('allowPrintApplication', true); //$this->getConfig()->getAllowApplicantPrintApplication());
+  }
+
+  public function actionPrintApplication(){
+    $this->addMessage('success', 'Test print application method called');
+
+    $applicants = array();
+    $applicants[] = $this->_applicant->getId();
+
+    $directoryName = $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy');
+    $zipFile = $this->_config->getVarPath() . '/tmp/' . uniqid() . '.zip';
+    $zip = new ZipArchive;
+    $zip->open($zipFile, ZipArchive::CREATE);
+    $zip->addEmptyDir($directoryName);
+    $count = 0;
+    foreach ($applicants as $key => $id) {
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
+
+      $pdf = new \Jazzee\RestrictedPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
+
+      $zip->addFromString($directoryName . '/' . $applicant->getFullName() . '.pdf', $pdf->pdf($applicant));
+      if ($count > 50) {
+        $count = 0;
+        $this->_em->clear();
+        gc_collect_cycles();
+      }
+      $count++;
+    }
+    $zip->close();
+    header('Content-Type: ' . 'application/zip');
+    header('Content-Disposition: attachment; filename='. $directoryName . '.zip');
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Length: ' . filesize($zipFile));
+    readfile($zipFile);
+    unlink($zipFile);
+    exit(0);
+
+
   }
 
   /**

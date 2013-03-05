@@ -8,7 +8,7 @@ namespace Jazzee;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-class ApplicantPDF
+class ApplicantPDF 
 {
   /**
    * Configuration Constants
@@ -358,5 +358,6 @@ class ApplicantPDF
       $this->tableRow = false;
     }
   }
+
 
 }

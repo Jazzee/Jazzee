@@ -19,4 +19,10 @@
   <?php if($allowPasswordChange){?>
     <a href='<?php print $this->controller->applyPath('/account/changePassword'); ?>'>Change Password</a>
   <?php } ?>
+<br/><br/>
+  <strong>Print Application:</strong>
+  <?php if($allowPrintApplication){?>
+    <a href='<?php print $this->controller->applyPath('/account/printApplication'); ?>'> Print</a>
+  <?php } ?><br />
+
 </p>
