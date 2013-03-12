@@ -190,7 +190,7 @@ JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
 
   var form = new Form();
   var formObject = form.create(obj);
-  $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
+  $('form',formObject).append($('<button type="submit" name="submit">').html('Apply'));
   var dialog = pageClass.displayForm(obj);
   $('form', dialog).unbind().bind('submit',function(e){
     pageClass.setVariable('answerStatusTitle',  $('input[name=title]', this).val());

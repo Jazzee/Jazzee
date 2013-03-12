@@ -438,7 +438,7 @@ JazzeePage.prototype.displayForm = function(formObj){
   var pageClass = this;
   var form = new Form();
   var formObject = form.create(formObj);
-  $('form',formObject).append($('<button type="submit" name="submit">').html('Save').button({
+  $('form',formObject).append($('<button type="submit" name="submit">').html('Apply').button({
     icons: {
       primary: 'ui-icon-disk'
     }
