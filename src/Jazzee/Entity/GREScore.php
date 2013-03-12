@@ -63,7 +63,7 @@ class GREScore
   /** @Column(type="string", length=1) */
   private $score1Type;
 
-  /** @Column(type="decimal", length=3) */
+  /** @Column(type="decimal", precision=10, scale=1) */
   private $score1Converted;
 
   /** @Column(type="decimal", length=3) */
@@ -72,7 +72,7 @@ class GREScore
   /** @Column(type="string", length=1, nullable=true) */
   private $score2Type;
 
-  /** @Column(type="decimal", length=3, nullable=true) */
+  /** @Column(type="decimal", precision=10, scale=1, nullable=true) */
   private $score2Converted;
 
   /** @Column(type="decimal", length=3, nullable=true) */
@@ -81,7 +81,7 @@ class GREScore
   /** @Column(type="string", length=1, nullable=true) */
   private $score3Type;
 
-  /** @Column(type="decimal", length=3, nullable=true) */
+  /** @Column(type="decimal", precision=10, scale=1, nullable=true) */
   private $score3Converted;
 
   /** @Column(type="decimal", length=3, nullable=true) */
@@ -90,7 +90,7 @@ class GREScore
   /** @Column(type="string", length=1, nullable=true) */
   private $score4Type;
 
-  /** @Column(type="decimal", length=3, nullable=true) */
+  /** @Column(type="decimal", precision=10, scale=1, nullable=true) */
   private $score4Converted;
 
   /** @Column(type="decimal", length=3, nullable=true) */

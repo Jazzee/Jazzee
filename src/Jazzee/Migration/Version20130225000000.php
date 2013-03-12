@@ -14,6 +14,8 @@ class Version20130225000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
     foreach($columns as $name){
       $column = $table->getColumn($name);
       $column->setType(\Doctrine\DBAL\Types\Type::getType(\Doctrine\DBAL\Types\Type::DECIMAL));
+      $column->setPrecision(10);
+      $column->setScale(1);
     }
   }
 
