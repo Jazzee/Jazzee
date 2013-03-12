@@ -221,6 +221,12 @@ class Lock implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
         'removed' => array(),
         'same' => array(),
         'changed' => array()
+      ),
+      'children' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
       )
     );
     $arr = array(

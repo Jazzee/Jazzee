@@ -87,6 +87,12 @@ class Page
    */
   private $_applicationPageJazzeePage;
 
+  /**
+   * a Generic application page we store it so doesn't get recreated
+   * @var \Jazzee\Entity\ApplicationPage
+   */
+  private $_fakeApplicationPage;
+
   public function __construct()
   {
     $this->children = new \Doctrine\Common\Collections\ArrayCollection();
@@ -590,12 +596,24 @@ class Page
   public function getApplicationPageJazzeePage()
   {
     if ($this->_applicationPageJazzeePage == null) {
-      $applicationPage = new ApplicationPage;
-      $applicationPage->setPage($this);
-      $this->_applicationPageJazzeePage = $applicationPage->getJazzeePage();
+      $this->_applicationPageJazzeePage = $this->getFakeApplicationPage()->getJazzeePage();
     }
 
     return $this->_applicationPageJazzeePage;
+  }
+
+  /**
+   * Create a temporary application page
+   * @return \Jazzee\Entity\ApplicationPage
+   */
+  public function getFakeApplicationPage()
+  {
+    if ($this->_fakeApplicationPage == null) {
+      $this->_fakeApplicationPage = new ApplicationPage;
+      $this->_fakeApplicationPage->setPage($this);
+    }
+
+    return $this->_fakeApplicationPage;
   }
 
 }

@@ -158,6 +158,32 @@ CompareApplications.prototype.processChangedPage = function(obj){
   });
   var tabdiv = $('<div>').append(tabsList).append(tabs);
   tabdiv.tabs();
+  
+  var ul = $('<ul>');
+  $(obj.children['new']).each(function(i){
+    ul.append($('<li>').html(this.valueOf()));
+  });
+  div.append($('<h3>').html('New Child Pages'));
+  div.append(ul);
+
+  var ul = $('<ul>');
+  $(obj.children['removed']).each(function(i){
+    ul.append($('<li>').html(this.valueOf()));
+  });
+  div.append($('<h3>').html('Removed Child Pages'));
+  div.append(ul);
+  
+  div.append($('<h3>').html('Changed Child Pages'));
+  var tabs = $('<div>');
+  var tabsList = $('<ul>');
+  $(obj.children['changed']).each(function(i){
+    var tab = compare.processChangedPage(this);
+    tab.attr('id', 'changedchildpage'+i);
+    tabsList.append($('<li>').append($('<a>').attr('href', '#changedchildpage'+i).html(this.title)));
+    tabs.append(tab);
+  });
+  var tabdiv = $('<div>').append(tabsList).append(tabs);
+  tabdiv.tabs();
 
   div.append(tabdiv);
   return div;

@@ -110,6 +110,12 @@ class Text implements \Jazzee\Interfaces\Page
         'removed' => array(),
         'same' => array(),
         'changed' => array()
+      ),
+      'children' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
       )
     );
     $arr = array(

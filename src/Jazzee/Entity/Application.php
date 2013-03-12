@@ -766,6 +766,10 @@ class Application
           $pageTitle = $title . '(' . $otherPages[$title]->getPage()->getTitle() . ')';
         }
         $differences['pages']['removed'][] = $pageTitle;
+      } else if($applicationPage->getPage()->isGlobal() AND $applicationPage->getPage()->getId() != $otherPages[$title]->getPage()->getId()){
+        //different global pages
+        $differences['pages']['new'][] = $title . '(' . $applicationPage->getPage()->getTitle() . ')';
+        $differences['pages']['removed'][] = $title . '(' . $otherPages[$title]->getPage()->getTitle() . ')';
       } else {
         $pageDifferences = $applicationPage->getJazzeePage()->compareWith($otherPages[$title]);
         if($pageDifferences['different']){

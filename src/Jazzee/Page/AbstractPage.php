@@ -404,6 +404,12 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
         'removed' => array(),
         'same' => array(),
         'changed' => array()
+      ),
+      'children' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
       )
     );
     $arr = array(
@@ -437,20 +443,56 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     }
     foreach ($thisElements as $title => $element) {
       if (!array_key_exists($title, $otherElements)) {
+        $differences['different'] = true;
         $differences['elements']['new'][] = $title;
       } else if ($element->getType()->getId() != $otherElements[$title]->getType()->getId()) {
+        $differences['different'] = true;
         $differences['elements']['new'][] = $title;
         $differences['elements']['removed'][] = $title;
       } else {
         $elementDifferences = $element->getJazzeeElement()->compareWith($otherElements[$title]);
         if ($elementDifferences['different']) {
+          $differences['different'] = true;
           $differences['elements']['changed'][] = $elementDifferences;
         }
       }
     }
     foreach ($otherElements as $title => $element) {
       if (!array_key_exists($title, $thisElements)) {
+        $differences['different'] = true;
         $differences['elements']['removed'][] = $title;
+      }
+    }
+    
+    $thisChildren = array();
+    foreach($this->_applicationPage->getPage()->getChildren() as $childPage){
+      $thisChildren[$childPage->getTitle()] = $childPage;
+    }
+    $otherChildren = array();
+    foreach($applicationPage->getPage()->getChildren() as $childPage){
+      $otherChildren[$childPage->getTitle()] = $childPage;
+    }
+    foreach($thisChildren as $title => $childPage){
+      $pageTitle = $title;
+      if(!array_key_exists($title, $otherChildren)){
+        $differences['different'] = true;
+        $differences['children']['new'][] = $pageTitle;
+      } else if($childPage->getType()->getId() != $otherChildren[$title]->getType()->getId()){
+        $differences['different'] = true;
+        $differences['children']['new'][] = $pageTitle;
+        $differences['children']['removed'][] = $pageTitle;
+      } else {
+        $pageDifferences = $childPage->getApplicationPageJazzeePage()->compareWith($otherChildren[$title]->getFakeApplicationPage());
+        if($pageDifferences['different']){
+          $differences['different'] = true;
+          $differences['children']['changed'][] = $pageDifferences;
+        }
+      }
+    }
+    foreach($otherChildren as $title => $array){
+      if(!array_key_exists($title, $thisChildren)){
+        $differences['different'] = true;
+        $differences['children']['removed'][] = $title;
       }
     }
     return $differences;
