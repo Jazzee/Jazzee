@@ -83,6 +83,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController
           $this->_authLog->info('Incorrect Password for applicant ' . $applicant->getId() . ' from ' . $_SERVER['REMOTE_ADDR'] . '. ' . $applicant->getFailedLoginAttempts() . ' attempts.');
         }
       }
+
       $this->addMessage('error', 'Incorrect username or password.  After ' . self::MAX_FAILED_LOGIN_ATTEMPTS . ' failed login attempts your account will be locked and you will need to reset your password to gain access.');
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
     }
@@ -109,6 +110,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController
     $form->newButton('submit', 'Submit');
 
     if ($input = $form->processInput($this->post)) {
+
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->_application);
       if ($applicant) {
         $applicant->generateUniqueId();
@@ -122,8 +124,54 @@ class ApplyApplicantController extends \Jazzee\ApplyController
         $message->Body = $body;
         $message->Send();
         $this->_em->persist($applicant);
+      }else{
+         // we did not find an application of this type for the given email.
+         // see if they have started any other application
+	 $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findByEmail($input->get('email'));
+	 if($applicant){
+	   $progs = false;
+           $pUrls = "";
+	   $parts = parse_url($this->absoluteApplyPath(''));
+	   $pBaseUrl = $parts["scheme"]."://".$parts["host"]."/apply";
+	   foreach($applicant as $appl){
+	      $prog = $appl->getApplication()->getProgram();	
+	      $pname = $prog->getName();
+              $purl = $pBaseUrl .= "/".$prog->getShortName()."/".$appl->getApplication()->getCycle()->getName();
+	      if($progs){
+	         $progs .= ", '".$pname."'";
+              }else{
+	         $progs = $pname;
+	      }
+
+	      		 $pUrls .= "\n".$pname.":  ".$purl;	
+	   }
+	   
+$applicant = $applicant[0];
+	   $prog = $this->_application->getProgram();
+	   $progName = $prog->getName();
+	   $body = "We have received a request to reset the applicant password for a  '$progName' application started using this email address (".$applicant->getEmail()."), however we do not have such an application. It appears you have started applications in other programs [$progs], you can log into them at: $pUrls";
+
+           $message = $this->newMailMessage();
+           $message->AddAddress($input->get('email'), $applicant->getFullName());
+           $message->Subject = 'Password Reset Request';
+           $message->Body = $body;
+           $message->Send();
+         }else{
+
+	   $prog = $this->_application->getProgram();
+	   $progName = $prog->getName();
+	   $body = "We have received a request to reset the applicant password for $progName at this email address (".$input->get('email')."), however we do not have a record of this address in our system.  You can create a new account at: ".$this->absoluteApplyPath('applicant/new');
+           $message = $this->newMailMessage();
+           $message->AddAddress($input->get('email'), "");
+           $message->Subject = 'Password Reset Request';
+           $message->Body = $body;
+           $message->Send();
+
+	 }
+
       }
-      $this->addMessage('success', 'If your email address is in our system we will send instructions for resetting your password immediately.');
+
+      $this->addMessage('success', "We have sent you an email with further instructions");
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
       $this->redirectApplyPath('applicant/login');
     }
