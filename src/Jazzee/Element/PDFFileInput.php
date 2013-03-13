@@ -156,6 +156,18 @@ class PDFFileInput extends AbstractElement
     return null;
   }
 
+
+  public function pdfValueFromArray(array $answerData, \Jazzee\ApplicantPDF $pdf)
+  {
+    if (isset($answerData['elements'][0])) {
+      $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($answerData['elements'][0]["values"][0]["value"]));
+
+      return 'Attached';
+    }
+
+    return null;
+  }
+
   public function formValue(\Jazzee\Entity\Answer $answer)
   {
     return false;

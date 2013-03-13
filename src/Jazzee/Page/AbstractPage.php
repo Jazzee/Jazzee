@@ -367,6 +367,84 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     }
   }
 
+  public function renderPdfSectionFromArray(\Jazzee\ApplicantPDF $pdf, array $applicantPDFData)
+  {
+    $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
+
+    // In StandardPage#getStatus() calls AbstractPage#getAnswers() which 
+    // uses the applicant object that we dont have, so pull the value from the array
+    //    if ($this->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) {
+    //  $pdf->addText("Applicant Skipped this page.\n", 'p');
+    //} else {
+
+
+    $answers = $this->findAnswersByPageFromArray($this->_applicationPage, $applicantPDFData);
+
+    if (!$this->_applicationPage->isRequired() and count($answers) and $answers[0]["pageStatus"] == self::SKIPPED) {
+      $pdf->addText("Applicant Skipped this page.\n", 'p');
+
+    }else{
+      //$this->log("DUMPING PDF:".var_export($answers, true));
+       //foreach ($this->getAnswers() as $answer) {
+      foreach ($answers as $answer) {
+        $this->renderPdfAnswerFromArray($pdf, $this->_applicationPage->getPage(), $answer);
+        $pdf->addText("\n", 'p');
+      }
+    }
+  }
+
+  /**
+   * Render a single answer in the PDF
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  protected function renderPdfAnswerFromArray(\Jazzee\ApplicantPDF $pdf, \Jazzee\Entity\Page $page, array $answerData)
+  {
+    foreach ($page->getElements() as $element) {
+      $element->getJazzeeElement()->setController($this->_controller);
+      $value = $element->getJazzeeElement()->pdfValueFromArray($answerData, $pdf);
+      if (!empty($value)) {
+        $pdf->addText("{$element->getTitle()}: ", 'b');
+        $pdf->addText("{$value}\n", 'p');
+      }
+    }
+
+    if ($attachment = $answerData['attachment']) {
+      try{
+	if($attachment["attachmentHash"]){
+	  $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]));
+	}else{
+	  $this->log("ERROR: attachment has no hash: ".var_export($attachment, true));
+	}
+      
+      }catch(Exception $attachFailed){
+	$this->log("ERROR: failed to add attachments: ".$attachFailed->getTraceAsString());
+      }
+    }
+  }
+
+  /**
+   * $page is an ApplicationPage
+   */
+  public function findAnswersByPageFromArray(\Jazzee\Entity\ApplicationPage $page, array $applicantData)
+  {
+    $return = array();
+
+    foreach($applicantData as $item){
+      foreach($item['pages'] as $pageData){
+	if ($pageData['id'] == $page->getPage()->getId()) {
+	  foreach($pageData['answers'] as $answer){
+	    $return[] = $answer;
+	  }
+	}
+      }
+    }
+
+    return $return;
+  }
+
+
   /**
    * By default just set the varialbe dont check it
    * @param string $name

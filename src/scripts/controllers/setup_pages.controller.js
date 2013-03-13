@@ -73,7 +73,7 @@ ApplicationPageBuilder.prototype.synchronizePageList = function(){
   var ol = this.getPagesList(this.applicationPageKinds.application);
   div.append(ol);
   div.append(this.addNewPageControl('New Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
-  div.append(this.addNewGlobalPageControl('Add Global Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
+  div.append(this.addNewGlobalPageControl('Add Gobal Page', this.applicationPageKinds.application, 'Jazzee\\Interfaces\\Page'));
   div.append(this.importPageControl());
 
   div.append($('<h5>').html('SIR Accept Page'));
@@ -81,7 +81,7 @@ ApplicationPageBuilder.prototype.synchronizePageList = function(){
   div.append(ol);
   if($('li',ol).length == 0){
     ol.append(this.addNewPageControl('Set Page', this.applicationPageKinds.sirAccept, 'Jazzee\\Interfaces\\SirPage'));
-    ol.append(this.addNewGlobalPageControl('Set Global Page', this.applicationPageKinds.sirAccept, 'Jazzee\\Interfaces\\SirPage'));
+    ol.append(this.addNewGlobalPageControl('Set Gobal Page', this.applicationPageKinds.sirAccept, 'Jazzee\\Interfaces\\SirPage'));
   }
 
   div.append($('<h5>').html('SIR Decline Page'));
