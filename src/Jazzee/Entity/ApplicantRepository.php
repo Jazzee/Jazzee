@@ -10,6 +10,26 @@ namespace Jazzee\Entity;
  */
 class ApplicantRepository extends \Doctrine\ORM\EntityRepository
 {
+  /**
+   * find on by email address and application
+   *
+   * Search for an Applicant by email in an application
+   * @param string $email
+   * @param Application $application
+   * @return Application
+   */
+  public function findByEmail($email)
+  {
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Applicant a WHERE  a.email = :email');
+//    $query->setParameter('applicationId', $application->getId());
+    $query->setParameter('email', $email);
+    $result = $query->getResult();
+    if (count($result)) {
+      return $result; //[0];
+    }
+
+    return false;
+  }
 
   /**
    * find on by email address and application
