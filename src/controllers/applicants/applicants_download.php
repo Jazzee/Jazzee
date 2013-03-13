@@ -308,9 +308,8 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     foreach ($applicants as $key => $id) {
       $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
 
-      //  $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
-      $pdf = new \Jazzee\PDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
-
+      $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
+      
       $zip->addFromString($directoryName . '/' . $applicant->getFullName() . '.pdf', $pdf->pdf($applicant));
       if ($count > 50) {
         $count = 0;
