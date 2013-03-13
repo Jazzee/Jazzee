@@ -30,4 +30,5 @@ class jazzee::php {
   class {'jazzee::php::mbstring': require => Package['php']}
   class {'jazzee::php::soap': require => Package['php']}
   class {'jazzee::php::apc': require => Package['php']}
+  class {'jazzee::php::pdflib': require => Package['php']}
 }
