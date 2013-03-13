@@ -328,4 +328,17 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     exit(0);
   }
 
+
+  /**
+   * Get applicant JSON
+   */
+  public function actionGetPDFs(){
+    $results = array();
+    $display = $this->getDisplay($this->post['display']);
+    $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findPDFsByApplication($this->_application, $display, $this->post['applicantIds']);
+    $this->setVar('result', array('applicants' => $applicants));
+    $this->loadView('applicants_single/result');
+  }
+
+
 }
