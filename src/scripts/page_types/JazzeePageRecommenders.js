@@ -166,7 +166,7 @@ JazzeePageRecommenders.prototype.deadlineButton = function(){
     var dialog = pageClass.createDialog();
     dialog.append($('<div>').attr('id', 'lorDeadlineForm').addClass('yui-g'));
     pageClass.deadlineForm(pageClass.getVariable('lorDeadline')!='');
-    var button = $('<button>').html('Save').bind('click',function(){
+    var button = $('<button>').html('Apply').bind('click',function(){
       if($('#lorDeadlineForm input[name="hasDeadline"]:checked').val() == 1){
         pageClass.setVariable('lorDeadline', $('#lorDeadlineForm input[name="deadline"]').val());
       } else {
