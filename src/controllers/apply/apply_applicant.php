@@ -83,6 +83,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController
           $this->_authLog->info('Incorrect Password for applicant ' . $applicant->getId() . ' from ' . $_SERVER['REMOTE_ADDR'] . '. ' . $applicant->getFailedLoginAttempts() . ' attempts.');
         }
       }
+
       $this->addMessage('error', 'Incorrect username or password.  After ' . self::MAX_FAILED_LOGIN_ATTEMPTS . ' failed login attempts your account will be locked and you will need to reset your password to gain access.');
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
     }
@@ -109,21 +110,49 @@ class ApplyApplicantController extends \Jazzee\ApplyController
     $form->newButton('submit', 'Submit');
 
     if ($input = $form->processInput($this->post)) {
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($input->get('email'), $this->_application);
-      if ($applicant) {
-        $applicant->generateUniqueId();
-        $body = "We have received a request to reset your password.  In order to reset your password you will need to click on the link at the bottom of this email.  This will take you back to the secure website were you will be ale to enter a new password. \n \n"
-                . "If you cannot click on the link you should copy and paste it into your browser. \n"
-                . "For your protection this link will only be valid for a limited time. \n \n"
-                . $this->absoluteApplyPath('applicant/resetpassword/' . $applicant->getUniqueId());
-        $message = $this->newMailMessage();
-        $message->AddAddress($applicant->getEmail(), $applicant->getFullName());
-        $message->Subject = 'Password Reset Request';
-        $message->Body = $body;
-        $message->Send();
-        $this->_em->persist($applicant);
+      $emailInput = $input->get('email');
+      $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findByEmail($emailInput);
+      $foundApplications = array();
+      if ($applicants) {
+        $found = false;
+        foreach($applicants as $applicant){
+          if($applicant->getApplication()->getId() == $this->_application->getId()){
+            $applicant->generateUniqueId();
+            $messageBody = "We have received a request to reset your password.  In order to reset your password you will need to click on the link at the bottom of this email.  This will take you back to the secure website were you will be ale to enter a new password. \n \n"
+                    . "If you cannot click on the link you should copy and paste it into your browser. \n"
+                    . "For your protection this link will only be valid for a limited time. \n \n"
+                    . $this->absoluteApplyPath('applicant/resetpassword/' . $applicant->getUniqueId());
+            $this->_em->persist($applicant);
+            $found = true;
+            break;
+          } else {
+            $foundApplications[$applicant->getApplication()->getId()] = $applicant->getApplication();
+          }
+        }
+        if(!$found){
+          $messageBody = "We have received a request to reset the applicant password for the "
+             . "{$this->_application->getCycle()->getName()} {$this->_application->getProgram()->getName()} "
+             . "application started using {$emailInput}, however we do "
+             . "not have such an application. \nYou can create a new account at: \n" . $this->absoluteApplyPath('applicant/new')
+             . "\n\nIt appears you have started applications in these programs: \n";
+          foreach($foundApplications as $application){
+            $messageBody .= "{$application->getCycle()->getName()} {$application->getProgram()->getName()} " 
+            . $this->absolutePath("apply/{$application->getProgram()->getShortName()}/{$application->getCycle()->getName()}/applicant/login") . "\n";
+          }
+        }
+      } else {
+        $messageBody = "We have received a request to reset the applicant password for the "
+             . "{$this->_application->getCycle()->getName()} {$this->_application->getProgram()->getName()} "
+             . "application started using {$emailInput}, however we do "
+             . "not have such an application. \nYou can create a new account at: \n" . $this->absoluteApplyPath('applicant/new');
       }
-      $this->addMessage('success', 'If your email address is in our system we will send instructions for resetting your password immediately.');
+      $message = $this->newMailMessage();
+      $message->AddAddress($emailInput);
+      $message->Subject = 'Password Reset Request';
+      $message->Body = $messageBody;
+      $message->Send();
+      
+      $this->addMessage('success', "We have sent a message to {$emailInput} with further instructions");
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
       $this->redirectApplyPath('applicant/login');
     }
