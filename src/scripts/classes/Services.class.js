@@ -4,15 +4,7 @@
 function Services(){
   var self = this;
   this.basepath = Services.prototype.absoluteBasePath;
-  this.preferences = {};
-  $.ajax({
-    type: 'GET',
-    url: this.basepath + 'services/getPreferences',
-    async: false,
-    success: function(json){
-      self.preferences = json.data.result;
-    }
-  });
+  this.preferences = false;
 };
 
 Services.prototype.request = function(service, data){
@@ -65,7 +57,22 @@ Services.prototype.savePreferences = function(){
   $.post(this.basepath + 'services/savePreferences', {'preferences':$.toJSON(this.preferences)});
 };
 
+Services.prototype.fillPreferences = function(){
+  var self = this;
+  if(this.preferences === false){
+    $.ajax({
+      type: 'GET',
+      url: this.basepath + 'services/getPreferences',
+      async: false,
+      success: function(json){
+        self.preferences = json.data.result;
+      }
+    });
+  }
+};
+
 Services.prototype.getPreference = function(name){
+  this.fillPreferences();
   if(name in this.preferences){
     return this.preferences[name];
   }
@@ -73,6 +80,7 @@ Services.prototype.getPreference = function(name){
 };
 
 Services.prototype.setPreference = function(name, value){
+  this.fillPreferences();
   this.preferences[name] = value;
   this.savePreferences();
 };
