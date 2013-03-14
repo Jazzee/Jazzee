@@ -446,10 +446,11 @@ abstract class PageBuilder extends AdminController
     $applicant->setMiddleName('T');
     $applicant->setSuffix('Jr.');
     $applicant->setEmail('jtSmith@example.com');
-    $applicant->setApplication($this->_application);
+    $application = is_null($this->_application)?new \Jazzee\Entity\Application():$this->_application;
+    $applicant->setApplication($application);
     $applicationPage = new \Jazzee\Entity\ApplicationPage();
     $applicationPage->setPage($page);
-    $applicationPage->setApplication($this->_application);
+    $applicationPage->setApplication($application);
     $applicationPage->getJazzeePage()->setController($this);
     $applicationPage->getJazzeePage()->setApplicant($applicant);
     $this->setVar('page', $applicationPage);
