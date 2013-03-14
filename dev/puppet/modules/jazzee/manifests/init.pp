@@ -2,6 +2,7 @@ class jazzee {
   class {'jazzee::apache': }
   class {'jazzee::php': }
   class {'jazzee::mysql': }
+  class {'jazzee::mail': }
   $dbName     = 'jazzee'
   $dbUser     = 'jazzee'
   $dbPassword = 'jazzee'
