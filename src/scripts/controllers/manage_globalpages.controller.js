@@ -116,7 +116,7 @@ GlobalPageBuilder.prototype.importPageControl = function(){
 
     var form = new Form();
     var formObject = form.create(obj);
-    $('form',formObject).append($('<button type="submit" name="submit">').html('Save'));
+    $('form',formObject).append($('<button type="submit" name="submit">').html('Apply'));
 
     var div = $('<div>');
     div.css("overflow-y", "auto");

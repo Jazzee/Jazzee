@@ -90,7 +90,7 @@ List.prototype.manageListItemsButton = function(){
     });
     $('h5',listDiv).append(text);
 
-    var button = $('<button>').html('Save').bind('click',function(){
+    var button = $('<button>').html('Apply').bind('click',function(){
       var orderedItems = [];
       $('li', listDiv).each(function(i){
         var item = $(this).data('item');
