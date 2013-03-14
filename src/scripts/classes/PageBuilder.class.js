@@ -310,13 +310,13 @@ PageBuilder.prototype.getPagePreview = function(page){
 };
 
 /**
- * Get a preview of the page
- * @param {String} type
+ * Get an element type by its class name
+ * @param {String} typeClassName
  * @returns {}
  */
-PageBuilder.prototype.getElementType = function(typeName){
+PageBuilder.prototype.getElementType = function(typeClassName){
   for(var i = 0; i < this.elementTypes.length; i++){
-    if(this.elementTypes[i].typeName == typeName ) {
+    if(this.elementTypes[i].typeClass == typeClassName ) {
       return this.elementTypes[i];
     }
   }

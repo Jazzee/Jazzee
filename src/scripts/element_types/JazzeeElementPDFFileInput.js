@@ -14,7 +14,7 @@ JazzeeElementPDFFileInput.prototype.constructor = JazzeeElementPDFFileInput;
  */
 JazzeeElementPDFFileInput.prototype.newElement = function(id,title,typeId,typeName,typeClass,status,page){
   var element = FileInput.prototype.newElement.call(this,id,title,typeId,typeName,typeClass,status,page);
-  element.setProperty('max', page.pageBuilder.getElementType('PDFFileInput').configurationVariables.defaultApplicantFileUploadSize);
+  element.setProperty('max', page.pageBuilder.getElementType(typeClass).configurationVariables.defaultApplicantFileUploadSize);
   return element;
 };
 
