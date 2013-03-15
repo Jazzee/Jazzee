@@ -57,6 +57,8 @@ class AnswerEventListener
             $uow->computeChangeSet($answerMetadata, $answer);
           }
           $answer = $answer->getParent();
+        } else {
+          $answer = null;
         }
       }
     }
