@@ -18,7 +18,6 @@
             "require": {
                 "php": ">=5.3.2"
             },
-            "time": "2012-09-19 22:55:18",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -63,12 +62,13 @@
             "description": "Common Library for Doctrine projects",
             "homepage": "http://www.doctrine-project.org",
             "keywords": [
-                "collections",
-                "spl",
-                "eventmanager",
                 "annotations",
-                "persistence"
-            ]
+                "collections",
+                "eventmanager",
+                "persistence",
+                "spl"
+            ],
+            "time": "2012-09-19 22:55:18"
         },
         {
             "name": "doctrine/dbal",
@@ -85,10 +85,9 @@
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2",
-                "doctrine/common": "2.3.*"
+                "doctrine/common": "2.3.*",
+                "php": ">=5.3.2"
             },
-            "time": "2013-01-07 20:03:43",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -128,10 +127,11 @@
             "homepage": "http://www.doctrine-project.org",
             "keywords": [
                 "database",
-                "persistence",
                 "dbal",
+                "persistence",
                 "queryobject"
-            ]
+            ],
+            "time": "2013-01-07 20:03:43"
         },
         {
             "name": "doctrine/migrations",
@@ -148,8 +148,8 @@
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2",
-                "doctrine/dbal": ">=2.0,<2.5.x-dev"
+                "doctrine/dbal": ">=2.0,<2.5.x-dev",
+                "php": ">=5.3.2"
             },
             "require-dev": {
                 "symfony/console": "2.*",
@@ -158,7 +158,6 @@
             "suggest": {
                 "symfony/console": "to run the migration from the console"
             },
-            "time": "2012-12-27 16:39:29",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -185,7 +184,8 @@
             "keywords": [
                 "database",
                 "migrations"
-            ]
+            ],
+            "time": "2012-12-27 16:39:29"
         },
         {
             "name": "doctrine/orm",
@@ -202,15 +202,14 @@
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2",
-                "ext-pdo": "*",
                 "doctrine/dbal": "2.3.*",
+                "ext-pdo": "*",
+                "php": ">=5.3.2",
                 "symfony/console": "2.*"
             },
             "suggest": {
                 "symfony/yaml": "If you want to use YAML Metadata Mapping Driver"
             },
-            "time": "2013-01-07 20:05:04",
             "bin": [
                 "bin/doctrine",
                 "bin/doctrine.php"
@@ -255,7 +254,8 @@
             "keywords": [
                 "database",
                 "orm"
-            ]
+            ],
+            "time": "2013-01-07 20:05:04"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -274,7 +274,6 @@
             "require": {
                 "php": ">=5.2"
             },
-            "time": "2012-06-12 07:26:41",
             "type": "library",
             "autoload": {
                 "classmap": [
@@ -298,40 +297,40 @@
             ],
             "support": {
                 "source": "https://github.com/jrjohnson/htmlpurifier/tree/v4.4.0.1"
-            }
+            },
+            "time": "2012-06-12 07:26:41"
         },
         {
             "name": "jazzee/foundation",
-            "version": "1.0.12",
+            "version": "1.0.13",
             "source": {
                 "type": "git",
-                "url": "git@github.com:Jazzee/Foundation.git",
-                "reference": "1.0.12"
+                "url": "https://github.com/Jazzee/Foundation.git",
+                "reference": "1.0.13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Jazzee/Foundation/archive/1.0.12.zip",
-                "reference": "1.0.12",
+                "url": "https://api.github.com/repos/Jazzee/Foundation/zipball/1.0.13",
+                "reference": "1.0.13",
                 "shasum": ""
             },
             "require": {
+                "ezyang/htmlpurifier": "4.4.*",
                 "php": ">=5.3.0",
-                "symfony/console": "2.0.*",
-                "ezyang/htmlpurifier": "4.4.*"
+                "symfony/console": "2.0.*"
             },
             "suggest": {
                 "ext-apc": "Caching will significantly improve performance.",
+                "ext-clamav": "Clamav Extension, http://php-clamav.sourceforge.net/",
                 "ext-curl": "PHP Curl",
-                "ext-json": "PHP JSON",
-                "ext-imagick": "PHP Image Magick",
-                "ext-uuid": "PHP UUID",
-                "ext-mbstring": "PHP MBString",
-                "ext-ldap": "PHP LDAP",
-                "ext-xml": "PHP XML",
                 "ext-dom": "PHP DOM",
-                "ext-clamav": "Clamav Extension, http://php-clamav.sourceforge.net/"
+                "ext-imagick": "PHP Image Magick",
+                "ext-json": "PHP JSON",
+                "ext-ldap": "PHP LDAP",
+                "ext-mbstring": "PHP MBString",
+                "ext-uuid": "PHP UUID",
+                "ext-xml": "PHP XML"
             },
-            "time": "2013-01-22 19:04:45",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -343,7 +342,7 @@
                     "lib/phpmailer"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -358,7 +357,8 @@
             "homepage": "http://jazzee.org",
             "keywords": [
                 "framework"
-            ]
+            ],
+            "time": "2013-02-14 21:35:35"
         },
         {
             "name": "monolog/monolog",
@@ -379,18 +379,17 @@
                 "psr/log": ">=1.0,<2.0"
             },
             "require-dev": {
+                "doctrine/couchdb": "dev-master",
                 "mlehner/gelf-php": "1.0.*",
-                "raven/raven": "0.3.*",
-                "doctrine/couchdb": "dev-master"
+                "raven/raven": "0.3.*"
             },
             "suggest": {
-                "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
-                "raven/raven": "Allow sending log messages to a Sentry server",
                 "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-                "ext-mongo": "Allow sending log messages to a MongoDB server"
+                "ext-mongo": "Allow sending log messages to a MongoDB server",
+                "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "raven/raven": "Allow sending log messages to a Sentry server"
             },
-            "time": "2013-02-13 18:06:51",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -420,7 +419,8 @@
                 "log",
                 "logging",
                 "psr-3"
-            ]
+            ],
+            "time": "2013-02-13 18:06:51"
         },
         {
             "name": "psr/log",
@@ -436,7 +436,6 @@
                 "reference": "1.0.0",
                 "shasum": ""
             },
-            "time": "2012-12-21 11:40:51",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -458,7 +457,8 @@
                 "log",
                 "psr",
                 "psr-3"
-            ]
+            ],
+            "time": "2012-12-21 11:40:51"
         },
         {
             "name": "symfony/console",
@@ -478,7 +478,6 @@
             "require": {
                 "php": ">=5.3.2"
             },
-            "time": "2013-01-11 13:49:52",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -500,7 +499,8 @@
                 }
             ],
             "description": "Symfony Console Component",
-            "homepage": "http://symfony.com"
+            "homepage": "http://symfony.com",
+            "time": "2013-01-11 13:49:52"
         }
     ],
     "packages-dev": null,
