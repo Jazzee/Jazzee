@@ -153,12 +153,10 @@ class ApplicantPDF
    */
   public function pdf(\Jazzee\Entity\Applicant $applicant)
   {
-    $fullName = $this->pdf->utf8_to_utf16($applicant->getFullName(), '');
-    $this->pdf->set_info("Title", $fullName . ' Application');
     $this->setFont('p');
-    $this->addText($fullName . "\n", 'h1');
-    $this->addText('Email Address: ' . $this->pdf->utf8_to_utf16($applicant->getEmail(), '') . "\n", 'p');
-
+    $this->pdf->set_info("Title", $this->pdf->utf8_to_utf16($applicant->getFullName(), '') . ' Application');
+    $this->addText($applicant->getFullName() . "\n", 'h1');
+    $this->addText('Email Address: ' . $applicant->getEmail() . "\n", 'p');
 
     if ($applicant->isLocked()) {
       switch ($applicant->getDecision()->status()) {
