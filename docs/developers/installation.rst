@@ -32,9 +32,9 @@ Veewee        https://github.com/jedi4ever/veewee
 Once you have those installed you can run::
 
   cd JAZZEE_SRC/dev
-  vagrant basebox build Jazzee_CentOS63
-  vagrant basebox export Jazzee_CentOS63
-  vagrant box add Jazzee_CentOS63 Jazzee_CentOS63.box
+  vagrant basebox build Jazzee_CentOS64
+  vagrant basebox export Jazzee_CentOS64
+  vagrant box add Jazzee_CentOS64 Jazzee_CentOS64.box
 
 A lot of stuff will happen there - ISO files for Centos will be downloaded, a new installation will be built 
 and then packaged for export.  Depending on your connection speed it can take anywhere from a few minutes to a few hours.
@@ -43,9 +43,9 @@ Once that is complete you can go to JAZZEE_SRC and use vagrant to start a new VM
 
   vagrant up
 
-and Jazzee will be availalbe at http://localhost:8080
+and Jazzee will be available at http://localhost:8080
 
-You will need to run some intiial setup for Jazzee to get the database 
+You will need to run some initial setup for Jazzee to get the database 
 initialized.  Those directions are at :ref:`installation_initial-setup`.  You 
 should run them from the virtual machine by doing::
 

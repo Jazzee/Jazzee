@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant::Config.run do |config|
-  config.vm.box = "Jazzee_CentOS63"
+  config.vm.box = "Jazzee_CentOS64"
   config.vm.host_name = "web"
   config.vm.network :hostonly, "10.10.10.10"
   config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
