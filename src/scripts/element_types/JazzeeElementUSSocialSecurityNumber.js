@@ -14,6 +14,8 @@ JazzeeElementUSSocialSecurityNumber.prototype.constructor = JazzeeElementUSSocia
  */
 JazzeeElementUSSocialSecurityNumber.prototype.newElement = function(id,title,typeId,typeName,typeClass,status,page){
   var element = JazzeeElementEncryptedTextInput.prototype.newElement.call(this,id,title,typeId,typeName,typeClass,status,page);
+  element.setProperty('min', 9);
+  element.setProperty('max', 9);
   element.setProperty('format', '');
   return element;
 };

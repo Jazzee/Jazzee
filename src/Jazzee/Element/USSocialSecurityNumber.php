@@ -21,6 +21,7 @@ class USSocialSecurityNumber extends EncryptedTextInput
     $validator->setErrorMessage('This is not a valid US Social Secutiry Number');
     $element->addValidator($validator);
     $element->prependFilter(new \Foundation\Form\Filter\Replace($element, array('pattern'=>'/[^0-9]/', 'replace'=>'')));
+
     return $element;
   }
 
