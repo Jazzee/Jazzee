@@ -3,9 +3,12 @@
 namespace Jazzee;
 
 /**
- * Create a PDF from an Applicant object
- *
+ * Restricted PDFs are Safe for applicants to view, they don't include any extra information
+ * 
+ * 
+ * @todo Probably should baseclass the PDF process and then have Admin/Applicant PDFs for a clearer seperation
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
+ * @author  Lawrence Roberts <Lawrence.Roberts@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
 class RestrictedPDF extends ApplicantPDF
@@ -18,34 +21,10 @@ class RestrictedPDF extends ApplicantPDF
    */
   public function pdf(\Jazzee\Entity\Applicant $applicant)
   {
-    $fullName = $this->pdf->utf8_to_utf16($applicant->getFullName(), '');
-    $this->pdf->set_info("Title", $fullName . ' Application');
     $this->setFont('p');
-    $this->addText($fullName . "\n", 'h1');
-    $this->addText('Email Address: ' . $this->pdf->utf8_to_utf16($applicant->getEmail(), '') . "\n", 'p');
-
-
-    if ($applicant->isLocked()) {
-      switch ($applicant->getDecision()->status()) {
-        case 'finalDeny':
-          $status = 'Denied';
-            break;
-        case 'finalAdmit':
-          $status = 'Admited';
-            break;
-        case 'acceptOffer':
-          $status = 'Accepted';
-            break;
-        case 'declineOffer':
-          $status = 'Declined';
-            break;
-        default: $status = 'No Decision';
-      }
-    } else {
-      $status = 'Not Locked';
-    }
-
-    $this->addText("Admission Status: **********\n", 'p');
+    $this->pdf->set_info("Title", $this->pdf->utf8_to_utf16($applicant->getFullName(), '') . ' Application');
+    $this->addText($applicant->getFullName() . "\n", 'h1');
+    $this->addText('Email Address: ' . $applicant->getEmail() . "\n", 'p');
     $this->write();
     foreach ($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page) {
       if ($page->getJazzeePage() instanceof \Jazzee\Interfaces\PdfPage) {
@@ -56,9 +35,6 @@ class RestrictedPDF extends ApplicantPDF
     }
     $this->write();
     $this->pdf->end_page_ext("");
-    foreach ($applicant->getAttachments() as $attachment) {
-      $this->addPdf($attachment->getAttachment());
-    }
     $this->attachPdfs();
     $this->pdf->end_document("");
 

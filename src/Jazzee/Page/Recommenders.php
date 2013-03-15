@@ -371,8 +371,10 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
           $jazzeePage->setController($this->_controller);
           $jazzeePage->renderLorPdfAnswer($pdf, $this->_applicationPage->getPage()->getChildren()->first(), $child);
         }
-        if ($attachment = $answer->getAttachment()) {
-          $pdf->addPdf($attachment->getAttachment());
+        if(!$pdf instanceof \Jazzee\RestrictedPDF){
+          if ($attachment = $answer->getAttachment()) {
+            $pdf->addPdf($attachment->getAttachment());
+          }
         }
         $pdf->addText("\n", 'p');
       }

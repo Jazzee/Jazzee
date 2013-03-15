@@ -218,6 +218,12 @@ class JazzeeConfiguration
   protected $_allowApplicantPasswordChange;
 
   /**
+   * @var boolean
+   * Is the applicant allowed to print thier application
+   */
+  protected $_allowApplicantPrintApplication;
+
+  /**
    * @var string
    * The maximum size for administrator file uploads.
    * Defaults to the value of PHP's builtin upload_max_filesize which is generally pretty large
@@ -523,6 +529,7 @@ class JazzeeConfiguration
       'allowApplicantNameChange' => false,
       'allowApplicantEmailChange' => false,
       'allowApplicantPasswordChange' => false,
+      'allowApplicantPrintApplication' => false,
       'varPath' => \realpath(__DIR__ . '/../../var'),
       'shibbolethUsernameAttribute' => 'eppn',
       'shibbolethFirstNameAttribute' => 'givenName',
@@ -1153,6 +1160,24 @@ class JazzeeConfiguration
   public function setAllowApplicantPasswordChange($value)
   {
     $this->_allowApplicantPasswordChange = (bool)$value;
+  }
+
+  /**
+   * get allowApplicantPrintApplication
+   * @return string
+   */
+  public function getAllowApplicantPrintApplication()
+  {
+    return $this->_allowApplicantPrintApplication;
+  }
+
+  /**
+   * set allowApplicantPrintApplication
+   * @var string $value
+   */
+  public function setAllowApplicantPrintApplication($value)
+  {
+    $this->_allowApplicantPrintApplication = (bool)$value;
   }
 
   /**

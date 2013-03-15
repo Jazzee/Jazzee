@@ -463,9 +463,6 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
         } else {
           $pdf->addText('This score has not been received from ETS.', 'p');
         }
-        if ($attachment = $answer->getAttachment()) {
-          $pdf->addPdf($attachment->getAttachment());
-        }
         $pdf->addText("\n", 'p');
       }
     }

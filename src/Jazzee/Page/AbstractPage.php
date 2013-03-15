@@ -360,8 +360,10 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
         $pdf->addText("{$value}\n", 'p');
       }
     }
-    if ($attachment = $answer->getAttachment()) {
-      $pdf->addPdf($attachment->getAttachment());
+    if(!$pdf instanceof \Jazzee\RestrictedPDF){
+      if ($attachment = $answer->getAttachment()) {
+        $pdf->addPdf($attachment->getAttachment());
+      }
     }
   }
 
