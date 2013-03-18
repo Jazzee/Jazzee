@@ -177,7 +177,7 @@ class Version20130219000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
       $checkHash->execute(array($hash));
       if($checkHash->rowCount() == 0){
         $new++;
-        $insertFile->execute(array($hash, $encodedBlob, 0));
+        $insertFile->execute(array($hash, $encodedBlob, 1));
       } else {
         $update++;
         $updateFile->execute(array($hash));
@@ -202,7 +202,7 @@ class Version20130219000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
       $checkHash->execute(array($hash));
       if($checkHash->rowCount() == 0){
         $new++;
-        $insertFile->execute(array($hash, $encodedBlob, 0));
+        $insertFile->execute(array($hash, $encodedBlob, 1));
       } else {
         $update++;
         $updateFile->execute(array($hash));
