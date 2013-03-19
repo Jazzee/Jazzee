@@ -305,9 +305,19 @@ abstract class PageBuilder extends AdminController
       switch ($child->status) {
         case 'delete':
           $childPage = $page->getChildById($child->id);
-          $this->_em->remove($childPage);
-          $page->getChildren()->removeElement($childPage);
-          $this->addMessage('success', $childPage->getTitle() . ' page deleted.');
+
+	  // FIX #591 the above method returns false if child is not found,
+	  // in which case we can skip the deletion
+	  if($childPage){ 
+	    $this->log(" ==> about to delete child");
+	    $this->_em->remove($childPage);
+
+	    $page->getChildren()->removeElement($childPage);
+	    $this->addMessage('success', $childPage->getTitle() . ' page deleted.');
+	  }else{
+	    $this->log("EntityManager is not aware of child page, skipping delete");
+	  }
+
           break;
         case 'import':
           $childPage = new \Jazzee\Entity\Page();
