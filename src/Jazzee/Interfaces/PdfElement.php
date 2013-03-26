@@ -19,4 +19,7 @@ interface PdfElement
    * @return mixed
    */
   function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf);
+
+  function pdfValueFromArray(array $answerData, \Jazzee\ApplicantPDF $pdf);
+
 }

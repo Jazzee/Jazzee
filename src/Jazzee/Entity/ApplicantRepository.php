@@ -268,7 +268,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     return $results;
   }
 
-  public function findPDFsByApplication(Application $application, \Jazzee\Interfaces\Display $display, array $applicantIds)
+  public function findPDFsForApplication(Application $application, \Jazzee\Interfaces\Display $display, array $applicantIds)
   {
     $results = array();
     foreach(array_chunk($applicantIds, 20) as $limitedIds){
@@ -289,6 +289,13 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
       $query->setHint(\Doctrine\ORM\Query::HINT_INCLUDE_META_COLUMNS, true);
       $query->setHydrationMode('ApplicantDisplayHydrator');
       $results = array_merge($results, $query->execute());
+
+      unset($queryBuilder);
+      $queryBuilder = null;
+      unset($query);
+      $query = null;
+      gc_collect_cycles();
+
     }
     
     return $results;
