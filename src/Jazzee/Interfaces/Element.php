@@ -59,6 +59,15 @@ interface Element
    */
   function displayValue(\Jazzee\Entity\Answer $answer);
 
+
+  /**
+   * Get the value of the element formated for display
+   *
+   * @param \Jazzee\Entity\Answer $answer
+   * @return string
+   */
+  function displayValueFromArray(array $answerData);
+
   /**
    * Get the value of the element that \Foundation\Form\Element will accept
    *

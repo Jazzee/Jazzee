@@ -305,27 +305,121 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $zip->open($zipFile, ZipArchive::CREATE);
     $zip->addEmptyDir($directoryName);
     $count = 0;
-    foreach ($applicants as $key => $id) {
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->find($id, true);
 
-      $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
+    // we need this b/c otherwise the readfile call (to write the file
+    // to the client) may attempt to slurp the whole archive and run out of memory.
+    // output buffering on or off does not affect the zip leak issue below.
+    if (ob_get_level()) {
+      $this->log("output buffering is on! level: ".ob_get_level().", stopping now..");
+      ob_end_clean();
+    }
+    // ensure garbage collection is on
+    gc_enable();
+
+    $displays = array();
+    foreach($this->listDisplays() as $key => $display){
+      $displays[$key] = $display;
+    }
+
+    $display = $this->getDisplay($displays[$this->post['display']]);
+    $applicantCount = 0;
+    $tempFileArray = array();
+    $tmppath = $this->_config->getVarPath() . '/tmp';
+
+    foreach ($applicants as $key => $id) {
+      $applicantCount++;
+      $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
+
+      $usage = $this->format_mem(memory_get_usage (true));
+      $usage2 = $this->format_mem($this->memory_get_sys_usage());
       
-      $zip->addFromString($directoryName . '/' . $applicant->getFullName() . '.pdf', $pdf->pdf($applicant));
-      if ($count > 50) {
-        $count = 0;
-        $this->_em->clear();
-        gc_collect_cycles();
+      $this->log("ITERATION[$applicantCount] via temp file '$temp_file_name', mem usage: ".$usage." vs. ".$usage2);
+
+
+      $idsArray = array();
+      $idsArray[] = $id;
+      // this method will return 1 applicant as the single item in an array.
+      // the pdf2 method below will throw an exception if mor are passed.
+      $appPDFs = $this->_em->getRepository('Jazzee\Entity\Applicant')->findPDFsForApplication($this->_application, $display, $idsArray);
+      // $this->log("Have applicant: ".var_export($appPDFs, true));
+      $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
+
+      $fullName = $appPDFs[0]["firstName"]." ".$appPDFs[0]["lastName"];
+
+      // 1. with output buffering turned off, leak still exists
+      // 2. just calling this, without writing to the zip, does not leak memory
+      try{
+      $pdfResult = $pdf->pdf2($this->_application, $appPDFs);
+      }catch(Exception $oom){
+	$this->_em->clear();
+	gc_collect_cycles();
+	$this->log("OUT OF MEMORY! ".var_export($appPDFs, true));
       }
-      $count++;
+      // 3. these both leak
+      //    $zip->addFromString($directoryName . '/' . $fullName . '.pdf', $pdf->pdf2($this->_application, $appPDFs));
+      //    $zip->addFromString($directoryName . '/' . $fullName . '.pdf', $pdfResult);
+
+      // writing to a temp file first and then using the zip#addFile method
+      // does not cause a leak.
+      $temp = fopen($temp_file_name, 'w') or die("Unable to open temp file $temp_file_name");
+      fwrite($temp, $pdfResult);
+
+      // add file just adds to the queue, the file is not written until later.
+      $zip->addFile($temp_file_name, $directoryName . '/' . $fullName . '.pdf');
+      // so we add the handle for cleanup after the zip is closed 
+      $tempFileArray[] = $temp;
+
+      unset($pdfResult);
+      $pdfResult = null;
+      unset($pdf);
+      $pdf = null;
+      unset($appPDFs);
+      $appPDFs = null;
+      //if ($count > 50) {
+       $count = 0;
+       $this->_em->clear();
+       gc_collect_cycles();
+       //}
+       $count++;
     }
     $zip->close();
+
+    foreach($tempFileArray as $temp){
+       fclose($temp);
+       $temp = null;
+    }
+
     header('Content-Type: ' . 'application/zip');
     header('Content-Disposition: attachment; filename='. $directoryName . '.zip');
     header('Content-Transfer-Encoding: binary');
     header('Content-Length: ' . filesize($zipFile));
     readfile($zipFile);
     unlink($zipFile);
+
+    unset($zip);
+    $zip = null;
+    unset($zipFile);
+    $zipFile = null;
     exit(0);
   }
+
+  function format_mem($mem_usage){
+    $usage = "";
+      if ($mem_usage < 1024) 
+	$usage = $mem_usage." bytes"; 
+      elseif ($mem_usage < 1048576) 
+	$usage = round($mem_usage/1024,2)." kb"; 
+      else 
+	$usage = round($mem_usage/1048576,2)." mb";
+
+      return $usage;
+  }
+
+  function memory_get_sys_usage() 
+  { 
+    $pid = getmypid(); 
+    exec("ps -o rss -p $pid", $output); 
+    return $output[1] *1024; 
+  } 
 
 }
