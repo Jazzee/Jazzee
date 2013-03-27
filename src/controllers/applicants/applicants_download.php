@@ -35,15 +35,6 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $element->newItem('pdfarchive', 'Archive of Multiple PDFs');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-    $element = $field->newElement('RadioList', 'display');
-    $element->setLabel('Display');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $displays = array();
-    foreach($this->listDisplays() as $key => $display){
-      $displays[$key] = $display;
-      $element->newItem($key, $display['name']);
-    }
-
     $element = $field->newElement('CheckboxList', 'filters');
     $element->setLabel('Types of applicants');
     $element->newItem('unlocked', 'Incomplete');
@@ -111,7 +102,8 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           $applicantsArray[] = $applicant['id'];
         }
       } //end foreach applicants
-      $display = $this->getDisplay($displays[$input->get('display')]);
+      //use a full applicant display where display is needed
+      $display= new \Jazzee\Display\FullApplication($this->_application);
       unset($ids);
       switch ($input->get('type')) {
         case 'xls':
