@@ -29,9 +29,9 @@ class SetupDecisionlettersController extends \Jazzee\AdminController
       '_Offer_Response_Deadline_'
     );
     $replace = array();
-    $replace[] = $now->format('F jS Y');
+    $replace[] = "&lt;&lt;admission date&gt;&gt; [formatted: ".$now->format('F jS Y')."]";
     $replace[] = 'John Smith';
-    $replace[] = $now->format('F jS Y g:ia');
+    $replace[] = "&lt;&lt;offer deadline date&gt;&gt; [formatted: ".$now->format('F jS Y g:ia')."]";
     $text = str_ireplace($search, $replace, $text);
 
     $text = nl2br($text);
@@ -43,7 +43,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController
       '_Applicant_Name_'
     );
     $replace = array();
-    $replace[] = $now->format('F jS Y');
+    $replace[] = "&lt;&lt;deny date&gt;&gt; [formatted: ".$now->format('F jS Y')."]";
     $replace[] = 'John Smith';
     $text = str_ireplace($search, $replace, $text);
 

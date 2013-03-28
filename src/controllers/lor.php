@@ -51,8 +51,11 @@ class LorController extends \Jazzee\Controller
       $jzp = $page->getApplicationPageJazzeePage();
       $jzp->setController($this);
       if ($input = $jzp->validateInput($this->post)) {
+	$fullName = $answer->getApplicant()->getFullName();
         $jzp->newLorAnswer($input, $answer);
         $this->setVar('answer', $answer);
+
+        $this->setVar('applicantFullName', $fullName);
         $this->loadView($this->controllerName . '/review');
       }
     }
