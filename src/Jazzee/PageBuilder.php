@@ -306,8 +306,6 @@ abstract class PageBuilder extends AdminController
         case 'delete':
           $childPage = $page->getChildById($child->id);
 
-	  // FIX #591 the above method returns false if child is not found,
-	  // in which case we can skip the deletion
 	  if($childPage){ 
 	    $this->log(" ==> about to delete child");
 	    $this->_em->remove($childPage);
