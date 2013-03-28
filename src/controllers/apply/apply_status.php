@@ -119,6 +119,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
     }
     $this->setVar('sirAcceptPage', $sirAcceptPage);
     $this->setVar('sirDeclinePage', $sirDeclinePage);
+    $this->setVar('actionPath', $this->applyPath('status/sir'));
 
     $form = new \Foundation\Form();
     $form->setAction($this->applyPath('status/sir'));
