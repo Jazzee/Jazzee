@@ -48,7 +48,9 @@ print '<?xml version="1.0" encoding="UTF-8"?>'
             <div id='topbar'><?php echo $layoutContentTop ?></div>
             <div id='messages'><?php $this->renderElement('messages') ?></div>
             <div id='content' class='tall'><?php echo $layoutContent ?></div>
-            <div id='ft'><p>This Application has been designed to meet current web standards in xhtml, css, and javascript in order to be accessible to everyone. If you notice a problem with the application or find it inaccessible in any way please let us know.</p></div>
+
+            <div id='ft'></div>
+
           </div> <!-- end main -->
         </div> <!-- end yui-main -->
       </div> <!-- end bd -->
