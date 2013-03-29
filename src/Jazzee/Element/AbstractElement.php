@@ -43,24 +43,14 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
   }
 
   public function pdfValueFromArray(array $answerData, \Jazzee\ApplicantPDF $pdf){
-    return html_entity_decode($this->displayValueFromArray($answerData));
-  }
-
-  function displayValueFromArray(array $answerData){
-    if (isset($answerData['elements'][0])) {
-      $displayValue = null;
-      if(isset($answerData['elements'][0]['displayValue'])){
-	$displayValue = $answerData['elements'][0]['displayValue'];
+    foreach($answerData['elements'] as $arr){
+      if($arr['id'] == $this->_element->getId()){
+        return $arr['displayValue'];
       }
-      
-      if($displayValue != null)
-	return nl2br(htmlentities($displayValue, ENT_COMPAT, 'utf-8'));
     }
 
     return null;
-
   }
-
 
   /**
    * Abstract element kills all queries

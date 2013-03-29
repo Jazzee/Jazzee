@@ -392,8 +392,6 @@ class JazzeePageController extends \Foundation\VC\Controller
   {
     $message = $exception->getMessage();
 
-    $trace = $exception->getTraceAsString();
-    error_log("PAGE ERROR: ".$trace);
     $userMessage = 'Unspecified Technical Difficulties';
     $code = 500;
     $log = $this->_log;
