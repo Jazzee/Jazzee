@@ -17,4 +17,13 @@ interface PdfPage extends DataPage
    * @param \Jazzee\ApplicantPDF
    */
   function renderPdfSection(\Jazzee\ApplicantPDF $pdf);
+
+  /**
+   * Render the pdf section of this page from an applicant display array
+   *
+   * @param array $pageData
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @return mixed
+   */
+  function renderPdfSectionFromArray(array $pageData, \Jazzee\ApplicantPDF $pdf);
 }

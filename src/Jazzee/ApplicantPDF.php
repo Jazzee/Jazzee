@@ -77,27 +77,6 @@ class ApplicantPDF
    */
   protected $_controller;
 
-  public function __destruct(){
-    foreach ($this->appendQueue as $blob) {
-      unset($blob);
-      $blob = null;
-    }
-
-    unset($this->pdf);
-    $this->pdf = null;
-    unset($this->appendQueue);
-    $this->appendQueue = null;
-    unset($this->_controller);
-    $this->_controller = null;
-    unset($this->fonts);
-    $this->fonts = null;
-    unset($this->currentText);
-    $this->currentText = null;
-    unset($this->currentTable);
-    $this->currentTable = null;
-
-  }
-
   /**
    * Constructor
    * @param string $key the PDFLib license key we are using
@@ -117,8 +96,6 @@ class ApplicantPDF
     $this->pdf->set_parameter("errorpolicy", "exception");
     $this->pdf->set_parameter("hypertextencoding", "unicode");
     $this->pdf->set_parameter("flush", "page");
-
-    $this->textFlowCache = array();
 
     $this->fonts = array(
       'h1' => array('face' => 'Helvetica-Bold', 'size' => '16.0', 'leading' => '100%', 'color' => array(207, 102, 0)),
@@ -148,9 +125,10 @@ class ApplicantPDF
     //add the first page
     $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
     $this->currentY = $this->pageHeight - 20;
+    $this->setFont('p');
 
     $this->pdf->set_info("Creator", "Jazzee");
-    $this->pdf->set_info("Author", "Jazzee Open Applicatoin Platform");
+    $this->pdf->set_info("Author", "Jazzee Open Application Platform");
     $this->currentText = $this->pdf->create_textflow('', '');
 
     $this->_controller = $controller;
@@ -177,7 +155,6 @@ class ApplicantPDF
    */
   public function pdf(\Jazzee\Entity\Applicant $applicant)
   {
-    $this->setFont('p');
     $this->pdf->set_info("Title", $this->pdf->utf8_to_utf16($applicant->getFullName(), '') . ' Application');
     $this->addText($applicant->getFullName() . "\n", 'h1');
     $this->addText('Email Address: ' . $applicant->getEmail() . "\n", 'p');
@@ -221,28 +198,20 @@ class ApplicantPDF
     return $this->pdf->get_buffer();
   }
 
-  public function pdf2(\Jazzee\Entity\Application $app, array $applicantPDFData)
+  /**
+   * PDF a full single applicant using the display array
+   * @param \Jazzee\Entity\Application $application
+   * @param array $applicant
+   * @return string the PDF buffer suitable for display
+   */
+  public function pdfFromApplicantArray(\Jazzee\Entity\Application $application, array $applicant)
   {
-    // we only pass a single application id so we should only get one
-    // array item returned
-    if(count($applicantPDFData) > 1){
-      throw new Exception("pdf2 was passed an applicant array with more than one item: "+count($applicantPDFData));
-    }
+    $this->pdf->set_info("Title", $this->pdf->utf8_to_utf16($applicant["fullName"], '') . ' Application');
+    $this->addText($applicant["fullName"] . "\n", 'h1');
+    $this->addText('Email Address: ' . $applicant["email"] . "\n", 'p');
 
-    $fn = $applicantPDFData[0]["fullName"];
-    $email = $applicantPDFData[0]["email"];
-    $locked = $applicantPDFData[0]["isLocked"];
-    $decision = $applicantPDFData[0]["decision"]["status"];
-
-    $fullName = $this->pdf->utf8_to_utf16($fn, '');
-    $this->pdf->set_info("Title", $fullName . ' Application');
-    $this->setFont('p');
-    $this->addText($fullName . "\n", 'h1');
-    $this->addText('Email Address: ' . $this->pdf->utf8_to_utf16($email, '') . "\n", 'p');
-
-
-    if ($locked) {
-      switch ($decision) {
+    if ($applicant["isLocked"]) {
+      switch ($applicant["decision"]["status"]) {
         case 'finalDeny':
           $status = 'Denied';
             break;
@@ -262,39 +231,29 @@ class ApplicantPDF
     }
     $this->addText("Admission Status: {$status}\n", 'p');
     $this->write();
-    foreach ($app->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $page) {
-      if ($page->getJazzeePage() instanceof \Jazzee\Interfaces\PdfPage) {
-        $page->getJazzeePage()->setController($this->_controller);
-        $page->getJazzeePage()->renderPdfSectionFromArray($this,$applicantPDFData);
+    
+    $pages = array();
+    foreach($applicant['pages'] as $pageArray){
+      $pages[$pageArray['id']] = $pageArray['answers'];
+    }
+    foreach ($application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPath) {
+      if ($applicationPath->getJazzeePage() instanceof \Jazzee\Interfaces\PdfPage) {
+        $applicationPath->getJazzeePage()->setController($this->_controller);
+        $pageData = array_key_exists($applicationPath->getPage()->getId(), $pages)?$pages[$applicationPath->getPage()->getId()]:array();
+        $applicationPath->getJazzeePage()->renderPdfSectionFromArray($pageData, $this);
       }
     }
     $this->write();
     $this->pdf->end_page_ext("");
 
-    try{
-      // applicants may have multiple attachments
-      foreach ( $applicantPDFData[0]["attachments"] as $attachment) {
-	if($attachment["attachmentHash"]){
-	  $blob = \Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]);
-	  
-	  $this->addPdf($blob);
-	  $blob = null;
-	}else{
-	  $this->log("ERROR: attachment has no hash: ".var_export($attachment, true));
-	}
-      }
-    }catch(Exception $attachFailed){
-      $this->log("ERROR: failed to add attachments: ".$attachFailed->getTraceAsString());
+    foreach ( $applicant["attachments"] as $attachment) {
+      $blob = \Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]);
+      $this->addPdf($blob);
+      $blob = null;
     }
 
     $this->attachPdfs();
     $this->pdf->end_document("");
-
-    $fn = null;
-    $email = null;
-    $locked = null;
-    $decision = null;
-    $fullName = null;
 
     return $this->pdf->get_buffer();
   }
@@ -327,9 +286,7 @@ class ApplicantPDF
    */
   public function addText($text, $type)
   {
-    $txtFlowId = $this->pdf->add_textflow($this->currentText, $this->pdf->utf8_to_utf16($text, ''), $this->fontOptions($type));
-
-    $this->textFlowCache[] = $txtFlowId;
+    $this->pdf->add_textflow($this->currentText, $this->pdf->utf8_to_utf16($text, ''), $this->fontOptions($type));
   }
 
   /**
@@ -352,7 +309,6 @@ class ApplicantPDF
 
     $this->pdf->delete_textflow($this->currentText);
     $this->currentText = $this->pdf->create_textflow('', '');
-    $this->textFlowCache = array();
   }
 
   /**
@@ -393,6 +349,7 @@ class ApplicantPDF
   {
     $this->pdf->end_page_ext("");
     $this->pdf->begin_page_ext($this->pageWidth, $this->pageHeight, "");
+    $this->setFont('p');
     $this->currentY = $this->pageHeight - 20;
   }
 

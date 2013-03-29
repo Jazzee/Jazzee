@@ -20,6 +20,13 @@ interface PdfElement
    */
   function pdfValue(\Jazzee\Entity\Answer $answer, \Jazzee\ApplicantPDF $pdf);
 
+  /**
+   * Get the pdf value of the element from an array
+   *
+   * @param array $answer
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @return mixed
+   */
   function pdfValueFromArray(array $answerData, \Jazzee\ApplicantPDF $pdf);
 
 }

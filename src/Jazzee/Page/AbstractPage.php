@@ -367,27 +367,14 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     }
   }
 
-  public function renderPdfSectionFromArray(\Jazzee\ApplicantPDF $pdf, array $applicantPDFData)
+  public function renderPdfSectionFromArray(array $answers, \Jazzee\ApplicantPDF $pdf)
   {
     $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
-
-    // In StandardPage#getStatus() calls AbstractPage#getAnswers() which 
-    // uses the applicant object that we dont have, so pull the value from the array
-    //    if ($this->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) {
-    //  $pdf->addText("Applicant Skipped this page.\n", 'p');
-    //} else {
-
-
-    $answers = $this->findAnswersByPageFromArray($this->_applicationPage, $applicantPDFData);
-
-    if (!$this->_applicationPage->isRequired() and count($answers) and $answers[0]["pageStatus"] == self::SKIPPED) {
+    if (!$this->_applicationPage->isRequired() and count($answers) and $this->getArrayStatus($answers) == self::SKIPPED) {
       $pdf->addText("Applicant Skipped this page.\n", 'p');
-
     }else{
-      //$this->log("DUMPING PDF:".var_export($answers, true));
-       //foreach ($this->getAnswers() as $answer) {
       foreach ($answers as $answer) {
-        $this->renderPdfAnswerFromArray($pdf, $this->_applicationPage->getPage(), $answer);
+        $this->renderPdfAnswerFromArray($this->_applicationPage->getPage(), $pdf, $answer);
         $pdf->addText("\n", 'p');
       }
     }
@@ -399,7 +386,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
    * @param \Jazzee\Entity\Page $page
    * @param \Jazzee\Entity\Answer $answer
    */
-  protected function renderPdfAnswerFromArray(\Jazzee\ApplicantPDF $pdf, \Jazzee\Entity\Page $page, array $answerData)
+  protected function renderPdfAnswerFromArray(\Jazzee\Entity\Page $page, \Jazzee\ApplicantPDF $pdf, array $answerData)
   {
     foreach ($page->getElements() as $element) {
       $element->getJazzeeElement()->setController($this->_controller);
@@ -411,39 +398,9 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     }
 
     if ($attachment = $answerData['attachment']) {
-      try{
-	if($attachment["attachmentHash"]){
-	  $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]));
-	}else{
-	  $this->log("ERROR: attachment has no hash: ".var_export($attachment, true));
-	}
-      
-      }catch(Exception $attachFailed){
-	$this->log("ERROR: failed to add attachments: ".$attachFailed->getTraceAsString());
-      }
+      $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]));
     }
   }
-
-  /**
-   * $page is an ApplicationPage
-   */
-  public function findAnswersByPageFromArray(\Jazzee\Entity\ApplicationPage $page, array $applicantData)
-  {
-    $return = array();
-
-    foreach($applicantData as $item){
-      foreach($item['pages'] as $pageData){
-	if ($pageData['id'] == $page->getPage()->getId()) {
-	  foreach($pageData['answers'] as $answer){
-	    $return[] = $answer;
-	  }
-	}
-      }
-    }
-
-    return $return;
-  }
-
 
   /**
    * By default just set the varialbe dont check it

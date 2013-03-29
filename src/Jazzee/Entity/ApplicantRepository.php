@@ -267,39 +267,6 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     
     return $results;
   }
-
-  public function findPDFsForApplication(Application $application, \Jazzee\Interfaces\Display $display, array $applicantIds)
-  {
-    $results = array();
-    foreach(array_chunk($applicantIds, 20) as $limitedIds){
-      $queryBuilder = $this->deepApplicantQuery($display);
-      $queryBuilder->andWhere('applicant.application = :applicationId');
-      $queryBuilder->andWhere('applicant.deactivated=false');
-      $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
-      $queryBuilder->setParameter('applicationId', $application->getId());
-      $expression = $queryBuilder->expr()->orX();
-      foreach($limitedIds as $key => $value){
-        $paramKey = 'applicantId' . $key;
-        $expression->add($queryBuilder->expr()->eq("applicant.id", ":{$paramKey}"));
-        $queryBuilder->setParameter($paramKey, $value);
-      }
-      $queryBuilder->andWhere($expression);
-
-      $query = $queryBuilder->getQuery();
-      $query->setHint(\Doctrine\ORM\Query::HINT_INCLUDE_META_COLUMNS, true);
-      $query->setHydrationMode('ApplicantDisplayHydrator');
-      $results = array_merge($results, $query->execute());
-
-      unset($queryBuilder);
-      $queryBuilder = null;
-      unset($query);
-      $query = null;
-      gc_collect_cycles();
-
-    }
-    
-    return $results;
-  }
   
   /**
    * Get a deep application query builder
