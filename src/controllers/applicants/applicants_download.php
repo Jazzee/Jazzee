@@ -295,6 +295,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
    */
   protected function makePdfArchive(array $applicants, \Jazzee\Interfaces\Display $display)
   {
+    // ensure garbage collection is on, we need it
+    gc_enable();
+
     $directoryName = $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy');
     $zipFile = $this->_config->getVarPath() . '/tmp/' . uniqid() . '.zip';
     $zip = new ZipArchive;
@@ -309,10 +312,8 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
         $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
         $tempFileArray[] = $temp_file_name;
-        $blob = $pdf->pdfFromApplicantArray($this->_application, $applicantArray);
-        file_put_contents($temp_file_name, $blob);
+        file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
         $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . '.pdf');
-        unset($blob);
         unset($pdf);
       }
     }
@@ -321,6 +322,11 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     header('Content-Type: ' . 'application/zip');
     header('Content-Disposition: attachment; filename='. $directoryName . '.zip');
     header('Content-Transfer-Encoding: binary');
+    // we need this b/c otherwise the readfile call (to write the file
+    // to the client) may attempt to slurp the whole archive and run out of memory.
+    if (ob_get_level()) {
+      ob_end_clean();
+    }
     header('Content-Length: ' . filesize($zipFile));
     readfile($zipFile);
     unlink($zipFile);
