@@ -19,6 +19,13 @@ class FileRepository extends \Doctrine\ORM\EntityRepository
     $query->execute();
   }
   
+  /**
+   * Seed the file cache with any files accessed after a date
+   * 
+   * @param \Jazzee\FileStore $fileStore
+   * @param \DateTime $lastAccessedSince
+   * @return int
+   */
   public function seedFileCache(\Jazzee\FileStore $fileStore, \DateTime $lastAccessedSince)
   {
     $query = $this->_em->createQuery('SELECT f.hash FROM Jazzee\Entity\File f WHERE f.lastAccess > :lastAccess');
@@ -31,5 +38,26 @@ class FileRepository extends \Doctrine\ORM\EntityRepository
     }
 
     return $cached;
+  }
+  
+  /**
+   * Get the file as an array by hash
+   * 
+   * @param string $hash
+   * @return array
+   */
+  public function findArrayByHash($hash)
+  {
+    $query = $this->_em->createQuery('SELECT f from Jazzee\Entity\File f WHERE f.hash= :hash');
+    $query->setParameter('hash', $hash);
+    $result = $query->getSingleResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+    //we use a second array becuase the other properties are internal
+    $arr = array();
+    $arr['blob'] = base64_decode($result['encodedBlob']);
+    $arr['hash'] = $result['hash'];
+    $arr['lastAccess'] = $result['lastAccess'];
+    $arr['lastModification'] = $result['lastModification'];
+    
+    return $arr;
   }
 }
