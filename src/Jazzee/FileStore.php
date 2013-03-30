@@ -96,8 +96,8 @@ class FileStore
   public function seedCache($hash)
   {
     if(!$this->inCache($hash)){
-      $file = $this->getFileEntity($hash);
-      $this->cacheBlob($file->getHash(), $file->getBlob());
+      $file = $this->getFileArray($hash);
+      $this->cacheBlob($file['hash'], $file['blob']);
       return true;
     }
 
@@ -115,9 +115,9 @@ class FileStore
     if($this->inCache($hash)){
       return file_get_contents($this->cachePath($hash));
     }
-    if($file = $this->getFileEntity($hash)){
-      $this->cacheBlob($file->getHash(), $file->getBlob());
-      return $file->getBlob();
+    if($file = $this->getFileArray($hash)){
+      $this->cacheBlob($file['hash'], $file['blob']);
+      return $file['blob'];
     }
 
     return false;
@@ -148,8 +148,8 @@ class FileStore
   public function getFilePath($hash)
   {
     if(!$this->inCache($hash)){
-      if($file = $this->getFileEntity($hash)){
-        $this->cacheBlob($file->getHash(), $file->getBlob());
+      if($file = $this->getFileArray($hash)){
+        $this->cacheBlob($file['hash'], $file['blob']);
       } else {
         return false;
       }
@@ -166,6 +166,16 @@ class FileStore
    */
   protected function getFileEntity($hash){
     return $this->_entityManager->getRepository('Jazzee\Entity\File')->findOneBy(array('hash'=>$hash));
+  }
+  
+  /**
+   * Get the file array
+   * @param type $hash
+   * 
+   * @return array
+   */
+  protected function getFileArray($hash){
+    return $this->_entityManager->getRepository('Jazzee\Entity\File')->findArrayByHash($hash);
   }
   
   /**
