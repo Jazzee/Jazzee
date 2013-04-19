@@ -59,6 +59,15 @@ class ApplyPageController extends \Jazzee\AuthenticatedApplyController
     }
   }
 
+  public function actionLookupschool()
+  {
+    $listOfSchools = $this->_em->getRepository('Jazzee\Entity\School')->findByAnyKeyword(preg_split('/\s+/', $_GET["searchTerm"])); 
+
+    header('Content-Type: application/json');
+    print "{result:".json_encode($listOfSchools)."}";
+    exit(0);
+  }
+
   /**
    * Perform a generic ApplyPage specific action
    * Pass the input through to the apply page

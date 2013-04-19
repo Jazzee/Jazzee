@@ -52,8 +52,32 @@ $basicRouter->addRoute('#^(?:admin/)?static/(.*)$#i', array(
   )
 ));
 
+
+$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/lookupschool#i', array(
+  'controller' => 'apply_page',
+  'action' => 'lookupschool',
+  'action_params' => array(
+    'programShortName' => 1,
+    'cycleName' => 2
+  )
+));
+
+
+
+
 //the apply page is the actual application
-$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(index|edit|delete)/([0-9]+)(/[0-9]+)?)?$#i', array(
+$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(lookupschool)?)?$#i', array(
+  'controller' => 'apply_page',
+  'action' => 4,
+  'action_params' => array(
+    'programShortName' => 1,
+    'cycleName' => 2,
+    'pageID' => 3 
+  )
+));
+
+//the apply page is the actual application
+$basicRouter->addRoute('#^apply/([^/]+)/([^/]+)/page/([0-9]+)/?(?:(index|edit|delete|lookupschool)/([0-9]+)(/[0-9]+)?)?$#i', array(
   'controller' => 'apply_page',
   'action' => 4,
   'action_params' => array(
@@ -86,6 +110,7 @@ $basicRouter->addRoute('#^apply/?([^/]*)/?([^/]*)$#i', array(
     'cycleName' => 2
   )
 ));
+
 
 //apply welcome gets any blank requests
 $basicRouter->addRoute('#^$#i', array(
