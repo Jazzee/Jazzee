@@ -282,6 +282,47 @@ class Branching extends Standard
       }
     }
   }
+  
+  /**
+   * Get the values for each element for use in the PDF template
+   * @return array
+   */
+  public function getPdfTemplateValues()
+  {
+    $values = parent::getPdfTemplateValues();
+    foreach($this->_applicationPage->getPage()->getChildren() as $child){
+      foreach($child->getElements() as $element){
+        $elementValues = array();
+        foreach($this->getAnswers() as $answer){
+          foreach($answer->getChildren() as $childAnswer){
+            $values[0] = $childAnswer->getPage()->getTitle();
+            $element->getJazzeeElement()->setController($this->_controller);
+            $elementValues[] = $element->getJazzeeElement()->displayValue($childAnswer);
+          }
+        }
+        $values[$element->getId()] = implode("\n", $elementValues);
+      }
+    }
+
+    return $values;
+  }
+  
+  /**
+   * Get the values for each element for use in the PDF template
+   * @return array
+   */
+  public function listPdfTemplateElements()
+  {
+    $templateElements = array();
+    $templateElements['page-'.$this->_applicationPage->getPage()->getId() . '-element-0'] = $this->_applicationPage->getTitle() . ': ' . substr($this->_applicationPage->getPage()->getVar('branchingElementLabel'), 0, 64);
+    foreach($this->_applicationPage->getPage()->getChildren() as $child){
+      foreach($child->getElements() as $element){
+        $templateElements['page-'.$this->_applicationPage->getPage()->getId() . '-element-' . $element->getId()] = $this->_applicationPage->getTitle() . ': ' . $child->getTitle() . ': ' . substr($element->getTitle(), 0, 64);
+      }
+    }
+
+    return $templateElements;
+  }
 
   /**
    * Render branching LOR pdf section

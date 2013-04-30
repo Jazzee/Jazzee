@@ -401,6 +401,39 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
       $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]));
     }
   }
+  
+  /**
+   * Get the values for each element for use in the PDF template
+   * @return array
+   */
+  public function getPdfTemplateValues()
+  {
+    $values = array();
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $elementValues = array();
+      foreach($this->getAnswers() as $answer){
+        $element->getJazzeeElement()->setController($this->_controller);
+        $elementValues[] = $element->getJazzeeElement()->displayValue($answer);
+      }
+      $values[$element->getId()] = implode("\n", $elementValues);
+    }
+
+    return $values;
+  }
+  
+  /**
+   * Get the values for each element for use in the PDF template
+   * @return array
+   */
+  public function listPdfTemplateElements()
+  {
+    $templateElements = array();
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $templateElements['page-'.$this->_applicationPage->getPage()->getId() . '-element-' . $element->getId()] = $this->_applicationPage->getTitle() . ': ' . substr($element->getTitle(), 0, 64);;
+    }
+
+    return $templateElements;
+  }
 
   /**
    * By default just set the varialbe dont check it

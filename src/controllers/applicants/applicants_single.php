@@ -1207,6 +1207,25 @@ class ApplicantsSingleController extends \Jazzee\AdminController
   }
 
   /**
+   * Create a pdf from template
+   * @param integer $applicantId
+   * @param integer $templateId
+   */
+  public function actionPdftemplate($applicantId, $templateId)
+  {
+    $applicant = $this->getApplicantById($applicantId);
+    if($template = $this->_application->getTemplateById($templateId)){
+      $pdf = new \Jazzee\TemplatePDF($this->_config->getPdflibLicenseKey(), $template, $this);
+      $this->setVar('blob', $pdf->pdf($applicant));
+      $this->setVar('filename', $applicant->getFullName() . '.pdf');
+      $this->loadView('applicants_single/pdf');
+    } else {
+      $this->addMessage('error', 'That is not a valid template for this application.');
+      $this->setLayoutVar('status', 'error');
+    }
+  }
+
+  /**
    * Delete PDF attached to applicant
    * @param integer $applicantId
    * @param integer $attachmentId
@@ -1542,6 +1561,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     }
     if (in_array($action, array('do', 'doAction', 'pageDo', 'doPageAction'))) {
       $action = 'editAnswer';
+    }
+    if (in_array($action, array('pdf', 'pdftemplate'))) {
+      $action = 'pdf';
     }
 
     //require a working ApplicantPDF class

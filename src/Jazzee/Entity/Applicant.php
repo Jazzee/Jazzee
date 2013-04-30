@@ -552,7 +552,7 @@ class Applicant
   /**
    * Get application
    *
-   * @return Entity\Application $application
+   * @return \Jazzee\Entity\Application $application
    */
   public function getApplication()
   {
@@ -575,7 +575,7 @@ class Applicant
   /**
    * get all answers
    *
-   * @param Doctrine\Common\Collections\Collection \Jazzee\Entity\Answer
+   * @return array \Jazzee\Entity\Answer
    */
   public function getAnswers()
   {
