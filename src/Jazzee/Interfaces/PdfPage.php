@@ -26,4 +26,16 @@ interface PdfPage extends DataPage
    * @return mixed
    */
   function renderPdfSectionFromArray(array $pageData, \Jazzee\ApplicantPDF $pdf);
+
+  /**
+   * Get the element values for a pdf template
+   * @return array
+   */
+  function getPdfTemplateValues();
+
+  /**
+   * List all the PDF template elements availabe on a page
+   * @return array
+   */
+  function listPdfTemplateElements();
 }

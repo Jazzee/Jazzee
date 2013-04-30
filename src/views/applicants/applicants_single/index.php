@@ -36,6 +36,11 @@
               if ($this->controller->checkIsAllowed('applicants_single', 'pdf')) { ?>
               <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/portrait"); ?>">Print Portrait PDF</a><br />
               <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdf/landscape"); ?>">Print Landscape PDF</a><br />
+              <?php
+                foreach($applicant->getApplication()->getTemplates() as $template){ ?>
+                  <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/pdftemplate/{$template->getId()}"); ?>">Print <?php print $template->getTitle(); ?> PDF</a><br />
+              <?php
+                } ?>
             <?php
               } ?>
             <?php

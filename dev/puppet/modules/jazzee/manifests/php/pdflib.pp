@@ -1,9 +1,9 @@
 class jazzee::php::pdflib {
   case $operatingsystem {
     centos, redhat: {
-      $modulePath = '/usr/lib64/php/modules/libpdf_php.so'
+      $modulePath = '/usr/lib64/php/modules/php_pdflib.so'
       file {$modulePath:
-        source => 'puppet:///modules/jazzee/libpdf_php.so',
+        source => 'puppet:///modules/jazzee/php_pdflib.so',
         ensure    => present
       }
       file {'/etc/php.d/pdflib.ini':

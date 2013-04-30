@@ -45,6 +45,11 @@ class Application
    */
   private $applicationPages;
 
+  /**
+   * @OneToMany(targetEntity="PDFTemplate", mappedBy="application")
+   */
+  private $pdfTemplates;
+
   /** @Column(type="string", nullable=true) */
   private $contactName;
 
@@ -836,6 +841,40 @@ class Application
       $applicant['attachments'][$key] = $attachment;
     }
     return $applicant;
+  }
+  
+  /**
+   * Get all application templates
+   * @return array
+   */
+  public function getTemplates(){
+    return $this->pdfTemplates;
+  }
+  
+  /**
+   * Add a template to the application
+   * @param \Jazzee\Entity\PDFTemplate $template
+   */
+  public function addTemplate(PDFTemplate $template){
+    $this->pdfTemplates[] = $template;
+    if($template->getApplication()->getId() != $this->id){
+      $template->setApplication($this);
+    }
+  }
+  
+  /**
+   * Get template by Id
+   * @param integer $id
+   * @return \Jazzee\Entity\PDFTemplate
+   */
+  public function getTemplateById($id){
+    foreach($this->pdfTemplates as $template){
+      if($template->getId() == $id){
+        return $template;
+      }
+    }
+
+    return null;
   }
 
 }

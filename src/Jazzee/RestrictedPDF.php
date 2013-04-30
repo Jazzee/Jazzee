@@ -22,7 +22,7 @@ class RestrictedPDF extends ApplicantPDF
   public function pdf(\Jazzee\Entity\Applicant $applicant)
   {
     $this->setFont('p');
-    $this->pdf->set_info("Title", $this->pdf->utf8_to_utf16($applicant->getFullName(), '') . ' Application');
+    $this->pdf->set_info("Title", $this->pdf->convert_to_unicode('auto', $applicant->getFullName(), '') . ' Application');
     $this->addText($applicant->getFullName() . "\n", 'h1');
     $this->addText('Email Address: ' . $applicant->getEmail() . "\n", 'p');
     $this->write();
