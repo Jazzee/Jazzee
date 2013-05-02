@@ -80,7 +80,7 @@ class Version20130219000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
   }
   
   public function postDown(\Doctrine\DBAL\Schema\Schema $schema) {
-    parent::postUp($schema);
+    parent::postDown($schema);
     $this->migrateFiles();
     foreach (scandir($this->_tmpDir) as $item) {
       if ($item == '.' || $item == '..') continue;
