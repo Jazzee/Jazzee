@@ -42,6 +42,16 @@ class ElementListItem
   /** @Column(type="string", nullable=true) */
   private $name;
 
+  /** @Column(type="array") */
+  private $metadata;
+
+  /**
+   * Constructor to create a default blank array for metadata
+   */
+  public function __construct(){
+    $this->clearMetadata();
+  }
+
   /**
    * Get id
    *
@@ -182,6 +192,30 @@ class ElementListItem
   public function getname()
   {
     return $this->name;
+  }
+  
+  /**
+   * Clear the metadata
+   */
+  public function clearMetadata(){
+    $this->metadata = array();
+  }
+  
+  /**
+   * Add metadata to the list item
+   * @param string $data
+   */
+  public function addMetadata($data){
+    $this->metadata[] = (string)$data;
+    $this->metadata = array_values(array_unique($this->metadata));
+  }
+  
+  /**
+   * Get metadata as an array of items
+   * @return array
+   */
+  public function getMetadata(){
+    return $this->metadata;
   }
 
 }
