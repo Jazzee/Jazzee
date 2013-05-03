@@ -25,4 +25,8 @@ $(document).ready(function(){
   $('#answers p.controls a.delete').click(function(i){
     if(!confirm('Are you sure you want to delete?  This cannot be undone')) return false;
   });
+  
+  $('div.form select.SearchList').each(function(i){
+    var searchListElement = new SearchListElement(this);
+  });
 });

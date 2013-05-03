@@ -308,7 +308,7 @@ List.prototype.filterItemsInput = function(list){
  */
 List.prototype.newListItem = function(value){
   var itemId = 'new-list-item' + this.page.pageBuilder.getUniqueId();
-  var item = {id: itemId, status: 'new', value: value, name: null, isActive: true, weight: this.listItems.length+1};
+  var item = {id: itemId, status: 'new', value: value, name: null, isActive: true, metadata: null, weight: this.listItems.length+1};
   this.addListItem(item);
   this.markModified();
   return item;

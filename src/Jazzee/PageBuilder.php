@@ -157,6 +157,7 @@ abstract class PageBuilder extends AdminController
           'status' => '',
           'value' => $item->getValue(),
           'name' => $item->getName(),
+          'metadata' => implode("\n", $item->getMetadata()),
           'weight' => $item->getWeight(),
           'isActive' => (int) $item->isActive()
         );
@@ -426,6 +427,10 @@ abstract class PageBuilder extends AdminController
           $item->setValue($htmlPurifier->purify($i->value));
           $item->setWeight($i->weight);
           $item->setName($i->name);
+          $item->clearMetadata();
+          foreach(explode("\n", $i->metadata) as $data){
+            $item->addMetadata($data);
+          }
           if ($i->isActive) {
             $item->activate();
           } else {

@@ -181,6 +181,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $scripts->addFile('jquery.wysiwyg.js', new \Foundation\Virtual\RealFile('jquery.wysiwyg.js', $foundationPath . '/lib/jquery/plugins/jwysiwyg/jquery.wysiwyg.full.min.js'));
     $scripts->addFile('anytime.js', new \Foundation\Virtual\RealFile('anytime.js', $foundationPath . '/lib/anytime/anytimec.js'));
     $scripts->addFile('form.js', new \Foundation\Virtual\RealFile('form.js', $foundationPath . '/src/javascript/form.js'));
+    $scripts->addFile('SearchListElement.js', new \Foundation\Virtual\RealFile('SearchListElement.js', $foundationPath . '/src/javascript/SearchListElement.js'));
 
     $styles = new \Foundation\Virtual\VirtualDirectory();
     $styles->addDirectory('jquerythemes', new \Foundation\Virtual\ProxyDirectory($foundationPath . '/lib/jquery/themes'));
