@@ -440,7 +440,7 @@ class Element
    * Get list item by id
    *
    * @param integer $itemId
-   * @return Entity\ElementListItem $item
+   * @return \Jazzee\Entity\ElementListItem
    */
   public function getItemById($itemId)
   {

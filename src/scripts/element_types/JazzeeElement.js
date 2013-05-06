@@ -142,7 +142,7 @@ JazzeeElement.prototype.getDataObject = function(){
     list: []
   };
   for(var i = 0; i < this.listItems.length; i++){
-    obj.list.push(this.listItems[i]);
+    obj.list.push(this.listItems[i].getDataObject());
   }
   return obj;
 };

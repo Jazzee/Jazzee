@@ -14,7 +14,7 @@ JazzeeElementSearchList.prototype.avatar = function(){
  * Edit List Item button
  * @return {jQuery}
  */
-List.prototype.editListItemButton = function(){
+JazzeeElementSearchList.prototype.editListItemButton = function(){
   var elementClass = this;
   var button = $('<button>').html('Edit').bind('click',function(){
     var li = $(this).parent().parent();
@@ -30,18 +30,16 @@ List.prototype.editListItemButton = function(){
     element.required = false;
     element.format = 'Only letters, numbers and underscore are allowed.';
     element.value = item.name;
-    var element = field.newElement('Textarea', 'metadata');
-    element.label = 'Search Data';
+    var element = field.newElement('Textarea', 'searchterms');
+    element.label = 'Search Terms';
     element.required = false;
-    element.format = 'One entry per ling';
-    element.instructions = 'Search data items will be queried when, but will not display.'
-    element.value = item.metadata;
+    element.value = item.getVariable('searchTerms');
     var dialog = elementClass.page.displayForm(obj);
     elementClass.page.pageBuilder.addNameTest($('input[name="name"]', dialog));
     $('form', dialog).bind('submit',function(e){
-      item.value = $('input[name="value"]', this).val();
-      item.name = $('input[name="name"]', this).val();
-      item.metadata = $('textarea[name="metadata"]', this).val();
+      item.setProperty('value', $('input[name="value"]', this).val());
+      item.setProperty('name', $('input[name="name"]', this).val());
+      item.setVariable('searchTerms', $('textarea[name="searchterms"]', this).val());
       elementClass.workspace();
       dialog.dialog("destroy").remove();
       elementClass.markModified();
@@ -52,4 +50,14 @@ List.prototype.editListItemButton = function(){
     return false;
   }).button({icons: {primary: 'ui-icon-pencil'}});
   return button;
+};
+
+/**
+ * Add a new New item for the list
+ * @param {String} value the items text
+ */
+JazzeeElementSearchList.prototype.newListItem = function(value){
+  var item = List.prototype.newListItem.call(this, value);
+  item.setVariable('searchTerms', '');
+  return item;
 };

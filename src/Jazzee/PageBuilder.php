@@ -45,6 +45,7 @@ abstract class PageBuilder extends AdminController
     $scripts[] = $this->path(\Jazzee\Interfaces\Element::PAGEBUILDER_SCRIPT);
     $scripts[] = $this->path('resource/scripts/element_types/List.js');
     $scripts[] = $this->path('resource/scripts/element_types/FileInput.js');
+    $scripts[] = $this->path('resource/scripts/element_types/ListItem.js');
     foreach ($types as $type) {
       $class = $type->getClass();
       $scripts[] = $this->path($class::PAGEBUILDER_SCRIPT);
@@ -152,15 +153,22 @@ abstract class PageBuilder extends AdminController
       $e['typeId'] = $element->getType()->getId();
       $e['list'] = array();
       foreach ($element->getListItems() as $item) {
-        $e['list'][] = array(
+        $itemArr = array(
           'id' => $item->getId(),
           'status' => '',
           'value' => $item->getValue(),
           'name' => $item->getName(),
-          'metadata' => implode("\n", $item->getMetadata()),
           'weight' => $item->getWeight(),
           'isActive' => (int) $item->isActive()
         );
+        $itemArr['variables'] = array();
+        foreach ($item->getVariables() as $variable) {
+          $itemArr['variables'][] = array(
+            'name' => $variable->getName(),
+            'value' => $variable->getValue()
+          );
+        }
+        $e['list'][] = $itemArr;
       }
       $arr['elements'][] = $e;
     }
@@ -427,9 +435,9 @@ abstract class PageBuilder extends AdminController
           $item->setValue($htmlPurifier->purify($i->value));
           $item->setWeight($i->weight);
           $item->setName($i->name);
-          $item->clearMetadata();
-          foreach(explode("\n", $i->metadata) as $data){
-            $item->addMetadata($data);
+          foreach ($i->variables as $v) {
+            $var = $item->setVar($v->name, $v->value);
+            $this->_em->persist($var);
           }
           if ($i->isActive) {
             $item->activate();

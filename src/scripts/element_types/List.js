@@ -94,7 +94,7 @@ List.prototype.manageListItemsButton = function(){
       var orderedItems = [];
       $('li', listDiv).each(function(i){
         var item = $(this).data('item');
-        item.weight = i+1;
+        item.setProperty('weight',i+1);
         orderedItems.push(item);
       });
 
@@ -190,11 +190,10 @@ List.prototype.editListItemButton = function(){
     var dialog = elementClass.page.displayForm(obj);
     elementClass.page.pageBuilder.addNameTest($('input[name="name"]', dialog));
     $('form', dialog).bind('submit',function(e){
-      item.value = $('input[name="value"]', this).val();
-      item.name = $('input[name="name"]', this).val();
+      item.setProperty('value',$('input[name="value"]', this).val());
+      item.setProperty('name',$('input[name="name"]', this).val());
       elementClass.workspace();
       dialog.dialog("destroy").remove();
-      elementClass.markModified();
       li.replaceWith(elementClass.singleItem(item));
       return false;
     });//end submit
@@ -213,8 +212,7 @@ List.prototype.displayListItemButton = function(){
   var button = $('<button>').html('Display').bind('click',function(){
     var li = $(this).parent().parent();
     var item = li.data('item');
-    item.isActive = true;
-    elementClass.markModified();
+    item.setProperty('isActive', true);
     li.replaceWith(elementClass.singleItem(item));
     return false;
   }).button({icons: {primary: 'ui-icon-plus'}});
@@ -230,8 +228,7 @@ List.prototype.hideListItemButton = function(){
   var button = $('<button>').html('Hide').bind('click',function(){
     var li = $(this).parent().parent();
     var item = li.data('item');
-    item.isActive = false;
-    elementClass.markModified();
+    item.setProperty('isActive', false);
     li.replaceWith(elementClass.singleItem(item));
     return false;
   }).button({icons: {primary: 'ui-icon-cancel'}});
@@ -253,9 +250,8 @@ List.prototype.deleteListItemButton = function(){
     button.bind('click', function(e){
       var li = $(this).parent().parent();
       var item = li.data('item');
-      item.isActive = false;
-      item.status = 'delete';
-      elementClass.markModified();
+      item.setProperty('isActive', false);
+      item.setProperty('status','delete');
       li.hide('explode');
       return false;
     });
@@ -308,17 +304,19 @@ List.prototype.filterItemsInput = function(list){
  */
 List.prototype.newListItem = function(value){
   var itemId = 'new-list-item' + this.page.pageBuilder.getUniqueId();
-  var item = {id: itemId, status: 'new', value: value, name: null, isActive: true, metadata: null, weight: this.listItems.length+1};
-  this.addListItem(item);
-  this.markModified();
+  var obj = {id: itemId, value: value, name: null, isActive: true, varaibles: {}, weight: this.listItems.length+1};
+  var item = this.addListItem(obj);
+  item.setProperty('status','new');
   return item;
 };
 
 /**
  * Add a new item to the list
- * @param {String} value the items text
+ * @param {} obj item object
  */
-List.prototype.addListItem = function(item){
+List.prototype.addListItem = function(obj){
+  var item = new ListItem();
+  item.init(obj, this);
   this.listItems.push(item);
   return item;
 };

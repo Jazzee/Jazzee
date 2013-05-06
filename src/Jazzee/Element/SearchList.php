@@ -27,9 +27,7 @@ class SearchList extends SelectList
     foreach ($this->_element->getListItems() as $item) {
       if ($item->isActive()) {
         $listItem = $element->newItem($item->getId(), $item->getValue());
-        foreach($item->getMetadata() as $data){
-          $listItem->addMetadata($data);
-        }
+        $listItem->addMetadata($item->getVar('searchTerms'));
       }
     }
     $this->_controller->addScript($this->_controller->path('resource/foundation/scripts/SearchListElement.js'));
