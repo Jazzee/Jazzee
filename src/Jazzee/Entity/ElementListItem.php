@@ -42,14 +42,16 @@ class ElementListItem
   /** @Column(type="string", nullable=true) */
   private $name;
 
-  /** @Column(type="array") */
-  private $metadata;
+  /**
+   * @OneToMany(targetEntity="ElementListItemVariable", mappedBy="item")
+   */
+  private $variables;
 
   /**
    * Constructor to create a default blank array for metadata
    */
   public function __construct(){
-    $this->clearMetadata();
+    $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
   }
 
   /**
@@ -193,29 +195,55 @@ class ElementListItem
   {
     return $this->name;
   }
-  
+
   /**
-   * Clear the metadata
+   * Set item variable
+   *
+   * @param string $name
+   * @param string $value
+   *
+   * @return \Jazzee\Entity\ElementItemVariable
    */
-  public function clearMetadata(){
-    $this->metadata = array();
+  public function setVar($name, $value)
+  {
+    foreach ($this->variables as $variable) {
+      if ($variable->getName() == $name) {
+        $variable->setValue($value);
+
+        return $variable;
+      }
+    }
+    //create a new empty variable with that name
+    $variable = new ElementListItemVariable;
+    $variable->setItem($this);
+    $variable->setName($name);
+    $this->variables[] = $variable;
+    $variable->setValue($value);
+
+    return $variable;
   }
-  
+
   /**
-   * Add metadata to the list item
-   * @param string $data
+   * get element variable
+   * @param string $name
+   * @return string $value
    */
-  public function addMetadata($data){
-    $this->metadata[] = (string)$data;
-    $this->metadata = array_values(array_unique($this->metadata));
+  public function getVar($name)
+  {
+    foreach ($this->variables as $variable) {
+      if ($variable->getName() == $name) {
+        return $variable->getValue();
+      }
+    }
   }
-  
+
   /**
-   * Get metadata as an array of items
-   * @return array
+   * get item variables
+   * @return array \Jazzee\Entity\ElementListItemVariable
    */
-  public function getMetadata(){
-    return $this->metadata;
+  public function getVariables()
+  {
+    return $this->variables;
   }
 
 }
