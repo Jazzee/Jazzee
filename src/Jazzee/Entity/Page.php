@@ -44,6 +44,9 @@ class Page
    */
   private $parent;
 
+  /** @Column(type="integer", nullable=true) */
+  private $fixedId;
+
   /**
    * @OneToMany(targetEntity="Page", mappedBy="parent")
    */
@@ -450,6 +453,23 @@ class Page
   }
 
   /**
+   * Get a child by fixedId
+   *
+   * @param integer $childId
+   * @return \Jazzee\Entity\Page
+   */
+  public function getChildByFixedId($fixedId)
+  {
+    foreach ($this->children as $child) {
+      if ($child->getFixedId() == $fixedId) {
+        return $child;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Set page variable
    *
    * we retunt he variable to is can be persisted
@@ -619,6 +639,26 @@ class Page
     }
 
     return $this->_fakeApplicationPage;
+  }
+
+  /**
+   * Set fixedId
+   *
+   * @param integer $fixedId
+   */
+  public function setFixedId($fixedId)
+  {
+    $this->fixedId = $fixedId;
+  }
+
+  /**
+   * Get fixedId
+   *
+   * @return integer $fixedId
+   */
+  public function getFixedId()
+  {
+    return $this->fixedId;
   }
 
 }
