@@ -123,6 +123,7 @@ abstract class PageBuilder extends AdminController
       }
     }
     $arr['id'] = $page->getId();
+    $arr['fixedId'] = $page->getFixedId();
     $arr['uuid'] = $page->getUuid();
     $arr['parentId'] = ($parent = $page->getParent())?$parent->getId():null;
     $arr['typeClass'] = $this->getClassName($page->getType()->getClass());
@@ -304,6 +305,7 @@ abstract class PageBuilder extends AdminController
       //otherwise continue making changes by swaping the $page varialbe for the correct \Jazzee\Entity\Page class
       $page = $page->getPage();
     }
+    $page->setFixedId(empty($data->fixedId) ? null : $data->fixedId);
     foreach ($data->variables as $v) {
       $jazzeePage = $page->getApplicationPageJazzeePage();
       $jazzeePage->setController($this);

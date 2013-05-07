@@ -8,6 +8,7 @@ function JazzeePage(){
   this.pageBuilder;
   this.pageId;
   this.uuid;
+  this.fixedId;
   this.applicationPageId;
   this.parentId;
   this.typeName;
@@ -86,6 +87,7 @@ JazzeePage.prototype.init = function(pageObject, pageBuilder){
   this.id = pageObject.id;
   this.parentId = pageObject.parentId;
   this.uuid = pageObject.uuid;
+  this.fixedId = pageObject.fixedId;
   this.typeId = pageObject.typeId;
   this.typeName = pageObject.typeName;
   this.typeClass = pageObject.typeClass;
@@ -136,6 +138,7 @@ JazzeePage.prototype.newPage = function(id,title,typeId,typeName,typeClass,statu
     id: id,
     parentId: null,
     uuid: null,
+    fixedId: null,
     typeId: typeId,
     typeName: typeName,
     typeClass: typeClass,
@@ -533,6 +536,7 @@ JazzeePage.prototype.getDataObject = function(){
     kind: this.kind,
     id: this.id,
     uuid: this.uuid,
+    fixedId: this.fixedId,
     status: this.status,
     title: this.title,
     name: this.name,
@@ -795,6 +799,35 @@ JazzeePage.prototype.workspace = function(){
   $('#editPage').show('slide');
 };
 
+/**
+ * Find an element on the page by its fixed id
+ * @param integer fixedId
+ * @return {JazzeeElement}
+ */
+JazzeePage.prototype.getElementByFixedId = function(fixedId){
+  for(var i = 0; i < this.elements.length; i++){
+    if(this.elements[i].fixedId = fixedId){
+      return this.elements[i];
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Find an element on the page by its fixed id
+ * @param integer fixedId
+ * @return {JazzeeElement}
+ */
+JazzeePage.prototype.getChildByFixedId = function(fixedId){
+  for(var i in this.children){
+    if(this.children[i].fixedId == fixedId){
+      return this.children[i];
+    }
+  }
+
+  return null;
+};
 /**
  * Default list page display elements returns an ampty array
  */
