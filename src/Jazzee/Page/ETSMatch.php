@@ -369,7 +369,6 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
 
   /**
    * Create the ets match form
-   * @param Entity\Page $page
    */
   public function setupNewPage()
   {
