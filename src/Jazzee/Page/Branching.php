@@ -11,8 +11,8 @@ class Branching extends Standard
 {
 
   /**
-   *
-   * Enter description here ...
+   * Create the branching form
+   * @return \Foundation\Form
    */
   protected function makeForm()
   {
