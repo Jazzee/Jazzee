@@ -179,6 +179,60 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\QueryPage, \Ja
     $pdf->addText($page->getTitle() . "\n", 'h5');
     $this->renderPdfAnswer($pdf, $page, $answer);
   }
+  
+  /**
+   * Get the values for each element for use in the PDF template
+   * Order them by the sortElement varialbe if it is set
+   * @return array
+   */
+  public function getPdfTemplateValues()
+  {
+    if ($displaySortElementId = $this->_applicationPage->getPage()->getVar('displaySortElement') and $displaySortElement = $this->_applicationPage->getPage()->getElementById($displaySortElementId)) {
+      $displaySortElement->getJazzeeElement()->setController($this->_controller);
+      $categories = array();
+      foreach ($this->getAnswers() as $answer) {
+        $categories[$displaySortElement->getJazzeeElement()->displayValue($answer)][] = $answer;
+      }
+      ksort($categories);
+      $values = array();
+      foreach($this->_applicationPage->getPage()->getElements() as $element){
+        $elementValues = array();
+        foreach($categories as $arr){
+          foreach($arr as $answer){
+            $element->getJazzeeElement()->setController($this->_controller);
+            $elementValues[] = $element->getJazzeeElement()->displayValue($answer);
+          }
+        }
+        $values[$element->getId()] = implode("\n", $elementValues);
+      }
+    } else {
+      $values = parent::getPdfTemplateValues();
+    }
+    return $values;
+  }
+
+  /**
+   * Check variables before they are set
+   * @param string $name
+   * @param string $value
+   * @throws \Jazzee\Exception
+   */
+  public function setVar($name, $value)
+  {
+    switch ($name) {
+      case 'displaySortElement':
+        if (!empty($value)) {
+          if(!$element = $this->_applicationPage->getPage()->getElementById($value)){
+            throw new \Jazzee\Exception("displaySortElement must be a valid element ID for the page.  {$value} is not.");
+          }
+          $value = $element->getId();
+        }
+        break;
+      default:
+        throw new \Jazzee\Exception($name . ' is not a valid variable on this page.');
+    }
+    parent::setVar($name, $value);
+  }
 
   public static function applyPageElement()
   {

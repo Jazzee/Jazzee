@@ -88,6 +88,7 @@ JazzeePageStandard.prototype.pageProperties = function(){
       div.replaceWith(pageClass.pageProperties());
       return true;
     });
+    div.append(this.editDisplaySortElementButton());
   }
 
   div.append(this.editNameButton());
@@ -199,4 +200,40 @@ JazzeePageStandard.prototype.displayAnswerStatusForm = function(){
     return false;
   });//end submit
   dialog.dialog('open');
+};
+
+/**
+ * Edit the recommender email
+ * @return {jQuery}
+ */
+JazzeePageStandard.prototype.editDisplaySortElementButton = function(){
+  var pageClass = this;
+  var button = $('<button>').html('Sort Display By Element').bind('click',function(){
+    $('.qtip').qtip('api').hide();
+    var obj = new FormObject();
+    var field = obj.newField({name: 'legend', value: 'Display Sort Element'});
+    field.instructions = "Choose the element to sort display with, elements must be saved before they will be on this list.";
+    var element = field.newElement('RadioList', 'displaySortElement');
+    element.label = 'Sort Display By';
+    element.required = true;
+    element.value = pageClass.getVariable('displaySortElement');
+    for(var i in pageClass.elements){
+      if(pageClass.elements[i].status != 'new'){
+        element.addItem(pageClass.elements[i].title, pageClass.elements[i].id);
+      }
+    }
+    var dialog = pageClass.displayForm(obj);
+    $('form', dialog).bind('submit',function(e){
+      pageClass.setVariable('displaySortElement', $('input[name="displaySortElement"]', this).val());
+      pageClass.workspace();
+      dialog.dialog("destroy").remove();
+      return false;
+    });//end submit
+    dialog.dialog('open');
+  }).button({
+    icons: {
+      primary: 'ui-icon-pencil'
+    }
+  });
+  return button;
 };
