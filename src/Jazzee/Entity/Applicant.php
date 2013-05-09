@@ -261,6 +261,26 @@ class Applicant
   {
     return $this->uniqueId;
   }
+
+  /**
+   * Generate a random password and store it returning the plain text
+   * 
+   * @return string
+   */
+  public function generatePassword()
+  {
+    //removed the vowels so we dont accidntally spell anything rude
+    //removed L l 1 0 so it will be less confusing
+    $possibleChars = 'bcdfghjkmnpqrstvwxyzBCDFGHJKMNPQRSTVWXYZ23456789';
+    $max = strlen($possibleChars) - 1;
+    $password = '';
+    for ($i = 0; $i < rand(8,10); $i++) {
+      $password .= substr($possibleChars, rand(0, $max), 1);
+    }
+    $this->setPassword($password);
+
+    return $password;
+  }
   
   /**
    * Set external ID

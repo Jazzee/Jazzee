@@ -66,7 +66,7 @@
           <td id="actions">
             Account Created: <?php print $applicant->getCreatedAt()->format('c'); ?><br />
             Last Update: <?php print $applicant->getUpdatedAt()->format('c'); ?><br />
-            Last Login: <?php print $applicant->getLastLogin()->format('c'); ?><br />
+            Last Login: <?php print $applicant->getLastLogin() ? $applicant->getLastLogin()->format('c') : 'never'; ?><br />
             Deadline Extension:
             <?php $text = $applicant->getDeadlineExtension() ? $applicant->getDeadlineExtension()->format('c') : 'none'; ?>
             <?php
