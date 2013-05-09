@@ -266,6 +266,13 @@ class SetupApplicationController extends \Jazzee\AdminController
     $element->addFilter(new \Foundation\Form\Filter\Safe($element));
     $element->setValue($this->_application->isVisible());
 
+    $element = $field->newElement('RadioList', 'byInvitationOnly');
+    $element->setLabel('Is this application by invitation only?');
+    $element->newItem(0, 'No');
+    $element->newItem(1, 'Yes');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->setValue((int)$this->_application->isByInvitationOnly());
+
     $form->newButton('submit', 'Save');
 
     if ($input = $form->processInput($this->post)) {
@@ -276,6 +283,11 @@ class SetupApplicationController extends \Jazzee\AdminController
         $this->_application->visible();
       } else {
         $this->_application->inVisible();
+      }
+      if ($input->get('byInvitationOnly')) {
+        $this->_application->byInvitationOnly();
+      } else {
+        $this->_application->notByInvitationOnly();
       }
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application Status Saved.');
