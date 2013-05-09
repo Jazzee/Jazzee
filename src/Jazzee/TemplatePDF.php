@@ -133,6 +133,7 @@ class TemplatePDF
     $elements['applicant']['suffix'] = $applicant->getSuffix();
     $elements['applicant']['email'] = $applicant->getEmail();
     $elements['applicant']['id'] = $applicant->getId();
+    $elements['applicant']['externalid'] = $applicant->getExternalId();
     if ($applicant->isLocked()) {
       switch ($applicant->getDecision()->status()) {
         case 'finalDeny':

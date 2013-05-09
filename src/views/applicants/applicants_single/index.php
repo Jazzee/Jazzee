@@ -76,6 +76,16 @@
               } else {
                 print $text;
               }
+              ?><br />
+            External ID:
+            <?php $text = $applicant->getExternalId() ? $applicant->getExternalId() : 'not set'; ?>
+            <?php
+              if ($this->controller->checkIsAllowed('applicants_single', 'editExternalId')) { ?>
+                <a href="<?php print $this->path("applicants/single/{$applicant->getId()}/editExternalId"); ?>"><?php print $text; ?></a>
+            <?php
+              } else {
+                print $text;
+              }
             ?>
           </td>
           <td id="decisions">

@@ -135,6 +135,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $rows = array();
     $header = array(
       'ID',
+      'External ID',
       'First Name',
       'Middle Name',
       'Last Name',
@@ -166,6 +167,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
       $applicant = $this->_application->formatApplicantArray($this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display));
       $arr = array(
         $applicant['id'],
+        $applicant['externalId'],
         $applicant['firstName'],
         $applicant['middleName'],
         $applicant['lastName'],
