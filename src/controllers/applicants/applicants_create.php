@@ -15,6 +15,15 @@ class ApplicantsCreateController extends \Jazzee\AdminController
   const ACTION_INDEX = 'Create applicants';
 
   /**
+   * Add the required JS
+   */
+  protected function setUp()
+  {
+    parent::setUp();
+    $this->addScript($this->path('resource/scripts/controllers/applicants_create.controller.js'));
+  }
+
+  /**
    * List all applicants
    */
   public function actionIndex()
@@ -50,6 +59,13 @@ class ApplicantsCreateController extends \Jazzee\AdminController
     $element->setLabel('Password');
     $element->setFormat('If you leave the password blank a random password will be generated.');
 
+    $element = $field->newElement('DateInput', 'deadlineExtension');
+    $element->setLabel('Deadline');
+    $element->setFormat('If you wish to extend this applicants deadline past the application deadline enter it here.');
+    if($this->_application->getClose()){
+      $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, $this->_application->getClose()->format('c')));
+    }
+    $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, date('c')));
     $element = $field->newElement('TextInput', 'externalId');
     $element->setLabel('External ID');
 
@@ -73,11 +89,14 @@ class ApplicantsCreateController extends \Jazzee\AdminController
         $applicant->setLastName($input->get('last'));
         $applicant->setSuffix($input->get('suffix'));
         $applicant->setExternalId($input->get('externalId'));
+        if($input->get('deadlineExtension')){
+          $applicant->setDeadlineExtension($input->get('deadlineExtension'));
+        }
         $this->_em->persist($applicant);
         $this->_em->flush();
         $this->setVar('applicant', $applicant);
         $this->setVar('plainTextPassword', $plainTextPassword);
-        $this->addMessage('success', 'Applicant Created Sucessfully');
+        $this->addMessage('success', 'Applicant Created Successfully');
         $form->applyDefaultValues();
       }
     }
