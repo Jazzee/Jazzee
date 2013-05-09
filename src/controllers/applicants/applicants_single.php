@@ -49,6 +49,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
   const ACTION_REFUNDPAYMENT = 'Refund Payment';
   const ACTION_REJECTPAYMENT = 'Reject Payment';
   const ACTION_VIEWAUDITLOG = 'View Applicant Audit Logs';
+  const ACTION_EDITEXTERNALID = 'Edit an applicants external ID';
 
   /**
    * Add the required JS
@@ -86,7 +87,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController
       'updatedAt' => $applicant->getUpdatedAt(),
       'lastLogin' => $applicant->getLastLogin(),
       'deadlineExtension' => $applicant->getDeadlineExtension(),
-      'allowExtendDeadline' => $this->checkIsAllowed($this->controllerName, 'extendDeadline')
+      'externalId' => $applicant->getExternalId(),
+      'allowExtendDeadline' => $this->checkIsAllowed($this->controllerName, 'extendDeadline'),
+      'allowEditExternalId' => $this->checkIsAllowed($this->controllerName, 'editExternalId')
     );
 
     return $actions;
@@ -1496,6 +1499,43 @@ class ApplicantsSingleController extends \Jazzee\AdminController
   {
     $auditLog = new \Jazzee\Entity\AuditLog($this->_user, $applicant, $text);
     $this->_em->persist($auditLog);
+  }
+
+  /**
+   * Edit an applicants external ID
+   * @param integer $applicantId
+   */
+  public function actionEditExternalId($applicantId)
+  {
+    $applicant = $this->getApplicantById($applicantId);
+    $form = new \Foundation\Form();
+    $form->setAction($this->path("applicants/single/{$applicantId}/editExternalId"));
+    $field = $form->newField();
+    $field->setLegend('Change External ID for ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
+
+    $element = $field->newElement('TextInput', 'externalId');
+    $element->setLabel('External ID');
+    $element->setFormat('Clear to remove the id');
+    $element->setValue($applicant->getExternalId());
+    
+    $form->newButton('submit', 'Apply');
+    if (!empty($this->post)) {
+      $this->setLayoutVar('textarea', true);
+      if ($input = $form->processInput($this->post)) {
+        if ($input->get('externalId')) {
+          $applicant->setExternalId($input->get('externalId'));
+          $this->auditLog($applicant, 'External ID set to ' . $applicant->getExternalId());
+        } else {
+          $applicant->setExternalId(null);
+          $this->auditLog($applicant, 'Removed External ID');
+        }
+        $this->_em->persist($applicant);
+        $this->setLayoutVar('status', 'success');
+      }
+    }
+    $this->setVar('result', array('actions' => $this->getActions($applicant)));
+    $this->setVar('form', $form);
+    $this->loadView('applicants_single/form');
   }
 
   /**

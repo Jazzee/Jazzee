@@ -37,6 +37,9 @@ class Applicant
   /** @Column(type="string", length=255, nullable=true) */
   private $uniqueId;
 
+  /** @Column(type="string", length=255, nullable=true) */
+  private $externalId;
+
   /**
    * @ManyToOne(targetEntity="Application", inversedBy="applicants")
    * @JoinColumn(onDelete="CASCADE")
@@ -257,6 +260,25 @@ class Applicant
   public function getUniqueId()
   {
     return $this->uniqueId;
+  }
+  
+  /**
+   * Set external ID
+   * 
+   * This is used to specify an alternate campus or third party application ID
+   * @param string $string
+   */
+  public function setExternalId($string){
+    $this->externalId = $string;
+  }
+  
+  /**
+   * Get the external ID
+   * 
+   * @return string
+   */
+  public function getExternalId(){
+    return $this->externalId;
   }
 
   /**
@@ -894,6 +916,7 @@ class Applicant
     $applicantXml = $dom->createElement("applicant");
     $account = $dom->createElement("account");
     $account->appendChild($dom->createElement('id', $this->getId()));
+    $account->appendChild($dom->createElement('externalId', $this->getExternalId()));
     $account->appendChild($dom->createElement('firstName', $this->getFirstName()));
     $account->appendChild($dom->createElement('middleName', $this->getMiddleName()));
     $account->appendChild($dom->createElement('lastName', $this->getLastName()));

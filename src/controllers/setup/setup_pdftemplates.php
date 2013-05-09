@@ -124,7 +124,8 @@ class SetupPdftemplatesController extends \Jazzee\AdminController
         'applicant-suffix' => 'Applicant: Suffix',
         'applicant-fullName' => 'Applicant: Full Name',
         'applicant-email' => 'Applicant: Email',
-        'applicant-id' => 'Applicant: ID'
+        'applicant-id' => 'Applicant: ID',
+        'applicant-externalid' => 'Applicant: External ID'
       );
       foreach($this->_application->getApplicationPages() as $applicationPage){
         if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\PdfPage){

@@ -251,6 +251,15 @@ Applicant.prototype.refreshActions = function(json){
   } else {
     $('#actions').append(text);
   }
+  $('#actions').append('<br />');
+  var text = json.externalId?json.externalId:'not set';
+  $('#actions').append('External ID: ');
+  if(json.allowEditExternalId){
+    var a = $('<a>').attr('href', this.baseUrl + '/editExternalId').html(text);
+    $('#actions').append(a);
+  } else {
+    $('#actions').append(text);
+  }
   this.parseActions();
 };
 
