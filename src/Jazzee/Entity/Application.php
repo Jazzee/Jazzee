@@ -72,6 +72,9 @@ class Application
   private $published;
 
   /** @Column(type="boolean") */
+  private $byInvitationOnly;
+
+  /** @Column(type="boolean") */
   private $visible;
 
   /** @Column(type="text", nullable=true) */
@@ -106,6 +109,7 @@ class Application
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
     $this->published = false;
     $this->visible = false;
+    $this->invitationOnly = false;
   }
 
   /**
@@ -318,6 +322,33 @@ class Application
   public function isVisible()
   {
     return $this->visible;
+  }
+
+  /**
+   * Dont allow applicant to create accounts, only applicants invited to apply
+   * can login
+   */
+  public function byInvitationOnly()
+  {
+    $this->byInvitationOnly = true;
+  }
+
+  /**
+   * Allow anyone to create an account and apply.
+   */
+  public function notByInvitationOnly()
+  {
+    $this->byInvitationOnly = false;
+  }
+
+  /**
+   * Get invitationOnly
+   *
+   * @return boolean
+   */
+  public function isByInvitationOnly()
+  {
+    return $this->byInvitationOnly;
   }
 
   /**

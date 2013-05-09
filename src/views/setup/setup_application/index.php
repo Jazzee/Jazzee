@@ -82,4 +82,5 @@ foreach ($statusMessages as $status => $title) {
   Application Closes: <?php print ($application->getClose() ? $application->getClose()->format($dateFormat) : 'not set'); ?><br />
   Program Begins: <?php print ($application->getBegin() ? $application->getBegin()->format($dateFormat) : 'not set'); ?><br />
   Visible: <?php print ($application->isVisible() ? 'Yes' : 'No'); ?><br />
+  By Invitation Only: <?php print ($application->isByInvitationOnly() ? 'Yes' : 'No'); ?><br />
 </fieldset>

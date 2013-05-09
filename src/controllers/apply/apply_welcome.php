@@ -134,11 +134,12 @@ class ApplyWelcomeController extends \Jazzee\Controller
       $link = new \Foundation\Navigation\Link('Returning Applicants');
       $link->setHref($this->path($path . '/applicant/login'));
       $menu->addLink($link);
-
-      $link = new \Foundation\Navigation\Link('Start a New Application');
-      $link->addClass('highlight');
-      $link->setHref($this->path($path . '/applicant/new'));
-      $menu->addLink($link);
+      if(!$this->application->isByInvitationOnly()){
+        $link = new \Foundation\Navigation\Link('Start a New Application');
+        $link->addClass('highlight');
+        $link->setHref($this->path($path . '/applicant/new'));
+        $menu->addLink($link);
+      }
     }
     $navigation->addMenu($menu);
 

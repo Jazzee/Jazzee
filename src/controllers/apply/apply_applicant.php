@@ -211,6 +211,10 @@ class ApplyApplicantController extends \Jazzee\ApplyController
    */
   public function actionNew()
   {
+    if($this->_application->isByInvitationOnly()){
+      $this->addMessage('error', 'This application is by invitation only.  You cannot create an account.');
+      $this->redirectApplyPath('');
+    }
     $form = new \Foundation\Form;
     $form->setCSRFToken($this->getCSRFToken());
     $form->setAction($this->applyPath('applicant/new'));
@@ -308,11 +312,12 @@ class ApplyApplicantController extends \Jazzee\ApplyController
     $link->setHref($this->applyPath('applicant/login'));
     $menu->addLink($link);
 
-    $link = new \Foundation\Navigation\Link('Start a New Application');
-    $link->setHref($this->applyPath('applicant/new'));
-    $link->addClass('highlight');
-    $menu->addLink($link);
-
+    if(!$this->_application->isByInvitationOnly()){
+      $link = new \Foundation\Navigation\Link('Start a New Application');
+      $link->setHref($this->applyPath('applicant/new'));
+      $link->addClass('highlight');
+      $menu->addLink($link);
+    }
     $navigation->addMenu($menu);
 
     return $navigation;
