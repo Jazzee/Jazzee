@@ -921,6 +921,20 @@ class Applicant
   {
     return $this->deactivated;
   }
+  
+  /**
+   * Get an applicants individual deadline
+   * @return DateTime
+   */
+  public function getDeadline(){
+    if ($this->getDeadlineExtension() and $this->getDeadlineExtension() > $this->getApplication()->getClose()) {
+      $deadline = $this->getDeadlineExtension();
+    } else {
+      $deadline = $this->getApplication()->getClose();
+    }
+
+    return $deadline;
+  }
 
   /**
    * Create applicant XML file

@@ -15,17 +15,29 @@ $dateFormat = 'm/d/Y';
     foreach ($applications as $application) {
         echo '<li>';
         if ($application->isPublished()) {
-          if ($application->getOpen() < new DateTime('now')) {
-            echo '<a href="' . $this->path('apply/' . $application->getProgram()->getShortName() . '/' . $application->getCycle()->getName()) . '">' . $application->getCycle()->getName() . ' Application</a>';
-            if ($application->getClose() < new DateTime('now')) {
-              echo ' <strong>(Closed)</strong>';
+          if($application->isByinvitationOnly()){
+            if ($application->getOpen() < new DateTime('now')) {
+              echo '<a href="' . $this->path('apply/' . $application->getProgram()->getShortName() . '/' . $application->getCycle()->getName()) . '">' . $application->getCycle()->getName() . ' Application</a>';
+            } else {
+              echo $application->getCycle()->getName() . ' Application <strong>(Closed)</strong>';
             }
+            if($application->getBegin()) {
+              echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
+            }
+            echo '<br />Application Available: by invitation only';
           } else {
-            echo $application->getCycle()->getName() . ' Application <strong>(Closed)</strong>';
+            if ($application->getOpen() < new DateTime('now')) {
+              echo '<a href="' . $this->path('apply/' . $application->getProgram()->getShortName() . '/' . $application->getCycle()->getName()) . '">' . $application->getCycle()->getName() . ' Application</a>';
+              if ($application->getClose() < new DateTime('now')) {
+                echo ' <strong>(Closed)</strong>';
+              }
+            } else {
+              echo $application->getCycle()->getName() . ' Application <strong>(Closed)</strong>';
+            }
+            echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
+            echo '<br />Application Available: ' . $application->getOpen()->format($dateFormat);
+            echo ' - ' . $application->getClose()->format($dateFormat);
           }
-          echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
-          echo '<br />Application Available: ' . $application->getOpen()->format($dateFormat);
-          echo ' - ' . $application->getClose()->format($dateFormat);
         } else {
           echo $application->getCycle()->getName() . ' Application <strong>(Closed)</strong>';
           echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);

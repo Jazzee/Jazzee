@@ -238,7 +238,6 @@ class SetupApplicationController extends \Jazzee\AdminController
 
     $element = $field->newElement('DateInput', 'open');
     $element->setLabel('Application Open');
-    $element->addValidator(new \Foundation\Form\Validator\DateBeforeElement($element, 'close'));
     if ($this->_application->getOpen()) {
       $element->setValue($this->_application->getOpen()->format('c'));
     }
@@ -249,7 +248,7 @@ class SetupApplicationController extends \Jazzee\AdminController
     if ($this->_application->getClose()) {
       $element->setValue($this->_application->getClose()->format('c'));
     }
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addValidator(new \Foundation\Form\Validator\DateAfterElement($element, 'open'));
 
     $element = $field->newElement('DateInput', 'begin');
     $element->setLabel('Program Start Date');
