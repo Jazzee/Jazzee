@@ -227,9 +227,7 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\QueryPage, \Ja
           }
           $value = $element->getId();
         }
-        break;
-      default:
-        throw new \Jazzee\Exception($name . ' is not a valid variable on this page.');
+      break;
     }
     parent::setVar($name, $value);
   }
