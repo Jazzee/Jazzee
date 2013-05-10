@@ -260,8 +260,8 @@ class Application
    */
   public function publish($override = false)
   {
-    if (!$override AND !$this->canPublish()) {
-      throw new \Jazzee\Exception('Application cannot be published, it is not ready.  Specify override if this should be ignored.');
+    if (!$this->canPublish() or (!$override AND !$this->shouldPublish())) {
+      throw new \Jazzee\Exception('Application cannot be published, it is not ready.');
     }
     $this->published = true;
   }
@@ -272,6 +272,29 @@ class Application
    */
   public function canPublish()
   {
+    if($this->open == null){
+      return false;
+    }
+    
+    if(!$this->byInvitationOnly and $this->close == null){
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Check if application is ready to be published or if there are non - blocking errors
+   * which can be ignored
+   * 
+   * @return boolean
+   */
+  public function shouldPublish()
+  {
+    if(!$this->canPublish()){
+      return false;
+    }
+
     foreach ($this->cycle->getRequiredPages() as $requiredPage) {
       if (!$this->hasPage($requiredPage)) {
         return false;

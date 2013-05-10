@@ -873,7 +873,9 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     if ($applicant->getDeadlineExtension()) {
       $element->setValue($applicant->getDeadlineExtension()->format('c'));
     }
-    $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, $applicant->getApplication()->getClose()->format('c')));
+    if($applicant->getApplication()->getClose()){
+      $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, $applicant->getApplication()->getClose()->format('c')));
+    }
     $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'now'));
 
     $form->newButton('submit', 'Extend Deadline');

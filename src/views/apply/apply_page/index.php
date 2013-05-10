@@ -6,14 +6,9 @@
  * @package jazzee
  * @subpackage apply
  */
-if ($applicant->getDeadlineExtension() and $applicant->getDeadlineExtension() > $applicant->getApplication()->getClose()) {
-  $deadline = $applicant->getDeadlineExtension();
-} else {
-  $deadline = $applicant->getApplication()->getClose();
-}
-
+$deadline = $applicant->getDeadline();
 $layoutContentTop = "<p class='deadline";
-if ($applicant->getApplication()->getClose()->diff(new DateTime('today'))->days < 7) {
+if ($deadline->diff(new DateTime('today'))->days < 7) {
   $layoutContentTop .= ' approaching-deadline';
 }
 $layoutContentTop .= "'>Application Deadline: " . $deadline->format('m/d/Y g:ia T') . '</p>';

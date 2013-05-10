@@ -23,15 +23,23 @@ class SetupPublishapplicationController extends \Jazzee\AdminController
   public function actionIndex()
   {
     $ready = true;
-    if (!$this->_application->canPublish()) {
+    if (!$this->_application->canPublish() or !$this->_application->shouldPublish()) {
+      $ready = false;
       $problems = array();
       foreach ($this->_cycle->getRequiredPages() as $requiredPage) {
         if (!$this->_application->hasPage($requiredPage)) {
-          $ready = false;
           $problems[] = "{$requiredPage->getTitle()} page is required, but is not in the application.";
         }
       }
+      $blockers = array();
+      if(!$this->_application->getOpen()){
+        $blockers[] = "Application must have an open date.";
+      }
+      if(!$this->_application->isByInvitationOnly() and !$this->_application->getClose()){
+        $blockers[] = "Applications which are not by invitation only must have a close date.";
+      }
       $this->setVar('problems', $problems);
+      $this->setVar('blockers', $blockers);
     }
     $this->setVar('published', $this->_application->isPublished());
     $this->setVar('ready', $ready);

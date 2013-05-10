@@ -69,7 +69,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
     );
     $replace = array(
       $this->_applicant->getFullName(),
-      $this->_application->getClose()->format('l F jS Y g:ia'),
+      $this->_applicant->getDeadline()?$this->_applicant->getDeadline()->format('l F jS Y g:ia'):'',
       $this->applyPath('status/sir'),
       $this->applyPath('status/admitLetter'),
       $this->applyPath('status/denyLetter')
