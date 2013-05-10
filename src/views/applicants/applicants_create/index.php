@@ -25,3 +25,5 @@ if (isset($applicant)) { ?>
   </table>
 <?php  } //if applicants
 $this->renderElement('form', array('form' => $form));
+?>
+<a href='<?php print $this->path('applicants/create/bulk'); ?>'>Upload Bulk applicant file</a>
