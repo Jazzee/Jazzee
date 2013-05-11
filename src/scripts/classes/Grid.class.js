@@ -136,6 +136,7 @@ Grid.prototype.loadapps = function(applicantIds, grid){
  * Format date objects
  */
 Grid.formatDate = function(data, type, full){
+  if(data == null) return null;
   if(type == 'filter' || type == 'display'){
     var date = new Date(data.date);
     return date.toLocaleDateString();
