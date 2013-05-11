@@ -52,7 +52,7 @@ foreach ($tags as $title => $applicants) { ?>
             $tags = implode(', ', $tags);
             ?>
             <td><?php print $tags; ?></td>
-            <td><?php print $applicant->getLastLogin()->format('m/d/y'); ?></td>
+            <td><?php print $applicant->getLastLogin()?$applicant->getLastLogin()->format('m/d/y'):'never'; ?></td>
             <td><?php print $applicant->getCreatedAt()->format('m/d/y'); ?></td>
           </tr>
         <?php
