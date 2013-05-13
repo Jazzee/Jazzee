@@ -211,6 +211,15 @@ JazzeePage.prototype.deleteElement = function(element){
   this.deletedElements.push(element);
 };
 
+
+JazzeePage.prototype.listElementsForDisplay = function(element){
+    console.log("in page["+this.typeName+", "+this.typeClass+"]");
+  for(var i = 0; i < this.elements.length; i++){
+      
+  }
+
+
+};
 /**
  * Add a child to the page
  * @param {JazzeePage} page

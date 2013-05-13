@@ -40,7 +40,8 @@ class SetupPagesController extends \Jazzee\PageBuilder
   {
     $applicationPages = array();
     foreach ($this->_application->getApplicationPages() as $applicationPage) {
-      $applicationPages[] = $this->pageArray($applicationPage);
+      //      $applicationPages[] = $this->pageArray($applicationPage);
+      $applicationPages[] = $applicationPage->toArray();
     }
     $this->setVar('result', $applicationPages);
     $this->loadView($this->controllerName . '/result');
@@ -120,7 +121,8 @@ class SetupPagesController extends \Jazzee\PageBuilder
   {
     $pages = array();
     foreach ($this->_em->getRepository('\Jazzee\Entity\Page')->findByIsGlobal(true) as $page) {
-      $pages[] = $this->pageArray($page);
+      //      $pages[] = $this->pageArray($page);
+      $pages[] = $page->toArray();
     }
     $this->setVar('result', $pages);
     $this->loadView($this->controllerName . '/result');

@@ -86,7 +86,7 @@ abstract class PageBuilder extends AdminController
    * Create an array from a page suitable for json_encoding
    * @param \Jazzee\Entity\Page of \Jazzee\Entity\ApplicationPage $page
    * @return array
-   */
+   *
   protected function pageArray($page)
   {
     $arr = array(
@@ -177,7 +177,7 @@ abstract class PageBuilder extends AdminController
 
     return $arr;
   }
-
+*/
   /**
    * List the available page types
    */

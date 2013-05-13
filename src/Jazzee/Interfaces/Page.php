@@ -80,4 +80,5 @@ interface Page
    * @return array
    */
   public function compareWith(\Jazzee\Entity\ApplicationPage $applicationPage);
+
 }

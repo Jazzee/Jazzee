@@ -581,4 +581,104 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     return $properties;
   }
 
+
+  /**
+   * Create an array from a page suitable for json_encoding
+   * @param \Jazzee\Entity\Page of \Jazzee\Entity\ApplicationPage $page
+   * @return array
+   */
+  public function toArray()
+  {
+    $page = this;
+
+    $arr = array(
+      'title' => $page->getTitle(),
+      'min' => is_null($page->getMin()) ? 0 : $page->getMin(),
+      'max' => is_null($page->getMax()) ? 0 : $page->getMax(),
+      'isRequired' => (int) $page->isRequired(),
+      'answerStatusDisplay' => $page->answerStatusDisplay() ? 1 : 0,
+      'instructions' => $page->getInstructions(),
+      'leadingText' => $page->getLeadingText(),
+      'trailingText' => $page->getTrailingText()
+    );
+
+    //now that we have completed the general setup replace $applicationPage with $page
+    if ($page instanceof \Jazzee\Entity\ApplicationPage) {
+      $arr['weight'] = $page->getWeight();
+      $arr['applicationPageId'] = $page->getId();
+      $arr['kind'] = $page->getKind();
+      $arr['name'] = $page->getName();
+      $page = $page->getPage();
+      //for global pages also pass the global page info for reference
+      if ($page->isGlobal()) {
+        $arr['globalPage'] = array(
+          'title' => $page->getTitle(),
+          'min' => is_null($page->getMin()) ? 0 : $page->getMin(),
+          'max' => is_null($page->getMax()) ? 0 : $page->getMax(),
+          'isRequired' => (int) $page->isRequired(),
+          'answerStatusDisplay' => $page->answerStatusDisplay() ? 1 : 0,
+          'instructions' => $page->getInstructions(),
+          'leadingText' => $page->getLeadingText(),
+          'trailingText' => $page->getTrailingText()
+        );
+      }
+    }
+    $arr['id'] = $page->getId();
+    $arr['uuid'] = $page->getUuid();
+    $arr['parentId'] = ($parent = $page->getParent())?$parent->getId():null;
+    $arr['typeClass'] = $this->getClassName($page->getType()->getClass());
+    $arr['typeName'] = $this->getClassName($page->getType()->getName());
+    $arr['typeId'] = $page->getType()->getId();
+    $arr['isGlobal'] = $page->isGlobal() ? 1 : 0;
+    $arr['hasAnswers'] = $this->_em->getRepository('\Jazzee\Entity\Page')->hasAnswers($page);
+    $arr['hasCycleAnswers'] = is_null($this->_cycle)?false:$this->_em->getRepository('\Jazzee\Entity\Page')->hasCycleAnswers($page, $this->_cycle);
+    $arr['hasApplicationAnswers'] = is_null($this->_application)?false:$this->_em->getRepository('\Jazzee\Entity\Page')->hasApplicationAnswers($page, $this->_application);
+    $arr['interfaces'] = array_values(class_implements($page->getType()->getClass()));
+    $arr['elements'] = array();
+    foreach ($page->getElements() as $element) {
+      $e = array(
+        'id' => $element->getId(),
+        'fixedId' => $element->getFixedId(),
+        'weight' => $element->getWeight(),
+        'title' => $element->getTitle(),
+        'name' => $element->getName(),
+        'format' => $element->getFormat(),
+        'min' => is_null($element->getMin()) ? 0 : $element->getMin(),
+        'max' => is_null($element->getMax()) ? 0 : $element->getMax(),
+        'isRequired' => (int) $element->isRequired(),
+        'instructions' => $element->getInstructions(),
+        'defaultValue' => $element->getDefaultValue()
+      );
+      $e['typeClass'] = $this->getClassName($element->getType()->getClass());
+      $e['typeName'] = $this->getClassName($element->getType()->getName());
+      $e['typeId'] = $element->getType()->getId();
+      $e['list'] = array();
+      foreach ($element->getListItems() as $item) {
+        $e['list'][] = array(
+          'id' => $item->getId(),
+          'status' => '',
+          'value' => $item->getValue(),
+          'name' => $item->getName(),
+          'weight' => $item->getWeight(),
+          'isActive' => (int) $item->isActive()
+        );
+      }
+      $arr['elements'][] = $e;
+    }
+    $arr['variables'] = array();
+    foreach ($page->getVariables() as $variable) {
+      $arr['variables'][] = array(
+        'name' => $variable->getName(),
+        'value' => $variable->getValue()
+      );
+    }
+    $arr['children'] = array();
+    foreach ($page->getChildren() as $child) {
+      //      $arr['children'][] = $this->pageArray($child);
+      $arr['children'][] = $child->toArray();
+    }
+
+    return $arr;
+  }
+
 }
