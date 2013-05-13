@@ -73,6 +73,11 @@ class SetupImportApplicationController extends \Jazzee\AdminController
       if($arr['visible'] == '1'){
         $this->_application->visible();
       }
+      if($arr['byinvitationonly'] == '1'){
+        $this->_application->byInvitationOnly();
+      } else {
+        $this->_application->notByInvitationOnly();
+      }
       foreach ($xml->xpath('/response/application/pages/page') as $element) {
         $attributes = $element->attributes();
         $page = $this->addPageFromXml($element);
