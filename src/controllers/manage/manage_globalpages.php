@@ -30,7 +30,7 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder
   public function actionListPages()
   {
     $pages = array();
-    foreach ($this->_em->getRepository('\Jazzee\Entity\Page')->findByIsGlobal(true) as $page) {
+    foreach ($this->_em->getRepository('\Jazzee\Entity\Page')->findBy(array('isGlobal' =>true), array('title' => 'ASC')) as $page) {
       $pages[] = $this->pageArray($page);
     }
     $this->setVar('result', $pages);
