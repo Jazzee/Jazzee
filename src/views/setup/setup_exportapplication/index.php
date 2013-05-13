@@ -13,8 +13,8 @@ $preferences->appendChild($xml->createElement('contactName', $application->getCo
 $preferences->appendChild($xml->createElement('contactEmail', $application->getContactEmail()));
 $preferences->appendChild($this->controller->createCdataElement($xml, 'welcome', $application->getWelcome()));
 $preferences->appendChild($xml->createElement('open', ($application->getOpen()?$application->getOpen()->format('c'):null)));
-$preferences->appendChild($xml->createElement('close', ($application->getOpen()?$application->getClose()->format('c'):null)));
-$preferences->appendChild($xml->createElement('begin', ($application->getOpen()?$application->getBegin()->format('c'):null)));
+$preferences->appendChild($xml->createElement('close', ($application->getClose()?$application->getClose()->format('c'):null)));
+$preferences->appendChild($xml->createElement('begin', ($application->getBegin()?$application->getBegin()->format('c'):null)));
 $preferences->appendChild($this->controller->createCdataElement($xml, 'admitletter', $application->getAdmitLetter()));
 $preferences->appendChild($this->controller->createCdataElement($xml, 'denyletter', $application->getDenyLetter()));
 $preferences->appendChild($this->controller->createCdataElement($xml, 'statusIncompleteText', $application->getStatusIncompleteText()));
