@@ -214,7 +214,7 @@ class Application
   public function setClose($close)
   {
     if (empty($close)) {
-      $this->close = $close;
+      $this->close = null;
     } else {
       $this->close = new \DateTime($close);
     }
