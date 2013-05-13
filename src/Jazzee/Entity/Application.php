@@ -109,7 +109,7 @@ class Application
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
     $this->published = false;
     $this->visible = false;
-    $this->invitationOnly = false;
+    $this->byInvitationOnly = false;
   }
 
   /**
