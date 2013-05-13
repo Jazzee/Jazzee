@@ -22,4 +22,8 @@ interface DataPage
    * @return array
    */
   public function formatApplicantArray(array $answers);
+
+  public function toArray();
+  
+
 }

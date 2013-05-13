@@ -1,3 +1,64 @@
+
+var triggerDownload = function(nButton, oConfig ) {
+	    
+    var applicants = [];
+    var dt = TableTools._aInstances[0].s.dt;
+    var table = TableTools._aInstances[0].dom.table;
+    console.log("have oDT? "+dt+", table: "+table);
+
+       //    $(table).find("tr.row_selected").each(function(idx, row){
+    $(table).find("tr."+ROW_CSS_CLASS).each(function(idx, row){
+	    var appls = $(row).find(".applicantlink");
+	    if(appls.length > 0)
+		applicants.push($(appls[0]).attr('href'));
+	});
+    console.log("have applicants: "+applicants.join());
+
+    if(applicants.length < 1){
+	alert("You must select some rows from the table.");
+	return;
+    }
+
+    var download = $('#downloadForm');
+    download.find("input[name=type]").remove();
+
+    var dl_type = oConfig["dl_type"];
+    
+    // use the requested type
+    $('<input type="hidden">').attr({
+	    name: 'type',
+	    value: dl_type
+	}).appendTo(download);
+
+    // we need to set this as the dl has it as a required field,
+    // but the value will be ignored if we send any ids
+    download.find("#filters_locked").attr("checked","checked");
+    
+    for(id in applicants){
+	console.log("adding all ids");
+	$('<input type="hidden">').attr({
+		name: 'applicantIds[]',
+		    value: applicants[id]
+		    }).appendTo(download);
+    }
+    console.log("added all ids, form is: "+download.get(0));
+    $(download).find("input[type=submit]").click(); 
+    console.log("submitted form");
+
+
+	    //	    window.location = "/admin/applicants/download?"+$.param(args);
+	    /*
+    var path = services.getControllerPath('applicants_download');
+
+    $.get(path + '/l', function(json){
+      var grid = new Grid(display,json.data.result, $('#grid'), path);
+      grid.init();
+    });
+	    */
+
+};
+
+
 /**
  * Grid class
  * Creats an applicant grid from a display and a set of applicant ids
@@ -32,8 +93,54 @@ Grid.prototype.init = function(){
     fnDrawCallback: Grid.processDraw,
     aaData: data,
     aoColumns: columns,
-    bJQueryUI: true
-  });
+    bJQueryUI: true,
+    "sDom": 'T<"clear">lfrtip',
+    "oTableTools": {
+	      "aButtons": ["select_all",
+			   "select_none",
+  {
+      "sExtends":    "collection",
+      "sButtonText": "Download",
+      "aButtons":    [ 		       {
+			   "sExtends":    "text",
+			   "sNewLine": "<br>",
+			   "sButtonText": "json",
+			   "sDiv": "",
+			   "dl_type": "json",
+			   "fnClick": triggerDownload
+	  }
+	  , 
+		       {
+			   "sExtends":    "text",
+			   "sNewLine": "<br>",
+			   "sButtonText": "Excel",
+			   "sDiv": "",
+			   "dl_type": "xls",
+			   "fnClick": triggerDownload
+		       } , 
+		       {
+			   "sExtends":    "text",
+			   "sNewLine": "<br>",
+			   "sButtonText": "XML",
+			   "sDiv": "",
+			   "dl_type": "xml",
+			   "fnClick": triggerDownload
+		       },
+		       {
+			   "sExtends":    "text",
+			   "sNewLine": "<br>",
+			   "sButtonText": "PDFX",
+			   "sDiv": "",
+			   "dl_type": "pdfarchive",
+			   "fnClick":  triggerDownload
+		       }
+	  ]
+  }
+			   ]
+	  }
+      }); 
+
+  $(table).noSelect(); // prevents text selection for shift-clicking multiple rows
   var progressbar = $('<div>').addClass('progress').append($('<div>').addClass('label').html('Loading Grid...'));
   $('div.overlay', this.target).append(progressbar);
   progressbar.progressbar({
@@ -42,6 +149,14 @@ Grid.prototype.init = function(){
   });
   this.loadapps(this.applicantIds, grid);
 };
+
+var dump = function(obj){
+    var txt = "";
+    for(x in obj)
+	txt += "'"+x+"' => "+obj[x]+"\n";
+    return txt;
+}
+
 
 Grid.prototype.getColumns = function(){
   var self = this;
@@ -106,6 +221,11 @@ Grid.prototype.loadapps = function(applicantIds, grid){
     }, function(json){
       var applicants = [];
       var length = json.data.result.applicants.length;
+      var pages = json.data.result.pages; // available pages
+      console.log("have pages!!!!!!!!: "+pages);
+      for(p in pages){
+	  console.log(" =["+p+"]=> "+pages[p]);
+      }
       while (length--) {
         var applicant = new ApplicantData(json.data.result.applicants.splice(length, 1)[0]);
         applicant.elements = {};
@@ -123,8 +243,9 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       }
       grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();
+      grid.rowSelect();
       self.loadapps(applicantIds, grid);
-    });
+	});
   } else {
     //after all of the data is loaded then fix the left column in place
     new FixedColumns(grid,  {iLeftColumns: 2});

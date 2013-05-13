@@ -58,4 +58,12 @@ class PageRepository extends \Doctrine\ORM\EntityRepository
     return ($result[0]['ancnt'] > 0);
   }
 
+  public function findByApplication(Application $application)
+  {
+    $query = $this->_em->createQuery('SELECT * FROM Jazzee\Entity\Answer answer JOIN answer.applicant applicant WHERE applicant.application = :applicationId');
+    $query->setParameter('applicationId', $application->getId());
+    $result = $query->getResult();
+    return $result;
+  }
+
 }

@@ -35,9 +35,10 @@ DisplayManager.prototype.drawChooser = function(){
   var div = $('<div>');
   div.append($('<h3>').html('Available Elements'));
   div.append(this.shrinkButton('Applicant', this.applicantBox()));
+    var builder = new PageBuilder();
   
   $.each(this.application.listApplicationPages(), function(){
-    div.append(self.shrinkButton(this.title, self.pageBox(this)));
+	  div.append(self.shrinkButton(this.title, self.pageBox(this, builder)));
   });
   
   $('.shrink_button', div).click(function() {
@@ -140,16 +141,65 @@ DisplayManager.prototype.shrinkButton = function(title, content){
  * 
  * @param {} applicationPage
  */
-DisplayManager.prototype.pageBox = function(applicationPage){
+DisplayManager.prototype.pageBox = function(applicationPage, builder){
   var self = this;
   var list = $('<ul>').addClass('block_list');
+  var ap = applicationPage;
+  /*
+    console.log("about to create Page object for "+ap);
+  for(x in ap){
+      //      console.log(" =["+x+"]=> "+ap[x]);
+      if(x == "page"){
+	    for(y in ap[x]){
+		console.log(" =["+x+"][page]["+y+"]=> "+ap[x][y]);
+	    }
+      }
+  }
+  */
+  //  var page = builder.createPageObject(applicationPage);
+
+  
+  if(ap["page"]){
+      console.log(" fetching page with id: "+ap["page"]["id"]+", title: "+ap["page"]["title"]);
+  var pg = this.application.getApplicationPageByPageId(ap["page"]["id"]);
+  //console.log(" =[have]=> "+pg);
+  if(ap["page"]["title"] == "Recommenders"){
+      for(x in pg){
+	  console.log(" =["+x+"]=> "+pg[x]);
+
+	  if(x == "page"){
+	      for(y in ap[x]){
+		  console.log(" =["+x+"][page]["+y+"]=> "+ap[x][y]);
+
+		  if(y == "type"){
+		      for(z in ap[x][y]){
+			  console.log(" =["+x+"][page]["+y+"]["+z+"]=> "+ap[x][y][z]);
+		      }
+	      }
+	  }
+
+      }
+  }
+  }
+  }
+
+  try{
+  //var pageObj = builder.createPageObject(ap["page"]);
+  var pageObj = new window[ap["page"]["type"]["class"]]();
+  pageObj.init(obj, builder);
+  
+console.log("have pageObj: "+pageObj);
+  pageObj.listElementsForDisplay();
+  }catch(e){
+      
+  }
   $.each(this.application.listPageElements(applicationPage.page.id), function(){
     var li = $('<li>').addClass('item').html(this.title).data('element', this);
     if(self.display.displayElement('page', this.id)){
       li.addClass('selected');
       li.bind('click', function(){
         self.display.removeElement('page',$(this).data('element').id);
-        list.replaceWith(self.pageBox(applicationPage));
+        list.replaceWith(self.pageBox(applicationPage, builder));
         self.drawChosen();
       });
     } else {
