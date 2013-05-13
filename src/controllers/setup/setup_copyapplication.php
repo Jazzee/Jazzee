@@ -43,6 +43,9 @@ class SetupCopyApplicationController extends \Jazzee\AdminController
       $this->_application->setCycle($this->_cycle);
       $this->_application->inVisible();
       $this->_application->unPublish();
+      if($previousApplication->isByInvitationOnly()){
+        $this->_application->byInvitationOnly();
+      }
       $this->_application->setContactName($previousApplication->getContactName());
       $this->_application->setContactEmail($previousApplication->getContactEmail());
       $this->_application->setWelcome($previousApplication->getWelcome());
@@ -66,6 +69,7 @@ class SetupCopyApplicationController extends \Jazzee\AdminController
         $applicationPage->setTitle($previousPage->getTitle());
         $applicationPage->setMin($previousPage->getMin());
         $applicationPage->setMax($previousPage->getMax());
+        $applicationPage->setName($previousPage->getName());
         if ($previousPage->isRequired()) {
           $applicationPage->required();
         } else {
@@ -130,6 +134,7 @@ class SetupCopyApplicationController extends \Jazzee\AdminController
         $element->setTitle($previousElement->getTitle());
         $element->setMin($previousElement->getMin());
         $element->setMax($previousElement->getMax());
+        $element->setName($previousElement->getName());
         if ($previousElement->isRequired()) {
           $element->required();
         } else {
@@ -143,7 +148,7 @@ class SetupCopyApplicationController extends \Jazzee\AdminController
           $listItem = new \Jazzee\Entity\ElementListItem();
           $listItem->setValue($previousItem->getValue());
           $listItem->setWeight($previousItem->getWeight());
-
+          $listItem->setName($previousItem->getName());
           if ($previousItem->isActive()) {
             $listItem->activate();
           } else {
