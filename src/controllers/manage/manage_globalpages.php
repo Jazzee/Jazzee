@@ -68,12 +68,16 @@ class ManageGlobalpagesController extends \Jazzee\PageBuilder
         $this->savePage($page, $data);
           break;
       case 'new':
+      case 'copy':
         $page = new \Jazzee\Entity\Page();
         $page->makeGlobal();
         $page->setType($this->_em->getRepository('\Jazzee\Entity\PageType')->find($data->typeId));
         //create a fake application page to work with so we can run setupNewPage
         $page->getApplicationPageJazzeePage()->setController($this);
-        $page->getApplicationPageJazzeePage()->setupNewPage();
+        //only do setup for new pages, copies already have elements
+        if ($data->status == 'new') {
+          $page->getApplicationPageJazzeePage()->setupNewPage();
+        }
         $this->addMessage('success', $data->title . ' created.');
         $this->savePage($page, $data);
           break;
