@@ -536,6 +536,11 @@ class Page
         return $element;
       }
     }
+    foreach ($this->children as $child) {
+      if ($element = $child->getElementById($elementId)) {
+        return $element;
+      }
+    }
 
     return false;
   }
