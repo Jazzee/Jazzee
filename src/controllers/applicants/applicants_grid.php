@@ -71,7 +71,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
 
   public function actionDownload()  {
-    error_log("in actionDownload");
+
     $this->layout = 'wide';
 
     $form = new \Foundation\Form();
@@ -105,10 +105,8 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Download Applicants');
-    if ($input = $form->processInput($this->post)
-	//	$input = $form->processInput($this->get)
-) {
-      error_log("have post input!".var_export($this->post, true));
+    if ($input = $form->processInput($this->post)) {
+
       $filters = $input->get('filters');
 
       $applicationPages = array();
@@ -119,7 +117,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
       $applicantsArray = array();
       if($input->get("applicantIds[]") || $input->get("applicantIds")){
 	$requestedIds = $input->get("applicantIds");
-	error_log("Have requested ids: ".var_export($requestedIds, true));
 	$applicantsArray = $requestedIds;
       }else{
       $minimalDisplay = new \Jazzee\Display\Minimal($this->_application);
@@ -268,7 +265,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
     fclose($handle);
     $this->setVar('outputType', 'file');
     $this->setVar('type', 'text/xls');
-    error_log("tmp file: ".$fileName);
 
     $this->setVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy') . '.xls');
     $this->setVar('filePath', $fileName);
