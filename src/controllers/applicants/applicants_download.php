@@ -51,7 +51,9 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Download Applicants');
-    if ($input = $form->processInput($this->post)) {
+    if ($input = $form->processInput($this->post)
+	//	$input = $form->processInput($this->get)
+) {
       $filters = $input->get('filters');
       $applicationPages = array();
       foreach ($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $pageEntity) {
@@ -59,6 +61,11 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         $applicationPages[$pageEntity->getId()] = $pageEntity;
       }
       $applicantsArray = array();
+      if($_GET("applicantIds")){
+	$requestedIds = $input->get("applicantIds");
+	error_log("Have requested ids: ".var_export($requestedIds, true));
+	$applicantsArray = $requestedIds;
+      }else{
       $minimalDisplay = new \Jazzee\Display\Minimal($this->_application);
       $ids = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findIdsByApplication($this->_application);
       foreach ($ids as $id) {
@@ -102,6 +109,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           $applicantsArray[] = $applicant['id'];
         }
       } //end foreach applicants
+      }
       //use a full applicant display where display is needed
       $display= new \Jazzee\Display\FullApplication($this->_application);
       unset($ids);
