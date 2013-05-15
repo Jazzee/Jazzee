@@ -1,3 +1,53 @@
+.hidden-form {
+display: none;
+}
+
+.DTTT_container {
+margin-bottom: 20px;
+}
+
+.DTTT_button{
+padding: 5px;
+z-index: 99; 
+position: relative; 
+top: 5px; 
+white-space: nowrap;
+}
+
+/**
+ * this is the main grid tool bar
+ */
+.applicant_grid .DTTT_button {
+left: 0px;
+background: orange;
+margin-right: 10px;
+}
+
+/**
+ * this is the popup toolbar for sub-actions
+ */
+.DTTT_collection>.DTTT_button {
+background: #FFC266;
+cursor: pointer;
+}
+
+tr.DTTT_selected {
+background: orange !important;
+}
+
+tr.row_selected {
+background: red !important;
+}
+
+table.dataTable, .dataTable td, .dataTable tr
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+
 div.applicant_grid{
   position: relative;
 }
