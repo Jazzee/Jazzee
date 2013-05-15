@@ -12,3 +12,8 @@
 <div id='ajaxstatus'></div>
 
 <div id="grid"></div>
+<div id="gridActionForm" class="hidden-form">
+<?php
+  $this->renderElement('form', array('form' => $form)); 
+?>
+</div>
