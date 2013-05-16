@@ -419,17 +419,11 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $display = $this->getDisplay($this->post['display']);
     $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $this->post['applicantIds']);
 
-    try{
     $pages = array();
     foreach ($this->_em->getRepository('\Jazzee\Entity\Page')->findByApplication($this->_application) as $page) {
-      //      $pages[] = $this->pageArray($page);
-      //      if(is_subclass_of($applicationPage->getPage()->getType()->getClass(), 'Jazzee\Interfaces\DataPage')){
       if($page instanceof Jazzee\Interfaces\DataPage){
 	$pages[] = $page->toArray();
       }
-    }
-    }catch(Exception $e){
-      error_log("unable to fetch pages");
     }
 
     $this->setVar('result', array('applicants' => $applicants,
