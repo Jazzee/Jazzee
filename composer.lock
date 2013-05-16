@@ -1,4 +1,8 @@
 {
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
     "hash": "7ced70ca7975156a70822a3c2671811f",
     "packages": [
         {
@@ -72,20 +76,20 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "2.3.2",
+            "version": "2.3.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/doctrine/dbal",
-                "reference": "2.3.2"
+                "url": "https://github.com/doctrine/dbal.git",
+                "reference": "2.3.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/dbal/archive/2.3.2.zip",
-                "reference": "2.3.2",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/2.3.4",
+                "reference": "2.3.4",
                 "shasum": ""
             },
             "require": {
-                "doctrine/common": "2.3.*",
+                "doctrine/common": ">=2.3.0,<2.5-dev",
                 "php": ">=5.3.2"
             },
             "type": "library",
@@ -131,7 +135,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2013-01-07 20:03:43"
+            "time": "2013-05-11 07:45:37"
         },
         {
             "name": "doctrine/migrations",
@@ -189,16 +193,16 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "2.3.2",
+            "version": "2.3.4",
             "source": {
                 "type": "git",
-                "url": "git://github.com/doctrine/doctrine2.git",
-                "reference": "2.3.2"
+                "url": "https://github.com/doctrine/doctrine2.git",
+                "reference": "2.3.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/doctrine2/archive/2.3.2.zip",
-                "reference": "2.3.2",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/2.3.4",
+                "reference": "2.3.4",
                 "shasum": ""
             },
             "require": {
@@ -255,7 +259,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2013-01-07 20:05:04"
+            "time": "2013-05-11 07:51:12"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -342,7 +346,7 @@
                     "lib/phpmailer"
                 ]
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -362,16 +366,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.4.0",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Seldaek/monolog",
-                "reference": "1.4.0"
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "1.5.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1.4.0",
-                "reference": "1.4.0",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1.5.0",
+                "reference": "1.5.0",
                 "shasum": ""
             },
             "require": {
@@ -420,7 +424,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2013-02-13 18:06:51"
+            "time": "2013-04-23 10:09:48"
         },
         {
             "name": "psr/log",
@@ -462,17 +466,17 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.0.22",
+            "version": "v2.0.23",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Console",
-                "reference": "v2.0.22"
+                "url": "https://github.com/symfony/Console.git",
+                "reference": "v2.0.23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/archive/v2.0.22.zip",
-                "reference": "v2.0.22",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/v2.0.23",
+                "reference": "v2.0.23",
                 "shasum": ""
             },
             "require": {
@@ -500,15 +504,23 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
-            "time": "2013-01-11 13:49:52"
+            "time": "2013-02-27 09:08:35"
         }
     ],
-    "packages-dev": null,
+    "packages-dev": [
+
+    ],
     "aliases": [
 
     ],
     "minimum-stability": "stable",
     "stability-flags": {
         "doctrine/migrations": 20
-    }
+    },
+    "platform": {
+        "php": ">=5.3.0"
+    },
+    "platform-dev": [
+
+    ]
 }
