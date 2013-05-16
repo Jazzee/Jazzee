@@ -59,11 +59,22 @@ class ApplicantsGridController extends \Jazzee\AdminController
     }
   }
 
+  public function getForm($p)
+  { 
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path($p));
+    $form->setId("gridForm");
+    $form->newButton('submit', 'Download Applicants');
+
+    return $form;
+  }
 
   public function actionIndex()
   {
     $this->layout = 'wide';
-         $this->actionDownload();
+    $form = $this->getForm('applicants/grid');
+    $this->setVar('form', $form);
   }
 
   /**
@@ -73,42 +84,9 @@ class ApplicantsGridController extends \Jazzee\AdminController
   public function actionDownload()  {
 
     $this->layout = 'wide';
-
-    $form = new \Foundation\Form();
-    $form->setCSRFToken($this->getCSRFToken());
-    $form->setAction($this->path('applicants/grid/download'));
-    $form->setId("downloadForm");
-    $field = $form->newField();
-    $field->setLegend('Download Applicants');
-
-    $element = $field->newElement('RadioList', 'type');
-    $element->setLabel('Type of Download');
-    $element->newItem('xls', 'Excel');
-    $element->newItem('xml', 'XML');
-    $element->newItem('json', 'JSON');
-    $element->newItem('pdfarchive', 'Archive of Multiple PDFs');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-
-    $element = $field->newElement('CheckboxList', 'filters');
-    $element->setLabel('Types of applicants');
-    $element->newItem('unlocked', 'Incomplete');
-    $element->newItem('locked', 'Locked');
-    $element->newItem('admitted', 'Admitted');
-    $element->newItem('denied', 'Denied');
-    $element->newItem('accepted', 'Accepted');
-    $element->newItem('declined', 'Declined');
-
-    $tags = $this->_em->getRepository('\Jazzee\Entity\Tag')->findByApplication($this->_application);
-    foreach ($tags as $tag) {
-      $element->newItem($tag->getId(), $tag->getTitle());
-    }
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-
-    $form->newButton('submit', 'Download Applicants');
+    $form = $this->getForm('applicants/grid');
     if ($input = $form->processInput($this->post)) {
-
       $filters = $input->get('filters');
-
       $applicationPages = array();
       foreach ($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $pageEntity) {
         $pageEntity->getJazzeePage()->setController($this);
@@ -181,10 +159,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
           break;
       }
     }
-    $this->setVar('form', $form);
-    //    $this->loadView('applicants_single/result');
-
-
   }
 
   /**
@@ -415,16 +389,19 @@ class ApplicantsGridController extends \Jazzee\AdminController
    * Get applicant JSON
    */
   public function actionGetApplicants(){
+
     $results = array();
     $display = $this->getDisplay($this->post['display']);
     $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $this->post['applicantIds']);
 
     $pages = array();
+    /* for lor x/y ticket, not working yet
     foreach ($this->_em->getRepository('\Jazzee\Entity\Page')->findByApplication($this->_application) as $page) {
       if($page instanceof Jazzee\Interfaces\DataPage){
 	$pages[] = $page->toArray();
       }
     }
+*/
 
     $this->setVar('result', array('applicants' => $applicants,
 				  'pages' => $pages));

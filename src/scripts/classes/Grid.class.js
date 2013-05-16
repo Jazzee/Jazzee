@@ -15,8 +15,9 @@ var triggerDownload = function(nButton, oConfig ) {
 	return;
     }
 
-    var download = $('#downloadForm');
-    download.find("input[name=type]").remove();
+    var gridForm = $('#gridForm');
+    gridForm.attr("action","grid/download");
+    gridForm.find("input[name=type]").remove();
 
     var dl_type = oConfig["dl_type"];
     
@@ -24,21 +25,20 @@ var triggerDownload = function(nButton, oConfig ) {
     $('<input type="hidden">').attr({
 	    name: 'type',
 	    value: dl_type
-	}).appendTo(download);
+	}).appendTo(gridForm);
 
     // we need to set this as the dl has it as a required field,
     // but the value will be ignored if we send any ids
-    download.find("#filters_locked").attr("checked","checked");
+    gridForm.find("#filters_locked").attr("checked","checked");
     
     for(id in applicants){
-	console.log("adding all ids");
 	$('<input type="hidden">').attr({
 		name: 'applicantIds[]',
 		    value: applicants[id]
-		    }).appendTo(download);
+		    }).appendTo(gridForm);
     }
 
-    $(download).find("input[type=submit]").click(); 
+    $(gridForm).find("input[type=submit]").click(); 
 };
 
 
@@ -199,16 +199,15 @@ Grid.prototype.getColumns = function(){
 Grid.prototype.loadapps = function(applicantIds, grid){
   var self = this;
   if(applicantIds.length){
+
     var limitedIds = applicantIds.splice(0, self.maxLoad);
+
     $.post(self.controllerPath + '/getApplicants',{applicantIds: limitedIds, display: self.display.getObj()
     }, function(json){
       var applicants = [];
       var length = json.data.result.applicants.length;
       var pages = json.data.result.pages; // available pages
-      console.log("have pages!!!!!!!!: "+pages);
-      for(p in pages){
-	  console.log(" =["+p+"]=> "+pages[p]);
-      }
+
       while (length--) {
         var applicant = new ApplicantData(json.data.result.applicants.splice(length, 1)[0]);
         applicant.elements = {};
