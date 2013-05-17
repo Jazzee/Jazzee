@@ -155,13 +155,18 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
   protected function makeQuery(){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Application', 'application');
-    $queryBuilder->add('select', 'application, applicationPages, pages, elements, elementListItems, pageType, elementType');
+    $queryBuilder->add('select', 'application, applicationPages, pages, elements, elementListItems, pageType, elementType, children, childElements, childPageType, childElementListItems, childElementType');
     $queryBuilder->leftJoin('application.applicationPages', 'applicationPages');
     $queryBuilder->leftJoin('applicationPages.page', 'pages');
     $queryBuilder->leftJoin('pages.elements', 'elements');
     $queryBuilder->leftJoin('pages.type', 'pageType');
     $queryBuilder->leftJoin('elements.listItems', 'elementListItems');
     $queryBuilder->leftJoin('elements.type', 'elementType');
+    $queryBuilder->leftJoin('pages.children', 'children');
+    $queryBuilder->leftJoin('children.elements', 'childElements');
+    $queryBuilder->leftJoin('children.type', 'childPageType');
+    $queryBuilder->leftJoin('childElements.listItems', 'childElementListItems');
+    $queryBuilder->leftJoin('childElements.type', 'childElementType');
     
     return $queryBuilder;
   }

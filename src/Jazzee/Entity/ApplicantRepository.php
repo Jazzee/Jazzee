@@ -277,7 +277,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   protected function deepApplicantQuery(\Jazzee\Interfaces\Display $display){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
-    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, payment, children, answer_attachment, children_element_answers, children_publicStatus, children_privateStatus, children_payment, children_attachment');
+    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, payment, answer_greScore, answer_toeflScore, children, answer_attachment, children_element_answers, children_publicStatus, children_privateStatus, children_payment, children_attachment');
     $expression = $queryBuilder->expr()->orX();
     //this one is the default - if there are no pages in the display then this 
     //expression is the only one that will load and no pages will be loaded
@@ -310,6 +310,8 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->leftJoin('answers.payment', 'payment');
     $queryBuilder->leftJoin('answers.children', 'children');
     $queryBuilder->leftJoin('answers.attachment', 'answer_attachment');
+    $queryBuilder->leftJoin('answers.greScore', 'answer_greScore');
+    $queryBuilder->leftJoin('answers.toeflScore', 'answer_toeflScore');
     $queryBuilder->leftJoin('children.elements', 'children_element_answers');
     $queryBuilder->leftJoin('children.publicStatus', 'children_publicStatus');
     $queryBuilder->leftJoin('children.privateStatus', 'children_privateStatus');

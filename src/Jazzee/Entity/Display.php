@@ -126,8 +126,19 @@ class Display implements \Jazzee\Interfaces\Display
   {
     $arr = array();
     foreach($this->elements as $displayElement){
+      if($displayElement->getType() == 'element'){
+        $page = $displayElement->getElement()->getPage();
+        while($page != null) {  
+          $arr[] = $page->getId();
+          $page = $page->getParent();
+        }
+      }
       if($displayElement->getType() == 'page'){
-        $arr[] = $displayElement->getElement()->getPage()->getId();
+        $page = $displayElement->getPage();
+        while($page != null) {  
+          $arr[] = $page->getId();
+          $page = $page->getParent();
+        }
       }
     }
 
@@ -166,7 +177,7 @@ class Display implements \Jazzee\Interfaces\Display
   {
     $elements = array();
     foreach($this->elements as $displayElement){
-      $elements[] = new \Jazzee\Display\Element($displayElement->getType(), $displayElement->getTitle(), $displayElement->getWeight(), $displayElement->getName());
+      $elements[] = new \Jazzee\Display\Element($displayElement->getType(), $displayElement->getTitle(), $displayElement->getWeight(), $displayElement->getName(), $displayElement->getPage()?$displayElement->getPage()->getId():null);
     }
 
     return $elements;
@@ -181,7 +192,7 @@ class Display implements \Jazzee\Interfaces\Display
   {
     $ids = array();
     foreach($this->elements as $element){
-      if($element->getType() == 'page'){
+      if($element->getType() == 'element'){
         $ids[] = $element->getElement()->getId();
       }
     }

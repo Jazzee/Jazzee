@@ -166,7 +166,6 @@ Grid.prototype.getColumns = function(){
           sTitle: this.title,
           mData: this.name
         };
-
         if(this.name == 'updatedAt' || this.name == 'createdAt' || this.name == 'lastLogin'){
           column.mRender = Grid.formatDate;
           column.sType = 'date';
@@ -176,11 +175,32 @@ Grid.prototype.getColumns = function(){
         }
         columns.push(column);
         break;
-      case 'page':
+      case 'element':
+        var displayElement = this;
         columns.push({
           sTitle: this.title,
-          mData: 'elements.element' + this.name,
-          mRender: Grid.formatAnswers
+          mData: function(obj, type, set){
+            return {
+              grid: self,
+              displayElement: displayElement, 
+              applicant: obj
+            };
+          },
+          mRender: Grid.formatElementAnswers
+        });
+        break;
+      case 'page':
+        var displayElement = this;
+        columns.push({
+          sTitle: this.title,
+          mData: function(obj, type, set){
+            return {
+              grid: self,
+              displayElement: displayElement, 
+              applicant: obj
+            };
+          },
+          mRender: Grid.formatPageAnswers
         });
         break;
     }
@@ -201,18 +221,7 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       var pages = json.data.result.pages; // available pages
 
       while (length--) {
-        var applicant = new ApplicantData(json.data.result.applicants.splice(length, 1)[0]);
-        applicant.elements = {};
-        $.each(self.display.getApplication().listApplicationPages(), function(){
-          var applicationPage = this;
-          $.each(self.display.getApplication().listPageElements(applicationPage.page.id), function(){
-            applicant.elements['element' + this.id] = {
-              data: applicant.getAnswersForPageElement(applicationPage.page.id, this.id),
-              elementClass: self.display.getApplication().getElementClassById(this.id)
-            };
-          });
-        });
-        applicants.push(applicant);
+        applicants.push(new ApplicantData(json.data.result.applicants.splice(length, 1)[0]));
         $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
       }
       grid.fnAddData(applicants);
@@ -252,8 +261,18 @@ Grid.formatCheckmark = function(data, type, full){
 /**
  * Format page element grid data
  */
-Grid.formatAnswers = function(data, type, full){
-  return data.elementClass.gridData(data.data, type, full);
+Grid.formatElementAnswers = function(data, type, full){
+  var elementClass = data.grid.display.getApplication().getElementClassById(data.displayElement.name);
+  var answers = data.applicant.getAnswersForElement(elementClass.id);
+  return elementClass.gridData(answers, type, full);
+};
+
+/**
+ * Format page element grid data
+ */
+Grid.formatPageAnswers = function(data, type, full){
+  var pageClass = data.grid.display.getApplication().getPageClassById(data.displayElement.pageId);
+  return pageClass.gridData(data, type, full);
 };
 
 Grid.processDraw = function(){

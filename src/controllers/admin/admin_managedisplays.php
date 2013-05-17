@@ -67,10 +67,20 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
             $displayElement = new \Jazzee\Entity\DisplayElement('applicant');
             $displayElement->setName($eObj->name);
             break;
+          case 'element':
+            $displayElement = new \Jazzee\Entity\DisplayElement('element');
+            if(!$element = $this->_application->getElementById($eObj->name)){
+              throw new \Jazzee\Exception("{$eObj->name} is not a valid Jazzee Element ID, so it cannot be used in a 'element' display element.  Element: " . var_export($eObj, true));
+            }
+            $displayElement->setElement($element);
+            break;
           case 'page':
             $displayElement = new \Jazzee\Entity\DisplayElement('page');
-            $element = $this->_application->getElementById($eObj->name);
-            $displayElement->setElement($element);
+            if(!$applicationPage = $this->_application->getApplicationPageByPageId($eObj->pageId)){
+              throw new \Jazzee\Exception("{$eObj->pageId} is not a valid Page ID, so it cannot be used in a 'page' display element.  Element: " . var_export($eObj, true));
+            }
+            $displayElement->setName($eObj->name);
+            $displayElement->setPage($applicationPage->getPage());
             break;
           default:
             throw new \Jazzee\Exception("{$eObj->type} is not a valid DisplayElement type");

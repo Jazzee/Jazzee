@@ -169,3 +169,54 @@ JazzeePageBranching.prototype.editBranchingElementLabelButton = function(){
   });
   return button;
 };
+
+/**
+ * List all a pages elements
+ */
+JazzeePageBranching.prototype.listDisplayElements = function(){
+  var self = this;
+  var elements = [];
+  elements.push({name: 'branchingPageSelection', type: 'page', title: this.getVariable('branchingElementLabel')?this.getVariable('branchingElementLabel'):this.title, pageId: this.id});
+  for(var i in this.children){
+    $(this.children[i].listDisplayElements()).each(function(){
+      var title = self.children[i].title + ' ' + this.title; 
+      elements.push({name: this.name, title: title, type: this.type});
+    });
+  }
+
+  return elements;
+};
+
+/**
+ * Dispaly applicant data in a grid
+ */
+JazzeePageBranching.prototype.gridData = function(data, type, full){
+  var values = [];
+  switch(data.displayElement.name){
+    case 'branchingPageSelection':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      $(answers).each(function(){
+        $(this.elements).each(function(){
+          if(this.id == 'branching'){
+            values.push(this.values[0].value);
+          }
+        });
+      });
+    break;
+  }
+  if(values.length == 0){
+    return '';
+  }
+  if(values.length == 1){
+    return values[0];
+  }
+  if(type == 'display'){
+    var ol = $('<ol>');
+    $.each(values, function(){
+      ol.append($('<li>').html(this.toString()));
+    });
+    return ol.clone().wrap('<p>').parent().html();
+  }
+  //forsorting and filtering return the raw data
+  return values.join(' ');
+};

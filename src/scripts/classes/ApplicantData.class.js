@@ -15,7 +15,7 @@ function ApplicantData(obj){
  */
 ApplicantData.prototype.getAnswersForPage = function(pageId){
   for(var i = 0; i < this.pages.length; i++){
-      var page = this.pages[i];
+    var page = this.pages[i];
     if(page.id == pageId){
 
       return page.answers;
@@ -99,17 +99,26 @@ ApplicantData.prototype.listTagTitles = function(){
  * 
  * @return []
  */
-ApplicantData.prototype.getAnswersForPageElement = function(pageId, elementId){
+ApplicantData.prototype.getAnswersForElement = function(elementId){
   var answers = [];
   for(var i = 0; i < this.pages.length; i++){
     var page = this.pages[i];
-    if(page.id == pageId){
-      for(var j = 0; j < page.answers.length; j++){
-        var answer = page.answers[j];
-        for(var k = 0; k < answer.elements.length; k++){
-          var element = answer.elements[k];
-          if(element.id == elementId){
-            answers.push(element);
+    for(var j = 0; j < page.answers.length; j++){
+      var answer = page.answers[j];
+      for(var k = 0; k < answer.elements.length; k++){
+        var element = answer.elements[k];
+        if(element.id == elementId){
+          answers.push(element);
+        }
+      }
+      if(answer.children != undefined){
+        for(var k = 0; k < answer.children.length; k++){
+          var childAnswer = answer.children[k];
+          for(var l = 0; l < childAnswer.elements.length; l++){
+            var element = childAnswer.elements[l];
+            if(element.id == elementId){
+              answers.push(element);
+            }
           }
         }
       }

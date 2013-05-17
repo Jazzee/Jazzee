@@ -52,9 +52,15 @@ class DisplayElement
    */
   private $element;
 
+  /**
+   * @ManyToOne(targetEntity="Page")
+   * @JoinColumn(onDelete="CASCADE")
+   */
+  private $page;
+
   public function __construct($type)
   {
-    if(!in_array($type, array('applicant', 'page'))){
+    if(!in_array($type, array('applicant', 'element', 'page'))){
       throw new \Jazzee\Exception("{$type} is not a valid type for DisplayElements");
     }
     $this->type = $type;
@@ -117,8 +123,8 @@ class DisplayElement
    */
   public function setName($name)
   {
-    if($this->type != 'applicant'){
-      throw new \Jazzee\Exception("You cannot set name for DisplayElements that do not have the type 'applicant'");
+    if(!in_array($this->type, array('applicant', 'page'))){
+      throw new \Jazzee\Exception("You cannot set name for DisplayElements that do not have the type 'applicant' or 'page'");
     }
     $this->name = $name;
   }
@@ -132,9 +138,10 @@ class DisplayElement
   {
     switch($this->type){
       case 'applicant':
+      case 'page':
         return $this->name;
         break;
-      case 'page':
+      case 'element':
         return $this->element->getId();
         break;
     }
@@ -169,11 +176,34 @@ class DisplayElement
    */
   public function setElement(Element $element)
   {
-    if($this->type != 'page'){
+    if($this->type != 'element'){
       throw new \Jazzee\Excption("You cannot set Element for DisplayElements that do not have the type 'element'");
     }
     $this->element = $element;
     $this->name = $this->element->getId();
+  }
+
+  /**
+   * Get page
+   *
+   * @return Page
+   */
+  public function getPage()
+  {
+    return $this->page;
+  }
+
+  /**
+   * Set page
+   *
+   * @param Page $page
+   */
+  public function setPage(Page $page)
+  {
+    if($this->type != 'page'){
+      throw new \Jazzee\Excption("You cannot set Page for DisplayElements that do not have the type 'page'");
+    }
+    $this->page = $page;
   }
 
   /**

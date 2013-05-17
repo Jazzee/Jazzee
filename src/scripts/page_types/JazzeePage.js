@@ -764,7 +764,7 @@ JazzeePage.prototype.pagePropertiesButton = function(){
 /**
  * Default Page properties button doesn't return anything
  */
-JazzeePage.prototype.pageProperties = function(){return false;}
+JazzeePage.prototype.pageProperties = function(){return false;};
 
 /**
  * Create the page workspace
@@ -794,3 +794,13 @@ JazzeePage.prototype.workspace = function(){
   $('#pageInfo').append(this.pageInfo());
   $('#editPage').show('slide');
 };
+
+/**
+ * Default list page display elements returns an ampty array
+ */
+JazzeePage.prototype.listDisplayElements = function(){return [];};
+
+/**
+ * Dispaly applicant data in a grid
+ */
+JazzeePage.prototype.gridData = function(data, type, full){return ''};
