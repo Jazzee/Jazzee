@@ -61,7 +61,7 @@ DisplayManager.prototype.drawChosen = function(){
     var li = $('<li>').addClass('item').html(this.title).data('element', this);
     li.prepend($('<span>').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
     li.bind('click', function(){
-      self.drawChosen();
+//      self.drawChosen();
     });
     list.append(li);
   });
@@ -74,7 +74,8 @@ DisplayManager.prototype.drawChosen = function(){
   list.bind("sortupdate", function(e, ui) {
     $('li',$(ui.item).parent()).each(function(i){
       var element = $(this).data('element');
-      self.display.addElement(element.type, element.title, i, element.name);
+      element.weight = i;
+      self.display.addElement(element);
     });
   });
   div.append(list);
@@ -90,28 +91,30 @@ DisplayManager.prototype.applicantBox = function(){
   var self = this;
   var list = $('<ul>').addClass('block_list');
   var arr = [
-    {title: 'First Name', name: 'firstName'},
-    {title: 'Last Name', name: 'lastName'},
-    {title: 'Email', name: 'email'},
-    {title: 'Last Update', name: 'updatedAt'},
-    {title: 'Progress', name: 'percentComplete'},
-    {title: 'Last Login', name: 'lastLogin'},
-    {title: 'Account Created', name: 'createdAt'},
-    {title: 'Locked', name: 'isLocked'},
-    {title: 'Paid', name: 'hasPaid'}
+    {type:'applicant', title: 'First Name', name: 'firstName'},
+    {type:'applicant', title: 'Last Name', name: 'lastName'},
+    {type:'applicant', title: 'Email', name: 'email'},
+    {type:'applicant', title: 'Last Update', name: 'updatedAt'},
+    {type:'applicant', title: 'Progress', name: 'percentComplete'},
+    {type:'applicant', title: 'Last Login', name: 'lastLogin'},
+    {type:'applicant', title: 'Account Created', name: 'createdAt'},
+    {type:'applicant', title: 'Locked', name: 'isLocked'},
+    {type:'applicant', title: 'Paid', name: 'hasPaid'}
   ];
   $.each(arr,function(){
     var li = $('<li>').addClass('item').html(this.title).data('element',this);
-    if(self.display.displayElement('applicant',this.name)){
+    if(self.display.displayElement(this)){
       li.addClass('selected');
       li.bind('click', function(){
-        self.display.removeElement('applicant',$(this).data('element').name);
+        self.display.removeElement($(this).data('element'));
         list.replaceWith(self.applicantBox());
         self.drawChosen();
       });
     } else {
       li.bind('click', function(){
-        self.display.addElement('applicant',$(this).data('element').title,self.nextWeight(),$(this).data('element').name);
+        var element = $(this).data('element');
+        element.weight = self.nextWeight();
+        self.display.addElement(element);
         list.replaceWith(self.applicantBox());
         self.drawChosen();
       });
@@ -129,6 +132,9 @@ DisplayManager.prototype.applicantBox = function(){
  */
 DisplayManager.prototype.shrinkButton = function(title, content){
   var div = $('<div>').addClass('shrinkable');
+  if(content === false ){
+    return div;
+  }
   div.append($('<div>').addClass('shrink_button').append($('<p>').html(title)));
   div.append($('<div>').addClass('shrink_list').append(content));
   
@@ -143,18 +149,26 @@ DisplayManager.prototype.shrinkButton = function(title, content){
 DisplayManager.prototype.pageBox = function(applicationPage){
   var self = this;
   var list = $('<ul>').addClass('block_list');
-  $.each(this.application.listPageElements(applicationPage.page.id), function(){
+  var pageClass = this.application.getPageClassById(applicationPage.page.id);
+  var pageDisplayElements = pageClass.listDisplayElements();
+  if(pageDisplayElements.length == 0){
+    return false;
+  }
+  $.each(pageDisplayElements, function(){
     var li = $('<li>').addClass('item').html(this.title).data('element', this);
-    if(self.display.displayElement('page', this.id)){
+    if(self.display.displayElement(this)){
       li.addClass('selected');
       li.bind('click', function(){
-        self.display.removeElement('page',$(this).data('element').id);
+        var element = $(this).data('element');
+        self.display.removeElement(element);
         list.replaceWith(self.pageBox(applicationPage));
         self.drawChosen();
       });
     } else {
       li.bind('click', function(){
-        self.display.addElement('page',$(this).data('element').title,self.nextWeight(),$(this).data('element').id);
+        var element = $(this).data('element');
+        element.weight = self.nextWeight();
+        self.display.addElement(element);
         list.replaceWith(self.pageBox(applicationPage));
         self.drawChosen();
       });

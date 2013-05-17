@@ -58,15 +58,42 @@ Application.prototype.getPageClassById = function(pageId){
   if(this.pageTypes['p'+pageId] == undefined){
     for(var i = 0; i < this.application.applicationPages.length; i++){
       if(this.application.applicationPages[i].page.id == pageId){
-        var className = this.application.applicationPages[i].page.type['class'].replace(/\\/g, '');
-        this.pageTypes['p'+pageId] = new window[className];
-        this.pageTypes['p'+pageId].init(this.application.applicationPages[i].page, null);
-
+        this.pageTypes['p'+pageId] = this.createPageObject(this.application.applicationPages[i].page);
       }
     }
   }
 
   return this.pageTypes['p'+pageId];
+};
+
+/**
+ * Create an JazzeePage object
+ * Calls itself recursivly for child pages
+ * @param {Object} obj
+ * @returns {JazzeePage}
+ */
+Application.prototype.createPageObject = function(page){
+  var self = this;
+  var className = page.type['class'].replace(/\\/g, '');
+  var pageClass = new window[className]();
+  pageClass.init(page, null);
+  $(page.elements).each(function(i,element){
+    var className = element.type['class'].replace(/\\/g, '');
+    var elementClass = new window[className]();
+    elementClass.init(element, pageClass);
+    $(element.list).each(function(){
+      elementClass.addListItem(this);
+    });
+    pageClass.addElement(elementClass);
+  });
+  $(page.variables).each(function(){
+    pageClass.variables[this.name] = {name : this.name, value: this.value};
+  });
+  $(page.children).each(function(){
+    pageClass.addChild(self.createPageObject(this));
+  });
+  pageClass.isModified = false; //reset isModified now that we have added cildren and varialbes
+  return pageClass;
 };
 
 /**
@@ -76,15 +103,38 @@ Application.prototype.getPageClassById = function(pageId){
 Application.prototype.getElementClassById = function(elementId){
   if(this.elementTypes['e'+elementId] == undefined){
     for(var i = 0; i < this.application.applicationPages.length; i++){
-      for(var j = 0; j < this.application.applicationPages[i].page.elements.length; j++){
-        if(this.application.applicationPages[i].page.elements[j].id == elementId){
-          var className = this.application.applicationPages[i].page.elements[j].type['class'].replace(/\\/g, '');
-          this.elementTypes['e'+elementId] = new window[className];
-          this.elementTypes['e'+elementId].init(this.application.applicationPages[i].page.elements[j], null);
-        }
+      var elementObject = this.findElementInPage(this.application.applicationPages[i].page, elementId);
+      if(elementObject){
+        this.elementTypes['e'+elementId] = elementObject;
+        break;
       }
     }
   }
 
   return this.elementTypes['e'+elementId];
+};
+
+/**
+ * Get element class by ID
+ * @param elementId
+ */
+Application.prototype.findElementInPage = function(page, elementId){
+  for(var i = 0; i < page.elements.length; i++){
+    if(page.elements[i].id == elementId){
+      var element = page.elements[i];
+      var className = element.type['class'].replace(/\\/g, '');
+      var elementObject = new window[className];
+      elementObject.init(element, page);
+
+      return elementObject;
+    }
+  }
+  for(var i in page.children){
+    var result = this.findElementInPage(page.children[i], elementId);
+    if(result){
+      return result;
+    }
+  }
+
+  return false;
 };

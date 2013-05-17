@@ -66,9 +66,19 @@ Display.prototype.displayPage = function(pageId){
  * @param type
  * @param name
  */
-Display.prototype.displayElement = function(type, name){
+Display.prototype.displayElement = function(obj){
   var matches = $.grep(this.display.elements, function(element) {
-    return element.type == type && element.name == name;
+    switch(obj.type){
+      case 'applicant':
+      case 'element':
+        return element.type == obj.type && element.name == obj.name;
+        break;
+      case 'page':
+        return element.type == obj.type && element.name == obj.name && element.pageId == obj.pageId;
+        break;
+        
+    }
+    
   });
 
   return (matches.length > 0);
@@ -77,20 +87,30 @@ Display.prototype.displayElement = function(type, name){
 /**
  * Check if an element should be displayed
  */
-Display.prototype.addElement = function(type, title, weight, name){
-  if(this.displayElement(type, name)){
-    this.removeElement(type, name);
+Display.prototype.addElement = function(obj){
+  if(this.displayElement(obj.type, obj.name)){
+    this.removeElement(obj);
   }
-  this.display.elements.push({type: type, title: title, weight: weight, name: name});
+  this.display.elements.push(obj);
 };
 
 /**
  * Remove an element from the display
  */
-Display.prototype.removeElement = function(type, name){
-  if(this.displayElement(type, name)){
+Display.prototype.removeElement = function(obj){
+  if(this.displayElement(obj)){
     this.display.elements = $.grep(this.display.elements, function(element) {
-      return element.type != type || element.name != name;
+      switch(obj.type){
+      case 'applicant':
+      case 'element':
+        return element.type != obj.type || element.name != obj.name;
+        break;
+      case 'page':
+        return element.type != obj.type || element.name != obj.name || element.pageId != obj.pageId;
+        break;
+        
+    }
+      
     });
   }
 };

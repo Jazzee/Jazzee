@@ -105,3 +105,15 @@ JazzeePageQASAddress.prototype.editQASVariablesButton = function(){
   });
   return button;
 };
+
+/**
+ * List all a pages elements
+ */
+JazzeePageQASAddress.prototype.listDisplayElements = function(){
+  var elements = [];
+  $(this.elements).each(function(){
+    elements.push({name: this.id, title: this.title, type: 'element'});
+  });
+
+  return elements;
+};

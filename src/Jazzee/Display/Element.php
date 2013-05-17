@@ -34,14 +34,21 @@ class Element
    */
   public $name;
   
-  public function __construct($type, $title, $weight, $name)
+  /**
+   *
+   * @var string
+   */
+  public $pageId;
+  
+  public function __construct($type, $title, $weight, $name, $pageId)
   {
-    if(!in_array($type, array('applicant', 'page'))){
+    if(!in_array($type, array('applicant', 'element', 'page'))){
       throw new \Jazzee\Exception("{$type} is not a valid type for Jazzee\Display\Elements");
     }
     $this->type = $type;
     $this->title = $title;
     $this->weight = $weight;
     $this->name = $name;
+    $this->pageId = $pageId;
   }
 }

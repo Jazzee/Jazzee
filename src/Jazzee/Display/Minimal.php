@@ -71,7 +71,7 @@ class Minimal implements \Jazzee\Interfaces\Display
     $elements = array();
     $weight = 0;
     foreach($applicantElements as $name => $title){
-      $elements[] = new \Jazzee\Display\Element('applicant', $title, $weight++, $name);
+      $elements[] = new \Jazzee\Display\Element('applicant', $title, $weight++, $name, null);
     }
     return $elements;
   }

@@ -303,3 +303,22 @@ JazzeePageRecommenders.prototype.editLorPage = function(){
   }
   return div;
 };
+
+/**
+ * List all a pages elements
+ */
+JazzeePageRecommenders.prototype.listDisplayElements = function(){
+  var self = this;
+  var elements = [];
+  $(this.elements).each(function(){
+    elements.push({name: this.id, title: this.title, type: 'element'});
+  });
+  for(var i in this.children){
+    $(this.children[i].listDisplayElements()).each(function(){
+      var title = self.children[i].title + ' ' + this.title; 
+      elements.push({name: this.name, title: title, type: this.type});
+    });
+  }
+
+  return elements;
+};
