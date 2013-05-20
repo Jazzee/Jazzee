@@ -59,11 +59,15 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         $applicationPages[$pageEntity->getId()] = $pageEntity;
       }
       $applicantsArray = array();
-      $minimalDisplay = new \Jazzee\Display\Minimal($this->_application);
-      $ids = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findIdsByApplication($this->_application);
-      foreach ($ids as $id) {
-        $applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findArray($id, $minimalDisplay);
-        $selected = false;
+      if($_GET("applicantIds")){
+	$requestedIds = $input->get("applicantIds");
+	$applicantsArray = $requestedIds;
+      }else{
+            $minimalDisplay = new \Jazzee\Display\Minimal($this->_application);
+      	    $ids = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findIdsByApplication($this->_application);
+	    foreach ($ids as $id) {
+	            $applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findArray($id, $minimalDisplay);
+		    $selected = false;
         if (!$applicant['isLocked'] and in_array('unlocked', $filters)) {
           $selected = true;
         }
@@ -102,6 +106,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
           $applicantsArray[] = $applicant['id'];
         }
       } //end foreach applicants
+      }
       //use a full applicant display where display is needed
       $display= new \Jazzee\Display\FullApplication($this->_application);
       unset($ids);

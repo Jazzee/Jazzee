@@ -32,6 +32,8 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->addScript($this->path('resource/scripts/classes/ApplicantData.class.js'));
     $this->addScript($this->path('resource/scripts/classes/DisplayChooser.class.js'));
     $this->addScript($this->path('resource/scripts/classes/DisplayManager.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/TableTools.js'));
+    $this->addScript($this->path('resource/scripts/classes/ZeroClipboard.js'));
     $this->addScript($this->path('resource/scripts/classes/Grid.class.js'));
     $this->addScript($this->path('resource/scripts/controllers/applicants_grid.controller.js'));
     $this->addScript($this->path('resource/scripts/controllers/jquery.dataTables.rowSelect.js'));

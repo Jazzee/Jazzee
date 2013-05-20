@@ -133,6 +133,14 @@ Grid.prototype.init = function(){
   this.loadapps(this.applicantIds, grid);
 };
 
+var dump = function(obj){
+    var txt = "";
+    for(x in obj)
+	txt += "'"+x+"' => "+obj[x]+"\n";
+    return txt;
+}
+
+
 Grid.prototype.getColumns = function(){
   var self = this;
   var columns = [];
