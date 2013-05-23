@@ -1540,61 +1540,6 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $this->loadView('applicants_single/form');
   }
 
-  /**
-   * Generate thumbnails for uploaded PDFs
-   *
-   * @param AdminCronController $cron
-   */
-  public static function runCron(AdminCronController $cron)
-  {
-
-    if($cron->getConfig()->getGeneratePDFPreviews()){
-      $attachments = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Attachment')->findBy(array('thumbnail' => null), array(), 100);
-      $start = time();
-      $total = 0;
-      $generic = 0;
-      $imagick = new \imagick;
-      foreach ($attachments as $attachment) {
-        $thumbnailBlob = false;
-        $total++;
-        try {
-          $blob = $attachment->getAttachment();
-          //use a temporary file so we can use the image magic shortcut [0]
-          //to load only the first page, otherwise the whole file gets loaded into memory and takes forever
-          $handle = tmpfile();
-          fwrite($handle, $blob);
-          $arr = stream_get_meta_data($handle);
-          if(@$imagick->readimage($arr['uri'] . '[0]') AND @$imagick->setImageFormat("png") AND @$imagick->thumbnailimage(100, 150, true)){
-            $thumbnailBlob = $imagick->getimageblob();
-          }
-          fclose($handle);
-        } catch (ImagickException $e) {
-          $thumbnailBlob = false;
-          $cron->log('Unable to create thumbnail for attachment #' . $attachment->getId() . '.  Error: ' . $e->getMessage());
-        }
-        if(!$thumbnailBlob){
-          $generic++;
-          $imagick = new \imagick;
-          $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-          $imagick->thumbnailimage(100, 150, true);
-          $thumbnailBlob = $imagick->getimageblob();
-        }
-        $attachment->setThumbnail($thumbnailBlob);
-        $imagick->clear();
-        $cron->getEntityManager()->persist($attachment);
-      }
-      unset($imagick);
-      if ($total) {
-        $message = "Generated {$total} Attachment thumbnail(s) in " . (time() - $start) . " seconds.";
-        if ($generic) {
-          $message .= "  Unable to create thumbnail for {$generic} attachments, so the generic one was used.";
-        }
-        $cron->log($message);
-      }
-
-    }
-  }
-
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
     //several views are controller by the complete action
