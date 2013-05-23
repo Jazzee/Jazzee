@@ -462,12 +462,6 @@ class JazzeeConfiguration
   protected $_virusScanUploads;
 
   /**
-   *  @var boolean
-   * Shoudl preview images be generated for uploaded PDFs
-   */
-  protected $_generatePDFPreviews;
-
-  /**
    * Construct
    * Load data from the ini file
    */
@@ -552,8 +546,7 @@ class JazzeeConfiguration
       'ldapLastNameAttribute' => 'sn',
       'ldapEmailAddressAttribute' => 'mail',
       'allowScramble' => false,
-      'virusScanUploads' => true,
-      'generatePDFPreviews' => true
+      'virusScanUploads' => true
     );
     foreach ($defaults as $name => $value) {
       $method = 'set' . ucfirst($name);
@@ -1719,23 +1712,6 @@ class JazzeeConfiguration
   public function setVirusScanUploads($virusScanUploads)
   {
     $this->_virusScanUploads = (bool)$virusScanUploads;
-  }
-
-  /**
-   * get generatePDFPreviews
-   * @return boolean
-   */
-  public function getGeneratePDFPreviews()
-  {
-    return $this->_generatePDFPreviews;
-  }
-
-  /**
-   * set set GeneratePDFPreviews
-   */
-  public function setGeneratePDFPreviews($generatePDFPreviews)
-  {
-    $this->_generatePDFPreviews = (bool)$generatePDFPreviews;
   }
 
   /**

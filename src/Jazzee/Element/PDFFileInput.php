@@ -196,63 +196,6 @@ class PDFFileInput extends AbstractElement
   }
 
   /**
-   * Render PDF Previews
-   * @param AdminCronController $cron
-   */
-  public static function runCron(\AdminCronController $cron)
-  {
-    if($cron->getConfig()->getGeneratePDFPreviews()){
-      $count = 0;
-      $generic = 0;
-      $start = time();
-      $type = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class' => '\Jazzee\Element\PDFFileInput'));
-      if ($type) {
-        $blankPreviewElementAnswers = $cron->getEntityManager()->getRepository('\Jazzee\Entity\ElementAnswer')->findByType($type, array('position' => 1, 'eShortString' => null), 100);
-        $imagick = new \imagick;
-        foreach ($blankPreviewElementAnswers as $blankPreviewElementAnswer) {
-          $thumbnailBlob = false;
-          $blobElementAnswer = $blankPreviewElementAnswer->getAnswer()->getElementAnswersForElementByPosition($blankPreviewElementAnswer->getElement(), 0);
-          try {
-            //use a temporary file so we can use the image magic shortcut [0]
-            //to load only the first page, otherwise the whole file gets loaded into memory and takes forever
-            if($handle = \Jazzee\Globals::getFileStore()->getFileHandle($blobElementAnswer->getEShortString())){
-              $arr = stream_get_meta_data($handle);
-              if(@$imagick->readimage($arr['uri'] . '[0]') AND @$imagick->setImageFormat("png") AND @$imagick->thumbnailimage(100, 150, true)){
-                $thumbnailBlob = $imagick->getimageblob();
-              }
-              fclose($handle);
-            }
-          } catch (ImagickException $e) {
-            $thumbnailBlob = false;
-            $cron->log('Unable to create thumbnail for ' . $blankPreviewElementAnswer->getElement()->getTitle() . ' for applicant #' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . ' answer #' . $blankPreviewElementAnswer->getAnswer()->getId() . '.  Error: ' . $e->getMessage());
-          }
-          if(!$thumbnailBlob){
-            $generic++;
-            $imagick = new \imagick;
-            $imagick->readimage(realpath(\Foundation\Configuration::getSourcePath() . '/src/media/default_pdf_logo.png'));
-            $imagick->thumbnailimage(100, 150, true);
-            $thumbnailBlob = $imagick->getimageblob();
-          }
-          $blankPreviewElementAnswer->setEShortString(\Jazzee\Globals::getFileStore()->storeFile($thumbnailBlob));
-
-          $cachedFileName = $blankPreviewElementAnswer->getAnswer()->getApplicant()->getFullName() . ' ' . $blankPreviewElementAnswer->getElement()->getTitle() . '_' . $blankPreviewElementAnswer->getAnswer()->getApplicant()->getId() . $blobElementAnswer->getId() . 'preview.png';
-          \Jazzee\Globals::removeStoredFile($cachedFileName);
-          $count++;
-          $imagick->clear();
-        }
-        unset($imagick);
-      }
-      if ($count) {
-        $message = "Generated {$count} PDFFileInput thumbnail(s) in " . (time() - $start) . ' seconds.';
-        if ($generic) {
-          $message .= "  Unable to create thumbnail for {$generic} answers, so the generic one was used.";
-        }
-        $cron->log($message);
-      }
-    }
-  }
-
-  /**
    * When removing an element answer remove its file association as well
    * @param \Jazzee\Entity\ElementAnswer $elementAnswer
    */
