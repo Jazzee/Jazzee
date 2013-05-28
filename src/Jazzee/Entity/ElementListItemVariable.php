@@ -80,7 +80,7 @@ class ElementListItemVariable
    */
   public function setValue($value)
   {
-    $this->value = base64_encode($value);
+    $this->value = $value;
   }
 
   /**
@@ -90,7 +90,7 @@ class ElementListItemVariable
    */
   public function getValue()
   {
-    return base64_decode($this->value);
+    return $this->value;
   }
 
 }

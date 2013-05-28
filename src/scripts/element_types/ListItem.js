@@ -78,7 +78,6 @@ ListItem.prototype.markModified = function(){
 ListItem.prototype.setVariable = function(name, value){
   //only set the variable and mark as modified if it is new or different
   if(typeof this.variables[name] == 'undefined'  || this.variables[name].value !== value){
-    console.log('setting variable ' + name + ' to ' + value);
     this.variables[name] = {name : name, value: value};
     this.markModified();
   }
