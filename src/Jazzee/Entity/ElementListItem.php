@@ -5,7 +5,7 @@ namespace Jazzee\Entity;
  * ElementListItem
  * Elements like selects and checkboxes have list items
  *
- * @Entity
+ * @Entity(repositoryClass="\Jazzee\Entity\ElementListItemRepository")
  * @HasLifecycleCallbacks
  * @Table(name="element_list_items", uniqueConstraints={
  *   @UniqueConstraint(name="item_name", columns={"element_id", "name"})
