@@ -306,16 +306,16 @@
         },
         {
             "name": "jazzee/foundation",
-            "version": "1.0.13",
+            "version": "1.0.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Jazzee/Foundation.git",
-                "reference": "1.0.13"
+                "reference": "1.0.14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Jazzee/Foundation/zipball/1.0.13",
-                "reference": "1.0.13",
+                "url": "https://api.github.com/repos/Jazzee/Foundation/zipball/1.0.14",
+                "reference": "1.0.14",
                 "shasum": ""
             },
             "require": {
@@ -362,7 +362,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2013-02-14 21:35:35"
+            "time": "2013-05-10 21:55:42"
         },
         {
             "name": "monolog/monolog",
