@@ -2,19 +2,37 @@
 namespace Jazzee\Page;
 
 /**
- * Get recommender information from applicnats and send out invitations
+ * Allows an applicant to set/edit their own external ID
  *
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-class ExternalId extends AbstractPage
+class ExternalId implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
 {
-  /**
-   * These fixedIDs make it easy to find the element we are looking for
-   * @const integer
-   */
 
-  const FID_EXT_ID = 2;
+  /**
+   * The ApplicationPage Entity
+   * @var \Jazzee\Entity\ApplicationPage
+   */
+  protected $_applicationPage;
+
+  /**
+   * Our controller
+   * @var \Jazzee\Controller
+   */
+  protected $_controller;
+
+  /**
+   * The Applicant
+   * @var \Jazzee\Entity\Applicant
+   */
+  protected $_applicant;
+
+  /**
+   * Our form
+   * @var \Foundation\Form
+   */
+  protected $_form;
 
 
   public function __construct(\Jazzee\Entity\ApplicationPage $applicationPage)
@@ -25,38 +43,22 @@ class ExternalId extends AbstractPage
   }
 
   /**
-   * Create the recommenders form
+   * Setup the default variables
    */
   public function setupNewPage()
   {
-    $entityManager = $this->_controller->getEntityManager();
-    $types = $entityManager->getRepository('Jazzee\Entity\ElementType')->findAll();
-    $elementTypes = array();
-    foreach ($types as $type) {
-      $elementTypes[$type->getClass()] = $type;
-    };
-    $count = 1;
-    foreach (array(self::FID_EXT_ID => 'External ID') as $fid => $title) {
-      $element = new \Jazzee\Entity\Element;
-      $element->setType($elementTypes['\Jazzee\Element\TextInput']);
-      $element->setTitle($title);
-      //      $element->required();
-      $element->setWeight($count);
-      $element->setFixedId($fid);
-      $this->_applicationPage->getPage()->addElement($element);
-      $entityManager->persist($element);
-      $count++;
+    $defaultVars = array(
+      'externalIdLabel' => ''
+    );
+    foreach ($defaultVars as $name => $value) {
+      $var = $this->_applicationPage->getPage()->setVar($name, $value);
+      $this->_controller->getEntityManager()->persist($var);
     }
-    
   }
-
+  
   public function newAnswer($input)
   {
-    error_log("saving new answer");
-    $elem = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EXT_ID);
-    $id = $input->get("el".$elem->getId());
-    error_log(" given external id is ".$id);
-    $this->_applicant->setExternalId($id);
+    $this->_applicant->setExternalId($input->get('externalId'));
 
     $this->_controller->getEntityManager()->persist($this->_applicant);
     $this->_controller->getEntityManager()->flush();
@@ -65,9 +67,9 @@ class ExternalId extends AbstractPage
 
   public function updateAnswer($input, $answerId)
   {
-    error_log("in update answer, answerid: ".$answerId);
-
+    $this->newAnswer($input);
   }
+
   public function deleteAnswer($answerId)
   {
     $this->_applicant->setExternalId(null);
@@ -78,16 +80,11 @@ class ExternalId extends AbstractPage
   }
 
 
-  public function fill($answerId)
-  {
-    $id = $this->_applicant->getExternalId();
-    $elem = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_EXT_ID);
-    error_log("FILL: current external id is ".$id);
-    $this->getForm()->getElementByName('el' . $elem->getId())->setValue($id);
-  
-
-
-  }
+  /**
+   * We don't need to fill since the form fills itself form the applicant
+   * @param type $answerId
+   */
+  public function fill($answerId){}
 
   public static function applicantsSingleElement()
   {
@@ -97,21 +94,15 @@ class ExternalId extends AbstractPage
 
   public function getStatus()
   {
-    $answers = $this->getAnswers();
+    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
     if (!$this->_applicationPage->isRequired() and count($answers) and $answers[0]->getPageStatus() == self::SKIPPED) {
       return self::SKIPPED;
     }
-    $completedAnswers = 0;
-    foreach ($answers as $answer) {
-      if ($answer->isLocked()) {
-        $completedAnswers++;
-      }
-    }
-    if (is_null($this->_applicationPage->getMin()) or $completedAnswers < $this->_applicationPage->getMin()) {
-      return self::INCOMPLETE;
-    } else {
+    if ($this->_applicant->getExternalId()) {
       return self::COMPLETE;
     }
+
+    return self::INCOMPLETE;
   }
 
   public function getArrayStatus(array $answers)
@@ -119,17 +110,11 @@ class ExternalId extends AbstractPage
     if (!$this->_applicationPage->isRequired() and count($answers) and $answers[0]['pageStatus'] == self::SKIPPED) {
       return self::SKIPPED;
     }
-    $completedAnswers = 0;
-    foreach ($answers as $answer) {
-      if ($answer['locked']) {
-        $completedAnswers++;
-      }
-    }
-    if (is_null($this->_applicationPage->getMin()) or $completedAnswers < $this->_applicationPage->getMin()) {
-      return self::INCOMPLETE;
-    } else {
+    if ($this->_applicant->getExternalId()) {
       return self::COMPLETE;
     }
+
+    return self::INCOMPLETE;
   }
 
 
@@ -143,5 +128,137 @@ class ExternalId extends AbstractPage
     return 'resource/scripts/page_types/JazzeePageExternalId.js';
   }
 
+  public function compareWith(\Jazzee\Entity\ApplicationPage $applicationPage)
+  {
+    $differences = array(
+      'different' => false,
+      'title' => $this->_applicationPage->getTitle(),
+      'properties' => array(),
+      'elements' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
+      ),
+      'children' => array(
+        'new' => array(),
+        'removed' => array(),
+        'same' => array(),
+        'changed' => array()
+      )
+    );
+    $arr = array(
+      'title' => 'Title',
+      'name' => 'Name',
+      'min' => 'Minimum Answers',
+      'max' => 'Maximum Answers',
+      'instructions' => 'Instructions',
+      'leadingText' => 'Leading Text',
+      'trailingText' => 'Trailing Text'
+    );
+    foreach ($arr as $name => $niceName) {
+      $func = 'get' . ucfirst($name);
+      if ($this->_applicationPage->$func() != $applicationPage->$func()) {
+        $differences['different'] = true;
+        $differences['properties'][] = array(
+          'name' => $niceName,
+          'type' => 'textdiff',
+          'this' => $this->_applicationPage->$func(),
+          'other' => $applicationPage->$func()
+        );
+      }
+    }
 
+    return $differences;
+  }
+
+  public function getForm()
+  {
+    $form = new \Foundation\Form;
+    $form->setCSRFToken($this->_controller->getCSRFToken());
+    $form->setAction($this->_controller->getActionPath());
+    $field = $form->newField();
+    $field->setLegend($this->_applicationPage->getTitle());
+    $field->setInstructions($this->_applicationPage->getInstructions());
+    $element = $field->newElement('TextInput', 'externalId');
+    $element->setLabel($this->_applicationPage->getPage()->getVar('externalIdLabel'));
+    $element->setValue($this->_applicant->getExternalId());
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $form->newButton('submit', 'Save');
+    
+    return $form;
+  }
+
+  /**
+   * Set the applicant
+   * @param \Jazzee\Entity\Applicant $applicant
+   */
+  public function setApplicant(\Jazzee\Entity\Applicant $applicant)
+  {
+    $this->_applicant = $applicant;
+  }
+
+  /**
+   * Set the controller
+   * @param \Jazzee\Controller $controller
+   */
+  public function setController(\Jazzee\Controller $controller)
+  {
+    $this->_controller = $controller;
+  }
+
+  /**
+   * By default just set the variable dont check it
+   * @param string $name
+   * @param string $value
+   */
+  public function setVar($name, $value)
+  {
+    $var = $this->_applicationPage->getPage()->setVar($name, $value);
+    $this->_controller->getEntityManager()->persist($var);
+  }
+
+  /**
+   * Validate user input
+   * @param array $input
+   * @return boolean
+   */
+  public function validateInput($input)
+  {
+    if ($input = $this->getForm()->processInput($input)) {
+      return $input;
+    }
+    $this->_controller->addMessage('error', 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.');
+
+    return false;
+  }
+
+  /**
+   * Skip an optional page
+   *
+   */
+  public function do_skip()
+  {
+    if ($this->_applicant->getExternalId()) {
+      $this->_controller->addMessage('error', 'You have already set your external ID, you must delete it before you can skip this page.');
+
+      return false;
+    }
+    if (!$this->_applicationPage->isRequired()) {
+      $answer = new \Jazzee\Entity\Answer();
+      $answer->setPage($this->_applicationPage->getPage());
+      $this->_applicant->addAnswer($answer);
+      $answer->setPageStatus(self::SKIPPED);
+      $this->_controller->getEntityManager()->persist($answer);
+    }
+  }
+
+  public function do_unskip()
+  {
+    $answers = $this->_applicant->findAnswersByPage($this->_applicationPage->getPage());
+    if (count($answers) and $answers[0]->getPageStatus() == self::SKIPPED) {
+      $this->_applicant->getAnswers()->removeElement($answers[0]);
+      $this->_controller->getEntityManager()->remove($answers[0]);
+    }
+  }
 }
