@@ -8,34 +8,29 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
 } else {
   if (!$page->isRequired() and (is_null($applicant->getExternalId()))) {?>
     <p class="skip">This page is optional, if you do not have any information to enter you can <a href='<?php print $this->controller->getActionPath() . '/do/skip'; ?>' title='skip this page'>Skip This Page</a>.</p><?php
-  } ?>
-   <?php
-      if (!is_null($applicant->getExternalId())
-	  && ($this->controller->getActionName() != 'edit')){
-	?>
+  } 
+  if ($applicant->getExternalId()) {?>
     <div id='answers'>
-        <div class='answer active'>
-          <h5>External ID</h5><?php
-	  print '<p><strong>External ID :</strong>&nbsp;' . $applicant->getExternalId() . '</p>';
+      <div class='answer<?php 
+        if($this->controller->getActionName() == 'edit') {
+          print ' active';
+        }?>'>
+        <h5>Saved Answer</h5><?php
+	  print '<p><strong>' . $page->getPage()->getVar('externalIdLabel') . ':</strong>&nbsp' . $applicant->getExternalId() . '</p>';
 	?>
 	  <p class='controls'>
               <a class='edit' href='<?php print $this->controller->getActionPath(); ?>/edit/0'>Edit</a>
               <a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/0'>Delete</a>
           </p>
-        </div>
-       </div><?php
-      } //end if !is_null(...)
-    ?><?php
-  }
-?>
- <div id='leadingText'><?php print $page->getLeadingText() ?></div>
-
-    <?php
+      </div>
+    </div><?php
+  } //end if appilcant ahs externalId 
+  ?>
+  <div id='leadingText'><?php print $page->getLeadingText() ?></div>
+  <?php
   if (is_null($applicant->getExternalId()) || ($this->controller->getActionName() == 'edit')){
-      $this->renderElement('form', array('form' => $page->getJazzeePage()->getForm()));
-    }
- ?>
-    <div id='trailingText'><?php print $page->getTrailingText() ?></div>
-<?php
-
-    
+    $this->renderElement('form', array('form' => $page->getJazzeePage()->getForm()));
+  }
+  ?>
+  <div id='trailingText'><?php print $page->getTrailingText() ?></div>
+<?php } //end else skipped
