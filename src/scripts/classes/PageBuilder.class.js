@@ -70,22 +70,57 @@ PageBuilder.prototype.setup = function(){
   var button = $('<button>').html('Save Changes');
   button.button({'disabled': true});
   button.bind('click', function(){
-    if(pageBuilder.checkNames()){
-      var toSave = [];
-      for(var i in pageBuilder.pages){
-        if(pageBuilder.pages[i].checkIsModified()){
-          toSave.push(pageBuilder.pages[i].getDataObject());
+    var overlay = $('<div>').attr('id', 'savepageoverlay');
+    overlay.dialog({
+      height: 90,
+      modal: true,
+      autoOpen: true,
+      open: function(event, ui){
+        $(".ui-dialog-titlebar", ui.dialog).hide();
+        if(pageBuilder.checkNames()){
+          var toSave = [];
+          for(var i in pageBuilder.pages){
+            if(pageBuilder.pages[i].checkIsModified()){
+              toSave.push(pageBuilder.pages[i].getDataObject());
+            }
+          }
+          for(var i = 0; i < pageBuilder.deletedPages.length; i++){
+            toSave.push(pageBuilder.deletedPages[i].getDataObject());
+          }
+          pageBuilder.deletedPages = [];
+          var label = $('<div>').addClass('label').html('Saving pages...').css('float', 'left').css('margin','10px 5px');
+          var progressbar = $('<div>').addClass('progress').append(label);
+          progressbar.data('pageBuilder', pageBuilder);
+          overlay.append(progressbar);
+          progressbar.progressbar({
+            max: toSave.length-1,
+            value: 0,
+            complete: function(event,ui){
+              var bar = $('#savepageoverlay div.progress');
+              var pageBuilder = bar.data('pageBuilder');
+              bar.progressbar('destroy');
+              bar.empty();
+              bar.append($('<div>').addClass('label').html('Downloading new page data...'));
+              bar.progressbar({
+                value: false,
+                create: function(){
+                  pageBuilder.setup();
+                  overlay.dialog('destroy').remove();
+                }
+              });
+            }
+          });
+          for(var i = 0; i < toSave.length; i++){
+            $.post(pageBuilder.controllerPath + '/savePage/' + toSave[i].id,{data: $.toJSON(toSave[i])}, function(){
+              var value = $('#savepageoverlay div.progress').progressbar('value');
+              $('#savepageoverlay div.progress').progressbar("value", value+1);
+            });
+          }
+          
         }
       }
-      for(var i = 0; i < pageBuilder.deletedPages.length; i++){
-        toSave.push(pageBuilder.deletedPages[i].getDataObject());
-      }
-      pageBuilder.deletedPages = [];
-      for(var i = 0; i < toSave.length; i++){
-        $.post(pageBuilder.controllerPath + '/savePage/' + toSave[i].id,{data: $.toJSON(toSave[i])});
-      }
-      pageBuilder.setup();
-    }
+    });
+    
     return false;
   });
   $('#save', this.canvas).empty().append(button);
@@ -125,21 +160,52 @@ PageBuilder.prototype.createPageObject = function(obj){
  */
 PageBuilder.prototype.refreshPages = function(){
   var pageBuilder = this;
-  $.get(this.controllerPath + '/listPages',function(json){
-    pageBuilder.pages = {};
-    $(json.data.result).each(function(i){
-      var page = pageBuilder.createPageObject(this);
-      pageBuilder.pages[page.id] = page;
+  var overlay = $('<div>').attr('id', 'refreshpagesoverlay');
+    overlay.dialog({
+      height: 90,
+      modal: true,
+      autoOpen: true,
+      open: function(event, ui){
+        $(".ui-dialog-titlebar", ui.dialog).hide();
+        var label = $('<div>').addClass('label').html('Updating page list...').css('float', 'left').css('margin','10px 5px');
+        var progressbar = $('<div>').addClass('progress').append(label);
+        progressbar.data('pageBuilder', pageBuilder);
+        overlay.append(progressbar);
+        progressbar.progressbar({
+          max: 100,
+          value: 25,
+          complete: function(event, ui){
+            $('#refreshpagesoverlay').dialog('destroy').remove();
+          },
+          create: function(event,ui){
+            var pageBuilder = $(this).data('pageBuilder');
+            $.get(pageBuilder.controllerPath + '/listPages',function(json){
+              $('#refreshpagesoverlay div.progress').progressbar("value", 50);
+              pageBuilder.pages = {};
+              $(json.data.result).each(function(i){
+                var page = pageBuilder.createPageObject(this);
+                pageBuilder.pages[page.id] = page;
+                $('#refreshpagesoverlay div.progress').progressbar('value', i/json.data.result.length*.25*100+50);
+              });
+              $('#refreshpagesoverlay div.progress').progressbar('value', 75);
+              pageBuilder.synchronizePageList();
+              var currentPageLi = $('#'+pageBuilder.currentPage);
+              if(currentPageLi.length){
+                currentPageLi.click();
+              } else {
+                $('#pages li', this.canvas).first().click();
+              }
+              pageBuilder.isModified = false;
+              $('#refreshpagesoverlay div.progress').progressbar('value', 100);
+              
+            });
+          }
+        });
+      }
     });
-    pageBuilder.synchronizePageList();
-    var currentPageLi = $('#'+pageBuilder.currentPage);
-    if(currentPageLi.length){
-      currentPageLi.click();
-    } else {
-      $('#pages li', this.canvas).first().click();
-    }
-    pageBuilder.isModified = false;
-  });
+    
+  
+  
 };
 
 /**
