@@ -139,6 +139,10 @@ class ApplyPageController extends \Jazzee\AuthenticatedApplyController
       $navigation->addMenu($menu);
 
       $menu->setTitle('Preview Functions');
+      $link = new \Foundation\Navigation\Link('Become Administrator');
+      $link->setHref($this->path('admin/login'));
+      $menu->addLink($link);
+      
       $link = new \Foundation\Navigation\Link('Lock Application');
       $link->setHref($this->applyPath('preview/lock'));
       $menu->addLink($link);
