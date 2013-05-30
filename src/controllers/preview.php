@@ -43,7 +43,9 @@ class PreviewController extends \Jazzee\Controller
     //clear all the messages
     $this->getMessages();
     $this->addMessage('success', 'Your preview session has ended.');
-    $this->redirectPath('admin/welcome');
+    $store = $this->_session->getStore(\Jazzee\AdminController::SESSION_STORE_NAME, 1);
+    $store->expire();
+    $this->redirectPath('admin/login');
   }
 
 }

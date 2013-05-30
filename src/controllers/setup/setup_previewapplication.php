@@ -21,7 +21,7 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
    */
   public function actionIndex()
   {
-    $pattern = $this->getPathString('*');
+    $pattern = $this->getPathString(preg_replace("/[^a-z0-9\._-]/i",'',$this->_program->getShortName() . $this->_cycle->getName()) . '-*');
     $existing = array();
     foreach (glob($pattern) as $path) {
       $stats = stat($path);
@@ -34,7 +34,6 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
       $existing[] = $arr;
     }
 
-
     $this->setVar('existing', $existing);
   }
 
@@ -43,21 +42,48 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
    */
   public function actionNew()
   {
-    $prefix = substr(md5(mt_rand() * mt_rand()), rand(0, 24), rand(6, 8));
-    $key = \uniqid($prefix);
-    $path = $this->getPathString($this->_program->getShortName() . $this->_cycle->getName() . '-' . $key);
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path("setup/previewapplication/new"));
+    $field = $form->newField();
+    $field->setLegend('Create New Preview');
 
-    $doctrineConfig = $this->_em->getConfiguration();
-    $connectionParams = array(
-      'driver' => 'pdo_sqlite',
-      'path' => $path
-    );
-    $previewEntityManager = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
-    $this->buildTemporaryDatabase($previewEntityManager);
-    $this->createPreviewApplication($previewEntityManager);
+    $element = $field->newElement('SelectList', 'adminRole');
+    $element->setLabel('Admin Role');
+    $element->setInstructions('If you specifiy and admin role then anyone using the preview will be able to access the administrator functions using this role.  They will only be able to see applicants in the prevew application.');
+    $element->newItem('', 'No access');
+    foreach($this->_em->getRepository('\Jazzee\Entity\Role')->findByProgram($this->_program->getId()) as $role){
+      $element->newItem($role->getId(), $role->getName());
+    }
+    $form->newButton('submit', 'Create Preview');
 
-    $this->addMessage('success', 'Created preview');
-    $this->redirectPath('setup/previewapplication');
+    if ($input = $form->processInput($this->post)) {
+      
+      if($input->get('adminRole')){
+        $adminRole = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('program'=>$this->_program->getId(), 'id'=> $input->get('adminRole')));
+      } else {
+        $adminRole = new \Jazzee\Entity\Role;
+        $adminRole->setName('No Access');
+      }
+      $prefix = substr(md5(mt_rand() * mt_rand()), rand(0, 24), rand(6, 8));
+      //clean out any wierd chars in program or cycle name
+      $key = preg_replace("/[^a-z0-9\._-]/i",'',$this->_program->getShortName() . $this->_cycle->getName()) . '-' . \uniqid($prefix);
+      $path = $this->getPathString($key);
+
+      $doctrineConfig = $this->_em->getConfiguration();
+      $connectionParams = array(
+        'driver' => 'pdo_sqlite',
+        'path' => $path
+      );
+      $previewEntityManager = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
+      $this->buildTemporaryDatabase($previewEntityManager);
+      $this->createPreviewApplication($previewEntityManager, $adminRole);
+
+      $this->addMessage('success', 'Created preview');
+      $this->redirectPath('setup/previewapplication');
+    }
+
+    $this->setVar('form', $form);
   }
 
   /**
@@ -121,9 +147,10 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
   /**
    * Create a preview application
    * @param \Doctrine\ORM\EntityManager $em
+   * @param \Jazzee\Entity\Role $adminRole
    * @return \Jazzee\Entity\Application
    */
-  protected function createPreviewApplication(\Doctrine\ORM\EntityManager $em)
+  protected function createPreviewApplication(\Doctrine\ORM\EntityManager $em, \Jazzee\Entity\Role $adminRole)
   {
     $newApplication = new \Jazzee\Entity\Application;
     $properties = array(
@@ -193,6 +220,31 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
       $em->persist($newApplicationPage);
     }
     $em->persist($newApplication);
+    
+    $newRole = new \Jazzee\Entity\Role;
+    $newRole->setName('Preview Access');
+    $newRole->notGlobal();
+    $newRole->setProgram($program);
+    foreach($adminRole->getActions() as $action){
+      $newAction = new \Jazzee\Entity\RoleAction();
+      $newAction->setRole($newRole);
+      $newAction->setAction($action->getAction());
+      $newAction->setController($action->getController());
+      $em->persist($newAction);
+    }
+    $em->persist($newRole);
+
+    $user = new \Jazzee\Entity\User();
+    $user->setUniqueName('previewuser');
+    $user->activate();
+    $user->setEmail('previewapp@example.com');
+    $user->setFirstName('Preview');
+    $user->setLastName('Application User');
+    $user->addRole($newRole);
+    $user->setDefaultCycle($cycle);
+    $user->setDefaultProgram($program);
+    $em->persist($user);
+
     $em->flush();
     return $newApplication;
   }

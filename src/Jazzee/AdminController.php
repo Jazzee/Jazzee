@@ -32,6 +32,12 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
    * @constant boolean
    */
   const REQUIRE_APPLICATION = true;
+  
+  /**
+   * The name of the admin session store
+   * @var string
+   */
+  const SESSION_STORE_NAME = 'admin';
 
   /**
    * AdminAuthentication Class
@@ -88,8 +94,12 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
   {
     parent::__construct();
     $this->layout = 'wide';
-    $this->_store = $this->_session->getStore('admin', $this->_config->getAdminSessionLifetime());
-    $class = $this->_config->getAdminAuthenticationClass();
+    $this->_store = $this->_session->getStore(self::SESSION_STORE_NAME, $this->_config->getAdminSessionLifetime());
+    if($this->isPreviewMode()){
+      $class = '\Jazzee\AdminAuthentication\PreviewApplication';
+    } else {
+      $class = $this->_config->getAdminAuthenticationClass();
+    }
     $this->_adminAuthentication = new $class($this);
     if (!($this->_adminAuthentication instanceof Interfaces\AdminAuthentication)) {
       throw new Exception($this->_config->getAdminAuthenticationClass() . ' does not implement AdminAuthentication Interface.');

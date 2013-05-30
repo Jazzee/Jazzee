@@ -320,6 +320,16 @@ class ApplyApplicantController extends \Jazzee\ApplyController
     }
     $navigation->addMenu($menu);
 
+    if($this->isPreviewMode()){
+      $menu = new \Foundation\Navigation\Menu();
+      $navigation->addMenu($menu);
+
+      $menu->setTitle('Preview Functions');
+      $link = new \Foundation\Navigation\Link('Become Administrator');
+      $link->setHref($this->path('admin/login'));
+      $menu->addLink($link);
+    }
+
     return $navigation;
   }
 
