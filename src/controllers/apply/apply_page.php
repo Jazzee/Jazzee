@@ -145,6 +145,17 @@ class ApplyPageController extends \Jazzee\AuthenticatedApplyController
 
     }
 
+    if($this->_applicant->isLocked()){
+      $actions = new \Foundation\Navigation\Menu();
+      $actions->setTitle('Actions');
+      $print = new \Foundation\Navigation\Link('Print Application');
+      $print->setHref($this->applyPath('/account/printApplication'));
+      $actions->addLink($print);
+      
+      $navigation->addMenu($actions);
+    }
+
+
     return $navigation;
   }
 
