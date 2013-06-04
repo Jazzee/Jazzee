@@ -10,7 +10,6 @@
 ?>
 <noscript>This Page Requires javascript.  Please consult your department IT support for help enabling Javascript in your browser.</noscript>
 <div id='ajaxstatus'></div>
-
 <div id="grid"></div>
 <div id="gridActionForm" class="hidden-form">
 <?php

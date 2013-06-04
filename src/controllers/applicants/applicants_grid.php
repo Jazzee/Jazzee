@@ -97,7 +97,9 @@ class ApplicantsGridController extends \Jazzee\AdminController
 
     $this->layout = 'wide';
     $form = $this->getForm('applicants/grid');
+
     if ($input = $form->processInput($this->post)) {
+
       $filters = $input->get('filters');
       $applicationPages = array();
       foreach ($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $pageEntity) {
@@ -105,9 +107,16 @@ class ApplicantsGridController extends \Jazzee\AdminController
         $applicationPages[$pageEntity->getId()] = $pageEntity;
       }
       $applicantsArray = array();
-      if($input->get("applicantIds[]") || $input->get("applicantIds")){
+
+      if(isset($this->post["from_date"])){
+	$to = (isset($this->post["to_date"])) ? $this->post["to_date"] : null;
+
+        $applicantsArray = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findApplicantsInDateRange($this->_application, $this->post["from_date"], $to);
+      }
+      else if($input->get("applicantIds[]") || $input->get("applicantIds")){
 	$requestedIds = $input->get("applicantIds");
 	$applicantsArray = $requestedIds;
+
       }else{
       $minimalDisplay = new \Jazzee\Display\Minimal($this->_application);
       $ids = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findIdsByApplication($this->_application);
@@ -359,13 +368,15 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $tempFileArray = array();
     $tmppath = $this->_config->getVarPath() . '/tmp';
     foreach(array_chunk($applicants, 20) as $limitedIds){
-      $applicantsDisplayArray = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $limitedIds);
+      $applicantsDisplayArray = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $limitedIds, $this->post);
       foreach($applicantsDisplayArray as $applicantArray){
         $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
         $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
         $tempFileArray[] = $temp_file_name;
         file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
-        $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . '.pdf');
+
+	$extId = ($applicantArray['externalId'] != null) ? $applicantArray['externalId'] : "NO_ID";
+        $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . '-'.$extId.'.pdf');
         unset($pdf);
       }
     }
