@@ -1,4 +1,18 @@
-.hidden-form {
+
+.select-dates {
+border: 1px solid #CCC;
+padding: 5px;
+padding-top: 10px;
+padding-bottom: 10px;
+margin: 10px;
+
+}
+
+.from-date {
+padding-bottom: 10px;
+}
+
+.hidden, .hidden-form {
 display: none;
 }
 

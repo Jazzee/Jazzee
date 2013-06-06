@@ -10,12 +10,74 @@ var triggerDownload = function(nButton, oConfig ) {
 		applicants.push($(appls[0]).attr('href'));
 	});
 
-    if(applicants.length < 1){
-	alert("You must select some rows from the table.");
-	return;
-    }
-
     var gridForm = $('#gridForm');
+    $( "<div id='grid-date-modal'></div>" ).appendTo(gridForm);
+
+    // remove any previous dates
+    gridForm.find("#from_date").remove();
+    gridForm.find("#to_date").remove();
+
+    var modal = $('#grid-date-modal');
+    modal.dialog({
+            height: 300,
+		width: 300,
+		modal: true
+		});
+
+    var dates = $('<div class="select-dates"><h5>Select date range (optional):</h5></div>');
+    dates.appendTo(modal);
+    $('<div class="from-date">From: <input type="text" class="date-picker" /></div>').appendTo(dates);
+    $('<div class="to-date">To: <input type="text" class="date-picker" /></div>').appendTo(dates);
+    modal.find(".from-date .date-picker").datepicker( {
+	    changeMonth: true,
+		changeYear: true,
+		showButtonPanel: true,
+		dateFormat: 'yy-mm-dd',
+		onSelect: function(dateText, inst) { 
+
+		gridForm.find("#from_date").remove();
+
+    $('<input type="hidden" id="from_date">').attr({
+	    name: 'from_date',
+	    value: dateText
+	}).appendTo(gridForm);
+
+	    }
+	});
+
+    modal.find(".to-date .date-picker").datepicker( {
+	    changeMonth: true,
+		changeYear: true,
+		showButtonPanel: true,
+		dateFormat: 'yy-mm-dd',
+		onSelect: function(dateText, inst) { 
+
+		gridForm.find("#to_date").remove();
+
+    $('<input type="hidden" id="to_date">').attr({
+	    name: 'to_date',
+	    value: dateText
+	}).appendTo(gridForm);
+
+	    }
+	});
+
+    $('<input class="dtpick" type="button" value="Search">').attr({
+	    name: 'picked_dates',
+	}).appendTo(modal);
+
+    modal.find(".dtpick").on("click",function(){
+	    var useDates = false;
+		if($('#from_date').length > 0){
+		    //   alert("have from date: "+$("#from_date"));
+		    useDates = true;
+		}
+
+		if((applicants.length < 1) && !useDates ){
+		    alert("You must select some rows from the table or provide at least a 'from' date.");
+		    return;
+		}
+
     gridForm.attr("action","grid/download");
     gridForm.find("input[name=type]").remove();
 
@@ -39,6 +101,8 @@ var triggerDownload = function(nButton, oConfig ) {
     }
 
     $(gridForm).find("input[type=submit]").click(); 
+
+	});
 };
 
 
@@ -61,6 +125,14 @@ function Grid(display, applicantIds, target, controllerPath){
 Grid.prototype.init = function(){
   var self = this;
   var columns = this.getColumns();
+
+  $( "#grid_from_date" ).datepicker({buttonText: 'Pick'});
+    $( "#grid_to_date" ).datepicker();
+    $( "#grid-date-modal" ).dialog({
+            height: 300,
+		width: 300,
+		modal: true
+		});
   
   var data = [];
   $(this.target).empty();
