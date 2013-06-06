@@ -63,6 +63,41 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     return $query->getResult();
   }
 
+  public function findApplicantsInDateRange(Application $application = null, $from, $to = null)
+  {
+    $queryBuilder = $this->_em->createQueryBuilder();
+    $queryBuilder->add('select', 'a.id')
+            ->from('Jazzee\Entity\Applicant', 'a');
+    //    $queryBuilder->add('select', 'applicant.id');
+
+    if (!is_null($application)) {
+      $queryBuilder->where('a.application = :applicationId');
+      $queryBuilder->setParameter('applicationId', $application->getId());
+    }
+
+
+    $queryBuilder->andWhere('a.deactivated=false');
+    $queryBuilder->andWhere('a.isLocked=true');
+
+    $queryBuilder->andWhere('a.updatedAt >= :fromDate')
+            ->orderBy('a.lastName, a.firstName');
+
+    $queryBuilder->setParameter('fromDate', $from);
+
+    if(!is_null($to)){
+      $queryBuilder->andWhere('a.updatedAt <= :toDate');
+      $queryBuilder->setParameter('toDate', $to);
+    }
+
+    //    return $queryBuilder->getQuery()->getResult();
+    $applicants = array();
+    foreach($queryBuilder->getQuery()->getArrayResult() as $app){
+      $applicants[] = $app['id'];
+    }
+    return $applicants;
+  }
+
+
   /**
    * Find applicants by name
    *
@@ -247,6 +282,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $results = array();
     foreach(array_chunk($applicantIds, 20) as $limitedIds){
       $queryBuilder = $this->deepApplicantQuery($display);
+
       $queryBuilder->andWhere('applicant.application = :applicationId');
       $queryBuilder->andWhere('applicant.deactivated=false');
       $queryBuilder->orderBy('applicant.lastName, applicant.firstName');
