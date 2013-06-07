@@ -41,6 +41,14 @@ Display.prototype.getName = function(){
 };
 
 /**
+ * Set the display name
+ * @param String name
+ */
+Display.prototype.setName = function(name){
+  this.display.name = name;
+};
+
+/**
  * Get the display type
  */
 Display.prototype.getType = function(){
