@@ -34,6 +34,31 @@ DisplayManager.prototype.drawChooser = function(){
   var self = this;
   var div = $('<div>');
   div.append($('<h3>').html('Available Elements'));
+  var button = $('<button>').html('Select All').button();
+  button.click(function(e){
+    var startWeight = self.nextWeight();
+    $('ul.block_list li.item', div).not('.selected').each(function(i){
+      var element = $(this).data('element');
+      element.weight = startWeight +i;
+      self.display.addElement(element);
+    });
+    self.drawChosen();
+    self.drawChooser();
+    return false;
+  });
+  $('h3',div).append(button);
+  var button = $('<button>').html('Deselect All').button();
+  button.click(function(e){
+    var startWeight = self.nextWeight();
+    $('ul.block_list li.item.selected', div).each(function(i){
+      var element = $(this).data('element');
+      self.display.removeElement(element);
+    });
+    self.drawChosen();
+    self.drawChooser();
+    return false;
+  });
+  $('h3',div).append(button);
   div.append(this.shrinkButton('Applicant', this.applicantBox()));
   
   $.each(this.application.listApplicationPages(), function(){
