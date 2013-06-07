@@ -15,12 +15,19 @@ function DisplayManager(display, application){
  * @param {jQuery} canvas
  */
 DisplayManager.prototype.init = function(canvas){
-  var container = $('<div>').addClass('yui-g');
+  var self = this;
+  var name = $('<div>').css('text-align', 'left');
+  name.append($('<label>').attr('for', 'display-name').html('Display Name: '));
+  name.append($('<input>').attr('id', 'display-name').val(this.display.getName()).bind('change', function(){
+    self.display.setName($(this).val());
+  }));
+  canvas.append(name);
+  var div = $('<div>').addClass('yui-g');
   var left = $('<div>').addClass('yui-u first').attr('id', 'chooser');
   var right = $('<div>').addClass('yui-u').attr('id', 'chosen');
-  container.append(left);
-  container.append(right);
-  canvas.append(container);
+  div.append(left);
+  div.append(right);
+  canvas.append(div);
   this.drawChooser();
   this.drawChosen();
 };
