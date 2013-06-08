@@ -1,47 +1,3 @@
-
-var triggerDownload = function(nButton, oConfig ) {
-	    
-    var applicants = [];
-    var dt = TableTools._aInstances[0].s.dt;
-    var table = TableTools._aInstances[0].dom.table;
-    $(table).find("tr."+ROW_CSS_CLASS).each(function(idx, row){
-	    var appls = $(row).find(".applicantlink");
-	    if(appls.length > 0)
-		applicants.push($(appls[0]).attr('href'));
-	});
-
-    if(applicants.length < 1){
-	alert("You must select some rows from the table.");
-	return;
-    }
-
-    var gridForm = $('#gridForm');
-    gridForm.attr("action","grid/download");
-    gridForm.find("input[name=type]").remove();
-
-    var dl_type = oConfig["dl_type"];
-    
-    // use the requested type
-    $('<input type="hidden">').attr({
-	    name: 'type',
-	    value: dl_type
-	}).appendTo(gridForm);
-
-    // we need to set this as the dl has it as a required field,
-    // but the value will be ignored if we send any ids
-    gridForm.find("#filters_locked").attr("checked","checked");
-    
-    for(id in applicants){
-	$('<input type="hidden">').attr({
-		name: 'applicantIds[]',
-		    value: applicants[id]
-		    }).appendTo(gridForm);
-    }
-
-    $(gridForm).find("input[type=submit]").click(); 
-};
-
-
 /**
  * Grid class
  * Creats an applicant grid from a display and a set of applicant ids
@@ -56,6 +12,7 @@ function Grid(display, applicantIds, target, controllerPath){
   this.target = target;
   this.controllerPath = controllerPath;
   this.maxLoad = 100;
+  this.lastClick = null;
 };
 
 Grid.prototype.init = function(){
@@ -67,6 +24,13 @@ Grid.prototype.init = function(){
   $(this.target).addClass('applicant_grid');
   $(this.target).append($('<div>').addClass('overlay'));
   var table = $('<table>').addClass('grid');
+  if($.browser.mozilla){//Firefox
+    table.css('MozUserSelect','none');
+  }else if($.browser.msie){//IE
+    table.bind('selectstart',function(){return false;});
+  }else{//Opera, etc.
+    table.mousedown(function(){return false;});
+  }
   $(this.target).append(table);
   var grid = table.dataTable( {
     sScrollY: "500",
@@ -77,53 +41,57 @@ Grid.prototype.init = function(){
     aaData: data,
     aoColumns: columns,
     bJQueryUI: true,
-    "sDom": 'T<"clear">lfrtip',
+    "sDom": '<"H"Tfrl>t<"F"ip>',
     "oTableTools": {
-	      "aButtons": ["select_all",
-			   "select_none",
-  {
-      "sExtends":    "collection",
-      "sButtonText": "Download",
-      "aButtons":    [ 		       {
-			   "sExtends":    "text",
-			   "sNewLine": "<br>",
-			   "sButtonText": "json",
-			   "sDiv": "",
-			   "dl_type": "json",
-			   "fnClick": triggerDownload
-	  }
-	  , 
-		       {
-			   "sExtends":    "text",
-			   "sNewLine": "<br>",
-			   "sButtonText": "Excel",
-			   "sDiv": "",
-			   "dl_type": "xls",
-			   "fnClick": triggerDownload
-		       } , 
-		       {
-			   "sExtends":    "text",
-			   "sNewLine": "<br>",
-			   "sButtonText": "XML",
-			   "sDiv": "",
-			   "dl_type": "xml",
-			   "fnClick": triggerDownload
-		       },
-		       {
-			   "sExtends":    "text",
-			   "sNewLine": "<br>",
-			   "sButtonText": "PDF",
-			   "sDiv": "",
-			   "dl_type": "pdfarchive",
-			   "fnClick":  triggerDownload
-		       }
-	  ]
-  }
-			   ]
-	  }
-      }); 
-
-  $(table).noSelect(); // prevents text selection for shift-clicking multiple rows
+      "sRowSelect": "multi",
+      "fnPreRowSelect": function(e, nodes) {
+        if(e){ //e is not defined when we call the fnSelect method directly
+          if (e.shiftKey && self.lastClick != null) {
+            var lastClickPosition = grid.fnGetPosition(self.lastClick);
+            var thisClickPosition = grid.fnGetPosition(nodes[0]);
+            if (lastClickPosition >= 0 && thisClickPosition >= 0 && lastClickPosition != thisClickPosition) {
+              //use min/max so we can click higher or ower than the first click and still loop corectly
+              for (var i=Math.min(thisClickPosition,lastClickPosition); i < Math.max(thisClickPosition,lastClickPosition); i++) {
+                this.fnSelect(grid.fnSettings().aoData[i].nTr);
+              }
+            }
+          }
+          self.lastClick = nodes[0];
+        }
+        return true;
+      },
+      "aButtons": [
+        "select_all",
+        "select_none",
+        {
+          "sExtends":    "collection",
+          "sButtonText": "Download",
+          "aButtons":    [	
+            {
+                "sExtends": "download_applicants",
+                "sButtonText": "Excel",
+                "sUrl": "grid/downloadXls"
+            },
+            {
+                "sExtends": "download_applicants",
+                "sButtonText": "XML",
+                "sUrl": "grid/downloadXml"
+            },
+            {
+                "sExtends": "download_applicants",
+                "sButtonText": "PDF",
+                "sUrl": "grid/downloadPdfArchive"
+            },
+            {
+                "sExtends": "download_applicants",
+                "sButtonText": "JSON",
+                "sUrl": "grid/downloadJson"
+            }
+          ]
+        }
+      ]
+    }
+  });
   var progressbar = $('<div>').addClass('progress').append($('<div>').addClass('label').html('Loading Grid...'));
   $('div.overlay', this.target).append(progressbar);
   progressbar.progressbar({
@@ -226,12 +194,9 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       }
       grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();
-      grid.rowSelect();
       self.loadapps(applicantIds, grid);
 	});
   } else {
-    //after all of the data is loaded then fix the left column in place
-    new FixedColumns(grid,  {iLeftColumns: 2});
     $('div:first', this.target).fadeOut();
   }
 };
@@ -330,50 +295,6 @@ Grid.bindDialogLinks = function(){
   });
 };
 
-/*
- * File:        FixedColumns.nightly.min.js
- * Version:     2.5.0.dev
- * Author:      Allan Jardine (www.sprymedia.co.uk)
- * Info:        www.datatables.net
- * 
- * Copyright 2008-2012 Allan Jardine, all rights reserved.
- *
- * This source file is free software, under either the GPL v2 license or a
- * BSD style license, available at:
- *   http://datatables.net/license_gpl2
- *   http://datatables.net/license_bsd
- * 
- * This source file is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
- */
-/*
-     GPL v2 or BSD 3 point style
-*/
-var FixedColumns;
-(function(d,t){FixedColumns=function(a,b){var c=this;if(!this instanceof FixedColumns)alert("FixedColumns warning: FixedColumns must be initialised with the 'new' keyword.");else{if(typeof b=="undefined")b={};this.s={dt:a.fnSettings(),iTableColumns:a.fnSettings().aoColumns.length,aiOuterWidths:[],aiInnerWidths:[]};this.dom={scroller:null,header:null,body:null,footer:null,grid:{wrapper:null,dt:null,left:{wrapper:null,head:null,body:null,foot:null},right:{wrapper:null,head:null,body:null,foot:null}},
-clone:{left:{header:null,body:null,footer:null},right:{header:null,body:null,footer:null}}};this.s.dt.oFixedColumns=this;this.s.dt._bInitComplete?this._fnConstruct(b):this.s.dt.oApi._fnCallbackReg(this.s.dt,"aoInitComplete",function(){c._fnConstruct(b)},"FixedColumns")}};FixedColumns.prototype={fnUpdate:function(){this._fnDraw(true)},fnRedrawLayout:function(){this._fnColCalc();this._fnGridLayout();this.fnUpdate()},fnRecalculateHeight:function(a){delete a._DTTC_iHeight;a.style.height="auto"},fnSetRowHeight:function(a,
-b){a.style.height=b+"px"},_fnConstruct:function(a){var b=this;if(typeof this.s.dt.oInstance.fnVersionCheck!="function"||this.s.dt.oInstance.fnVersionCheck("1.8.0")!==true)alert("FixedColumns "+FixedColumns.VERSION+" required DataTables 1.8.0 or later. Please upgrade your DataTables installation");else if(this.s.dt.oScroll.sX==="")this.s.dt.oInstance.oApi._fnLog(this.s.dt,1,"FixedColumns is not needed (no x-scrolling in DataTables enabled), so no action will be taken. Use 'FixedHeader' for column fixing when scrolling is not enabled");
-else{this.s=d.extend(true,this.s,FixedColumns.defaults,a);this.dom.grid.dt=d(this.s.dt.nTable).parents("div.dataTables_scroll")[0];this.dom.scroller=d("div.dataTables_scrollBody",this.dom.grid.dt)[0];this._fnColCalc();this._fnGridSetup();d(this.dom.scroller).scroll(function(){if(b.s.iLeftColumns>0)b.dom.grid.left.liner.scrollTop=b.dom.scroller.scrollTop;if(b.s.iRightColumns>0)b.dom.grid.right.liner.scrollTop=b.dom.scroller.scrollTop});if(b.s.iLeftColumns>0){d(b.dom.grid.left.liner).scroll(function(){b.dom.scroller.scrollTop=
-b.dom.grid.left.liner.scrollTop;if(b.s.iRightColumns>0)b.dom.grid.right.liner.scrollTop=b.dom.grid.left.liner.scrollTop});d(b.dom.grid.left.liner).bind("mousewheel",function(f){b.dom.scroller.scrollLeft-=f.originalEvent.wheelDeltaX/3})}if(b.s.iRightColumns>0){d(b.dom.grid.right.liner).scroll(function(){b.dom.scroller.scrollTop=b.dom.grid.right.liner.scrollTop;if(b.s.iLeftColumns>0)b.dom.grid.left.liner.scrollTop=b.dom.grid.right.liner.scrollTop});d(b.dom.grid.right.liner).bind("mousewheel",function(f){b.dom.scroller.scrollLeft-=
-f.originalEvent.wheelDeltaX/3})}d(t).resize(function(){b._fnGridLayout.call(b)});var c=true;this.s.dt.aoDrawCallback=[{fn:function(){b._fnDraw.call(b,c);b._fnGridLayout(b);c=false},sName:"FixedColumns"}].concat(this.s.dt.aoDrawCallback);this._fnGridLayout();this.s.dt.oInstance.fnDraw(false)}},_fnColCalc:function(){var a=this,b=d(this.dom.grid.dt).width(),c=0,f=0;this.s.aiInnerWidths=[];d("tbody>tr:eq(0)>td, tbody>tr:eq(0)>th",this.s.dt.nTable).each(function(g){a.s.aiInnerWidths.push(d(this).width());
-var e=d(this).outerWidth();a.s.aiOuterWidths.push(e);if(g<a.s.iLeftColumns)c+=e;if(a.s.iTableColumns-a.s.iRightColumns<=g)f+=e});this.s.iLeftWidth=this.s.sLeftWidth=="fixed"?c:c/b*100;this.s.iRightWidth=this.s.sRightWidth=="fixed"?f:f/b*100},_fnGridSetup:function(){var a=this._fnDTOverflow(),b;this.dom.body=this.s.dt.nTable;this.dom.header=this.s.dt.nTHead.parentNode;this.dom.header.parentNode.parentNode.style.position="relative";var c=d('<div class="DTFC_ScrollWrapper" style="position:relative; clear:both;"><div class="DTFC_LeftWrapper" style="position:absolute; top:0; left:0;"><div class="DTFC_LeftHeadWrapper" style="position:relative; top:0; left:0; overflow:hidden;"></div><div class="DTFC_LeftBodyWrapper" style="position:relative; top:0; left:0; overflow:hidden;"><div class="DTFC_LeftBodyLiner" style="position:relative; top:0; left:0; overflow-y:scroll;"></div></div><div class="DTFC_LeftFootWrapper" style="position:relative; top:0; left:0; overflow:hidden;"></div></div><div class="DTFC_RightWrapper" style="position:absolute; top:0; left:0;"><div class="DTFC_RightHeadWrapper" style="position:relative; top:0; left:0;"><div class="DTFC_RightHeadBlocker DTFC_Blocker" style="position:absolute; top:0; bottom:0;"></div></div><div class="DTFC_RightBodyWrapper" style="position:relative; top:0; left:0; overflow:hidden;"><div class="DTFC_RightBodyLiner" style="position:relative; top:0; left:0; overflow-y:scroll;"></div></div><div class="DTFC_RightFootWrapper" style="position:relative; top:0; left:0;"><div class="DTFC_RightFootBlocker DTFC_Blocker" style="position:absolute; top:0; bottom:0;"></div></div></div></div>')[0],
-f=c.childNodes[0],g=c.childNodes[1];this.dom.grid.dt.parentNode.insertBefore(c,this.dom.grid.dt);c.appendChild(this.dom.grid.dt);this.dom.grid.wrapper=c;if(this.s.iLeftColumns>0){this.dom.grid.left.wrapper=f;this.dom.grid.left.head=f.childNodes[0];this.dom.grid.left.body=f.childNodes[1];this.dom.grid.left.liner=d("div.DTFC_LeftBodyLiner",c)[0];c.appendChild(f)}if(this.s.iRightColumns>0){this.dom.grid.right.wrapper=g;this.dom.grid.right.head=g.childNodes[0];this.dom.grid.right.body=g.childNodes[1];
-this.dom.grid.right.liner=d("div.DTFC_RightBodyLiner",c)[0];b=d("div.DTFC_RightHeadBlocker",c)[0];b.style.width=a.bar+"px";b.style.right=-a.bar+"px";this.dom.grid.right.headBlock=b;b=d("div.DTFC_RightFootBlocker",c)[0];b.style.width=a.bar+"px";b.style.right=-a.bar+"px";this.dom.grid.right.footBlock=b;c.appendChild(g)}if(this.s.dt.nTFoot){this.dom.footer=this.s.dt.nTFoot.parentNode;if(this.s.iLeftColumns>0)this.dom.grid.left.foot=f.childNodes[2];if(this.s.iRightColumns>0)this.dom.grid.right.foot=g.childNodes[2]}},
-_fnGridLayout:function(){var a=this.dom.grid,b=d(a.wrapper).width(),c=d(this.s.dt.nTable.parentNode).height(),f=d(this.s.dt.nTable.parentNode.parentNode).height(),g,e,h=this._fnDTOverflow();g=this.s.sLeftWidth=="fixed"?this.s.iLeftWidth:this.s.iLeftWidth/100*b;e=this.s.sRightWidth=="fixed"?this.s.iRightWidth:this.s.iRightWidth/100*b;if(h.x)c-=h.bar;a.wrapper.style.height=f+"px";if(this.s.iLeftColumns>0){a.left.wrapper.style.width=g+"px";a.left.wrapper.style.height=f+"px";a.left.body.style.height=
-c+"px";if(a.left.foot)a.left.foot.style.top=(h.x?h.bar:0)+"px";a.left.liner.style.width=g+h.bar+"px";a.left.liner.style.height=c+"px"}if(this.s.iRightColumns>0){b=b-e;if(h.y)b-=h.bar;a.right.wrapper.style.width=e+"px";a.right.wrapper.style.left=b+"px";a.right.wrapper.style.height=f+"px";a.right.body.style.height=c+"px";if(a.right.foot)a.right.foot.style.top=(h.x?h.bar:0)+"px";a.right.liner.style.width=e+h.bar+"px";a.right.liner.style.height=c+"px";a.right.headBlock.style.display=h.x?"block":"none";
-a.right.footBlock.style.display=h.x?"block":"none"}},_fnDTOverflow:function(){var a=this.s.dt.nTable,b=a.parentNode,c={x:false,y:false,bar:this.s.dt.oScroll.iBarWidth};if(a.offsetWidth>b.offsetWidth)c.x=true;if(a.offsetHeight>b.offsetHeight)c.y=true;return c},_fnDraw:function(a){this._fnCloneLeft(a);this._fnCloneRight(a);this.s.fnDrawCallback!==null&&this.s.fnDrawCallback.call(this,this.dom.clone.left,this.dom.clone.right);d(this).trigger("draw",{leftClone:this.dom.clone.left,rightClone:this.dom.clone.right})},
-_fnCloneRight:function(a){if(!(this.s.iRightColumns<=0)){var b,c=[];for(b=this.s.iTableColumns-this.s.iRightColumns;b<this.s.iTableColumns;b++)c.push(b);this._fnClone(this.dom.clone.right,this.dom.grid.right,c,a)}},_fnCloneLeft:function(a){if(!(this.s.iLeftColumns<=0)){var b,c=[];for(b=0;b<this.s.iLeftColumns;b++)c.push(b);this._fnClone(this.dom.clone.left,this.dom.grid.left,c,a)}},_fnCopyLayout:function(a,b){for(var c=[],f=[],g=[],e=0,h=a.length;e<h;e++){var j=[];j.nTr=d(a[e].nTr).clone(true)[0];
-for(var i=0,m=this.s.iTableColumns;i<m;i++)if(d.inArray(i,b)!==-1){var l=d.inArray(a[e][i].cell,g);if(l===-1){l=d(a[e][i].cell).clone(true)[0];f.push(l);g.push(a[e][i].cell);j.push({cell:l,unique:a[e][i].unique})}else j.push({cell:f[l],unique:a[e][i].unique})}c.push(j)}return c},_fnClone:function(a,b,c,f){var g=this,e,h,j,i,m,l,n,k,p;if(f){a.header!==null&&a.header.parentNode.removeChild(a.header);a.header=d(this.dom.header).clone(true)[0];a.header.className+=" DTFC_Cloned";a.header.style.width="100%";
-b.head.appendChild(a.header);k=this._fnCopyLayout(this.s.dt.aoHeader,c);i=d(">thead",a.header);i.empty();e=0;for(h=k.length;e<h;e++)i[0].appendChild(k[e].nTr);this.s.dt.oApi._fnDrawHead(this.s.dt,k,true)}else{k=this._fnCopyLayout(this.s.dt.aoHeader,c);p=[];this.s.dt.oApi._fnDetectHeader(p,d(">thead",a.header)[0]);e=0;for(h=k.length;e<h;e++){j=0;for(i=k[e].length;j<i;j++){p[e][j].cell.className=k[e][j].cell.className;d("span.DataTables_sort_icon",p[e][j].cell).each(function(){this.className=d("span.DataTables_sort_icon",
-k[e][j].cell)[0].className})}}}this._fnEqualiseHeights("thead",this.dom.header,a.header);this.s.sHeightMatch=="auto"&&d(">tbody>tr",g.dom.body).css("height","auto");if(a.body!==null){a.body.parentNode.removeChild(a.body);a.body=null}a.body=d(this.dom.body).clone(true)[0];a.body.className+=" DTFC_Cloned";a.body.style.paddingBottom=this.s.dt.oScroll.iBarWidth+"px";a.body.style.marginBottom=this.s.dt.oScroll.iBarWidth*2+"px";a.body.getAttribute("id")!==null&&a.body.removeAttribute("id");d(">thead>tr",
-a.body).empty();d(">tfoot",a.body).remove();var q=d("tbody",a.body)[0];d(q).empty();if(this.s.dt.aiDisplay.length>0){h=d(">thead>tr",a.body)[0];for(n=0;n<c.length;n++){m=c[n];l=d(this.s.dt.aoColumns[m].nTh).clone(true)[0];l.innerHTML="";i=l.style;i.paddingTop="0";i.paddingBottom="0";i.borderTopWidth="0";i.borderBottomWidth="0";i.height=0;i.width=g.s.aiInnerWidths[m]+"px";h.appendChild(l)}d(">tbody>tr",g.dom.body).each(function(o){var r=this.cloneNode(false);o=g.s.dt.oFeatures.bServerSide===false?
-g.s.dt.aiDisplay[g.s.dt._iDisplayStart+o]:o;for(n=0;n<c.length;n++){var s=g.s.dt.oApi._fnGetTdNodes(g.s.dt,o);m=c[n];if(s.length>0){l=d(s[m]).clone(true)[0];r.appendChild(l)}}q.appendChild(r)})}else d(">tbody>tr",g.dom.body).each(function(){l=this.cloneNode(true);l.className+=" DTFC_NoData";d("td",l).html("");q.appendChild(l)});a.body.style.width="100%";a.body.style.margin="0";a.body.style.padding="0";f&&typeof this.s.dt.oScroller!="undefined"&&b.liner.appendChild(this.s.dt.oScroller.dom.force.cloneNode(true));
-b.liner.appendChild(a.body);this._fnEqualiseHeights("tbody",g.dom.body,a.body);if(this.s.dt.nTFoot!==null){if(f){a.footer!==null&&a.footer.parentNode.removeChild(a.footer);a.footer=d(this.dom.footer).clone(true)[0];a.footer.className+=" DTFC_Cloned";a.footer.style.width="100%";b.foot.appendChild(a.footer);k=this._fnCopyLayout(this.s.dt.aoFooter,c);b=d(">tfoot",a.footer);b.empty();e=0;for(h=k.length;e<h;e++)b[0].appendChild(k[e].nTr);this.s.dt.oApi._fnDrawHead(this.s.dt,k,true)}else{k=this._fnCopyLayout(this.s.dt.aoFooter,
-c);b=[];this.s.dt.oApi._fnDetectHeader(b,d(">tfoot",a.footer)[0]);e=0;for(h=k.length;e<h;e++){j=0;for(i=k[e].length;j<i;j++)b[e][j].cell.className=k[e][j].cell.className}}this._fnEqualiseHeights("tfoot",this.dom.footer,a.footer)}b=this.s.dt.oApi._fnGetUniqueThs(this.s.dt,d(">thead",a.header)[0]);d(b).each(function(o){m=c[o];this.style.width=g.s.aiInnerWidths[m]+"px"});if(g.s.dt.nTFoot!==null){b=this.s.dt.oApi._fnGetUniqueThs(this.s.dt,d(">tfoot",a.footer)[0]);d(b).each(function(o){m=c[o];this.style.width=
-g.s.aiInnerWidths[m]+"px"})}},_fnGetTrNodes:function(a){for(var b=[],c=0,f=a.childNodes.length;c<f;c++)a.childNodes[c].nodeName.toUpperCase()=="TR"&&b.push(a.childNodes[c]);return b},_fnEqualiseHeights:function(a,b,c){if(!(this.s.sHeightMatch=="none"&&a!=="thead"&&a!=="tfoot")){var f,g,e=b.getElementsByTagName(a)[0];c=c.getElementsByTagName(a)[0];a=d(">"+a+">tr:eq(0)",b).children(":first");a.outerHeight();a.height();e=this._fnGetTrNodes(e);b=this._fnGetTrNodes(c);c=0;for(a=b.length;c<a;c++){f=e[c].offsetHeight;
-g=b[c].offsetHeight;f=g>f?g:f;if(this.s.sHeightMatch=="semiauto")e[c]._DTTC_iHeight=f;b[c].style.height=f+"px";e[c].style.height=f+"px"}}}};FixedColumns.defaults={iLeftColumns:1,iRightColumns:0,fnDrawCallback:null,sLeftWidth:"fixed",iLeftWidth:null,sRightWidth:"fixed",iRightWidth:null,sHeightMatch:"semiauto"};FixedColumns.prototype.CLASS="FixedColumns";FixedColumns.VERSION="2.5.0.dev"})(jQuery,window,document);
-
 // Simple Set Clipboard System
 // Author: Joseph Huckaby
 var ZeroClipboard_TableTools={version:"1.0.4-TableTools2",clients:{},moviePath:"",nextId:1,$:function(a){"string"==typeof a&&(a=document.getElementById(a));a.addClass||(a.hide=function(){this.style.display="none"},a.show=function(){this.style.display=""},a.addClass=function(a){this.removeClass(a);this.className+=" "+a},a.removeClass=function(a){this.className=this.className.replace(RegExp("\\s*"+a+"\\s*")," ").replace(/^\s+/,"").replace(/\s+$/,"")},a.hasClass=function(a){return!!this.className.match(RegExp("\\s*"+
@@ -451,3 +372,78 @@ sButtonClass:"DTTT_button_collection",sButtonText:"Collection",fnClick:function(
 {container:"DTTT_container ui-buttonset ui-buttonset-multi",buttons:{normal:"DTTT_button ui-button ui-state-default"},collection:{container:"DTTT_collection ui-buttonset ui-buttonset-multi"}};TableTools.DEFAULTS={sSwfPath:"media/swf/copy_csv_xls_pdf.swf",sRowSelect:"none",sSelectedClass:null,fnPreRowSelect:null,fnRowSelected:null,fnRowDeselected:null,aButtons:["copy","csv","xls","pdf","print"],oTags:{container:"div",button:"a",liner:"span",collection:{container:"div",button:"a",liner:"span"}}};TableTools.prototype.CLASS=
 "TableTools";TableTools.VERSION="2.1.5";TableTools.prototype.VERSION=TableTools.VERSION;"function"==typeof e.fn.dataTable&&"function"==typeof e.fn.dataTableExt.fnVersionCheck&&e.fn.dataTableExt.fnVersionCheck("1.9.0")?e.fn.dataTableExt.aoFeatures.push({fnInit:function(a){a=new TableTools(a.oInstance,"undefined"!=typeof a.oInit.oTableTools?a.oInit.oTableTools:{});TableTools._aInstances.push(a);return a.dom.container},cFeature:"T",sFeature:"TableTools"}):alert("Warning: TableTools 2 requires DataTables 1.9.0 or newer - www.datatables.net/download");
 e.fn.DataTable.TableTools=TableTools})(jQuery,window,document);
+
+
+/**
+* Table tools button plugin to create downloads from applicant data
+* Copied form: http://datatables.net/extras/tabletools/plug-ins
+**/
+
+TableTools.BUTTONS.download_applicants = {
+    "sAction": "text",
+    "sTag": "default",
+    "sFieldBoundary": "",
+    "sFieldSeperator": "\t",
+    "sNewLine": "<br>",
+    "sToolTip": "",
+    "sButtonClass": "DTTT_button_text",
+    "sButtonClassHover": "DTTT_button_text_hover",
+    "sButtonText": "Download",
+    "mColumns": "all",
+    "bHeader": true,
+    "bFooter": true,
+    "sDiv": "",
+    "fnMouseover": null,
+    "fnMouseout": null,
+    "fnClick": function( nButton, oConfig ) { 
+        var tableTools = this;
+        var overlay = $('<div>').attr('id', 'downloadoverlay');
+        $('body').append(overlay);
+        overlay.dialog({
+          height: 90,
+          modal: true,
+          autoOpen: true,
+          open: function(event, ui){
+            $(".ui-dialog-titlebar", ui.dialog).hide();
+            var label = $('<div>').addClass('label').html('Downloading...').css('float', 'left').css('margin','10px 5px');
+            var progressbar = $('<div>').addClass('progress').append(label);
+            overlay.append(progressbar);
+            progressbar.progressbar({
+              value: false
+            });
+            var iFrameName = "iFrame" + (new Date().getTime());
+            var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
+            iFrame.css("display", "none");
+
+            var form = $('<form>');
+            form.attr( 'method', 'post' );
+            iFrame.append(form);
+            var applicantIds = [];
+            var selected = tableTools.fnGetSelectedData();
+            for(var i = 0; i < selected.length; i++){
+              applicantIds.push(selected[i].id);
+            }
+            form.append($('<input>').attr('name', 'applicantIds').attr('type', 'text').val(applicantIds));
+            form.attr( 'action', oConfig.sUrl );
+            form.bind('submit', function(){
+              var cookieName = 'fileDownload';
+              var check = function(){
+                if($.cookie(cookieName) == 'complete'){
+                  $.cookie(cookieName, 'false', {expires: 1, path: '/' });
+                  $('#downloadoverlay').dialog('destroy').remove();
+                  iFrame.remove();
+                } else {
+                  setTimeout(check, 500);
+                }
+              };
+              setTimeout(check, 500);
+              return true;
+            });
+            form.submit();
+          }
+        });
+    },
+    "fnSelect": null,
+    "fnComplete": null,
+    "fnInit": null
+};

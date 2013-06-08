@@ -34,7 +34,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->addScript($this->path('resource/scripts/classes/DisplayManager.class.js'));
     $this->addScript($this->path('resource/scripts/classes/Grid.class.js'));
     $this->addScript($this->path('resource/scripts/controllers/applicants_grid.controller.js'));
-    $this->addScript($this->path('resource/scripts/controllers/jquery.dataTables.rowSelect.js'));
 
     $this->addCss($this->path('resource/styles/grid.css'));
     $this->addCss($this->path('resource/styles/displaymanager.css'));
@@ -71,117 +70,21 @@ class ApplicantsGridController extends \Jazzee\AdminController
     }
   }
 
-  public function getForm($p)
-  { 
-    $form = new \Foundation\Form();
-    $form->setCSRFToken($this->getCSRFToken());
-    $form->setAction($this->path($p));
-    $form->setId("gridForm");
-    $form->newButton('submit', 'Download Applicants');
-
-    return $form;
-  }
-
   public function actionIndex()
   {
     $this->layout = 'wide';
-    $form = $this->getForm('applicants/grid');
-    $this->setVar('form', $form);
   }
-
+  
   /**
    * List all applicants
    */
 
-  public function actionDownload()  {
-
-    $this->layout = 'wide';
-    $form = $this->getForm('applicants/grid');
-    if ($input = $form->processInput($this->post)) {
-      $filters = $input->get('filters');
-      $applicationPages = array();
-      foreach ($this->_application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $pageEntity) {
-        $pageEntity->getJazzeePage()->setController($this);
-        $applicationPages[$pageEntity->getId()] = $pageEntity;
-      }
-      $applicantsArray = array();
-      if($input->get("applicantIds[]") || $input->get("applicantIds")){
-	$requestedIds = $input->get("applicantIds");
-	$applicantsArray = $requestedIds;
-      }else{
-      $minimalDisplay = new \Jazzee\Display\Minimal($this->_application);
-      $ids = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findIdsByApplication($this->_application);
-      foreach ($ids as $id) {
-        $applicant = $this->_em->getRepository('\Jazzee\Entity\Applicant')->findArray($id, $minimalDisplay);
-        $selected = false;
-        if (!$applicant['isLocked'] and in_array('unlocked', $filters)) {
-          $selected = true;
-        }
-        if ($applicant['isLocked']) {
-          if (in_array('locked', $filters)) {
-            $selected = true;
-          }
-          if ($applicant['decision']['finalAdmit'] and in_array('admitted', $filters)) {
-            $selected = true;
-          }
-          if ($applicant['decision']['finalDeny'] and in_array('denied', $filters)) {
-            $selected = true;
-          }
-          if ($applicant['decision']['acceptOffer'] and in_array('accepted', $filters)) {
-            $selected = true;
-          }
-          if ($applicant['decision']['declineOffer'] and in_array('declined', $filters)) {
-            $selected = true;
-          }
-        }
-        if(!$selected){
-          $tagIds = array();
-          foreach($applicant['tags'] as $arr){
-            $tagIds[] = $arr['id'];
-          }
-          foreach ($filters as $value) {
-            if(array_key_exists($value, $tags)){
-              $tag = $tags[$value];
-              if (in_array($tag->getId(), $tagIds)) {
-                $selected = true;
-              }
-            }
-          }
-        }
-        if ($selected) {
-          $applicantsArray[] = $applicant['id'];
-        }
-      } //end foreach applicants
-      }
-      //use a full applicant display where display is needed
-      $display= new \Jazzee\Display\FullApplication($this->_application);
-      unset($ids);
-      switch ($input->get('type')) {
-        case 'xls':
-          $this->makeXls($applicantsArray, $display);
-          break;
-        case 'xml':
-          $this->makeXml($applicantsArray);
-          break;
-        case 'json':
-          $this->makeJson($applicantsArray, $display);
-          break;
-        case 'pdfarchive':
-          $this->makePdfArchive($applicantsArray, $display);
-          break;
-      }
-    }
-  }
-
-  /**
-   * XLS file type
-   * @param array \Jazzee\Entity\Applicant $applicants
-   */
-  protected function makeXls(array $applicants, \Jazzee\Interfaces\Display $display)
+  public function actionDownloadXls()  
   {
+    //use a full applicant display where display is needed
+    $display = new \Jazzee\Display\FullApplication($this->_application);
     $applicationPages = array();
     $pageAnswerCount = $this->_em->getRepository('Jazzee\Entity\Application')->getPageAnswerCounts($this->_application);
-
     $rows = array();
     $header = array(
       'ID',
@@ -199,8 +102,9 @@ class ApplicantsGridController extends \Jazzee\AdminController
       'Tags'
     );
     $applicationPages = array();
-    foreach ($this->getApplicationPages() as $applicationPage) {
+    foreach ($this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application' => $this->_application->getId(), 'kind' => \Jazzee\Entity\ApplicationPage::APPLICATION), array('weight' => 'asc')) as $applicationPage) {
       if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\CsvPage){
+        $applicationPage->getJazzeePage()->setController($this);
         $applicationPages[] = $applicationPage;
         for ($i = 1; $i <= $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
           foreach ($applicationPage->getJazzeePage()->getCsvHeaders() as $title) {
@@ -212,6 +116,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $fileName = tempnam($this->_config->getVarPath() . '/tmp/', 'applicants_download');
     $handle = fopen($fileName, 'w+');
     $this->writeXlsFile($header, $handle);
+    $applicants = explode(',',$this->post['applicantIds']);
     foreach ($applicants as $id) {
       $applicant = $this->_application->formatApplicantArray($this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display));
       $arr = array(
@@ -251,9 +156,9 @@ class ApplicantsGridController extends \Jazzee\AdminController
     fclose($handle);
     $this->setVar('outputType', 'file');
     $this->setVar('type', 'text/xls');
-
     $this->setVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy') . '.xls');
     $this->setVar('filePath', $fileName);
+    $this->loadView('applicants_grid/download');
   }
   
   /**
@@ -269,30 +174,37 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $string .= "\n";
     fwrite($handle, $string);
   }
-
-
+  
   /**
-   * Get application pages
-   * @return array
+   * List all applicants
    */
-  protected function getApplicationPages()
+
+  public function actionDownloadJson()  
   {
-    $applicationPages = array();
-    foreach ($this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findBy(array('application' => $this->_application->getId(), 'kind' => \Jazzee\Entity\ApplicationPage::APPLICATION), array('weight' => 'asc')) as $applicationPage) {
-      if ($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\CsvPage) {
-        $applicationPage->getJazzeePage()->setController($this);
-        $applicationPages[] = $applicationPage;
-      }
+    //use a full applicant display where display is needed
+    $display = new \Jazzee\Display\FullApplication($this->_application);
+    $applicants = explode(',',$this->post['applicantIds']);
+    $applicants = array_slice($applicants, 0, 50);
+    $arr = array();
+    $count = 0;
+    foreach ($applicants as $id) {
+      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display);
+      $arr[] = $this->_application->formatApplicantArray($applicant);
+      $count++;
     }
-    return $applicationPages;
+    $this->setVar('outputType', 'json');
+    $this->setVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy') . '.json');
+    $this->setVar('output', array('applicants' => $arr));
+    $this->loadView('applicants_grid/download');
   }
-
+  
   /**
-   * XML file type
-   * @param array \Jazzee\Entity\Applicant $applicants
+   * List all applicants
    */
-  protected function makeXml(array $applicants)
+
+  public function actionDownloadXml()  
   {
+    $applicants = explode(',',$this->post['applicantIds']);
     $xml = new DOMDocument();
     $xml->formatOutput = true;
     $applicantsXml = $xml->createElement("applicants");
@@ -314,39 +226,19 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->setLayout('xml');
     $this->setLayoutVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy'));
     $this->setVar('xml', $xml);
+    $this->loadView('applicants_grid/download');
   }
-
+  
   /**
-   * JSON file type
-   * @param array \Jazzee\Entity\Applicant $applicants
-   * @param \Jazzee\Entity\Display $display
+   * List all applicants
    */
-  protected function makeJson(array $applicants, \Jazzee\Interfaces\Display $display)
-  {
-    $applicants = array_slice($applicants, 0, 50);
-    $arr = array();
-    $count = 0;
-    foreach ($applicants as $id) {
-      $applicant = $this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display);
-      $arr[] = $this->_application->formatApplicantArray($applicant);
-      $count++;
-    }
-    $this->setVar('outputType', 'json');
-    $this->setVar('filename', $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy') . '.json');
-    $this->setVar('output', array('applicants' => $arr));
-  }
 
-  /**
-   * PDF file type
-   * Create a single large PDF of all applicants
-   * We do this with temporary files because the add from string method leaks
-   * These both leak
-   * $zip->addFromString($directoryName . '/' . $fullName . '.pdf', $pdfResult);
-   * @param array \Jazzee\Entity\Applicant $applicants
-   * @param \Jazzee\Interfaces\Display $display
-   */
-  protected function makePdfArchive(array $applicants, \Jazzee\Interfaces\Display $display)
+  public function actionDownloadPdfArchive()  
   {
+    //use a full applicant display where display is needed
+    $display = new \Jazzee\Display\FullApplication($this->_application);
+    $applicants = explode(',',$this->post['applicantIds']);
+    
     // ensure garbage collection is on, we need it
     gc_enable();
 
@@ -370,22 +262,11 @@ class ApplicantsGridController extends \Jazzee\AdminController
       }
     }
     $zip->close();
-
-    header('Content-Type: ' . 'application/zip');
-    header('Content-Disposition: attachment; filename='. $directoryName . '.zip');
-    header('Content-Transfer-Encoding: binary');
-    // we need this b/c otherwise the readfile call (to write the file
-    // to the client) may attempt to slurp the whole archive and run out of memory.
-    if (ob_get_level()) {
-      ob_end_clean();
-    }
-    header('Content-Length: ' . filesize($zipFile));
-    readfile($zipFile);
-    unlink($zipFile);
-    foreach($tempFileArray as $path){
-      unlink($path);
-    }
-    exit(0);
+    $this->setVar('outputType', 'file');
+    $this->setVar('type', 'application/zip');
+    $this->setVar('filename', $directoryName . '.zip');
+    $this->setVar('filePath', $zipFile);
+    $this->loadView('applicants_grid/download');
   }
   
   /**
@@ -407,14 +288,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $this->post['applicantIds']);
 
     $pages = array();
-    /* for lor x/y ticket, not working yet
-    foreach ($this->_em->getRepository('\Jazzee\Entity\Page')->findByApplication($this->_application) as $page) {
-      if($page instanceof Jazzee\Interfaces\DataPage){
-	$pages[] = $page->toArray();
-      }
-    }
-*/
-
     $this->setVar('result', array('applicants' => $applicants,
 				  'pages' => $pages));
     $this->loadView('applicants_single/result');
@@ -430,7 +303,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay', 'download'))) {
+    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive'))) {
       $action = 'index';
     }
 

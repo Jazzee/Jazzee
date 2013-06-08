@@ -180,41 +180,40 @@ div.form div.control li{
 }
 
 /***** TABLE STYLE *****/
-
-#main table {
+table {
   border-collapse: collapse;
   border: 1px solid #000000;
 
 }
-#main td, #main th {
+td, th {
   padding: .25em;
   border: 1px solid #000000;
 }
 
-#main thead {
+thead {
   background-color: #CCCCCC;
   font-weight: bold;
   border-bottom: 2px solid black;
 }
 
-#main .highlight td{
+.highlight td{
   background-color: #ffcc66;
 }
 
-#main table caption {
+table caption {
   font-weight: bold;
   font-size: 1.2em;
 }
 
-#main table tr.even {
+table tr.even {
   background-color: #fffff;
 }
 
-#main table tr.odd {
+table tr.odd {
   background-color: #eeeeee;
 }
 
-#main div.discussion tr.unread td:first-child{
+div.discussion tr.unread td:first-child{
   padding-left: 20px;
   background-image: url(resource/foundation/media/icons/email_add.png);
   background-repeat: no-repeat;
