@@ -257,7 +257,8 @@ class ApplicantsGridController extends \Jazzee\AdminController
         $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
         $tempFileArray[] = $temp_file_name;
         file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
-        $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . '.pdf');
+        $externalIDSuffix = ($applicantArray['externalId'] != null) ? ' - '.$applicantArray['externalId'] : "";
+        $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . $externalIDSuffix . '.pdf');
         unset($pdf);
       }
     }
