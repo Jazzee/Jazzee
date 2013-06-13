@@ -42,6 +42,11 @@ class Role
    * */
   private $users;
 
+  /**
+   * @OneToOne(targetEntity="Display", mappedBy="role")
+   */
+  protected $display;
+
   public function __construct()
   {
     $this->actions = new \Doctrine\Common\Collections\ArrayCollection();
@@ -189,6 +194,14 @@ class Role
     }
 
     return false;
+  }
+
+  /**
+   * Get the display for a role
+   * @return Display
+   */
+  public function getDisplay(){
+    return $this->display;
   }
 
 }

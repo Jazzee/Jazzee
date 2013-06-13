@@ -48,6 +48,11 @@ Services.prototype.getDisplays = function(){
   return displays;
 };
 
+Services.prototype.getMaximumDisplay = function(){
+  var application = this.getCurrentApplication();
+  return new Display(this.request('maximumDisplay', {}), application);
+};
+
 Services.prototype.getCurrentApplication = function(){
   var result = this.request('currentApplication',{});
   return new Application(result);

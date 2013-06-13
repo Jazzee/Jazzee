@@ -6,7 +6,7 @@ namespace Jazzee\Entity;
  * 
  * Format the display of applicant data
  *
- * @Entity(repositoryClass="\Jazzee\Entity\DisplayRepository")
+ * @Entity
  * @Table(name="displays")
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
@@ -22,6 +22,11 @@ class Display implements \Jazzee\Interfaces\Display
    */
   private $id;
 
+  /**
+   * @Column(type="string")
+   */
+  private $type;
+
   /** @Column(type="string", length=255) */
   private $name;
 
@@ -30,6 +35,12 @@ class Display implements \Jazzee\Interfaces\Display
    * @JoinColumn(onDelete="CASCADE")
    */
   protected $user;
+
+  /**
+   * @OneToOne(targetEntity="Role",inversedBy="display")
+   * @JoinColumn(onDelete="CASCADE")
+   */
+  protected $role;
 
   /**
    * @ManyToOne(targetEntity="Application")
@@ -43,8 +54,16 @@ class Display implements \Jazzee\Interfaces\Display
    */
   private $elements;
 
-  public function __construct()
+  /**
+   * Constructur requires the role type
+   * @param string $type
+   */
+  public function __construct($type)
   {
+    if(!in_array($type, array('user', 'role'))){
+      throw new \Jazzee\Exception("{$type} is not a valid type for Display");
+    }
+    $this->type = $type;
     $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
   }
 
@@ -85,17 +104,49 @@ class Display implements \Jazzee\Interfaces\Display
    */
   public function setUser(User $user)
   {
+    if(!in_array($this->type, array('user'))){
+      throw new \Jazzee\Exception("You cannot set user for Displays that do not have the type 'user'");
+    }
     $this->user = $user;
   }
 
   /**
    * Get user
    *
-   * @return Entity\User $user
+   * @return User $user
    */
   public function getUser()
   {
     return $this->user;
+  }
+
+  /**
+   * Set role
+   *
+   * @param Role $role
+   */
+  public function setRole(Role $role)
+  {
+    if(!in_array($this->type, array('role'))){
+      throw new \Jazzee\Exception("You cannot set role for Displays that do not have the type 'role'");
+    }
+    if($role->isGlobal()){
+      throw new \Jazzee\Exception("Global roles cannot be used for displays");
+    }
+    if(isset($this->application) and $this->application->getProgram()->getId() != $role->getProgram()->getId()){
+      throw new \Jazzee\Exception("Role program / display program mismatch");
+    }
+    $this->role = $role;
+  }
+
+  /**
+   * Get role
+   *
+   * @return Role $role
+   */
+  public function getRole()
+  {
+    return $this->role;
   }
   
   /**
@@ -104,6 +155,9 @@ class Display implements \Jazzee\Interfaces\Display
    * @param Application $application
    */
   public function setApplication(Application $application){
+    if(isset($this->role) and $this->role->getProgram()->getId() != $application->getProgram()->getId()){
+      throw new \Jazzee\Exception("Role program / display program mismatch");
+    }
     $this->application = $application;
   }
 

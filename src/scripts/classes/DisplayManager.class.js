@@ -7,6 +7,7 @@
 function DisplayManager(display, application){
   this.display = display;
   this.application = application;
+  this.services = new Services();
 };
 
 /**
@@ -66,10 +67,11 @@ DisplayManager.prototype.drawChooser = function(){
     return false;
   });
   $('h3',div).append(button);
-  div.append(this.shrinkButton('Applicant', this.applicantBox()));
+  var maximumDisplay = this.services.getMaximumDisplay();
+  div.append(this.shrinkButton('Applicant', this.applicantBox(maximumDisplay)));
   
   $.each(this.application.listApplicationPages(), function(){
-    div.append(self.shrinkButton(this.title, self.pageBox(this)));
+    div.append(self.shrinkButton(this.title, self.pageBox(this, maximumDisplay)));
   });
   
   $('.shrink_button', div).click(function() {
@@ -117,9 +119,9 @@ DisplayManager.prototype.drawChosen = function(){
 /**
  * Draw the applicant box
  * 
- * @param {jQuery} canvas
+ * @param {Display} maximumDisplay
  */
-DisplayManager.prototype.applicantBox = function(){
+DisplayManager.prototype.applicantBox = function(maximumDisplay){
   var self = this;
   var list = $('<ul>').addClass('block_list');
   var arr = [
@@ -133,27 +135,35 @@ DisplayManager.prototype.applicantBox = function(){
     {type:'applicant', title: 'Locked', name: 'isLocked'},
     {type:'applicant', title: 'Paid', name: 'hasPaid'}
   ];
+  var hasItems = false;
   $.each(arr,function(){
-    var li = $('<li>').addClass('item').html(this.title).data('element',this);
-    if(self.display.displayElement(this)){
-      li.addClass('selected');
-      li.bind('click', function(){
-        self.display.removeElement($(this).data('element'));
-        list.replaceWith(self.applicantBox());
-        self.drawChosen();
-      });
-    } else {
-      li.bind('click', function(){
-        var element = $(this).data('element');
-        element.weight = self.nextWeight();
-        self.display.addElement(element);
-        list.replaceWith(self.applicantBox());
-        self.drawChosen();
-      });
+    if(maximumDisplay.displayElement(this)){
+      hasItems = true;
+      var li = $('<li>').addClass('item').html(this.title).data('element',this);
+      if(self.display.displayElement(this)){
+        li.addClass('selected');
+        li.bind('click', function(){
+          self.display.removeElement($(this).data('element'));
+          list.replaceWith(self.applicantBox(maximumDisplay));
+          self.drawChosen();
+        });
+      } else {
+        li.bind('click', function(){
+          var element = $(this).data('element');
+          element.weight = self.nextWeight();
+          self.display.addElement(element);
+          list.replaceWith(self.applicantBox(maximumDisplay));
+          self.drawChosen();
+        });
+      }
+      list.append(li);
     }
-    list.append(li);
   });
-  return $('<div>').append(list);
+  if(hasItems){
+    return $('<div>').append(list);
+  } else {
+    return false;
+  }
 };
 
 /**
@@ -177,8 +187,9 @@ DisplayManager.prototype.shrinkButton = function(title, content){
  * Draw the applicant box
  * 
  * @param {} applicationPage
+ * @param {Display} maximumDisplay
  */
-DisplayManager.prototype.pageBox = function(applicationPage){
+DisplayManager.prototype.pageBox = function(applicationPage, maximumDisplay){
   var self = this;
   var list = $('<ul>').addClass('block_list');
   var pageClass = this.application.getPageClassById(applicationPage.page.id);
@@ -186,29 +197,36 @@ DisplayManager.prototype.pageBox = function(applicationPage){
   if(pageDisplayElements.length == 0){
     return false;
   }
+  var hasItems = false;
   $.each(pageDisplayElements, function(){
-    var li = $('<li>').addClass('item').html(this.title).data('element', this);
-    if(self.display.displayElement(this)){
-      li.addClass('selected');
-      li.bind('click', function(){
-        var element = $(this).data('element');
-        self.display.removeElement(element);
-        list.replaceWith(self.pageBox(applicationPage));
-        self.drawChosen();
-      });
-    } else {
-      li.bind('click', function(){
-        var element = $(this).data('element');
-        element.weight = self.nextWeight();
-        self.display.addElement(element);
-        list.replaceWith(self.pageBox(applicationPage));
-        self.drawChosen();
-      });
+    if(maximumDisplay.displayElement(this)){
+      hasItems = true;
+      var li = $('<li>').addClass('item').html(this.title).data('element', this);
+      if(self.display.displayElement(this)){
+        li.addClass('selected');
+        li.bind('click', function(){
+          var element = $(this).data('element');
+          self.display.removeElement(element);
+          list.replaceWith(self.pageBox(applicationPage, maximumDisplay));
+          self.drawChosen();
+        });
+      } else {
+        li.bind('click', function(){
+          var element = $(this).data('element');
+          element.weight = self.nextWeight();
+          self.display.addElement(element);
+          list.replaceWith(self.pageBox(applicationPage, maximumDisplay));
+          self.drawChosen();
+        });
+      }
+      list.append(li);
     }
-    list.append(li);
   });
-  
-  return $('<div>').append(list);
+  if(hasItems){
+    return $('<div>').append(list);
+  }
+
+  return false;
 };
 
 /**
@@ -219,7 +237,7 @@ DisplayManager.prototype.pageBox = function(applicationPage){
  */
 DisplayManager.save = function(url, display){
   $.ajax({
-    url: url + '/save',
+    url: url + '/saveDisplay',
     type: 'POST',
     data: {display: $.toJSON(display.getObj())},
     async: false
@@ -233,7 +251,7 @@ DisplayManager.save = function(url, display){
  */
 DisplayManager.remove = function(url, display){
   $.ajax({
-    url: url + '/delete',
+    url: url + '/deleteDisplay',
     type: 'POST',
     data: {display: $.toJSON(display.getObj())},
     async: false

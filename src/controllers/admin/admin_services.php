@@ -45,6 +45,18 @@ class AdminServicesController extends \Jazzee\AdminController
           $this->setLayoutVar('status', 'success');
           $result = $this->listDisplays();
           break;
+        case 'maximumDisplay':
+          $this->setLayoutVar('status', 'success');
+          $userMaximumDisplay = $this->_user->getMaximumDisplayForApplication($this->_application);
+          $result = array(
+            'type' => 'maximum',
+            'id'  => $userMaximumDisplay->getId(),
+            'name' => $userMaximumDisplay->getName(),
+            'pageIds' => $userMaximumDisplay->getPageIds(),
+            'elementIds' => $userMaximumDisplay->getElementIds(),
+            'elements' => $userMaximumDisplay->listElements()
+          );
+          break;
         case 'currentApplication':
           if($this->_application){
             $this->setLayoutVar('status', 'success');
