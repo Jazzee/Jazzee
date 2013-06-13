@@ -49,6 +49,6 @@ class Element
     $this->title = $title;
     $this->weight = $weight;
     $this->name = $name;
-    $this->pageId = $pageId;
+    $this->pageId = $type == 'page'?$pageId:null;
   }
 }

@@ -34,10 +34,9 @@ class FullApplication implements \Jazzee\Interfaces\Display
       'isLocked' => 'Locked',
       'hasPaid' => 'Paid'
     );
-    $elements = array();
     $weight = 0;
     foreach($applicantElements as $name => $title){
-      $elements[] = new \Jazzee\Display\Element('applicant', $title, $weight++, $name, null);
+      $this->_elements[] = new \Jazzee\Display\Element('applicant', $title, $weight++, $name, null);
     }
     $pages = array();
     foreach($application->getApplicationPages() as $applicationPage){
@@ -54,7 +53,7 @@ class FullApplication implements \Jazzee\Interfaces\Display
             'title' => $element->getTitle(),
           );
           $this->_elementIds[] = $element->getId();
-          $this->_elements[] = new \Jazzee\Display\Element('page', $element->getTitle(), $weight++, $element->getId(), null);
+          $this->_elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++, $element->getId(), null);
         }
         $pages[] = $pageArr;
       }

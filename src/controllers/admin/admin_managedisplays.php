@@ -25,7 +25,7 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
    */
   public function actionNew()
   {
-    $display = new \Jazzee\Entity\Display;
+    $display = new \Jazzee\Entity\Display('user');
     $display->setName('New');
     $display->setUser($this->_user);
     $display->setApplication($this->_application);
@@ -39,7 +39,7 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
   /**
    * Create a new display
    */
-  public function actionDelete()
+  public function actionDeleteDisplay()
   {
     $obj = json_decode($this->post['display']);
     if($display = $this->_em->getRepository('Jazzee\Entity\Display')->findOneBy(array('id'=>$obj->id, 'user'=>$this->_user))){
@@ -52,7 +52,7 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
   /**
    * Create a new display
    */
-  public function actionSave()
+  public function actionSaveDisplay()
   {
     $obj = json_decode($this->post['display']);
     if($display = $this->_em->getRepository('Jazzee\Entity\Display')->findOneBy(array('id'=>$obj->id, 'user'=>$this->_user))){
@@ -106,7 +106,7 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('save', 'new', 'delete')) AND $user) {
+    if (in_array($action, array('saveDisplay', 'new', 'deleteDisplay')) AND $user) {
       return true;
     }
 

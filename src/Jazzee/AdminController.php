@@ -399,28 +399,35 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
    * @return array
    */
   protected function listDisplays(){
+    $userMaximumDisplay = $this->_user->getMaximumDisplayForApplication($this->_application);
     $displays = array();
-    foreach($this->_em->getRepository('Jazzee\Entity\Display')->findBy(array('user'=>$this->_user, 'application'=>$this->_application)) as $userDisplay){
+    foreach($this->_em->getRepository('Jazzee\Entity\Display')->findBy(array('type'=>'user','user'=>$this->_user, 'application'=>$this->_application)) as $userDisplay){
+      $intersection = new \Jazzee\Display\Intersection();
+      $intersection->addDisplay($userDisplay);
+      $intersection->addDisplay($userMaximumDisplay);
       $displays[] = array(
         'type' => 'user',
         'id'  => $userDisplay->getId(),
         'name' => $userDisplay->getName(),
-        'pageIds' => $userDisplay->getPageIds(),
-        'elementIds' => $userDisplay->getElementIds(),
-        'elements' => $userDisplay->listElements()
+        'pageIds' => $intersection->getPageIds(),
+        'elementIds' => $intersection->getElementIds(),
+        'elements' => $intersection->listElements()
       );
     }
     $systemDisplays = array('\Jazzee\Display\Minimal');
     foreach($systemDisplays as $class){
       $display = new $class($this->_application);
+      $intersection = new \Jazzee\Display\Intersection();
+      $intersection->addDisplay($display);
+      $intersection->addDisplay($userMaximumDisplay);
       $displays[] = array(
         'id' => $display->getId(),
         'type' => 'system',
         'class'  => get_class($display),
         'name'  =>  $display->getName(),
-        'pageIds' => $display->getPageIds(),
-        'elementIds' => $display->getElementIds(),
-        'elements' => $display->listElements()
+        'pageIds' => $intersection->getPageIds(),
+        'elementIds' => $intersection->getElementIds(),
+        'elements' => $intersection->listElements()
       );
     }
     
@@ -428,12 +435,18 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
   }
   
   protected function getDisplay(array $arr){
+    $intersection = new \Jazzee\Display\Intersection();
+    $intersection->addDisplay($this->_user->getMaximumDisplayForApplication($this->_application));
     switch($arr['type']){
       case 'user':
-        return $this->_em->getRepository('Jazzee\Entity\Display')->findOneBy(array('id'=>$arr['id'], 'user'=>$this->_user));
+        $display = $this->_em->getRepository('Jazzee\Entity\Display')->findOneBy(array('id'=>$arr['id'], 'user'=>$this->_user));
+        $intersection->addDisplay($display);
+        return $intersection;
         break;
       case 'system':
-        return new $arr['class']($this->_application);
+        $display = new $arr['class']($this->_application);
+        $intersection->addDisplay($display);
+        return $intersection;
         break;
       default:
         throw new Exception('Unkown display type ' . $arr['type']);

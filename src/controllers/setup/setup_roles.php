@@ -16,6 +16,7 @@ class SetupRolesController extends \Jazzee\AdminController
   const ACTION_EDIT = 'Edit';
   const ACTION_COPY = 'Copy';
   const ACTION_NEW = 'New';
+  const ACTION_GETROLEDISPLAY = 'Set Maximum Display';
   const REQUIRE_APPLICATION = false;
 
   /**
@@ -24,7 +25,36 @@ class SetupRolesController extends \Jazzee\AdminController
   protected function setUp()
   {
     parent::setUp();
+    $this->addScript($this->path('resource/scripts/classes/Display.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/Application.class.js'));
+    $this->addScript($this->path('resource/scripts/classes/DisplayManager.class.js'));
     $this->addScript($this->path('resource/scripts/controllers/setup_roles.controller.js'));
+    
+    $this->addCss($this->path('resource/styles/displaymanager.css'));
+    //add all of the JazzeePage scripts for display
+    $types = $this->_em->getRepository('\Jazzee\Entity\PageType')->findAll();
+    $scripts = array();
+    $scripts[] = $this->path('resource/scripts/page_types/JazzeePage.js');
+    foreach ($types as $type) {
+      $class = $type->getClass();
+      $scripts[] = $this->path($class::pageBuilderScriptPath());
+    }
+
+    //add all of the Jazzee element scripts for data rendering
+    $this->addScript($this->path('resource/scripts/element_types/JazzeeElement.js'));
+
+    $types = $this->_em->getRepository('\Jazzee\Entity\ElementType')->findAll();
+    $scripts[] = $this->path(\Jazzee\Interfaces\Element::PAGEBUILDER_SCRIPT);
+    $scripts[] = $this->path('resource/scripts/element_types/List.js');
+    $scripts[] = $this->path('resource/scripts/element_types/FileInput.js');
+    foreach ($types as $type) {
+      $class = $type->getClass();
+      $scripts[] = $this->path($class::PAGEBUILDER_SCRIPT);
+    }
+    $scripts = array_unique($scripts);
+    foreach ($scripts as $path) {
+      $this->addScript($path);
+    }
   }
 
   /**
@@ -199,6 +229,102 @@ class SetupRolesController extends \Jazzee\AdminController
   }
 
   /**
+   * Set the maximum display for a role
+   * @param integer $roleID
+   */
+  public function actionGetRoleDisplay($roleID)
+  {
+    $this->layout = 'json';
+    if ($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program' => $this->_program->getId()))) {
+      if(!$display = $role->getDisplay()){
+        $display = new \Jazzee\Entity\Display('role');
+        $display->setRole($role);
+        $display->setApplication($this->_application);
+        $display->setName($role->getName() . ' display');
+        $this->_em->persist($display);
+        $this->_em->flush();
+      }
+      $displayArray = array(
+        'type' => 'role',
+        'id'  => $display->getId(),
+        'name' => $display->getName(),
+        'pageIds' => $display->getPageIds(),
+        'elementIds' => $display->getElementIds(),
+        'elements' => $display->listElements(),
+        'roleId'  => $display->getRole()->getId()
+      );
+      $this->setVar('result', $displayArray);
+    } else {
+      $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
+    }
+    $this->loadView('setup_roles/result');
+  }
+
+  /**
+   * Save the display
+   */
+  public function actionSaveDisplay()
+  {
+    $this->layout = 'json';
+    $obj = json_decode($this->post['display']);
+    if ($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $obj->roleId, 'program' => $this->_program->getId())) and $display = $role->getDisplay()) {
+      $display->setName($obj->name);
+      foreach ($display->getElements() as $displayElement) {
+        $display->getElements()->removeElement($displayElement);
+        $this->getEntityManager()->remove($displayElement);
+      }
+      foreach($obj->elements as $eObj){
+        switch($eObj->type){
+          case 'applicant':
+            $displayElement = new \Jazzee\Entity\DisplayElement('applicant');
+            $displayElement->setName($eObj->name);
+            break;
+          case 'element':
+            $displayElement = new \Jazzee\Entity\DisplayElement('element');
+            if(!$element = $this->_application->getElementById($eObj->name)){
+              throw new \Jazzee\Exception("{$eObj->name} is not a valid Jazzee Element ID, so it cannot be used in a 'element' display element.  Element: " . var_export($eObj, true));
+            }
+            $displayElement->setElement($element);
+            break;
+          case 'page':
+            $displayElement = new \Jazzee\Entity\DisplayElement('page');
+            if(!$applicationPage = $this->_application->getApplicationPageByPageId($eObj->pageId)){
+              throw new \Jazzee\Exception("{$eObj->pageId} is not a valid Page ID, so it cannot be used in a 'page' display element.  Element: " . var_export($eObj, true));
+            }
+            $displayElement->setName($eObj->name);
+            $displayElement->setPage($applicationPage->getPage());
+            break;
+          default:
+            throw new \Jazzee\Exception("{$eObj->type} is not a valid DisplayElement type");
+        }
+        $displayElement->setTitle($eObj->title);
+        $displayElement->setWeight($eObj->weight);
+        $display->addElement($displayElement);
+        $this->getEntityManager()->persist($displayElement);
+      }
+      $this->_em->persist($display);
+      $this->addMessage('success', $display->getName() . ' saved');
+    }
+    $this->setVar('result', 'nothing');
+    $this->loadView('setup_roles/result');
+  }
+
+  /**
+   * Delete the role display
+   */
+  public function actionDeleteDisplay()
+  {
+    $this->layout = 'json';
+    $obj = json_decode($this->post['display']);
+    if ($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $obj->roleId, 'program' => $this->_program->getId())) and $display = $role->getDisplay()) {
+      $this->addMessage('success', $display->getName() . ' deleted');
+      $this->getEntityManager()->remove($display);
+    }
+    $this->setVar('result', 'nothing');
+    $this->loadView('setup_roles/result');
+  }
+
+  /**
    * Get All of the possible controllers and actions
    *
    * only allow the ones the user has access to
@@ -226,6 +352,15 @@ class SetupRolesController extends \Jazzee\AdminController
     }
 
     return $controllers;
+  }
+
+  public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
+  {
+    //several views are controller by the complete action
+    if (in_array($action, array('saveDisplay', 'deleteDisplay'))) {
+      $action = 'getRoleDisplay';
+    }
+    return parent::isAllowed($controller, $action, $user, $program, $application);
   }
 
 }

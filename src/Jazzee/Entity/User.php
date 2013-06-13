@@ -372,5 +372,24 @@ class User
 
     return false;
   }
+  
+  
+  public function getMaximumDisplayForApplication(\Jazzee\Entity\Application $application)
+  {
+    $display = new \Jazzee\Display\Union();
+
+    foreach($this->roles as $role){
+      if(!$role->isGlobal() AND $role->getProgram()->getId() == $application->getProgram()->getId()){
+        if($roleDisplay = $role->getDisplay()){
+          $display->addDisplay($roleDisplay);
+        } else {
+          $display->addDisplay(new \Jazzee\Display\FullApplication($application));
+          break; //we interupt the loop here because once we have included a full display there is no reason to continue
+        }
+      }
+    }
+
+    return $display;
+  }
 
 }

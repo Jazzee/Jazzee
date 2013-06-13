@@ -68,39 +68,65 @@ DisplayChooser.prototype.getCurrentDisplay = function(){
 DisplayChooser.prototype.editLink = function(){
   var self = this;
   var a = $('<a>').attr('href', '#').html('edit');
-  a.data('chooser', this);
-  a.bind('click', function(){
-    var div = $('<div>');
-    div.css("overflow-y", "auto");
-    div.dialog({
+  a.on('click', function(){
+    var overlay = $('<div>').attr('id', 'loaddisplayoverlay');
+    overlay.dialog({
+      height: 90,
       modal: true,
-      autoOpen: true,
-      position: 'center',
-      width: '90%',
-      height: 500,
-      close: function() {
-        div.dialog("destroy").remove();
+      autoOpen: false,
+      create: function(event, ui){
+        $(".ui-dialog-titlebar", ui.dialog).hide();
+        var label = $('<div>').addClass('label').html('Loading Display...').css('float', 'left').css('margin','10px 5px');
+        var progressbar = $('<div>').addClass('progress').append(label);
+        overlay.append(progressbar);
+        progressbar.progressbar({value: false});
+        overlay.dialog('open');
       },
-      buttons: [ 
-        {
-          text: "Save", click: function() { 
-            var display = self.getCurrentDisplay();
-            DisplayManager.save(self.services.getControllerPath('admin_managedisplays'),display);
-            $('#displayChooserSelect').replaceWith(self.dropdown());
-            $(this).dialog("destroy").remove();
-            self.chooseDisplay(display.getId());
-        }},
-        {
-          text: "Delete Display", click: function() { 
-            DisplayManager.remove(self.services.getControllerPath('admin_managedisplays'),self.getCurrentDisplay());
-            $('#displayChooserSelect').replaceWith(self.dropdown());
-            self.chooseDisplay('min');
-            $(this).dialog("destroy").remove();
-        }}
-      ]
+      open: function(event, ui){
+        var displayManagerDiv = $('<div>').attr('id', 'displaymanagercontainer');
+        displayManagerDiv.css("overflow-y", "auto");
+        displayManagerDiv.dialog({
+          modal: true,
+          autoOpen: false,
+          position: 'center',
+          width: '90%',
+          height: 500,
+          close: function(event, ui) {
+            displayManagerDiv.dialog("destroy").remove();
+          },
+          create: function(event, ui) {
+            //use a setTimeout here to take this out of the document flow so the overlay gets built and displayed first
+            setTimeout(function(){
+              var displayManager = new DisplayManager(self.getCurrentDisplay(), self.services.getCurrentApplication());
+              displayManager.init($('#displaymanagercontainer'));
+              $('#displaymanagercontainer').dialog('open');
+            }, 1); 
+          },
+          open: function(event, ui) {
+            overlay.dialog('destroy').remove();
+          },
+          buttons: [ 
+            {
+              text: "Save", click: function() { 
+                var display = self.getCurrentDisplay();
+                DisplayManager.save(self.services.getControllerPath('admin_managedisplays'),display);
+                $('#displayChooserSelect').replaceWith(self.dropdown());
+                $(this).dialog("destroy").remove();
+                self.chooseDisplay(display.getId());
+            }},
+            {
+              text: "Delete Display", click: function() { 
+                DisplayManager.remove(self.services.getControllerPath('admin_managedisplays'),self.getCurrentDisplay());
+                $('#displayChooserSelect').replaceWith(self.dropdown());
+                self.chooseDisplay('min');
+                $(this).dialog("destroy").remove();
+            }}
+          ]
+        });
+        
+      }
     });
-    var displayManager = new DisplayManager($(this).data('chooser').getCurrentDisplay(), self.services.getCurrentApplication());
-    displayManager.init(div);
+    
     return false;
   });
   
