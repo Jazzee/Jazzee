@@ -93,7 +93,7 @@ PageBuilder.prototype.setup = function(){
           progressbar.data('pageBuilder', pageBuilder);
           overlay.append(progressbar);
           progressbar.progressbar({
-            max: toSave.length-1,
+            max: toSave.length,
             value: 0,
             complete: function(event,ui){
               var bar = $('#savepageoverlay div.progress');
