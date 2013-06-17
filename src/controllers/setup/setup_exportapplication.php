@@ -85,8 +85,7 @@ class SetupExportApplicationController extends \Jazzee\AdminController
       foreach ($element->getListItems() as $item) {
         //only export active items
         if ($item->isActive()) {
-          $ixml = $dom->createElement('item');
-          $ixml->nodeValue = htmlentities($item->getValue(), ENT_COMPAT, 'utf-8');
+          $ixml = $this->createCdataElement($dom, 'item', $item->getValue());
           $ixml->setAttribute('active', (integer) $item->isActive());
           $ixml->setAttribute('weight', $item->getWeight());
           $ixml->setAttribute('name', $item->getName());
