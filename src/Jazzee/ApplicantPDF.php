@@ -87,7 +87,7 @@ class ApplicantPDF
     $this->pdf = new \PDFlib();
     if ($key) {
       try {
-        $this->pdf->set_parameter("license", $key);
+        $this->pdf->set_option("license={$key}");
       } catch (PDFlibException $e) {
         throw new Exception("Unable to validate PDFLib license key, check that your PDFLib version is compatible with your key: " . $e->getMessage());
       }

@@ -64,7 +64,7 @@ class TemplatePDF
     $pdf = new \PDFlib();
     if ($this->_licenseKey) {
       try {
-        $pdf->set_parameter("license", $this->_licenseKey);
+        $pdf->set_option("license={$this->_licenseKey}");
       } catch (PDFlibException $e) {
         throw new Exception("Unable to validate PDFLib license key, check that your PDFLib version is compatible with your key: " . $e->getMessage());
       }
