@@ -34,8 +34,11 @@ class Defaults extends \Symfony\Component\Console\Command\Command
     $pageTypes = array(
       '\Jazzee\Page\Branching' => 'Branching',
       '\Jazzee\Page\ETSMatch' => 'ETS Score Matching',
+      '\Jazzee\Page\Education' => 'Education',
+      '\Jazzee\Page\ExternalId' => 'External ID',
       '\Jazzee\Page\Lock' => 'Lock Application',
       '\Jazzee\Page\Payment' => 'Payment',
+      '\Jazzee\Page\QASAddress' => 'Address Verification QAS',
       '\Jazzee\Page\Recommenders' => 'Recommenders',
       '\Jazzee\Page\Standard' => 'Standard',
       '\Jazzee\Page\Text' => 'Plain Text'
@@ -58,10 +61,12 @@ class Defaults extends \Symfony\Component\Console\Command\Command
       '\Jazzee\Element\Phonenumber' => 'Phone Number',
       '\Jazzee\Element\RadioList' => 'Radio Buttons',
       '\Jazzee\Element\RankingList' => 'Rank Order Dropdown',
+      '\Jazzee\Element\SearchList' => 'Search',
       '\Jazzee\Element\SelectList' => 'Dropdown List',
       '\Jazzee\Element\ShortDate' => 'Short Date',
       '\Jazzee\Element\TextInput' => 'Single Line Text',
-      '\Jazzee\Element\Textarea' => 'Text Area'
+      '\Jazzee\Element\Textarea' => 'Text Area',
+      '\Jazzee\Element\USSocialSecurityNumber' => 'US Social Security Number',
     );
     foreach ($elementTypes as $class => $name) {
       $elementType = new \Jazzee\Entity\ElementType();
