@@ -37,10 +37,10 @@ JazzeeElementTextInput.prototype.elementProperties = function(){
     step: 5,
     slide: function( event, ui ) {
       elementClass.setProperty('min', ui.value);
-      $('#minValue').html(elementClass.min);
+      $('#minValue'+elementClass.id).html(elementClass.min);
     }
   });
-  div.append($('<p>').html('Minimum Length ').append($('<span>').attr('id', 'minValue').html(elementClass.min)));
+  div.append($('<p>').html('Minimum Length ').append($('<span>').attr('id', 'minValue'+elementClass.id).html(elementClass.min)));
   div.append(slider);
   
   var slider = $('<div>');
@@ -51,10 +51,10 @@ JazzeeElementTextInput.prototype.elementProperties = function(){
     step: 5,
     slide: function( event, ui ) {
       elementClass.setProperty('max', ui.value);
-      $('#maxvalue').html(elementClass.max);
+      $('#maxvalue'+elementClass.id).html(elementClass.max);
     }
   });
-  div.append($('<p>').html('Maximum Length ').append($('<span>').attr('id', 'maxvalue').html(elementClass.max)));
+  div.append($('<p>').html('Maximum Length ').append($('<span>').attr('id', 'maxvalue'+elementClass.id).html(elementClass.max)));
   div.append(slider);
   
   return div;

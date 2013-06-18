@@ -30,8 +30,8 @@ JazzeeElementTextarea.prototype.elementProperties = function(){
  */
 JazzeeElementTextarea.prototype.createSlider = function(property, title){
   var elementClass = this;
-  var div = $('<div>').attr('id', property + 'slider');
-  var link = $('<a>').attr('href', '#').attr('id', property + 'Value').html(elementClass[property]).bind('click', function(){
+  var div = $('<div>').attr('id', property + 'slider' + elementClass.id);
+  var link = $('<a>').attr('href', '#').attr('id', property + 'Value' + elementClass.id).html(elementClass[property]).bind('click', function(){
     $('#' + property + 'slider').replaceWith(elementClass.createInput(property, title));
     return false;
   });
@@ -45,7 +45,7 @@ JazzeeElementTextarea.prototype.createSlider = function(property, title){
     step: 100,
     slide: function( event, ui ) {
       elementClass.setProperty(property, ui.value);
-      $('#' + property + 'Value').html(elementClass[property]);
+      $('#' + property + 'Value' + elementClass.id).html(elementClass[property]);
     }
   });
   div.append(slider);
