@@ -77,6 +77,7 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
             print "/{$currentAnswerID}";
           }?>');
           form.append($('<input>').attr('type', 'hidden').attr('name', 'picklistMoniker').val("<?php echo $picklist->sPicklistMoniker ?>"));
+          form.append($('<input>').attr('type', 'hidden').attr('name', 'originalInput').val("<?php print $originalInput ?>"));
           form.append($('<input>').attr('type', 'hidden').attr('name', 'addressMoniker'));
           $('body').append(form);
           var addresses = [];<?php
