@@ -35,10 +35,10 @@ JazzeeElementPDFFileInput.prototype.elementProperties = function(){
  */
 JazzeeElementPDFFileInput.prototype.createSlider = function(property, title){
   var elementClass = this;
-  var div = $('<div>').attr('id', property + 'slider');
+  var div = $('<div>').attr('id', property + 'slider'+elementClass.id);
   var value = (elementClass[property]/1048576).toFixed(1);
-  var link = $('<a>').attr('href', '#').attr('id', property + 'Value').html(value).bind('click', function(){
-    $('#' + property + 'slider').replaceWith(elementClass.createInput(property, title));
+  var link = $('<a>').attr('href', '#').attr('id', property + 'Value'+elementClass.id).html(value).bind('click', function(){
+    $('#' + property + 'slider'+elementClass.id).replaceWith(elementClass.createInput(property, title));
     return false;
   });
   div.append($('<p>').html(title + ' File Size ').append(link).append('mb'));
@@ -51,7 +51,7 @@ JazzeeElementPDFFileInput.prototype.createSlider = function(property, title){
     step: .5,
     slide: function( event, ui ) {
       elementClass.setProperty(property, ui.value * 1048576);
-      $('#' + property + 'Value').html(ui.value);
+      $('#' + property + 'Value'+elementClass.id).html(ui.value);
     }
   });
   div.append(slider);
@@ -64,17 +64,17 @@ JazzeeElementPDFFileInput.prototype.createSlider = function(property, title){
  */
 JazzeeElementPDFFileInput.prototype.createInput = function(property, title){
   var elementClass = this;
-  var div = $('<div>').attr('id', property + 'slider');
-  var link = $('<a>').attr('href', '#').attr('id', property + 'Value').html(elementClass[property]).bind('click', function(){
-    $('#' + property + 'slider').replaceWith(elementClass.createSlider(property, title));
+  var div = $('<div>').attr('id', property + 'slider'+elementClass.id);
+  var link = $('<a>').attr('href', '#').attr('id', property + 'Value'+elementClass.id).html(elementClass[property]).bind('click', function(){
+    $('#' + property + 'slider'+elementClass.id).replaceWith(elementClass.createSlider(property, title));
     return false;
   });
   div.append($('<p>').html(title + ' File Size ').append(link).append('bytes'));
   
-  var input = $('<input>').attr('type', 'text'). attr('size', 7).attr('id', property + 'Input').attr('value', elementClass[property]);
+  var input = $('<input>').attr('type', 'text'). attr('size', 7).attr('id', property + 'Input'+elementClass.id).attr('value', elementClass[property]);
   input.bind('change', function(){
     elementClass.setProperty(property, $(this).val());
-    $('#' + property + 'Value').html(elementClass[property]);
+    $('#' + property + 'Value'+elementClass.id).html(elementClass[property]);
   });
   div.append(input);
   this.page.pageBuilder.addNumberTest(input);

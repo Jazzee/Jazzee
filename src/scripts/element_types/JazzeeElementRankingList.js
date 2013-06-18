@@ -39,7 +39,7 @@ JazzeeElementRankingList.prototype.avatar = function(){
 JazzeeElementRankingList.prototype.elementProperties = function(){
   var elementClass = this;
   var div = List.prototype.elementProperties.call(this);
-  
+
   var slider = $('<div>');
   slider.slider({
     value: elementClass.min,
@@ -48,12 +48,12 @@ JazzeeElementRankingList.prototype.elementProperties = function(){
     step: 1,
     slide: function( event, ui ) {
       elementClass.setProperty('min', ui.value);
-      $('#minValue').html(elementClass.min);
+      $('#minValue'+elementClass.id).html(elementClass.min);
     }
   });
-  div.append($('<p>').html('Minimum Rankings Required ').append($('<span>').attr('id', 'minValue').html(elementClass.min)));
+  div.append($('<p>').html('Minimum Rankings Required ').append($('<span>').attr('id', 'minValue'+elementClass.id).html(elementClass.min)));
   div.append(slider);
-  
+
   var slider = $('<div>');
   slider.slider({
     value: elementClass.max,
@@ -62,11 +62,11 @@ JazzeeElementRankingList.prototype.elementProperties = function(){
     step: 1,
     slide: function( event, ui ) {
       elementClass.setProperty('max', ui.value);
-      $('#maxvalue').html(elementClass.max);
+      $('#maxvalue'+elementClass.id).html(elementClass.max);
     }
   });
-  div.append($('<p>').html('Maximum Rankings Allowed ').append($('<span>').attr('id', 'maxvalue').html(elementClass.max)));
+  div.append($('<p>').html('Maximum Rankings Allowed ').append($('<span>').attr('id', 'maxvalue'+elementClass.id).html(elementClass.max)));
   div.append(slider);
-  
+
   return div;
 };
