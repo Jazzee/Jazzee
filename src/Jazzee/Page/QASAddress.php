@@ -38,7 +38,7 @@ class QASAddress extends Standard
     $field->setInstructions($this->_applicationPage->getInstructions());
 
     $element = $field->newElement('TextInput', 'address3');
-    $element->setLabel('company name, department, c/o, etc');
+    $element->setLabel('company name, department, etc');
 
     $element = $field->newElement('TextInput', 'address1');
     $element->setLabel('Address 1');
@@ -119,7 +119,7 @@ class QASAddress extends Standard
 
     $element = new \Jazzee\Entity\Element;
     $element->setType($elementTypes['\Jazzee\Element\TextInput']);
-    $element->setTitle('company name, department, c/o, etc');
+    $element->setTitle('Address 3');
     $element->setWeight(1);
     $element->setFixedId(self::FID_ADDRESS3);
     $this->_applicationPage->getPage()->addElement($element);
