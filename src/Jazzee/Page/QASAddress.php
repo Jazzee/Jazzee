@@ -23,11 +23,24 @@ class QASAddress extends Standard
   const FID_COUNTRY = 12;
   const FID_POSTALCODE = 14;
 
+  protected static $_countries = array("United States","Afghanistan","Aland Islands","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antarctica","Antigua And Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia And Herzegowina","Botswana","Bouvet Island","Brazil","British Indian Ocean Territory","Brunei Darussalam","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Cocos (Keeling) Islands","Colombia","Comoros","Congo","Congo, The Democratic Republic Of The","Cook Islands","Costa Rica","Cote D'Ivoire","Croatia (Local Name: Hrvatska)","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands (Malvinas)","Faroe Islands","Fiji","Finland","France","French Guiana","French Polynesia","French Southern Territories","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guadeloupe","Guam","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Heard And McDonald Islands","Holy See (Vatican City State)","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran (Islamic Republic Of)","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Korea, Democratic People's Republic Of","Korea, Republic Of","Kuwait","Kyrgyzstan","Lao People's Democratic Republic","Latvia","Lebanon","Lesotho","Liberia","Libyan Arab Jamahiriya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia, The Former Yugoslav Republic Of","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Martinique","Mauritania","Mauritius","Mayotte","Mexico","Micronesia, Federated States Of","Moldova, Republic Of","Monaco","Montenegro","Mongolia","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands, The","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Niue","Norfolk Island","Northern Mariana Islands","Norway","Oman","Pakistan","Palau","Palestinian Territory","Panama","Papua New Guinea","Paraguay","Peru","Philippines, The","Pitcairn","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russian Federation","Rwanda","Saint Kitts And Nevis","Saint Lucia","Saint Vincent And The Grenadines","Samoa","San Marino","Sao Tome And Principe","Saudi Arabia","Serbia","Senegal","Seychelles","Sierra Leone","Singapore","Slovakia (Slovak Republic)","Slovenia","Solomon Islands","Somalia","South Africa","South Georgia And The South Sandwich Islands","Spain","Sri Lanka","St. Helena","St. Pierre And Miquelon","Sudan","Suriname","Svalbard And Jan Mayen Islands","Swaziland","Sweden","Switzerland","Syrian Arab Republic","Taiwan","Tajikistan","Tanzania, United Republic Of","Thailand","Timor-Leste","Togo","Tokelau","Tonga","Trinidad And Tobago","Tunisia","Turkey","Turkmenistan","Turks And Caicos Islands","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States Minor Outlying Islands","Uruguay","Uzbekistan","Vanuatu","Venezuela","Vietnam","Virgin Islands (British)","Virgin Islands (U.S.)","Wallis And Futuna Islands","Western Sahara","Yemen","Zambia","Zimbabwe");
+  
   /**
    *
    * Enter description here ...
    */
   protected function makeForm()
+  {
+    return $this->selectCountryForm();
+  }
+  
+  /**
+   * Select a country is the first form shown so validation and elements can 
+   * be specified for different countries
+   * 
+   * @return \Foundation\Form
+   */
+  protected function selectCountryForm()
   {
     $this->_controller->setVar('confirm', false);
     $form = new \Foundation\Form;
@@ -37,50 +50,78 @@ class QASAddress extends Standard
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
 
-    $element = $field->newElement('TextInput', 'address3');
-    $element->setLabel('company name, department, etc');
-
-    $element = $field->newElement('TextInput', 'address1');
-    $element->setLabel('Address 1');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-
-    $element = $field->newElement('TextInput', 'address2');
-    $element->setLabel('Address 2');
-
-    $element = $field->newElement('TextInput', 'city');
-    $element->setLabel('City');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-
-    $element = $field->newElement('TextInput', 'state');
-    $element->setLabel('State');
-
-    $element = $field->newElement('TextInput', 'postalCode');
-    $element->setLabel('ZIP or Postal Code');
-    $element->setFormat('');
-    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 60));
-
     $element = $field->newElement('SelectList', 'country');
     $element->setLabel('Country');
-    $countries = array('USA' => "United States", 'AFG' => "Afghanistan", 'ALA' => "Aland Islands", 'ALB' => "Albania", 'DZA' => "Algeria", 'ASM' => "American Samoa", 'AND' => "Andorra", 'AGO' => "Angola", 'AIA' => "Anguilla", 'ATA' => "Antarctica", 'ATG' => "Antigua And Barbuda", 'ARG' => "Argentina", 'ARM' => "Armenia", 'ABW' => "Aruba", 'AUS' => "Australia", 'AUT' => "Austria", 'AZE' => "Azerbaijan", 'BHS' => "Bahamas", 'BHR' => "Bahrain", 'BGD' => "Bangladesh", 'BRB' => "Barbados", 'BLR' => "Belarus", 'BEL' => "Belgium", 'BLZ' => "Belize", 'BEN' => "Benin", 'BMU' => "Bermuda", 'BTN' => "Bhutan", 'BOL' => "Bolivia", 'BIH' => "Bosnia And Herzegowina", 'BWA' => "Botswana", 'BVT' => "Bouvet Island", 'BRA' => "Brazil", 'IOT' => "British Indian Ocean Territory", 'BRN' => "Brunei Darussalam", 'BGR' => "Bulgaria", 'BFA' => "Burkina Faso", 'BDI' => "Burundi", 'KHM' => "Cambodia", 'CMR' => "Cameroon", 'CAN' => "Canada", 'CPV' => "Cape Verde", 'CYM' => "Cayman Islands", 'CAF' => "Central African Republic", 'TCD' => "Chad", 'CHL' => "Chile", 'CHN' => "China", 'CXR' => "Christmas Island", 'CCK' => "Cocos (Keeling) Islands", 'COL' => "Colombia", 'COM' => "Comoros", 'COG' => "Congo", 'COD' => "Congo, The Democratic Republic Of The", 'COK' => "Cook Islands", 'CRI' => "Costa Rica", 'CIV' => "Cote D'Ivoire", 'HRV' => "Croatia (Local Name: Hrvatska)", 'CUB' => "Cuba", 'CYP' => "Cyprus", 'CZE' => "Czech Republic", 'DNK' => "Denmark", 'DJI' => "Djibouti", 'DMA' => "Dominica", 'DOM' => "Dominican Republic", 'ECU' => "Ecuador", 'EGY' => "Egypt", 'SLV' => "El Salvador", 'GNQ' => "Equatorial Guinea", 'ERI' => "Eritrea", 'EST' => "Estonia", 'ETH' => "Ethiopia", 'FLK' => "Falkland Islands (Malvinas)", 'FRO' => "Faroe Islands", 'FJI' => "Fiji", 'FIN' => "Finland", 'FRP' => "France", 'GUF' => "French Guiana", 'PYF' => "French Polynesia", 'ATF' => "French Southern Territories", 'GAB' => "Gabon", 'GMB' => "Gambia", 'GEO' => "Georgia", 'DEU' => "Germany", 'GHA' => "Ghana", 'GIB' => "Gibraltar", 'GRC' => "Greece", 'GRL' => "Greenland", 'GRD' => "Grenada", 'GLP' => "Guadeloupe", 'GUM' => "Guam", 'GTM' => "Guatemala", 'GIN' => "Guinea", 'GNB' => "Guinea-Bissau", 'GUY' => "Guyana", 'HTI' => "Haiti", 'HMD' => "Heard And McDonald Islands", 'VAT' => "Holy See (Vatican City State)", 'HND' => "Honduras", 'HKG' => "Hong Kong", 'HUN' => "Hungary", 'ISL' => "Iceland", 'IND' => "India", 'IDN' => "Indonesia", 'IRN' => "Iran (Islamic Republic Of)", 'IRQ' => "Iraq", 'IRL' => "Ireland", 'ISR' => "Israel", 'ITA' => "Italy", 'JAM' => "Jamaica", 'JPN' => "Japan", 'JOR' => "Jordan", 'KAZ' => "Kazakhstan", 'KEN' => "Kenya", 'KIR' => "Kiribati", 'PRK' => "Korea, Democratic People's Republic Of", 'KOR' => "Korea, Republic Of", 'KWT' => "Kuwait", 'KGZ' => "Kyrgyzstan", 'LAO' => "Lao People's Democratic Republic", 'LVA' => "Latvia", 'LBN' => "Lebanon", 'LSO' => "Lesotho", 'LBR' => "Liberia", 'LBY' => "Libyan Arab Jamahiriya", 'LIE' => "Liechtenstein", 'LTU' => "Lithuania", 'LUX' => "Luxembourg", 'MAC' => "Macau", 'MKD' => "Macedonia, The Former Yugoslav Republic Of", 'MDG' => "Madagascar", 'MWI' => "Malawi", 'MYS' => "Malaysia", 'MDV' => "Maldives", 'MLI' => "Mali", 'MLT' => "Malta", 'MHL' => "Marshall Islands", 'MTQ' => "Martinique", 'MRT' => "Mauritania", 'MUS' => "Mauritius", 'MYT' => "Mayotte", 'MEX' => "Mexico", 'FSM' => "Micronesia, Federated States Of", 'MDA' => "Moldova, Republic Of", 'MCO' => "Monaco", 'MNE' => "Montenegro", 'MNG' => "Mongolia", 'MSR' => "Montserrat", 'MAR' => "Morocco", 'MOZ' => "Mozambique", 'MMR' => "Myanmar", 'NAM' => "Namibia", 'NRU' => "Nauru", 'NPL' => "Nepal", 'NLD' => "Netherlands, The", 'ANT' => "Netherlands Antilles", 'NCL' => "New Caledonia", 'NZL' => "New Zealand", 'NIC' => "Nicaragua", 'NER' => "Niger", 'NGA' => "Nigeria", 'NIU' => "Niue", 'NFK' => "Norfolk Island", 'MNP' => "Northern Mariana Islands", 'NOR' => "Norway", 'OMN' => "Oman", 'PAK' => "Pakistan", 'PLW' => "Palau", 'PSE' => "Palestinian Territory", 'PAN' => "Panama", 'PNG' => "Papua New Guinea", 'PRY' => "Paraguay", 'PER' => "Peru", 'PHL' => "Philippines, The", 'PCN' => "Pitcairn", 'POL' => "Poland", 'PRT' => "Portugal", 'PRI' => "Puerto Rico", 'QAT' => "Qatar", 'REU' => "Reunion", 'ROM' => "Romania", 'RUS' => "Russian Federation", 'RWA' => "Rwanda", 'KNA' => "Saint Kitts And Nevis", 'LCA' => "Saint Lucia", 'VCT' => "Saint Vincent And The Grenadines", 'WSM' => "Samoa", 'SMR' => "San Marino", 'STP' => "Sao Tome And Principe", 'SAU' => "Saudi Arabia", 'SRB' => "Serbia", 'SEN' => "Senegal", 'SYC' => "Seychelles", 'SLE' => "Sierra Leone", 'SGF' => "Singapore", 'SVK' => "Slovakia (Slovak Republic)", 'SVN' => "Slovenia", 'SLB' => "Solomon Islands", 'SOM' => "Somalia", 'ZAF' => "South Africa", 'SGS' => "South Georgia And The South Sandwich Islands", 'ESP' => "Spain", 'LKA' => "Sri Lanka", 'SHN' => "St. Helena", 'SPM' => "St. Pierre And Miquelon", 'SDN' => "Sudan", 'SRB' => "Serbia", 'SUR' => "Suriname", 'SJM' => "Svalbard And Jan Mayen Islands", 'SWZ' => "Swaziland", 'SWE' => "Sweden", 'CHE' => "Switzerland", 'SYR' => "Syrian Arab Republic", 'TWN' => "Taiwan", 'TJK' => "Tajikistan", 'TZA' => "Tanzania, United Republic Of", 'THA' => "Thailand", 'TLS' => "Timor-Leste", 'TGO' => "Togo", 'TKL' => "Tokelau", 'TON' => "Tonga", 'TTO' => "Trinidad And Tobago", 'TUN' => "Tunisia", 'TUR' => "Turkey", 'TKM' => "Turkmenistan", 'TCA' => "Turks And Caicos Islands", 'TUV' => "Tuvalu", 'UGA' => "Uganda", 'UKR' => "Ukraine", 'ARE' => "United Arab Emirates", 'GBR' => "United Kingdom", 'UMI' => "United States Minor Outlying Islands", 'URY' => "Uruguay", 'UZB' => "Uzbekistan", 'VUT' => "Vanuatu", 'VEN' => "Venezuela", 'VNM' => "Vietnam", 'VGB' => "Virgin Islands (British)", 'VIR' => "Virgin Islands (U.S.)", 'WLF' => "Wallis And Futuna Islands", 'ESH' => "Western Sahara", 'YEM' => "Yemen", 'ZMB' => "Zambia", 'ZWE' => "Zimbabwe");
-    foreach ($countries as $value => $label) {
+    foreach (self::$_countries as $value => $label) {
       $element->newItem($value, $label);
     }
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-    $form->newButton('submit', 'Save');
+    $form->newHiddenElement('level', 1);
+    $form->newButton('submit', 'Next');
 
     return $form;
   }
 
   public function validateInput($arr)
   {
-    if ($input = $this->getForm()->processInput($arr)) {
-      return $this->validateAddress($input);
+    if ($input = $this->selectCountryForm()->processInput($arr)) {
+      $countryName = $this->selectCountryForm()->getElementByName('country')->getLabelForValue($input->get('country'));
+      $form = $this->getFormForCountry($countryName);
+      $form->newHiddenElement('countryName', $countryName);
+      $form->newHiddenElement('country', $input->get('country'));
+      $this->_form = $form;
+      if ($input->get('level') == 1) {
+        $this->_controller->setVar('confirm', false);
+        return false;
+      } else {
+        if ($input = $this->_form->processInput($arr)) {
+          return $this->validateAddress($input);
+        }
+      }
     }
 
     return false;
   }
 
+  /**
+   * Get the form for a country
+   * @param string $countryCode
+   * @return \Fondation\Form
+   */
+  protected function getFormForCountry($countryName)
+  {
+    $specialCountryForms = array(
+      'United States' => 'usAddressForm'
+    );
+    if(array_key_exists($countryName, $specialCountryForms) and method_exists($this, $specialCountryForms[$countryName])){
+      $form = $this->$specialCountryForms[$countryName]();
+    } else {
+      $form = $this->defaultAddressForm();
+    }
+
+    return $form;
+  }
+
+  /**
+   * Get the form for a country
+   * @param string $countryCode
+   * @return \Fondation\Form
+   */
+  protected function getQASCodeForCountry($country)
+  {
+    $qasCountries = array('United States' => 'USA');
+    if(array_key_exists($country, $qasCountries)){
+      return $qasCountries[$country];
+    }
+
+    return null;
+  }
+
+  /**
+   * Pick the address form from the country and fill it with data
+   * @param int $answerId
+   */
   public function fill($answerId)
   {
     if ($answer = $this->_applicant->findAnswerById($answerId)) {
@@ -90,18 +131,30 @@ class QASAddress extends Standard
         self::FID_ADDRESS3 => 'address3',
         self::FID_CITY => 'city',
         self::FID_STATE => 'state',
-        self::FID_POSTALCODE => 'postalCode',
-        self::FID_COUNTRY => 'country'
+        self::FID_POSTALCODE => 'postalCode'
       );
+      $element = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY);
+      $element->getJazzeeElement()->setController($this->_controller);
+      $countryName = $element->getJazzeeElement()->formValue($answer);
+      $country = array_search($countryName, self::$_countries);
+      if($country === false){
+        $this->_controller->addMessage('error', "This address cannot be edited, you will need to delete it and add it again.");
+        $this->_controller->redirectPath($this->_controller->getActionPath());
+      }
+      $form = $this->getFormForCountry($countryName);
+      $form->setAction($this->_controller->getActionPath() . "/edit/{$answerId}");
+      $form->newHiddenElement('countryName', $countryName);
+      $form->newHiddenElement('country', $country);
+      $this->_controller->setVar('confirm', false);
       foreach ($fixedElements as $fid => $name) {
         $element = $this->_applicationPage->getPage()->getElementByFixedId($fid);
         $element->getJazzeeElement()->setController($this->_controller);
         $value = $element->getJazzeeElement()->formValue($answer);
-        if ($value) {
-          $this->getForm()->getElementByName($name)->setValue($value);
+        if ($value and $formElement = $form->getElementByName($name)) {
+          $formElement->setValue($value);
         }
       }
-      $this->getForm()->setAction($this->_controller->getActionPath() . "/edit/{$answerId}");
+      $this->_form = $form;
     }
   }
 
@@ -209,16 +262,15 @@ class QASAddress extends Standard
         }
       }
     }
-    $country = $input->get('country');
+    $countryName = $input->get('countryName');
     $countriesToValidate = explode(',', $this->_applicationPage->getPage()->getVar('validatedCountries'));
-    if ($sameUserInput or !in_array($country, $countriesToValidate)) {
+    if ($sameUserInput or !in_array($this->getQASCodeForCountry($countryName), $countriesToValidate)) {
       $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId(), $input->get('address1'));
       $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId(), $input->get('address2'));
       $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $input->get('address3'));
       $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId(), $input->get('city'));
       $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId(), $input->get('state'));
       $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId(), $input->get('postalCode'));
-      $countryName = $this->getForm()->getElementByName('country')->getLabelForValue($input->get('country'));
       $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $countryName);
 
       return $input;
@@ -231,7 +283,7 @@ class QASAddress extends Standard
     $search[2] = $input->get('city');
     $search[3] = $input->get('state');
     $search[4] = $input->get('postalCode');
-    
+
     //Create the QuickAddress Object and set the engine and picklist type
     $qas = new \QuickAddress($this->_applicationPage->getPage()->getVar('wsdlAddress'));
     $qas->setEngineType(QAS_VERIFICATION_ENGINE);
@@ -239,7 +291,7 @@ class QASAddress extends Standard
 
 
     //Perform the search itself
-    $result = $qas->search($country, $search, QAS_DEFAULT_PROMPT, "Database layout");
+    $result = $qas->search($this->getQASCodeForCountry($countryName), $search, QAS_DEFAULT_PROMPT, "Database layout");
     switch ($result->sVerifyLevel) {
       case 'Verified':
         $arr = $result->address->atAddressLines;
@@ -249,7 +301,7 @@ class QASAddress extends Standard
         $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId(), $arr[3]->Line);
         $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId(), $arr[4]->Line);
         $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId(), $arr[5]->Line);
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $arr[6]->Line);
+        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $countryName);
 
         return $input;
           break;
@@ -257,7 +309,7 @@ class QASAddress extends Standard
         $this->_controller->addMessage('error', 'We were unable to validate your address.');
         $this->_controller->setVar('confirm', true);
         $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
-        $this->_form->newHiddenElement('originalInput', base64_encode(serialize($input)));
+        $this->_controller->setVar('originalInput', base64_encode(serialize($input)));
         $this->_controller->setVar('picklist', $result->picklist);
           break;
       case 'StreetPartial':
@@ -320,20 +372,112 @@ class QASAddress extends Standard
     $qas = new \QuickAddress($this->_applicationPage->getPage()->getVar('wsdlAddress'));
     $address = $qas->getFormattedAddress("Database layout", $postData['addressMoniker']);
     $arr = $address->atAddressLines;
+    $originalInput = unserialize(base64_decode($postData['originalInput']));
     $input = new \Foundation\Form\Input($postData);
     $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId(), $arr[0]->Line);
     $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId(), $arr[1]->Line);
-    $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $input->get('address3'));
+    $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $originalInput->get('address3'));
     $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId(), $arr[3]->Line);
     $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId(), $arr[4]->Line);
     $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId(), $arr[5]->Line);
-    $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $arr[6]->Line);
+    $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $originalInput->get('countryName'));
     if (!empty($answerId)) {
       $this->updateAnswer($input, $answerId);
       $this->_controller->setVar('currentAnswerID', null);
     } else {
       $this->newAnswer($input);
     }
+  }
+
+  /**
+   * The Address form for the united stated
+   * 
+   * @return \Foundation\Form
+   */
+  protected function usAddressForm()
+  {
+    $form = new \Foundation\Form;
+    $form->setAction($this->_controller->getActionPath());
+    $form->setCSRFToken($this->_controller->getCSRFToken());
+    $field = $form->newField();
+    $field->setLegend($this->_applicationPage->getTitle());
+    $field->setInstructions($this->_applicationPage->getInstructions());
+
+    $element = $field->newElement('TextInput', 'address3');
+    $element->setLabel('company name, department, etc');
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('TextInput', 'address1');
+    $element->setLabel('Address 1');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('TextInput', 'address2');
+    $element->setLabel('Address 2');
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('TextInput', 'city');
+    $element->setLabel('City');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('SelectList', 'state');
+    $element->setLabel('State');
+    $states = array('AL'=>"Alabama",'AK'=>"Alaska",'AZ'=>"Arizona",'AR'=>"Arkansas",'CA'=>"California",'CO'=>"Colorado",'CT'=>"Connecticut",'DE'=>"Delaware",'DC'=>"District Of Columbia",'FL'=>"Florida",'GA'=>"Georgia",'HI'=>"Hawaii",'ID'=>"Idaho",'IL'=>"Illinois",'IN'=>"Indiana",'IA'=>"Iowa",'KS'=>"Kansas",'KY'=>"Kentucky",'LA'=>"Louisiana",'ME'=>"Maine",'MD'=>"Maryland",'MA'=>"Massachusetts",'MI'=>"Michigan",'MN'=>"Minnesota",'MS'=>"Mississippi",'MO'=>"Missouri",'MT'=>"Montana",'NE'=>"Nebraska",'NV'=>"Nevada",'NH'=>"New Hampshire",'NJ'=>"New Jersey",'NM'=>"New Mexico",'NY'=>"New York",'NC'=>"North Carolina",'ND'=>"North Dakota",'OH'=>"Ohio",'OK'=>"Oklahoma",'OR'=>"Oregon",'PA'=>"Pennsylvania",'RI'=>"Rhode Island",'SC'=>"South Carolina",'SD'=>"South Dakota",'TN'=>"Tennessee",'TX'=>"Texas",'UT'=>"Utah",'VT'=>"Vermont",'VA'=>"Virginia",'WA'=>"Washington",'WV'=>"West Virginia",'WI'=>"Wisconsin",'WY'=>"Wyoming");
+    foreach ($states as $value => $label) {
+      $element->newItem($value, $label);
+    }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
+    $element = $field->newElement('TextInput', 'postalCode');
+    $element->setLabel('ZIP or Postal Code');
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 10));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
+    $form->newButton('submit', 'Save');
+
+    return $form;
+  }
+
+  /**
+   * The default address form where a specific country form is not available
+   * 
+   * @return \Foundation\Form
+   */
+  protected function defaultAddressForm()
+  {
+    $form = new \Foundation\Form;
+    $form->setAction($this->_controller->getActionPath());
+    $form->setCSRFToken($this->_controller->getCSRFToken());
+    $field = $form->newField();
+    $field->setLegend($this->_applicationPage->getTitle());
+    $field->setInstructions($this->_applicationPage->getInstructions());
+
+    $element = $field->newElement('TextInput', 'address3');
+    $element->setLabel('company name, department, etc');
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('TextInput', 'address1');
+    $element->setLabel('Address 1');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('TextInput', 'address2');
+    $element->setLabel('Address 2');
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('TextInput', 'city');
+    $element->setLabel('City (teritory, provinces, etc)');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
+
+    $element = $field->newElement('TextInput', 'postalCode');
+    $element->setLabel('ZIP or Postal Code');
+    $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 10));
+
+    $form->newButton('submit', 'Save');
+
+    return $form;
   }
 
   public static function applyPageElement()
