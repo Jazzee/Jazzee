@@ -62,4 +62,12 @@ interface Display
    * @return boolean
    */
   function displayElement(\Jazzee\Entity\Element $element);
+  
+  /**
+   * Does the display have this element in it
+   * @param \Jazzee\Display\Element $displayElement
+   * 
+   * @return boolean
+   */
+  function hasDisplayElement(\Jazzee\Display\Element $displayElement);
 }

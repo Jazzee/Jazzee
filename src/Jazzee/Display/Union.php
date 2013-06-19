@@ -113,4 +113,15 @@ class Union implements \Jazzee\Interfaces\Display
   public function displayElement(\Jazzee\Entity\Element $element){
     return in_array($element->getId(), $this->_elementIds);
   }
+
+  public function hasDisplayElement(Element $displayElement)
+  {
+    foreach($this->listElements() as $element){
+      if($displayElement->sameAs($element)){
+        return true;
+      }
+    }
+
+    return false;
+  }
 }

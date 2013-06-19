@@ -266,4 +266,15 @@ class Display implements \Jazzee\Interfaces\Display
     return in_array($element->getId(), $elementIds);
   }
 
+  public function hasDisplayElement(\Jazzee\Display\Element $displayElement)
+  {
+    foreach($this->listElements() as $element){
+      if($displayElement->sameAs($element)){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 }

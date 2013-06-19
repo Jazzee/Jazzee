@@ -47,6 +47,7 @@ class FullApplication implements \Jazzee\Interfaces\Display
             $this->_pageIds[] = $displayElement->pageId;
           } else if ($displayElement->type == 'element'){
             $this->_elementIds[] = $displayElement->name;
+            $this->_pageIds[] = $application->getElementById($displayElement->name)->getPage()->getId();
           }
         }
       }
@@ -113,5 +114,16 @@ class FullApplication implements \Jazzee\Interfaces\Display
    */
   public function displayElement(\Jazzee\Entity\Element $element){
     return in_array($element->getId(), $this->_elementIds);
+  }
+
+  public function hasDisplayElement(Element $displayElement)
+  {
+    foreach($this->listElements() as $element){
+      if($displayElement->sameAs($element)){
+        return true;
+      }
+    }
+
+    return false;
   }
 }

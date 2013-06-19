@@ -61,34 +61,14 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
         $display->getElements()->removeElement($displayElement);
         $this->getEntityManager()->remove($displayElement);
       }
+      $maximumUserDisplay = $this->_user->getMaximumDisplayForApplication($this->_application);
       foreach($obj->elements as $eObj){
-        switch($eObj->type){
-          case 'applicant':
-            $displayElement = new \Jazzee\Entity\DisplayElement('applicant');
-            $displayElement->setName($eObj->name);
-            break;
-          case 'element':
-            $displayElement = new \Jazzee\Entity\DisplayElement('element');
-            if(!$element = $this->_application->getElementById($eObj->name)){
-              throw new \Jazzee\Exception("{$eObj->name} is not a valid Jazzee Element ID, so it cannot be used in a 'element' display element.  Element: " . var_export($eObj, true));
-            }
-            $displayElement->setElement($element);
-            break;
-          case 'page':
-            $displayElement = new \Jazzee\Entity\DisplayElement('page');
-            if(!$applicationPage = $this->_application->getApplicationPageByPageId($eObj->pageId)){
-              throw new \Jazzee\Exception("{$eObj->pageId} is not a valid Page ID, so it cannot be used in a 'page' display element.  Element: " . var_export($eObj, true));
-            }
-            $displayElement->setName($eObj->name);
-            $displayElement->setPage($applicationPage->getPage());
-            break;
-          default:
-            throw new \Jazzee\Exception("{$eObj->type} is not a valid DisplayElement type");
+        $tempDisplayElement = new \Jazzee\Display\Element($eObj->type, $eObj->title, $eObj->weight, $eObj->name, isset($eObj->pageId)?$eObj->pageId:null);
+        if($maximumUserDisplay->hasDisplayElement($tempDisplayElement)){
+          $displayElement = \Jazzee\Entity\DisplayElement::createFromDisplayElement($tempDisplayElement, $this->_application);
+          $display->addElement($displayElement);
+          $this->getEntityManager()->persist($displayElement);
         }
-        $displayElement->setTitle($eObj->title);
-        $displayElement->setWeight($eObj->weight);
-        $display->addElement($displayElement);
-        $this->getEntityManager()->persist($displayElement);
       }
       $this->_em->persist($display);
       $this->addMessage('success', $display->getName() . ' saved');
