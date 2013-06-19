@@ -613,5 +613,21 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     }
     return $properties;
   }
+  
+  /**
+   * By default list the elements on a page
+   * 
+   * @return array
+   */
+  public function listDisplayElements()
+  {
+    $elements = array();
+    $weight = 0;
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++, $element->getId(), null);
+    }
+
+    return $elements;
+  }
 
 }

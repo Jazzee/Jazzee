@@ -535,6 +535,42 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     }
   }
 
+  /**
+   * ETS Pages include all the score information
+   * 
+   * @return array
+   */
+  public function listDisplayElements()
+  {
+    $elements = parent::listDisplayElements();
+    $items = array(
+      'greRegistrationNumber' => 'GRE Registration Number',
+      'greDepartmentName' => 'GRE Department Name',
+      'greTestDate' => 'GRE Test Date',
+      'greTestName' => 'GRE Test Name',
+      'greScore1' => 'GRE Score 1',
+      'greScore2' => 'GRE Score 2',
+      'greScore3' => 'GRE Score 3',
+      'greScore4' => 'GRE Score 4',
+      'toeflRegistrationNumber' => 'TOEFL Registration Number',
+      'toeflNativeCountry' => 'TOEFL Native Country',
+      'toeflNativeLanguage' => 'TOEFL Native Language',
+      'toeflTestDate' => 'TOEFL Test Date',
+      'toeflTestType' => 'TOEFL Test Type',
+      'toeflListening' => 'TOEFL Listening',
+      'toeflWriting' => 'TOEFL Writing',
+      'toeflReading' => 'TOEFL Reading',
+      'toeflEssay' => 'TOEFL Essay',
+      'toeflTotal' => 'TOEFL Total'
+    );
+    $weight = count($elements);
+    foreach($items as $name => $title){
+      $elements[] = new \Jazzee\Display\Element('page', $title, $weight++, $name, $this->_applicationPage->getPage()->getId());
+    }
+
+    return $elements;
+  }
+
   public static function applyPageElement()
   {
     return 'ETSMatch-apply_page';

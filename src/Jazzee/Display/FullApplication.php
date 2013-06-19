@@ -41,24 +41,16 @@ class FullApplication implements \Jazzee\Interfaces\Display
     $pages = array();
     foreach($application->getApplicationPages() as $applicationPage){
       if(is_subclass_of($applicationPage->getPage()->getType()->getClass(), 'Jazzee\Interfaces\DataPage')){
-        $pageArr = array(
-          'id' => $applicationPage->getPage()->getId(),
-          'title' => $applicationPage->getTitle(),
-          'elements' => array()
-        );
-        $this->_pageIds[] = $applicationPage->getPage()->getId();
-        foreach($applicationPage->getPage()->getElements() as $element){
-          $pageArr['elements'][] = array(
-            'id' => $element->getId(),
-            'title' => $element->getTitle(),
-          );
-          $this->_elementIds[] = $element->getId();
-          $this->_elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++, $element->getId(), null);
+        foreach($applicationPage->getJazzeePage()->listDisplayElements() as $displayElement){
+          $this->_elements[] = $displayElement;
+          if($displayElement->type == 'page'){
+            $this->_pageIds[] = $displayElement->pageId;
+          } else if ($displayElement->type == 'element'){
+            $this->_elementIds[] = $displayElement->name;
+          }
         }
-        $pages[] = $pageArr;
       }
     }
-    $this->_displayArray['pages'] = $pages;
   }
 
   /**

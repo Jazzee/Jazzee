@@ -403,6 +403,24 @@ class Branching extends Standard
     }
   }
 
+  /**
+   * Branching pages list the children of each branch
+   * 
+   * @return array
+   */
+  public function listDisplayElements()
+  {
+    $elements = array();
+    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getPage()->getVar('branchingElementLabel'), 0, 'branchingPageSelection', $this->_applicationPage->getPage()->getId());
+    foreach($this->_applicationPage->getPage()->getChildren() as $child){
+      foreach($child->getApplicationPageJazzeePage()->listDisplayElements() as $displayElement){
+        $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() + ' ' + $displayElement->title, $displayElement->weight, $displayElement->name, $displayElement->pageId);
+      }
+    }
+
+    return $elements;
+  }
+
   public static function applyPageElement()
   {
     return 'Branching-apply_page';
