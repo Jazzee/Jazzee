@@ -857,7 +857,7 @@ class Application
     unset($applicant['answers']);
     $applicant['pages'] = array();
     foreach($answers as $pageId => $answers){
-      if($applicationPage = $this->getApplicationPageByPageId($pageId)){
+      if($applicationPage = $this->getApplicationPageByPageId($pageId) and is_a($applicationPage->getJazzeePage(), '\Jazzee\Interfaces\DataPage')){
         $applicant['pages'][] = $applicationPage->getJazzeePage()->formatApplicantArray($answers);
       }
     }
