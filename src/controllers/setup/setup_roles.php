@@ -223,6 +223,19 @@ class SetupRolesController extends \Jazzee\AdminController
       $role->setProgram($this->_program);
       $role->setName($input->get('name'));
       $this->_em->persist($role);
+      
+      $display = new \Jazzee\Entity\Display('role');
+      $display->setRole($role);
+      $display->setApplication($this->_application);
+      $display->setName($role->getName() . ' display');
+      foreach($this->_user->getMaximumDisplayForApplication($this->_application)->listElements() as $userDisplayElement){
+        $displayElement = \Jazzee\Entity\DisplayElement::createFromDisplayElement($userDisplayElement, $this->_application);
+        $display->addElement($displayElement);
+        $this->getEntityManager()->persist($displayElement);
+      }
+      $this->_em->persist($display);
+      $this->_em->flush();
+ 
       $this->addMessage('success', "Role Saved Successfully");
       $this->redirectPath('setup/roles');
     }
