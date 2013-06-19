@@ -51,4 +51,14 @@ class Element
     $this->name = $name;
     $this->pageId = $type == 'page'?$pageId:null;
   }
+  
+  /**
+   * Check if this Element is the same as another one
+   * @param \Jazzee\Display\Element $element
+   * 
+   * @return type
+   */
+  public function sameAs(Element $element){
+    return ($this->type == $element->type and $this->name == $element->name and ((is_null($this->pageId) and is_null($element->pageId)) or $this->pageId == $element->pageId));
+  }
 }
