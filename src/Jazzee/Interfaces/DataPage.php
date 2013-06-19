@@ -22,4 +22,11 @@ interface DataPage
    * @return array
    */
   public function formatApplicantArray(array $answers);
+  
+  /**
+   * List the elements available for creating a display
+   * 
+   * @return array \Jazzee\Display\Element
+   */
+  public function listDisplayElements();
 }
