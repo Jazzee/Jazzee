@@ -25,6 +25,64 @@ div.applicant_grid div.progress div.label{
   margin: 10px 5px;
 }
 
+#emailoverlay form div>span.label{
+vertical-align: top;
+display: inline-block;
+}
+
+#emailoverlay form>div {
+margin-top: 5px;
+}
+
+
+#emailoverlay form input {
+width: 200px;
+}
+
+#emailoverlay form input[type='submit'] {
+display: block;
+width: 100%;
+margin: 10px;
+margin-top: 20px;
+}
+
+#emailoverlay form textarea {
+height: 180px;
+width: 200px;
+}
+
+.recipients span{
+display: inline-block;
+}
+
+.recipients span.label {
+margin-right: 3px;
+}
+
+.recipients {
+border-bottom: 1px solid #CCC;
+margin: 10px;
+max-height: 30px;
+width: 230px;
+overflow: hidden;
+}
+
+.recipients:hover {
+border-bottom: 1px solid #CCC;
+margin: 10px;
+max-height: 900px;
+
+}
+
+.recipient {
+color: blue;
+background: #BBF;
+border-radius: 0.3em;
+padding: 3px;
+margin: 3px;
+font-size: 10px;
+}
+
 /*
  * File:        TableTools.css
  * Description: Styles for TableTools 2
