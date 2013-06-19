@@ -74,6 +74,30 @@ class ApplicantsGridController extends \Jazzee\AdminController
   {
     $this->layout = 'wide';
   }
+
+  public function actionSendMessage()  
+  {
+    $applicants = explode(',',$this->post['applicantIds']);
+    $count = 0;
+    foreach ($applicants as $id) {
+      
+      $thread = new \Jazzee\Entity\Thread();
+      $thread->setSubject($this->post['subject']);
+      $applicant = $this->getApplicantById($id);
+      $thread->setApplicant($applicant);
+
+      $message = new \Jazzee\Entity\Message();
+      $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+      $message->setText($this->post['body']);
+      $thread->addMessage($message);
+      $this->_em->persist($thread);
+      $this->_em->persist($message);
+    }
+
+    $status = array("message_sent_status"=>"ok");
+    $this->setVar('result', $status);
+    $this->loadView('applicants_single/result');
+  }
   
   /**
    * List all applicants
@@ -304,7 +328,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive'))) {
+    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive','sendMessage'))) {
       $action = 'index';
     }
 
