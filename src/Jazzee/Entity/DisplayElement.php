@@ -225,5 +225,37 @@ class DisplayElement
   {
     $this->display = $display;
   }
+  
+  /**
+   * Create a new display element from the Elements of another display
+   * @param \Jazzee\Display\Element $originalElement
+   * @param \Jazzee\Entity\Application $application
+   * 
+   * @return \Jazzee\Entity\DisplayElement
+   */
+  public static function createFromDisplayElement(\Jazzee\Display\Element $originalElement, \Jazzee\Entity\Application $application)
+  {
+    $displayElement = new \Jazzee\Entity\DisplayElement($originalElement->type);
+    switch($originalElement->type){
+      case 'element':
+        if(!$element = $application->getElementById($originalElement->name)){
+          throw new \Jazzee\Exception("{$originalElement->name} is not a valid Jazzee Element ID, so it cannot be used in a 'element' display element.  Element: " . var_export($originalElement, true));
+        }
+        $displayElement->setElement($element);
+        break;
+      case 'page':
+        if(!$applicationPage = $application->getApplicationPageByPageId($originalElement->pageId)){
+          throw new \Jazzee\Exception("{$originalElement->pageId} is not a valid Page ID, so it cannot be used in a 'page' display element.  Element: " . var_export($originalElement, true));
+        }
+        $displayElement->setPage($originalElement->getPage());
+      case 'applicant':
+        $displayElement->setName($originalElement->name);
+        break;
+    }
+    $displayElement->setTitle($originalElement->title);
+    $displayElement->setWeight($originalElement->weight); 
+
+    return $displayElement;
+  }
 
 }
