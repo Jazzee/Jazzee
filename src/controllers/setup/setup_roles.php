@@ -100,7 +100,7 @@ class SetupRolesController extends \Jazzee\AdminController
           $element->setValue($values);
         }
       }
-      $form->newButton('submit', 'Edit Role');
+      $form->newButton('submit', 'Save');
       $this->setVar('form', $form);
       if ($input = $form->processInput($this->post)) {
         $role->setName($input->get('name'));
