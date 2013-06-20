@@ -191,10 +191,10 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
    * Find a single application
    * @param integer id of the applicant
    * @param boolean $deep should we load the full data for each applicant
-   * @pram Display $display
+   * @pram \Jazzee\Interfaces\Display $display
    * @return Application
    */
-  public function find($id, $deep = false, Display $display = null)
+  public function find($id, $deep = false, \Jazzee\Interfaces\Display $display = null)
   {
     if (!$deep) {
       $queryBuilder = $this->_em->createQueryBuilder();
