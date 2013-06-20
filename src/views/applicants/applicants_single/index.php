@@ -211,9 +211,11 @@
   <div id='pages'>
     <?php
     foreach ($applicant->getApplication()->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPage) {
-      if ($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\ReviewPage) {
-        $class = $applicationPage->getPage()->getType()->getClass();
-        $this->renderElement($class::applicantsSingleElement(), array('page' => $applicationPage, 'applicant' => $applicant));
+      if($display->displayPage($applicationPage->getPage())){
+        if ($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\ReviewPage) {
+          $class = $applicationPage->getPage()->getType()->getClass();
+          $this->renderElement($class::applicantsSingleElement(), array('page' => $applicationPage, 'applicant' => $applicant, 'display' => $display));
+        }
       }
     }
     ?>

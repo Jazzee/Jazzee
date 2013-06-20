@@ -74,6 +74,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $this->layout = 'wide';
     $applicant = $this->getApplicantById($applicantId);
     $this->setVar('applicant', $applicant);
+    $this->setVar('display', $this->_user->getMaximumDisplayForApplication($applicant->getApplication()));
   }
 
   /**
@@ -359,7 +360,7 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $this->layout = 'blank';
     $applicant = $this->getApplicantById($applicantId);
     $page = $this->_em->getRepository('\Jazzee\Entity\ApplicationPage')->findOneBy(array('page' => $pageId, 'application' => $this->_application->getId()));
-    $this->setVar('variables', array('page' => $page, 'applicant' => $applicant));
+    $this->setVar('variables', array('page' => $page, 'applicant' => $applicant, 'display'=>$this->_user->getMaximumDisplayForApplication($this->_application)));
     $class = $page->getPage()->getType()->getClass();
     $this->setVar('element', $class::applicantsSingleElement());
     $this->loadView($this->controllerName . '/element');

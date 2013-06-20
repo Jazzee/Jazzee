@@ -32,10 +32,12 @@ $page->getJazzeePage()->setApplicant($applicant);
               <th><?php print $displaySortElement->getTitle() ?></th>
               <?php
               foreach ($page->getPage()->getElements() as $element) {
-                if($element->getId() != $displaySortElement->getId()) { ?>
-                  <th><?php print $element->getTitle() ?></th><?php 
+                if($element->getId() != $displaySortElement->getId()) {
+                  if($display->displayElement($element)){ ?>
+                    <th><?php print $element->getTitle() ?></th><?php
+                  }
                 }
-              } ?>
+              } die;?>
               <th>Status</th>
               <th>Attachment</th>
               <?php
@@ -54,8 +56,10 @@ $page->getJazzeePage()->setApplicant($applicant);
                   }
                   foreach ($page->getPage()->getElements() as $element) {
                     if($element->getId() != $displaySortElement->getId()){
-                      $element->getJazzeeElement()->setController($this->controller);
-                      ?><td class='answerElement element_<?php print $element->getType()->getNiceClass() ?>'><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php
+                      if($display->displayElement($element)){
+                        $element->getJazzeeElement()->setController($this->controller);
+                        ?><td class='answerElement element_<?php print $element->getType()->getNiceClass() ?>'><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php
+                      }
                     }
                   } ?>
                   <td>
@@ -96,8 +100,10 @@ $page->getJazzeePage()->setApplicant($applicant);
           <thead>
             <tr>
               <?php
-              foreach ($page->getPage()->getElements() as $element) { ?>
-                <th><?php print $element->getTitle() ?></th><?php
+              foreach ($page->getPage()->getElements() as $element) { 
+                if($display->displayElement($element)){ ?>
+                  <th><?php print $element->getTitle() ?></th><?php
+                }
               } ?>
               <th>Status</th>
               <th>Attachment</th>
@@ -113,8 +119,10 @@ $page->getJazzeePage()->setApplicant($applicant);
               <tr id='answer<?php print $answer->getId() ?>'>
                 <?php
                 foreach ($page->getPage()->getElements() as $element) {
-                  $element->getJazzeeElement()->setController($this->controller);
-                  ?><td class='answerElement element_<?php print $element->getType()->getNiceClass() ?>'><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php
+                  if($display->displayElement($element)){
+                    $element->getJazzeeElement()->setController($this->controller);
+                    ?><td class='answerElement element_<?php print $element->getType()->getNiceClass() ?>'><?php print $element->getJazzeeElement()->displayValue($answer); ?></td><?php
+                  }
                 } ?>
                 <td>
                   <strong>Last Updated:</strong> <?php print $answer->getUpdatedAt()->format('M d Y g:i a'); ?>
