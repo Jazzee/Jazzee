@@ -191,7 +191,7 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\QueryPage, \Ja
       $displaySortElement->getJazzeeElement()->setController($this->_controller);
       $categories = array();
       foreach ($this->getAnswers() as $answer) {
-        $categories[$displaySortElement->getJazzeeElement()->displayValue($answer)][] = $answer;
+        $categories[$displaySortElement->getJazzeeElement()->rawValue($answer)][] = $answer;
       }
       ksort($categories);
       $values = array();
@@ -200,7 +200,7 @@ class Standard extends AbstractPage implements \Jazzee\Interfaces\QueryPage, \Ja
         foreach($categories as $arr){
           foreach($arr as $answer){
             $element->getJazzeeElement()->setController($this->_controller);
-            $elementValues[] = $element->getJazzeeElement()->displayValue($answer);
+            $elementValues[] = $element->getJazzeeElement()->rawValue($answer);
           }
         }
         $values[$element->getId()] = implode("\n", $elementValues);

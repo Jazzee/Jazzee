@@ -413,7 +413,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
       $elementValues = array();
       foreach($this->getAnswers() as $answer){
         $element->getJazzeeElement()->setController($this->_controller);
-        $elementValues[] = $element->getJazzeeElement()->displayValue($answer);
+        $elementValues[] = $element->getJazzeeElement()->rawValue($answer);
       }
       $values[$element->getId()] = implode("\n", $elementValues);
     }

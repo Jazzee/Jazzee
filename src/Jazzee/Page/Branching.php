@@ -297,7 +297,7 @@ class Branching extends Standard
           foreach($answer->getChildren() as $childAnswer){
             $values[0] = $childAnswer->getPage()->getTitle();
             $element->getJazzeeElement()->setController($this->_controller);
-            $elementValues[] = $element->getJazzeeElement()->displayValue($childAnswer);
+            $elementValues[] = $element->getJazzeeElement()->rawValue($childAnswer);
           }
         }
         $values[$element->getId()] = implode("\n", $elementValues);
