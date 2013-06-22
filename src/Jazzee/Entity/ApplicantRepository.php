@@ -277,7 +277,7 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
   protected function deepApplicantQuery(\Jazzee\Interfaces\Display $display){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Applicant', 'applicant');
-    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, payment, answer_greScore, answer_toeflScore, children, answer_attachment, children_element_answers, children_publicStatus, children_privateStatus, children_payment, children_attachment');
+    $queryBuilder->add('select', 'applicant, attachments, decision, tags, answers, element_answers, publicStatus, privateStatus, payment, answer_greScore, answer_toeflScore, children, answer_attachment, children_element_answers, children_publicStatus, children_privateStatus, children_payment, children_attachment, children2, children_element_answers2, children_publicStatus2, children_privateStatus2, children_payment2, children_attachment2');
     $expression = $queryBuilder->expr()->orX();
     //this one is the default - if there are no pages in the display then this 
     //expression is the only one that will load and no pages will be loaded
@@ -317,6 +317,12 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->leftJoin('children.privateStatus', 'children_privateStatus');
     $queryBuilder->leftJoin('children.payment', 'children_payment');
     $queryBuilder->leftJoin('children.attachment', 'children_attachment');
+    $queryBuilder->leftJoin('children.children', 'children2');
+    $queryBuilder->leftJoin('children2.elements', 'children_element_answers2');
+    $queryBuilder->leftJoin('children2.publicStatus', 'children_publicStatus2');
+    $queryBuilder->leftJoin('children2.privateStatus', 'children_privateStatus2');
+    $queryBuilder->leftJoin('children2.payment', 'children_payment2');
+    $queryBuilder->leftJoin('children2.attachment', 'children_attachment2');
     $queryBuilder->where('answers.parent IS NULL');
 
     return $queryBuilder;

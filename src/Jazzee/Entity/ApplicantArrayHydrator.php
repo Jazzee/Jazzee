@@ -89,7 +89,7 @@ class ApplicantArrayHydrator extends \Doctrine\ORM\Internal\Hydration\ArrayHydra
     } else {
       $answer['children'] = array();
     }
-    
+
     return $answer;
   }
 }
