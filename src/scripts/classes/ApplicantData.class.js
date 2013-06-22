@@ -94,7 +94,6 @@ ApplicantData.prototype.listTagTitles = function(){
 
 /**
  * Get values for a page element
- * @param pageId
  * @param elementId
  * 
  * @return []
@@ -102,26 +101,34 @@ ApplicantData.prototype.listTagTitles = function(){
 ApplicantData.prototype.getAnswersForElement = function(elementId){
   var answers = [];
   for(var i = 0; i < this.pages.length; i++){
-    var page = this.pages[i];
-    for(var j = 0; j < page.answers.length; j++){
-      var answer = page.answers[j];
-      for(var k = 0; k < answer.elements.length; k++){
-        var element = answer.elements[k];
-        if(element.id == elementId){
-          answers.push(element);
-        }
-      }
-      if(answer.children != undefined){
-        for(var k = 0; k < answer.children.length; k++){
-          var childAnswer = answer.children[k];
-          for(var l = 0; l < childAnswer.elements.length; l++){
-            var element = childAnswer.elements[l];
-            if(element.id == elementId){
-              answers.push(element);
-            }
-          }
-        }
-      }
+    for(var j = 0; j < this.pages[i].answers.length; j++){
+      answers = answers.concat(this.getAnswersFromAnswerForElement(this.pages[i].answers[j],elementId));
+    }
+  }
+
+  return answers;
+};
+
+/**
+ * Get values for a page answer block
+ * Calls itself recursivly for children
+ * @param {pageId}answer}
+ * @param elementId
+ * 
+ * @return []
+ */
+ApplicantData.prototype.getAnswersFromAnswerForElement = function(answer, elementId){
+  var answers = [];
+  for(var i = 0; i < answer.elements.length; i++){
+    var element = answer.elements[i];
+    if(element.id == elementId){
+      answers.push(element);
+    }
+  }
+
+  if(answer.children != undefined){
+    for(var i = 0; i < answer.children.length; i++){
+      answers = answers.concat(this.getAnswersFromAnswerForElement(answer.children[i],elementId));
     }
   }
 
