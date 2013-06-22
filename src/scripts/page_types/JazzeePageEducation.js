@@ -9,23 +9,29 @@ JazzeePageEducation.prototype.constructor = JazzeePageEducation;
 JazzeePageEducation.prototype.workspace = function(){
   var pageClass = this;
   JazzeePage.prototype.workspace.call(this);
-  if(Object.keys(this.children).length == 2){
-    JazzeePage.prototype.workspace.call(this);
-    $('#pageToolbar').append(this.pagePropertiesButton());
-    $('#workspace').append(this.editChildPageButton(2));
-    $('#workspace').append(this.editChildPageButton(4));
+  $('#pageToolbar').append(this.pagePropertiesButton());
+  if(this.isEditable()){
+    if(!this.isGlobal || this.pageBuilder.editGlobal){
+      $('#workspace').append(this.editChildPageButton(2));
+      $('#workspace').append(this.editChildPageButton(4));
+    }
   } else {
-    $('#elements').html('<h2>You must save this page before elements can be edited.</h2>');
-  }
+      $('#elements').html('<h2>You must save this page before Known School and New School pages can be edited.</h2>');
+    }
 };
 
 JazzeePageEducation.prototype.getSchoolListElement = function(){
   var element = this.getElementByFixedId(2);
   if(!element){
     console.log('Unable to get element by fixed id: ' + 2);
+    return false;
   }
 
   return element;
+};
+
+JazzeePageEducation.prototype.isEditable = function(){
+  return (Object.keys(this.children).length == 2 && this.getSchoolListElement());
 };
 
 /**
@@ -65,9 +71,9 @@ JazzeePageEducation.prototype.pageProperties = function(){
   });
   div.append($('<p>').html('Maximum Answers Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
   div.append(slider);
-  
-  div.append(this.manageSchoolListButton());
-
+  if(this.isEditable() && (!this.isGlobal || this.pageBuilder.editGlobal)){
+    div.append(this.manageSchoolListButton());
+  }
   return div;
 };
 
