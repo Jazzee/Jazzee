@@ -411,10 +411,11 @@ class Branching extends Standard
   public function listDisplayElements()
   {
     $elements = array();
-    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getPage()->getVar('branchingElementLabel'), 0, 'branchingPageSelection', $this->_applicationPage->getPage()->getId());
+    $weight = 0;
+    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getPage()->getVar('branchingElementLabel'), $weight++, 'branchingPageSelection', $this->_applicationPage->getPage()->getId());
     foreach($this->_applicationPage->getPage()->getChildren() as $child){
       foreach($child->getApplicationPageJazzeePage()->listDisplayElements() as $displayElement){
-        $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() + ' ' + $displayElement->title, $displayElement->weight, $displayElement->name, $displayElement->pageId);
+        $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() .' ' . $displayElement->title, $weight++, $displayElement->name, $displayElement->pageId);
       }
     }
 

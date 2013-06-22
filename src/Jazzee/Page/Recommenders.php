@@ -446,7 +446,7 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $weight = count($elements);
     foreach($this->_applicationPage->getPage()->getChildren() as $child){
       foreach($child->getApplicationPageJazzeePage()->listDisplayElements() as $displayElement){
-        $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() + ' ' + $displayElement->title, $weight++, $displayElement->name, $displayElement->pageId);
+        $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() . ' ' . $displayElement->title, $weight++, $displayElement->name, $displayElement->pageId);
       }
     }
 
