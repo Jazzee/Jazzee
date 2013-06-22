@@ -77,7 +77,9 @@ PageBuilder.prototype.setup = function(){
       autoOpen: true,
       open: function(event, ui){
         $(".ui-dialog-titlebar", ui.dialog).hide();
-        if(pageBuilder.checkNames()){
+        if(!pageBuilder.checkNames()){
+          overlay.dialog('destroy').remove();
+        } else {
           var toSave = [];
           for(var i in pageBuilder.pages){
             if(pageBuilder.pages[i].checkIsModified()){
