@@ -88,8 +88,9 @@ JazzeeElementPDFFileInput.prototype.gridData = function(data, type, full){
   var values = [];
   
   var img = $('<img>').attr('src', 'resource/foundation/media/default_pdf_logo.png').attr('title', 'Download ' + this.title + ' PDF').attr('alt', 'PDF Logo');
+  img.css('height', '1em');
   $.each(data, function(){
-    var a = $('<a>').attr('href', this.filePath).addClass('dialog_file').append(img);
+    var a = $('<a>').attr('href', this.filePath).addClass('dialog_file').append(img.clone());
     values.push(a);
   });
   if(values.length == 0){
