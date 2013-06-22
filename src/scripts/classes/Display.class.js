@@ -96,7 +96,7 @@ Display.prototype.displayElement = function(obj){
  * Check if an element should be displayed
  */
 Display.prototype.addElement = function(obj){
-  if(this.displayElement(obj.type, obj.name)){
+  if(this.displayElement(obj)){
     this.removeElement(obj);
   }
   this.display.elements.push(obj);
