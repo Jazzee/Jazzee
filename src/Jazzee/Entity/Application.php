@@ -730,6 +730,24 @@ class Application
   }
 
   /**
+   * Get an application page the id of one of its children
+   * @param integer $id
+   * @return ApplicationPage
+   */
+  public function getApplicationPageByChildPageId($id)
+  {
+    foreach ($this->applicationPages as $applicationPage) {
+      foreach($applicationPage->getPage()->getChildren() as $child){
+        if($child->getId() == $id){
+          return $applicationPage;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Compare two application and list the differences
    *
    * @param \Jazzee\Entity\Application $application

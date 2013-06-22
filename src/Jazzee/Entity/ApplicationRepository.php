@@ -155,7 +155,7 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
   protected function makeQuery(){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Application', 'application');
-    $queryBuilder->add('select', 'application, applicationPages, pages, elements, elementListItems, pageType, elementType, children, childElements, childPageType, childElementListItems, childElementType');
+    $queryBuilder->add('select', 'application, applicationPages, pages, elements, elementListItems, pageType, elementType, children, childElements, childPageType, childElementListItems, childElementType, children2, childElements2, childPageType2, childElementListItems2, childElementType2');
     $queryBuilder->leftJoin('application.applicationPages', 'applicationPages');
     $queryBuilder->leftJoin('applicationPages.page', 'pages');
     $queryBuilder->leftJoin('pages.elements', 'elements');
@@ -167,6 +167,11 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->leftJoin('children.type', 'childPageType');
     $queryBuilder->leftJoin('childElements.listItems', 'childElementListItems');
     $queryBuilder->leftJoin('childElements.type', 'childElementType');
+    $queryBuilder->leftJoin('children.children', 'children2');
+    $queryBuilder->leftJoin('children2.elements', 'childElements2');
+    $queryBuilder->leftJoin('children2.type', 'childPageType2');
+    $queryBuilder->leftJoin('childElements2.listItems', 'childElementListItems2');
+    $queryBuilder->leftJoin('childElements2.type', 'childElementType2');
     
     return $queryBuilder;
   }

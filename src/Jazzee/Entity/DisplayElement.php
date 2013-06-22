@@ -244,7 +244,7 @@ class DisplayElement
         $displayElement->setElement($element);
         break;
       case 'page':
-        if(!$applicationPage = $application->getApplicationPageByPageId($originalElement->pageId)){
+        if(!$applicationPage = $application->getApplicationPageByPageId($originalElement->pageId) and !$applicationPage = $application->getApplicationPageByChildPageId($originalElement->pageId)){
           throw new \Jazzee\Exception("{$originalElement->pageId} is not a valid Page ID, so it cannot be used in a 'page' display element.  Element: " . var_export($originalElement, true));
         }
         $displayElement->setPage($applicationPage->getPage());
