@@ -130,12 +130,13 @@ JazzeePageEducation.prototype.manageSchoolListBlock = function(){
     var schools = [];
     for(var i = 0; i< element.listItems.length; i++){
       var item = element.listItems[i];
-      schools.push({item: item, search: item.name+item.title+item.getVariable('searchTerms')});
+      schools.push({item: item, search: item.getVariable('code')+item.title+item.getVariable('searchTerms')});
     }
     var input = $('<input>').attr('type', 'text').bind('change keyup', function(){
       $('div', div).remove();   
       var matcher = new RegExp($.ui.autocomplete.escapeRegex($(this).val()), "i");
-      var results = results.concat($.grep(schools, function(item,index){
+      var results = [];
+      results = results.concat($.grep(schools, function(item,index){
         return matcher.test(item.search);
       }));
       
@@ -164,7 +165,7 @@ JazzeePageEducation.prototype.manageSchoolListBlock = function(){
  */
 JazzeePageEducation.prototype.singleSchool = function(element, item){
   var value = ($.trim(item.value).length > 0)?item.value:'[blank]';
-  var name = ($.trim(item.name).length > 0)?' (' + item.name + ')':'';
+  var name = ($.trim(item.getVariable('code')).length > 0)?' (' + item.getVariable('code') + ')':'';
   var li = $('<li>').html(value+name).data('item', item).data('element', element).addClass('ui-state-default');
   var tools = $('<span>').addClass('tools');
   if(item.isActive){
@@ -301,7 +302,7 @@ JazzeePageEducation.prototype.newSchoolButton = function(){
   element.label = 'School Name';
   element.required = true;
   var element = field.newElement('TextInput', 'schoolCode');
-  element.label = 'Unique Code';
+  element.label = 'Code';
   element.required = true;
   var element = field.newElement('Textarea', 'searchterms');
   element.label = 'Additional Search Terms';
@@ -321,7 +322,7 @@ JazzeePageEducation.prototype.newSchoolButton = function(){
     if(!error){
       var element = pageClass.getSchoolListElement();
       var item = element.newListItem(schoolName);
-      item.setProperty('name', schoolCode);
+      item.setVariable('code', schoolCode);
       item.setVariable('searchTerms', $('textarea[name="searchterms"]', this).val());
       dialog.dialog("destroy").remove();
       $('#manageSchoolListBlock').replaceWith(pageClass.manageSchoolListBlock());
@@ -396,7 +397,7 @@ JazzeePageEducation.prototype.importSchoolsButton = function(){
           var pieces = lines[i].split("\t");
           if(pieces.length >= 2){
             var item = element.newListItem($.trim(pieces[0]));
-            item.setProperty('name', $.trim(pieces[1]));
+            item.setVariable('code', $.trim(pieces[1]));
             if($.trim(pieces[2]).length > 0){
               item.setVariable('searchTerms', $.trim(pieces[2]));
             }
