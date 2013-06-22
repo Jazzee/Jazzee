@@ -375,10 +375,8 @@ JazzeePageEducation.prototype.importSchoolsButton = function(){
   element.label = 'Schools';
   element.required = true;
   var dialog = pageClass.displayForm(obj);
-  var progressbar = $('<div>').addClass('progress').append($('<div>').addClass('label').html('Importing Schools...'));
-  progressbar.hide();
+  var progressbar = $('<div>').addClass('progress');
   dialog.append(progressbar);
-  progressbar.progressbar({});
   $('form', dialog).bind('submit',function(e){
     var schools = $('textarea[name="schools"]', this).val();
     var error = false;
@@ -387,27 +385,32 @@ JazzeePageEducation.prototype.importSchoolsButton = function(){
       error = true;
     }
     if(!error){
-      $('.progress', $(this).parent().parent()).show();
       var element = pageClass.getSchoolListElement();
       var lines = schools.split("\n");
-      $('.progress', $(this).parent().parent()).progressbar("option", "max", lines.length);
       var total = lines.length;
-      for(var i = 0;i<total; i++){
-        if($.trim(lines[i]).length > 0){
-          var pieces = lines[i].split("\t");
-          if(pieces.length >= 2){
-            var item = element.newListItem($.trim(pieces[0]));
-            item.setVariable('code', $.trim(pieces[1]));
-            if($.trim(pieces[2]).length > 0){
-              item.setVariable('searchTerms', $.trim(pieces[2]));
+      progressbar.progressbar({
+        max: total-1,
+        value: 1,
+        create: function(event, ui){
+          for(var i = 0;i<total; i++){
+            if($.trim(lines[i]).length > 0){
+              var pieces = lines[i].split("\t");
+              if(pieces.length >= 2){
+                var item = element.newListItem($.trim(pieces[0]));
+                item.setVariable('code', $.trim(pieces[1]));
+                if($.trim(pieces[2]).length > 0){
+                  item.setVariable('searchTerms', $.trim(pieces[2]));
+                }
+                $('.progress', dialog).progressbar("option", "value", i);
+              }
             }
-            console.log("Addiing School: " + i + " of " + total);
           }
+        }, 
+        complete: function(event, ui){
+          dialog.dialog("destroy").remove();
+          $('#manageSchoolListBlock').replaceWith(pageClass.manageSchoolListBlock());
         }
-        $('.progress', $(this).parent().parent()).progressbar("option", "value", i);
-      }
-      dialog.dialog("destroy").remove();
-      $('#manageSchoolListBlock').replaceWith(pageClass.manageSchoolListBlock());
+      });
     }
     return false;
   });//end submit
