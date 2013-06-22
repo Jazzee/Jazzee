@@ -261,7 +261,6 @@ JazzeePage.prototype.setVariable = function(name, value){
  */
 JazzeePage.prototype.getVariable = function(name){
   if(name in this.variables) return this.variables[name].value;
-  console.log(name + ' is not a set variable');
   return null;
 };
 
