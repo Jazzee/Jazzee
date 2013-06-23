@@ -59,7 +59,7 @@ class Intersection implements \Jazzee\Interfaces\Display
           $elementIds[] = $display->getElementIds();
           $ourElements = array();
           foreach($display->listElements() as $element){
-            $ourElements[$element->type.$element->name] = $element;
+            $ourElements[$element->type.$element->name.$element->pageId] = $element;
           }
           $elements[] = $ourElements;
         }
