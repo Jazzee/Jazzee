@@ -141,6 +141,9 @@ Grid.prototype.getColumns = function(){
         if(this.name == 'isLocked' || this.name == 'hasPaid'){
           column.mRender = Grid.formatCheckmark;
         }
+        if(this.name == 'attachments'){
+          column.mRender = Grid.formatAttachments;
+        }
         columns.push(column);
         break;
       case 'element':
@@ -221,6 +224,37 @@ Grid.formatCheckmark = function(data, type, full){
     return data === true ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
   }
   return data;
+};
+
+/**
+ * Display applicant attachments
+ */
+Grid.formatAttachments = function(data, type, full){
+  var self = this;
+  if(this.attachmentThumbnailImg == undefined){
+    this.attachmentThumbnailImg = $('<img>').attr('src', 'resource/foundation/media/default_pdf_logo.png').attr('title', 'Download PDF').attr('alt', 'PDF Logo');
+    this.attachmentThumbnailImg.css('height', '1em');
+  }
+  var values = [];
+  $(data).each(function(){
+    var a = $('<a>').attr('href', this.filePath).addClass('dialog_file').append(self.attachmentThumbnailImg.clone());
+    values.push(a.clone().wrap('<p>').parent().html());
+  });
+  if(type == 'display'){
+    if(values.length == 1){
+      return values[0];
+    } else {
+      var ol = $('<ol>');
+      $.each(values, function(){
+        ol.append($('<li>').html(this.toString()));
+      });
+      return ol.clone().wrap('<p>').parent().html();
+    }
+  } else if (type == 'sort'){
+    return values.length;
+  }
+
+  return '';
 };
 
 /**

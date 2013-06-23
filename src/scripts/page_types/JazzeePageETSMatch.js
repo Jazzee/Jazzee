@@ -83,6 +83,8 @@ JazzeePageETSMatch.prototype.listDisplayElements = function(){
   elements.push({name: 'toeflReading', type: 'page', title: 'TOEFL Reading', pageId: this.id});
   elements.push({name: 'toeflEssay', type: 'page', title: 'TOEFL Essay', pageId: this.id});
   elements.push({name: 'toeflTotal', type: 'page', title: 'TOEFL Total', pageId: this.id});
+
+  elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
   
   return elements;
 };

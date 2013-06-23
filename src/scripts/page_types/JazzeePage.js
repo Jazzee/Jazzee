@@ -835,4 +835,50 @@ JazzeePage.prototype.listDisplayElements = function(){return [];};
 /**
  * Dispaly applicant data in a grid
  */
-JazzeePage.prototype.gridData = function(data, type, full){return ''};
+JazzeePage.prototype.gridData = function(data, type, full){
+  var values = [];
+  switch(data.displayElement.name){
+    case 'attachment':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      values = values.concat(this.gridAnswerAttachment(answers));
+    break;
+  }
+  if(values.length == 0){
+    return '';
+  }
+  if(values.length == 1){
+    return values[0];
+  }
+  if(type == 'display'){
+    var ol = $('<ol>');
+    $.each(values, function(){
+      ol.append($('<li>').html(this.toString()));
+    });
+    return ol.clone().wrap('<p>').parent().html();
+  }
+  //forsorting and filtering return the raw data
+  return values.join(' ');
+};
+
+/**
+ * Format an answer attachment for display on the grid
+ * @param [] answers
+ */
+JazzeePage.prototype.gridAnswerAttachment = function(answers){
+  var self = this;
+  var values = [];
+  if(this.img == undefined){
+    this.img = $('<img>').attr('src', 'resource/foundation/media/default_pdf_logo.png').attr('title', 'Download PDF').attr('alt', 'PDF Logo');
+    this.img.css('height', '1em');
+  }
+  $(answers).each(function(){
+    if(this.attachment){
+      var a = $('<a>').attr('href', this.attachment.filePath).addClass('dialog_file').append(self.img.clone());
+      values.push(a.clone().wrap('<p>').parent().html());
+    } else {
+      values.push('');
+    }
+  });
+
+  return values;
+};

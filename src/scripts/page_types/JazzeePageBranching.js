@@ -179,10 +179,14 @@ JazzeePageBranching.prototype.listDisplayElements = function(){
   elements.push({name: 'branchingPageSelection', type: 'page', title: this.getVariable('branchingElementLabel')?this.getVariable('branchingElementLabel'):this.title, pageId: this.id});
   for(var i in this.children){
     $(this.children[i].listDisplayElements()).each(function(){
-      var title = self.children[i].title + ' ' + this.title; 
-      elements.push({name: this.name, title: title, type: this.type});
+      if(this.type != 'page'  && this.name != 'attachment'){
+        var title = self.children[i].title + ' ' + this.title; 
+        elements.push({name: this.name, title: title, type: this.type});
+      }   
     });
+    
   }
+  elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
 
   return elements;
 };
@@ -202,6 +206,10 @@ JazzeePageBranching.prototype.gridData = function(data, type, full){
           }
         });
       });
+    break;
+    case 'attachment':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      values = values.concat(this.gridAnswerAttachment(answers));
     break;
   }
   if(values.length == 0){

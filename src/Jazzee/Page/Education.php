@@ -338,6 +338,9 @@ class Education extends Standard
       $element = $childPage->getElementById($elementId);
       $answer['elements'][] = $element->getJazzeeElement()->formatApplicantArray($elementAnswers);
     }
+    if(!is_null($answer['attachment'])){
+      $answer['attachment'] = $this->arrayAnswerAttachment($answer['attachment'], $page);
+    }
 
     return $answer;
   }

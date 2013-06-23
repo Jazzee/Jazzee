@@ -133,7 +133,8 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
     {type:'applicant', title: 'Last Login', name: 'lastLogin'},
     {type:'applicant', title: 'Account Created', name: 'createdAt'},
     {type:'applicant', title: 'Locked', name: 'isLocked'},
-    {type:'applicant', title: 'Paid', name: 'hasPaid'}
+    {type:'applicant', title: 'Paid', name: 'hasPaid'},
+    {type:'applicant', title: 'Attachments', name: 'attachments'}
   ];
   var hasItems = false;
   $.each(arr,function(){

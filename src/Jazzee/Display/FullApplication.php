@@ -32,7 +32,8 @@ class FullApplication implements \Jazzee\Interfaces\Display
       'lastLogin' => 'Last Login',
       'percentComplete' => 'Progress',
       'isLocked' => 'Locked',
-      'hasPaid' => 'Paid'
+      'hasPaid' => 'Paid',
+      'attachments' => 'Attachments'
     );
     $weight = 0;
     foreach($applicantElements as $name => $title){

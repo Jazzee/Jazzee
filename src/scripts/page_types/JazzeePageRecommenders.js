@@ -315,10 +315,14 @@ JazzeePageRecommenders.prototype.listDisplayElements = function(){
   });
   for(var i in this.children){
     $(this.children[i].listDisplayElements()).each(function(){
-      var title = self.children[i].title + ' ' + this.title; 
-      elements.push({name: this.name, title: title, type: this.type, pageId: this.pageId});
+      if(this.type != 'page'  && this.name != 'attachment'){
+        var title = self.children[i].title + ' ' + this.title; 
+        elements.push({name: this.name, title: title, type: this.type, pageId: this.pageId});
+      }
     });
   }
+
+  elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
 
   return elements;
 };
