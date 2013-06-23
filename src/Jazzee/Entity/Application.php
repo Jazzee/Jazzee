@@ -895,7 +895,8 @@ class Application
   {
     $applicant = $this->formatApplicantArray($applicant);
     $fileStore = \Jazzee\Globals::getFileStore();
-    foreach($applicant['attachments'] as $key => $attachment){
+    $attachments = array();
+    foreach($applicant['attachments'] as $attachment){
       $base = $applicant['fullName'] . '_attachment_' . '_' . $attachment['id'];
       //remove slashes in path to fix an apache issues with encoding slashes in redirects
       $base = str_replace(array('/', '\\'),'slash' , $base);
@@ -910,8 +911,10 @@ class Application
         $attachment['thumbnailPath'] = \Jazzee\Globals::path('resource/foundation/media/default_pdf_logo.png');
       }
       $attachment['displayValue'] = "<a href='{$attachment['filePath']}'><img src='{$attachment['thumbnailPath']}' /></a>";
-      $applicant['attachments'][$key] = $attachment;
+      $attachments[] = $attachment;
     }
+    $applicant['attachments'] = $attachments;
+
     return $applicant;
   }
   

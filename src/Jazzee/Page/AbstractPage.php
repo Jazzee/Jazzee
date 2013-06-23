@@ -315,8 +315,41 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     foreach ($children as $child) {
       $answer['children'][] = $this->arrayAnswer($child, $page->getChildById($child['page_id']));
     }
+    if(!is_null($answer['attachment'])){
+      $answer['attachment'] = $this->arrayAnswerAttachment($answer['attachment'], $page);
+    }
 
     return $answer;
+  }
+
+  /**
+   * Format an answer attachment
+   * @param \array $attachment
+   * @param \Jazzee\Entity\Page $page
+   * 
+   * @return array
+   */
+  protected function arrayAnswerAttachment(array $attachment, \Jazzee\Entity\Page $page)
+  {
+    $attachment['filePath'] = false;
+    $attachment['thumbnailPath'] = false;
+
+    $base = $page->getTitle() . '_attachment_' . $attachment['id'];
+    //remove slashes in path to fix an apache issues with encoding slashes in redirects
+    $base = str_replace(array('/', '\\'),'slash' , $base);
+    $pdfName = $base . '.pdf';
+    $pngName = $base . 'preview.png';
+    \Jazzee\Globals::getFileStore()->createSessionFile($pdfName, $attachment['attachmentHash']);
+    $attachment['filePath'] = \Jazzee\Globals::path('file/' . \urlencode($pdfName));
+    if (!empty($attachment['thumbnailHash'])) {
+      \Jazzee\Globals::getFileStore()->createSessionFile($pngName, $arr['thumbnailHash']);
+      $attachment['thumbnailPath'] = \Jazzee\Globals::path('file/' . \urlencode($pngName));
+    } else {
+      $attachment['thumbnailPath'] = \Jazzee\Globals::path('resource/foundation/media/default_pdf_logo.png');
+    }
+    $attachment['displayValue'] = "<a href='{$attachment['filePath']}'><img src='{$attachment['thumbnailPath']}' /></a>";
+
+    return $attachment;
   }
   
   /**
@@ -626,6 +659,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     foreach($this->_applicationPage->getPage()->getElements() as $element){
       $elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++, $element->getId(), null);
     }
+    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Attacment', $weight++, 'attachment', $this->_applicationPage->getPage()->getId());
 
     return $elements;
   }

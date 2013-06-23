@@ -4,7 +4,7 @@
  * Displayes the png preview and the delete link
  */
 if ($attachment = $answer->getAttachment()) {
-  $base = $answer->getPage()->getTitle() . '_attachment_' . $answer->getId();
+  $base = $answer->getPage()->getTitle() . '_attachment_' . $attachment->getId();
   //remove slashes in path to fix an apache issues with encoding slashes in redirects
   $base = str_replace(array('/', '\\'),'slash' , $base);
   $pdfName = $base . '.pdf';

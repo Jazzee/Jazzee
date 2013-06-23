@@ -247,5 +247,7 @@ JazzeePageStandard.prototype.listDisplayElements = function(){
     elements.push({name: this.id, title: this.title, type: 'element'});
   });
 
+  elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
+
   return elements;
 };
