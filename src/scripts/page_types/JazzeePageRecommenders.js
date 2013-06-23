@@ -321,8 +321,57 @@ JazzeePageRecommenders.prototype.listDisplayElements = function(){
       }
     });
   }
-
+  elements.push({name: 'lorReceived', type: 'page', title: 'Received Recommendations', pageId: this.id, sType: 'numeric'});
   elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
 
   return elements;
+};
+
+/**
+ * Dispaly applicant data in a grid
+ */
+JazzeePageRecommenders.prototype.gridData = function(data, type, full){
+  var values = [];
+  switch(data.displayElement.name){
+    case 'attachment':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      values = values.concat(this.gridAnswerAttachment(answers));
+    break;
+    case 'lorReceived':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      var complete = 0;
+      var img = $("<img src='resource/foundation/media/icons/tick.png'>").css('height', '1em');
+      $(answers).each(function(){
+        if(this.children.length > 0){
+          complete++;
+          values.push(img.clone().wrap('<p>').parent().html());
+        } else {
+          values.push('');
+        }
+      });
+      if(type == 'sort'){
+        var per = complete/answers.length;
+        //if all recommenders have been received then use the total to sort
+        if(per == 1){
+          return complete;
+        }
+        return per;
+      }
+    break;
+  }
+  if(values.length == 0){
+    return '';
+  }
+  if(values.length == 1){
+    return values[0];
+  }
+  if(type == 'display'){
+    var ol = $('<ol>');
+    $.each(values, function(){
+      ol.append($('<li>').html(this.toString()));
+    });
+    return ol.clone().wrap('<p>').parent().html();
+  }
+  //forsorting and filtering return the raw data
+  return values.join(' ');
 };

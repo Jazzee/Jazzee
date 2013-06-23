@@ -164,6 +164,7 @@ Grid.prototype.getColumns = function(){
         var displayElement = this;
         columns.push({
           sTitle: this.title,
+          sType: ('sType' in this)?this.Stype:null,
           mData: function(obj, type, set){
             return {
               grid: self,
