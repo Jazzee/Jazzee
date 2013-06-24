@@ -13,14 +13,27 @@ class ApplicantsCreateController extends \Jazzee\AdminController
   const TITLE = 'Create';
   const PATH = 'applicants/create';
   const ACTION_INDEX = 'Create applicants';
-
+  
+  protected $_defaultEmail;
   /**
-   * Add the required JS
+   * Add the required JS and create a default email to be used in single and bulk
    */
   protected function setUp()
   {
     parent::setUp();
     $this->addScript($this->path('resource/scripts/controllers/applicants_create.controller.js'));
+    $this->_defaultEmail = "Dear _Applicant_Name_,\n\nWe would like to invite you to submit an application to our {$this->_program->getName()} program. " .
+      "An account has been created for you on our online application system. To apply, visit our online application system at:\n_Link_\n\n" .
+      "Please login using the email and password listed below.\n" .
+      "Email: _Email_\nPassword: _Password_\n\n" .
+      "We recommend you change your Password after initially logging on." .
+      "You may change your password by clicking 'My Account' in the top right hand corner and clicking 'Change Password.'\n\n" .
+      "You will have until _Deadline_ to complete your application.\n\n" .
+      "If this application is not submitted by this deadline, your application for admission " .
+      "will be denied and you will be ineligible to be considered for {$this->_cycle->getName()} admission.\n\n" .
+      "If you have decided that you no longer wish to apply to our program, please inform us immediately so that we may cancel your application.\n\n" .
+      "If you have trouble with your account, please contact {$this->_application->getContactName()} at {$this->_application->getContactEmail()}\n" . 
+      "Thank you.\n{$this->_application->getContactName()}";
   }
 
   /**
@@ -71,8 +84,7 @@ class ApplicantsCreateController extends \Jazzee\AdminController
       '_Password_'
     );
     $element->setInstructions('You can use these tokens in the text, they will be replaced automatically: <br />' . implode('</br />', $notificationMessagereplacements));
-    $element->setValue("_Applicant_Name_,\nAn account has been created for you in the {$this->_application->getProgram()->getName()} application.\nYou can login at: _Link_ \nEmail: _Email_\nPassword: _Password_ \nYou have until _Deadline_ to complete your application.");
-    
+    $element->setValue($this->_defaultEmail);
     $element = $field->newElement('TextInput', 'password');
     $element->setLabel('Password');
     $element->setFormat('If you leave the password blank a random password will be generated.');
@@ -192,7 +204,7 @@ class ApplicantsCreateController extends \Jazzee\AdminController
       '_Password_'
     );
     $element->setInstructions('You can use these tokens in the text, they will be replaced automatically: <br />' . implode('</br />', $notificationMessagereplacements));
-    $element->setValue("_Applicant_Name_,\nAn account has been created for you in the {$this->_application->getProgram()->getName()} application.\nYou can login at: _Link_ \nEmail: _Email_\nPassword: _Password_ \nYou have until _Deadline_ to complete your application.");
+    $element->setValue($this->_defaultEmail);
 
     $element = $field->newElement('DateInput', 'deadlineExtension');
     $element->setLabel('Deadline');
