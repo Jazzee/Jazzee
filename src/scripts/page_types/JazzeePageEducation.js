@@ -130,7 +130,7 @@ JazzeePageEducation.prototype.manageSchoolListBlock = function(){
     var schools = [];
     for(var i = 0; i< element.listItems.length; i++){
       var item = element.listItems[i];
-      schools.push({item: item, search: item.getVariable('code')+item.title+item.getVariable('searchTerms')});
+      schools.push({item: item, search: item.getVariable('code')+item.value+item.getVariable('searchTerms')});
     }
     var input = $('<input>').attr('type', 'text').bind('change keyup', function(){
       $('div', div).remove();   
@@ -139,8 +139,9 @@ JazzeePageEducation.prototype.manageSchoolListBlock = function(){
       results = results.concat($.grep(schools, function(item,index){
         return matcher.test(item.search);
       }));
-      
-      if (results.length < 25) {
+      if (results.length == 0) {
+        div.append($('<div>').html('No Results for your search.'));
+      } else if (results.length < 50) {
         var list = $('<ul>').addClass('elementListItems');
         for(var i = 0; i< results.length; i++){
           var singleItem = pageClass.singleSchool(element, results[i].item);
@@ -198,8 +199,8 @@ JazzeePageEducation.prototype.editSchoolButton = function(){
     element.value = item.value;
     element.required = true;
     var element = field.newElement('TextInput', 'schoolCode');
-    element.label = 'Unique Code';
-    element.value = item.name;
+    element.label = 'Code';
+    element.value = item.getVariable('code');
     element.required = true;
     var element = field.newElement('Textarea', 'searchterms');
     element.label = 'Additional Search Terms';
@@ -215,12 +216,13 @@ JazzeePageEducation.prototype.editSchoolButton = function(){
         error = true;
       }
       if(schoolCode.length == 0){
-        $('input[name="schoolCode"]', this).parent().append($('<p>').addClass('message').html('Unique Code is Required and you left it blank.'));
+        $('input[name="schoolCode"]', this).parent().append($('<p>').addClass('message').html('Code is Required and you left it blank.'));
         error = true;
       }
       if(!error){
         item.setProperty('value', schoolName);
         item.setProperty('name', schoolCode);
+        item.setVariable('code', $schoolCode);
         item.setVariable('searchTerms', $('textarea[name="searchterms"]', this).val());
         dialog.dialog("destroy").remove();
         li.replaceWith(pageClass.singleSchool(elementClass, item));
@@ -316,7 +318,7 @@ JazzeePageEducation.prototype.newSchoolButton = function(){
       error = true;
     }
     if(schoolCode.length == 0){
-      $('input[name="schoolCode"]', this).parent().append($('<p>').addClass('message').html('Unique Code is Required and you left it blank.'));
+      $('input[name="schoolCode"]', this).parent().append($('<p>').addClass('message').html('Code is Required and you left it blank.'));
       error = true;
     }
     if(!error){
@@ -370,7 +372,7 @@ JazzeePageEducation.prototype.importSchoolsButton = function(){
   var pageClass = this;
   var obj = new FormObject();
   var field = obj.newField({name: 'legend', value: 'New School'});
-  field.instructions = "Schools can be intered as [tab] seperated values, one per line.  Each line can have three seperate elements School Name, Unique Code, Search Data.  School Name and Unique Code are required.";
+  field.instructions = "Schools can be intered as [tab] seperated values, one per line.  Each line can have three seperate elements seperated by tabs School Name, Code, Search Data.  School Name and Code are required.";
   var element = field.newElement('Textarea', 'schools');
   element.label = 'Schools';
   element.required = true;
