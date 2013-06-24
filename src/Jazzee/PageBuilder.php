@@ -17,8 +17,9 @@ abstract class PageBuilder extends AdminController
    */
   public function setUp()
   {
-    //remove time limits so any page can be saved no matter how complicated
+    //remove time limits and memory restrictions so any page can be saved no matter how complicated
     set_time_limit(0);
+    ini_set('memory_limit', -1);
     //everything is displayed over json
     $this->layout = 'json';
 
