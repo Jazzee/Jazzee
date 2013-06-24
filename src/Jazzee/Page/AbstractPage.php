@@ -660,6 +660,8 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
       $elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++, $element->getId(), null);
     }
     $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Attacment', $weight++, 'attachment', $this->_applicationPage->getPage()->getId());
+    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Public Answer Status', $weight++, 'publicAnswerStatus', $this->_applicationPage->getPage()->getId());
+    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Private Answer Status', $weight++, 'privateAnswerStatus', $this->_applicationPage->getPage()->getId());
 
     return $elements;
   }
