@@ -116,6 +116,8 @@ JazzeePageQASAddress.prototype.listDisplayElements = function(){
   });
 
   elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
+  elements.push({name: 'publicAnswerStatus', type: 'page', title: this.title + ' Public Answer Status', pageId: this.id, sType: 'numeric'});
+  elements.push({name: 'privateAnswerStatus', type: 'page', title: this.title + ' Private Answer Status', pageId: this.id, sType: 'numeric'});
 
   return elements;
 };

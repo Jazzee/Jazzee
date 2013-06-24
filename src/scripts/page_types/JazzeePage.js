@@ -842,6 +842,46 @@ JazzeePage.prototype.gridData = function(data, type, full){
       var answers = data.applicant.getAnswersForPage(this.id);
       values = values.concat(this.gridAnswerAttachment(answers));
     break;
+    case 'publicAnswerStatus':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      var hasStatus = 0;
+      $(answers).each(function(){
+        if(this.publicStatus != null){
+          hasStatus++;
+          values.push(this.publicStatus.name);
+        } else {
+          values.push('');
+        }
+      });
+      if(type == 'sort'){
+        var per = hasStatus/values.length;
+        //if 100% are set then use the total set
+        if(per == 1){
+          return hasStatus+1;
+        }
+        return per;
+      }
+    break;
+    case 'privateAnswerStatus':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      var hasStatus = 0;
+      $(answers).each(function(){
+        if(this.privateStatus != null){
+          hasStatus++;
+          values.push(this.privateStatus.name);
+        } else {
+          values.push('');
+        }
+      });
+      if(type == 'sort'){
+        var per = hasStatus/values.length;
+        //if 100% are set then use the total set
+        if(per == 1){
+          return hasStatus+1;
+        }
+        return per;
+      }
+    break;
   }
   if(values.length == 0){
     return '';

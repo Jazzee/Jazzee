@@ -315,7 +315,7 @@ JazzeePageRecommenders.prototype.listDisplayElements = function(){
   });
   for(var i in this.children){
     $(this.children[i].listDisplayElements()).each(function(){
-      if(this.type != 'page'  && this.name != 'attachment'){
+      if(this.type != 'page'  && (this.name != 'attachment' || this.name != 'answerPublicStatus' || this.name != 'answerPublicStatus')){
         var title = self.children[i].title + ' ' + this.title; 
         elements.push({name: this.name, title: title, type: this.type, pageId: this.pageId});
       }

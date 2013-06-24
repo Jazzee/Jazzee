@@ -446,13 +446,12 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $weight = count($elements);
     foreach($this->_applicationPage->getPage()->getChildren() as $child){
       foreach($child->getApplicationPageJazzeePage()->listDisplayElements() as $displayElement){
-        if($displayElement->type != 'page' and $displayElement->name != 'attachment'){
+        if($displayElement->type != 'page' and !in_array($displayElement->name, array('attachment', 'answerPublicStatus', 'answerPrivateStatus'))){
           $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() . ' ' . $displayElement->title, $weight++, $displayElement->name, $displayElement->pageId);
         }
       }
     }
     $elements[] = new \Jazzee\Display\Element('page', 'Received Recommendations', $weight++, 'lorReceived', $this->_applicationPage->getPage()->getId());
-    $elements[] = new \Jazzee\Display\Element('page', 'Attacment', $weight++, 'attachment', $this->_applicationPage->getPage()->getId());
 
     return $elements;
   }

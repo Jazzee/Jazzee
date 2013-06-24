@@ -179,7 +179,7 @@ JazzeePageBranching.prototype.listDisplayElements = function(){
   elements.push({name: 'branchingPageSelection', type: 'page', title: this.getVariable('branchingElementLabel')?this.getVariable('branchingElementLabel'):this.title, pageId: this.id});
   for(var i in this.children){
     $(this.children[i].listDisplayElements()).each(function(){
-      if(this.type != 'page'  && this.name != 'attachment'){
+      if(this.type != 'page'  && (this.name != 'attachment' || this.name != 'answerPublicStatus' || this.name != 'answerPublicStatus')){
         var title = self.children[i].title + ' ' + this.title; 
         elements.push({name: this.name, title: title, type: this.type});
       }   
@@ -187,6 +187,8 @@ JazzeePageBranching.prototype.listDisplayElements = function(){
     
   }
   elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
+  elements.push({name: 'publicAnswerStatus', type: 'page', title: this.title + ' Public Answer Status', pageId: this.id, sType: 'numeric'});
+  elements.push({name: 'privateAnswerStatus', type: 'page', title: this.title + ' Private Answer Status', pageId: this.id, sType: 'numeric'});
 
   return elements;
 };
@@ -210,6 +212,46 @@ JazzeePageBranching.prototype.gridData = function(data, type, full){
     case 'attachment':
       var answers = data.applicant.getAnswersForPage(this.id);
       values = values.concat(this.gridAnswerAttachment(answers));
+    break;
+    case 'publicAnswerStatus':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      var hasStatus = 0;
+      $(answers).each(function(){
+        if(this.publicStatus != null){
+          hasStatus++;
+          values.push(this.publicStatus.name);
+        } else {
+          values.push('');
+        }
+      });
+      if(type == 'sort'){
+        var per = hasStatus/values.length;
+        //if 100% are set then use the total set
+        if(per == 1){
+          return hasStatus+1;
+        }
+        return per;
+      }
+    break;
+    case 'privateAnswerStatus':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      var hasStatus = 0;
+      $(answers).each(function(){
+        if(this.privateStatus != null){
+          hasStatus++;
+          values.push(this.privateStatus.name);
+        } else {
+          values.push('');
+        }
+      });
+      if(type == 'sort'){
+        var per = hasStatus/values.length;
+        //if 100% are set then use the total set
+        if(per == 1){
+          return hasStatus+1;
+        }
+        return per;
+      }
     break;
   }
   if(values.length == 0){
