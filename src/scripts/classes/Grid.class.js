@@ -47,12 +47,24 @@ Grid.prototype.init = function(){
       "fnPreRowSelect": function(e, nodes) {
         if(e){ //e is not defined when we call the fnSelect method directly
           if (e.shiftKey && self.lastClick != null) {
-            var lastClickPosition = grid.fnGetPosition(self.lastClick);
-            var thisClickPosition = grid.fnGetPosition(nodes[0]);
-            if (lastClickPosition >= 0 && thisClickPosition >= 0 && lastClickPosition != thisClickPosition) {
+            var oSettings = grid.fnSettings();
+            var clickPositionOne = grid.fnGetPosition(self.lastClick);
+            var clickPositionTwo = grid.fnGetPosition(nodes[0]);
+            
+            var displayPositionOne = -1;
+            var displayPositionTwo = -1;
+            for(var i = 0; i < oSettings.aiDisplay.length; i++) {
+              if(oSettings.aiDisplay[i] == clickPositionOne) {
+                displayPositionOne = i;
+              }
+              if(oSettings.aiDisplay[i] == clickPositionTwo) {
+                displayPositionTwo = i;
+              }
+            }
+            if (displayPositionOne >= 0 && displayPositionTwo >= 0 && displayPositionOne != displayPositionTwo) {
               //use min/max so we can click higher or ower than the first click and still loop corectly
-              for (var i=Math.min(thisClickPosition,lastClickPosition); i < Math.max(thisClickPosition,lastClickPosition); i++) {
-                this.fnSelect(grid.fnSettings().aoData[i].nTr);
+              for (var i=Math.min(displayPositionTwo,displayPositionOne); i < Math.max(displayPositionTwo,displayPositionOne); i++) {
+                this.fnSelect(oSettings.aoData[ oSettings.aiDisplay[i] ].nTr);
               }
             }
           }
