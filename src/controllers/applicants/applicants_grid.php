@@ -38,6 +38,11 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->addCss($this->path('resource/styles/grid.css'));
     $this->addCss($this->path('resource/styles/displaymanager.css'));
 
+    $this->addScript($this->path('resource/foundation/scripts/form.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jquery.wysiwyg.js'));
+    $this->addScript($this->path('resource/foundation/scripts/jquery.filter_input.js'));
+    $this->addCss($this->path('resource/foundation/styles/jquery.wysiwyg.css'));
+
     $scripts = array();
     
     //add all of the JazzeePage scripts for display
@@ -73,6 +78,41 @@ class ApplicantsGridController extends \Jazzee\AdminController
   public function actionIndex()
   {
     $this->layout = 'wide';
+  }
+
+  /**
+   *  Adds Messages entities for the submitted list of applicants
+   */	
+  public function actionSendMessage()  
+  {
+    $applicants = explode(',',$this->post['applicantIds']);
+    $count = 0;
+    try{
+      foreach ($applicants as $id) {
+      
+        $thread = new \Jazzee\Entity\Thread();
+        $thread->setSubject($this->post['subject']);
+        $applicant = $this->getApplicantById($id);
+        $thread->setApplicant($applicant);
+
+        $message = new \Jazzee\Entity\Message();
+        $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+        $message->setText($this->post['body']);
+        $thread->addMessage($message);
+        $this->_em->persist($thread);
+        $this->_em->persist($message);
+      }
+
+      $this->addMessage('success', 'Messages sent successfully');
+      $this->setLayoutVar('status', 'success');
+    }catch(Exception $e){
+      $this->addMessage('error', 'An error occured while sending messages, please contact the administrator.');
+      $this->setLayoutVar('status', 'error');
+      error_log("Error sending messages: ".$e->getTraceAsString());
+    }
+
+    $this->setVar('result', array());
+    $this->loadView('applicants_single/result');
   }
   
   /**
@@ -304,7 +344,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive'))) {
+    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive','sendMessage'))) {
       $action = 'index';
     }
 

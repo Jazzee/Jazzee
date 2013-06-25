@@ -75,6 +75,11 @@ Grid.prototype.init = function(){
       "aButtons": [
         "select_all",
         "select_none",
+            {
+                "sExtends": "send_messages",
+                "sButtonText": "Email",
+                "sUrl": "grid/sendMessage"
+            },
         {
           "sExtends":    "collection",
           "sButtonText": "Download",
@@ -426,6 +431,83 @@ e.fn.DataTable.TableTools=TableTools})(jQuery,window,document);
 * Copied form: http://datatables.net/extras/tabletools/plug-ins
 **/
 
+TableTools.BUTTONS.send_messages = {
+    "sAction": "text",
+    "sTag": "default",
+    "sFieldBoundary": "",
+    "sFieldSeperator": "\t",
+    "sNewLine": "<br>",
+    "sToolTip": "",
+    "sButtonClass": "DTTT_button_text",
+    "sButtonClassHover": "DTTT_button_text_hover",
+    "sButtonText": "Email",
+    "mColumns": "all",
+    "bHeader": true,
+    "bFooter": true,
+    "sDiv": "",
+    "fnMouseover": null,
+    "fnMouseout": null,
+    "fnClick": function( nButton, oConfig ) { 
+        var tableTools = this;
+        var overlay = $('<div>').attr('id', 'emailoverlay');
+        $('body').append(overlay);
+        overlay.dialog({
+          height: 390,
+          modal: true,
+          autoOpen: true,
+          open: function(event, ui){
+
+             var obj = new FormObject();
+	     var field = obj.newField({name: 'legend', value: 'Send Bulk Message'});
+	     var element = field.newElement('TextInput', 'subject');
+	     element.label = 'Subject';
+	     element.required = true;
+
+	     var body = field.newElement('Textarea', 'body');
+	     body.label = 'Body';
+	     body.required = true;
+
+	     var toList = $('<div>').addClass('recipients');
+	     overlay.append(toList);
+	     toList.append($('<span>').addClass('label').addClass('to').html("To:"));
+	     var applicantIds = [];
+	     var selected = tableTools.fnGetSelectedData();
+	     for(var i = 0; i < selected.length; i++){
+		 applicantIds.push(selected[i].id);
+		 toList.append($('<span>').addClass('recipient').html(""+selected[i].fullName));
+	     }
+  
+	     var formObject = new Form().create(obj);
+	     var form = $('form',formObject);
+	     form.append($('<button type="submit" name="submit">').html('Send').button({
+			 icons: {
+			     primary: 'ui-icon-disk'
+				 }
+		     }));
+  
+	     form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+	     form.attr( 'action', oConfig.sUrl );
+	     form.bind('submit',function(e){
+		     $.ajax({
+			     type: 'POST',
+				 url: form.attr('action'),
+				 data: form.serialize()
+				 });
+
+		     overlay.dialog("destroy").remove();
+		     event.preventDefault(); 
+		     return false;
+		 });//end submit
+
+	     overlay.append(form);
+		}
+	    });
+    },
+    "fnSelect": null,
+    "fnComplete": null,
+    "fnInit": null
+};
+
 TableTools.BUTTONS.download_applicants = {
     "sAction": "text",
     "sTag": "default",
@@ -494,3 +576,4 @@ TableTools.BUTTONS.download_applicants = {
     "fnComplete": null,
     "fnInit": null
 };
+
