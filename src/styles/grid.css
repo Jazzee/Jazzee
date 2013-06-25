@@ -25,30 +25,12 @@ div.applicant_grid div.progress div.label{
   margin: 10px 5px;
 }
 
-#emailoverlay form div>span.label{
-vertical-align: top;
-display: inline-block;
-}
-
-#emailoverlay form>div {
-margin-top: 5px;
-}
-
-
-#emailoverlay form input {
-width: 200px;
-}
-
-#emailoverlay form input[type='submit'] {
-display: block;
-width: 100%;
-margin: 10px;
-margin-top: 20px;
+#emailoverlay form input, #emailoverlay form textarea {
+width: 150px;
 }
 
 #emailoverlay form textarea {
 height: 180px;
-width: 200px;
 }
 
 .recipients span{

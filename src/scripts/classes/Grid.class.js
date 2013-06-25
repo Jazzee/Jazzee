@@ -409,55 +409,52 @@ TableTools.BUTTONS.send_messages = {
           modal: true,
           autoOpen: true,
           open: function(event, ui){
-            //$(".ui-dialog-titlebar", ui.dialog).hide();
 
-            var form = $('<form>');
-            form.attr( 'method', 'post' );
-	    overlay.append(form);
+             var obj = new FormObject();
+	     var field = obj.newField({name: 'legend', value: 'Send Bulk Message'});
+	     var element = field.newElement('TextInput', 'subject');
+	     element.label = 'Subject';
+	     element.required = true;
 
-            var toList = $('<div>').addClass('recipients');
-          form.append(toList);
+	     var body = field.newElement('Textarea', 'body');
+	     body.label = 'Body';
+	     body.required = true;
 
-            toList.append($('<span>').addClass('label').addClass('to').html("To:"));
-            var applicantIds = [];
-            var selected = tableTools.fnGetSelectedData();
-            for(var i = 0; i < selected.length; i++){
-              applicantIds.push(selected[i].id);
-              toList.append($('<span>').addClass('recipient').html(""+selected[i].fullName));
-            }
+	     var toList = $('<div>').addClass('recipients');
+	     overlay.append(toList);
+	     toList.append($('<span>').addClass('label').addClass('to').html("To:"));
+	     var applicantIds = [];
+	     var selected = tableTools.fnGetSelectedData();
+	     for(var i = 0; i < selected.length; i++){
+		 applicantIds.push(selected[i].id);
+		 toList.append($('<span>').addClass('recipient').html(""+selected[i].fullName));
+	     }
+  
+	     var formObject = new Form().create(obj);
+	     var form = $('form',formObject);
+	     form.append($('<button type="submit" name="submit">').html('Send').button({
+			 icons: {
+			     primary: 'ui-icon-disk'
+				 }
+		     }));
+  
+	     form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+	     form.attr( 'action', oConfig.sUrl );
+	     form.bind('submit',function(e){
+		     $.ajax({
+			     type: 'POST',
+				 url: form.attr('action'),
+				 data: form.serialize()
+				 });
 
-            var subject = $('<div>'); 
-            form.append(subject);
-            subject.append($('<span>').addClass('label').html('Subject').css('display', 'inline-block'));
-            subject.append($('<input>').attr('name', 'subject').attr('type', 'text').val(""));
-            form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+		     overlay.dialog("destroy").remove();
+		     event.preventDefault(); 
+		     return false;
+		 });//end submit
 
-            var body = $('<div>');
-            form.append(body);
-            body.append($('<span>').addClass('label').html('Body').css('display', 'inline-block'));
-            body.append($('<textarea>').attr('name', 'body').val(""));
-
-            body.append($('<input>').attr('type','submit').attr('value','Send'));
-
-            form.attr( 'action', oConfig.sUrl );
-            form.bind('submit', function(){
-    $.ajax({
-      type: form.attr('method'),
-      url: form.attr('action'),
-      data: form.serialize()
-    }).done(function() {
-	 $('#emailoverlay').dialog('destroy').remove();
-         alert("Messages sent successfully");       
-    }).fail(function() {
-
-	 $('#emailoverlay').dialog('destroy').remove();
-         alert("Failed to send messages");       
-    });
-    event.preventDefault(); 
-return false;
-            });
-          }
-        });
+	     overlay.append(form);
+		}
+	    });
     },
     "fnSelect": null,
     "fnComplete": null,
