@@ -32,6 +32,9 @@ Grid.prototype.init = function(){
   }else{//Opera, etc.
     table.mousedown(function(){return false;});
   }
+
+  var pdfTemplates = this.services.getCurrentApplication().listTemplates();
+  console.log("have templates? "+pdfTemplates);
   $(this.target).append(table);
   var grid = table.dataTable( {
     sScrollY: "500",
@@ -73,7 +76,16 @@ Grid.prototype.init = function(){
         }
         return true;
       },
-      "aButtons": buttons
+      "aButtons": [
+        "select_all",
+        "select_none",
+        {
+          "sExtends": "download_with_options",
+          "sButtonText": "Download",
+	  "pdfTemplates": pdfTemplates,
+	  "sUrl": "grid/downloadPdfArchive"
+        }
+      ]
     }
   });
   var progressbar = $('<div>').addClass('progress').append($('<div>').addClass('label').html('Loading Grid...'));
@@ -564,6 +576,132 @@ TableTools.BUTTONS.send_messages = {
     "fnInit": null
 };
 
+TableTools.BUTTONS.download_with_options = {
+    "sAction": "text",
+    "sTag": "default",
+    "sFieldBoundary": "",
+    "sFieldSeperator": "\t",
+    "sNewLine": "<br>",
+    "sToolTip": "",
+    "sButtonClass": "DTTT_button_text",
+    "sButtonClassHover": "DTTT_button_text_hover",
+    "sButtonText": "Download",
+    "mColumns": "all",
+    "bHeader": true,
+    "bFooter": true,
+    "sDiv": "",
+    "fnMouseover": null,
+    "fnMouseout": null,
+    "fnClick": function( nButton, oConfig ) { 
+        var tableTools = this;
+        var overlay = $('<div>').attr('id', 'downloadoverlay');
+        $('body').append(overlay);
+        overlay.dialog({
+		height: 390,
+		    modal: true,
+		    autoOpen: true,
+		    open: function(event, ui){
+		    var obj = new FormObject();
+		    var field = obj.newField({name: 'legend', value: 'Choose PDF Template'});
+
+		    var type = field.newElement('RadioList', 'type');
+		    type.label = 'Download Type';
+		    type.required = true;
+		    type.addItem("Excel", "grid/downloadXls");
+		    type.addItem("XML", "grid/downloadXml");
+		    type.addItem("PDF", "grid/downloadPdfArchive");
+		    type.addItem("JSON", "grid/downloadJson");
+
+		    var template = field.newElement('SelectList', 'pdftemplate');
+		    template.name = "pdftemplate";
+		    template.label = 'PDF Template';
+		    template.addItem("--", "");
+		    for(var i = 0; i < oConfig.pdfTemplates.length; i++){
+			template.addItem(oConfig.pdfTemplates[i]["title"], oConfig.pdfTemplates[i]["id"])
+		    }
+
+		    var formObject = new Form().create(obj);
+		    var form = $('form',formObject);
+                    form.attr( 'method', 'post' );
+		    form.append($('<button type="submit" name="submit">').html('Download').button({
+				icons: {
+				    primary: 'ui-icon-disk'
+					}
+			    }));
+
+            var iFrameName = "iFrame" + (new Date().getTime());
+            var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
+            iFrame.css("display", "none");
+
+            var form2 = $('<form>');
+            form2.attr( 'method', 'post' );
+            iFrame.append(form2);
+
+		    var applicantIds = [];
+		    var selected = tableTools.fnGetSelectedData();
+		    for(var i = 0; i < selected.length; i++){
+			applicantIds.push(selected[i].id);
+		    }		    
+		    form2.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+		    form2.attr( 'action', oConfig.sUrl );
+
+		    form.bind('submit', function(){
+                       form2.submit();
+		       event.preventDefault(); 
+		       return false;
+
+                 });
+
+     form2.bind('submit', function(){
+        // BUG: foundation does not seem to add the name to the select element
+	// var template = $('select[name="pdftemplate"]',overlay).val();
+        var template = $('select',overlay).val();
+        var dlType = $('input[name="type"]:radio:checked', overlay).val();
+        if(template && (dlType == "grid/downloadPdfArchive")){
+	  form2.append($('<input>').attr('name', 'pdftemplate').attr('type', 'hidden').val(template));
+	  form2.attr( 'action', "grid/downloadPdfTemplateArchive" );
+        }else{
+	  form2.attr( 'action', dlType );
+        }
+        $(".ui-dialog-titlebar", ui.dialog).hide();
+
+        var label = $('<div>').addClass('label').html('Downloading...').css('float', 'left').css('margin','10px 5px');
+        var progressbar = $('<div>').addClass('progress').append(label);
+        overlay.append(progressbar);
+        progressbar.progressbar({
+           value: false
+        });
+
+	var cookieName = 'fileDownload';
+	var check = function(){
+        if($.cookie(cookieName) == 'complete'){
+	    $.cookie(cookieName, 'false', {expires: 1, path: '/' });
+	    $('#downloadoverlay').dialog('destroy').remove();
+	    iFrame.remove();
+	} else {
+	    setTimeout(check, 500);
+	}
+      };
+      setTimeout(check, 500);
+      return true;
+    });
+	
+    overlay.append(form);
+    event.preventDefault(); 
+    return false;
+  }
+});
+    },
+    "fnSelect": null,
+    "fnComplete": null,
+    "fnInit": null
+};
+
+/**
+* Table tools button plugin to create downloads from applicant data
+* Copied form: http://datatables.net/extras/tabletools/plug-ins
+**/
+
 TableTools.BUTTONS.download_applicants = {
     "sAction": "text",
     "sTag": "default",
@@ -583,6 +721,7 @@ TableTools.BUTTONS.download_applicants = {
     "fnClick": function( nButton, oConfig ) { 
         var tableTools = this;
         var overlay = $('<div>').attr('id', 'downloadoverlay');
+        $('body').append(overlay);
         overlay.dialog({
           height: 90,
           modal: true,
@@ -631,4 +770,3 @@ TableTools.BUTTONS.download_applicants = {
     "fnComplete": null,
     "fnInit": null
 };
-
