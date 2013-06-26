@@ -32,7 +32,7 @@ JazzeeElementTextarea.prototype.createSlider = function(property, title){
   var elementClass = this;
   var div = $('<div>').attr('id', property + 'slider' + elementClass.id);
   var link = $('<a>').attr('href', '#').attr('id', property + 'Value' + elementClass.id).html(elementClass[property]).bind('click', function(){
-    $('#' + property + 'slider').replaceWith(elementClass.createInput(property, title));
+    $('#' + property + 'slider' + elementClass.id).replaceWith(elementClass.createInput(property, title));
     return false;
   });
   div.append($('<p>').html(title + ' Length ').append(link));
@@ -58,9 +58,9 @@ JazzeeElementTextarea.prototype.createSlider = function(property, title){
  */
 JazzeeElementTextarea.prototype.createInput = function(property, title){
   var elementClass = this;
-  var div = $('<div>').attr('id', property + 'slider');
-  var link = $('<a>').attr('href', '#').attr('id', property + 'Value').html(elementClass[property]).bind('click', function(){
-    $('#' + property + 'slider').replaceWith(elementClass.createSlider(property, title));
+  var div = $('<div>').attr('id', property + 'slider' + elementClass.id);
+  var link = $('<a>').attr('href', '#').attr('id', property + 'Value' + elementClass.id).html(elementClass[property]).bind('click', function(){
+    $('#' + property + 'slider' + elementClass.id).replaceWith(elementClass.createSlider(property, title));
     return false;
   });
   div.append($('<p>').html(title + ' Length ').append(link));
@@ -68,7 +68,7 @@ JazzeeElementTextarea.prototype.createInput = function(property, title){
   var minInput = $('<input>').attr('type', 'text'). attr('size', 5).attr('id', property + 'Input').attr('value', elementClass[property]);
   minInput.bind('change', function(){
     elementClass.setProperty(property, $(this).attr('value'));
-    $('#' + property + 'Value').html(elementClass[property]);
+    $('#' + property + 'Value' + elementClass.id).html(elementClass[property]);
   });
   div.append(minInput);
   this.page.pageBuilder.addNumberTest(minInput);
