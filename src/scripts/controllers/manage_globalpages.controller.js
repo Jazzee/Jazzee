@@ -141,6 +141,7 @@ GlobalPageBuilder.prototype.importPageControl = function(){
         pageBuilder.importPage(obj);
         div.dialog("close");
       } catch(e){
+        console.log(e);
         pageBuilder.status.addMessage('error', 'Cannot import this page, there is something wrong with the exported page structure.  You will need to re-export and try importing this page again.');
       }
       return false;
