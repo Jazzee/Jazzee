@@ -14,8 +14,13 @@ class ApplicantsGridController extends \Jazzee\AdminController
   const MENU = 'Applicants';
   const TITLE = 'Grid View';
   const PATH = 'applicants/grid';
-  const ACTION_INDEX = 'All Applicants';
-
+  const ACTION_INDEX = 'View Applicants';
+  const ACTION_DOWNLOADXLS = 'Download Excel Data';
+  const ACTION_DOWNLOADJSON = 'Download JSON Data';
+  const ACTION_DOWNLOADXML = 'Download XML Data';
+  const ACTION_DOWNLOADPDFARCHIVE = 'Download PDF Data';
+  const ACTION_SENDMESSAGE = 'Send Applicant Messages';
+    
   /**
    * Add the required JS
    */
@@ -332,7 +337,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive','sendMessage'))) {
+    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay'))) {
       $action = 'index';
     }
 
