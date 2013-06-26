@@ -326,10 +326,13 @@ PageBuilder.prototype.pageFromObject = function(obj, title, status){
     Element.isModified = true;
     for(var j = 0; j < e.list.length; j++){
       var item = Element.newListItem(e.list[j].value);
-      item.isActive = e.list[j].isActive;
-      item.weight = e.list[j].weight;
-      item.name = e.list[j].name;
-      item.status = 'new';
+      item.setProperty('isActive',e.list[j].isActive);
+      item.setProperty('weight',e.list[j].weight);
+      item.setProperty('name',e.list[j].name);
+      for( var name in e.list[j].variables){
+        item.setVariable(e.list[j].variables[name].name, e.list[j].variables[name].value);
+      };
+      item.setProperty('status','new');
     }
     page.addElement(Element);
   }
