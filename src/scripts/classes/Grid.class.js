@@ -449,9 +449,24 @@ TableTools.BUTTONS.send_messages = {
     "fnMouseout": null,
     "fnClick": function( nButton, oConfig ) { 
       var tableTools = this;
-      var dialog = $('<div>').attr('id', 'emailoverlay');
+      var dialog = $('<div>');
       var obj = new FormObject();
       var field = obj.newField({name: 'legend', value: 'Send Message'});
+      
+      var applicantIds = [];
+      var selected = tableTools.fnGetSelectedData();
+      var toList = [];
+      for(var i = 0; i < selected.length; i++){
+        applicantIds.push(selected[i].id);
+        toList.push(selected[i].fullName);
+      }
+      var element = field.newElement('Plaintext', 'to');
+      element.label = 'To';
+      if(toList.length < 10){
+        element.value = toList.join(', ');
+      } else {
+        element.value = toList.length + ' recipients';
+      }
       var element = field.newElement('TextInput', 'subject');
       element.label = 'Subject';
       element.required = true;
@@ -459,16 +474,6 @@ TableTools.BUTTONS.send_messages = {
       var body = field.newElement('Textarea', 'body');
       body.label = 'Body';
       body.required = true;
-
-      var toList = $('<div>').addClass('recipients');
-      dialog.append(toList);
-      toList.append($('<span>').addClass('label').addClass('to').html("To:"));
-      var applicantIds = [];
-      var selected = tableTools.fnGetSelectedData();
-      for(var i = 0; i < selected.length; i++){
-          applicantIds.push(selected[i].id);
-          toList.append($('<span>').addClass('recipient').html(""+selected[i].fullName));
-      }
 
       var formObject = new Form().create(obj);
       var form = $('form',formObject);
@@ -479,6 +484,8 @@ TableTools.BUTTONS.send_messages = {
       }));
 
       form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+      $('input', form).css('width', '250px');
+      $('textarea', form).css('width', '250px').css('height', '180px');
       form.attr( 'action', oConfig.sUrl );
       form.bind('submit',function(e){
         $('p.message', this).remove();
@@ -526,7 +533,8 @@ TableTools.BUTTONS.send_messages = {
       dialog.append(form);
       dialog.dialog({
         modal: true,
-        autoOpen: true
+        autoOpen: true,
+        width: 500
       });
     },
     "fnSelect": null,
