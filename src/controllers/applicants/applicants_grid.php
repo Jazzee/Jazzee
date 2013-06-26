@@ -86,32 +86,23 @@ class ApplicantsGridController extends \Jazzee\AdminController
   public function actionSendMessage()  
   {
     $applicants = explode(',',$this->post['applicantIds']);
-    $count = 0;
-    try{
-      foreach ($applicants as $id) {
-      
-        $thread = new \Jazzee\Entity\Thread();
-        $thread->setSubject($this->post['subject']);
-        $applicant = $this->getApplicantById($id);
-        $thread->setApplicant($applicant);
+    foreach ($applicants as $id) {
+      $thread = new \Jazzee\Entity\Thread();
+      $thread->setSubject($this->post['subject']);
+      $applicant = $this->getApplicantById($id);
+      $thread->setApplicant($applicant);
 
-        $message = new \Jazzee\Entity\Message();
-        $message->setSender(\Jazzee\Entity\Message::PROGRAM);
-        $message->setText($this->post['body']);
-        $thread->addMessage($message);
-        $this->_em->persist($thread);
-        $this->_em->persist($message);
-      }
-
-      $this->addMessage('success', 'Messages sent successfully');
-      $this->setLayoutVar('status', 'success');
-    }catch(Exception $e){
-      $this->addMessage('error', 'An error occured while sending messages, please contact the administrator.');
-      $this->setLayoutVar('status', 'error');
-      error_log("Error sending messages: ".$e->getTraceAsString());
+      $message = new \Jazzee\Entity\Message();
+      $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+      $message->setText($this->post['body']);
+      $thread->addMessage($message);
+      $this->_em->persist($thread);
+      $this->_em->persist($message);
     }
 
-    $this->setVar('result', array());
+    $this->addMessage('success', count($applicants) . ' messages sent successfully');
+    $this->setLayoutVar('status', 'success');
+    $this->setVar('result', true);
     $this->loadView('applicants_single/result');
   }
   
