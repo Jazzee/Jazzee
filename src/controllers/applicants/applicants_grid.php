@@ -39,9 +39,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->addCss($this->path('resource/styles/displaymanager.css'));
 
     $this->addScript($this->path('resource/foundation/scripts/form.js'));
-    $this->addScript($this->path('resource/foundation/scripts/jquery.wysiwyg.js'));
-    $this->addScript($this->path('resource/foundation/scripts/jquery.filter_input.js'));
-    $this->addCss($this->path('resource/foundation/styles/jquery.wysiwyg.css'));
 
     $scripts = array();
     
