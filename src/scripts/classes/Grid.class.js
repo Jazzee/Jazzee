@@ -481,30 +481,45 @@ TableTools.BUTTONS.send_messages = {
       form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
       form.attr( 'action', oConfig.sUrl );
       form.bind('submit',function(e){
+        $('p.message', this).remove();
+        var subject = $('input[name="subject"]', this).val();
+        var body = $('textarea[name="body"]', this).val();
+        var error = false;
+        if(subject.length == 0){
+          $('input[name="subject"]', this).parent().append($('<p>').addClass('message').html('this element is Required and you left it blank.'));
+          error = true;
+        }
+        if(body.length == 0){
+          $('textarea[name="body"]', this).parent().append($('<p>').addClass('message').html('this element is Required and you left it blank.'));
+          error = true;
+        }
+        if(!error){
         var overlay = $('<div>').attr('id', 'downloadoverlay');
-        overlay.dialog({
-          height: 90,
-          modal: true,
-          autoOpen: true,
-          open: function(event, ui){
-            $(".ui-dialog-titlebar", ui.dialog).hide();
-            var label = $('<div>').addClass('label').html('Sending Email...').css('float', 'left').css('margin','10px 5px');
-            var progressbar = $('<div>').addClass('progress').append(label);
-            overlay.append(progressbar);
-            progressbar.progressbar({
-              value: false
-            });
-            $.ajax({
-              type: 'POST',
-              url: form.attr('action'),
-              data: form.serialize(),
-              success: function(){
-                overlay.dialog("destroy").remove();
-              }
-            });
-            dialog.dialog("destroy").remove();
-          }
-        });
+          overlay.dialog({
+            height: 90,
+            modal: true,
+            autoOpen: true,
+            open: function(event, ui){
+              $(".ui-dialog-titlebar", ui.dialog).hide();
+              var label = $('<div>').addClass('label').html('Sending Email...').css('float', 'left').css('margin','10px 5px');
+              var progressbar = $('<div>').addClass('progress').append(label);
+              overlay.append(progressbar);
+              progressbar.progressbar({
+                value: false
+              });
+              dialog.dialog("destroy").remove();
+              $.ajax({
+                type: 'POST',
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(){
+                  overlay.dialog("destroy").remove();
+                }
+              });
+              
+            }
+          });
+        }
         event.preventDefault(); 
         return false;
       });//end submit
