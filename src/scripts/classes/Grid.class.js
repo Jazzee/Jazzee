@@ -13,12 +13,13 @@ function Grid(display, applicantIds, target, controllerPath){
   this.controllerPath = controllerPath;
   this.maxLoad = 100;
   this.lastClick = null;
+  this.services = new Services;
 };
 
 Grid.prototype.init = function(){
   var self = this;
   var columns = this.getColumns();
-  
+  var buttons = this.getButtons();
   var data = [];
   $(this.target).empty();
   $(this.target).addClass('applicant_grid');
@@ -72,41 +73,7 @@ Grid.prototype.init = function(){
         }
         return true;
       },
-      "aButtons": [
-        "select_all",
-        "select_none",
-            {
-                "sExtends": "send_messages",
-                "sButtonText": "Email",
-                "sUrl": "grid/sendMessage"
-            },
-        {
-          "sExtends":    "collection",
-          "sButtonText": "Download",
-          "aButtons":    [	
-            {
-                "sExtends": "download_applicants",
-                "sButtonText": "Excel",
-                "sUrl": "grid/downloadXls"
-            },
-            {
-                "sExtends": "download_applicants",
-                "sButtonText": "XML",
-                "sUrl": "grid/downloadXml"
-            },
-            {
-                "sExtends": "download_applicants",
-                "sButtonText": "PDF",
-                "sUrl": "grid/downloadPdfArchive"
-            },
-            {
-                "sExtends": "download_applicants",
-                "sButtonText": "JSON",
-                "sUrl": "grid/downloadJson"
-            }
-          ]
-        }
-      ]
+      "aButtons": buttons
     }
   });
   var progressbar = $('<div>').addClass('progress').append($('<div>').addClass('label').html('Loading Grid...'));
@@ -195,6 +162,61 @@ Grid.prototype.getColumns = function(){
     }
   });
   return columns;
+};
+
+/**
+ * Get the buttons for the grid based on user permissions
+ * @return []
+**/
+Grid.prototype.getButtons = function(){
+  var self = this;
+  var buttons = [];
+  buttons.push('select_all');
+  buttons.push('select_none');
+  if(self.services.checkIsAllowed('applicants_grid', 'sendMessage')){
+    buttons.push({
+      "sExtends": "send_messages",
+      "sButtonText": "Email",
+      "sUrl": "grid/sendMessage"
+    });
+  }
+  var downloads = [];
+  if(self.services.checkIsAllowed('applicants_grid', 'downloadXls')){
+    downloads.push({  
+      "sExtends": "download_applicants",
+      "sButtonText": "Excel",
+      "sUrl": "grid/downloadXls"     
+    });
+  }
+  if(self.services.checkIsAllowed('applicants_grid', 'downloadXml')){
+    downloads.push({
+      "sExtends": "download_applicants",
+      "sButtonText": "XML",
+      "sUrl": "grid/downloadXml"
+    });
+  }
+  if(self.services.checkIsAllowed('applicants_grid', 'downloadPdfArchive')){
+    downloads.push({
+      "sExtends": "download_applicants",
+      "sButtonText": "PDF",
+      "sUrl": "grid/downloadPdfArchive"
+    });
+  }
+  if(self.services.checkIsAllowed('applicants_grid', 'downloadJson')){
+    downloads.push({
+      "sExtends": "download_applicants",
+      "sButtonText": "JSON",
+      "sUrl": "grid/downloadJson"
+    });
+  }
+  if(downloads.length > 0){
+    buttons.push({
+      "sExtends":    "collection",
+      "sButtonText": "Download",
+      "aButtons":  downloads
+    });
+  }
+  return buttons;
 };
 
 Grid.prototype.loadapps = function(applicantIds, grid){
