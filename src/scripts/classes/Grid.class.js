@@ -448,60 +448,71 @@ TableTools.BUTTONS.send_messages = {
     "fnMouseover": null,
     "fnMouseout": null,
     "fnClick": function( nButton, oConfig ) { 
-        var tableTools = this;
-        var overlay = $('<div>').attr('id', 'emailoverlay');
-        $('body').append(overlay);
+      var tableTools = this;
+      var dialog = $('<div>').attr('id', 'emailoverlay');
+      var obj = new FormObject();
+      var field = obj.newField({name: 'legend', value: 'Send Message'});
+      var element = field.newElement('TextInput', 'subject');
+      element.label = 'Subject';
+      element.required = true;
+
+      var body = field.newElement('Textarea', 'body');
+      body.label = 'Body';
+      body.required = true;
+
+      var toList = $('<div>').addClass('recipients');
+      dialog.append(toList);
+      toList.append($('<span>').addClass('label').addClass('to').html("To:"));
+      var applicantIds = [];
+      var selected = tableTools.fnGetSelectedData();
+      for(var i = 0; i < selected.length; i++){
+          applicantIds.push(selected[i].id);
+          toList.append($('<span>').addClass('recipient').html(""+selected[i].fullName));
+      }
+
+      var formObject = new Form().create(obj);
+      var form = $('form',formObject);
+      form.append($('<button type="submit" name="submit">').html('Send').button({
+        icons: {
+          primary: 'ui-icon-mail-closed'
+        }
+      }));
+
+      form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+      form.attr( 'action', oConfig.sUrl );
+      form.bind('submit',function(e){
+        var overlay = $('<div>').attr('id', 'downloadoverlay');
         overlay.dialog({
-          height: 390,
+          height: 90,
           modal: true,
           autoOpen: true,
           open: function(event, ui){
-
-             var obj = new FormObject();
-	     var field = obj.newField({name: 'legend', value: 'Send Bulk Message'});
-	     var element = field.newElement('TextInput', 'subject');
-	     element.label = 'Subject';
-	     element.required = true;
-
-	     var body = field.newElement('Textarea', 'body');
-	     body.label = 'Body';
-	     body.required = true;
-
-	     var toList = $('<div>').addClass('recipients');
-	     overlay.append(toList);
-	     toList.append($('<span>').addClass('label').addClass('to').html("To:"));
-	     var applicantIds = [];
-	     var selected = tableTools.fnGetSelectedData();
-	     for(var i = 0; i < selected.length; i++){
-		 applicantIds.push(selected[i].id);
-		 toList.append($('<span>').addClass('recipient').html(""+selected[i].fullName));
-	     }
-  
-	     var formObject = new Form().create(obj);
-	     var form = $('form',formObject);
-	     form.append($('<button type="submit" name="submit">').html('Send').button({
-			 icons: {
-			     primary: 'ui-icon-disk'
-				 }
-		     }));
-  
-	     form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
-	     form.attr( 'action', oConfig.sUrl );
-	     form.bind('submit',function(e){
-		     $.ajax({
-			     type: 'POST',
-				 url: form.attr('action'),
-				 data: form.serialize()
-				 });
-
-		     overlay.dialog("destroy").remove();
-		     event.preventDefault(); 
-		     return false;
-		 });//end submit
-
-	     overlay.append(form);
-		}
-	    });
+            $(".ui-dialog-titlebar", ui.dialog).hide();
+            var label = $('<div>').addClass('label').html('Sending Email...').css('float', 'left').css('margin','10px 5px');
+            var progressbar = $('<div>').addClass('progress').append(label);
+            overlay.append(progressbar);
+            progressbar.progressbar({
+              value: false
+            });
+            $.ajax({
+              type: 'POST',
+              url: form.attr('action'),
+              data: form.serialize(),
+              success: function(){
+                overlay.dialog("destroy").remove();
+              }
+            });
+            dialog.dialog("destroy").remove();
+          }
+        });
+        event.preventDefault(); 
+        return false;
+      });//end submit
+      dialog.append(form);
+      dialog.dialog({
+        modal: true,
+        autoOpen: true
+      });
     },
     "fnSelect": null,
     "fnComplete": null,
@@ -527,7 +538,6 @@ TableTools.BUTTONS.download_applicants = {
     "fnClick": function( nButton, oConfig ) { 
         var tableTools = this;
         var overlay = $('<div>').attr('id', 'downloadoverlay');
-        $('body').append(overlay);
         overlay.dialog({
           height: 90,
           modal: true,
