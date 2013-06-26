@@ -265,13 +265,12 @@ class ApplicantsGridController extends \Jazzee\AdminController
   /**
    * List all applicants
    */
-
   public function actionDownloadPdfArchive()  
   {
     //use a full applicant display where display is needed
     $display = new \Jazzee\Display\FullApplication($this->_application);
     $applicants = explode(',',$this->post['applicantIds']);
-    
+
     // ensure garbage collection is on, we need it
     gc_enable();
 
@@ -295,6 +294,53 @@ class ApplicantsGridController extends \Jazzee\AdminController
         unset($pdf);
       }
     }
+    $zip->close();
+    $this->setVar('outputType', 'file');
+    $this->setVar('type', 'application/zip');
+    $this->setVar('filename', $directoryName . '.zip');
+    $this->setVar('filePath', $zipFile);
+    $this->loadView('applicants_grid/download');
+  }
+
+
+  public function actionDownloadPdfTemplateArchive()  
+  {
+    //use a full applicant display where display is needed
+    $display = new \Jazzee\Display\FullApplication($this->_application);
+    $applicants = explode(',',$this->post['applicantIds']);
+    error_log("pdf template? ".$this->post['pdftemplate']);
+$templateId = (isset($this->post['pdftemplate'])) ? $this->post['pdftemplate']
+: null;
+    // ensure garbage collection is on, we need it
+    gc_enable();
+
+    $directoryName = $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy');
+    $zipFile = $this->_config->getVarPath() . '/tmp/' . uniqid() . '.zip';
+    $zip = new ZipArchive;
+    $zip->open($zipFile, ZipArchive::CREATE);
+    $zip->addEmptyDir($directoryName);
+
+    $tempFileArray = array();
+    $tmppath = $this->_config->getVarPath() . '/tmp';
+//    foreach(array_chunk($applicants, 20) as $limitedIds){
+//      $applicantsDisplayArray = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $limitedIds);
+//      foreach($applicantsDisplayArray as $applicantArray){
+    foreach($applicants as $applicantId){
+        $applicant = $this->getApplicantById($applicantId);
+
+	if(($templateId != null) && ($template = $this->_application->getTemplateById($templateId))){
+           $pdf = new \Jazzee\TemplatePDF($this->_config->getPdflibLicenseKey(), $template, $this);
+           $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
+           $tempFileArray[] = $temp_file_name;
+           file_put_contents($temp_file_name, $pdf->pdf($applicant));
+           $externalIDSuffix = ($applicant->getExternalId() != null) ? ' - '.$applicant->getExternalId() : "";
+           $zip->addFile($temp_file_name, $directoryName . '/' . $applicant->getFullName() . $externalIDSuffix . '.pdf');
+           unset($pdf);
+        }else{
+	   throw new Error("Template ID [".$templateId."] not found.");
+        }
+      }
+    //}
     $zip->close();
     $this->setVar('outputType', 'file');
     $this->setVar('type', 'application/zip');
@@ -337,7 +383,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay'))) {
+    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive', 'downloadPdfTemplateArchive'))) {
       $action = 'index';
     }
 

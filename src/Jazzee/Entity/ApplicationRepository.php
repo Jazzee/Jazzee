@@ -142,6 +142,10 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
       $query->setParameter('applicationId', $application['id']);
       $application['tags'] = $query->getArrayResult();
       
+      $query = $this->_em->createQuery('SELECT template from \Jazzee\Entity\PDFTemplate as template WHERE template.application = :applicationId');
+      $query->setParameter('applicationId', $application['id']);
+      $application['templates'] = $query->getArrayResult();
+      
       return $application;
     } 
 
