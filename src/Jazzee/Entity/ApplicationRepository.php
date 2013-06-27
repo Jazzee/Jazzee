@@ -141,11 +141,7 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
       $query = $this->_em->createQuery('SELECT tag from \Jazzee\Entity\Tag as tag LEFT JOIN tag.applicants applicant WHERE applicant.id IN (SELECT a.id from Jazzee\Entity\Applicant a WHERE a.application = :applicationId)');
       $query->setParameter('applicationId', $application['id']);
       $application['tags'] = $query->getArrayResult();
-      
-      $query = $this->_em->createQuery('SELECT template from \Jazzee\Entity\PDFTemplate as template WHERE template.application = :applicationId');
-      $query->setParameter('applicationId', $application['id']);
-      $application['templates'] = $query->getArrayResult();
-      
+
       return $application;
     } 
 
@@ -159,7 +155,8 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
   protected function makeQuery(){
     $queryBuilder = $this->_em->createQueryBuilder();
     $queryBuilder->from('Jazzee\Entity\Application', 'application');
-    $queryBuilder->add('select', 'application, applicationPages, pages, elements, elementListItems, pageType, elementType, children, childElements, childPageType, childElementListItems, childElementType, children2, childElements2, childPageType2, childElementListItems2, childElementType2');
+    $queryBuilder->add('select', 'application, applicationPages, pages, elements, elementListItems, pageType, elementType, children, childElements, childPageType, childElementListItems, childElementType, children2, childElements2, childPageType2, childElementListItems2, childElementType2, pdfTemplates');
+    $queryBuilder->leftJoin('application.pdfTemplates', 'pdfTemplates');
     $queryBuilder->leftJoin('application.applicationPages', 'applicationPages');
     $queryBuilder->leftJoin('applicationPages.page', 'pages');
     $queryBuilder->leftJoin('pages.elements', 'elements');
