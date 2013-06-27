@@ -181,7 +181,7 @@ Grid.prototype.getButtons = function(){
       "sUrl": "grid/sendMessage"
     });
   }
-  buttons.push({
+  var obj = {
     "sExtends": "download_applicants",
     "sButtonText": "Download",
     'templates': this.services.getCurrentApplication().listTemplates(),
@@ -190,7 +190,10 @@ Grid.prototype.getButtons = function(){
     'downloadPdfArchive': this.services.checkIsAllowed('applicants_grid', 'downloadPdfArchive'),
     'downloadJson': this.services.checkIsAllowed('applicants_grid', 'downloadJson'),
     'basepath': this.services.getControllerPath('applicants_grid')
-  });
+  };
+  if(obj.downloadXls || obj.downloadXml || obj.downloadPdfArchive || obj.downloadJson){
+    buttons.push(obj);
+  }
   return buttons;
 };
 
