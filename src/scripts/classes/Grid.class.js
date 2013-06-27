@@ -33,8 +33,6 @@ Grid.prototype.init = function(){
     table.mousedown(function(){return false;});
   }
 
-  var pdfTemplates = this.services.getCurrentApplication().listTemplates();
-  console.log("have templates? "+pdfTemplates);
   $(this.target).append(table);
   var grid = table.dataTable( {
     sScrollY: "500",
@@ -76,16 +74,7 @@ Grid.prototype.init = function(){
         }
         return true;
       },
-      "aButtons": [
-        "select_all",
-        "select_none",
-        {
-          "sExtends": "download_with_options",
-          "sButtonText": "Download",
-	  "pdfTemplates": pdfTemplates,
-	  "sUrl": "grid/downloadPdfArchive"
-        }
-      ]
+      "aButtons": buttons
     }
   });
   var progressbar = $('<div>').addClass('progress').append($('<div>').addClass('label').html('Loading Grid...'));
@@ -192,42 +181,54 @@ Grid.prototype.getButtons = function(){
       "sUrl": "grid/sendMessage"
     });
   }
-  var downloads = [];
-  if(self.services.checkIsAllowed('applicants_grid', 'downloadXls')){
-    downloads.push({  
-      "sExtends": "download_applicants",
-      "sButtonText": "Excel",
-      "sUrl": "grid/downloadXls"     
-    });
-  }
-  if(self.services.checkIsAllowed('applicants_grid', 'downloadXml')){
-    downloads.push({
-      "sExtends": "download_applicants",
-      "sButtonText": "XML",
-      "sUrl": "grid/downloadXml"
-    });
-  }
-  if(self.services.checkIsAllowed('applicants_grid', 'downloadPdfArchive')){
-    downloads.push({
-      "sExtends": "download_applicants",
-      "sButtonText": "PDF",
-      "sUrl": "grid/downloadPdfArchive"
-    });
-  }
-  if(self.services.checkIsAllowed('applicants_grid', 'downloadJson')){
-    downloads.push({
-      "sExtends": "download_applicants",
-      "sButtonText": "JSON",
-      "sUrl": "grid/downloadJson"
-    });
-  }
-  if(downloads.length > 0){
-    buttons.push({
-      "sExtends":    "collection",
-      "sButtonText": "Download",
-      "aButtons":  downloads
-    });
-  }
+  buttons.push({
+    "sExtends": "download_applicants",
+    "sButtonText": "Download",
+    "services": self.services
+  });
+//  var downloads = [];
+//  if(self.services.checkIsAllowed('applicants_grid', 'downloadXls')){
+//    downloads.push({  
+//      "sExtends": "download_applicants",
+//      "sButtonText": "Excel",
+//      "sUrl": "grid/downloadXls",
+//      'services': self.services
+//    });
+//  }
+//  if(self.services.checkIsAllowed('applicants_grid', 'downloadXml')){
+//    downloads.push({
+//      "sExtends": "download_applicants",
+//      "sButtonText": "XML",
+//      "sUrl": "grid/downloadXml"
+//    });
+//  }
+//  if(self.services.checkIsAllowed('applicants_grid', 'downloadPdfArchive')){
+//    downloads.push({
+//      "sExtends": "download_applicants",
+//      "sButtonText": "PDF",
+//      "sUrl": "grid/downloadPdfArchive"
+//    });
+//    downloads.push({
+//      "sExtends": "download_with_options",
+//      "sButtonText": "Download",
+//      "pdfTemplates": this.services.getCurrentApplication().listTemplates(),
+//      "sUrl": "grid/downloadPdfArchive"
+//    });
+//  }
+//  if(self.services.checkIsAllowed('applicants_grid', 'downloadJson')){
+//    downloads.push({
+//      "sExtends": "download_applicants",
+//      "sButtonText": "JSON",
+//      "sUrl": "grid/downloadJson"
+//    });
+//  }
+//  if(downloads.length > 0){
+//    buttons.push({
+//      "sExtends":    "collection",
+//      "sButtonText": "Download",
+//      "aButtons":  downloads
+//    });
+//  }
   return buttons;
 };
 
@@ -350,7 +351,7 @@ Grid.bindApplicantLinks = function(){
 //    $.get($(this).attr('href'),function(html){
 //      div.html(html);
 //    });
-    div.html('applicant data');
+    div.html('Applicant data is not yet available.');
     return false;
   });
 };
@@ -464,7 +465,6 @@ e.fn.DataTable.TableTools=TableTools})(jQuery,window,document);
 * Table tools button plugin to create downloads from applicant data
 * Copied form: http://datatables.net/extras/tabletools/plug-ins
 **/
-
 TableTools.BUTTONS.send_messages = {
     "sAction": "text",
     "sTag": "default",
@@ -770,3 +770,119 @@ TableTools.BUTTONS.download_applicants = {
     "fnComplete": null,
     "fnInit": null
 };
+
+/**
+* Table tools button plugin to create downloads from applicant data
+**/
+TableTools.BUTTONS.download_applicants = $.extend( true, TableTools.buttonBase, {
+    "fnClick": function( nButton, oConfig ) {
+      var tableTools = this;
+      var dialog = $('<div>');
+      var obj = new FormObject();
+      var field = obj.newField({name: 'legend', value: 'Download Options'});
+      
+      var type = field.newElement('SelectList', 'type');
+      type.label = 'Download Type';
+      type.required = true;
+      var downloadTypes = [
+        {action: 'downloadXls', title: 'Excel'},
+        {action: 'downloadXml', title: 'XML'},
+        {action: 'downloadPdfArchive', title: 'PDF'},
+        {action: 'downloadJson', title: 'JSON'},
+      ];
+      var basePath = oConfig.services.getControllerPath('applicants_grid');
+      for(var i = 0; i < downloadTypes.length; i++){
+//        if(oConfig.services.checkIsAllowed('applicants_grid', downloadTypes[i].action)){
+          type.addItem(downloadTypes[i].title, basePath + '/' + downloadTypes[i].action);
+//        }
+      }
+      
+      var template = field.newElement('SelectList', 'pdftemplate');
+      template.label = 'PDF Type';
+      template.required = true;
+      var templates = [];
+      templates.push({title: 'Portrait', id: 'portrait'});
+      templates.push({title: 'Landscape', id: 'landscape'});
+      templates = templates.concat(oConfig.services.getCurrentApplication().listTemplates());
+      for(var i = 0; i < templates.length; i++){
+        template.addItem(templates[i]["title"], templates[i]["id"]);
+      }
+
+      var formObject = new Form().create(obj);
+      var form = $('form',formObject);
+      form.append($('<button type="submit" name="submit">').html('Download').button({
+        icons: {
+          primary: 'ui-icon-mail-closed'
+        }
+      }));
+      $('select[name=pdftemplate]', form).parent().parent().hide();
+      $('select[name=type]', form).on('change', function(){
+        if($('option:selected', this).text() == 'PDF'){
+          $('select[name=pdftemplate]', form).parent().parent().show();
+        } else {
+          $('select[name=pdftemplate]', form).parent().parent().hide();
+        }
+      });
+      form.bind('submit',function(e){
+        var subject = $('input[name="subject"]', this).val();
+        var overlay = $('<div>').attr('id', 'downloadoverlay');
+        overlay.dialog({
+          height: 90,
+          modal: true,
+          autoOpen: true,
+          open: function(event, ui){
+            $(".ui-dialog-titlebar", ui.dialog).hide();
+            var label = $('<div>').addClass('label').html('Downloading...').css('float', 'left').css('margin','10px 5px');
+            var progressbar = $('<div>').addClass('progress').append(label);
+            overlay.append(progressbar);
+            progressbar.progressbar({
+              value: false
+            });
+            dialog.dialog("destroy").remove();
+            var iFrameName = "iFrame" + (new Date().getTime());
+            var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
+            iFrame.css("display", "none");
+
+            var iframeForm = $('<form>');
+            iframeForm.attr( 'method', 'post' );
+            iframeForm.append(form);
+            var template = $('select[name=pdftemplate]', form).val();
+            var type = $('select[name=type]', form).val();
+            iframeForm.attr('action', type);
+            iframeForm.append($('<input>').attr('name', 'pdftemplate').attr('type', 'hidden').val(template));
+            
+            var applicantIds = [];
+            var selected = tableTools.fnGetSelectedData();
+            for(var i = 0; i < selected.length; i++){
+              applicantIds.push(selected[i].id);
+            }
+            iframeForm.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+            iframeForm.bind('submit', function(){
+              var cookieName = 'fileDownload';
+              var check = function(){
+                if($.cookie(cookieName) == 'complete'){
+                  $.cookie(cookieName, 'false', {expires: 1, path: '/' });
+                  $('#downloadoverlay').dialog('destroy').remove();
+                  iFrame.remove();
+                } else {
+                  setTimeout(check, 500);
+                }
+              };
+              setTimeout(check, 500);
+              return true;
+            });
+            iframeForm.submit();
+          }
+        });
+        
+        event.preventDefault(); 
+        return false;
+      });//end submit
+      dialog.append(form);
+      dialog.dialog({
+        modal: true,
+        autoOpen: true,
+        width: 500
+      });
+    }
+});

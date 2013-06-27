@@ -267,6 +267,38 @@ class ApplicantRepository extends \Doctrine\ORM\EntityRepository
     
     return $results;
   }
+
+  /**
+   * All the applicants in an application
+   * @param Application $application
+   * @param \Jazzee\Interfaces\Display $display
+   * @param array $applicantIds
+   * @return array
+   */
+  public function findPDFTemplateArrayByApplication(Application $application, \Jazzee\Interfaces\Display $display, array $applicantIds)
+  {
+    $results = array();
+    foreach(array_chunk($applicantIds, 20) as $limitedIds){
+      $queryBuilder = $this->deepApplicantQuery($display);
+      $queryBuilder->andWhere('applicant.application = :applicationId');
+      $queryBuilder->andWhere('applicant.deactivated=false');
+      $queryBuilder->setParameter('applicationId', $application->getId());
+      $expression = $queryBuilder->expr()->orX();
+      foreach($limitedIds as $key => $value){
+        $paramKey = 'applicantId' . $key;
+        $expression->add($queryBuilder->expr()->eq("applicant.id", ":{$paramKey}"));
+        $queryBuilder->setParameter($paramKey, $value);
+      }
+      $queryBuilder->andWhere($expression);
+
+      $query = $queryBuilder->getQuery();
+      $query->setHint(\Doctrine\ORM\Query::HINT_INCLUDE_META_COLUMNS, true);
+      $query->setHydrationMode('ApplicantPDFTemplateHydrator');
+      $results = array_merge($results, $query->execute());
+    }
+    
+    return $results;
+  }
   
   /**
    * Get a deep application query builder

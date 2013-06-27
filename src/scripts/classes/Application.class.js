@@ -55,7 +55,7 @@ Application.prototype.listTags = function(){
  * List all of the tags
  */
 Application.prototype.listTemplates = function(){
-  return this.application.templates;
+  return this.application.pdfTemplates;
 };
 
 /**
