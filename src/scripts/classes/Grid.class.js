@@ -184,51 +184,13 @@ Grid.prototype.getButtons = function(){
   buttons.push({
     "sExtends": "download_applicants",
     "sButtonText": "Download",
-    "services": self.services
+    'templates': this.services.getCurrentApplication().listTemplates(),
+    'downloadXls': this.services.checkIsAllowed('applicants_grid', 'downloadXls'),
+    'downloadXml': this.services.checkIsAllowed('applicants_grid', 'downloadXml'),
+    'downloadPdfArchive': this.services.checkIsAllowed('applicants_grid', 'downloadPdfArchive'),
+    'downloadJson': this.services.checkIsAllowed('applicants_grid', 'downloadJson'),
+    'basepath': this.services.getControllerPath('applicants_grid')
   });
-//  var downloads = [];
-//  if(self.services.checkIsAllowed('applicants_grid', 'downloadXls')){
-//    downloads.push({  
-//      "sExtends": "download_applicants",
-//      "sButtonText": "Excel",
-//      "sUrl": "grid/downloadXls",
-//      'services': self.services
-//    });
-//  }
-//  if(self.services.checkIsAllowed('applicants_grid', 'downloadXml')){
-//    downloads.push({
-//      "sExtends": "download_applicants",
-//      "sButtonText": "XML",
-//      "sUrl": "grid/downloadXml"
-//    });
-//  }
-//  if(self.services.checkIsAllowed('applicants_grid', 'downloadPdfArchive')){
-//    downloads.push({
-//      "sExtends": "download_applicants",
-//      "sButtonText": "PDF",
-//      "sUrl": "grid/downloadPdfArchive"
-//    });
-//    downloads.push({
-//      "sExtends": "download_with_options",
-//      "sButtonText": "Download",
-//      "pdfTemplates": this.services.getCurrentApplication().listTemplates(),
-//      "sUrl": "grid/downloadPdfArchive"
-//    });
-//  }
-//  if(self.services.checkIsAllowed('applicants_grid', 'downloadJson')){
-//    downloads.push({
-//      "sExtends": "download_applicants",
-//      "sButtonText": "JSON",
-//      "sUrl": "grid/downloadJson"
-//    });
-//  }
-//  if(downloads.length > 0){
-//    buttons.push({
-//      "sExtends":    "collection",
-//      "sButtonText": "Download",
-//      "aButtons":  downloads
-//    });
-//  }
   return buttons;
 };
 
@@ -465,424 +427,210 @@ e.fn.DataTable.TableTools=TableTools})(jQuery,window,document);
 * Table tools button plugin to create downloads from applicant data
 * Copied form: http://datatables.net/extras/tabletools/plug-ins
 **/
-TableTools.BUTTONS.send_messages = {
-    "sAction": "text",
-    "sTag": "default",
-    "sFieldBoundary": "",
-    "sFieldSeperator": "\t",
-    "sNewLine": "<br>",
-    "sToolTip": "",
-    "sButtonClass": "DTTT_button_text",
-    "sButtonClassHover": "DTTT_button_text_hover",
-    "sButtonText": "Email",
-    "mColumns": "all",
-    "bHeader": true,
-    "bFooter": true,
-    "sDiv": "",
-    "fnMouseover": null,
-    "fnMouseout": null,
-    "fnClick": function( nButton, oConfig ) { 
-      var tableTools = this;
-      var dialog = $('<div>');
-      var obj = new FormObject();
-      var field = obj.newField({name: 'legend', value: 'Send Message'});
-      
-      var applicantIds = [];
-      var selected = tableTools.fnGetSelectedData();
-      var toList = [];
-      for(var i = 0; i < selected.length; i++){
-        applicantIds.push(selected[i].id);
-        toList.push(selected[i].fullName);
-      }
-      var element = field.newElement('Plaintext', 'to');
-      element.label = 'To';
-      if(toList.length < 10){
-        element.value = toList.join(', ');
-      } else {
-        element.value = toList.length + ' recipients';
-      }
-      var element = field.newElement('TextInput', 'subject');
-      element.label = 'Subject';
-      element.required = true;
+TableTools.BUTTONS.send_messages = {};
+$.extend( true, TableTools.BUTTONS.send_messages, TableTools.buttonBase);
+TableTools.BUTTONS.send_messages.fnClick =  function( nButton, oConfig ) {
+  var tableTools = this;
+  var dialog = $('<div>');
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Send Message'});
 
-      var body = field.newElement('Textarea', 'body');
-      body.label = 'Body';
-      body.required = true;
+  var applicantIds = [];
+  var selected = tableTools.fnGetSelectedData();
+  var toList = [];
+  for(var i = 0; i < selected.length; i++){
+    applicantIds.push(selected[i].id);
+    toList.push(selected[i].fullName);
+  }
+  var element = field.newElement('Plaintext', 'to');
+  element.label = 'To';
+  if(toList.length < 10){
+    element.value = toList.join(', ');
+  } else {
+    element.value = toList.length + ' recipients';
+  }
+  var element = field.newElement('TextInput', 'subject');
+  element.label = 'Subject';
+  element.required = true;
 
-      var formObject = new Form().create(obj);
-      var form = $('form',formObject);
-      form.append($('<button type="submit" name="submit">').html('Send').button({
-        icons: {
-          primary: 'ui-icon-mail-closed'
-        }
-      }));
+  var body = field.newElement('Textarea', 'body');
+  body.label = 'Body';
+  body.required = true;
 
-      form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
-      $('input', form).css('width', '250px');
-      $('textarea', form).css('width', '250px').css('height', '180px');
-      form.attr( 'action', oConfig.sUrl );
-      form.bind('submit',function(e){
-        $('p.message', this).remove();
-        var subject = $('input[name="subject"]', this).val();
-        var body = $('textarea[name="body"]', this).val();
-        var error = false;
-        if(subject.length == 0){
-          $('input[name="subject"]', this).parent().append($('<p>').addClass('message').html('this element is Required and you left it blank.'));
-          error = true;
-        }
-        if(body.length == 0){
-          $('textarea[name="body"]', this).parent().append($('<p>').addClass('message').html('this element is Required and you left it blank.'));
-          error = true;
-        }
-        if(!error){
-        var overlay = $('<div>').attr('id', 'downloadoverlay');
-          overlay.dialog({
-            height: 90,
-            modal: true,
-            autoOpen: true,
-            open: function(event, ui){
-              $(".ui-dialog-titlebar", ui.dialog).hide();
-              var label = $('<div>').addClass('label').html('Sending Email...').css('float', 'left').css('margin','10px 5px');
-              var progressbar = $('<div>').addClass('progress').append(label);
-              overlay.append(progressbar);
-              progressbar.progressbar({
-                value: false
-              });
-              dialog.dialog("destroy").remove();
-              $.ajax({
-                type: 'POST',
-                url: form.attr('action'),
-                data: form.serialize(),
-                success: function(){
-                  overlay.dialog("destroy").remove();
-                }
-              });
-              
-            }
-          });
-        }
-        event.preventDefault(); 
-        return false;
-      });//end submit
-      dialog.append(form);
-      dialog.dialog({
+  var formObject = new Form().create(obj);
+  var form = $('form',formObject);
+  form.append($('<button type="submit" name="submit">').html('Send').button({
+    icons: {
+      primary: 'ui-icon-mail-closed'
+    }
+  }));
+
+  form.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+  $('input', form).css('width', '250px');
+  $('textarea', form).css('width', '250px').css('height', '180px');
+  form.attr( 'action', oConfig.sUrl );
+  form.bind('submit',function(e){
+    $('p.message', this).remove();
+    var subject = $('input[name="subject"]', this).val();
+    var body = $('textarea[name="body"]', this).val();
+    var error = false;
+    if(subject.length == 0){
+      $('input[name="subject"]', this).parent().append($('<p>').addClass('message').html('this element is Required and you left it blank.'));
+      error = true;
+    }
+    if(body.length == 0){
+      $('textarea[name="body"]', this).parent().append($('<p>').addClass('message').html('this element is Required and you left it blank.'));
+      error = true;
+    }
+    if(!error){
+    var overlay = $('<div>').attr('id', 'downloadoverlay');
+      overlay.dialog({
+        height: 90,
         modal: true,
         autoOpen: true,
-        width: 500
+        open: function(event, ui){
+          $(".ui-dialog-titlebar", ui.dialog).hide();
+          var label = $('<div>').addClass('label').html('Sending Email...').css('float', 'left').css('margin','10px 5px');
+          var progressbar = $('<div>').addClass('progress').append(label);
+          overlay.append(progressbar);
+          progressbar.progressbar({
+            value: false
+          });
+          dialog.dialog("destroy").remove();
+          $.ajax({
+            type: 'POST',
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(){
+              overlay.dialog("destroy").remove();
+            }
+          });
+
+        }
       });
-    },
-    "fnSelect": null,
-    "fnComplete": null,
-    "fnInit": null
+    }
+    event.preventDefault(); 
+    return false;
+  });//end submit
+  dialog.append(form);
+  dialog.dialog({
+    modal: true,
+    autoOpen: true,
+    width: 500
+  });
 };
 
-TableTools.BUTTONS.download_with_options = {
-    "sAction": "text",
-    "sTag": "default",
-    "sFieldBoundary": "",
-    "sFieldSeperator": "\t",
-    "sNewLine": "<br>",
-    "sToolTip": "",
-    "sButtonClass": "DTTT_button_text",
-    "sButtonClassHover": "DTTT_button_text_hover",
-    "sButtonText": "Download",
-    "mColumns": "all",
-    "bHeader": true,
-    "bFooter": true,
-    "sDiv": "",
-    "fnMouseover": null,
-    "fnMouseout": null,
-    "fnClick": function( nButton, oConfig ) { 
-        var tableTools = this;
-        var overlay = $('<div>').attr('id', 'downloadoverlay');
-        $('body').append(overlay);
-        overlay.dialog({
-		height: 390,
-		    modal: true,
-		    autoOpen: true,
-		    open: function(event, ui){
-		    var obj = new FormObject();
-		    var field = obj.newField({name: 'legend', value: 'Choose PDF Template'});
+/**
+* Table tools button plugin to create downloads from applicant data
+**/
+TableTools.BUTTONS.download_applicants = {};
+$.extend( true, TableTools.BUTTONS.download_applicants, TableTools.buttonBase);
+TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
+  var tableTools = this;
+  var dialog = $('<div>');
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Download Options'});
 
-		    var type = field.newElement('RadioList', 'type');
-		    type.label = 'Download Type';
-		    type.required = true;
-		    type.addItem("Excel", "grid/downloadXls");
-		    type.addItem("XML", "grid/downloadXml");
-		    type.addItem("PDF", "grid/downloadPdfArchive");
-		    type.addItem("JSON", "grid/downloadJson");
+  var type = field.newElement('SelectList', 'type');
+  type.label = 'Download Type';
+  type.required = true;
+  var downloadTypes = [
+    {action: 'downloadXls', title: 'Excel'},
+    {action: 'downloadXml', title: 'XML'},
+    {action: 'downloadPdfArchive', title: 'PDF'},
+    {action: 'downloadJson', title: 'JSON'},
+  ];
+  for(var i = 0; i < downloadTypes.length; i++){
+    if(oConfig[downloadTypes[i].action]){
+      type.addItem(downloadTypes[i].title, oConfig.basepath + '/' + downloadTypes[i].action);
+    }
+  }
 
-		    var template = field.newElement('SelectList', 'pdftemplate');
-		    template.name = "pdftemplate";
-		    template.label = 'PDF Template';
-		    template.addItem("--", "");
-		    for(var i = 0; i < oConfig.pdfTemplates.length; i++){
-			template.addItem(oConfig.pdfTemplates[i]["title"], oConfig.pdfTemplates[i]["id"])
-		    }
+  var template = field.newElement('SelectList', 'pdftemplate');
+  template.label = 'PDF Type';
+  template.required = true;
+  var templates = [];
+  templates.push({title: 'Portrait', id: 'portrait'});
+  templates.push({title: 'Landscape', id: 'landscape'});
+  templates = templates.concat(oConfig.templates);
+  for(var i = 0; i < templates.length; i++){
+    template.addItem(templates[i]["title"], templates[i]["id"]);
+  }
 
-		    var formObject = new Form().create(obj);
-		    var form = $('form',formObject);
-                    form.attr( 'method', 'post' );
-		    form.append($('<button type="submit" name="submit">').html('Download').button({
-				icons: {
-				    primary: 'ui-icon-disk'
-					}
-			    }));
-
-            var iFrameName = "iFrame" + (new Date().getTime());
-            var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
-            iFrame.css("display", "none");
-
-            var form2 = $('<form>');
-            form2.attr( 'method', 'post' );
-            iFrame.append(form2);
-
-		    var applicantIds = [];
-		    var selected = tableTools.fnGetSelectedData();
-		    for(var i = 0; i < selected.length; i++){
-			applicantIds.push(selected[i].id);
-		    }		    
-		    form2.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
-		    form2.attr( 'action', oConfig.sUrl );
-
-		    form.bind('submit', function(){
-                       form2.submit();
-		       event.preventDefault(); 
-		       return false;
-
-                 });
-
-     form2.bind('submit', function(){
-        // BUG: foundation does not seem to add the name to the select element
-	// var template = $('select[name="pdftemplate"]',overlay).val();
-        var template = $('select',overlay).val();
-        var dlType = $('input[name="type"]:radio:checked', overlay).val();
-        if(template && (dlType == "grid/downloadPdfArchive")){
-	  form2.append($('<input>').attr('name', 'pdftemplate').attr('type', 'hidden').val(template));
-	  form2.attr( 'action', "grid/downloadPdfTemplateArchive" );
-        }else{
-	  form2.attr( 'action', dlType );
-        }
+  var formObject = new Form().create(obj);
+  var form = $('form',formObject);
+  form.append($('<button type="submit" name="submit">').html('Download').button({
+    icons: {
+      primary: 'ui-icon-mail-closed'
+    }
+  }));
+  $('select[name=pdftemplate]', form).parent().parent().hide();
+  $('select[name=type]', form).on('change', function(){
+    if($('option:selected', this).text() == 'PDF'){
+      $('select[name=pdftemplate]', form).parent().parent().show();
+    } else {
+      $('select[name=pdftemplate]', form).parent().parent().hide();
+    }
+  });
+  form.bind('submit',function(e){
+    var subject = $('input[name="subject"]', this).val();
+    var overlay = $('<div>').attr('id', 'downloadoverlay');
+    overlay.dialog({
+      height: 90,
+      modal: true,
+      autoOpen: true,
+      open: function(event, ui){
         $(".ui-dialog-titlebar", ui.dialog).hide();
-
         var label = $('<div>').addClass('label').html('Downloading...').css('float', 'left').css('margin','10px 5px');
         var progressbar = $('<div>').addClass('progress').append(label);
         overlay.append(progressbar);
         progressbar.progressbar({
-           value: false
+          value: false
         });
+        dialog.dialog("destroy").remove();
+        var iFrameName = "iFrame" + (new Date().getTime());
+        var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
+        iFrame.css("display", "none");
 
-	var cookieName = 'fileDownload';
-	var check = function(){
-        if($.cookie(cookieName) == 'complete'){
-	    $.cookie(cookieName, 'false', {expires: 1, path: '/' });
-	    $('#downloadoverlay').dialog('destroy').remove();
-	    iFrame.remove();
-	} else {
-	    setTimeout(check, 500);
-	}
-      };
-      setTimeout(check, 500);
-      return true;
+        var iframeForm = $('<form>');
+        iframeForm.attr( 'method', 'post' );
+        iframeForm.append(form);
+        var template = $('select[name=pdftemplate]', form).val();
+        var type = $('select[name=type]', form).val();
+        iframeForm.attr('action', type);
+        iframeForm.append($('<input>').attr('name', 'pdftemplate').attr('type', 'hidden').val(template));
+
+        var applicantIds = [];
+        var selected = tableTools.fnGetSelectedData();
+        for(var i = 0; i < selected.length; i++){
+          applicantIds.push(selected[i].id);
+        }
+        iframeForm.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
+        iframeForm.bind('submit', function(){
+          var cookieName = 'fileDownload';
+          var check = function(){
+            if($.cookie(cookieName) == 'complete'){
+              $.cookie(cookieName, 'false', {expires: 1, path: '/' });
+              $('#downloadoverlay').dialog('destroy').remove();
+              iFrame.remove();
+            } else {
+              setTimeout(check, 500);
+            }
+          };
+          setTimeout(check, 500);
+          return true;
+        });
+        iframeForm.submit();
+      }
     });
-	
-    overlay.append(form);
+
     event.preventDefault(); 
     return false;
-  }
-});
-    },
-    "fnSelect": null,
-    "fnComplete": null,
-    "fnInit": null
+  });//end submit
+  dialog.append(form);
+  dialog.dialog({
+    modal: true,
+    autoOpen: true,
+    width: 500
+  });
 };
-
-/**
-* Table tools button plugin to create downloads from applicant data
-* Copied form: http://datatables.net/extras/tabletools/plug-ins
-**/
-
-TableTools.BUTTONS.download_applicants = {
-    "sAction": "text",
-    "sTag": "default",
-    "sFieldBoundary": "",
-    "sFieldSeperator": "\t",
-    "sNewLine": "<br>",
-    "sToolTip": "",
-    "sButtonClass": "DTTT_button_text",
-    "sButtonClassHover": "DTTT_button_text_hover",
-    "sButtonText": "Download",
-    "mColumns": "all",
-    "bHeader": true,
-    "bFooter": true,
-    "sDiv": "",
-    "fnMouseover": null,
-    "fnMouseout": null,
-    "fnClick": function( nButton, oConfig ) { 
-        var tableTools = this;
-        var overlay = $('<div>').attr('id', 'downloadoverlay');
-        $('body').append(overlay);
-        overlay.dialog({
-          height: 90,
-          modal: true,
-          autoOpen: true,
-          open: function(event, ui){
-            $(".ui-dialog-titlebar", ui.dialog).hide();
-            var label = $('<div>').addClass('label').html('Downloading...').css('float', 'left').css('margin','10px 5px');
-            var progressbar = $('<div>').addClass('progress').append(label);
-            overlay.append(progressbar);
-            progressbar.progressbar({
-              value: false
-            });
-            var iFrameName = "iFrame" + (new Date().getTime());
-            var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
-            iFrame.css("display", "none");
-
-            var form = $('<form>');
-            form.attr( 'method', 'post' );
-            iFrame.append(form);
-            var applicantIds = [];
-            var selected = tableTools.fnGetSelectedData();
-            for(var i = 0; i < selected.length; i++){
-              applicantIds.push(selected[i].id);
-            }
-            form.append($('<input>').attr('name', 'applicantIds').attr('type', 'text').val(applicantIds));
-            form.attr( 'action', oConfig.sUrl );
-            form.bind('submit', function(){
-              var cookieName = 'fileDownload';
-              var check = function(){
-                if($.cookie(cookieName) == 'complete'){
-                  $.cookie(cookieName, 'false', {expires: 1, path: '/' });
-                  $('#downloadoverlay').dialog('destroy').remove();
-                  iFrame.remove();
-                } else {
-                  setTimeout(check, 500);
-                }
-              };
-              setTimeout(check, 500);
-              return true;
-            });
-            form.submit();
-          }
-        });
-    },
-    "fnSelect": null,
-    "fnComplete": null,
-    "fnInit": null
-};
-
-/**
-* Table tools button plugin to create downloads from applicant data
-**/
-TableTools.BUTTONS.download_applicants = $.extend( true, TableTools.buttonBase, {
-    "fnClick": function( nButton, oConfig ) {
-      var tableTools = this;
-      var dialog = $('<div>');
-      var obj = new FormObject();
-      var field = obj.newField({name: 'legend', value: 'Download Options'});
-      
-      var type = field.newElement('SelectList', 'type');
-      type.label = 'Download Type';
-      type.required = true;
-      var downloadTypes = [
-        {action: 'downloadXls', title: 'Excel'},
-        {action: 'downloadXml', title: 'XML'},
-        {action: 'downloadPdfArchive', title: 'PDF'},
-        {action: 'downloadJson', title: 'JSON'},
-      ];
-      var basePath = oConfig.services.getControllerPath('applicants_grid');
-      for(var i = 0; i < downloadTypes.length; i++){
-//        if(oConfig.services.checkIsAllowed('applicants_grid', downloadTypes[i].action)){
-          type.addItem(downloadTypes[i].title, basePath + '/' + downloadTypes[i].action);
-//        }
-      }
-      
-      var template = field.newElement('SelectList', 'pdftemplate');
-      template.label = 'PDF Type';
-      template.required = true;
-      var templates = [];
-      templates.push({title: 'Portrait', id: 'portrait'});
-      templates.push({title: 'Landscape', id: 'landscape'});
-      templates = templates.concat(oConfig.services.getCurrentApplication().listTemplates());
-      for(var i = 0; i < templates.length; i++){
-        template.addItem(templates[i]["title"], templates[i]["id"]);
-      }
-
-      var formObject = new Form().create(obj);
-      var form = $('form',formObject);
-      form.append($('<button type="submit" name="submit">').html('Download').button({
-        icons: {
-          primary: 'ui-icon-mail-closed'
-        }
-      }));
-      $('select[name=pdftemplate]', form).parent().parent().hide();
-      $('select[name=type]', form).on('change', function(){
-        if($('option:selected', this).text() == 'PDF'){
-          $('select[name=pdftemplate]', form).parent().parent().show();
-        } else {
-          $('select[name=pdftemplate]', form).parent().parent().hide();
-        }
-      });
-      form.bind('submit',function(e){
-        var subject = $('input[name="subject"]', this).val();
-        var overlay = $('<div>').attr('id', 'downloadoverlay');
-        overlay.dialog({
-          height: 90,
-          modal: true,
-          autoOpen: true,
-          open: function(event, ui){
-            $(".ui-dialog-titlebar", ui.dialog).hide();
-            var label = $('<div>').addClass('label').html('Downloading...').css('float', 'left').css('margin','10px 5px');
-            var progressbar = $('<div>').addClass('progress').append(label);
-            overlay.append(progressbar);
-            progressbar.progressbar({
-              value: false
-            });
-            dialog.dialog("destroy").remove();
-            var iFrameName = "iFrame" + (new Date().getTime());
-            var iFrame = $("<iframe name='" + iFrameName + "' src='about:blank' />").insertAfter('body');
-            iFrame.css("display", "none");
-
-            var iframeForm = $('<form>');
-            iframeForm.attr( 'method', 'post' );
-            iframeForm.append(form);
-            var template = $('select[name=pdftemplate]', form).val();
-            var type = $('select[name=type]', form).val();
-            iframeForm.attr('action', type);
-            iframeForm.append($('<input>').attr('name', 'pdftemplate').attr('type', 'hidden').val(template));
-            
-            var applicantIds = [];
-            var selected = tableTools.fnGetSelectedData();
-            for(var i = 0; i < selected.length; i++){
-              applicantIds.push(selected[i].id);
-            }
-            iframeForm.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
-            iframeForm.bind('submit', function(){
-              var cookieName = 'fileDownload';
-              var check = function(){
-                if($.cookie(cookieName) == 'complete'){
-                  $.cookie(cookieName, 'false', {expires: 1, path: '/' });
-                  $('#downloadoverlay').dialog('destroy').remove();
-                  iFrame.remove();
-                } else {
-                  setTimeout(check, 500);
-                }
-              };
-              setTimeout(check, 500);
-              return true;
-            });
-            iframeForm.submit();
-          }
-        });
-        
-        event.preventDefault(); 
-        return false;
-      });//end submit
-      dialog.append(form);
-      dialog.dialog({
-        modal: true,
-        autoOpen: true,
-        width: 500
-      });
-    }
-});
