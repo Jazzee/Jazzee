@@ -50,6 +50,14 @@ Application.prototype.listTags = function(){
   return this.application.tags;
 };
 
+
+/**
+ * List all of the tags
+ */
+Application.prototype.listTemplates = function(){
+  return this.application.templates;
+};
+
 /**
  * Get page class by ID
  * @param pageId
