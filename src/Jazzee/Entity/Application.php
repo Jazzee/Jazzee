@@ -919,6 +919,28 @@ class Application
   }
   
   /**
+   * Format applicant Array to use in PDF templates
+   *
+   * @param array $applicant
+   * 
+   * @return array
+   */
+  public function formatApplicantPDFTemplateArray(array $applicant)
+  {
+    $answers = $applicant['answers'];
+    unset($applicant['answers']);
+    $applicant['pages'] = array();
+    foreach($answers as $pageId => $answers){
+      if($applicationPage = $this->getApplicationPageByPageId($pageId) and is_a($applicationPage->getJazzeePage(), '\Jazzee\Interfaces\PdfPage')){
+        $applicant['pages'][$applicationPage->getPage()->getId()] = $applicationPage->getJazzeePage()->formatApplicantPDFTemplateArray($answers);
+      }
+    }
+    $applicant['attachments'] = array();
+
+    return $applicant;
+  }
+  
+  /**
    * Get all application templates
    * @return array
    */

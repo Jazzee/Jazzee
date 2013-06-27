@@ -198,6 +198,7 @@ class JazzeeController extends PageController
     $this->_em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig, $eventManager);
     $this->_em->getConfiguration()->addCustomHydrationMode('ApplicantArrayHydrator', 'Jazzee\Entity\ApplicantArrayHydrator');
     $this->_em->getConfiguration()->addCustomHydrationMode('ApplicantDisplayHydrator', 'Jazzee\Entity\ApplicantDisplayHydrator');
+    $this->_em->getConfiguration()->addCustomHydrationMode('ApplicantPDFTemplateHydrator', 'Jazzee\Entity\ApplicantPDFTemplateHydrator');
 
     \Jazzee\Globals::setEntityManager($this->_em);
   }

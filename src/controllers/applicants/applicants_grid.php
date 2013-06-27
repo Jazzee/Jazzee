@@ -270,7 +270,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
     //use a full applicant display where display is needed
     $display = new \Jazzee\Display\FullApplication($this->_application);
     $applicants = explode(',',$this->post['applicantIds']);
-
     // ensure garbage collection is on, we need it
     gc_enable();
 
@@ -279,68 +278,43 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $zip = new ZipArchive;
     $zip->open($zipFile, ZipArchive::CREATE);
     $zip->addEmptyDir($directoryName);
-
-    $tempFileArray = array();
     $tmppath = $this->_config->getVarPath() . '/tmp';
-    foreach(array_chunk($applicants, 20) as $limitedIds){
-      $applicantsDisplayArray = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $limitedIds);
-      foreach($applicantsDisplayArray as $applicantArray){
-        $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
-        $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
-        $tempFileArray[] = $temp_file_name;
-        file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
-        $externalIDSuffix = ($applicantArray['externalId'] != null) ? ' - '.$applicantArray['externalId'] : "";
-        $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . $externalIDSuffix . '.pdf');
-        unset($pdf);
-      }
-    }
-    $zip->close();
-    $this->setVar('outputType', 'file');
-    $this->setVar('type', 'application/zip');
-    $this->setVar('filename', $directoryName . '.zip');
-    $this->setVar('filePath', $zipFile);
-    $this->loadView('applicants_grid/download');
-  }
-
-
-  public function actionDownloadPdfTemplateArchive()  
-  {
-    //use a full applicant display where display is needed
-    $display = new \Jazzee\Display\FullApplication($this->_application);
-    $applicants = explode(',',$this->post['applicantIds']);
-    error_log("pdf template? ".$this->post['pdftemplate']);
-$templateId = (isset($this->post['pdftemplate'])) ? $this->post['pdftemplate']
-: null;
-    // ensure garbage collection is on, we need it
-    gc_enable();
-
-    $directoryName = $this->_application->getProgram()->getShortName() . '-' . $this->_application->getCycle()->getName() . date('-mdy');
-    $zipFile = $this->_config->getVarPath() . '/tmp/' . uniqid() . '.zip';
-    $zip = new ZipArchive;
-    $zip->open($zipFile, ZipArchive::CREATE);
-    $zip->addEmptyDir($directoryName);
-
-    $tempFileArray = array();
-    $tmppath = $this->_config->getVarPath() . '/tmp';
-//    foreach(array_chunk($applicants, 20) as $limitedIds){
-//      $applicantsDisplayArray = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $limitedIds);
-//      foreach($applicantsDisplayArray as $applicantArray){
-    foreach($applicants as $applicantId){
-        $applicant = $this->getApplicantById($applicantId);
-
-	if(($templateId != null) && ($template = $this->_application->getTemplateById($templateId))){
-           $pdf = new \Jazzee\TemplatePDF($this->_config->getPdflibLicenseKey(), $template, $this);
-           $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
-           $tempFileArray[] = $temp_file_name;
-           file_put_contents($temp_file_name, $pdf->pdf($applicant));
-           $externalIDSuffix = ($applicant->getExternalId() != null) ? ' - '.$applicant->getExternalId() : "";
-           $zip->addFile($temp_file_name, $directoryName . '/' . $applicant->getFullName() . $externalIDSuffix . '.pdf');
-           unset($pdf);
-        }else{
-	   throw new Error("Template ID [".$templateId."] not found.");
+    
+    if($this->post['pdftemplate'] == 'portrait' or $this->post['pdftemplate'] == 'landscape'){
+      foreach(array_chunk($applicants, 20) as $limitedIds){
+        $applicantsDisplayArray = $this->_em->getRepository('Jazzee\Entity\Applicant')->findDisplayArrayByApplication($this->_application, $display, $limitedIds);
+        foreach($applicantsDisplayArray as $applicantArray){
+          switch($this->post['pdftemplate']){
+            case 'portrait':
+              $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_PORTRAIT, $this);
+            case 'landscape':
+              $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
+              break;
+          }
+          $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
+          file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
+          $externalIDSuffix = ($applicantArray['externalId'] != null) ? ' - '.$applicantArray['externalId'] : "";
+          $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . $externalIDSuffix . '.pdf');
+          unset($pdf);
         }
       }
-    //}
+    } else {
+      if(!$template = $this->_application->getTemplateById($this->post['pdftemplate'])){
+        throw new \Jazzee\Exception("Invalid template ID: " . $this->post['pdftemplate'] . ' for ' . $this->_application->getProgram()->getName());
+      }
+      foreach(array_chunk($applicants, 20) as $limitedIds){
+        $applicantsPDFTemplateArray = $this->_em->getRepository('Jazzee\Entity\Applicant')->findPDFTemplateArrayByApplication($this->_application, $display, $limitedIds);
+        foreach($applicantsPDFTemplateArray as $applicantArray){
+          $pdf = new \Jazzee\TemplatePDF($this->_config->getPdflibLicenseKey(), $template, $this);
+          $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
+          file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
+          $externalIDSuffix = ($applicantArray['externalId'] != null) ? ' - '.$applicantArray['externalId'] : "";
+          $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . $externalIDSuffix . '.pdf');
+          unset($pdf);
+        }
+      }
+    }
+
     $zip->close();
     $this->setVar('outputType', 'file');
     $this->setVar('type', 'application/zip');
@@ -383,7 +357,7 @@ $templateId = (isset($this->post['pdftemplate'])) ? $this->post['pdftemplate']
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay','downloadXls','downloadJson','downloadXml', 'downloadPdfArchive', 'downloadPdfTemplateArchive'))) {
+    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay'))) {
       $action = 'index';
     }
 

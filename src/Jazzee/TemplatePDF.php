@@ -173,12 +173,17 @@ class TemplatePDF
    */
   public function pdfFromApplicantArray(\Jazzee\Entity\Application $application, array $applicant)
   {
-    $this->pdf->set_info("Title", $this->pdf->utf8_to_utf16($applicant["fullName"], '') . ' Application');
-    $this->addText($applicant["fullName"] . "\n", 'h1');
-    $this->addText('Email Address: ' . $applicant["email"] . "\n", 'p');
-
-    if ($applicant["isLocked"]) {
-      switch ($applicant["decision"]["status"]) {
+    $elements = array('applicant' => array(), 'pages'=>array());
+    $elements['applicant']['firstName'] = $applicant['firstName'];
+    $elements['applicant']['lastName'] = $applicant['lastName'];
+    $elements['applicant']['middleName'] = $applicant['middleName'];
+    $elements['applicant']['fullName'] = $applicant['fullName'];
+    $elements['applicant']['suffix'] = $applicant['suffix'];
+    $elements['applicant']['email'] = $applicant['email'];
+    $elements['applicant']['id'] = $applicant['id'];
+    $elements['applicant']['externalid'] = $applicant['externalId'];
+    if ($applicant['isLocked']) {
+      switch ($applicant['decision']['status']) {
         case 'finalDeny':
           $status = 'Denied';
             break;
@@ -196,34 +201,9 @@ class TemplatePDF
     } else {
       $status = 'Not Locked';
     }
-    $this->addText("Admission Status: {$status}\n", 'p');
-    $this->write();
-    
-    $pages = array();
-    foreach($applicant['pages'] as $pageArray){
-      $pages[$pageArray['id']] = $pageArray['answers'];
-    }
-    foreach ($application->getApplicationPages(\Jazzee\Entity\ApplicationPage::APPLICATION) as $applicationPath) {
-      if ($applicationPath->getJazzeePage() instanceof \Jazzee\Interfaces\PdfPage) {
-        $applicationPath->getJazzeePage()->setController($this->_controller);
-        $pageData = array_key_exists($applicationPath->getPage()->getId(), $pages)?$pages[$applicationPath->getPage()->getId()]:array();
-        $applicationPath->getJazzeePage()->renderPdfSectionFromArray($pageData, $this);
-      }
-    }
-    $this->write();
-    $this->pdf->end_page_ext("");
+    $elements['applicant']['status'] = $status;
+    $elements['pages'] = $applicant['pages'];
 
-    foreach ( $applicant["attachments"] as $attachment) {
-      $blob = \Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]);
-      $this->addPdf($blob);
-      $blob = null;
-    }
-
-    $this->attachPdfs();
-    $this->pdf->end_document("");
-
-    return $this->pdf->get_buffer();
+    return $this->generatePDF($elements);
   }
-
-
 }

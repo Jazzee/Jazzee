@@ -453,6 +453,26 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
 
     return $values;
   }
+
+  public function formatApplicantPDFTemplateArray(array $answers)
+  {
+    $values = array();
+    foreach($this->_applicationPage->getPage()->getElements() as $element){
+      $elementValues = array();
+      foreach($answers as $answer){
+        if(array_key_exists($element->getId(), $answer['elements'])){
+          $arr = $element->getJazzeeElement()->formatApplicantArray($answer['elements'][$element->getId()]);
+          foreach($arr['values'] as $arr2){
+            $elementValues[] = $arr2['value'];
+          }
+          
+        }
+      }
+      $values[$element->getId()] = implode("\n", $elementValues);
+    }
+
+    return $values;
+  }
   
   /**
    * Get the values for each element for use in the PDF template

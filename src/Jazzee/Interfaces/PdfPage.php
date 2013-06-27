@@ -38,4 +38,14 @@ interface PdfPage extends DataPage
    * @return array
    */
   function listPdfTemplateElements();
+  
+  /**
+   * Format a page array with answers into a usable strucutre with customizations
+   * for each page type
+   * 
+   * @param array $answers
+   * 
+   * @return array
+   */
+  public function formatApplicantPDFTemplateArray(array $answers);
 }

@@ -5,6 +5,7 @@ function Services(){
   var self = this;
   this.basepath = Services.prototype.absoluteBasePath;
   this.preferences = false;
+  this.applications = [];
 };
 
 Services.prototype.request = function(service, data){
