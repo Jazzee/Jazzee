@@ -96,13 +96,16 @@ class TemplatePDF
       for($blockNum = 0; $blockNum < $blockcount; $blockNum++){
         $blockName = $pdf->pcos_get_string($document,"pages[{$pageNum}]/blocks[{$blockNum}]/Name");
         if($this->_template->hasBlock($blockName)){
+          $string = '';
           $blockData = $this->_template->getBlock($blockName);
           switch($blockData['type']){
             case 'applicant':
               $string = $pdf->convert_to_unicode('auto',$elements['applicant'][$blockData['element']], '');
               break;
             case 'page':
-              $string = $pdf->convert_to_unicode('auto',$elements['pages'][$blockData['pageId']][$blockData['elementId']], '');
+              if(array_key_exists($blockData['pageId'], $elements['pages']) AND array_key_exists($blockData['elementId'], $elements['pages'][$blockData['pageId']])){
+                $string = $pdf->convert_to_unicode('auto',$elements['pages'][$blockData['pageId']][$blockData['elementId']], '');
+              }
               break;
           }
           $length = strlen($string);
