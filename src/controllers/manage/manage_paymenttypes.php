@@ -121,6 +121,10 @@ class ManagePaymenttypesController extends \Jazzee\AdminController
 
     if ($input = $form->processInput($this->post)) {
       if ($input->get('newtypeform')) {
+        if($this->_em->getRepository('Jazzee\Entity\PaymentType')->findBy(array('name'=> $input->get('name')))){
+          $form->getElementByName('name')->addMessage('That payment name has already been used.');
+          return false;
+        }
         $paymentClass->setup($input);
         $this->_em->persist($paymentType);
         foreach ($paymentType->getVariables() as $var) {
