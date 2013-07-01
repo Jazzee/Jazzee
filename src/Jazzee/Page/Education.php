@@ -13,41 +13,43 @@ class Education extends Standard
 {
   
   /**
-   * Fixed element for the school
+   * Fixed pages for the school
    */
-  const ELEMENT_FID_SCHOOL = 2;
-  const PAGE_FID_KNOWNSCHOOL = 2;
   const PAGE_FID_NEWSCHOOL = 4;
-
+  const ELEMENT_FID_NAME = 2;
+  const ELEMENT_FID_CITY = 4;
+  const ELEMENT_FID_STATE = 8;
+  const ELEMENT_FID_COUNTRY = 16;
+  const ELEMENT_FID_POSTALCODE = 32;
+  
   /**
-   * Initial form is for school select, then 
+   * Initial form is for school search
    */
   protected function makeForm()
   {
-    $schoolList = $this->_applicationPage->getPage()->getElementByFixedId(self::ELEMENT_FID_SCHOOL);
     $form = new \Foundation\Form;
     $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
-    $element = $field->newElement('TextInput', 'el' . $schoolList->getId());
+    $element = $field->newElement('TextInput', 'schoolSearch');
     $element->setLabel('Search for School');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $form->newButton('submit', 'Search');
     
-    $form->newHiddenElement('level', 1);
+    $form->newHiddenElement('level', 'search');
     $form->getElementByName('submit')->setValue('Search');
     return $form;
   }
 
   /**
-   * Branching Page Form
-   * Replaces the form with the correct branch
-   * @param \Jazzee\Entity\Page $page
+   * Create the new school Form
+   * 
    * @param int $schoolId
    */
-  protected function branchingForm(\Jazzee\Entity\Page $page, $schoolId)
+  protected function newSchoolForm()
   {
+    $page = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
     $form = new \Foundation\Form;
     $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
@@ -58,9 +60,38 @@ class Education extends Standard
       $element->getJazzeeElement()->setController($this->_controller);
       $element->getJazzeeElement()->addToField($field);
     }
-    $form->newHiddenElement('level', 3);
-    $schoolList = $this->_applicationPage->getPage()->getElementByFixedId(self::ELEMENT_FID_SCHOOL);
-    $form->newHiddenElement( 'el'.$schoolList->getId(), $schoolId);
+    $form->newHiddenElement('level', 'new');
+    $form->newButton('submit', 'Next');
+    $this->_form = $form;
+  }
+
+  /**
+   * Branching Page Form
+   * Replaces the form with the correct branch
+   * @param array $input
+   */
+  protected function pageForm($input)
+  {
+    $form = new \Foundation\Form;
+    $form->setAction($this->_controller->getActionPath());
+    $field = $form->newField();
+    $field->setLegend($this->_applicationPage->getTitle());
+    $field->setInstructions($this->_applicationPage->getInstructions());
+
+    foreach ($this->_applicationPage->getPage()->getElements() as $element) {
+      $element->getJazzeeElement()->setController($this->_controller);
+      $element->getJazzeeElement()->addToField($field);
+    }
+    $form->newHiddenElement('level', 'complete');
+    $arr = array(self::ELEMENT_FID_NAME,self::ELEMENT_FID_CITY,self::ELEMENT_FID_STATE,self::ELEMENT_FID_COUNTRY,self::ELEMENT_FID_POSTALCODE);
+    $newSchoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
+    foreach($arr as $fid){
+      $element = $newSchoolPage->getElementByFixedId($fid);
+      $eid = 'el'.$element->getId();
+      if(array_key_exists($eid, $input)){
+        $form->newHiddenElement($eid, $input[$eid]);
+      }
+    }
     $form->newButton('submit', 'Save');
     $this->_form = $form;
   }
@@ -71,14 +102,13 @@ class Education extends Standard
    */
   protected function pickSchoolForm($choices)
   {
-    $schoolList = $this->_applicationPage->getPage()->getElementByFixedId(self::ELEMENT_FID_SCHOOL);
     $form = new \Foundation\Form;
     $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
 
-    $element = $field->newElement('RadioList', 'el'.$schoolList->getId());
+    $element = $field->newElement('RadioList', 'pickSchoolId');
     $element->setLabel('Choose School');
     $element->newItem(null, 'Enter a new School');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
@@ -86,46 +116,54 @@ class Education extends Standard
     foreach ($choices as $id => $value) {
       $element->newItem($id, $value);
     }
-    $form->newHiddenElement('level', 2);
+    $form->newHiddenElement('level', 'pick');
     $form->newButton('submit', 'Next');
     $this->_form = $form;
   }
 
   public function validateInput($input)
   {
-    $schoolList = $this->_applicationPage->getPage()->getElementByFixedId(self::ELEMENT_FID_SCHOOL);
-    if($input['level'] == 1){
-      if ($input = $this->getForm()->processInput($input)) {
-        $choices = array();
-        $searchTerms = explode(' ',$input->get('el'.$schoolList->getId()));
-        $items = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\ElementListItem')->search($schoolList, $searchTerms, array('searchTerms'));
-        foreach($items as $item){
-          $choices[$item->getId()] = $item->getValue();
-        }
-        if(count($choices) > 50){
-          $this->_controller->addMessage('error', 'Your search returned too many results, please try again with more detail.');
+    switch($input['level']){
+      case 'search':
+        if ($input = $this->getForm()->processInput($input)) {
+          $choices = array();
+          $searchTerms = $input->get('schoolSearch');
+          $resultsCount = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->getSearchCount($searchTerms);
+          if($resultsCount == 0){
+            $this->_controller->addMessage('error', 'Your search returned no results, please try again.');
+          } else if($resultsCount > 50){
+            $this->_controller->addMessage('error', 'Your search returned too many results, please try again with more detail.');
+          } else {
+            $schools = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->search($searchTerms);
+            foreach($schools as $school){
+              $choices[$school->getId()] = $school->getName();
+            }
+          }
+          $this->pickSchoolForm($choices);
+          return false;
+        } else {
+          $this->_controller->addMessage('error', self::ERROR_MESSAGE);
           return false;
         }
-        $this->pickSchoolForm($choices);
+        break;
+      case 'pick':
+        if(!empty($input['pickSchoolId'])){
+          $selectedSchool = $this->getSchoolById($input[ 'pickSchoolId']);
+          $this->_controller->setVar('schoolName', $selectedSchool->getName());
+          $this->pageForm($input);
+          $this->_form->newHiddenElement('schoolId', $selectedSchool->getId());
+        } else {
+          $this->newSchoolForm();
+        }
         return false;
-      } else {
-        $this->_controller->addMessage('error', self::ERROR_MESSAGE);
-        return false;
-      }
-    } else if($input['level'] == 2 OR $input['level'] == 3){
-      if(!empty($input[ 'el'.$schoolList->getId()])){
-        $schoolId = $input[ 'el'.$schoolList->getId()];
-        $this->_controller->setVar('schoolName', $schoolList->getItemById($schoolId)->getValue());
-        $page = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_KNOWNSCHOOL);
-      } else {
-        $schoolId = null;
-        $page = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
-      }
-      $this->branchingForm($page, $schoolId);
-      if($input['level'] == 2){
-        return false;
-      }
-      return parent::validateInput($input);
+        break;
+      case 'new':
+        $this->pageForm($input);
+        break;
+      case 'complete':
+        $this->pageForm($input);
+        return parent::validateInput($input);
+        break;
     }
   }
 
@@ -140,26 +178,27 @@ class Education extends Standard
         }
       }
       $this->_applicant->addAnswer($answer);
-      $childAnswer = new \Jazzee\Entity\Answer;
-      $schoolList = $this->_applicationPage->getPage()->getElementByFixedId(self::ELEMENT_FID_SCHOOL);
-      if($input->get('el'.$schoolList->getId()) != null){
-        $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_KNOWNSCHOOL);
+      $schoolId = $input->get('schoolId');
+      if(!is_null($schoolId) and $school = $this->getSchoolById($schoolId)){
+        $answer->setSchool($school);
       } else {
-        $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
-      }
-      $childAnswer->setPage($schoolPage);
-      $answer->addChild($childAnswer);
+        $childPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
+        $childAnswer = new \Jazzee\Entity\Answer;
+        $childAnswer->setPage($childPage);
+        $answer->addChild($childAnswer);
 
-      foreach ($schoolPage->getElements() as $element) {
-        foreach ($element->getJazzeeElement()->getElementAnswers($input->get('el' . $element->getId())) as $elementAnswer) {
-          $childAnswer->addElementAnswer($elementAnswer);
+        foreach ($childPage->getElements() as $element) {
+          foreach ($element->getJazzeeElement()->getElementAnswers($input->get('el' . $element->getId())) as $elementAnswer) {
+            $childAnswer->addElementAnswer($elementAnswer);
+          }
         }
+        $this->_controller->getEntityManager()->persist($childAnswer);
       }
 
       $this->_form = $this->makeForm();
       $this->_form->applyDefaultValues();
       $this->_controller->getEntityManager()->persist($answer);
-      $this->_controller->getEntityManager()->persist($childAnswer);
+      
       $this->_controller->addMessage('success', 'Answered Saved Successfully');
       //flush here so the answerId will be correct when we view
       $this->_controller->getEntityManager()->flush();
@@ -183,8 +222,9 @@ class Education extends Standard
         }
       }
       $childAnswer = new \Jazzee\Entity\Answer;
-      $element = $this->_applicationPage->getPage()->getElementByFixedId(self::ELEMENT_FID_SCHOOL);
-      if($input->get('el' . $element->getId()) != null){
+      $schoolId = $input->get('schoolId');
+      if(!is_null($schoolId) and $school = $this->getSchoolById($schoolId)){
+        $answer->setSchool($school);
         $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_KNOWNSCHOOL);
       } else {
         $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
@@ -208,23 +248,29 @@ class Education extends Standard
   public function fill($answerId)
   {
     if ($answer = $this->_applicant->findAnswerById($answerId)) {
-      $element = $this->_applicationPage->getPage()->getElementByFixedId(self::ELEMENT_FID_SCHOOL);
-      $schoolName = $element->getJazzeeElement()->rawValue($answer);
-      if($schoolName != null){
-        $this->_controller->setVar('schoolName', $schoolName);
-        $schoolId = $element->getItemByValue($schoolName)->getId();
-      } else {
-        $schoolId = null;
+      if($school = $answer->getSchool()){
+        $this->_controller->setVar('schoolName', $school->getName());
+        $schoolId = $school->getId();
       }
-      $child = $answer->getChildren()->first();
-      $this->branchingForm($child->getPage(), $schoolId);
-      foreach ($child->getPage()->getElements() as $element) {
+      $input = array();
+      if($child = $answer->getChildren()->first()){
+        foreach ($child->getPage()->getElements() as $element) {
+          $element->getJazzeeElement()->setController($this->_controller);
+          $value = $element->getJazzeeElement()->formValue($child);
+          if ($value) {
+            $input['el' . $element->getId()] = $value;
+          }
+        }
+      }
+      $this->pageForm($input);
+      foreach ($this->_applicationPage->getPage()->getElements() as $element) {
         $element->getJazzeeElement()->setController($this->_controller);
-        $value = $element->getJazzeeElement()->formValue($child);
+        $value = $element->getJazzeeElement()->formValue($answer);
         if ($value) {
           $this->getForm()->getElementByName('el' . $element->getId())->setValue($value);
         }
       }
+
       $this->getForm()->setAction($this->_controller->getActionPath() . "/edit/{$answerId}");
     }
   }
@@ -235,25 +281,12 @@ class Education extends Standard
   public function setupNewPage()
   {
     $entityManager = $this->_controller->getEntityManager();
-    $type = $entityManager->getRepository('\Jazzee\Entity\ElementType')->findOneBy(array('class'=>'\\Jazzee\Element\SelectList'));
+    $types = $entityManager->getRepository('Jazzee\Entity\ElementType')->findAll();
+    $elementTypes = array();
+    foreach ($types as $type) {
+      $elementTypes[$type->getClass()] = $type;
+    };
     $standardPageType = $entityManager->getRepository('\Jazzee\Entity\PageType')->findOneBy(array('class'=>'\\Jazzee\Page\Standard'));
-
-    $element = new \Jazzee\Entity\Element;
-    $this->_applicationPage->getPage()->addElement($element);
-    $element->setType($type);
-    $element->setTitle('School Name');
-    $element->required();
-    $element->setWeight(1);
-    $element->setFixedId(self::ELEMENT_FID_SCHOOL);
-    $entityManager->persist($element);
-    
-    $knownSchool = new \Jazzee\Entity\Page();
-    $knownSchool->setType($standardPageType);
-    $knownSchool->setFixedId(self::PAGE_FID_KNOWNSCHOOL);
-    $knownSchool->setTitle('Known School');
-    $this->_applicationPage->getPage()->addChild($knownSchool);
-    $entityManager->persist($knownSchool);
-    
     $newSchool = new \Jazzee\Entity\Page();
     $newSchool->setType($standardPageType);
     $newSchool->setFixedId(self::PAGE_FID_NEWSCHOOL);
@@ -261,43 +294,71 @@ class Education extends Standard
     $this->_applicationPage->getPage()->addChild($newSchool);
     $entityManager->persist($newSchool);
     
+    $count = 1;
+    $element = new \Jazzee\Entity\Element;
+    $element->setType($elementTypes['\Jazzee\Element\TextInput']);
+    $element->setTitle('School Name');
+    $element->required();
+    $element->setWeight($count++);
+    $element->setMax(255);
+    $element->setFixedId(self::ELEMENT_FID_NAME);
+    $newSchool->addElement($element);
+    $entityManager->persist($element);
+
+    foreach (array(self::ELEMENT_FID_CITY => 'City', self::ELEMENT_FID_STATE => 'State or Province', self::ELEMENT_FID_COUNTRY => 'Country') as $fid => $title) {
+      $element = new \Jazzee\Entity\Element;
+      $element->setType($elementTypes['\Jazzee\Element\TextInput']);
+      $element->setTitle($title);
+      $element->required();
+      $element->setWeight($count++);
+      $element->setMax(64);
+      $element->setFixedId($fid);
+      $newSchool->addElement($element);
+      $entityManager->persist($element);
+    }
+
+    $element = new \Jazzee\Entity\Element;
+    $element->setType($elementTypes['\Jazzee\Element\TextInput']);
+    $element->setTitle('Postal Code');
+    $element->required();
+    $element->setWeight($count++);
+    $element->setMax(10);
+    $element->setFixedId(self::ELEMENT_FID_POSTALCODE);
+    $newSchool->addElement($element);
+    $entityManager->persist($element);
+
+    $defaultVars = array(
+      'schoolListType' => 'full',
+      'partialSchoolList' => ''
+    );
+    foreach ($defaultVars as $name => $value) {
+      $var = $this->_applicationPage->getPage()->setVar($name, $value);
+      $entityManager->persist($var);
+    }
+    
   }
 
   /**
-   * XML answers include the type of school page (known or unknown)
-   * as well as the school name if it is available
-   * @param \DOMDocument $dom
-   * @param type $version
-   * @return type
+   * Check variables before they are set
+   * @param string $name
+   * @param string $value
+   * @throws \Jazzee\Exception
    */
-  public function getXmlAnswers(\DOMDocument $dom, $version)
+  public function setVar($name, $value)
   {
-    $answers = array();
-    foreach ($this->_applicant->findAnswersByPage($this->_applicationPage->getPage()) as $answer) {
-      $child = $answer->getChildren()->first();
-      $xmlAnswer = $this->xmlAnswer($dom, $child, $version);
-      $eXml = $dom->createElement('element');
-      $eXml->setAttribute('elementId', 'type');
-
-
-      $eXml->setAttribute('title', htmlentities('Type', ENT_COMPAT, 'utf-8'));
-      $eXml->setAttribute('type', null);
-      switch ($version) {
-        case 1:
-          $eXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $child->getPage()->getTitle())));
-          break;
-        case 2:
-          $vXml = $dom->createElement('value');
-          $vXml->appendChild($dom->createCDATASection(preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $child->getPage()->getTitle())));
-          $eXml->appendChild($vXml);
-          break;
-      }
-      $xmlAnswer->appendChild($eXml);
-      $xmlAnswer->appendChild($answer->getPage()->getElementByFixedId(\Jazzee\Page\Education::ELEMENT_FID_SCHOOL)->getJazzeeElement()->getXmlAnswer($dom, $answer, $version));
-      $answers[] = $xmlAnswer;
+    switch ($name) {
+      case 'schoolListType':
+        if(!in_array($value, array('full', 'partial'))){
+          throw new \Jazzee\Exception("{$value} is not a valid option for schoolListType");
+        }
+        break;
+      case 'partialSchoolList':
+        $value = preg_replace("/[^0-9,]+/", "", $value);
+        break;
+      default:
+        throw new \Jazzee\Exception($name . ' is not a valid variable on this page.');
     }
-
-    return $answers;
+    parent::setVar($name, $value);
   }
 
   /**
@@ -316,169 +377,107 @@ class Education extends Standard
       $answer['elements'][] = $element->getJazzeeElement()->formatApplicantArray($elementAnswers);
     }
 
-    $child = $answer['children'][0];
-    $childPage = $page->getChildById($child['page_id']);
+    if(!is_null($answer['attachment'])){
+      $answer['attachment'] = $this->arrayAnswerAttachment($answer['attachment'], $page);
+    }
+
+    if(count($answer['children'])){
+      $child = $answer['children'][0];
+      $childPage = $page->getChildById($child['page_id']);
+      $childElements = $child['elements'];
+      $values = array();
+      foreach ($childElements as $elementId => $elementAnswers) {
+        $element = $childPage->getElementById($elementId);
+        $arr = $element->getJazzeeElement()->formatApplicantArray($elementAnswers);
+        $values[$element->getFixedId()] = $arr['displayValue'];
+      }
+      $schoolName = $values[\Jazzee\Page\Education::ELEMENT_FID_NAME];
+      $schoolType = 'New';
+      $parts = array(
+        $values[\Jazzee\Page\Education::ELEMENT_FID_CITY],
+        $values[\Jazzee\Page\Education::ELEMENT_FID_STATE],
+        $values[\Jazzee\Page\Education::ELEMENT_FID_COUNTRY],
+        $values[\Jazzee\Page\Education::ELEMENT_FID_POSTALCODE],
+      );
+      $schoolLocation = implode(' ', $parts);
+    } else {
+      $schoolName = $answer['school']['name'];
+      $parts = array(
+        $answer['school']['city'],
+        $answer['school']['state'],
+        $answer['school']['country'],
+        $answer['school']['postalCode']
+      );
+      $schoolLocation = implode(' ', $parts);;
+      $schoolType = 'Known';
+    }
     $answer['elements'][] = array(
-      'id' => 'type',
-      'title' => 'Type',
+      'id' => 'locationSummary',
+      'title' => 'School Location',
       'type' => null,
       'name' => null,
       'weight' => 0,
       'values' => array(
-        array('value' => $childPage->getTitle(), 'name' => null, 'id'=>null)
+        array('value' => $schoolLocation, 'name' => null, 'id'=>null)
       ),
-      'displayValue' => $childPage->getTitle()
+      'displayValue' => $schoolLocation
     );
-    
-    $childElements = $child['elements'];
-    unset($answer['children']);
-    
-    
-    foreach ($childElements as $elementId => $elementAnswers) {
-      $element = $childPage->getElementById($elementId);
-      $answer['elements'][] = $element->getJazzeeElement()->formatApplicantArray($elementAnswers);
-    }
-    if(!is_null($answer['attachment'])){
-      $answer['attachment'] = $this->arrayAnswerAttachment($answer['attachment'], $page);
-    }
+    $answer['elements'][] = array(
+      'id' => 'schoolName',
+      'title' => 'Schoo Namel',
+      'type' => null,
+      'name' => null,
+      'weight' => 0,
+      'values' => array(
+        array('value' => $schoolName, 'name' => null, 'id'=>null)
+      ),
+      'displayValue' => $schoolName
+    );
+    $answer['elements'][] = array(
+      'id' => 'schoolType',
+      'title' => 'School Type',
+      'type' => null,
+      'name' => null,
+      'weight' => 0,
+      'values' => array(
+        array('value' => $schoolType, 'name' => null, 'id'=>null)
+      ),
+      'displayValue' => $schoolType
+    );
 
     return $answer;
   }
 
   /**
-   * Represent all branches and the type/school name as well
-   * @return array
+   * Convienence method for getting the school so the entity manager does not
+   * get used everywhere and if it becomed necesary this can be modified in a signle place
+   * 
+   * @param integer $schoolId
+   * @return boolean
    */
-  public function getCsvHeaders()
+  public function getSchoolById($schoolId)
   {
-    $headers = parent::getCsvHeaders();
-    $headers[] = 'Type';
-    foreach ($this->_applicationPage->getPage()->getChildren() as $child) {
-      foreach ($child->getElements() as $element) {
-        $headers[] = $child->getTitle() . ' ' . $element->getTitle();
-      }
+    if($schoolId != null and $school = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->find($schoolId)){
+      return $school;
     }
 
-    return $headers;
-  }
-
-   /**
-   * CSV elements for main page and any branches as well
-   * @param array $pageArr
-   * @param int $position
-   * @return array
-   */
-  public function getCsvAnswer(array $pageArr, $position)
-  {
-    $arr = array();
-    foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-      $value = '';
-      if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
-        foreach($pageArr['answers'][$position]['elements'] as $eArr){
-          if($eArr['id'] == $element->getId()){
-            $value = $eArr['displayValue'];
-            break;
-          }
-        }
-      }
-      $arr[] = $value;
-    }
-    if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
-      $value = '';
-      if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
-        foreach($pageArr['answers'][$position]['elements'] as $eArr){
-          if($eArr['id'] == 'type'){
-            $value = $eArr['displayValue'];
-            break;
-          }
-        }
-      }
-      $arr[] = $value;
-    }
-    foreach($this->_applicationPage->getPage()->getChildren() as $child){
-      foreach ($child->getElements() as $element) {
-        $value = '';
-        if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
-          foreach($pageArr['answers'][$position]['elements'] as $eArr){
-            if($eArr['id'] == $element->getId()){
-              $value = $eArr['displayValue'];
-              break;
-            }
-          }
-        }
-        $arr[] = $value;
-      }
-    }
-
-    return $arr;
+    return false;
   }
 
   /**
-   * Create a table from answers
-   * and append any attached PDFs
-   * @param \Jazzee\ApplicantPDF $pdf
+   * Education pages list the children of each branch
+   * 
+   * @return array
    */
-  public function renderPdfSection(\Jazzee\ApplicantPDF $pdf)
+  public function listDisplayElements()
   {
-    $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
-    if($this->getStatus() == \Jazzee\Interfaces\Page::SKIPPED){
-      $pdf->addText("Applicant Skipped this page.\n", 'p');
-    } else {
-      foreach ($this->getAnswers() as $answer) {
-        $childAnswer = $answer->getChildren()->first();
-        $childPage = $childAnswer->getPage();
-        $pdf->addText("Type: ", 'b');
-        $pdf->addText("{$childPage->getTitle()}\n", 'p');
-        $this->renderPdfAnswer($pdf, $this->_applicationPage->getPage(), $answer);
-        $this->renderPdfAnswer($pdf, $childPage, $childAnswer);
-        if ($attachment = $answer->getAttachment()) {
-          $pdf->addPdf($attachment->getAttachment());
-        }
-        $pdf->addText("\n", 'p');
-      }
-    }
-  }
+    $elements = parent::listDisplayElements();
+    $weight = count($elements);
+    $elements[] = new \Jazzee\Display\Element('page', 'School Name', $weight++, 'schoolName', $this->_applicationPage->getPage()->getId());
+    $elements[] = new \Jazzee\Display\Element('page', 'School Type', $weight++, 'schoolType', $this->_applicationPage->getPage()->getId());
+    $elements[] = new \Jazzee\Display\Element('page', 'School Location', $weight++, 'locationSummary', $this->_applicationPage->getPage()->getId());
 
-  /**
-   * Render a single answer in the PDF
-   * @param \Jazzee\ApplicantPDF $pdf
-   * @param \Jazzee\Entity\Page $page
-   * @param \Jazzee\Entity\Answer $answer
-   */
-  protected function renderPdfAnswerFromArray(\Jazzee\Entity\Page $page, \Jazzee\ApplicantPDF $pdf, array $answerData)
-  {
-    $value = '';
-    foreach($answerData['elements'] as $eArr){
-      if($eArr['id'] == 'type'){
-        $value = $eArr['displayValue'];
-        break;
-      }
-    }
-    if (!empty($value)) {
-      $pdf->addText("Type: ", 'b');
-      $pdf->addText("{$value}\n", 'p');
-    }
-    foreach ($page->getElements() as $element) {
-      $element->getJazzeeElement()->setController($this->_controller);
-      $value = $element->getJazzeeElement()->pdfValueFromArray($answerData, $pdf);
-      if (!empty($value)) {
-        $pdf->addText("{$element->getTitle()}: ", 'b');
-        $pdf->addText("{$value}\n", 'p');
-      }
-    }
-    foreach($page->getChildren() as $child){
-      foreach ($child->getElements() as $element) {
-        $element->getJazzeeElement()->setController($this->_controller);
-        $value = $element->getJazzeeElement()->pdfValueFromArray($answerData, $pdf);
-        if (!empty($value)) {
-          $pdf->addText("{$element->getTitle()}: ", 'b');
-          $pdf->addText("{$value}\n", 'p');
-        }
-      }
-    }
-    if ($attachment = $answerData['attachment']) {
-      $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]));
-    }
+    return $elements;
   }
 
   public static function applyPageElement()

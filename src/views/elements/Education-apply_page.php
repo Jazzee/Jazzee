@@ -38,18 +38,21 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
           }?>'>
           <h5>Saved Answer</h5>
           <?php
+          if ($school = $answer->getSchool()) {
+            print '<p><strong>School Name:</strong>&nbsp;' . $school->getName() . '</p>';
+          }
+          if($child = $answer->getChildren()->first()){
+            foreach ($child->getPage()->getElements() as $element) {
+              $element->getJazzeeElement()->setController($this->controller);
+              $value = $element->getJazzeeElement()->displayValue($child);
+              if ($value) {
+                print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>';
+              }
+            }
+          }
           foreach ($answer->getPage()->getElements() as $element) {
             $element->getJazzeeElement()->setController($this->controller);
             $value = $element->getJazzeeElement()->displayValue($answer);
-            if ($value) {
-              print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>';
-            }
-          }
-          $child = $answer->getChildren()->first();
-
-          foreach ($child->getPage()->getElements() as $element) {
-            $element->getJazzeeElement()->setController($this->controller);
-            $value = $element->getJazzeeElement()->displayValue($child);
             if ($value) {
               print '<p><strong>' . $element->getTitle() . ':</strong>&nbsp;' . $value . '</p>';
             }
@@ -73,17 +76,18 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
     </div><?php
   } //end if answers
   if (!empty($currentAnswerID) or is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax()) {
-    if ($page->getJazzeePage()->getForm()->getElementByName('level')->getValue() == 2) { ?>
+    $level = $page->getJazzeePage()->getForm()->getElementByName('level')->getValue();
+    if ($level == 'pick') { ?>
       <p>If you do not see your school on the list you can also go back and <a href='<?php print $this->controller->getActionPath() ?>'>search again</a>.</p><?php
     }
-    if ($page->getJazzeePage()->getForm()->getElementByName('level')->getValue() > 2 AND isset($schoolName)) { ?>
+    if (in_array($level, array('complete')) AND isset($schoolName)) { ?>
       <p>You have selected <?php print $schoolName; ?>.
       <?php if(!empty($currentAnswerID)) { ?>
         If you wish to change schools you will need to <a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/<?php print $answer->getId() ?>'>delete this answer</a>.
       <?php } else { ?>
         You can also go back and <a href='<?php print $this->controller->getActionPath() ?>'>choose a different school</a>.</p><?php
       }
-    } if ($page->getJazzeePage()->getForm()->getElementByName('level')->getValue() > 2 AND !isset($schoolName)) { ?>
+    } if (in_array($level, array('new','complete')) AND !isset($schoolName)) { ?>
       <p>You have chosen to create a new school.  
       <?php if(!empty($currentAnswerID)) { ?>
         If you wish to change schools you will need to <a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/<?php print $answer->getId() ?>'>delete this answer</a>.
