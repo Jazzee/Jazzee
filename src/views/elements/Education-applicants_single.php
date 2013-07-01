@@ -3,6 +3,7 @@
  * Single applicant view page
  */
 $page->getJazzeePage()->setApplicant($applicant);
+$page->getJazzeePage()->setController($this->controller);
 ?>
 <div class='page' id='page<?php print $page->getPage()->getId(); ?>'>
   <h4><?php print $page->getTitle(); ?></h4><?php
@@ -17,16 +18,29 @@ $page->getJazzeePage()->setApplicant($applicant);
   } else if (count($page->getJazzeePage()->getAnswers())) {
     //prepares the branching answers into an array so we can make a nice table
     $headers = array();
-    $schoolList = $page->getPage()->getElementByFixedId(\Jazzee\Page\Education::ELEMENT_FID_SCHOOL);
     foreach ($page->getJazzeePage()->getAnswers() as $answer) {
       $arr = array();
-      $schoolName = $schoolList->getJazzeeElement()->displayValue($answer);
-      $child = $answer->getChildren()->first();
-      $arr['Type'] = $child->getPage()->getTitle();
-      $arr['School'] = $schoolName;
-      foreach ($child->getPage()->getElements() as $element) {
+      $arr['Type'] = $answer->getChildren()->first()?'New School':'Known School';
+      $arr['School'] = $answer->getSchool()?$answer->getSchool()->getName():null;
+      $arr['Location'] = $answer->getSchool()?$answer->getSchool()->getLocationSummary():null;
+      foreach ($answer->getPage()->getElements() as $element) {
         $element->getJazzeeElement()->setController($this->controller);
-        $arr[$element->getTitle()] = $element->getJazzeeElement()->displayValue($child);
+        $arr[$element->getTitle()] = $element->getJazzeeElement()->displayValue($answer);
+      }
+      if($child = $answer->getChildren()->first()){
+        $values = array();
+        foreach ($child->getPage()->getElements() as $element) {
+          $element->getJazzeeElement()->setController($this->controller);
+          $values[$element->getFixedId()] = $element->getJazzeeElement()->displayValue($child);
+        }
+        $arr['School'] = $values[\Jazzee\Page\Education::ELEMENT_FID_NAME];
+        $parts = array(
+          $values[\Jazzee\Page\Education::ELEMENT_FID_CITY],
+          $values[\Jazzee\Page\Education::ELEMENT_FID_STATE],
+          $values[\Jazzee\Page\Education::ELEMENT_FID_COUNTRY],
+          $values[\Jazzee\Page\Education::ELEMENT_FID_POSTALCODE],
+        );
+        $arr['Location'] = implode(' ', $parts);
       }
       $headers = array_unique(array_merge($headers, array_keys($arr)));
       $arr['answer'] = $answer;

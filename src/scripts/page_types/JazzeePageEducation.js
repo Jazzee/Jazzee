@@ -3,426 +3,116 @@
   @extends JazzeePage
  */
 function JazzeePageEducation(){}
-JazzeePageEducation.prototype = new JazzeePage();
+JazzeePageEducation.prototype = new JazzeePageStandard();
 JazzeePageEducation.prototype.constructor = JazzeePageEducation;
 
-JazzeePageEducation.prototype.workspace = function(){
-  var pageClass = this;
-  JazzeePage.prototype.workspace.call(this);
-  $('#pageToolbar').append(this.pagePropertiesButton());
-  if(this.isEditable()){
-    if(!this.isGlobal || this.pageBuilder.editGlobal){
-      $('#workspace').append(this.editChildPageButton(2));
-      $('#workspace').append(this.editChildPageButton(4));
-    }
-  } else {
-      $('#elements').html('<h2>You must save this page before Known School and New School pages can be edited.</h2>');
-    }
-};
-
-JazzeePageEducation.prototype.getSchoolListElement = function(){
-  var element = this.getElementByFixedId(2);
-  if(!element){
-    console.log('Unable to get element by fixed id: ' + 2);
-    return false;
-  }
-
-  return element;
-};
-
-JazzeePageEducation.prototype.isEditable = function(){
-  return (Object.keys(this.children).length == 2 && this.getSchoolListElement());
+/**
+ * Create a new Education with good default values
+ * @param {String} id the id to use
+ * @returns {RecommendersPage}
+ */
+JazzeePageEducation.prototype.newPage = function(id,title,typeId,typeName,typeClass,status,pageBuilder){
+  var page = JazzeePage.prototype.newPage.call(this, id,title,typeId,typeName,typeClass,status,pageBuilder);
+  page.setVariable('schoolListType', 'full');
+  page.setVariable('partialSchoolList', '');
+  return page;
 };
 
 /**
- * Create the page properties dropdown
-*/
-JazzeePageEducation.prototype.pageProperties = function(){
-  var pageClass = this;
-
-  var div = $('<div>');
-  div.append(this.isRequiredButton());
-  div.append(this.editNameButton());
-  var slider = $('<div>');
-  slider.slider({
-    value: this.min,
-    min: 0,
-    max: 20,
-    step: 1,
-    slide: function( event, ui ) {
-      pageClass.setProperty('min', ui.value);
-      $('#minValue').html(pageClass.min == 0?'No Minimum':pageClass.min);
-    }
+ * List all a pages elements
+ */
+JazzeePageEducation.prototype.listDisplayElements = function(){
+  var self = this;
+  var elements = [];
+  elements.push({name: 'schoolName', type: 'page', title: 'Selected School', pageId: this.id});
+  elements.push({name: 'schoolType', type: 'page', title: 'School Type', pageId: this.id});
+  $(this.elements).each(function(){
+    elements.push({name: this.id, title: this.title, type: 'element'});
   });
-  div.append($('<p>').html('Minimum Answers Required ').append($('<span>').attr('id', 'minValue').html(this.min == 0?'No Minimum':this.min)));
-  div.append(slider);
+  elements.push({name: 'locationSummary', type: 'page', title: 'School Location', pageId: this.id});
+  elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
+  elements.push({name: 'publicAnswerStatus', type: 'page', title: this.title + ' Public Answer Status', pageId: this.id, sType: 'numeric'});
+  elements.push({name: 'privateAnswerStatus', type: 'page', title: this.title + ' Private Answer Status', pageId: this.id, sType: 'numeric'});
 
-
-  var slider = $('<div>');
-  slider.slider({
-    value: this.max,
-    min: 0,
-    max: 20,
-    step: 1,
-    slide: function( event, ui ) {
-      pageClass.setProperty('max', ui.value);
-      $('#maxValue').html(pageClass.max == 0?'No Maximum':pageClass.max);
-    }
-  });
-  div.append($('<p>').html('Maximum Answers Allowed ').append($('<span>').attr('id', 'maxValue').html(this.max == 0?'No Maximum':this.max)));
-  div.append(slider);
-  if(this.isEditable() && (!this.isGlobal || this.pageBuilder.editGlobal)){
-    div.append(this.manageSchoolListButton());
-  }
-  return div;
+  return elements;
 };
 
 /**
- * Manage School List
- * @return {jQuery}
+ * Dispaly applicant data in a grid
  */
-JazzeePageEducation.prototype.manageSchoolListButton = function(){
-  var pageClass = this;
-  var button = $('<button>').html('Manage Schools').bind('click',function(){
-    $('.qtip').qtip('api').hide();
-    var div = pageClass.createDialog();
-    div.append(pageClass.manageSchoolListBlock());
-    var button = $('<button>').html('Close').bind('click',function(){
-      div.dialog("destroy").remove();
-      return false;
-    }).button({
-      icons: {
-        primary: 'ui-icon-disk'
-      }
-    });
-    div.append(button);
-    div.dialog('open');
-  }).button({
-    icons: {
-      primary: 'ui-icon-arrow-1-nw'
-    }
-  });
-  return button;
-};
-
-/**
- * Manage School List
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.manageSchoolListBlock = function(){
-  var pageClass = this;
-  var element = this.getSchoolListElement();
-  var div = $('<div>').attr('id', 'manageSchoolListBlock');
-  div.append(this.newSchoolButton());
-  div.append(this.importSchoolsButton());
-  //ui cant really accomodate more than a few items, use a search box if there are more than 25 schools
-  if(element.listItems.length < 25){
-    var list = $('<ul>').addClass('elementListItems');
-    for(var i = 0; i< element.listItems.length; i++){
-      var item = element.listItems[i];
-      var singleItem = this.singleSchool(element, item);
-      list.append(singleItem);
-    }
-    var listDiv = $('<div>').html('<h5>List Items</h5>').append(list).addClass('yui-u first');
-    div.append(listDiv);
-  } else {
-    div.append($('<p>').html('You current have ' + element.listItems.length + ' schools.'));
-    var schools = [];
-    for(var i = 0; i< element.listItems.length; i++){
-      var item = element.listItems[i];
-      schools.push({item: item, search: item.getVariable('code')+item.value+item.getVariable('searchTerms')});
-    }
-    var input = $('<input>').attr('type', 'text').bind('change keyup', function(){
-      $('div', div).remove();   
-      var matcher = new RegExp($.ui.autocomplete.escapeRegex($(this).val()), "i");
-      var results = [];
-      results = results.concat($.grep(schools, function(item,index){
-        return matcher.test(item.search);
-      }));
-      if (results.length == 0) {
-        div.append($('<div>').html('No Results for your search.'));
-      } else if (results.length < 50) {
-        var list = $('<ul>').addClass('elementListItems');
-        for(var i = 0; i< results.length; i++){
-          var singleItem = pageClass.singleSchool(element, results[i].item);
-          list.append(singleItem);
-        }
-        var listDiv = $('<div>').html('<h5>List Items</h5>').append(list).addClass('yui-u first');
-        div.append(listDiv);
-      } else {
-        div.append($('<div>').html('Too many results, keep typing to narrow your choices.'));
-      }
-    });
-    div.append($('<span>').html('Search Schools: ').append(input));
-  }
-  
-  return div;
-};
-
-/**
- * Edit List Item button
- * @param obj item
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.singleSchool = function(element, item){
-  var value = ($.trim(item.value).length > 0)?item.value:'[blank]';
-  var name = ($.trim(item.getVariable('code')).length > 0)?' (' + item.getVariable('code') + ')':'';
-  var li = $('<li>').html(value+name).data('item', item).data('element', element).addClass('ui-state-default');
-  var tools = $('<span>').addClass('tools');
-  if(item.isActive){
-    tools.append(this.hideSchoolButton());
-  } else {
-    li.addClass('inactive');
-    tools.append(this.displaySchoolButton());
-  }
-  tools.append(this.editSchoolButton());
-  tools.append(this.deleteSchoolButton());
-  li.append(tools)
-
-  return li;
-};
-
-/**
- * Edit List Item button
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.editSchoolButton = function(){
-  var pageClass = this;
-  var button = $('<button>').html('Edit').bind('click',function(){
-    var li = $(this).parent().parent();
-    var item = li.data('item');
-    var elementClass = li.data('element');
-    var obj = new FormObject();
-    var field = obj.newField({name: 'legend', value: 'Edit ' + item.value});
-    var element = field.newElement('TextInput', 'schoolName');
-    element.label = 'School Name';
-    element.value = item.value;
-    element.required = true;
-    var element = field.newElement('TextInput', 'schoolCode');
-    element.label = 'Code';
-    element.value = item.getVariable('code');
-    element.required = true;
-    var element = field.newElement('Textarea', 'searchterms');
-    element.label = 'Additional Search Terms';
-    element.value = item.getVariable('searchTerms');
-    var dialog = pageClass.displayForm(obj);
-    pageClass.pageBuilder.addNameTest($('input[name="name"]', dialog));
-    $('form', dialog).bind('submit',function(e){
-      var schoolName = $('input[name="schoolName"]', this).val();
-      var schoolCode = $('input[name="schoolCode"]', this).val();
-      var error = false;
-      if(schoolName.length == 0){
-        $('input[name="schoolName"]', this).parent().append($('<p>').addClass('message').html('School Name is Required and you left it blank.'));
-        error = true;
-      }
-      if(schoolCode.length == 0){
-        $('input[name="schoolCode"]', this).parent().append($('<p>').addClass('message').html('Code is Required and you left it blank.'));
-        error = true;
-      }
-      if(!error){
-        item.setProperty('value', schoolName);
-        item.setProperty('name', schoolCode);
-        item.setVariable('code', $schoolCode);
-        item.setVariable('searchTerms', $('textarea[name="searchterms"]', this).val());
-        dialog.dialog("destroy").remove();
-        li.replaceWith(pageClass.singleSchool(elementClass, item));
-      }
-      return false;
-    });//end submit
-    dialog.dialog('open');
-    return false;
-  }).button({icons: {primary: 'ui-icon-pencil'}});
-  return button;
-};
-
-/**
- * Active List Item button
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.displaySchoolButton = function(){
-  var pageClass = this;
-  var button = $('<button>').html('Display').bind('click',function(){
-    var li = $(this).parent().parent();
-    var item = li.data('item');
-    var element = li.data('element');
-    item.setProperty('isActive', true);
-    li.replaceWith(pageClass.singleSchool(element, item));
-    return false;
-  }).button({icons: {primary: 'ui-icon-plus'}});
-  return button;
-};
-
-/**
- * Active List Item button
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.hideSchoolButton = function(){
-  var pageClass = this;
-  var button = $('<button>').html('Hide').bind('click',function(){
-    var li = $(this).parent().parent();
-    var item = li.data('item');
-    var element = li.data('element');
-    item.setProperty('isActive', false);
-    li.replaceWith(pageClass.singleSchool(element, item));
-    return false;
-  }).button({icons: {primary: 'ui-icon-cancel'}});
-  return button;
-};
-
-/**
- * Delete List Item button
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.deleteSchoolButton = function(){
-  var button = $('<button>').html('Delete').button({icons: {primary: 'ui-icon-trash'}});
-  if(this.hasAnswers){
-    button.addClass('ui-button-disabled ui-state-disabled');
-    button.attr('title', 'This item cannot be deleted because there is applicant information associated with it.');
-    button.qtip();
-  } else {
-    button.bind('click', function(e){
-      var li = $(this).parent().parent();
-      var item = li.data('item');
-      item.setProperty('isActive', false);
-      item.setProperty('status','delete');
-      li.hide('explode');
-      return false;
-    });
-  }
-  return button;
-};
-
-/**
- * Add new school items button
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.newSchoolButton = function(){
-  var pageClass = this;
-  var obj = new FormObject();
-  var field = obj.newField({name: 'legend', value: 'New School'});
-  var element = field.newElement('TextInput', 'schoolName');
-  element.label = 'School Name';
-  element.required = true;
-  var element = field.newElement('TextInput', 'schoolCode');
-  element.label = 'Code';
-  element.required = true;
-  var element = field.newElement('Textarea', 'searchterms');
-  element.label = 'Additional Search Terms';
-  var dialog = pageClass.displayForm(obj);
-  $('form', dialog).bind('submit',function(e){
-    var schoolName = $('input[name="schoolName"]', this).val();
-    var schoolCode = $('input[name="schoolCode"]', this).val();
-    var error = false;
-    if(schoolName.length == 0){
-      $('input[name="schoolName"]', this).parent().append($('<p>').addClass('message').html('School Name is Required and you left it blank.'));
-      error = true;
-    }
-    if(schoolCode.length == 0){
-      $('input[name="schoolCode"]', this).parent().append($('<p>').addClass('message').html('Code is Required and you left it blank.'));
-      error = true;
-    }
-    if(!error){
-      var element = pageClass.getSchoolListElement();
-      var item = element.newListItem(schoolName);
-      item.setVariable('code', schoolCode);
-      item.setVariable('searchTerms', $('textarea[name="searchterms"]', this).val());
-      dialog.dialog("destroy").remove();
-      $('#manageSchoolListBlock').replaceWith(pageClass.manageSchoolListBlock());
-    }
-    return false;
-  });//end submit
-  var button = $('<button>').html('Add School').bind('click',function(){
-    $('.qtip').qtip('api').hide();
-    dialog.dialog('open');
-  }).button({
-    icons: {
-      primary: 'ui-icon-plus'
-    }
-  });
-  return button;
-};
-
-/**
- * Edit the child page by its fixed id
- * @param Integer fixedId
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.editChildPageButton = function(fixedId){
-  var branch = this.getChildByFixedId(fixedId);
-  var button = $('<button>').html('Edit ' + branch.title + ' Page').data('page', branch).bind('click',function(){
-    var page = $(this).data('page');
-    page.workspace();
-    //empty the toolbar becuase the delete/copy are going to be wrong
-    $('#pageToolbar .copy').remove();
-    $('#pageToolbar .delete').remove();
-    $('#pageToolbar .properties').remove();
-  }).button({
-    icons: {
-      primary: 'ui-icon-pencil'
-    }
-  });
-  return button;
-};
-
-/**
- * Add new school items button
- * @return {jQuery}
- */
-JazzeePageEducation.prototype.importSchoolsButton = function(){
-  var pageClass = this;
-  var obj = new FormObject();
-  var field = obj.newField({name: 'legend', value: 'New School'});
-  field.instructions = "Schools can be intered as [tab] seperated values, one per line.  Each line can have three seperate elements seperated by tabs School Name, Code, Search Data.  School Name and Code are required.";
-  var element = field.newElement('Textarea', 'schools');
-  element.label = 'Schools';
-  element.required = true;
-  var dialog = pageClass.displayForm(obj);
-  var progressbar = $('<div>').addClass('progress');
-  dialog.append(progressbar);
-  $('form', dialog).bind('submit',function(e){
-    var schools = $('textarea[name="schools"]', this).val();
-    var error = false;
-    if(schools.length == 0){
-      $('textarea[name="schools"]', this).parent().append($('<p>').addClass('message').html('this element is Required and you left it blank.'));
-      error = true;
-    }
-    if(!error){
-      var element = pageClass.getSchoolListElement();
-      var lines = schools.split("\n");
-      var total = lines.length;
-      progressbar.progressbar({
-        max: total-1,
-        value: 1,
-        create: function(event, ui){
-          for(var i = 0;i<total; i++){
-            if($.trim(lines[i]).length > 0){
-              var pieces = lines[i].split("\t");
-              if(pieces.length >= 2){
-                var item = element.newListItem($.trim(pieces[0]));
-                item.setVariable('code', $.trim(pieces[1]));
-                if($.trim(pieces[2]).length > 0){
-                  item.setVariable('searchTerms', $.trim(pieces[2]));
-                }
-                $('.progress', dialog).progressbar("option", "value", i);
-              }
-            }
+JazzeePageEducation.prototype.gridData = function(data, type, full){
+  var values = [];
+  switch(data.displayElement.name){
+    case 'schoolName':
+    case 'schoolType':
+    case 'locationSummary':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      $(answers).each(function(){
+        $(this.elements).each(function(){
+          if(this.id == data.displayElement.name){
+            values.push(this.displayValue != null?this.displayValue:'');
           }
-        }, 
-        complete: function(event, ui){
-          dialog.dialog("destroy").remove();
-          $('#manageSchoolListBlock').replaceWith(pageClass.manageSchoolListBlock());
+        });
+      });
+    break;
+    case 'attachment':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      values = values.concat(this.gridAnswerAttachment(answers));
+    break;
+    case 'publicAnswerStatus':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      var hasStatus = 0;
+      $(answers).each(function(){
+        if(this.publicStatus != null){
+          hasStatus++;
+          values.push(this.publicStatus.name);
+        } else {
+          values.push('');
         }
       });
-    }
-    return false;
-  });//end submit
-  var button = $('<button>').html('Import Schools').bind('click',function(){
-    $('.qtip').qtip('api').hide();
-    dialog.dialog('open');
-  }).button({
-    icons: {
-      primary: 'ui-icon-plus'
-    }
-  });
-  return button;
+      if(type == 'sort'){
+        var per = hasStatus/values.length;
+        //if 100% are set then use the total set
+        if(per == 1){
+          return hasStatus+1;
+        }
+        return per;
+      }
+    break;
+    case 'privateAnswerStatus':
+      var answers = data.applicant.getAnswersForPage(this.id);
+      var hasStatus = 0;
+      $(answers).each(function(){
+        if(this.privateStatus != null){
+          hasStatus++;
+          values.push(this.privateStatus.name);
+        } else {
+          values.push('');
+        }
+      });
+      if(type == 'sort'){
+        var per = hasStatus/values.length;
+        //if 100% are set then use the total set
+        if(per == 1){
+          return hasStatus+1;
+        }
+        return per;
+      }
+    break;
+  }
+  if(values.length == 0){
+    return '';
+  }
+  if(values.length == 1){
+    return values[0];
+  }
+  if(type == 'display'){
+    var ol = $('<ol>');
+    $.each(values, function(){
+      ol.append($('<li>').html(this.toString()));
+    });
+    return ol.clone().wrap('<p>').parent().html();
+  }
+  //forsorting and filtering return the raw data
+  return values.join(' ');
 };

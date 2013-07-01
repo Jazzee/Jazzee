@@ -96,6 +96,11 @@ class Answer
   private $payment;
 
   /**
+   * @ManyToOne(targetEntity="School")
+   */
+  private $school;
+
+  /**
    * If we set a manual update don't override it
    * @var boolean
    */
@@ -508,6 +513,25 @@ class Answer
   public function setTOEFLScore($score)
   {
     $this->toeflScore = $score;
+  }
+  
+  /**
+   * Set the school
+   * @param \Jazzee\Entity\School $school
+   */
+  public function setSchool(School $school)
+  {
+    $this->school = $school;
+  }
+  
+  /**
+   * Get the school
+   * 
+   * @return \Jazzee\Entity\School
+   */
+  public function getSchool()
+  {
+    return $this->school;
   }
 
   /**
