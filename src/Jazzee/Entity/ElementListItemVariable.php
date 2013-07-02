@@ -54,6 +54,16 @@ class ElementListItemVariable
   }
 
   /**
+   * Get item
+   *
+   * @return Jazzee\Entity\ElementListItem $item
+   */
+  public function getItem()
+  {
+    return $thhis->item;
+  }
+
+  /**
    * Set name
    *
    * @param string $name

@@ -15,6 +15,13 @@ namespace Jazzee\Entity;
  */
 class Application
 {
+
+  /**
+   * The prefix to use for application caching
+   * @var string
+   */
+  const ARRAY_CACHE_PREFIX = 'JazzeeApplicationarray-';
+
   /**
    * @Id
    * @Column(type="bigint")
@@ -972,6 +979,15 @@ class Application
     }
 
     return null;
+  }
+
+  /**
+   * Delete any references to the application in the cache
+   * 
+   */
+  public function clearCache()
+  {
+    \Jazzee\Controller::getCache()->delete(self::ARRAY_CACHE_PREFIX . $this->id);
   }
 
 }

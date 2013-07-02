@@ -123,6 +123,11 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findArray($id)
   {
+    $cache = \Jazzee\Controller::getCache();
+    $cacheId = Application::ARRAY_CACHE_PREFIX . $id;
+    if($cache->contains($cacheId)){
+      return $cache->fetch($cacheId);
+    }
     $queryBuilder = $this->makeQuery();
     $queryBuilder->andWhere('application.id = :id');
     $queryBuilder->setParameter('id', $id);
@@ -141,6 +146,7 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
       $query = $this->_em->createQuery('SELECT tag from \Jazzee\Entity\Tag as tag LEFT JOIN tag.applicants applicant WHERE applicant.id IN (SELECT a.id from Jazzee\Entity\Applicant a WHERE a.application = :applicationId)');
       $query->setParameter('applicationId', $application['id']);
       $application['tags'] = $query->getArrayResult();
+      $cache->save($cacheId, $application);
 
       return $application;
     } 

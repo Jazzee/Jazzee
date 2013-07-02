@@ -85,6 +85,12 @@ class Page
   private $trailingText;
 
   /**
+   * @OneToMany(targetEntity="ApplicationPage", mappedBy="page")
+   * @JoinColumn(onDelete="CASCADE")
+   */
+  private $applicationPages;
+
+  /**
    * a Generic application Jazzee page we store it so it can be persistent
    * @var \Jazzee\Interfaces\Page
    */
@@ -659,6 +665,16 @@ class Page
   public function getFixedId()
   {
     return $this->fixedId;
+  }
+
+  /**
+   * Get application pages
+   *
+   * @return array \Jazzee\Entity\ApplicationPage
+   */
+  public function getApplicationPages()
+  {
+    return $this->applicationPages;
   }
 
 }

@@ -47,7 +47,7 @@ class ApplicationPage
   private $application;
 
   /**
-   * @ManyToOne(targetEntity="Page")
+   * @ManyToOne(targetEntity="Page", inversedBy="applicationPages")
    * @JoinColumn(onDelete="CASCADE")
    */
   private $page;
