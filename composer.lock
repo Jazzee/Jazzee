@@ -143,12 +143,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/migrations.git",
-                "reference": "e1f6efcd94993b493de5c6a413cbc327ea9c0caa"
+                "reference": "ced3b419252af47f29d6680f9ec74df00ee0c58e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/e1f6efcd94993b493de5c6a413cbc327ea9c0caa",
-                "reference": "e1f6efcd94993b493de5c6a413cbc327ea9c0caa",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/ced3b419252af47f29d6680f9ec74df00ee0c58e",
+                "reference": "ced3b419252af47f29d6680f9ec74df00ee0c58e",
                 "shasum": ""
             },
             "require": {
@@ -189,7 +189,7 @@
                 "database",
                 "migrations"
             ],
-            "time": "2012-12-27 16:39:29"
+            "time": "2013-06-27 19:46:00"
         },
         {
             "name": "doctrine/orm",
@@ -306,16 +306,16 @@
         },
         {
             "name": "jazzee/foundation",
-            "version": "1.0.14",
+            "version": "1.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Jazzee/Foundation.git",
-                "reference": "1.0.14"
+                "reference": "1.0.15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Jazzee/Foundation/zipball/1.0.14",
-                "reference": "1.0.14",
+                "url": "https://api.github.com/repos/Jazzee/Foundation/zipball/1.0.15",
+                "reference": "1.0.15",
                 "shasum": ""
             },
             "require": {
@@ -362,7 +362,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2013-05-10 21:55:42"
+            "time": "2013-06-27 05:33:29"
         },
         {
             "name": "monolog/monolog",
