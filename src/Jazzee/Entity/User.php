@@ -377,9 +377,10 @@ class User
   public function getMaximumDisplayForApplication(\Jazzee\Entity\Application $application)
   {
     $display = new \Jazzee\Display\Union();
-
+    $hasProgramRole = false;
     foreach($this->roles as $role){
       if(!$role->isGlobal() AND $role->getProgram()->getId() == $application->getProgram()->getId()){
+        $hasProgramRole = true;
         if($roleDisplay = $role->getDisplay()){
           $display->addDisplay($roleDisplay);
         } else {
@@ -387,6 +388,11 @@ class User
           break; //we interupt the loop here because once we have included a full display there is no reason to continue
         }
       }
+    }
+    //Temporary solution global users dont generally have program roles, but get access to all the elementns
+    //for any action they can see
+    if(!$hasProgramRole){
+      $display->addDisplay(new \Jazzee\Display\FullApplication($application));
     }
 
     return $display;
