@@ -107,6 +107,7 @@ class Page
     $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     $this->variables = new \Doctrine\Common\Collections\ArrayCollection();
     $this->elements = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->applicationPages = new \Doctrine\Common\Collections\ArrayCollection();
     $this->isGlobal = false;
     $this->isRequired = true;
     $this->answerStatusDisplay = false;
