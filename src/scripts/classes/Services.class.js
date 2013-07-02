@@ -8,6 +8,10 @@ function Services(){
   this.applications = [];
 };
 
+Services.prototype.currentApplication = false;
+Services.prototype.allowedActions = [];
+Services.prototype.controllerPaths = {};
+
 Services.prototype.request = function(service, data){
   data.service = service;
   var result = null;
@@ -24,7 +28,15 @@ Services.prototype.request = function(service, data){
 };
 
 Services.prototype.checkIsAllowed = function(controller, action){
-  return this.request('checkIsAllowed', {'controller':controller, 'action':action});
+  if($.inArray(controller+action, Services.prototype.allowedActions) == -1){
+    var result = this.request('checkIsAllowed', {'controller':controller, 'action':action});
+    if(result){
+      Services.prototype.allowedActions.push(controller+action);
+    }
+    return result;
+  } else {
+    return true;
+  }
 };
 
 Services.prototype.getBasepath = function(){
@@ -32,7 +44,10 @@ Services.prototype.getBasepath = function(){
 };
 
 Services.prototype.getControllerPath = function(controller){
-  return this.request('pathToController', {'controller': controller});
+  if(!Services.prototype.controllerPaths.hasOwnProperty(controller)){
+    Services.prototype.controllerPaths[controller] = this.request('pathToController', {'controller': controller})
+  }
+  return Services.prototype.controllerPaths[controller];
 };
 
 Services.prototype.getCurrentApplicationId = function(){
@@ -55,8 +70,12 @@ Services.prototype.getMaximumDisplay = function(){
 };
 
 Services.prototype.getCurrentApplication = function(){
-  var result = this.request('currentApplication',{});
-  return new Application(result);
+  if(!Services.prototype.currentApplication){
+    var result = this.request('currentApplication',{});
+    Services.prototype.currentApplication =  new Application(result);
+  }
+
+  return Services.prototype.currentApplication;
 };
 
 Services.prototype.savePreferences = function(){
