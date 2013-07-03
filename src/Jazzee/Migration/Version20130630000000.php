@@ -79,29 +79,29 @@ class Version20130630000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
            '(SELECT value FROM element_list_items WHERE id = ' .
            '(SELECT eInteger FROM element_answers WHERE answer_id = answers.id AND position = 0))) ' .
       'WHERE page_id IN (SELECT id from pages where type_id=(SELECT id from page_types where class="\\\Jazzee\\\Page\\\Education"))';
-    $this->connection->executeQuery($sql);
-    $this->write("<info>Added School to answer for existing applicants</info>");
+    $rows = $this->connection->executeUpdate($sql);
+    $this->write("<info>Added School to answer for existing applicants.  Modified {$rows} answers</info>");
     $sql = 'DELETE FROM elements WHERE page_id IN ' .
       '(SELECT id from pages where type_id= ' .
       '(SELECT id from page_types where class="\\\Jazzee\\\Page\\\Education")) ' .
       'AND elements.fixedId = ' . 2;
-    $this->connection->executeQuery($sql);
-    $this->write("<info>Removed the School List Element from Education pages</info>");
+    $rows = $this->connection->executeUpdate($sql);
+    $this->write("<info>Removed the School List Element from Education pages.  Modified {$rows} rows</info>");
     $sql = 'UPDATE elements set page_id = (SELECT parent_id FROM pages WHERE id = page_id) WHERE page_id IN ' .
       '(SELECT id from pages WHERE parent_id IN ' .
       '(SELECT id from pages where type_id= ' .
       '(SELECT id from page_types where class="\\\Jazzee\\\Page\\\Education")) ' .
       'AND pages.fixedId = 2)';
-    $this->connection->executeQuery($sql);
-    $this->write("<info>Moved all the Known School page elements to the Education page's new single page form</info>");
+    $rows = $this->connection->executeUpdate($sql);
+    $this->write("<info>Moved all the Known School page elements to the Education page's new single page form.  Modified {$rows} rows</info>");
     $sql = 'UPDATE element_answers set answer_id = (SELECT parent_id from answers where id = element_answers.answer_id) ' .
       'WHERE answer_id IN ' .
       '(SELECT id from answers WHERE page_id IN ' .
       '(SELECT id from pages WHERE parent_id IN ' .
       '(SELECT id from pages where type_id= ' .
       '(SELECT id from page_types where class="\\\Jazzee\\\Page\\\Education")) AND pages.fixedId = 2))';
-    $this->connection->executeQuery($sql);
-    $this->write("<info>Migrated Applicant Known school Answers to the Education page</info>");
+    $rows = $this->connection->executeUpdate($sql);
+    $this->write("<info>Migrated Applicant Known school Answers to the Education page.  Modified {$rows} rows</info>");
     
     $sql = 'SELECT parent_id from answers WHERE page_id IN ' .
       '(SELECT id from pages WHERE parent_id IN ' .
@@ -115,7 +115,7 @@ class Version20130630000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
       $fixChildAnswer->execute(array($row['parent_id']));
     }
     
-    $this->write("<info>Dis-associated all the applicant New School Answers from the Education Page.  This will result in some applicant data loss and can be manually corrected in the DB</info>");
+    $this->write("<info>Dis-associated all the applicant New School Answers from the Education Page.  This will result in some applicant data loss and can be manually corrected in the DB.  Modified " . count($rows) . " answers.</info>");
     $sql = 'SELECT id from pages where type_id=(SELECT id from page_types where class="\\\Jazzee\\\Page\\\Education")';
     $rows = $this->connection->executeQuery($sql)->fetchAll();
     $insertPageVars = $this->connection->prepare('INSERT INTO page_variables (page_id, name, value) VALUES (?,?,?)');
@@ -129,7 +129,7 @@ class Version20130630000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
       $deleteChildPages->execute(array($row['id']));
       $insertNewSchoolPage->execute(array($row['id'], 'New School', \Jazzee\Page\Education::PAGE_FID_NEWSCHOOL, '\Jazzee\Page\Standard'));
     }
-    $this->write("<info>Removed existing child pages, created new school page, set page elements for existing educaiton pages.</info>");
+    $this->write("<info>Removed existing child pages, created new school page, set page elements for existing educaiton pages.  Modified " . count($rows) . " pages.</info>");
     $sql = 'SELECT id from pages WHERE fixedId = 4 AND parent_id IN (SELECT id from pages where type_id=(SELECT id from page_types where class="\\\Jazzee\\\Page\\\Education"))';
     $rows = $this->connection->executeQuery($sql)->fetchAll();
     $insertPageElement = $this->connection->prepare('INSERT INTO elements (page_id, weight, fixedId, title, max, required, type_id) VALUES (?,?,?,?,?,?,(SELECT id from element_types WHERE class=?))');
@@ -142,7 +142,7 @@ class Version20130630000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
       $insertPageElement->execute(array($row['id'], $count++, \Jazzee\Page\Education::ELEMENT_FID_COUNTRY, 'Country', 64, 1, $tie));
       $insertPageElement->execute(array($row['id'], $count++, \Jazzee\Page\Education::ELEMENT_FID_POSTALCODE, 'Postal Code', 10, 1, $tie));
     }
-    $this->write("<info>Added elements to all new school pages.</info>");
+    $this->write("<info>Added elements to all new school pages.  For " . count($rows) . " pages.</info>");
   }
 
   public function down(\Doctrine\DBAL\Schema\Schema $schema)
