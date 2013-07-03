@@ -30,8 +30,8 @@ class UCLACashNet extends AbstractPaymentType
       $form->newHiddenElement('ref1type1', $this->_paymentType->getVar('reftypeApplicantId'));
       $form->newHiddenElement('ref1val1', $applicant->getId());
       $form->newHiddenElement('ref2type1', $this->_paymentType->getVar('reftypeForwardUrl'));
-      $form->newHiddenElement('ref2val1', $this->_controller->getServerPath() . $this->_controller->getActionPath());
-      $form->newHiddenElement('signouturl', $this->_controller->getServerPath() . '/transaction/' . \urlencode(get_class($this)));
+      $form->newHiddenElement('ref2val1', $this->_controller->absolutePath('') . $this->_controller->getActionPath());
+      $form->newHiddenElement('signouturl',  $this->_controller->absolutePath('transaction/' . \urlencode(get_class($this))));
       if($this->_controller->getConfig()->getStatus() == 'PRODUCTION'){
         $form->setAction(self::CASHNET_URL . $this->_paymentType->getVar('liveSiteName'));
       } else {
