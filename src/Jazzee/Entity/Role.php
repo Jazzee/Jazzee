@@ -29,6 +29,7 @@ class Role
 
   /**
    * @ManyToOne(targetEntity="Program")
+   * @JoinColumn(onDelete="CASCADE")
    */
   private $program;
 
@@ -89,7 +90,7 @@ class Role
   public function makeGlobal()
   {
     if ($this->program) {
-      throw new \Jazzee\Exception("{this->name} is set for program " . $this->program->getName() . ' but you are trying to make it global.');
+      throw new \Jazzee\Exception("{$this->name} is set for program " . $this->program->getName() . ' but you are trying to make it global.');
     }
     $this->isGlobal = true;
   }
@@ -119,7 +120,7 @@ class Role
   public function setProgram(Program $program)
   {
     if ($this->isGlobal) {
-      throw new \Jazzee\Exception("{this->name} is global but you are trying to set its program to " . $program->getName());
+      throw new \Jazzee\Exception("{$this->name} is global but you are trying to set its program to " . $program->getName());
     }
     $this->program = $program;
   }
