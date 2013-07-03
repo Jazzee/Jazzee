@@ -28,7 +28,6 @@ class Education extends Standard
   protected function makeForm()
   {
     $form = new \Foundation\Form;
-    $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
@@ -51,7 +50,6 @@ class Education extends Standard
   {
     $page = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
     $form = new \Foundation\Form;
-    $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($page->getTitle());
     $field->setInstructions($page->getInstructions());
@@ -73,7 +71,6 @@ class Education extends Standard
   protected function pageForm($input)
   {
     $form = new \Foundation\Form;
-    $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
@@ -103,7 +100,6 @@ class Education extends Standard
   protected function pickSchoolForm($choices)
   {
     $form = new \Foundation\Form;
-    $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
@@ -129,17 +125,20 @@ class Education extends Standard
           $choices = array();
           $searchTerms = $input->get('schoolSearch');
           $resultsCount = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->getSearchCount($searchTerms);
-          if($resultsCount == 0){
-            $this->_controller->addMessage('error', 'Your search returned no results, please try again.');
-          } else if($resultsCount > 50){
-            $this->_controller->addMessage('error', 'Your search returned too many results, please try again with more detail.');
+          if($resultsCount > 50){
+            $this->_form->getElementByName('schoolSearch')->addMessage('Your search returned too many results, please try again with more detail.');
           } else {
-            $schools = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->search($searchTerms);
-            foreach($schools as $school){
-              $choices[$school->getId()] = $school->getName();
+            if($resultsCount == 0){
+              $this->_controller->addMessage('info', 'We were not able to find any schools that matched your search, you can search again or add a new school to our system.');
+            } else {
+              $schools = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->search($searchTerms);
+              foreach($schools as $school){
+                $choices[$school->getId()] = $school->getName();
+              }
             }
+            $this->pickSchoolForm($choices);
           }
-          $this->pickSchoolForm($choices);
+
           return false;
         } else {
           $this->_controller->addMessage('error', self::ERROR_MESSAGE);
@@ -147,8 +146,7 @@ class Education extends Standard
         }
         break;
       case 'pick':
-        if(!empty($input['pickSchoolId'])){
-          $selectedSchool = $this->getSchoolById($input[ 'pickSchoolId']);
+        if(!empty($input['pickSchoolId']) and $selectedSchool = $this->getSchoolById($input[ 'pickSchoolId'])){
           $this->_controller->setVar('schoolName', $selectedSchool->getName());
           $this->pageForm($input);
           $this->_form->newHiddenElement('schoolId', $selectedSchool->getId());
@@ -158,7 +156,13 @@ class Education extends Standard
         return false;
         break;
       case 'new':
-        $this->pageForm($input);
+        $this->newSchoolForm();
+        if ($this->getForm()->processInput($input)) {
+          $this->pageForm($input);
+        } else {
+          $this->_controller->addMessage('error', self::ERROR_MESSAGE);
+        }
+        return false;
         break;
       case 'complete':
         $this->pageForm($input);
