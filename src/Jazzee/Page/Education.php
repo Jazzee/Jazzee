@@ -298,38 +298,29 @@ class Education extends Standard
     $this->_applicationPage->getPage()->addChild($newSchool);
     $entityManager->persist($newSchool);
     
+    $elements = array(
+      array('fid' => self::ELEMENT_FID_NAME, 'title' => 'School Name', 'max' => 255, 'required' => true),
+      array('fid' => self::ELEMENT_FID_CITY, 'title' => 'City', 'max' => 64, 'required' => true),
+      array('fid' => self::ELEMENT_FID_STATE, 'title' => 'State or Province', 'max' => 64, 'required' => false),
+      array('fid' => self::ELEMENT_FID_COUNTRY, 'title' => 'Country', 'max' => 64, 'required' => true),
+      array('fid' => self::ELEMENT_FID_POSTALCODE, 'title' => 'Postal Code', 'max' => 10, 'required' => false)
+    );
     $count = 1;
-    $element = new \Jazzee\Entity\Element;
-    $element->setType($elementTypes['\Jazzee\Element\TextInput']);
-    $element->setTitle('School Name');
-    $element->required();
-    $element->setWeight($count++);
-    $element->setMax(255);
-    $element->setFixedId(self::ELEMENT_FID_NAME);
-    $newSchool->addElement($element);
-    $entityManager->persist($element);
-
-    foreach (array(self::ELEMENT_FID_CITY => 'City', self::ELEMENT_FID_STATE => 'State or Province', self::ELEMENT_FID_COUNTRY => 'Country') as $fid => $title) {
+    foreach($elements as $arr){
       $element = new \Jazzee\Entity\Element;
       $element->setType($elementTypes['\Jazzee\Element\TextInput']);
-      $element->setTitle($title);
-      $element->required();
+      $element->setTitle($arr['title']);
+      if($arr['required']){
+        $element->required();
+      } else {
+        $element->optional();
+      }
       $element->setWeight($count++);
-      $element->setMax(64);
-      $element->setFixedId($fid);
+      $element->setMax($arr['max']);
+      $element->setFixedId($arr['fid']);
       $newSchool->addElement($element);
       $entityManager->persist($element);
     }
-
-    $element = new \Jazzee\Entity\Element;
-    $element->setType($elementTypes['\Jazzee\Element\TextInput']);
-    $element->setTitle('Postal Code');
-    $element->required();
-    $element->setWeight($count++);
-    $element->setMax(10);
-    $element->setFixedId(self::ELEMENT_FID_POSTALCODE);
-    $newSchool->addElement($element);
-    $entityManager->persist($element);
 
     $defaultVars = array(
       'schoolListType' => 'full',
