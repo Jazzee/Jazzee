@@ -472,7 +472,7 @@ TableTools.BUTTONS.send_messages.fnClick =  function( nButton, oConfig ) {
   $('input', form).css('width', '250px');
   $('textarea', form).css('width', '250px').css('height', '180px');
   form.attr( 'action', oConfig.sUrl );
-  form.bind('submit',function(e){
+  form.on('submit',function(e){
     $('p.message', this).remove();
     var subject = $('input[name="subject"]', this).val();
     var body = $('textarea[name="body"]', this).val();
@@ -512,7 +512,7 @@ TableTools.BUTTONS.send_messages.fnClick =  function( nButton, oConfig ) {
         }
       });
     }
-    event.preventDefault(); 
+    e.preventDefault();
     return false;
   });//end submit
   dialog.append(form);
@@ -575,8 +575,7 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
       $('select[name=pdftemplate]', form).parent().parent().hide();
     }
   });
-  form.bind('submit',function(e){
-    var subject = $('input[name="subject"]', this).val();
+  form.on('submit',function(e){
     var overlay = $('<div>').attr('id', 'downloadoverlay');
     overlay.dialog({
       height: 90,
@@ -597,7 +596,6 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
 
         var iframeForm = $('<form>');
         iframeForm.attr( 'method', 'post' );
-        iframeForm.append(form);
         var template = $('select[name=pdftemplate]', form).val();
         var type = $('select[name=type]', form).val();
         iframeForm.attr('action', type);
@@ -623,11 +621,11 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
           setTimeout(check, 500);
           return true;
         });
+        iFrame.append(iframeForm);
         iframeForm.submit();
       }
     });
-
-    event.preventDefault(); 
+    e.preventDefault();
     return false;
   });//end submit
   dialog.append(form);
