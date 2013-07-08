@@ -2,7 +2,7 @@ class web {
   class {'jazzee': }
   case $operatingsystem {
     centos, redhat: { 
-      $enhancers = [ "screen", "emacs", "vim-enhanced" ]
+      $enhancers = [ "screen", "emacs", "vim-enhanced", "ant" ]
       $firewall = ["iptables", "ip6tables"]
       file { "/var/log/httpd":
         ensure => directory,
