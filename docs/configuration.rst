@@ -80,6 +80,10 @@ allowApplicantPasswordChange
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Are applicant allowed to change their own password.  Defaults to false.
 
+allowApplicantPrintApplication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Are applicant allowed to print their application.  Defaults to false.
+
 maximumAdminFileUploadSize
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The maximum size for administrator file uploads.
