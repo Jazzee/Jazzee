@@ -18,29 +18,58 @@ class Payment extends AbstractPage
    */
   protected function makeForm()
   {
+    $allowedTypes = explode(',', $this->_applicationPage->getPage()->getVar('allowedPaymentTypes'));
+    $allowedTypesCount = count($allowedTypes);
+    $amounts = $this->_applicationPage->getPage()->getVar('amounts');
+    
+    if($allowedTypesCount == 1 AND $amounts == 1){
+      $paymentType = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('id' => $allowedTypes[0], 'isExpired' => false));
+      $form = $paymentType->getJazzeePaymentType($this->_controller)->paymentForm($this->_applicant, $this->_applicationPage->getPage()->getVar('amount1'));
+      $form->setCSRFToken($this->_controller->getCSRFToken());
+      $form->newHiddenElement('level', 2);
+      $form->newHiddenElement('paymentType', $paymentType->getId());
+
+      return $form;
+    }
+
     $form = new \Foundation\Form;
     $form->setAction($this->_controller->getActionPath());
     $form->setCSRFToken($this->_controller->getCSRFToken());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
-    $field->setInstructions($this->_applicationPage->getInstructions());
+    $field->setInstructions($this->_applicationPage->getInstructions()); 
 
-    $element = $field->newElement('SelectList', 'paymentType');
-    $element->setLabel('Payment Method');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-
-    $allowedTypes = explode(',', $this->_applicationPage->getPage()->getVar('allowedPaymentTypes'));
-    $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired' => false), array('name' => 'ASC'));
-    foreach ($paymentTypes as $type) {
-      if ($this->_controller instanceof \Jazzee\AdminController or in_array($type->getId(), $allowedTypes)) {
-        $element->newItem($type->getId(), $type->getName());
+    if($allowedTypesCount == 1){
+      $paymentType = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('id' => $allowedTypes[0], 'isExpired' => false));
+      $element = $field->newElement('Plaintext', 'paymentTypeName');
+      $element->setLabel('Payment Method');
+      $element->setValue($paymentType->getName());
+      $form->newHiddenElement('paymentType', $paymentType->getId());
+    } else {
+      $element = $field->newElement('SelectList', 'paymentType');
+      $element->setLabel('Payment Method');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      $paymentTypes = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findBy(array('isExpired' => false), array('name' => 'ASC'));
+      foreach ($paymentTypes as $type) {
+        if ($this->_controller instanceof \Jazzee\AdminController or in_array($type->getId(), $allowedTypes)) {
+          $element->newItem($type->getId(), $type->getName());
+        }
       }
     }
-    $element = $field->newElement('RadioList', 'amount');
-    $element->setLabel('Type of payment');
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    for ($i = 1; $i <= $this->_applicationPage->getPage()->getVar('amounts'); $i++) {
-      $element->newItem($this->_applicationPage->getPage()->getVar('amount' . $i), $this->_applicationPage->getPage()->getVar('description' . $i));
+    if($amounts == 1){
+      $element = $field->newElement('Plaintext', 'amountText');
+      $element->setLabel('Type of payment');
+      $element->setValue($this->_applicationPage->getPage()->getVar('description1'));
+      
+      $form->newHiddenElement('amount', $this->_applicationPage->getPage()->getVar('amount1'));
+    } else {
+      $element = $field->newElement('RadioList', 'amount');
+      $element->setLabel('Type of payment');
+      $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+      for ($i = 1; $i <= $amounts; $i++) {
+        $element->newItem($this->_applicationPage->getPage()->getVar('amount' . $i), $this->_applicationPage->getPage()->getVar('description' . $i));
+      }
+      $element->setValue($this->_applicationPage->getPage()->getVar('amount1'));
     }
     $form->newHiddenElement('level', 1);
     $form->newButton('submit', 'Select');
