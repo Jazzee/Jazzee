@@ -294,7 +294,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
           $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
           file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
           $externalIDSuffix = ($applicantArray['externalId'] != null) ? ' - '.$applicantArray['externalId'] : "";
-          $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . $externalIDSuffix . '.pdf');
+          $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['lastName'] . '_' . $applicantArray['firstName'] . $externalIDSuffix . '.pdf');
           unset($pdf);
         }
       }
@@ -309,7 +309,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
           $temp_file_name = tempnam($tmppath, 'JazzeeTempDL');
           file_put_contents($temp_file_name, $pdf->pdfFromApplicantArray($this->_application, $applicantArray));
           $externalIDSuffix = ($applicantArray['externalId'] != null) ? ' - '.$applicantArray['externalId'] : "";
-          $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['fullName'] . $externalIDSuffix . '.pdf');
+          $zip->addFile($temp_file_name, $directoryName . '/' . $applicantArray['lastName'] . '_' . $applicantArray['firstName'] . $externalIDSuffix . '.pdf');
           unset($pdf);
         }
       }
