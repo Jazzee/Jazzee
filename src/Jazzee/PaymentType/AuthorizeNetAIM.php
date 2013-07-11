@@ -55,7 +55,7 @@ class AuthorizeNetAIM extends AbstractPaymentType
       $element->setInstructions('US Credit Cards which do not provide a postal code will be rejected.');
 
       $form->newButton('submit', 'Pay with Credit Card');
-    } else if (\is_a($this->_controller, 'ApplicantsSingle')) {
+    } else if (\is_a($this->_controller, 'ApplicantsSingleController')) {
       $field->setInstructions("<p>Credit card details should be enterd directly at the authorize.net website and then the transaction entered here.</p>");
       $element = $field->newElement('TextInput', 'transactionId');
       $element->setLabel('Transaction ID');
@@ -171,7 +171,7 @@ class AuthorizeNetAIM extends AbstractPaymentType
 
         return false;
       }
-    } else if (\is_a($this->_controller, 'ApplicantsSingle')) {
+    } else if (\is_a($this->_controller, 'ApplicantsSingleController')) {
       $transactionDetails = new \AuthorizeNetTD($this->_paymentType->getVar('gatewayId'), $this->_paymentType->getVar('gatewayKey'));
       $transactionDetails->setSandBox($this->_paymentType->getVar('testAccount')); //test accounts get sent to the sandbox
       // Get Transaction Details
