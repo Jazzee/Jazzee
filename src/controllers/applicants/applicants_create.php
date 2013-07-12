@@ -140,8 +140,8 @@ class ApplicantsCreateController extends \Jazzee\AdminController
           $email = $this->newMailMessage();
           $email->AddCustomHeader('X-Jazzee-Applicant-ID:' . $applicant->getId());
           $email->AddAddress(
-              $applicant->getFullName(),
-              $applicant->getEmail()
+              $applicant->getEmail(),
+              $applicant->getFullName()
           );
           
           $email->setFrom($this->_application->getContactEmail(), $this->_application->getContactName());
@@ -289,8 +289,8 @@ class ApplicantsCreateController extends \Jazzee\AdminController
             $email = $this->newMailMessage();
             $email->AddCustomHeader('X-Jazzee-Applicant-ID:' . $applicant->getId());
             $email->AddAddress(
-                $applicant->getFullName(),
-                $applicant->getEmail()
+                $applicant->getEmail(),
+                $applicant->getFullName()
             );
 
             $email->setFrom($this->_application->getContactEmail(), $this->_application->getContactName());
