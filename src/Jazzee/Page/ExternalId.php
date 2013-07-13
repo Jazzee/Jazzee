@@ -62,12 +62,14 @@ class ExternalId implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
 
     $this->_controller->getEntityManager()->persist($this->_applicant);
     $this->_controller->getEntityManager()->flush();
+    $this->_controller->setVar('edit', false);
 	
   }
 
   public function updateAnswer($input, $answerId)
   {
     $this->newAnswer($input);
+    $this->_controller->setVar('edit', false);
   }
 
   public function deleteAnswer($answerId)
@@ -84,7 +86,9 @@ class ExternalId implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
    * We don't need to fill since the form fills itself form the applicant
    * @param type $answerId
    */
-  public function fill($answerId){}
+  public function fill($answerId){
+    $this->_controller->setVar('edit', true);
+  }
 
   public static function applicantsSingleElement()
   {
@@ -172,7 +176,26 @@ class ExternalId implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
     return $differences;
   }
 
+  /**
+   * Get the form or make it if it doesn't exist
+   * @return \Foundation\Form
+   */
   public function getForm()
+  {
+    if (is_null($this->_form)) {
+      $this->_form = $this->makeForm();
+    }
+    //reset the CSRF token on every request so when submission fails token validation doesn't even if the session has timed out
+    $this->_form->setCSRFToken($this->_controller->getCSRFToken());
+
+    return $this->_form;
+  }
+
+  /**
+   * Make the form for the page
+   * @return \Foundation\Form
+   */
+  public function makeForm()
   {
     $form = new \Foundation\Form;
     $form->setCSRFToken($this->_controller->getCSRFToken());
@@ -183,9 +206,13 @@ class ExternalId implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
     $element = $field->newElement('TextInput', 'externalId');
     $element->setLabel($this->_applicationPage->getPage()->getVar('externalIdLabel'));
     $element->setValue($this->_applicant->getExternalId());
-    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));$element->addValidator(new \Foundation\Form\Validator\SpecialObject($element, array(
+      'object' => $this->_applicationPage->getApplication(),
+      'method' => 'validateExternalId',
+      'errorMessage' => 'This is not a valid External ID.'
+    )));
     $form->newButton('submit', 'Save');
-    
+
     return $form;
   }
 
@@ -228,6 +255,7 @@ class ExternalId implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\FormPage
     if ($input = $this->getForm()->processInput($input)) {
       return $input;
     }
+    $this->_controller->setVar('edit', true);
     $this->_controller->addMessage('error', 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.');
 
     return false;

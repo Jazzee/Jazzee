@@ -23,6 +23,7 @@ class SetupApplicationController extends \Jazzee\AdminController
   const ACTION_EDITSTATUSACCEPT = 'Edit message for applicants who accept their offer';
   const ACTION_EDITSTATUSDECLINE = 'Edit message for applicants who decline their offer';
   const ACTION_EDITSTATUS = 'Edit status information (open, close, published, visible)';
+  const ACTION_EDITEXTERNALIDVALIDATION = 'Edit the validation for external IDs';
   const REQUIRE_APPLICATION = false;
 
   /**
@@ -290,6 +291,35 @@ class SetupApplicationController extends \Jazzee\AdminController
       }
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application Status Saved.');
+      $this->redirectPath('setup/application');
+    }
+    $this->setVar('form', $form);
+    $this->loadView($this->controllerName . '/form');
+  }
+
+  /**
+   * Edit the external ID validation
+   */
+  public function actionEditExternalIdValidation()
+  {
+    $form = new \Foundation\Form();
+    $form->setCSRFToken($this->getCSRFToken());
+    $form->setAction($this->path("setup/application/editExternalIdValidation"));
+    $field = $form->newField();
+    $field->setLegend('Edit External iD Validation');
+
+    $element = $field->newElement('TextInput', 'externalRegex');
+    $element->setLabel('Regular Expression');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    $element->addValidator(new \Foundation\Form\Validator\IsRegex($element));
+    $element->setValue($this->_application->getExternalIdValidationExpression());
+
+    $form->newButton('submit', 'Save');
+
+    if ($input = $form->processInput($this->post)) {
+      $this->_application->setExternalIdValidationExpression($input->get('externalRegex'));
+      $this->_em->persist($this->_application);
+      $this->addMessage('success', 'External ID validation Saved.');
       $this->redirectPath('setup/application');
     }
     $this->setVar('form', $form);
