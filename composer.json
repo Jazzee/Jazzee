@@ -1,17 +1,17 @@
 {
   "name": "jazzee/jazzee",
   "license": "BSD-3-Clause",
+  "description": "Jazzee open application platform",
   "authors": [
     {
       "name": "Jon Johnson",
       "email": "jon.johnson@ucsf.edu",
       "role": "Developer"
-    }
-  ],
-  "repositories": [
+    },
     {
-      "type": "vcs",
-      "url": "https://github.com/jrjohnson/htmlpurifier"
+      "name": "Larry Roberts",
+      "email": "larry.roberts@ucsf.edu",
+      "role": "Developer"
     }
   ],
   "require": {
@@ -21,7 +21,7 @@
     "doctrine/migrations": "dev-master",
     "symfony/console": "2.*",
     "monolog/monolog": "1.*",
-    "ezyang/htmlpurifier": "4.4.0.1"
+    "ezyang/htmlpurifier": "4.5.*"
   },
   "autoload": {
     "psr-0": {
