@@ -84,3 +84,11 @@ foreach ($statusMessages as $status => $title) {
   Visible: <?php print ($application->isVisible() ? 'Yes' : 'No'); ?><br />
   By Invitation Only: <?php print ($application->isByInvitationOnly() ? 'Yes' : 'No'); ?><br />
 </fieldset>
+<fieldset>
+  <legend>External ID Validation<?php
+    if ($this->controller->checkIsAllowed('setup_application', 'editExternalIdValidation')) { ?>
+      (<a href='<?php print $this->path('setup/application/editExternalIdValidation') ?>'>Edit</a>)<?php
+    } ?>
+  </legend>
+  External ID Validation: <?php print ($application->getExternalIdValidationExpression() ? 'Regular Expression: ' . $application->getExternalIdValidationExpression() : 'No'); ?><br />
+</fieldset>

@@ -111,6 +111,9 @@ class Application
   /** @Column(type="text", nullable=true) */
   private $statusDeactivatedText;
 
+  /** @Column(type="string", nullable=true) */
+  private $externalIdValidationExpression;
+
   public function __construct()
   {
     $this->applicants = new \Doctrine\Common\Collections\ArrayCollection();
@@ -988,6 +991,39 @@ class Application
   public function clearCache()
   {
     \Jazzee\Controller::getCache()->delete(self::ARRAY_CACHE_PREFIX . $this->id);
+  }
+  
+  /**
+   * Set the externalIdValidationExpression
+   * @param type $expression
+   */
+  public function setExternalIdValidationExpression($expression){
+    if (@preg_match($expression, null) === false){
+      throw new \Jazzee\Exception("{$expression} is not a valid regular expression.");
+    }
+
+    $this->externalIdValidationExpression = $expression;
+  }
+  
+  /**
+   * Get the externalIdValidationExpression
+   * @return string
+   */
+  public function getExternalIdValidationExpression(){
+    return $this->externalIdValidationExpression;
+  }
+  
+  /**
+   * Validate an applicants external ID
+   * @param string $externalId
+   * @return boolean
+   */
+  public function validateExternalId($externalId){
+    if(empty($this->externalIdValidationExpression)){
+      return true;
+    }
+
+    return (preg_match($this->externalIdValidationExpression, $externalId) === 1);
   }
 
 }

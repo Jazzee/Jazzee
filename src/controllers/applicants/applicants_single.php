@@ -1520,7 +1520,12 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $element->setLabel('External ID');
     $element->setFormat('Clear to remove the id');
     $element->setValue($applicant->getExternalId());
-    
+    $element->addValidator(new \Foundation\Form\Validator\SpecialObject($element, array(
+      'object' => $this->_application,
+      'method' => 'validateExternalId',
+      'errorMessage' => 'This is not a valid External ID for this program.'
+    )));
+
     $form->newButton('submit', 'Apply');
     if (!empty($this->post)) {
       $this->setLayoutVar('textarea', true);
@@ -1528,12 +1533,16 @@ class ApplicantsSingleController extends \Jazzee\AdminController
         if ($input->get('externalId')) {
           $applicant->setExternalId($input->get('externalId'));
           $this->auditLog($applicant, 'External ID set to ' . $applicant->getExternalId());
+          $this->_em->persist($applicant);
+          $this->setLayoutVar('status', 'success');
         } else {
           $applicant->setExternalId(null);
           $this->auditLog($applicant, 'Removed External ID');
+          $this->_em->persist($applicant);
+          $this->setLayoutVar('status', 'success');
         }
-        $this->_em->persist($applicant);
-        $this->setLayoutVar('status', 'success');
+      } else {
+        $this->setLayoutVar('status', 'error');
       }
     }
     $this->setVar('result', array('actions' => $this->getActions($applicant)));
