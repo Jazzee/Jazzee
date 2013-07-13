@@ -608,6 +608,7 @@ abstract class PageBuilder extends AdminController
     $config = \HTMLPurifier_Config::createDefault();
     $config->set('HTML.DefinitionID', 'JazzeeJazzeeConfig');
     $config->set('HTML.DefinitionRev', 1); // increment when configuration changes
+    $config->set('Attr.AllowedFrameTargets', array('_blank', '_top'));
     $config->set('Cache.SerializerPath', $cachePath);
 
     $purifier = new \HTMLPurifier($config);
