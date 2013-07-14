@@ -83,7 +83,7 @@ class TemplatePDF
   
   protected function generatePDF(array $elements){
     $pdf = $this->getPdf();
-    $pdf->set_info("Title", $pdf->convert_to_unicode('auto',$elements['applicant']['fullName'], '') . ' Application');
+    $pdf->set_info("Title", $pdf->convert_to_unicode('utf8',$elements['applicant']['fullName'], '') . ' Application');
     $document = $pdf->open_pdi_document($this->_template->getTmpFilePath(), '');
     $pagecount = $pdf->pcos_get_number($document, "length:pages");
     for($pageNum = 0; $pageNum < $pagecount; $pageNum++){
@@ -100,11 +100,11 @@ class TemplatePDF
           $blockData = $this->_template->getBlock($blockName);
           switch($blockData['type']){
             case 'applicant':
-              $string = $pdf->convert_to_unicode('auto',$elements['applicant'][$blockData['element']], '');
+              $string = $pdf->convert_to_unicode('utf8',$elements['applicant'][$blockData['element']], '');
               break;
             case 'page':
               if(array_key_exists($blockData['pageId'], $elements['pages']) AND array_key_exists($blockData['elementId'], $elements['pages'][$blockData['pageId']])){
-                $string = $pdf->convert_to_unicode('auto',$elements['pages'][$blockData['pageId']][$blockData['elementId']], '');
+                $string = $pdf->convert_to_unicode('utf8',$elements['pages'][$blockData['pageId']][$blockData['elementId']], '');
               }
               break;
           }
