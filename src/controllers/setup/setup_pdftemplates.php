@@ -16,6 +16,7 @@ class SetupPdftemplatesController extends \Jazzee\AdminController
   const ACTION_NEW = 'Create New Template';
   const ACTION_EDIT = 'Edit Existing Template Fields';
   const ACTION_DELETE = 'Delete Existing Template';
+  const ACTION_DOWNLOAD = 'Download Existing Template';
 
   /**
    * List templates for this application
@@ -192,6 +193,19 @@ class SetupPdftemplatesController extends \Jazzee\AdminController
       $this->addMessage('error', 'Unable to delete template.  It is not associated with this application.');
     }
     $this->redirectPath('setup/pdftemplates');
+  }
+
+  /**
+   * Download a template
+   */
+  public function actionDownload($id)
+  {
+    if($template = $this->_application->getTemplateById($id)){
+      header("Content-type: application/pdf");
+      header('Content-Disposition: attachment; filename=' . $template->getTitle() . '.pdf');
+      print $template->getFile();
+      exit();
+    }
   }
 
 }

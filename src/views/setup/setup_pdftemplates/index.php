@@ -11,6 +11,9 @@ if (!empty($templates)) {?>
         if ($this->controller->checkIsAllowed('setup_pdftemplates', 'edit')) { ?>
           (<a href='<?php print $this->path('setup/pdftemplates/edit/') . $template->getId() ?>'>Edit Fields</a>)<?php
         }
+        if ($this->controller->checkIsAllowed('setup_pdftemplates', 'download')) { ?>
+          (<a href='<?php print $this->path('setup/pdftemplates/download/') . $template->getId() ?>'>Download</a>)<?php
+        }
         if ($this->controller->checkIsAllowed('setup_pdftemplates', 'delete')) { ?>
           (<a href='<?php print $this->path('setup/pdftemplates/delete/') . $template->getId() ?>'>Delete</a>)<?php
         }?>
