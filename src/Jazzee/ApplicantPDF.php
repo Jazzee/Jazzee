@@ -154,7 +154,7 @@ class ApplicantPDF
    */
   public function pdf(\Jazzee\Entity\Applicant $applicant)
   {
-    $this->pdf->set_info("Title", $this->pdf->convert_to_unicode('auto', $applicant->getFullName(), '') . ' Application');
+    $this->pdf->set_info("Title", $this->pdf->convert_to_unicode('utf8', $applicant->getFullName(), '') . ' Application');
     $this->addText($applicant->getFullName() . "\n", 'h1');
     $this->addText('Email Address: ' . $applicant->getEmail() . "\n", 'p');
 
@@ -205,7 +205,7 @@ class ApplicantPDF
    */
   public function pdfFromApplicantArray(\Jazzee\Entity\Application $application, array $applicant)
   {
-    $this->pdf->set_info("Title", $this->pdf->convert_to_unicode('auto', $applicant["fullName"], '') . ' Application');
+    $this->pdf->set_info("Title", $this->pdf->convert_to_unicode('utf8', $applicant["fullName"], '') . ' Application');
     $this->addText($applicant["fullName"] . "\n", 'h1');
     $this->addText('Email Address: ' . $applicant["email"] . "\n", 'p');
 
@@ -285,7 +285,7 @@ class ApplicantPDF
    */
   public function addText($text, $type)
   {
-    $this->pdf->add_textflow($this->currentText, $this->pdf->convert_to_unicode('auto', $text, ''), $this->fontOptions($type));
+    $this->pdf->add_textflow($this->currentText, $this->pdf->convert_to_unicode('utf8', $text, ''), $this->fontOptions($type));
   }
 
   /**
@@ -380,7 +380,7 @@ class ApplicantPDF
    */
   public function addTableCell($string)
   {
-    $this->currentTable[$this->tableRow][] = $this->pdf->convert_to_unicode('auto', $string, '');
+    $this->currentTable[$this->tableRow][] = $this->pdf->convert_to_unicode('utf8', $string, '');
   }
 
   /**
