@@ -521,6 +521,79 @@ class Education extends Standard
     return $arr;
   }
 
+  /**
+   * Convert an answer to an xml element and add school information
+   * Since school data is stored either in the School entity or else in a child answer
+   * we combine these two
+   * @param \DomDocument $dom
+   * @param \Jazzee\Entity\Answer $answer
+   * @param integer $version the XML version to create
+   * @return \DomElement
+   */
+  protected function xmlAnswer(\DomDocument $dom, \Jazzee\Entity\Answer $answer, $version)
+  {
+    $answerXml = $dom->createElement('answer');
+    $answerXml->setAttribute('answerId', $answer->getId());
+    $answerXml->setAttribute('uniqueId', $answer->getUniqueId());
+    $answerXml->setAttribute('updatedAt', $answer->getUpdatedAt()->format('c'));
+    $answerXml->setAttribute('pageStatus', $answer->getPageStatus());
+    $answerXml->setAttribute('publicStatus', ($answer->getPublicStatus() ? $answer->getPublicStatus()->getName() : ''));
+    $answerXml->setAttribute('privateStatus', ($answer->getPrivateStatus() ? $answer->getPrivateStatus()->getName() : ''));
+    foreach ($answer->getPage()->getElements() as $element) {
+      $element->getJazzeeElement()->setController($this->_controller);
+      if ($element->getJazzeeElement() instanceof \Jazzee\Interfaces\XmlElement) {
+        $answerXml->appendChild($element->getJazzeeElement()->getXmlAnswer($dom, $answer, $version));
+      }
+    }
+    $attachment = $dom->createElement('attachment');
+    if ($answer->getAttachment()) {
+      $attachment->appendChild($dom->createCDATASection(base64_encode($answer->getAttachment()->getAttachment())));
+    }
+    $answerXml->appendChild($attachment);
+
+    $schoolXml = $dom->createElement('school');
+    if ($school = $answer->getSchool()) {
+      $schoolXml->setAttribute('type', 'known');
+      $schoolXml->setAttribute('code', htmlentities($school->getCode(), ENT_COMPAT, 'utf-8'));
+      $eXml = $dom->createElement('name');
+      $eXml->appendChild($dom->createCDATASection($school->getName()));
+      $schoolXml->appendChild($eXml);
+      $eXml = $dom->createElement('city');
+      $eXml->appendChild($dom->createCDATASection($school->getCity()));
+      $schoolXml->appendChild($eXml);
+      $eXml = $dom->createElement('state');
+      $eXml->appendChild($dom->createCDATASection($school->getState()));
+      $schoolXml->appendChild($eXml);
+      $eXml = $dom->createElement('country');
+      $eXml->appendChild($dom->createCDATASection($school->getCountry()));
+      $schoolXml->appendChild($eXml);
+      $eXml = $dom->createElement('postalCode');
+      $eXml->appendChild($dom->createCDATASection($school->getPostalCode()));
+      $schoolXml->appendChild($eXml);
+    } else {
+      $schoolXml->setAttribute('type', 'new');
+      $newSchoolElements = array(
+        self::ELEMENT_FID_NAME => 'name',
+        self::ELEMENT_FID_CITY => 'city',
+        self::ELEMENT_FID_STATE => 'state',
+        self::ELEMENT_FID_COUNTRY => 'country',
+        self::ELEMENT_FID_POSTALCODE => 'postalCode'
+      );
+      foreach($newSchoolElements as $fid => $name){
+        $element = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL)->getElementByFixedId($fid);
+        $element->getJazzeeElement()->setController($this->_controller);
+        if ($element->getJazzeeElement() instanceof \Jazzee\Interfaces\XmlElement) {
+          $eXml = $dom->createElement($name);
+          $eXml->appendChild($dom->createCDATASection($element->getJazzeeElement()->displayValue($answer->getChildren()->first())));
+          $schoolXml->appendChild($eXml);
+        }
+      }
+    }
+    $answerXml->appendChild($schoolXml);
+
+    return $answerXml;
+  }
+
   public static function applyPageElement()
   {
     return 'Education-apply_page';
