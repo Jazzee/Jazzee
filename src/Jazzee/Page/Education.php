@@ -594,6 +594,55 @@ class Education extends Standard
     return $answerXml;
   }
 
+  /**
+   * Add school information to the PDF
+   * @param \Jazzee\ApplicantPDF $pdf
+   */
+  public function renderPdfSection(\Jazzee\ApplicantPDF $pdf)
+  {
+    $pdf->addText($this->_applicationPage->getTitle() . "\n", 'h3');
+    if($this->getStatus() == \Jazzee\Interfaces\Page::SKIPPED){
+      $pdf->addText("Applicant Skipped this page.\n", 'p');
+    } else {
+      foreach ($this->getAnswers() as $answer) {
+        $type = '';
+        $name = '';
+        $location = '';
+        
+        if ($school = $answer->getSchool()) {
+          $type = 'Known';
+          $name = $school->getName();
+          $location = $school->getLocationSummary();
+        } else {
+          $type = 'New';
+          $element = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL)->getElementByFixedId(self::ELEMENT_FID_NAME);
+          $element->getJazzeeElement()->setController($this->_controller);
+          $name = $element->getJazzeeElement()->displayValue($answer->getChildren()->first());
+          $element = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL)->getElementByFixedId(self::ELEMENT_FID_CITY);
+          $element->getJazzeeElement()->setController($this->_controller);
+          $location .= $element->getJazzeeElement()->displayValue($answer->getChildren()->first()) . ' ';
+          $element = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL)->getElementByFixedId(self::ELEMENT_FID_STATE);
+          $element->getJazzeeElement()->setController($this->_controller);
+          $location .= $element->getJazzeeElement()->displayValue($answer->getChildren()->first()) . ' ';
+          $element = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL)->getElementByFixedId(self::ELEMENT_FID_COUNTRY);
+          $element->getJazzeeElement()->setController($this->_controller);
+          $location .= $element->getJazzeeElement()->displayValue($answer->getChildren()->first()) . ' ';
+          $element = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL)->getElementByFixedId(self::ELEMENT_FID_POSTALCODE);
+          $element->getJazzeeElement()->setController($this->_controller);
+          $location .= $element->getJazzeeElement()->displayValue($answer->getChildren()->first()) . ' ';
+        }
+        $pdf->addText("Type: ", 'b');
+        $pdf->addText("{$type}\n", 'p');
+        $pdf->addText("School: ", 'b');
+        $pdf->addText("{$name}\n", 'p');
+        $pdf->addText("Location: ", 'b');
+        $pdf->addText("{$location}\n", 'p');
+        $this->renderPdfAnswer($pdf, $this->_applicationPage->getPage(), $answer);
+        $pdf->addText("\n", 'p');
+      }
+    }
+  }
+
   public static function applyPageElement()
   {
     return 'Education-apply_page';
