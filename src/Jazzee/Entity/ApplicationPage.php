@@ -104,7 +104,7 @@ class ApplicationPage
   /**
    * Set application
    *
-   * @param Entity\Application $application
+   * @param Application $application
    */
   public function setApplication(Application $application)
   {
@@ -114,7 +114,7 @@ class ApplicationPage
   /**
    * get application
    *
-   * @return \Jazzee\Entity\Application $application
+   * @return Application $application
    */
   public function getApplication()
   {
@@ -124,7 +124,7 @@ class ApplicationPage
   /**
    * Set page
    *
-   * @param Entity\Page $page
+   * @param Page $page
    */
   public function setPage(Page $page)
   {
@@ -134,7 +134,7 @@ class ApplicationPage
   /**
    * Get page
    *
-   * @return Entity\Page
+   * @return Page
    */
   public function getPage()
   {
