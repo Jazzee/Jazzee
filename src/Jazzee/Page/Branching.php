@@ -229,6 +229,8 @@ class Branching extends Standard
     $arr = array();
     if (isset($pageArr['answers']) AND array_key_exists($position, $pageArr['answers'])) {
       $arr[] = $pageArr['answers'][$position]['elements'][0]['values'][0]['value'];
+    } else {
+      $arr[] = '';
     }
     foreach($this->_applicationPage->getPage()->getChildren() as $child){
       foreach ($child->getElements() as $element) {
