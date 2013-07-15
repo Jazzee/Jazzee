@@ -73,12 +73,21 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
   {
     $query = $this->_em->createQuery('SELECT page.id as pageId, count(answer.id) as answers FROM Jazzee\Entity\Answer answer JOIN answer.page page JOIN answer.applicant applicant WHERE answer.applicant IN (SELECT app1.id FROM Jazzee\Entity\Applicant app1 WHERE app1.application = :applicationId) GROUP BY answer.applicant, answer.page');
     $query->setParameter('applicationId', $application->getId());
-    $pages = array();
+    $pageAnswers = array();
     foreach ($query->getResult() as $arr) {
-      if (!array_key_exists($arr['pageId'], $pages) or $pages[$arr['pageId']] < $arr['answers']) {
-        $pages[$arr['pageId']] = $arr['answers'];
+      if (!array_key_exists($arr['pageId'], $pageAnswers) or $pageAnswers[$arr['pageId']] < $arr['answers']) {
+        $pageAnswers[$arr['pageId']] = $arr['answers'];
       }
     }
+    $pages = array();
+    foreach($application->getApplicationPages() as $applicationPage){
+      if(array_key_exists($applicationPage->getPage()->getId(), $pageAnswers)){
+        $pages[$applicationPage->getPage()->getId()] = $pageAnswers[$applicationPage->getPage()->getId()];
+      } else {
+        $pages[$applicationPage->getPage()->getId()] = 0;
+      }
+    }
+
     return $pages;
   }
 
