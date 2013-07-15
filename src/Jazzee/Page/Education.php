@@ -475,6 +475,52 @@ class Education extends Standard
     return $elements;
   }
 
+  /**
+   * Education pages get special CSV headers
+   * @return array
+   */
+  public function getCsvHeaders()
+  {
+    $headers = parent::getCsvHeaders();
+    $headers[] = 'School Name';
+    $headers[] = 'School Type';
+    $headers[] = 'School Location';
+
+    return $headers;
+  }
+
+  /**
+   * Education extract the school
+   * @param array $pageArr
+   * @param int $position
+   * @return array
+   */
+  public function getCsvAnswer(array $pageArr, $position)
+  {
+    $arr = parent::getCsvAnswer($pageArr, $position);
+    if (isset($pageArr['answers']) AND array_key_exists($position, $pageArr['answers'])) {
+      $locationSummary = '';
+      $schoolName = '';
+      $schoolType = '';
+      foreach($pageArr['answers'][$position]['elements'] as $element){
+        if($element['id'] == 'locationSummary'){
+          $locationSummary = $element['displayValue'];
+        }
+        if($element['id'] == 'schoolName'){
+          $schoolName = $element['displayValue'];
+        }
+        if($element['id'] == 'schoolType'){
+          $schoolType = $element['displayValue'];
+        }
+      }
+      $arr[] = $schoolName;
+      $arr[] = $schoolType;
+      $arr[] = $locationSummary;
+    }
+
+    return $arr;
+  }
+
   public static function applyPageElement()
   {
     return 'Education-apply_page';
