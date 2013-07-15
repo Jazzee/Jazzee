@@ -643,6 +643,37 @@ class Education extends Standard
     }
   }
 
+  /**
+   * Render a single answer in the PDF
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  protected function renderPdfAnswerFromArray(\Jazzee\Entity\Page $page, \Jazzee\ApplicantPDF $pdf, array $answerData)
+  {
+    $locationSummary = '';
+    $schoolName = '';
+    $schoolType = '';
+    foreach($answerData['elements'] as $element){
+      if($element['id'] == 'locationSummary'){
+        $locationSummary = $element['displayValue'];
+      }
+      if($element['id'] == 'schoolName'){
+        $schoolName = $element['displayValue'];
+      }
+      if($element['id'] == 'schoolType'){
+        $schoolType = $element['displayValue'];
+      }
+    }
+    $pdf->addText("Type: ", 'b');
+    $pdf->addText("{$schoolType}\n", 'p');
+    $pdf->addText("School: ", 'b');
+    $pdf->addText("{$schoolName}\n", 'p');
+    $pdf->addText("Location: ", 'b');
+    $pdf->addText("{$locationSummary}\n", 'p');
+    parent::renderPdfAnswerFromArray($page, $pdf, $answerData);
+  }
+
   public static function applyPageElement()
   {
     return 'Education-apply_page';
