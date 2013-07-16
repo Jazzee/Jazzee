@@ -61,11 +61,13 @@ class SetupPdftemplatesController extends \Jazzee\AdminController
       for($pageNum = 0; $pageNum < $pagecount; $pageNum++){
         $blockcount = $pdfLib->pcos_get_number($document,"length:pages[{$pageNum}]/blocks");
         for($blockNum = 0; $blockNum < $blockcount; $blockNum++){
-          $fontName = $pdfLib->pcos_get_string($document,"pages[{$pageNum}]/blocks[{$blockNum}]/fontname");
-          if(!array_key_exists($fontName, $fonts)){
-            $fonts[$fontName] = array();
+          if($pdfLib->pcos_get_number($document,"type:pages[{$pageNum}]/blocks[{$blockNum}]/fontname") == 4){
+            $fontName = $pdfLib->pcos_get_string($document,"pages[{$pageNum}]/blocks[{$blockNum}]/fontname");
+            if(!array_key_exists($fontName, $fonts)){
+              $fonts[$fontName] = array();
+            }
+            $fonts[$fontName][] = $pdfLib->pcos_get_string($document,"pages[{$pageNum}]/blocks[{$blockNum}]/Name");
           }
-          $fonts[$fontName][] = $pdfLib->pcos_get_string($document,"pages[{$pageNum}]/blocks[{$blockNum}]/Name");
         }
       }
       foreach(array_keys($fonts) as $name){
