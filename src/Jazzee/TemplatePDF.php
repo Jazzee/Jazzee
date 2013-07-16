@@ -95,21 +95,38 @@ class TemplatePDF
       $blockcount = $pdf->pcos_get_number($document,"length:pages[{$pageNum}]/blocks");
       for($blockNum = 0; $blockNum < $blockcount; $blockNum++){
         $blockName = $pdf->pcos_get_string($document,"pages[{$pageNum}]/blocks[{$blockNum}]/Name");
+        $blockType = $pdf->pcos_get_string($document,"pages[{$pageNum}]/blocks[{$blockNum}]/Subtype");
         if($this->_template->hasBlock($blockName)){
           $string = '';
           $blockData = $this->_template->getBlock($blockName);
           switch($blockData['type']){
             case 'applicant':
-              $string = $pdf->convert_to_unicode('utf8',$elements['applicant'][$blockData['element']], '');
+              $string = $elements['applicant'][$blockData['element']];
               break;
             case 'page':
               if(array_key_exists($blockData['pageId'], $elements['pages']) AND array_key_exists($blockData['elementId'], $elements['pages'][$blockData['pageId']])){
-                $string = $pdf->convert_to_unicode('utf8',$elements['pages'][$blockData['pageId']][$blockData['elementId']], '');
+                $string = $elements['pages'][$blockData['pageId']][$blockData['elementId']];
               }
               break;
           }
-          $length = strlen($string);
-          $pdf->fill_textblock($page, $blockName, $string, "encoding=unicode textlen={$length}");
+          switch($blockType){
+            case 'Text':
+              $string = $pdf->convert_to_unicode('utf8',$string, '');
+              $length = strlen($string);
+              $pdf->fill_textblock($page, $blockName, $string, "encoding=unicode textlen={$length}");
+              break;
+            case 'PDF':
+              if($string){
+                $name = '/pvf/pdf/' . uniqid() . '.pdf';
+                $pvf = $pdf->create_pvf($name, base64_decode($string), '');
+                $doc = $pdf->open_pdi_document($name, '');
+                $contents = $pdf->open_pdi_page($doc, 1, '');
+                $pdf->fill_pdfblock($page, $blockName, $contents, '');
+                $pdf->close_pdi_document($doc);
+                $pdf->delete_pvf($pvf);
+              }
+              break;
+          }
         }
       }
       $pdf->end_page_ext("");
