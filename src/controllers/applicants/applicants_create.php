@@ -97,6 +97,11 @@ class ApplicantsCreateController extends \Jazzee\AdminController
     }
     $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, date('c')));
     $element = $field->newElement('TextInput', 'externalId');
+    $element->addValidator(new \Foundation\Form\Validator\SpecialObject($element, array(
+      'object' => $this->_application,
+      'method' => 'validateExternalId',
+      'errorMessage' => 'This is not a valid External ID for this program.'
+    )));
     $element->setLabel('External ID');
 
     $form->newButton('submit', 'Create Applicant');
@@ -252,6 +257,11 @@ class ApplicantsCreateController extends \Jazzee\AdminController
           $result['status'] = 'duplicate';
           $result['messages'][] = 'An applicant with that email address already exists.';
           $result['applicant'] = $duplicate;
+        } else if (!empty($newApplicant['External ID']) AND !$this->_application->validateExternalId($newApplicant['External ID'])) {
+          $result['status'] = 'badExternalId';
+          $result['messages'][] = $newApplicant['External ID'] . ' is not a valid external ID for this program';
+          $result['applicantName'] = "{$newApplicant['First Name']} {$newApplicant['Last Name']}";
+          $result['applicantEmail'] = $newApplicant['Email Address'];
         } else {
           $result['status'] = 'success';
           $applicant = new \Jazzee\Entity\Applicant;
