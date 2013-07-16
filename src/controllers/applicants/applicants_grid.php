@@ -327,7 +327,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    * Get applicant JSON
    */
   public function actionListApplicants(){
-    $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findIdsByApplication($this->_application, true);
+    $applicants = $this->_em->getRepository('Jazzee\Entity\Applicant')->findIdsByApplication($this->_application, false);
     $this->setVar('result', $applicants);
     $this->loadView('applicants_single/result');
   }
