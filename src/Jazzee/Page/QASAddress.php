@@ -466,7 +466,7 @@ class QASAddress extends Standard
     $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
 
     $element = $field->newElement('TextInput', 'city');
-    $element->setLabel('City (teritory, provinces, etc)');
+    $element->setLabel('City (territory, provinces, etc)');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\MaximumLength($element, 100));
 
