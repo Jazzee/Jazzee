@@ -39,7 +39,7 @@ class Payment extends AbstractPage
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions()); 
 
-    if($allowedTypesCount == 1){
+    if($allowedTypesCount == 1 and !$this->_controller instanceof \Jazzee\AdminController){
       $paymentType = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('id' => $allowedTypes[0], 'isExpired' => false));
       $element = $field->newElement('Plaintext', 'paymentTypeName');
       $element->setLabel('Payment Method');
