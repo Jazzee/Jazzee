@@ -118,7 +118,7 @@ class TemplatePDF
             case 'PDF':
               if($string){
                 $name = '/pvf/pdf/' . uniqid() . '.pdf';
-                $pvf = $pdf->create_pvf($name, base64_decode($string), '');
+                $pvf = $pdf->create_pvf($name, base64_decode($string), 'copy=true');
                 $doc = $pdf->open_pdi_document($name, '');
                 $contents = $pdf->open_pdi_page($doc, 1, '');
                 $pdf->fill_pdfblock($page, $blockName, $contents, '');
