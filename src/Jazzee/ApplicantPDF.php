@@ -285,7 +285,7 @@ class ApplicantPDF
    */
   public function addText($text, $type)
   {
-    $this->pdf->add_textflow($this->currentText, $this->pdf->convert_to_unicode('utf8', $text, ''), $this->fontOptions($type));
+    $this->pdf->add_textflow($this->currentText, $this->pdf->convert_to_unicode('utf8', html_entity_decode($text, ENT_QUOTES, 'UTF-8'), ''), $this->fontOptions($type));
   }
 
   /**
