@@ -306,8 +306,20 @@ PageBuilder.prototype.importPage = function(obj){
  * @return {JazzeePage}
  */
 PageBuilder.prototype.pageFromObject = function(obj, title, status){
+  var hasType = false;
+  $.each(this.pageTypes, function(){
+     if(this.typeClass == obj.typeClass){
+       obj.typeId = this.id;
+       hasType = true;
+       return;
+     }
+  });
+  if(!hasType){
+    this.status.addMessage('error','Canot create this page becuase ' + obj.typeName + ' is not a recognized page type on this system.');
+    return false;
+  }
   if(window[obj.typeClass] == undefined){
-    this.status.addMessage('error','Canot create this page becuase ' + obj.typeName + ' is not a recognized page type.');
+    this.status.addMessage('error','Canot create this page becuase ' + obj.typeClass + ' is not present on this system.');
     return false;
   }
   var id = 'newpage' + this.getUniqueId();
