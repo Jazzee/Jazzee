@@ -29,4 +29,22 @@ interface PdfElement
    */
   function pdfValueFromArray(array $answerData, \Jazzee\ApplicantPDF $pdf);
 
+  /**
+   * Get the template pdf values of the element
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  function pdfTemplateValue(array $answers);
+
+  /**
+   * Get the template pdf values of the element from array data
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  function pdfTemplateValueFromArray(array $answers);
+
 }

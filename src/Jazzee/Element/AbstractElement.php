@@ -161,6 +161,7 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
       $arr['values'][] = $this->arrayValue($elementAnswer);
     }
     $arr['displayValue'] = $this->arrayDisplayValue($arr['values']);
+
     return $arr;
   }
   
@@ -208,4 +209,42 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
     return;
   }
 
+  /**
+   * Get the template pdf values of the element
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  public function pdfTemplateValue(array $answers)
+  {
+    $values = array();
+    foreach($answers as $answer){
+      $values[] = $this->rawValue($answer);
+    }
+
+    return implode("\n", $values);
+  }
+
+  /**
+   * Get the template pdf values of the element from array data
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  function pdfTemplateValueFromArray(array $answers)
+  {
+    $values = array();
+    foreach($answers as $answer){
+      if(array_key_exists($this->_element->getId(), $answer['elements'])){
+        $arr = $this->formatApplicantArray($answer['elements'][$this->_element->getId()]);
+        foreach($arr['values'] as $arr2){
+          $values[] = $arr2['value'];
+        }
+      }
+    }
+
+    return implode("\n", $values);
+  }
 }
