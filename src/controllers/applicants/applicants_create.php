@@ -341,7 +341,7 @@ class ApplicantsCreateController extends \Jazzee\AdminController
       'External ID'
     );
     header("Content-type: text/csv");
-    header("Content-Disposition: attachment; filename=buik_upload_sample.csv");
+    header("Content-Disposition: attachment; filename=bulk_upload_sample.csv");
     ob_end_clean();
     $handle = fopen('php://output', 'w');
     fputcsv($handle, $headers);
