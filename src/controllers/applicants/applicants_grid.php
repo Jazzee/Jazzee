@@ -287,6 +287,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
           switch($this->post['pdftemplate']){
             case 'portrait':
               $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_PORTRAIT, $this);
+              break;
             case 'landscape':
               $pdf = new \Jazzee\ApplicantPDF($this->_config->getPdflibLicenseKey(), \Jazzee\ApplicantPDF::USLETTER_LANDSCAPE, $this);
               break;
