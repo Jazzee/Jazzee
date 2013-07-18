@@ -443,12 +443,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
   {
     $values = array();
     foreach($this->_applicationPage->getPage()->getElements() as $element){
-      $elementValues = array();
-      foreach($this->getAnswers() as $answer){
-        $element->getJazzeeElement()->setController($this->_controller);
-        $elementValues[] = $element->getJazzeeElement()->rawValue($answer);
-      }
-      $values[$element->getId()] = implode("\n", $elementValues);
+      $values[$element->getId()] = $element->getJazzeeElement()->pdfTemplateValue($this->getAnswers());
     }
 
     return $values;
@@ -458,17 +453,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
   {
     $values = array();
     foreach($this->_applicationPage->getPage()->getElements() as $element){
-      $elementValues = array();
-      foreach($answers as $answer){
-        if(array_key_exists($element->getId(), $answer['elements'])){
-          $arr = $element->getJazzeeElement()->formatApplicantArray($answer['elements'][$element->getId()]);
-          foreach($arr['values'] as $arr2){
-            $elementValues[] = $arr2['value'];
-          }
-          
-        }
-      }
-      $values[$element->getId()] = implode("\n", $elementValues);
+      $values[$element->getId()] = $element->getJazzeeElement()->pdfTemplateValueFromArray($answers);
     }
 
     return $values;

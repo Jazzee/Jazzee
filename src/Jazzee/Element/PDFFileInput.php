@@ -123,6 +123,7 @@ class PDFFileInput extends AbstractElement
       }
       $arr['displayValue'] = "<a href='{$arr['filePath']}'><img src='{$arr['thumbnailPath']}' /></a>";
     }
+
     return $arr;
   }
   
@@ -165,6 +166,47 @@ class PDFFileInput extends AbstractElement
     }
 
     return null;
+  }
+
+  /**
+   * Get the template pdf values of the element
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  public function pdfTemplateValue(array $answers)
+  {
+    $blob = false;
+    if(count($answers)){
+      $answer = array_shift($answers);
+      $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
+      if (isset($elementsAnswers[0])) {
+        $blob = \Jazzee\Globals::getFileStore()->getFileContents($elementsAnswers[0]->getEShortString());
+      }
+    }
+
+    return $blob;
+  }
+
+  /**
+   * Get the template pdf values of the element from array data
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  function pdfTemplateValueFromArray(array $answers)
+  {
+    $blob = false;
+    if(count($answers)){
+      $answer = array_shift($answers);
+      if(array_key_exists($this->_element->getId(), $answer['elements'])){
+        $blob = \Jazzee\Globals::getFileStore()->getFileContents($answer['elements'][$this->_element->getId()][0]['eShortString']);
+      }
+    }
+
+    return $blob;
   }
 
   public function formValue(\Jazzee\Entity\Answer $answer)
