@@ -225,23 +225,22 @@ class Education extends Standard
           $answer->addElementAnswer($elementAnswer);
         }
       }
-      $childAnswer = new \Jazzee\Entity\Answer;
       $schoolId = $input->get('schoolId');
       if(!is_null($schoolId) and $school = $this->getSchoolById($schoolId)){
         $answer->setSchool($school);
         $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_KNOWNSCHOOL);
       } else {
+        $childAnswer = new \Jazzee\Entity\Answer;
         $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
-      }
-      $childAnswer->setPage($schoolPage);
-      $answer->addChild($childAnswer);
-
-      foreach ($schoolPage->getElements() as $element) {
-        foreach ($element->getJazzeeElement()->getElementAnswers($input->get('el' . $element->getId())) as $elementAnswer) {
-          $childAnswer->addElementAnswer($elementAnswer);
+        $childAnswer->setPage($schoolPage);
+        $answer->addChild($childAnswer);
+        foreach ($schoolPage->getElements() as $element) {
+          foreach ($element->getJazzeeElement()->getElementAnswers($input->get('el' . $element->getId())) as $elementAnswer) {
+            $childAnswer->addElementAnswer($elementAnswer);
+          }
         }
       }
-      
+
       $this->_form = null;
       $this->_controller->getEntityManager()->persist($answer);
       $this->_controller->getEntityManager()->persist($childAnswer);
