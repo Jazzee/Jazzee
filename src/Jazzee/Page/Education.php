@@ -387,12 +387,12 @@ class Education extends Standard
       }
       $schoolName = $values[\Jazzee\Page\Education::ELEMENT_FID_NAME];
       $schoolType = 'New';
-      $parts = array(
-        $values[\Jazzee\Page\Education::ELEMENT_FID_CITY],
-        $values[\Jazzee\Page\Education::ELEMENT_FID_STATE],
-        $values[\Jazzee\Page\Education::ELEMENT_FID_COUNTRY],
-        $values[\Jazzee\Page\Education::ELEMENT_FID_POSTALCODE],
-      );
+      $parts = array();
+      foreach(array(self::ELEMENT_FID_CITY, self::ELEMENT_FID_STATE, self::ELEMENT_FID_COUNTRY, self::ELEMENT_FID_POSTALCODE) as $fid){
+        if(array_key_exists($fid, $values)){
+          $parts[] = $values[$fid];
+        }
+      }
       $schoolLocation = implode(' ', $parts);
     } else {
       $schoolName = $answer['school']['name'];
