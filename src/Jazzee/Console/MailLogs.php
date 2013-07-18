@@ -110,27 +110,29 @@ class MailLogs extends \Symfony\Component\Console\Command\Command
       'stamp' => null,
       'message' => null
     );
-    $lines = file($this->getPath('error_log'));
-    foreach ($lines as $line) {
-      $matches = array();
-      if (preg_match('#^\[([0-9-:\s]+)\]([^\[]+)(?:[\[\]]+)[^{]+{(.*)}$#', $line, $matches)) {
-        $stamp = new \DateTime($matches[1]);
-        if ($stamp > $from AND $stamp < $to) {
-          $message = trim($matches[2]);
-          $hash = md5($message);
-          if (!array_key_exists($hash, $messages)) {
-            $messages[$hash] = $singleTemplate;
-          }
-          $arr = array();
-          if (preg_match_all('#"([^"]+)":"([^"]+)",#', $matches[3], $arr)) {
-            $extras = array();
-            foreach (array_keys($arr[0]) as $key) {
-              $extras[$arr[1][$key]] = $arr[2][$key];
+    if($path = $this->getPath('error_log')){
+      $lines = file($path);
+      foreach ($lines as $line) {
+        $matches = array();
+        if (preg_match('#^\[([0-9-:\s]+)\]([^\[]+)(?:[\[\]]+)[^{]+{(.*)}$#', $line, $matches)) {
+          $stamp = new \DateTime($matches[1]);
+          if ($stamp > $from AND $stamp < $to) {
+            $message = trim($matches[2]);
+            $hash = md5($message);
+            if (!array_key_exists($hash, $messages)) {
+              $messages[$hash] = $singleTemplate;
             }
+            $arr = array();
+            if (preg_match_all('#"([^"]+)":"([^"]+)",#', $matches[3], $arr)) {
+              $extras = array();
+              foreach (array_keys($arr[0]) as $key) {
+                $extras[$arr[1][$key]] = $arr[2][$key];
+              }
+            }
+            $messages[$hash]['stamp'] = $stamp;
+            $messages[$hash]['count']++;
+            $messages[$hash]['message'] = "{$message} in {$extras['file']}";
           }
-          $messages[$hash]['stamp'] = $stamp;
-          $messages[$hash]['count']++;
-          $messages[$hash]['message'] = "{$message} in {$extras['file']}";
         }
       }
     }
@@ -146,10 +148,7 @@ class MailLogs extends \Symfony\Component\Console\Command\Command
   {
     $path = $this->_config->getVarPath() . '/log/' . $fileName;
     if (!$realPath = \realpath($path) or !\is_readable($realPath)) {
-      if ($realPath) {
-        $path = $realPath; //nicer error message if the path exists
-      }
-      throw new \Exception("{$path} is not readable.");
+      return false;
     }
 
     return $realPath;
