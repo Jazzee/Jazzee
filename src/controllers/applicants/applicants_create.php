@@ -168,10 +168,6 @@ class ApplicantsCreateController extends \Jazzee\AdminController
           
          $this->addMessage('success', 'New account email sent to ' . $applicant->getEmail());
         }
-        
-        
-        
-        $form->applyDefaultValues();
       }
     }
     $this->setVar('form', $form);
@@ -325,7 +321,6 @@ class ApplicantsCreateController extends \Jazzee\AdminController
         $results[] = $result;
       }
       $this->setVar('results', $results);
-      $form->applyDefaultValues();
       $this->_em->flush();
     }
     $this->setVar('form', $form);
