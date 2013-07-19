@@ -5,8 +5,8 @@
  * @subpackage apply
  */
 $layoutContentTop = '<p class="links">';
-$layoutContentTop .= '<a href="' . $this->controller->applyPath('/account') . '">My Account</a>';
-$layoutContentTop .= '<a href="' . $this->controller->applyPath('/support') . '">Support</a>';
+$layoutContentTop .= '<a href="' . $this->controller->applyPath('account') . '">My Account</a>';
+$layoutContentTop .= '<a href="' . $this->controller->applyPath('support') . '">Support</a>';
 if ($count = $applicant->unreadMessageCount()) {
   $layoutContentTop .= '<sup class="count">' . $count . '</sup>';
 }

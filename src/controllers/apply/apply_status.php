@@ -291,7 +291,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
       $actions = new \Foundation\Navigation\Menu();
       $actions->setTitle('Actions');
       $print = new \Foundation\Navigation\Link('Print Application');
-      $print->setHref($this->applyPath('/account/printApplication'));
+      $print->setHref($this->applyPath('account/printApplication'));
       $actions->addLink($print);
 
       $navigation->addMenu($actions);
