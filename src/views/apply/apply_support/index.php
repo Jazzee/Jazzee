@@ -29,7 +29,7 @@ if (count($threads)) { ?>
     }
     ?>'>
             <td><strong><?php print $thread->getSubject(); ?></strong>
-              <br /><a href='<?php print $this->controller->applyPath('/support/single/' . $thread->getId()); ?>'><?php print strip_tags(substr($thread->getLastMessage()->getText(), 0, 100)); ?>
+              <br /><a href='<?php print $this->controller->applyPath('support/single/' . $thread->getId()); ?>'><?php print strip_tags(substr($thread->getLastMessage()->getText(), 0, 100)); ?>
               <?php
               if (strlen($thread->getLastMessage()->getText()) > 100) {
                 print '...';

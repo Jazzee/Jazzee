@@ -26,12 +26,12 @@ class ApplyAccountController extends \Jazzee\AuthenticatedApplyController
       }
     }
     $layoutContentTop = '<p class="links">';
-    $layoutContentTop .= '<a href="' . $this->applyPath('/account') . '">My Account</a>';
-    $layoutContentTop .= '<a href="' . $this->applyPath('/support') . '">Support</a>';
+    $layoutContentTop .= '<a href="' . $this->applyPath('account') . '">My Account</a>';
+    $layoutContentTop .= '<a href="' . $this->applyPath('support') . '">Support</a>';
     if ($count = $this->_applicant->unreadMessageCount()) {
       $layoutContentTop .= '<sup class="count">' . $count . '</sup>';
     }
-    $layoutContentTop .= '<a href="' . $this->applyPath('/applicant/logout') . '">Log Out</a></p>';
+    $layoutContentTop .= '<a href="' . $this->applyPath('applicant/logout') . '">Log Out</a></p>';
 
     $this->setLayoutVar('layoutContentTop', $layoutContentTop);
   }
