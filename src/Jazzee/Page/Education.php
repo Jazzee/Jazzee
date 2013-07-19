@@ -80,6 +80,9 @@ class Education extends Standard
       $element->getJazzeeElement()->addToField($field);
     }
     $form->newHiddenElement('level', 'complete');
+    if(array_key_exists('schoolId', $input)){
+      $form->newHiddenElement('schoolId', $input['schoolId']);
+    }
     $arr = array(self::ELEMENT_FID_NAME,self::ELEMENT_FID_CITY,self::ELEMENT_FID_STATE,self::ELEMENT_FID_COUNTRY,self::ELEMENT_FID_POSTALCODE);
     $newSchoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
     foreach($arr as $fid){
@@ -165,6 +168,19 @@ class Education extends Standard
         return false;
         break;
       case 'complete':
+        if(array_key_exists('schoolId', $input)){
+          if(!$this->getSchoolById($input[ 'schoolId'])){
+            $this->_form = $this->makeForm();
+            $this->_controller->addMessage('error', 'There was a problem with your school selection.  You will need to search again.');
+            return false;
+          }
+        } else {
+          $this->newSchoolForm();
+          if (!$this->getForm()->processInput($input)) {
+            $this->_controller->addMessage('error', self::ERROR_MESSAGE);
+            return false;
+          }
+        }
         $this->pageForm($input);
         return parent::validateInput($input);
         break;
@@ -228,7 +244,6 @@ class Education extends Standard
       $schoolId = $input->get('schoolId');
       if(!is_null($schoolId) and $school = $this->getSchoolById($schoolId)){
         $answer->setSchool($school);
-        $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_KNOWNSCHOOL);
       } else {
         $childAnswer = new \Jazzee\Entity\Answer;
         $schoolPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
@@ -239,23 +254,24 @@ class Education extends Standard
             $childAnswer->addElementAnswer($elementAnswer);
           }
         }
+        $this->_controller->getEntityManager()->persist($childAnswer);
       }
 
       $this->_form = null;
       $this->_controller->getEntityManager()->persist($answer);
-      $this->_controller->getEntityManager()->persist($childAnswer);
       $this->_controller->addMessage('success', 'Answer Updated Successfully');
     }
   }
 
   public function fill($answerId)
   {
+    $input = array();
     if ($answer = $this->_applicant->findAnswerById($answerId)) {
       if($school = $answer->getSchool()){
         $this->_controller->setVar('schoolName', $school->getName());
-        $schoolId = $school->getId();
+        $input['schoolId'] = $school->getId();
       }
-      $input = array();
+
       if($child = $answer->getChildren()->first()){
         foreach ($child->getPage()->getElements() as $element) {
           $element->getJazzeeElement()->setController($this->_controller);
