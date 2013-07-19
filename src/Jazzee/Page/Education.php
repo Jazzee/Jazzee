@@ -28,6 +28,7 @@ class Education extends Standard
   protected function makeForm()
   {
     $form = new \Foundation\Form;
+    $form->setAction($this->_controller->getActionPath());
     $field = $form->newField();
     $field->setLegend($this->_applicationPage->getTitle());
     $field->setInstructions($this->_applicationPage->getInstructions());
