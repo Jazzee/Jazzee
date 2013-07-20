@@ -56,7 +56,7 @@ class Version20130718000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
         $message = "Dear {$row['firstName']} {$row['lastName']}, <br />" .
         "Our application system has had an error in recording one or more of your school " .
         "institution name(s). We have corrected our system, but in order for your application " .
-        "to reflect your information correctly, it will require your input. lease click on 'Back to Application,' then " .
+        "to reflect your information correctly, it will require your input. Please click on 'Back to Application,' then " .
         "select '{$pageName}' from the navigation and review the school information entered. " .
         "Please delete entries for schools where the School name is listed as 'Unknown School,' " .
         "and re-enter from the beginning all information for that school.<br /><br />" .
