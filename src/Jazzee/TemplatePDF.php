@@ -111,9 +111,14 @@ class TemplatePDF
           }
           switch($blockType){
             case 'Text':
-              $string = $pdf->convert_to_unicode('utf8',$string, '');
-              $length = strlen($string);
-              $pdf->fill_textblock($page, $blockName, $string, "encoding=unicode textlen={$length}");
+	      $mime = $this->binarymimetype($string);
+	      if($mime === false){
+		$string = $pdf->convert_to_unicode('utf8',$string, '');
+		$length = strlen($string);
+		$pdf->fill_textblock($page, $blockName, $string, "encoding=unicode textlen={$length}");
+	      }else{
+		$this->_controller->log("Binary data found in Text field, mime:".$mime.", page: ".$page.", block: ".$blockName.", block num: ".$blockNum, \Monolog\Logger::ERROR);
+	      }
               break;
             case 'PDF':
               if($string){
@@ -136,6 +141,43 @@ class TemplatePDF
     $pdf->close_pdi_document($document);
     
     return $pdf->get_buffer();
+  }
+
+  /**
+   *  https://en.wikipedia.org/wiki/Magic_number_(programming)#Magic_GUIDs
+   */
+  public function binarymimetype($data)
+  {
+    //File signatures with their associated mime type
+    $Types = array(
+		   "25504446" => "application/pdf", //  25 50 44 46 == '%PDF'
+		   "474946383761"=>"image/gif",     //GIF87a type gif
+		   "474946383961"=>"image/gif",     //GIF89a type gif
+		   "89504E470D0A1A0A"=>"image/png",
+		   "FFD8FFE0"=>"image/jpeg",        //JFIF jpeg
+		   "FFD8FFE1"=>"image/jpeg",        //EXIF jpeg
+		   "FFD8FFE8"=>"image/jpeg",        //SPIFF jpeg
+		   "377ABCAF271C"=>"application/zip",  //7-Zip zip file
+		   "504B0304"=>"application/zip",   //PK Zip file ( could also match other file types like docx, jar, etc )
+		   );
+
+    $Signature = substr($data,0,60); //get first 60 bytes shouldnt need more then that to determine signature
+    $Signature = unpack("H*",$Signature); // nesting this below gives a php warning in strict mode
+    $Signature = array_shift($Signature); //String representation of the hex values
+
+    foreach($Types as $MagicNumber => $Mime)
+      {
+	$p = stripos((string)$Signature,(string)$MagicNumber);
+	if($p === false){
+	  continue;
+	}
+
+        if( $p === 0 )
+	  return $Mime;  
+      }
+    
+    //Return false if not a recognized type
+    return false; 
   }
 
   /**
