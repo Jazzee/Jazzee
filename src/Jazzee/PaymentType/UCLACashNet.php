@@ -154,9 +154,9 @@ class UCLACashNet extends AbstractPaymentType
         }
       }
 
+      $payment->setAmount($input->get('amount1')?$input->get('amount1'):0);
       if ($input->get('result') == '0' ) {
         $payment->setVar('tx', $input->get('tx'));
-        $payment->setAmount($input->get('amount1'));
         $client = new \SoapClient(self::CASHNET_WSDL);
         $parameters = array(
           'OperatorID' => $this->_paymentType->getVar('operatorId'),
