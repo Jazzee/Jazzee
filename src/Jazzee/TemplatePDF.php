@@ -122,13 +122,26 @@ class TemplatePDF
               break;
             case 'PDF':
               if($string){
-                $name = '/pvf/pdf/' . uniqid() . '.pdf';
-                $pvf = $pdf->create_pvf($name, $string, 'copy=true');
-                $doc = $pdf->open_pdi_document($name, '');
+                $pdfPath = tempnam($this->_controller->getConfig()->getVarPath() . '/tmp/', '') . '.pdf';
+                if($pdftkPath = $this->_controller->getConfig()->getPdftkPath()){
+                  $tmpFile = tempnam($this->_controller->getConfig()->getVarPath() . '/tmp/', '') . '.pdf';
+                  file_put_contents($tmpFile, $string);
+                  $output = array();
+                  $status = 0;
+                  $return = exec("{$pdftkPath} {$tmpFile} output {$pdfPath} flatten", $output, $status);
+                  if($status != 0){
+                    throw new \Jazzee\Exception("Problem flattening PDF, return: {$return}, status: {$status}, output was: " . var_export($output, true));
+                  }
+                  unlink($tmpFile);
+                } else {
+                  $this->_controller->log("You do not have PDFTK installed or you have not set the pdftkPath configuration variable.  Some PDFs may be generated without all of their data.");
+                  file_put_contents($pdfPath, $string);
+                }
+                $doc = $this->pdf->open_pdi_document($pdfPath, 'shrug=true');
                 $contents = $pdf->open_pdi_page($doc, 1, '');
                 $pdf->fill_pdfblock($page, $blockName, $contents, '');
                 $pdf->close_pdi_document($doc);
-                $pdf->delete_pvf($pvf);
+                unlink($pdfPath);
               }
               break;
           }
