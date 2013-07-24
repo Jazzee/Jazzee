@@ -144,12 +144,16 @@ class TemplatePDF
   }
 
   /**
-   *  https://en.wikipedia.org/wiki/Magic_number_(programming)#Magic_GUIDs
+   * Check if the data is binnary
+   * https://en.wikipedia.org/wiki/Magic_number_(programming)#Magic_GUIDs
+   * 
+   * @param string $data
+   * @return string | false
    */
   public function binarymimetype($data)
   {
     //File signatures with their associated mime type
-    $Types = array(
+    $types = array(
 		   "25504446" => "application/pdf", //  25 50 44 46 == '%PDF'
 		   "474946383761"=>"image/gif",     //GIF87a type gif
 		   "474946383961"=>"image/gif",     //GIF89a type gif
@@ -161,21 +165,21 @@ class TemplatePDF
 		   "504B0304"=>"application/zip",   //PK Zip file ( could also match other file types like docx, jar, etc )
 		   );
 
-    $Signature = substr($data,0,60); //get first 60 bytes shouldnt need more then that to determine signature
-    $Signature = unpack("H*",$Signature); // nesting this below gives a php warning in strict mode
-    $Signature = array_shift($Signature); //String representation of the hex values
+    $signature = substr($data,0,60); //get first 60 bytes shouldnt need more then that to determine signature
+    $signature = unpack("H*",$signature); // nesting this below gives a php warning in strict mode
+    $signature = array_shift($signature); //String representation of the hex values
 
-    foreach($Types as $MagicNumber => $Mime)
-      {
-	$p = stripos((string)$Signature,(string)$MagicNumber);
-	if($p === false){
-	  continue;
-	}
-
-        if( $p === 0 )
-	  return $Mime;  
+    foreach($types as $magicNumber => $mime) {
+      $p = stripos((string)$signature,(string)$magicNumber);
+      if($p === false){
+        continue;
       }
-    
+
+      if( $p === 0 ) {
+        return $mime; 
+      }
+    }
+
     //Return false if not a recognized type
     return false; 
   }
