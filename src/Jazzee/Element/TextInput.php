@@ -10,6 +10,7 @@ namespace Jazzee\Element;
  */
 class TextInput extends AbstractElement
 {
+  protected $keep = array("&lt;"=>"<", "&gt;"=>">");
 
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementTextInput.js';
 
@@ -57,15 +58,26 @@ class TextInput extends AbstractElement
 
   public function displayValue(\Jazzee\Entity\Answer $answer)
   {
+
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      return htmlentities($elementsAnswers[0]->getEShortString(), ENT_COMPAT, 'utf-8');
+      // the database currently stores text values with encoded html entites. 
+      // this is done by the addToField method Safe filter. when we display this
+      // we do not want already encoded entities to be double-encoded so we
+      // temporarily replace some characters back.
+      $dbValue = $elementsAnswers[0]->getEShortString();
+      foreach($this->keep as $encoded=>$unencoded){
+	$dbValue = str_replace($encoded, $unencoded, $dbValue);
+      }
+
+      return htmlentities($dbValue, ENT_COMPAT, 'utf-8');
     }
 
     return null;
   }
   
   protected function arrayValue(array $elementAnswer){
+
     $value = array(
       'value' => $elementAnswer['eShortString']
     );
