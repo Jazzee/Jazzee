@@ -10,6 +10,7 @@ namespace Jazzee\Element;
  */
 class Textarea extends AbstractElement
 {
+  protected $_doubleEncoded = array("&lt;"=>"<", "&gt;"=>">");
 
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementTextarea.js';
 
@@ -60,7 +61,13 @@ class Textarea extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      return nl2br(htmlentities($elementsAnswers[0]->getEText(), ENT_COMPAT, 'utf-8'));
+      // the database currently stores text values with encoded html entites. 
+      // this is done by the addToField method Safe filter. when we display this
+      // we do not want already encoded entities to be double-encoded so we
+      // temporarily replace some characters back.
+      $singleEncodedValue = str_replace(array_keys($this->_doubleEncoded), array_values($this->_doubleEncoded), $elementsAnswers[0]->getEText());
+    
+      return nl2br(htmlentities($singleEncodedValue, ENT_COMPAT, 'utf-8'));
     }
 
     return null;
