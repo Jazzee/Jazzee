@@ -102,6 +102,46 @@ class Textarea extends AbstractElement
   }
 
   /**
+   * Get the template pdf values of the element
+   * Account for HTMLSafe double encoded values
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  public function pdfTemplateValue(array $answers)
+  {
+    $values = array();
+    foreach($answers as $answer){
+      $values[] = str_replace(array_keys($this->_doubleEncoded), array_values($this->_doubleEncoded), $this->rawValue($answer));
+    }
+
+    return implode("\n", $values);
+  }
+
+  /**
+   * Get the template pdf values of the element from array data
+   * Takes all the answers and returns a single string that sumerizes the data
+   *
+   * @param array $answers
+   * @return string
+   */
+  function pdfTemplateValueFromArray(array $answers)
+  {
+    $values = array();
+    foreach($answers as $answer){
+      if(array_key_exists($this->_element->getId(), $answer['elements'])){
+        $arr = $this->formatApplicantArray($answer['elements'][$this->_element->getId()]);
+        foreach($arr['values'] as $arr2){
+          $values[] = str_replace(array_keys($this->_doubleEncoded), array_values($this->_doubleEncoded), $arr2['value']);
+        }
+      }
+    }
+
+    return implode("\n", $values);
+  }
+
+  /**
    * Perform a regular expression match on each value
    * @param \Jazzee\Entity\Answer $answer
    * @param \stdClass $obj
