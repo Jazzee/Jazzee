@@ -106,6 +106,12 @@ pdflibLicenseKey
 If you want some advanced PDF functions you will have to purchase a PDFlib+PDI license
 and enter your license key here. http://www.pdflib.com/
 
+pdftkPath
+^^^^^^^^^^^^^^^^^^^^^^^^^
+If your applicants are uploading filled acrobat forms you will need to install and enable
+pdftk http://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/ which will allow jazzee to include that
+data in any exported PDFs.
+
 adminCronAllowed
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Hostnames or IP addresses which are allowed to hit the cron page and trigger
