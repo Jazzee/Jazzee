@@ -10,7 +10,7 @@ namespace Jazzee\Element;
  */
 class TextInput extends AbstractElement
 {
-  protected $keep = array("&lt;"=>"<", "&gt;"=>">");
+  protected $_doubleEncoded = array("&lt;"=>"<", "&gt;"=>">");
 
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementTextInput.js';
 
@@ -65,12 +65,9 @@ class TextInput extends AbstractElement
       // this is done by the addToField method Safe filter. when we display this
       // we do not want already encoded entities to be double-encoded so we
       // temporarily replace some characters back.
-      $dbValue = $elementsAnswers[0]->getEShortString();
-      foreach($this->keep as $encoded=>$unencoded){
-	$dbValue = str_replace($encoded, $unencoded, $dbValue);
-      }
+      $singleEncodedValue = str_replace(array_keys($this->_doubleEncoded), array_values($this->_doubleEncoded), $elementsAnswers[0]->getEShortString());
 
-      return htmlentities($dbValue, ENT_COMPAT, 'utf-8');
+      return htmlentities($singleEncodedValue, ENT_COMPAT, 'utf-8');
     }
 
     return null;
