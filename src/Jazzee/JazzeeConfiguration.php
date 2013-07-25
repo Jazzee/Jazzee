@@ -442,6 +442,12 @@ class JazzeeConfiguration
   protected $_pdflibLicenseKey;
 
   /**
+   * Path to pdftk executable
+   * @var string
+   */
+  protected $_pdftkPath;
+
+  /**
    *  @var array
    * Hostnames or IP addresses which are allowed to hit the cron page and trigger
    * a run.  If you're using links to trigger cron from the webserver jazzee is on then
@@ -1658,6 +1664,24 @@ class JazzeeConfiguration
   public function setPdflibLicenseKey($pdflibLicenseKey)
   {
     $this->_pdflibLicenseKey = $pdflibLicenseKey;
+  }
+
+  /**
+   * get pdftkPath
+   * @return string
+   */
+  public function getPdftkPath()
+  {
+    return $this->_pdftkPath;
+  }
+
+  /**
+   * set pdftkPath
+   * @var string $pdftkPath
+   */
+  public function setPdftkPath($pdftkPath)
+  {
+    $this->_pdftkPath = $pdftkPath;
   }
 
   /**

@@ -325,9 +325,22 @@ class ApplicantPDF
   protected function attachPdfs()
   {
     foreach ($this->appendQueue as $blob) {
-      $name = '/pvf/pdf/' . uniqid() . '.pdf';
-      $pvf = $this->pdf->create_pvf($name, $blob, '');
-      $doc = $this->pdf->open_pdi_document($name, '');
+      $pdfPath = tempnam($this->_controller->getConfig()->getVarPath() . '/tmp/', '') . '.pdf';
+      if($pdftkPath = $this->_controller->getConfig()->getPdftkPath()){
+        $tmpFile = tempnam($this->_controller->getConfig()->getVarPath() . '/tmp/', '') . '.pdf';
+        file_put_contents($tmpFile, $blob);
+        $output = array();
+        $status = 0;
+        $return = exec("{$pdftkPath} {$tmpFile} output {$pdfPath} flatten", $output, $status);
+        if($status != 0){
+          throw new \Jazzee\Exception("Problem flattening PDF, return: {$return}, status: {$status}, output was: " . var_export($output, true));
+        }
+        unlink($tmpFile);
+      } else {
+        $this->_controller->log("You do not have PDFTK installed or you have not set the pdftkPath configuration variable.  Some PDFs may be generated without all of their data.");
+        file_put_contents($pdfPath, $blob);
+      }
+      $doc = $this->pdf->open_pdi_document($pdfPath, 'shrug=true');
       //loop through each page
       for ($i = 1; $i <= $this->pdf->pcos_get_number($doc, "length:pages"); $i++) {
         $page = $this->pdf->open_pdi_page($doc, $i, '');
@@ -337,7 +350,7 @@ class ApplicantPDF
         $this->pdf->end_page_ext('');
       }
       $this->pdf->close_pdi_document($doc);
-      $this->pdf->delete_pvf($pvf);
+      unlink($pdfPath);
     }
   }
 
