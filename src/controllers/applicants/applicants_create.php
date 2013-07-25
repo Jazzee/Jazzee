@@ -218,110 +218,115 @@ class ApplicantsCreateController extends \Jazzee\AdminController
     if ($input = $form->processInput($this->post)) {
       $newApplicants = $input->get('file');
       $first = $newApplicants[0];
-      
-      if(in_array('First Name',$first) OR in_array('Last Name',$first) OR in_array('Email Address',$first)){
+      $requiredHeaders = array(
+        'External ID',
+        'First Name',
+        'Middle Name',
+        'Last Name',
+        'Suffix',
+        'Email Address',
+        'Password'
+      );
+      $error = false;
+      foreach($requiredHeaders as $value){
+        if(!in_array($value, $first)){
+          $form->getElementByName('file')->addMessage("The uploaded file must contain a column '{$value}'");
+          $error = true;
+        }
+      }
+      if(!$error){
         $headers = array_shift($newApplicants);
-      } else {
-        $headers = array(
-          'First Name',
-          'Last Name',
-          'Middle Name',
-          'Suffix',
-          'Email Address',
-          'Password',
-          'External ID'
-        );
-      }
-      $byKey = array();
-      foreach($newApplicants as $newApplicant){
-        $arr = array();
-        foreach($headers as $key => $value){
-          $arr[$value] = $newApplicant[$key];
+        $byKey = array();
+        foreach($newApplicants as $newApplicant){
+          $arr = array();
+          foreach($headers as $key => $value){
+            $arr[$value] = $newApplicant[$key];
+          }
+          $byKey[] = $arr;
         }
-        $byKey[] = $arr;
-      }
-      $newApplicants = $byKey;
-      $results = array();
-      foreach($newApplicants as $newApplicant){
-        $result = array(
-          'messages' => array(),
-          'applicant' => null,
-          'plainTextPassword' => ''
-        );
-        $duplicate = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($newApplicant['Email Address'], $this->_application);
-        if ($duplicate) {
-          $result['status'] = 'duplicate';
-          $result['messages'][] = 'An applicant with that email address already exists.';
-          $result['applicant'] = $duplicate;
-        } else if (!empty($newApplicant['External ID']) AND !$this->_application->validateExternalId($newApplicant['External ID'])) {
-          $result['status'] = 'badExternalId';
-          $result['messages'][] = $newApplicant['External ID'] . ' is not a valid external ID for this program';
-          $result['applicantName'] = "{$newApplicant['First Name']} {$newApplicant['Last Name']}";
-          $result['applicantEmail'] = $newApplicant['Email Address'];
-        } else {
-          $result['status'] = 'success';
-          $applicant = new \Jazzee\Entity\Applicant;
-          $applicant->setApplication($this->_application);
-          $applicant->setEmail($newApplicant['Email Address']);
-          if($newApplicant['Password']){
-            $applicant->setPassword($newApplicant['Password']);
-            $plainTextPassword = $newApplicant['Password'];
+        $newApplicants = $byKey;
+        $results = array();
+        foreach($newApplicants as $newApplicant){
+          $result = array(
+            'messages' => array(),
+            'applicant' => null,
+            'plainTextPassword' => ''
+          );
+          $duplicate = $this->_em->getRepository('Jazzee\Entity\Applicant')->findOneByEmailAndApplication($newApplicant['Email Address'], $this->_application);
+          if ($duplicate) {
+            $result['status'] = 'duplicate';
+            $result['messages'][] = 'An applicant with that email address already exists.';
+            $result['applicant'] = $duplicate;
+          } else if (!empty($newApplicant['External ID']) AND !$this->_application->validateExternalId($newApplicant['External ID'])) {
+            $result['status'] = 'badExternalId';
+            $result['messages'][] = $newApplicant['External ID'] . ' is not a valid external ID for this program';
+            $result['applicantName'] = "{$newApplicant['First Name']} {$newApplicant['Last Name']}";
+            $result['applicantEmail'] = $newApplicant['Email Address'];
           } else {
-            $plainTextPassword = $applicant->generatePassword();
-          }
-          $applicant->setFirstName($newApplicant['First Name']);
-          $applicant->setMiddleName($newApplicant['Middle Name']);
-          $applicant->setLastName($newApplicant['Last Name']);
-          $applicant->setSuffix($newApplicant['Suffix']);
-          $applicant->setExternalId($newApplicant['External ID']);
-          if($input->get('deadlineExtension')){
-            $applicant->setDeadlineExtension($input->get('deadlineExtension'));
-          }
-          $this->_em->persist($applicant);
-          
-          $result['applicant'] = $applicant;
-          $result['plainTextPassword'] = $plainTextPassword;
-          $result['messages'][] = 'Applicant Created Successfully';
-          if($input->get('notificationMessage')){
-            $replace = array(
-              $applicant->getFullName(),
-              $applicant->getDeadline()?$applicant->getDeadline()->format('l F jS Y g:ia'):'',
-              $this->absoluteApplyPath("apply/{$this->_application->getProgram()->getShortName()}/{$this->_application->getCycle()->getName()}/applicant/login"),
-              $applicant->getEmail(),
-              $plainTextPassword
-            );
-            $body = str_ireplace($notificationMessagereplacements, $replace, $input->get('notificationMessage'));
-            $subject = $input->get('notificationSubject')?$input->get('notificationSubject'):'New Application Account';
-            $email = $this->newMailMessage();
-            $email->AddCustomHeader('X-Jazzee-Applicant-ID:' . $applicant->getId());
-            $email->AddAddress(
+            $result['status'] = 'success';
+            $applicant = new \Jazzee\Entity\Applicant;
+            $applicant->setApplication($this->_application);
+            $applicant->setEmail($newApplicant['Email Address']);
+            if($newApplicant['Password']){
+              $applicant->setPassword($newApplicant['Password']);
+              $plainTextPassword = $newApplicant['Password'];
+            } else {
+              $plainTextPassword = $applicant->generatePassword();
+            }
+            $applicant->setFirstName($newApplicant['First Name']);
+            $applicant->setMiddleName($newApplicant['Middle Name']);
+            $applicant->setLastName($newApplicant['Last Name']);
+            $applicant->setSuffix($newApplicant['Suffix']);
+            $applicant->setExternalId($newApplicant['External ID']);
+            if($input->get('deadlineExtension')){
+              $applicant->setDeadlineExtension($input->get('deadlineExtension'));
+            }
+            $this->_em->persist($applicant);
+
+            $result['applicant'] = $applicant;
+            $result['plainTextPassword'] = $plainTextPassword;
+            $result['messages'][] = 'Applicant Created Successfully';
+            if($input->get('notificationMessage')){
+              $replace = array(
+                $applicant->getFullName(),
+                $applicant->getDeadline()?$applicant->getDeadline()->format('l F jS Y g:ia'):'',
+                $this->absoluteApplyPath("apply/{$this->_application->getProgram()->getShortName()}/{$this->_application->getCycle()->getName()}/applicant/login"),
                 $applicant->getEmail(),
-                $applicant->getFullName()
-            );
+                $plainTextPassword
+              );
+              $body = str_ireplace($notificationMessagereplacements, $replace, $input->get('notificationMessage'));
+              $subject = $input->get('notificationSubject')?$input->get('notificationSubject'):'New Application Account';
+              $email = $this->newMailMessage();
+              $email->AddCustomHeader('X-Jazzee-Applicant-ID:' . $applicant->getId());
+              $email->AddAddress(
+                  $applicant->getEmail(),
+                  $applicant->getFullName()
+              );
 
-            $email->setFrom($this->_application->getContactEmail(), $this->_application->getContactName());
-            $email->Subject = $subject;
-            $email->Body = $body;
-            $email->Send();
+              $email->setFrom($this->_application->getContactEmail(), $this->_application->getContactName());
+              $email->Subject = $subject;
+              $email->Body = $body;
+              $email->Send();
 
-            $thread = new \Jazzee\Entity\Thread();
-            $thread->setSubject($subject);
-            $thread->setApplicant($applicant);
+              $thread = new \Jazzee\Entity\Thread();
+              $thread->setSubject($subject);
+              $thread->setApplicant($applicant);
 
-            $message = new \Jazzee\Entity\Message();
-            $message->setSender(\Jazzee\Entity\Message::PROGRAM);
-            $message->setText(nl2br($body));
-            $message->read();
-            $thread->addMessage($message);
-            $this->_em->persist($thread);
-            $this->_em->persist($message);
-            $result['messages'][] = 'New account email sent';
+              $message = new \Jazzee\Entity\Message();
+              $message->setSender(\Jazzee\Entity\Message::PROGRAM);
+              $message->setText(nl2br($body));
+              $message->read();
+              $thread->addMessage($message);
+              $this->_em->persist($thread);
+              $this->_em->persist($message);
+              $result['messages'][] = 'New account email sent';
+            }
           }
+          $results[] = $result;
         }
-        $results[] = $result;
+        $this->setVar('results', $results);
+        $this->_em->flush();
       }
-      $this->setVar('results', $results);
-      $this->_em->flush();
     }
     $this->setVar('form', $form);
   }
@@ -332,13 +337,13 @@ class ApplicantsCreateController extends \Jazzee\AdminController
   public function actionSampleFile()
   {
     $headers = array(
+      'External ID',
       'First Name',
-      'Last Name',
       'Middle Name',
+      'Last Name',
       'Suffix',
       'Email Address',
-      'Password',
-      'External ID'
+      'Password'
     );
     header("Content-type: text/csv");
     header("Content-Disposition: attachment; filename=bulk_upload_sample.csv");
