@@ -14,6 +14,7 @@ class UCLACashNet extends AbstractPaymentType
   const APPLICANTS_SINGLE_ELEMENT = 'UCLACashNet-applicants_single';
   const CASHNET_URL = 'https://commerce.cashnet.com/404Handler/pageredirpost.aspx?virtual=';
   const CASHNET_WSDL = 'http://commerce.cashnet.com/ws/CASHNetWebService.asmx?WSDL';
+  const MIN_CRON_INTERVAL = 21500; //6 hours minus a bit
 
   /**
    * Credit card payment form
@@ -157,6 +158,7 @@ class UCLACashNet extends AbstractPaymentType
       $payment->setAmount($input->get('amount1')?$input->get('amount1'):0);
       if ($input->get('result') == '0' ) {
         $payment->setVar('tx', $input->get('tx'));
+        $payment->pending();
         $client = new \SoapClient(self::CASHNET_WSDL);
         $parameters = array(
           'OperatorID' => $this->_paymentType->getVar('operatorId'),
@@ -168,12 +170,13 @@ class UCLACashNet extends AbstractPaymentType
         $results = $client->CASHNetSOAPRequestInquiry(array('inquiryParams'=>$parameters));
         $xml = new \SimpleXMLElement($results->CASHNetSOAPRequestInquiryResult);
         if($xml->result != 0){
-          throw new \Jazzee\Exception("Unable to get transaction details from cashnet for payment: {$payment->getId()} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}");
-        }
-        if($xml->transactions[0]->transaction->txno == $payment->getVar('tx') and $xml->transactions[0]->transaction->totalamount == $payment->getAmount()){
-          $payment->settled();
+          $this->_controller->log("Unable to get transaction details from cashnet for transaction: {$payment->getVar('tx')} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}",  \Monolog\Logger::ERROR);
         } else {
-          throw new \Jazzee\Exception("Transaction details differ between cashnet and payment for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Payment (TX: {$payment->getVar('tx')}, Ammount: {$payment->getAmount()}) Cashnet Payment (TX: {$xml->transactions[0]->transaction->txno}, Amount: {$xml->transactions[0]->transaction->totalamount}) ");
+          if($xml->transactions[0]->transaction->txno == $payment->getVar('tx') and $xml->transactions[0]->transaction->totalamount == $payment->getAmount()){
+            $payment->settled();
+          } else {
+            throw new \Jazzee\Exception("Transaction details differ between cashnet and payment for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Payment (TX: {$payment->getVar('tx')}, Ammount: {$payment->getAmount()}) Cashnet Payment (TX: {$xml->transactions[0]->transaction->txno}, Amount: {$xml->transactions[0]->transaction->totalamount}) ");
+          }
         }
       } else {
         $payment->setVar('tx', $input->get('failedtx'));
@@ -229,9 +232,9 @@ class UCLACashNet extends AbstractPaymentType
     $field->setLegend('Settle Payment');
 
     $element = $field->newElement('Plaintext', 'info');
-    $element->setValue("Transactions have to be settled by UCLA you can mark this transaction as settled manually");
+    $element->setValue("Transactions have to be settled by UCLA.  To check the status of this payment click 'Attempt Settlement'");
 
-    $form->newButton('submit', 'Settle Transaction');
+    $form->newButton('submit', 'Attempt Settlement');
 
     return $form;
   }
@@ -252,7 +255,7 @@ class UCLACashNet extends AbstractPaymentType
     $results = $client->CASHNetSOAPRequestInquiry(array('inquiryParams'=>$parameters));
     $xml = new \SimpleXMLElement($results->CASHNetSOAPRequestInquiryResult);
     if($xml->result != 0){
-      throw new \Jazzee\Exception("Unable to get transaction details from cashnet for payment: {$payment->getId()} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}");
+      return "Unable to get transaction details from cashnet for payment: {$payment->getId()}, transaction: {$payment->getVar('tx')} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}";
     }
     if($xml->transactions[0]->transaction->txno == $payment->getVar('tx') and $xml->transactions[0]->transaction->totalamount == $payment->getAmount()){
       $payment->settled();
@@ -367,6 +370,40 @@ class UCLACashNet extends AbstractPaymentType
         $controller->getEntityManager()->flush();
         header('Location: ' . $_POST['ref2val1']);
         die();
+      }
+    }
+  }
+
+  /**
+   * Attempt to settle payments
+   * @param AdminCronController $cron
+   */
+  public static function runCron(\AdminCronController $cron)
+  {
+    $paymentType = $cron->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class' => get_called_class()));
+    $cronIntervalVar = 'uclacashnetPaymentLastRun-id-' . $paymentType->getId();
+    if (time() - (int) $cron->getVar($cronIntervalVar) > self::MIN_CRON_INTERVAL) {
+      $cron->setVar($cronIntervalVar, time());
+      $count = 0;
+      $unsettledIds = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->findIdByStatusAndTypeArray(\Jazzee\Entity\Payment::PENDING, $paymentType);
+      $fakeInput = new \Foundation\Form\Input(array());
+      foreach ($unsettledIds as $id) {
+        $payment = $cron->getEntityManager()->getRepository('\Jazzee\Entity\Payment')->find($id);
+        $result = $paymentType->getJazzeePaymentType($cron)->settlePayment($payment, $fakeInput);
+        if ($result === true) {
+          $count++;
+          $cron->getEntityManager()->persist($payment);
+          foreach ($payment->getVariables() as $var) {
+            $cron->getEntityManager()->persist($var);
+          }
+        } else {
+          $cron->log($result);
+        }
+        unset($payment);
+      }
+
+      if ($count) {
+        $cron->log("Settled {$count} {$paymentType->getClass()} Payments.");
       }
     }
   }
