@@ -247,8 +247,8 @@ class UCLACashNet extends AbstractPaymentType
   {
     $client = new \SoapClient(self::CASHNET_WSDL);
     $parameters = array(
-      'OperatorID' => '29930UCSFGD',
-      'Password' => '29930UCSFGD',
+      'OperatorID' => $this->_paymentType->getVar('operatorId'),
+      'Password' => $this->_paymentType->getVar('operatorPassword'),
       'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?'UCLAINQ':'UCLAINQTEST',
       'TransactionNo' => $payment->getVar('tx')
     );
