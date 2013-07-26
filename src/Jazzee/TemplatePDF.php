@@ -137,7 +137,7 @@ class TemplatePDF
                   $this->_controller->log("You do not have PDFTK installed or you have not set the pdftkPath configuration variable.  Some PDFs may be generated without all of their data.");
                   file_put_contents($pdfPath, $string);
                 }
-                $doc = $this->pdf->open_pdi_document($pdfPath, 'shrug=true');
+                $doc = $pdf->open_pdi_document($pdfPath, 'shrug=true');
                 $contents = $pdf->open_pdi_page($doc, 1, '');
                 $pdf->fill_pdfblock($page, $blockName, $contents, '');
                 $pdf->close_pdi_document($doc);
