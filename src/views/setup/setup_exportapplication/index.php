@@ -25,6 +25,7 @@ $preferences->appendChild($this->controller->createCdataElement($xml, 'statusAcc
 $preferences->appendChild($this->controller->createCdataElement($xml, 'statusDeclineText', $application->getStatusDeclineText()));
 $preferences->appendChild($xml->createElement('visible', $application->isVisible()?'1':'0'));
 $preferences->appendChild($xml->createElement('byinvitationonly', $application->isByInvitationOnly()?'1':'0'));
+$preferences->appendChild($this->controller->createCdataElement($xml, 'externalIdValidationExpression', $application->getExternalIdValidationExpression()));
 
 $app->appendChild($preferences);
 
