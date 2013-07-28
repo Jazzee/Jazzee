@@ -300,15 +300,41 @@ class Branching extends Standard
       foreach($child->getElements() as $element){
         $elementValues = array();
         foreach($this->getAnswers() as $answer){
-          foreach($answer->getChildren() as $childAnswer){
-            $values[0] = $childAnswer->getPage()->getTitle();
-            $element->getJazzeeElement()->setController($this->_controller);
-            $elementValues[] = $element->getJazzeeElement()->rawValue($childAnswer);
-          }
+          $childAnswer = $answer->getChildren()->first();
+          $element->getJazzeeElement()->setController($this->_controller);
+          $elementValues[] = $element->getJazzeeElement()->rawValue($childAnswer);
         }
         $values[$element->getId()] = implode("\n", $elementValues);
       }
+      $branchingElementValues = array();
+      foreach($this->getAnswers() as $answer){
+        $childAnswer = $answer->getChildren()->first();
+        $branchingElementValues[] = $childAnswer->getPage()->getTitle();
+      }
+      $values[0] = implode("\n", $branchingElementValues);
     }
+
+    return $values;
+  }
+
+  public function formatApplicantPDFTemplateArray(array $answers)
+  {
+    $values = parent::formatApplicantPDFTemplateArray($answers);
+    $branchingElementValues = array();
+    $childrenAnswers = array();
+    foreach($answers as $answer){
+      if(array_key_exists(0, $answer['children'])){
+        $childrenAnswers[] = $answer['children'][0];
+        $branchingElementValues[] = $this->_applicationPage->getPage()->getChildById($answer['children'][0]['page_id'])->getTitle();
+      }
+    }
+    $values[0] = implode("\n", $branchingElementValues);
+    foreach($this->_applicationPage->getPage()->getChildren() as $child){
+      foreach($child->getElements() as $element){
+        $values[$element->getId()] = $element->getJazzeeElement()->pdfTemplateValueFromArray($childrenAnswers);
+      }
+    }
+    
 
     return $values;
   }
