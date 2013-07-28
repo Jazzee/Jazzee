@@ -78,6 +78,9 @@ class SetupImportApplicationController extends \Jazzee\AdminController
       } else {
         $this->_application->notByInvitationOnly();
       }
+      if(array_key_exists('externalIdValidationExpression', $arr)){
+        $this->_application->setExternalIdValidationExpression($arr['externalIdValidationExpression']);
+      }
       foreach ($xml->xpath('/response/application/pages/page') as $element) {
         $attributes = $element->attributes();
         $page = $this->addPageFromXml($element);
