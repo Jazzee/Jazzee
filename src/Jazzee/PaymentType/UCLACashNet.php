@@ -186,10 +186,8 @@ class UCLACashNet extends AbstractPaymentType
       
       $payment->setVar('custcode', $input->get('custcode'));
       $payment->setVar('pmtcode', $input->get('pmtcode'));
-      $payment->setVar('pmttype', $input->get('pmttype'));
       $payment->setVar('itemcode', $input->get('itemcode1'));
       $payment->setVar('UCLA_REF_NO', $input->get('UCLA_REF_NO'));
-      $payment->setVar('PAYMENTTYPE', $input->get('PAYMENTTYPE'));
     } else if (\is_a($this->_controller, 'ApplicantsSingleController')) {
       $client = new \SoapClient(self::CASHNET_WSDL);
       $parameters = array(
@@ -306,10 +304,12 @@ class UCLACashNet extends AbstractPaymentType
   {
     $form = new \Foundation\Form();
     $field = $form->newField();
-    $field->setLegend('Void Payment');
+    $field->setLegend('Refund Payment');
+    $field->setInstructions('Transactions have to be refunded by UCLA.  After refunding this transaction enter details into this system for record keeping.');
 
-    $element = $field->newElement('Plaintext', 'info');
-    $element->setValue("Transactions have to be refunded by UCLA.  Enter details into the system for record keeping only.");
+    $element = $field->newElement('TextInput', 'transactionId');
+    $element->setLabel('Refund Transaction ID');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $element = $field->newElement('Textarea', 'refundedReason');
     $element->setLabel('Reason displayed to Applicant');
@@ -326,8 +326,27 @@ class UCLACashNet extends AbstractPaymentType
    */
   public function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input)
   {
-    $payment->refunded();
-    $payment->setVar('refundedReason', $input->get('refundedReason'));
+    $client = new \SoapClient(self::CASHNET_WSDL);
+    $parameters = array(
+      'OperatorID' => $this->_paymentType->getVar('operatorId'),
+      'Password' => $this->_paymentType->getVar('operatorPassword'),
+      'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?'UCLAINQ':'UCLAINQTEST',
+      'TransactionNo' => $input->get('transactionId')
+    );
+    $results = $client->CASHNetSOAPRequestInquiry(array('inquiryParams'=>$parameters));
+    $xml = new \SimpleXMLElement($results->CASHNetSOAPRequestInquiryResult);
+    if($xml->result != 0){
+      return "Unable to get refund transaction details from cashnet for payment: {$payment->getId()}, transaction: {$input->get('transactionId')} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}";
+    }
+    if($xml->transactions[0]->transaction->txno == $input->get('transactionId')){
+      $payment->refunded();
+      $payment->setVar('refundAmount', $xml->transactions[0]->transaction->totalamount);
+      $payment->setVar('refundTransactionId', $xml->transactions[0]->transaction->txno);
+      $payment->setVar('refundedReason', $input->get('refundedReason'));
+      return true;
+    } else {
+      throw new \Jazzee\Exception("Transaction details differ between cashnet and payment: {$payment->getId()} for applicant {$payment->getAnswer()->getApplicant()->getId()}.");
+    }
 
     return true;
   }
