@@ -17,7 +17,7 @@ class AdminCronController extends \Jazzee\AdminController
   const REQUIRE_APPLICATION = false;
   const MAX_EXECUTION_TIME = 600;
   const MEMORY_LIMIT = '2G';
-  const VERBOSE_LOGS = false;
+  const VERBOSE_LOGS = true;
 
   /**
    * Check to see if this host is allowed to run cron
