@@ -134,7 +134,9 @@ class SetupApplicationController extends \Jazzee\AdminController
     $element = $field->newElement('Textarea', 'welcome');
     $element->setLabel('Welcome Message');
     $element->setValue($this->_application->getWelcome());
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $safe = new \Foundation\Form\Filter\Safe($element);
+    $safe->setIsHtml(true);
+    $element->addFilter($safe);
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Save');
@@ -242,7 +244,7 @@ class SetupApplicationController extends \Jazzee\AdminController
     if ($this->_application->getOpen()) {
       $element->setValue($this->_application->getOpen()->format('c'));
     }
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element, null, true));
 
     $element = $field->newElement('DateInput', 'close');
     $element->setLabel('Application Close');
@@ -256,14 +258,14 @@ class SetupApplicationController extends \Jazzee\AdminController
     if ($this->_application->getBegin()) {
       $element->setValue($this->_application->getBegin()->format('c'));
     }
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element, null, true));
 
     $element = $field->newElement('RadioList', 'visible');
     $element->setLabel('Is this application visible in the list of cycles?');
     $element->newItem(0, 'No');
     $element->newItem(1, 'Yes');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element, null, true));
     $element->setValue($this->_application->isVisible());
 
     $element = $field->newElement('RadioList', 'byInvitationOnly');
@@ -355,7 +357,7 @@ class SetupApplicationController extends \Jazzee\AdminController
     $element->setLabel('Message');
     $func = "getStatus{$status}Text";
     $element->setValue($this->_application->$func());
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addFilter(new \Foundation\Form\Filter\Safe($element, null, true));
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Save');
