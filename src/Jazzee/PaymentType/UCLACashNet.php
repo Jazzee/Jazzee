@@ -14,6 +14,8 @@ class UCLACashNet extends AbstractPaymentType
   const APPLICANTS_SINGLE_ELEMENT = 'UCLACashNet-applicants_single';
   const CASHNET_URL = 'https://commerce.cashnet.com/404Handler/pageredirpost.aspx?virtual=';
   const CASHNET_WSDL = 'http://commerce.cashnet.com/ws/CASHNetWebService.asmx?WSDL';
+  const CASHNET_TEST_VIRTUALDIRECTORY = 'UCLAINQTEST';
+  const CASHNET_VIRTUALDIRECTORY = 'UCLAINQUIRY';
   const MIN_CRON_INTERVAL = 21500; //6 hours minus a bit
 
   /**
@@ -163,7 +165,7 @@ class UCLACashNet extends AbstractPaymentType
         $parameters = array(
           'OperatorID' => $this->_paymentType->getVar('operatorId'),
           'Password' => $this->_paymentType->getVar('operatorPassword'),
-          'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?'UCLAINQ':'UCLAINQTEST',
+          'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?self::CASHNET_VIRTUALDIRECTORY:self::CASHNET_TEST_VIRTUALDIRECTORY,
           'TransactionNo' =>  $payment->getVar('tx')
         );
 
@@ -193,14 +195,14 @@ class UCLACashNet extends AbstractPaymentType
       $parameters = array(
         'OperatorID' => $this->_paymentType->getVar('operatorId'),
         'Password' => $this->_paymentType->getVar('operatorPassword'),
-        'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?'UCLAINQ':'UCLAINQTEST',
+        'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?self::CASHNET_VIRTUALDIRECTORY:self::CASHNET_TEST_VIRTUALDIRECTORY,
         'TransactionNo' =>  $input->get('transactionId')
       );
 
       $results = $client->CASHNetSOAPRequestInquiry(array('inquiryParams'=>$parameters));
       $xml = new \SimpleXMLElement($results->CASHNetSOAPRequestInquiryResult);
       if($xml->result != 0){
-        throw new \Jazzee\Exception("Unable to get transaction details from cashnet for payment: {$payment->getId()} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}");
+        throw new \Jazzee\Exception("Unable to get transaction details from cashnet for transaction: {$input->get('transactionId')} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}");
       }
       
       $payment->setVar('tx', $xml->transactions[0]->transaction->txno);
@@ -247,7 +249,7 @@ class UCLACashNet extends AbstractPaymentType
     $parameters = array(
       'OperatorID' => $this->_paymentType->getVar('operatorId'),
       'Password' => $this->_paymentType->getVar('operatorPassword'),
-      'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?'UCLAINQ':'UCLAINQTEST',
+      'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?self::CASHNET_VIRTUALDIRECTORY:self::CASHNET_TEST_VIRTUALDIRECTORY,
       'TransactionNo' => $payment->getVar('tx')
     );
     $results = $client->CASHNetSOAPRequestInquiry(array('inquiryParams'=>$parameters));
@@ -330,7 +332,7 @@ class UCLACashNet extends AbstractPaymentType
     $parameters = array(
       'OperatorID' => $this->_paymentType->getVar('operatorId'),
       'Password' => $this->_paymentType->getVar('operatorPassword'),
-      'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?'UCLAINQ':'UCLAINQTEST',
+      'VirtualDirectory'  => ($this->_controller->getConfig()->getStatus() == 'PRODUCTION')?self::CASHNET_VIRTUALDIRECTORY:self::CASHNET_TEST_VIRTUALDIRECTORY,
       'TransactionNo' => $input->get('transactionId')
     );
     $results = $client->CASHNetSOAPRequestInquiry(array('inquiryParams'=>$parameters));
@@ -357,40 +359,42 @@ class UCLACashNet extends AbstractPaymentType
    */
   public static function transaction($controller)
   {
+    if(empty($_POST['ref1val1']) or empty($_POST['ref2val1'])){
+      throw new \Jazzee\Exception("refval1 or refval2 not set by cashnet.  Cashnet post: " . var_export($_POST, true));
+    }
     $matches = array();
     preg_match('#page/(\d{1,})/?#', $_POST['ref2val1'], $matches);
     if (!isset($matches[1])) {
-      throw new \Jazzee\Exception("No page id match found in ref2val1: '{$_POST['ref2val1']}");
+      throw new \Jazzee\Exception("No page id match found in ref2val1: '{$_POST['ref2val1']}'");
     }
     $applicationPage = $controller->getEntityManager()->getRepository('\Jazzee\Entity\ApplicationPage')->find($matches[1]);
     if (!$applicationPage) {
       throw new \Jazzee\Exception("{$matches[1]} is not a valid applicationPage id");
     }
-    if(!empty($_POST['ref1val1'])){
-      $applicant = $controller->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->find($_POST['ref1val1']);
-      if (!$applicant) {
-        throw new \Jazzee\Exception("{$_POST['ref1val1']} is not a valid applicant id.  Cashnet post: " . var_export($_POST, true));
-      }
-      $answer = new \Jazzee\Entity\Answer();
-      $answer->setPage($applicationPage->getPage());
-      $applicant->addAnswer($answer);
-
-      $payment = new \Jazzee\Entity\Payment();
-      $payment->setType($controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class' => get_called_class())));
-      $answer->setPayment($payment);
-      $input = new \Foundation\Form\Input($_POST);
-      if ($payment->getType()->getJazzeePaymentType($controller)->pendingPayment($payment, $input)) {
-        $controller->getEntityManager()->persist($applicant);
-        $controller->getEntityManager()->persist($answer);
-        $controller->getEntityManager()->persist($payment);
-        foreach ($payment->getVariables() as $var) {
-          $controller->getEntityManager()->persist($var);
-        }
-        $controller->getEntityManager()->flush();
-        header('Location: ' . $_POST['ref2val1']);
-        die();
-      }
+    $applicant = $controller->getEntityManager()->getRepository('\Jazzee\Entity\Applicant')->find($_POST['ref1val1']);
+    if (!$applicant) {
+      throw new \Jazzee\Exception("{$_POST['ref1val1']} is not a valid applicant id.  Cashnet post: " . var_export($_POST, true));
     }
+    $answer = new \Jazzee\Entity\Answer();
+    $answer->setPage($applicationPage->getPage());
+    $applicant->addAnswer($answer);
+
+    $payment = new \Jazzee\Entity\Payment();
+    $payment->setType($controller->getEntityManager()->getRepository('\Jazzee\Entity\PaymentType')->findOneBy(array('class' => get_called_class())));
+    $answer->setPayment($payment);
+    $input = new \Foundation\Form\Input($_POST);
+    if ($payment->getType()->getJazzeePaymentType($controller)->pendingPayment($payment, $input)) {
+      $controller->getEntityManager()->persist($applicant);
+      $controller->getEntityManager()->persist($answer);
+      $controller->getEntityManager()->persist($payment);
+      foreach ($payment->getVariables() as $var) {
+        $controller->getEntityManager()->persist($var);
+      }
+      $controller->getEntityManager()->flush();
+      header('Location: ' . $_POST['ref2val1']);
+      die();
+    }
+    throw new \Jazzee\Exception("We were unable to record this payment.  Cashnet post: " . var_export($_POST, true));
   }
 
   /**
