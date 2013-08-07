@@ -6,7 +6,7 @@ $fields = array();
 $tools = array();
 $fields['Amount'] = $answer->getPayment()->getAmount();
 ?>
-<fieldset id='answer<? print $answer->getId() ?>'>
+<fieldset id='answer<?php print $answer->getId() ?>'>
   <legend><?php print $answer->getPayment()->getType()->getName(); ?> Payment</legend><?php
   switch ($answer->getPayment()->getStatus()) {
     case \Jazzee\Entity\Payment::PENDING:
