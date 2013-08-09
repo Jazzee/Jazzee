@@ -189,6 +189,18 @@ class User
   }
 
   /**
+   * set apiKey
+   * @param string $apiKey
+   */
+  public function setApiKey($apiKey)
+  {
+    if(strlen($apiKey) < 32){
+      throw new \Jazzee\Exception("Api key must be at least 32 charecters you passed: {$apiKey}");
+    }
+    $this->apiKey = $apiKey;
+  }
+
+  /**
    * Is the user active
    * @return boolean
    */
