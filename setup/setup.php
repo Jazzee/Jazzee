@@ -20,6 +20,7 @@ $cli->addCommands(array(
   new \Jazzee\Console\MailLogs(),
   new \Jazzee\Console\CreateDemo(),
   new \Jazzee\Console\Scramble(),
-  new \Jazzee\Console\SeedFilesCache()
+  new \Jazzee\Console\SeedFilesCache(),
+  new \Jazzee\Console\UserApiKey()
 ));
 $cli->run();
