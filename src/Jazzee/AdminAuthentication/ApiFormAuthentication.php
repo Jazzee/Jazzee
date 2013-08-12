@@ -76,7 +76,7 @@ class ApiFormAuthentication implements \Jazzee\Interfaces\AdminAuthentication
           return false;
         }
       } else {
-        throw new \Jazzee\Exception("{$_SERVER['REMOTE_ADDR']} is not a valid ip address for ApiFormAuthentication.  Add it to the noAuthIpAddresses configuration to continue.");
+        throw new \Jazzee\Exception("{$_SERVER['REMOTE_ADDR']} is not a valid ip address for ApiFormAuthentication: {$allowedIps}.  Add it to the apiFormAuthenticationIpAddresses configuration to continue.");
       }
     }
   }
