@@ -61,9 +61,9 @@ class CreateDemo extends \Symfony\Component\Console\Command\Command
     $application->setCycle($cycle);
     $application->setWelcome('THIS IS A DEMO APP.');
     $application->visible();
-    $application->publish();
     $application->setOpen('yesterday');
     $application->setClose('next year');
+    $application->publish(true);
     $entityManager->persist($application);
 
     $StandardPageType = $entityManager->getRepository('\Jazzee\Entity\PageType')->findOneBy(array('class' => '\Jazzee\Page\Standard'));
