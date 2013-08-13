@@ -98,7 +98,7 @@ class JazzeePageController extends \Foundation\VC\Controller
     $this->addCss($this->path('resource/styles/style.css'));
 
     //Set HTML purifier cache location
-    \Foundation\Form\Filter\Safe::setCachePath($this->_config->getVarPath() . '/tmp/');
+    \Foundation\Form\Filter\SafeHTML::setCachePath($this->_config->getVarPath() . '/tmp/');
   }
 
   /**

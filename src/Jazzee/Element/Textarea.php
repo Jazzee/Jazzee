@@ -10,7 +10,6 @@ namespace Jazzee\Element;
  */
 class Textarea extends AbstractElement
 {
-  protected $_doubleEncoded = array("&lt;"=>"<", "&gt;"=>">");
 
   const PAGEBUILDER_SCRIPT = 'resource/scripts/element_types/JazzeeElementTextarea.js';
 
@@ -61,13 +60,7 @@ class Textarea extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      // the database currently stores text values with encoded html entites. 
-      // this is done by the addToField method Safe filter. when we display this
-      // we do not want already encoded entities to be double-encoded so we
-      // temporarily replace some characters back.
-      $singleEncodedValue = str_replace(array_keys($this->_doubleEncoded), array_values($this->_doubleEncoded), $elementsAnswers[0]->getEText());
-    
-      return nl2br(htmlentities($singleEncodedValue, ENT_COMPAT, 'utf-8'));
+      return nl2br($elementsAnswers[0]->getEText());
     }
 
     return null;
@@ -85,7 +78,7 @@ class Textarea extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      return $elementsAnswers[0]->getEText();
+      return html_entity_decode($elementsAnswers[0]->getEText());
     }
 
     return null;
@@ -95,7 +88,7 @@ class Textarea extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      return $elementsAnswers[0]->getEText();
+      return html_entity_decode($elementsAnswers[0]->getEText());
     }
 
     return null;
@@ -103,7 +96,6 @@ class Textarea extends AbstractElement
 
   /**
    * Get the template pdf values of the element
-   * Account for HTMLSafe double encoded values
    * Takes all the answers and returns a single string that sumerizes the data
    *
    * @param array $answers
@@ -113,7 +105,7 @@ class Textarea extends AbstractElement
   {
     $values = array();
     foreach($answers as $answer){
-      $values[] = str_replace(array_keys($this->_doubleEncoded), array_values($this->_doubleEncoded), $this->rawValue($answer));
+      $values[] = $this->rawValue($answer);
     }
 
     return implode("\n", $values);
@@ -133,7 +125,7 @@ class Textarea extends AbstractElement
       if(array_key_exists($this->_element->getId(), $answer['elements'])){
         $arr = $this->formatApplicantArray($answer['elements'][$this->_element->getId()]);
         foreach($arr['values'] as $arr2){
-          $values[] = str_replace(array_keys($this->_doubleEncoded), array_values($this->_doubleEncoded), $arr2['value']);
+          $values[] = html_entity_decode($arr2['value']);
         }
       }
     }

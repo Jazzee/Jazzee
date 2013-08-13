@@ -99,7 +99,7 @@ class ApplicantsMessagesController extends \Jazzee\AdminController
     $element = $field->newElement('Textarea', 'text');
     $element->setLabel('Your Reply');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addFilter(new \Foundation\Form\Filter\SafeHTML($element));
     $form->newButton('submit', 'Submit');
     $this->setVar('form', $form);
 
@@ -151,12 +151,12 @@ class ApplicantsMessagesController extends \Jazzee\AdminController
     $element = $field->newElement('TextInput', 'subject');
     $element->setLabel('Subject');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addFilter(new \Foundation\Form\Filter\SafeHTML($element));
 
     $element = $field->newElement('Textarea', 'text');
     $element->setLabel('Message');
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
-    $element->addFilter(new \Foundation\Form\Filter\Safe($element));
+    $element->addFilter(new \Foundation\Form\Filter\SafeHTML($element));
     $form->newButton('submit', 'Submit');
     $this->setVar('form', $form);
 
