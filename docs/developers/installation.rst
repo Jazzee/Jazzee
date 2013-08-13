@@ -26,57 +26,34 @@ Install       Instructions
 ============ =======================================
 Virtualbox    https://www.virtualbox.org/
 Vagrant       http://www.vagrantup.com
-Veewee        https://github.com/jedi4ever/veewee
 ============ =======================================
 
 There are currently two types of VM supported, most development is done on the centOS based box, 
 however there is also an Oracle Linux option for testing and working with an Oracle Database.
+If you wish to work with Oracle then copy the dev/Vegrantfile.orace file to JAZZEE_SRC before
+completing the following.
 
-CentOS
-^^^^^^^
-With Virtualbox, Vagrant, and Veewee installed run::
+With Virtualbox and Vagrant installed run::
 
-  cd JAZZEE_SRC/dev
-  vagrant basebox build -f Jazzee_CentOS64
-  vagrant basebox export -f Jazzee_CentOS64
-  vagrant box add -f Jazzee_CentOS64 Jazzee_CentOS64.box
   cd JAZZEE_SRC
   cp dev/Vagrantfile.centos Vagrantfile
   vagrant up
-
-Oracle
-^^^^^^^
-With Virtualbox, Vagrant, and Veewee installed run::
-
-  cd JAZZEE_SRC/dev
-  vagrant basebox build -f Jazzee_Oracle63
-  vagrant basebox export -f Jazzee_Oracle63
-  vagrant box add -f Jazzee_Oracle63 Jazzee_Oracle63.box
-  cd JAZZEE_SRC
-  cp dev/Vagrantfile.oracle Vagrantfile
-  vagrant up
-
-
-Final Setup
-^^^^^^^^^^^^
 
 A lot of stuff will happen there - ISO files will be downloaded, a new installation will be built
 and then packaged for export.  Packages will be installed and a new VM setup.  
 Depending on your connection speed it can take anywhere from a few minutes to a few hours.
 
-Jazzee will be available at http://localhost:8080
+Final Setup
+^^^^^^^^^^^^
+
+Jazzee is now available at http://localhost:8080
 
 You will need to run some initial setup for Jazzee to get the database 
-initialized.  Those directions are at :ref:`installation_initial-setup`.  You 
-should run them from the virtual machine by doing::
+initialized.  Log into your new virtual machine by doing::
 
   cd JAZZEE_SRC
   vagrant up
   vagrant ssh
+  cd /vagrant
 
-This will log you into the vagrant virtual machine where you can setup the database with::
-
-  cd /vagrant/setup
-  ./setup update
-  ./setup defaults
-  ./setup create-demo
+The run the setup instructions at :ref:`installation_initial-setup`
