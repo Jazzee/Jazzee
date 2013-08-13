@@ -10,13 +10,9 @@ class jazzee::oracle {
       $clientRpm = 'oracle-instantclient11.2-basic-11.2.0.3.0-1.x86_64.rpm'
       $clientDevRpm = 'oracle-instantclient11.2-devel-11.2.0.3.0-1.x86_64.rpm'
       $sqlClientRpm = 'oracle-instantclient11.2-sqlplus-11.2.0.3.0-1.x86_64.rpm'
-      $tmpDir = "/tmp/rpms"
+      $rpmDir = "/opt/oracle-rpms"
+      $tmpDir = "/tmp"
       $configurationFile = "$tmpDir/oracleConfigure"
-
-      file { $tmpDir:
-        source => "puppet:///modules/jazzee/rpms",
-        recurse => true;
-      }
 
       file { 'oracle-xe-configure':
         path   => "$configurationFile",
@@ -40,9 +36,9 @@ class jazzee::oracle {
       }
       package { 'oracle-xe':
         ensure   => present,
-        source   => "$tmpDir/$serverRpm",
+        source   => "$rpmDir/$serverRpm",
         provider => 'rpm',
-        require => [Package['oracle-preinstall'], File[$tmpDir]]
+        require => Package['oracle-preinstall']
       }
       service { 'oracle-xe':
         ensure => running,
@@ -51,21 +47,21 @@ class jazzee::oracle {
       }
       package { 'oracle-instantclient11.2-basic':
         ensure   => present,
-        source   => "$tmpDir/$clientRpm",
+        source   => "$rpmDir/$clientRpm",
         provider => 'rpm',
-        require => [Package['oracle-preinstall'], File[$tmpDir]]
+        require => Package['oracle-preinstall']
       }
       package { 'oracle-instantclient11.2-devel':
         ensure   => present,
-        source   => "$tmpDir/$clientDevRpm",
+        source   => "$rpmDir/$clientDevRpm",
         provider => 'rpm',
-        require => [Package['oracle-instantclient11.2-basic'], File[$tmpDir]]
+        require => Package['oracle-instantclient11.2-basic']
       }
       package { 'oracle-instantclient11.2-sqlplus':
         ensure   => present,
-        source   => "$tmpDir/$sqlClientRpm",
+        source   => "$rpmDir/$sqlClientRpm",
         provider => 'rpm',
-        require => [Package['oracle-instantclient11.2-basic'], File[$tmpDir]]
+        require => Package['oracle-instantclient11.2-basic']
       }
 
       $addVagrantUserSql = "DECLARE\nu_count number;\nBEGIN u_count :=0;\nSELECT COUNT (1) INTO u_count FROM dba_users WHERE username = 'VAGRANT';\nIF u_count = 0 THEN\nEXECUTE IMMEDIATE 'CREATE USER vagrant identified by vagrant';\nEXECUTE IMMEDIATE 'GRANT create session to vagrant';\nEXECUTE IMMEDIATE 'GRANT all privileges to vagrant';\nELSE\nEXECUTE IMMEDIATE 'GRANT create session to vagrant';\nEXECUTE IMMEDIATE 'GRANT all privileges to vagrant';\nEND IF;\nEND;\n/\nEXIT"
