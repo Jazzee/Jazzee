@@ -19,7 +19,7 @@
     <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
 </listeners>
 <logging>
- <log type="coverage-html" target="build/coverage" title="Foundation"
+ <log type="coverage-html" target="build/coverage" title="Jazzee"
       charset="UTF-8" yui="true" highlight="true"
       lowUpperBound="35" highLowerBound="70"/>
  <log type="coverage-clover" target="build/logs/clover.xml"/>
