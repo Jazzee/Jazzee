@@ -467,48 +467,26 @@ class JazzeeConfiguration
    */
   protected $_virusScanUploads;
 
-  /**
-   * Construct
-   * Load data from the ini file
-   */
-  public function __construct()
-  {
-    $this->setDefaults();
-    $path = $this->getPath();
-    if (!$realPath = \realpath($path)) {
-      $directory = \dirname($path);
-      if ($realPath = \realpath($directory)) {
-        $directory = $realPath;
-      }
-      $file = \basename($path);
-      throw new Exception("Unable to load configuration.  We were looking for {$file} in {$directory}.");
+    /**
+     * Construct
+     * Load data from the ini file
+     */
+    public function __construct()
+    {
+        $this->setDefaults();
+        if($path = $this->getPath()){
+            $arr = parse_ini_file($path);
+            if (!empty($arr) and $arr !== false) {
+                foreach ($arr as $name => $value) {
+                  $setter = 'set' . \ucfirst($name);
+                  if (!method_exists($this, $setter)) {
+                    throw new Exception("Configuration variable ({$name}) found in file, but it is not a recognized option.");
+                  }
+                  $this->$setter($value);
+                }
+            }
+        }
     }
-    if (!\is_readable($realPath)) {
-      $perms = \substr(\sprintf('%o', \fileperms($realPath)), -4);
-      $owner = \fileowner($realPath);
-      $group = \filegroup($realPath);
-      if (function_exists('posix_getpwuid')) {
-        $arr = posix_getpwuid($owner);
-        $owner = $arr['name'];
-      }
-      if (function_exists('posix_getgrgid')) {
-        $arr = posix_getgrgid($group);
-        $group = $arr['name'];
-      }
-      throw new Exception("The configuration file at {$realPath} is not readable.  The file is owned by user {$owner} and group {$group} and has permissions {$perms}.");
-    }
-    $arr = parse_ini_file($realPath);
-    if (empty($arr) or $arr === false) {
-      throw new Exception("Unable to read configuration file at " . $realPath);
-    }
-    foreach ($arr as $name => $value) {
-      $setter = 'set' . \ucfirst($name);
-      if (!method_exists($this, $setter)) {
-        throw new Exception("Configuration variable ({$name}) found in file, but it is not a recognized option.");
-      }
-      $this->$setter($value);
-    }
-  }
 
   /**
    * Set the defaults for those options that have defaults
@@ -572,7 +550,27 @@ class JazzeeConfiguration
    */
   protected function getPath()
   {
-    return __DIR__ . '/../../etc/config.ini.php';
+    $defaultPath =  __DIR__ . '/../../etc/config.ini.php';
+    if ($realPath = \realpath($defaultPath)) {
+      if (!\is_readable($realPath)) {
+        $perms = \substr(\sprintf('%o', \fileperms($realPath)), -4);
+        $owner = \fileowner($realPath);
+        $group = \filegroup($realPath);
+        if (function_exists('posix_getpwuid')) {
+          $arr = posix_getpwuid($owner);
+          $owner = $arr['name'];
+        }
+        if (function_exists('posix_getgrgid')) {
+          $arr = posix_getgrgid($group);
+          $group = $arr['name'];
+        }
+        throw new Exception("The configuration file at {$realPath} is not readable.  The file is owned by user {$owner} and group {$group} and has permissions {$perms}.");
+      } else {
+        return $realPath;
+      }
+    }
+
+    return false;
   }
 
   /**
