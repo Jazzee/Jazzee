@@ -23,6 +23,13 @@
     "monolog/monolog": "1.*",
     "ezyang/htmlpurifier": "4.5.*"
   },
+  "require-dev": {
+      "phpunit/phpunit": "3.7.*",
+      "satooshi/php-coveralls": "dev-master",
+      "mockery/mockery": "*",
+      "cordoval/hamcrest-php": "1.*",
+      "apigen/apigen": "*"
+  },
   "autoload": {
     "psr-0": {
       "Jazzee": "src/"
