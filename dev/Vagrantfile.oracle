@@ -1,14 +1,15 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant::Config.run do |config|
+VAGRANTFILE_API_VERSION = "2"
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "Jazzee_Oracle63-1"
   config.vm.box_url = "https://ucsf.box.com/shared/static/urdor9q137yla23zlhid.box"
-  config.vm.host_name = "web"
-  config.vm.network :hostonly, "10.10.10.10"
-  config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
-  config.vm.forward_port 8080, 8080
-  config.vm.forward_port 9090, 9090
+  config.vm.hostname = "jazzeedev"
+  config.vm.network :private_network, ip: "10.10.10.10"
+  config.vm.synced_folder ".", "/vagrant", :nfs => true, id: "vagrant-root"
+  config.vm.network :forwarded_port, guest: 8080, host: 8080
+  config.vm.network :forwarded_port, guest: 9090, host: 9090
   config.vm.provision  :puppet do  |puppet|
     puppet.manifests_path = "dev/puppet/manifests"
     puppet.manifest_file = "oracle.pp"
