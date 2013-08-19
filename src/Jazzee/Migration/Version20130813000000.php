@@ -44,9 +44,9 @@ class Version20130813000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
     while ($row = $stmt->fetch()) {
       $newString = htmlentities ($row['eText'], \ENT_COMPAT, 'UTF-8', false);
       if($row['eText'] != $newString){
-        $fixShortString->bindParam(':id', $row['id']);
-        $fixShortString->bindParam(':newString', $newString);
-        $fixShortString->execute();
+        $fixText->bindParam(':id', $row['id']);
+        $fixText->bindParam(':newString', $newString);
+        $fixText->execute();
         $updated++;
       }
       
@@ -101,9 +101,9 @@ class Version20130813000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
         array_values($doubleEncoded),
         html_entity_decode ($row['eText']));
       if($row['eText'] != $newString){
-        $fixShortString->bindParam(':id', $row['id']);
-        $fixShortString->bindParam(':newString', $newString);
-        $fixShortString->execute();
+        $fixText->bindParam(':id', $row['id']);
+        $fixText->bindParam(':newString', $newString);
+        $fixText->execute();
         $updated++;
       }
       
