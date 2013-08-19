@@ -68,7 +68,8 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
               <a class='undo' href='<?php print $this->controller->getActionPath() ?>'>Undo</a><?php
             } else { ?>
               <a class='edit' href='<?php print $this->controller->getActionPath(); ?>/edit/<?php print $answer->getId() ?>'>Edit</a>
-              <a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/<?php print $answer->getId() ?>'>Delete</a><?php
+              <a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/<?php print $answer->getId() ?>'>Delete</a>
+              <a class='changeSchool' href='<?php print $this->controller->getActionPath(); ?>/do/changeSchool/<?php print $answer->getId() ?>'>Change School</a><?php
             } ?>
           </p>
         </div><?php
@@ -77,20 +78,24 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
   } //end if answers
   if (!empty($currentAnswerID) or is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax()) {
     $level = $page->getJazzeePage()->getForm()->getElementByName('level')->getValue();
-    if ($level == 'pick') { ?>
-      <p>If you do not see your school on the list you can also go back and <a href='<?php print $this->controller->getActionPath() ?>'>search again</a>.</p><?php
+    if ($level == 'pick') {
+      if(!empty($currentAnswerID)) { ?>
+        <p>If you do not see your school on the list you can also go back and <a href='<?php print $this->controller->getActionPath() ?>/do/changeSchool/<?php print $answer->getId() ?>'>search again</a>.</p>
+      <?php } else { ?>
+        <p>If you do not see your school on the list you can also go back and <a href='<?php print $this->controller->getActionPath() ?>'>search again</a>.</p><?php
+      }
     }
     if (in_array($level, array('complete')) AND isset($schoolName)) { ?>
       <p>You have selected <?php print $schoolName; ?>.
       <?php if(!empty($currentAnswerID)) { ?>
-        If you wish to change schools you will need to <a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/<?php print $answer->getId() ?>'>delete this answer</a>.
+        If this is not the correct school you can <a class='changeSchool' href='<?php print $this->controller->getActionPath(); ?>/do/changeSchool/<?php print $answer->getId() ?>'>change this school</a>.
       <?php } else { ?>
         You can also go back and <a href='<?php print $this->controller->getActionPath() ?>'>choose a different school</a>.</p><?php
       }
     } if (in_array($level, array('new','complete')) AND !isset($schoolName)) { ?>
       <p>You have chosen to create a new school.  
       <?php if(!empty($currentAnswerID)) { ?>
-        If you wish to change schools you will need to <a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/<?php print $answer->getId() ?>'>delete this answer</a>.
+        If this is not the correct school you can <a class='changeSchool' href='<?php print $this->controller->getActionPath(); ?>/do/changeSchool/<?php print $answer->getId() ?>'>change this school</a>.
       <?php } else { ?>
         You can also go back and <a href='<?php print $this->controller->getActionPath() ?>'>choose a different school</a>.</p><?php
       }

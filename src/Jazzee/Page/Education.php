@@ -220,7 +220,7 @@ class Education extends Standard
       $this->_form->applyDefaultValues();
       $this->_controller->getEntityManager()->persist($answer);
       
-      $this->_controller->addMessage('success', 'Answered Saved Successfully');
+      $this->_controller->addMessage('success', 'Answer Saved Successfully');
       //flush here so the answerId will be correct when we view
       $this->_controller->getEntityManager()->flush();
     }
@@ -261,6 +261,195 @@ class Education extends Standard
       $this->_form = null;
       $this->_controller->getEntityManager()->persist($answer);
       $this->_controller->addMessage('success', 'Answer Updated Successfully');
+    }
+  }
+
+  /**
+   * Lets an administrator change the school selected
+   * We have do duplicate the do_changeSchool method because the admin page
+   * handles success and the form action path differently
+   * @param integer $answerID
+   * @param array $input
+   */
+  public function do_adminChangeSchool($answerId, array $input)
+  {
+    $this->checkIsAdmin();
+    if ($answer = $this->_applicant->findAnswerById($answerId)) {
+      $this->_form = $this->makeForm();
+      if(!array_key_exists('level', $input)){
+        $input['level'] = null;
+      }
+      switch($input['level']){
+        case 'search':
+          if ($input = $this->getForm()->processInput($input)) {
+            $choices = array();
+            $searchTerms = $input->get('schoolSearch');
+            $resultsCount = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->getSearchCount($searchTerms);
+            if($resultsCount > 50){
+              $this->_form->getElementByName('schoolSearch')->addMessage('Your search returned too many results, please try again with more detail.');
+            } else {
+              if($resultsCount == 0){
+                $this->_controller->addMessage('info', 'We were not able to find any schools that matched your search, you can search again or add a new school to our system.');
+              } else {
+                $schools = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->search($searchTerms);
+                foreach($schools as $school){
+                  $choices[$school->getId()] = $school->getName();
+                }
+              }
+              $this->pickSchoolForm($choices);
+            }
+          } else {
+            $this->_controller->setLayoutVar('status', 'error');
+            $this->_controller->addMessage('error', self::ERROR_MESSAGE);
+          }
+          break;
+        case 'pick':
+          if(!empty($input['pickSchoolId']) and $selectedSchool = $this->getSchoolById($input[ 'pickSchoolId'])){
+            $answer->setSchool($selectedSchool);
+            foreach ($answer->getChildren() as $childAnswer) {
+              $this->_controller->getEntityManager()->remove($childAnswer);
+              $answer->getChildren()->removeElement($childAnswer);
+            }
+            $this->_controller->getEntityManager()->persist($answer);
+            $this->_controller->addMessage('success', 'Answer Saved Successfully');
+            $this->_controller->setLayoutVar('status', 'success');
+          } else {
+            $this->newSchoolForm();
+            $this->_form->getElementByName('submit')->setValue('Save');
+            if($child = $answer->getChildren()->first()){
+              foreach ($child->getPage()->getElements() as $element) {
+                $element->getJazzeeElement()->setController($this->_controller);
+                $value = $element->getJazzeeElement()->formValue($child);
+                if ($value) {
+                  $this->_form->getElementByName('el' . $element->getId())->setValue($value);
+                }
+              }
+            }
+          }
+          break;
+        case 'new':
+          $this->newSchoolForm();
+          if ($filteredInput = $this->getForm()->processInput($input)) {
+            $answer->removeSchool();
+            $childPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
+            if($childAnswer = $answer->getChildren()->first()){
+              foreach ($childAnswer->getElementAnswers() as $ea) {
+                $this->_controller->getEntityManager()->remove($ea);
+                $childAnswer->getElementAnswers()->removeElement($ea);
+              }
+            } else {
+              $childAnswer = new \Jazzee\Entity\Answer;
+              $childAnswer->setPage($childPage);
+              $answer->addChild($childAnswer);
+            }
+            foreach ($childPage->getElements() as $element) {
+              foreach ($element->getJazzeeElement()->getElementAnswers($filteredInput->get('el' . $element->getId())) as $elementAnswer) {
+                $childAnswer->addElementAnswer($elementAnswer);
+              }
+            }
+            $this->_controller->getEntityManager()->persist($childAnswer);
+            $this->_controller->addMessage('success', 'Answer Saved Successfully');
+            $this->_controller->setLayoutVar('status', 'success');
+          } else {
+            $this->_controller->setLayoutVar('status', 'error');
+            $this->_controller->addMessage('error', self::ERROR_MESSAGE);
+          }
+          break;
+      }
+      //use getForm here to set teh antiCsrf token
+      return $this->getForm();
+    }
+    $this->_controller->setLayoutVar('status', 'error');
+  }
+
+  /**
+   * Change the school for an answer
+   * @param integer $answerID
+   * @param array $input
+   */
+  public function do_changeSchool($answerId, array $input)
+  {
+    if ($answer = $this->_applicant->findAnswerById($answerId)) {
+      $this->_form = $this->makeForm();
+      if(!array_key_exists('level', $input)){
+        $input['level'] = null;
+      }
+      switch($input['level']){
+        case 'search':
+          if ($input = $this->getForm()->processInput($input)) {
+            $choices = array();
+            $searchTerms = $input->get('schoolSearch');
+            $resultsCount = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->getSearchCount($searchTerms);
+            if($resultsCount > 50){
+              $this->_form->getElementByName('schoolSearch')->addMessage('Your search returned too many results, please try again with more detail.');
+            } else {
+              if($resultsCount == 0){
+                $this->_controller->addMessage('info', 'We were not able to find any schools that matched your search, you can search again or add a new school to our system.');
+              } else {
+                $schools = $this->_controller->getEntityManager()->getRepository('\Jazzee\Entity\School')->search($searchTerms);
+                foreach($schools as $school){
+                  $choices[$school->getId()] = $school->getName();
+                }
+              }
+              $this->pickSchoolForm($choices);
+            }
+          } else {
+            $this->_controller->addMessage('error', self::ERROR_MESSAGE);
+          }
+          break;
+        case 'pick':
+          if(!empty($input['pickSchoolId']) and $selectedSchool = $this->getSchoolById($input[ 'pickSchoolId'])){
+            $answer->setSchool($selectedSchool);
+            foreach ($answer->getChildren() as $childAnswer) {
+              $this->_controller->getEntityManager()->remove($childAnswer);
+              $answer->getChildren()->removeElement($childAnswer);
+            }
+            $this->_controller->getEntityManager()->persist($answer);
+            $this->_controller->addMessage('success', 'Answer Saved Successfully');
+            $this->_controller->redirectUrl($this->_controller->getActionPath());
+          } else {
+            $this->newSchoolForm();
+            $this->_form->getElementByName('submit')->setValue('Save');
+            if($child = $answer->getChildren()->first()){
+              foreach ($child->getPage()->getElements() as $element) {
+                $element->getJazzeeElement()->setController($this->_controller);
+                $value = $element->getJazzeeElement()->formValue($child);
+                if ($value) {
+                  $this->_form->getElementByName('el' . $element->getId())->setValue($value);
+                }
+              }
+            }
+          }
+          break;
+        case 'new':
+          $this->newSchoolForm();
+          if ($filteredInput = $this->getForm()->processInput($input)) {
+            $answer->removeSchool();
+            $childPage = $this->_applicationPage->getPage()->getChildByFixedId(self::PAGE_FID_NEWSCHOOL);
+            if($childAnswer = $answer->getChildren()->first()){
+              foreach ($childAnswer->getElementAnswers() as $ea) {
+                $this->_controller->getEntityManager()->remove($ea);
+                $childAnswer->getElementAnswers()->removeElement($ea);
+              }
+            } else {
+              $childAnswer = new \Jazzee\Entity\Answer;
+              $childAnswer->setPage($childPage);
+              $answer->addChild($childAnswer);
+            }
+            foreach ($childPage->getElements() as $element) {
+              foreach ($element->getJazzeeElement()->getElementAnswers($filteredInput->get('el' . $element->getId())) as $elementAnswer) {
+                $childAnswer->addElementAnswer($elementAnswer);
+              }
+            }
+            $this->_controller->getEntityManager()->persist($childAnswer);
+            $this->_controller->addMessage('success', 'Answer Saved Successfully');
+            $this->_controller->redirectUrl($this->_controller->getActionPath());
+          } else {
+            $this->_controller->addMessage('error', self::ERROR_MESSAGE);
+          }
+          break;
+      }
+      $this->_form->setAction($this->_controller->getActionPath() . "/do/changeSchool/{$answerId}");
     }
   }
 
