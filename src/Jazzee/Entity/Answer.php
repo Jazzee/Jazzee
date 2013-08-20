@@ -525,6 +525,14 @@ class Answer
   }
   
   /**
+   * Remove the school
+   */
+  public function removeSchool()
+  {
+    $this->school = null;
+  }
+  
+  /**
    * Get the school
    * 
    * @return \Jazzee\Entity\School

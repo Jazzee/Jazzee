@@ -89,7 +89,8 @@ $page->getJazzeePage()->setController($this->controller);
               if ($this->controller->checkIsAllowed('applicants_single', 'editAnswer')) { ?>
                 <td><?php
                   if ($this->controller->checkIsAllowed('applicants_single', 'editAnswer')) { ?>
-                    <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId()); ?>' class='actionForm'>Edit</a><br /><?php
+                    <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/editAnswer/' . $answer->getId()); ?>' class='actionForm'>Edit</a><br />
+                    <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/do/adminChangeSchool/' . $answer->getId()); ?>' class='actionForm'>Change School</a><br /><?php
                   }
                   if ($this->controller->checkIsAllowed('applicants_single', 'deleteAnswer')) { ?>
                     <a href='<?php print $this->path('applicants/single/' . $answer->getApplicant()->getId() . '/deleteAnswer/' . $answer->getId()); ?>' class='action confirmDelete'>Delete</a><br /><?php
