@@ -78,7 +78,7 @@ class Textarea extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      return html_entity_decode($elementsAnswers[0]->getEText());
+      return \Foundation\Form\Filter\Safe::unFilter($elementsAnswers[0]->getEText());
     }
 
     return null;
@@ -88,7 +88,7 @@ class Textarea extends AbstractElement
   {
     $elementsAnswers = $answer->getElementAnswersForElement($this->_element);
     if (isset($elementsAnswers[0])) {
-      return html_entity_decode($elementsAnswers[0]->getEText());
+      return \Foundation\Form\Filter\Safe::unFilter($elementsAnswers[0]->getEText());
     }
 
     return null;
@@ -125,7 +125,7 @@ class Textarea extends AbstractElement
       if(array_key_exists($this->_element->getId(), $answer['elements'])){
         $arr = $this->formatApplicantArray($answer['elements'][$this->_element->getId()]);
         foreach($arr['values'] as $arr2){
-          $values[] = html_entity_decode($arr2['value']);
+          $values[] = \Foundation\Form\Filter\Safe::unFilter($arr2['value']);
         }
       }
     }
