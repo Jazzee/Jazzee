@@ -17,7 +17,10 @@ class USSocialSecurityNumber extends EncryptedTextInput
   public function addToField(\Foundation\Form\Field $field)
   {
     $element = parent::addToField($field);
-    $validator = new \Foundation\Form\Validator\Regex($element, '/^(?!000)([0-6]\d{2}|7([0-6]\d|7[012]))([ -]?)(?!00)\d\d([ -]?)(?!0000)\d{4}$/');
+    $validator = new \Foundation\Form\Validator\Regex(
+        $element,
+        '/^(?!000)(?!666)(?!9)[0-9]{3}[ -]?(?!00)[0-9]{2}[ -]?(?!0000)[0-9]{4}$/'
+    );
     $validator->setErrorMessage('This is not a valid US Social Secutiry Number');
     $element->addValidator($validator);
     //check if every digit is the same
