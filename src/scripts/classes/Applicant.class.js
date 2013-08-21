@@ -540,6 +540,9 @@ Applicant.prototype.parseLonganswertext = function(obj){
     var td = $(this);
     var string = td.text();
     if(string.length > 125){
+      //use the HTML representation for the actual conversion otherwise special
+      //html entites cause problems.
+      var string = td.html();
       var shortString = string.substr(0, 100);
       td.data('fullText', string);
       td.addClass('truncated-text');

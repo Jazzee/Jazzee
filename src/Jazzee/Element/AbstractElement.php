@@ -184,7 +184,7 @@ abstract class AbstractElement implements \Jazzee\Interfaces\Element, \Jazzee\In
   protected function arrayDisplayValue(array $values)
   {
     if (isset($values[0])) {
-      return htmlentities($values[0]['value'], ENT_COMPAT, 'utf-8');
+      return $values[0]['value'];
     }
 
     return '';
