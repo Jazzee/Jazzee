@@ -174,7 +174,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         $applicant['suffix'],
         $applicant['email'],
         $applicant['isLocked']? 'yes':'no',
-        $applicant['lastLogin']->format('c'),
+        !is_null($applicant['lastLogin'])?$applicant['lastLogin']->format('c'):'never',
         $applicant['updatedAt']->format('c'),
         $applicant['createdAt']->format('c'),
         $applicant['decision'] ? $applicant['decision']['status'] : 'none',

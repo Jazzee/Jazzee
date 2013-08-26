@@ -958,7 +958,7 @@ class Applicant
     $account->appendChild($dom->createElement('email', $this->getEmail()));
     $account->appendChild($dom->createElement('isLocked', $this->isLocked() ? 'yes' : 'no'));
     $account->appendChild($dom->createElement('isDeactivated', $this->isDeactivated() ? 'yes' : 'no'));
-    $account->appendChild($dom->createElement('lastLogin', $this->getLastLogin()->format('c')));
+    $account->appendChild($dom->createElement('lastLogin', $this->getLastLogin()?$this->getLastLogin()->format('c'):''));
     $account->appendChild($dom->createElement('updatedAt', $this->getUpdatedAt()->format('c')));
     $account->appendChild($dom->createElement('createdAt', $this->getCreatedAt()->format('c')));
     $account->appendChild($dom->createElement('percentComplete', $this->getPercentComplete()));
