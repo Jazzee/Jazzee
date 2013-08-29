@@ -26,6 +26,7 @@ class GREScoreRepository extends \Doctrine\ORM\EntityRepository
 
     $query = $this->_em->createQuery("SELECT DISTINCT(CONCAT(CONCAT(g.testYear,'-'),g.cycleNumber) as Cycle FROM Jazzee\Entity\GREScore g ORDER BY Cycle DESC");
 
+    $return['cycles'] = array();
     foreach ($query->getResult() as $arr) {
       $return['cycles'][] = $arr['Cycle'];
     }
