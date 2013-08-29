@@ -284,7 +284,7 @@ abstract class PageBuilder extends AdminController
     } else {
       $page->optional();
     }
-    if ($data->answerStatusDisplay) {
+    if ($page instanceof \Jazzee\Interfaces\StatusPage and  $data->answerStatusDisplay) {
       $page->showAnswerStatus();
     } else {
       $page->hideAnswerStatus();
