@@ -116,3 +116,45 @@ JazzeePageEducation.prototype.gridData = function(data, type, full){
   //forsorting and filtering return the raw data
   return values.join(' ');
 };
+
+/**
+ * Display the form for setting up answer status
+ * @returns {jQuery}
+ */
+JazzeePageEducation.prototype.displayAnswerStatusForm = function(){
+  var pageClass = this;
+
+  var obj = new FormObject();
+  var field = obj.newField({name: 'legend', value: 'Answer Status'});
+
+  var element = field.newElement('TextInput', 'title');
+  element.label = 'Title';
+  element.required = true;
+  element.value = pageClass.getVariable('answerStatusTitle');
+  var element = field.newElement('Textarea', 'text');
+  element.label = 'Text';
+  element.required = true;
+  element.value = pageClass.getVariable('answerStatusText');
+  element.instructions = 'The following will be replaced with the applicant input on this answer:';
+  
+  element.instructions += '<br />_SCHOOL_NAME_: School Name';
+  element.instructions += '<br />_SCHOOL_LOCATION_: Location';
+  for(var i in pageClass.elements){
+    var el = pageClass.elements[i];
+    var text = el.title.replace(/\s+/g, '_');
+    text = '_' + text.toUpperCase() + '_';
+    element.instructions += '<br />' + text + ': ' + el.title;
+  }
+
+  var form = new Form();
+  var formObject = form.create(obj);
+  $('form',formObject).append($('<button type="submit" name="submit">').html('Apply'));
+  var dialog = pageClass.displayForm(obj);
+  $('form', dialog).unbind().bind('submit',function(e){
+    pageClass.setVariable('answerStatusTitle',  $('input[name=title]', this).val());
+    pageClass.setVariable('answerStatusText', $('textarea[name=text]', this).val());
+    dialog.dialog("destroy").remove();
+    return false;
+  });//end submit
+  dialog.dialog('open');
+};

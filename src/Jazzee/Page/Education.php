@@ -555,8 +555,6 @@ class Education extends Standard
       case 'partialSchoolList':
         $value = preg_replace("/[^0-9,]+/", "", $value);
         break;
-      default:
-        throw new \Jazzee\Exception($name . ' is not a valid variable on this page.');
     }
     parent::setVar($name, $value);
   }
@@ -892,6 +890,11 @@ class Education extends Standard
   public static function applicantsSingleElement()
   {
     return 'Education-applicants_single';
+  }
+
+  public static function applyStatusElement()
+  {
+    return 'Education-apply_status';
   }
 
 }

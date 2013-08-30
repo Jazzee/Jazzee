@@ -270,3 +270,15 @@ JazzeePageBranching.prototype.gridData = function(data, type, full){
   //forsorting and filtering return the raw data
   return values.join(' ');
 };
+
+/**
+ * Ensure we don't set answerStatusDisplay
+ * Since this page type descends from StandardPage it is allowed to set
+ * this variable because it inherits the interface
+ * @returns {Object}
+ */
+JazzeePageBranching.prototype.getDataObject = function(){
+  var obj = JazzeePage.prototype.getDataObject.call(this);
+  obj.answerStatusDisplay = 0;
+  return obj;
+};
