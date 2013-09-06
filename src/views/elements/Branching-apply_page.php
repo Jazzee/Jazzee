@@ -67,8 +67,17 @@ if ($page->getJazzeePage()->getStatus() == \Jazzee\Interfaces\Page::SKIPPED) { ?
     </div><?php
   } //end if answers
   if (!empty($currentAnswerID) or is_null($page->getMax()) or count($page->getJazzeePage()->getAnswers()) < $page->getMax()) {
-    if ($page->getJazzeePage()->getForm()->getElementByName('level')->getValue() > 1) { ?>
-      <p><a href='<?php print $this->controller->getActionPath() ?>'>Choose a different option</a></p><?php
+    if ($page->getJazzeePage()->getForm()->getElementByName('level')->getValue() > 1) { 
+      if(isset($answer)){
+?>    
+	 <p><a class='delete' href='<?php print $this->controller->getActionPath(); ?>/delete/<?php print $answer->getId() ?>'>Choose a different option</a></p>
+<?php	 
+          }else{
+?>
+      <p><a href='<?php print $this->controller->getActionPath() ?>'>Choose a different option</a></p>
+
+<?php
+          }
     } ?>
     <div id='leadingText'><?php print $page->getLeadingText() ?></div>
     <?php $this->renderElement('form', array('form' => $page->getJazzeePage()->getForm())); ?>
