@@ -19,7 +19,7 @@ $this->controller->setLayoutVar('layoutContentTop', $layoutContentTop);
 <?php
 if ($applicant->isLocked()) {
   foreach ($pages as $page) {
-    if ($page instanceof \Jazzee\Interfaces\StatusPage and $page->answerStatusDisplay()) {
+    if ($page->answerStatusDisplay() and $page->getJazzeePage() instanceof Jazzee\Interfaces\StatusPage) {
       $class = $page->getPage()->getType()->getClass();
       $this->renderElement($class::applyStatusElement(), array('page' => $page));
     }

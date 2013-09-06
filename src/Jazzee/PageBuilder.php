@@ -284,10 +284,16 @@ abstract class PageBuilder extends AdminController
     } else {
       $page->optional();
     }
-    if ($page instanceof \Jazzee\Interfaces\StatusPage and  $data->answerStatusDisplay) {
-      $page->showAnswerStatus();
-    } else {
-      $page->hideAnswerStatus();
+    $page->hideAnswerStatus();
+    if ($data->answerStatusDisplay){
+        if ($page instanceof \Jazzee\Entity\ApplicationPage) {
+            $interfaces = class_implements($page->getPage()->getType()->getClass());
+        } else {
+            $interfaces = class_implements($page->getType()->getClass());
+        }
+        if(in_array('Jazzee\Interfaces\StatusPage', $interfaces)) {
+            $page->showAnswerStatus();
+        }
     }
     $page->setInstructions(empty($data->instructions) ? null : $htmlPurifier->purify($data->instructions));
     $page->setLeadingText(empty($data->leadingText) ? null : $htmlPurifier->purify($data->leadingText));
