@@ -34,6 +34,7 @@ Grid.prototype.init = function(){
   }
 
   $(this.target).append(table);
+  table.data('ApplicantGrid', this);
   var grid = table.dataTable( {
     sScrollY: "500",
     sScrollX: "95%",
@@ -96,7 +97,11 @@ Grid.prototype.getColumns = function(){
     sWidth: '8px',
     mData: 'id',
     mRender: function( data, type, full ) {
-      return '<a class="applicantlink" href="' + data + '">' + "<img src='resource/foundation/media/icons/user_go.png'>" + '</a>';
+      return '<a class="applicantlink" href="' + 
+                self.services.getControllerPath('applicants_single') + '/' + 
+                data + 
+                '">' + "<img src='resource/foundation/media/icons/user_go.png'>" + 
+              '</a>';
     }
   });
   columns.push({
@@ -222,6 +227,18 @@ Grid.prototype.loadapps = function(applicantIds, grid){
   }
 };
 
+Grid.prototype.updateSingleApplicant = function(applicantId, grid, row){
+  var self = this;
+  $('td', row).css('background-color', 'grey');
+  $.post(self.controllerPath + '/getApplicants',{applicantIds: [applicantId], display: self.display.getObj()}, 
+    function(json){
+      var applicant = new ApplicantData(json.data.result.applicants.splice(0, 1)[0]);
+      //for some reason we ahve to delete and add the row fnUpdate wouldn't work
+      grid.fnDeleteRow(grid.fnGetPosition(row));
+      grid.fnAddData(applicant);
+    });
+};
+
 /**
  * Format date objects
  */
@@ -302,21 +319,35 @@ Grid.processDraw = function(){
  */
 Grid.bindApplicantLinks = function(){
   $('a.applicantlink').unbind().bind('click', function(){
-    var div = $('<div>');
-    div.css("overflow-y", "auto");
-    div.dialog({
-      modal: true,
-      position: 'center',
-      width: '90%',
-      height: ($(window).height()*0.9),
-      close: function() {
-        div.dialog("destroy").remove();
-      }
+    var link = this;
+    
+    var iFrame = $('<iframe id="singleApplicantFrame" scrolling="yes" src="' + $(this).attr('href') + '"/>');
+    iFrame.dialog({
+        modal: true,
+        position: 'center',
+        width: '90%',
+        height: ($(window).height()*0.9),
+        autoOpen: false,
+        close: function() {
+          $(this).dialog("destroy").remove();
+          var grid = $(link).closest('table').dataTable();
+          var applicantGridObject = $(link).closest('table').data('ApplicantGrid');
+          var row = $(link).closest('tr').get(0);
+          var applicant = grid.fnGetData(row);
+          applicantGridObject.updateSingleApplicant(applicant.id, grid, row);
+        },
+        open: function(event, ui){
+          iFrame.css('width', '95%');
+          iFrame.contents().find('#hd').css("display","none");
+          iFrame.contents().find('#topbar').css("display","none");
+          var name = iFrame.contents().find('#bio h1').first().text().replace('(edit)', "").trim();
+          iFrame.dialog('option', 'title', name);
+        }
     });
-//    $.get($(this).attr('href'),function(html){
-//      div.html(html);
-//    });
-    div.html('Applicant data is not yet available.');
+    iFrame.bind('load', function(){
+       $(this).dialog('open'); 
+    });
+    
     return false;
   });
 };
