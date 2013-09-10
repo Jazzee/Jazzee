@@ -140,4 +140,14 @@ class GenericWaiver extends \Jazzee\PaymentType\AbstractPaymentType{
     $payment->setVar('refundedReason', $input->get('refundedReason'));
     return true;
   }
+
+    public function getPaymentNotes(\Jazzee\Entity\Payment $payment)
+    {
+        return array();
+    }
+
+    public function getPaymentNotesFromArray(array $payment)
+    {
+        return array();
+    }
 }
