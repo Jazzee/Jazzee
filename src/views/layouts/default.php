@@ -30,6 +30,9 @@ print '<?xml version="1.0" encoding="UTF-8"?>'
     <script type='text/javascript'>
       Services.prototype.absoluteBasePath = '<?php print $this->path(''); ?>';
     </script>
+    <?php
+        $this->renderElement('google_analytics', array('controller' => $this->controller));
+    ?>
   </head>
   <body>
     <div id='doc3' class='yui-t2'>
