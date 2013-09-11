@@ -467,6 +467,24 @@ class JazzeeConfiguration
    */
   protected $_virusScanUploads;
 
+  /**
+   *  @var boolean
+   * Are google analytics enabled
+   */
+  protected $_enableGoogleAnalytics;
+
+  /**
+   *  @var string
+   * Google Analytics site ID
+   */
+  protected $_googleAnalyticsWebPropertyId;
+
+  /**
+   *  @var string
+   * Google Analytics site ID
+   */
+  protected $_googleAnalyticsSiteDimension;
+
     /**
      * Construct
      * Load data from the ini file
@@ -530,7 +548,10 @@ class JazzeeConfiguration
       'ldapLastNameAttribute' => 'sn',
       'ldapEmailAddressAttribute' => 'mail',
       'allowScramble' => false,
-      'virusScanUploads' => true
+      'virusScanUploads' => true,
+      'enableGoogleAnalytics' => false,
+      'googleAnalyticsWebPropertyId' => '',
+      'googleAnalyticsSiteDimension' => ''
     );
     foreach ($defaults as $name => $value) {
       $method = 'set' . ucfirst($name);
@@ -1734,6 +1755,70 @@ class JazzeeConfiguration
   public function setVirusScanUploads($virusScanUploads)
   {
     $this->_virusScanUploads = (bool)$virusScanUploads;
+  }
+  
+  /**
+   * Get enableGoogleAnalytics
+   * @return boolean
+   */
+  public function getEnableGoogleAnalytics()
+  {
+      if(empty($this->_googleAnalyticsWebPropertyId)){
+          return false;
+      }
+      
+      return $this->_enableGoogleAnalytics;
+  }
+  
+  /**
+   * Set enable google analytics
+   * @param boolean $enableGa
+   */
+  public function setEnableGoogleAnalytics($enableGa)
+  {
+      $this->_enableGoogleAnalytics = (bool)$enableGa;
+  }
+  
+  /**
+   * Set google analytics web property id
+   * @param boolean $webPropertyId
+   */
+  public function setGoogleAnalyticsWebPropertyId($webPropertyId)
+  {
+      if(!empty($webPropertyId) and !preg_match('/^UA-[\d]+-[\d]+$/', $webPropertyId)){
+          throw new \Jazzee\Exception("{$webPropertyId} does not appear to be a valid Google Analytics Web Property Id");
+      }
+      $this->_googleAnalyticsWebPropertyId = $webPropertyId;
+  }
+  
+  /**
+   * Get google analytics web property id
+   * @return string
+   */
+  public function getGoogleAnalyticsWebPropertyId()
+  {
+      return $this->_googleAnalyticsWebPropertyId;
+  }
+  
+  /**
+   * Set google analytics Site Dimension
+   * @param boolean $dimension
+   */
+  public function setGoogleAnalyticsSiteDimension($dimension)
+  {
+      if(!empty($dimension) and !preg_match('/^dimension\d{1,2}$/', $dimension)){
+          throw new \Jazzee\Exception("{$dimension} does not appear to be a valid Google Analytics Dimension");
+      }
+      $this->_googleAnalyticsSiteDimension = $dimension;
+  }
+  
+  /**
+   * Get google analytics web property id
+   * @return string
+   */
+  public function getGoogleAnalyticsSiteDimension()
+  {
+      return $this->_googleAnalyticsSiteDimension;
   }
 
   /**

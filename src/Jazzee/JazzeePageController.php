@@ -473,4 +473,26 @@ class JazzeePageController extends \Foundation\VC\Controller
   public function getServerPath(){
     return $this->_serverPath;
   }
+  
+  /**
+   * Get Google Analytics dimension
+   * @return array
+   */
+  public function getGoogleAnalyticsDeminsion($name)
+  {
+      if($name == 'site'){
+          if($this instanceof \Jazzee\ApplyController or 
+              $this instanceof \ApplyWelcomeController){
+              return 'applicant';
+          }
+          if($this instanceof \Jazzee\AdminController){
+              return 'admin';
+          }
+          if($this instanceof \LorController){
+              return 'lor';
+          }
+      }
+      
+      return '';
+  }
 }
