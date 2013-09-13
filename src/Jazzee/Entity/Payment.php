@@ -28,7 +28,7 @@ class Payment
   private $answer;
 
   /**
-   * @ManyToOne(targetEntity="PaymentType",inversedBy="payment")
+   * @ManyToOne(targetEntity="PaymentType",inversedBy="payments")
    */
   private $type;
 
