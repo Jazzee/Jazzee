@@ -225,13 +225,13 @@ class Display implements \Jazzee\Interfaces\Display
   /**
    * List elements as an array
    *
-   * @return array \Jazzee\Display\Element
+   * @return array \Jazzee\Interfaces\DisplayElement
    */
   public function listElements()
   {
     $elements = array();
     foreach($this->elements as $displayElement){
-      $elements[] = new \Jazzee\Display\Element($displayElement->getType(), $displayElement->getTitle(), $displayElement->getWeight(), $displayElement->getName(), $displayElement->getPage()?$displayElement->getPage()->getId():null);
+      $elements[] = $displayElement->getDisplayElementObject();
     }
 
     return $elements;
@@ -266,7 +266,7 @@ class Display implements \Jazzee\Interfaces\Display
     return in_array($element->getId(), $elementIds);
   }
 
-  public function hasDisplayElement(\Jazzee\Display\Element $displayElement)
+  public function hasDisplayElement(\Jazzee\Interfaces\DisplayElement $displayElement)
   {
     foreach($this->listElements() as $element){
       if($displayElement->sameAs($element)){

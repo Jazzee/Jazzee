@@ -50,6 +50,16 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
     }
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
+    $element = $field->newElement('RadioList', 'display');
+    $element->setLabel('Display');
+
+    $displays = array();
+    foreach ($this->listDisplays() as $key => $display) {
+      $displays[$key] = $display;
+      $element->newItem($key, $display['name']);
+    }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+
     $form->newButton('submit', 'Download Applicants');
     if ($input = $form->processInput($this->post)) {
       $filters = $input->get('filters');
@@ -103,7 +113,7 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
         }
       } //end foreach applicants
       //use a full applicant display where display is needed
-      $display= new \Jazzee\Display\FullApplication($this->_application);
+      $display= $this->getDisplay($displays[$input->get('display')]);
       unset($ids);
       switch ($input->get('type')) {
         case 'xls':
@@ -129,73 +139,79 @@ class ApplicantsDownloadController extends \Jazzee\AdminController
    */
   protected function makeXls(array $applicants, \Jazzee\Interfaces\Display $display)
   {
-    $applicationPages = array();
     $pageAnswerCount = $this->_em->getRepository('Jazzee\Entity\Application')->getPageAnswerCounts($this->_application);
 
     $rows = array();
-    $header = array(
-      'ID',
-      'External ID',
-      'First Name',
-      'Middle Name',
-      'Last Name',
-      'Suffix',
-      'Email',
-      'Locked',
-      'Last Login',
-      'Last Update',
-      'Account Created',
-      'Status',
-      'Progress',
-      'Tags'
-    );
-    $applicationPages = array();
-    foreach ($this->getApplicationPages() as $applicationPage) {
-      if($applicationPage->getJazzeePage() instanceof \Jazzee\Interfaces\CsvPage){
-        $applicationPages[] = $applicationPage;
-        for ($i = 1; $i <= $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
-          foreach ($applicationPage->getJazzeePage()->getCsvHeaders() as $title) {
-            $header[] = $applicationPage->getTitle() . ' ' . $i . ' ' . $title;
-          }
+    $header = array();
+    foreach($display->listElements() as $displayElement){
+        if($displayElement->getType() == 'applicant'){
+            $header[] = $displayElement->getTitle();
+        } else {
+            $applicationPage = $this->_application->getApplicationPageByChildPageId($displayElement->getPageId());
+            for ($i = 1; $i <= $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
+              $header[] = $applicationPage->getTitle() . ' ' . $i . ' ' . $displayElement->getTitle();
+            }
         }
-      }
     }
     $fileName = tempnam($this->_config->getVarPath() . '/tmp/', 'applicants_download');
     $handle = fopen($fileName, 'w+');
     $this->writeXlsFile($header, $handle);
     foreach ($applicants as $id) {
-      $applicant = $this->_application->formatApplicantArray($this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display));
-      $arr = array(
-        $applicant['id'],
-        $applicant['externalId'],
-        $applicant['firstName'],
-        $applicant['middleName'],
-        $applicant['lastName'],
-        $applicant['suffix'],
-        $applicant['email'],
-        $applicant['isLocked']? 'yes':'no',
-        !is_null($applicant['lastLogin'])?$applicant['lastLogin']->format('c'):'never',
-        $applicant['updatedAt']->format('c'),
-        $applicant['createdAt']->format('c'),
-        $applicant['decision'] ? $applicant['decision']['status'] : 'none',
-        $applicant['percentComplete'] * 100 . '%'
-      );
-      $tags = array();
-      foreach ($applicant['tags'] as $tag) {
-        $tags[] = $tag['title'];
-      }
-      $arr[] = implode(' ', $tags);
-      $pages = array();
-      foreach($applicationPages as $applicationPage){
-        $pages[$applicationPage->getPage()->getId()] = array();
-      }
-      foreach($applicant['pages'] as $page){
-        $pages[$page['id']] = $page;
-      }
-      foreach ($applicationPages as $applicationPage) {
-        for ($i = 0; $i < $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
-          $arr = array_merge($arr, $applicationPage->getJazzeePage()->getCsvAnswer($pages[$applicationPage->getPage()->getId()], $i));
+      $applicant = $this->_application->formatApplicantDisplayArray($this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display));
+      $arr = array();
+      foreach($display->listElements() as $displayElement){
+        if($displayElement->getType() == 'applicant'){
+            switch($displayElement->getName()){
+                case 'isLocked':
+                    $arr['isLocked'] = $applicant['isLocked']? 'yes':'no';
+                    break;
+                case 'hasPaid':
+                    $arr['hasPaid'] = $applicant['hasPaid']? 'yes':'no';
+                    break;
+                case 'lastLogin':
+                    $arr['lastLogin'] = !is_null($applicant['lastLogin'])?$applicant['lastLogin']->format('c'):'never';
+                    break;
+                case 'updatedAt':
+                case 'createdAt':
+                    $arr[$displayElement->getName()] = $applicant['updatedAt']->format('c');
+                    break;
+                case 'decision':
+                    $arr['decision'] = $applicant['decision']? $applicant['decision']['status']:'none';
+                    break;
+                case 'percentComplete':
+                    $arr['percentComplete'] = $applicant['percentComplete'] * 100 . '%';
+                    break;
+                case 'attachments':
+                    $values = array();
+                    foreach($applicant['attachments'] as $attachment){
+                        $values[] = $attachment['displayValue'];
+                    }
+                    $arr[$displayElement->getName()] = implode(',', $values);
+                    break;
+                default:
+                    $arr[$displayElement->getName()] = $applicant[$displayElement->getName()];
+            }
+            
+        } else {
+            $applicationPage = $this->_application->getApplicationPageByChildPageId($displayElement->getPageId());
+            $pageArr = array();
+            foreach($applicant['pages'] as $page){
+                if($page['id'] == $applicationPage->getPage()->getId()){
+                    $pageArr = $page;
+                }
+            }
+
+            for ($i = 0; $i < $pageAnswerCount[$applicationPage->getPage()->getId()]; $i++) {
+              $value = '';
+              if (isset($pageArr['answers']) and array_key_exists($i, $pageArr['answers'])) {
+                $value = $applicationPage->getJazzeePage()
+                  ->getDisplayElementValueFromArray($pageArr['answers'][$i], $displayElement);
+              }
+              $arr[$displayElement->getType().$displayElement->getName().$displayElement->getPageId().$i] = $value;
+            }
+            
         }
+        
       }
       $this->writeXlsFile($arr, $handle);
     }

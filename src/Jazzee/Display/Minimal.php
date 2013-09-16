@@ -97,7 +97,7 @@ class Minimal implements \Jazzee\Interfaces\Display
     return false;
   }
 
-  public function hasDisplayElement(Element $displayElement)
+  public function hasDisplayElement(\Jazzee\Interfaces\DisplayElement $displayElement)
   {
     foreach($this->listElements() as $element){
       if($displayElement->sameAs($element)){

@@ -134,7 +134,7 @@ class ApplicationPage
   /**
    * Get page
    *
-   * @return Page
+   * @return \Jazzee\Entity\Page
    */
   public function getPage()
   {

@@ -8,37 +8,37 @@ namespace Jazzee\Display;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-class Element
+class Element implements \Jazzee\Interfaces\DisplayElement
 { 
   /**
    *
    * @var string
    */
-  public $type;
+  protected $type;
   
   /**
    *
    * @var string
    */
-  public $title;
+  protected $title;
   
   /**
    *
    * @var integer
    */
-  public $weight;
+  protected $weight;
   
   /**
    *
    * @var string
    */
-  public $name;
+  protected $name;
   
   /**
    *
    * @var string
    */
-  public $pageId;
+  protected $pageId;
   
   public function __construct($type, $title, $weight, $name, $pageId)
   {
@@ -49,16 +49,41 @@ class Element
     $this->title = $title;
     $this->weight = $weight;
     $this->name = $name;
-    $this->pageId = $type == 'page'?$pageId:null;
+    $this->pageId = $pageId;
   }
   
   /**
    * Check if this Element is the same as another one
-   * @param \Jazzee\Display\Element $element
+   * @param \Jazzee\Interfaces\DisplayElement $element
    * 
    * @return type
    */
-  public function sameAs(Element $element){
-    return ($this->type == $element->type and $this->name == $element->name and ((is_null($this->pageId) and is_null($element->pageId)) or $this->pageId == $element->pageId));
+  public function sameAs(\Jazzee\Interfaces\DisplayElement $element){
+    return ($this->type == $element->getType() and $this->name == $element->getName() and ((is_null($this->pageId) and is_null($element->getPageId())) or $this->pageId == $element->getPageId()));
   }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    public function getPageId()
+    {
+        return $this->pageId;
+    }
 }

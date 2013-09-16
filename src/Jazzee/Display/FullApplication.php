@@ -58,11 +58,11 @@ class FullApplication implements \Jazzee\Interfaces\Display
       if(is_subclass_of($applicationPage->getPage()->getType()->getClass(), 'Jazzee\Interfaces\DataPage')){
         foreach($applicationPage->getJazzeePage()->listDisplayElements() as $displayElement){
           $this->_elements[] = $displayElement;
-          if($displayElement->type == 'page'){
-            $this->_pageIds[] = $displayElement->pageId;
-          } else if ($displayElement->type == 'element'){
-            $this->_elementIds[] = $displayElement->name;
-            $this->_pageIds[] = $application->getElementById($displayElement->name)->getPage()->getId();
+          if($displayElement->getType() == 'page'){
+            $this->_pageIds[] = $displayElement->getPageId();
+          } else if ($displayElement->getType() == 'element'){
+            $this->_elementIds[] = $displayElement->getName();
+            $this->_pageIds[] = $application->getElementById($displayElement->getName())->getPage()->getId();
           }
         }
       }
@@ -131,7 +131,7 @@ class FullApplication implements \Jazzee\Interfaces\Display
     return in_array($element->getId(), $this->_elementIds);
   }
 
-  public function hasDisplayElement(Element $displayElement)
+  public function hasDisplayElement(\Jazzee\Interfaces\DisplayElement $displayElement)
   {
     foreach($this->listElements() as $element){
       if($displayElement->sameAs($element)){

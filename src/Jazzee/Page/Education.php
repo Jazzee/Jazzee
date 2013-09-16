@@ -679,52 +679,6 @@ class Education extends Standard
   }
 
   /**
-   * Education pages get special CSV headers
-   * @return array
-   */
-  public function getCsvHeaders()
-  {
-    $headers = parent::getCsvHeaders();
-    $headers[] = 'School Name';
-    $headers[] = 'School Type';
-    $headers[] = 'School Location';
-
-    return $headers;
-  }
-
-  /**
-   * Education extract the school
-   * @param array $pageArr
-   * @param int $position
-   * @return array
-   */
-  public function getCsvAnswer(array $pageArr, $position)
-  {
-    $arr = parent::getCsvAnswer($pageArr, $position);
-    if (isset($pageArr['answers']) AND array_key_exists($position, $pageArr['answers'])) {
-      $locationSummary = '';
-      $schoolName = '';
-      $schoolType = '';
-      foreach($pageArr['answers'][$position]['elements'] as $element){
-        if($element['id'] == 'locationSummary'){
-          $locationSummary = $element['displayValue'];
-        }
-        if($element['id'] == 'schoolName'){
-          $schoolName = $element['displayValue'];
-        }
-        if($element['id'] == 'schoolType'){
-          $schoolType = $element['displayValue'];
-        }
-      }
-      $arr[] = $schoolName;
-      $arr[] = $schoolType;
-      $arr[] = $locationSummary;
-    }
-
-    return $arr;
-  }
-
-  /**
    * Convert an answer to an xml element and add school information
    * Since school data is stored either in the School entity or else in a child answer
    * we combine these two
