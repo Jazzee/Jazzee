@@ -26,7 +26,16 @@ interface DataPage
   /**
    * List the elements available for creating a display
    * 
-   * @return array \Jazzee\Display\Element
+   * @return array \Jazzee\Interfaces\DisplayElement
    */
   public function listDisplayElements();
+  
+  /**
+   * Get the value for an answer array for a display element
+   * 
+   * @param array $answer
+   * @param \Jazzee\Interfaces\DisplayElement $displayElement
+   * @retrun string
+   */
+  public function getDisplayElementValueFromArray(array $answer, \Jazzee\Interfaces\DisplayElement $displayElement);
 }

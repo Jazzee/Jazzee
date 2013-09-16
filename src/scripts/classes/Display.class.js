@@ -63,6 +63,13 @@ Display.prototype.getId = function(){
 };
 
 /**
+ * Get the display name
+ */
+Display.prototype.getClass = function(){
+  return this.display.class;
+};
+
+/**
  * Check if a page should be displayed
  */
 Display.prototype.displayPage = function(pageId){

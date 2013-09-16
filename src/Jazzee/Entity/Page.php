@@ -458,6 +458,25 @@ class Page
 
     return false;
   }
+  
+  /**
+   * Recursivly check children for a page ID
+   * @param integer $pageId
+   * @return boolean
+   */
+  public function hasPageId($pageId)
+  {
+    if($this->id == $pageId){
+        return true;
+    }
+    foreach($this->children as $child){
+        if($child->hasPageId($pageId)){
+            return true;
+        }
+    }
+
+    return false;
+  }
 
   /**
    * Get a child by fixedId

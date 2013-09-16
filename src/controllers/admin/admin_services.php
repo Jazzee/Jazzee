@@ -54,8 +54,17 @@ class AdminServicesController extends \Jazzee\AdminController
             'name' => $userMaximumDisplay->getName(),
             'pageIds' => $userMaximumDisplay->getPageIds(),
             'elementIds' => $userMaximumDisplay->getElementIds(),
-            'elements' => $userMaximumDisplay->listElements()
+            'elements' => array()
           );
+          foreach($userMaximumDisplay->listElements() as $displayElement){
+            $result['elements'][] = array(
+              'type' => $displayElement->getType(),
+              'title' => $displayElement->getTitle(),
+              'weight' => $displayElement->getWeight(),
+              'name' => $displayElement->getName(),
+              'pageId' => $displayElement->getPageId()
+            );
+          }
           break;
         case 'currentApplication':
           if($this->_application){

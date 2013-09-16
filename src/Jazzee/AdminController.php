@@ -405,30 +405,50 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
       $intersection = new \Jazzee\Display\Intersection();
       $intersection->addDisplay($userDisplay);
       $intersection->addDisplay($userMaximumDisplay);
-      $displays[] = array(
+      $arr = array(
         'type' => 'user',
         'id'  => $userDisplay->getId(),
         'name' => $userDisplay->getName(),
         'pageIds' => $intersection->getPageIds(),
         'elementIds' => $intersection->getElementIds(),
-        'elements' => $intersection->listElements()
+        'elements' => array()
       );
+      foreach($intersection->listElements() as $displayElement){
+        $arr['elements'][] = array(
+            'type' => $displayElement->getType(),
+            'title' => $displayElement->getTitle(),
+            'weight' => $displayElement->getWeight(),
+            'name' => $displayElement->getName(),
+            'pageId' => $displayElement->getPageId()
+        );
+      }
+      $displays[] = $arr;
     }
-    $systemDisplays = array('\Jazzee\Display\Minimal');
+    $systemDisplays = array('\Jazzee\Display\Minimal', '\Jazzee\Display\FullApplication');
     foreach($systemDisplays as $class){
       $display = new $class($this->_application);
       $intersection = new \Jazzee\Display\Intersection();
       $intersection->addDisplay($display);
       $intersection->addDisplay($userMaximumDisplay);
-      $displays[] = array(
+      $arr = array(
         'id' => $display->getId(),
         'type' => 'system',
         'class'  => get_class($display),
         'name'  =>  $display->getName(),
         'pageIds' => $intersection->getPageIds(),
         'elementIds' => $intersection->getElementIds(),
-        'elements' => $intersection->listElements()
+        'elements' => array()
       );
+      foreach($intersection->listElements() as $displayElement){
+        $arr['elements'][] = array(
+            'type' => $displayElement->getType(),
+            'title' => $displayElement->getTitle(),
+            'weight' => $displayElement->getWeight(),
+            'name' => $displayElement->getName(),
+            'pageId' => $displayElement->getPageId()
+        );
+      }
+      $displays[] = $arr;
     }
     
     return $displays;

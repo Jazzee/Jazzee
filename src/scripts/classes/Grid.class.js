@@ -560,6 +560,16 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
     template.addItem(templates[i]["title"], templates[i]["id"]);
   }
 
+  var display = field.newElement('SelectList', 'display');
+  display.label = 'Display';
+  display.required = true;
+  var displays = {};
+  var services = new Services;
+  $.each(services.getDisplays(), function(){
+    displays[this.getId()] = $.toJSON(this.getObj());
+    display.addItem(this.getName(), this.getId());
+  });
+
   var formObject = new Form().create(obj);
   var form = $('form',formObject);
   form.append($('<button type="submit" name="submit">').html('Download').button({
@@ -569,10 +579,10 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
   }));
   $('select[name=pdftemplate]', form).parent().parent().hide();
   $('select[name=type]', form).on('change', function(){
-    if($('option:selected', this).text() == 'PDF'){
-      $('select[name=pdftemplate]', form).parent().parent().show();
+    if($('option:selected', this).text() == 'Excel'){
+      $('select[name=display]', form).parent().parent().show();
     } else {
-      $('select[name=pdftemplate]', form).parent().parent().hide();
+      $('select[name=display]', form).parent().parent().hide();
     }
   });
   form.on('submit',function(e){
@@ -598,8 +608,10 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
         iframeForm.attr( 'method', 'post' );
         var template = $('select[name=pdftemplate]', form).val();
         var type = $('select[name=type]', form).val();
+        var display = displays[$('select[name=display]', form).val()];
         iframeForm.attr('action', type);
         iframeForm.append($('<input>').attr('name', 'pdftemplate').attr('type', 'hidden').val(template));
+        iframeForm.append($('<input>').attr('name', 'display').attr('type', 'hidden').val(display));
 
         var applicantIds = [];
         var selected = tableTools.fnGetSelectedData();

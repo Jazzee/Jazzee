@@ -46,7 +46,7 @@ class Union implements \Jazzee\Interfaces\Display
       $this->_pageIds = array_unique(array_merge($this->_pageIds, $display->getPageIds()));
       $this->_elementIds = array_unique(array_merge($this->_elementIds, $display->getElementIds()));
       foreach($display->listElements() as $element){
-        $elements[$element->type.$element->name.$element->pageId] = $element;
+        $elements[$element->getType().$element->getName().$element->getPageId()] = $element;
       }
     }
     $this->_elements = array_values($elements);
@@ -114,7 +114,7 @@ class Union implements \Jazzee\Interfaces\Display
     return in_array($element->getId(), $this->_elementIds);
   }
 
-  public function hasDisplayElement(Element $displayElement)
+  public function hasDisplayElement(\Jazzee\Interfaces\DisplayElement $displayElement)
   {
     foreach($this->listElements() as $element){
       if($displayElement->sameAs($element)){
