@@ -139,11 +139,15 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
     {type:'applicant', title: 'Account Created', name: 'createdAt'},
     {type:'applicant', title: 'Locked', name: 'isLocked'},
     {type:'applicant', title: 'Paid', name: 'hasPaid'},
-    {type:'applicant', title: 'Attachments', name: 'attachments'}
+    {type:'applicant', title: 'Attachments', name: 'attachments'},
+{type:'applicant', title: 'Declined', name: 'status_declined'},
+{type:'applicant', title: 'Admitted', name: 'status_admitted'},
+{type:'applicant', title: 'Denied', name: 'status_denied'},
+{type:'applicant', title: 'Accepted', name: 'status_accepted'}
   ];
   var hasItems = false;
   $.each(arr,function(){
-    if(maximumDisplay.displayElement(this)){
+	  if(maximumDisplay.displayElement(this)){
       hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element',this);
       if(self.display.displayElement(this)){
@@ -163,7 +167,7 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
         });
       }
       list.append(li);
-    }
+            }
   });
   if(hasItems){
     return $('<div>').append(list);

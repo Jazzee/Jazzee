@@ -49,9 +49,9 @@ Grid.prototype.init = function(){
     bJQueryUI: true,
     "sDom": '<"H"Tfrl>t<"F"ip>',
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-		console.log("row data: ");
-		console.log(aData);
-		console.log(nRow);
+	      //console.log("row data: ");
+	      //console.log(aData);
+	      //console.log(nRow);
 		// Bold the grade for all 'A' grade browsers
 		$.each(aData["tags"], function(){
 			$(nRow).addClass("tag_"+this.id);
@@ -146,6 +146,16 @@ Grid.prototype.getColumns = function(){
         if(this.name == 'attachments'){
           column.mRender = Grid.formatAttachments;
         }
+
+	if((this.name == 'status_declined') ||
+	   (this.name == 'status_admitted') ||
+	   (this.name == 'status_denied') ||
+	   (this.name == 'status_accepted') ){
+	    column.mData = null;
+	    column.mRender = Grid.formatStatus.bind(this, this.name);
+	}
+
+	// using the numeric tag id 
 	if(isNumber(this.name)){
 	    column.mRender = Grid.formatTag.bind(this, this.name);
 	    column.mData = null;
@@ -234,6 +244,7 @@ Grid.prototype.loadapps = function(applicantIds, grid){
 
       while (length--) {
 	  var d = json.data.result.applicants.splice(length, 1)[0];
+	  //	  console.log(d);
         applicants.push(new ApplicantData(d));
         $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
       }
@@ -278,7 +289,46 @@ Grid.formatTag = function(tagName, data, type, full){
 		  if(tagName == this.id) hasTag = true;
 	      });
       }
-    return hasTag ? "<img src='resource/foundation/media/icons/tick.png'>" : "nope";
+    return hasTag ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
+  }
+  return data;
+};
+
+Grid.formatStatus = function(statusName, data, type, full){
+  if(type == 'filter' || type == 'display'){
+      var hasTag = false;
+      var hasTags = full["tags"].length > 0;
+      if(hasTags){
+	  // check if we have a tag that matches the bound tagName
+	  $.each(full["tags"], function(){
+		  if(tagName == this.id) hasTag = true;
+	      });
+      }
+    return hasTag ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
+  }
+  return data;
+};
+Grid.formatStatus = function(statusName, data, type, full){
+  if(type == 'filter' || type == 'display'){
+      var hasStatus = false;
+      var hasDecision = full["decision"];
+      if(hasDecision){
+	  // check if we have a status that matches the bound statusName
+	  console.log("decision is ");
+	  console.log(full["decision"]);
+	  if(statusName == 'status_declined'){
+	      hasStatus = (full["decision"]["declineOffer"] != null);
+	  }else if(statusName == 'status_admitted'){
+	      hasStatus = (full["decision"]["finalAdmit"] != null);
+	  }else if(statusName == 'status_denied'){
+	      hasStatus = (full["decision"]["finalDeny"] != null);
+	  }else if(statusName == 'status_accepted'){
+	      hasStatus = (full["decision"]["acceptOffer"] != null);
+
+	  }
+
+      }
+    return hasStatus ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
   }
   return data;
 };
