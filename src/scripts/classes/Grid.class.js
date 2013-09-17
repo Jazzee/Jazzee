@@ -1,3 +1,7 @@
+function isNumber (o) {
+    return ! isNaN (o-0) && o !== null && o !== "" && o !== false;
+}
+
 /**
  * Grid class
  * Creats an applicant grid from a display and a set of applicant ids
@@ -44,6 +48,16 @@ Grid.prototype.init = function(){
     aoColumns: columns,
     bJQueryUI: true,
     "sDom": '<"H"Tfrl>t<"F"ip>',
+      "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+		console.log("row data: ");
+		console.log(aData);
+		console.log(nRow);
+		// Bold the grade for all 'A' grade browsers
+		$.each(aData["tags"], function(){
+			$(nRow).addClass("tag_"+this.id);
+		    });
+
+      },
     "oTableTools": {
       "sRowSelect": "multi",
       "fnPreRowSelect": function(e, nodes) {
@@ -112,10 +126,13 @@ Grid.prototype.getColumns = function(){
       return data.fullName + ' ' + data.email;
     }
   });
+  var tags = this.display.getApplication().listTags();
   $.each(this.display.listElements(), function(){
+
     switch(this.type){
       case 'applicant':
-        var column = {
+	  console.log("adding applicant column: "+this.title);
+	  var column = {
           sTitle: this.title,
           mData: this.name
         };
@@ -129,6 +146,10 @@ Grid.prototype.getColumns = function(){
         if(this.name == 'attachments'){
           column.mRender = Grid.formatAttachments;
         }
+	if(isNumber(this.name)){
+	    column.mRender = Grid.formatTag.bind(this, this.name);
+	    column.mData = null;
+	}
         columns.push(column);
         break;
       case 'element':
@@ -160,6 +181,8 @@ Grid.prototype.getColumns = function(){
           mRender: Grid.formatPageAnswers
         });
         break;
+    default:
+	console.log("unknown display element type: "+this.type);
     }
   });
   return columns;
@@ -210,7 +233,8 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       var pages = json.data.result.pages; // available pages
 
       while (length--) {
-        applicants.push(new ApplicantData(json.data.result.applicants.splice(length, 1)[0]));
+	  var d = json.data.result.applicants.splice(length, 1)[0];
+        applicants.push(new ApplicantData(d));
         $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
       }
       grid.fnAddData(applicants);
@@ -240,6 +264,21 @@ Grid.formatDate = function(data, type, full){
 Grid.formatCheckmark = function(data, type, full){
   if(type == 'filter' || type == 'display'){
     return data === true ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
+  }
+  return data;
+};
+
+Grid.formatTag = function(tagName, data, type, full){
+  if(type == 'filter' || type == 'display'){
+      var hasTag = false;
+      var hasTags = full["tags"].length > 0;
+      if(hasTags){
+	  // check if we have a tag that matches the bound tagName
+	  $.each(full["tags"], function(){
+		  if(tagName == this.id) hasTag = true;
+	      });
+      }
+    return hasTag ? "<img src='resource/foundation/media/icons/tick.png'>" : "nope";
   }
   return data;
 };

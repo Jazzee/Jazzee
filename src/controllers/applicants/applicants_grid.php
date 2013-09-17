@@ -348,6 +348,12 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->loadView('applicants_single/result');
   }
 
+  public function actionGetApplicationTags(){
+   $this->setVar('result', $this->_em->getRepository('Jazzee\Entity\Tag')->findByApplication2($this->_application));
+    $this->loadView('applicants_single/result');
+
+  }
+
   /**
    * Controll actions with the index action
    * @param string $controller
@@ -358,7 +364,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay'))) {
+    if (in_array($action, array('getApplicants', 'getApplicationTags', 'listApplicants', 'describeDisplay'))) {
       $action = 'index';
     }
 

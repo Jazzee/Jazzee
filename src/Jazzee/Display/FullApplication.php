@@ -35,6 +35,14 @@ class FullApplication implements \Jazzee\Interfaces\Display
       'hasPaid' => 'Paid',
       'attachments' => 'Attachments'
     );
+
+    
+    foreach($application->getApplicants() as $applicant){
+       foreach($applicant->getTags() as $tag){
+	 $applicantElements[$tag->getId()] = $tag->getTitle();
+       }      
+    }   
+
     $weight = 0;
     foreach($applicantElements as $name => $title){
       $this->_elements[] = new \Jazzee\Display\Element('applicant', $title, $weight++, $name, null);
