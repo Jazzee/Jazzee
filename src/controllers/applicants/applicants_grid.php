@@ -31,6 +31,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->addCss('https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css');
     $this->addCss('https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css');
     $this->addScript('https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js');
+    $this->addScript('//cdnjs.cloudflare.com/ajax/libs/jeditable.js/1.7.3/jeditable.min.js');
     
     $this->addScript($this->path('resource/scripts/classes/Display.class.js'));
     $this->addScript($this->path('resource/scripts/classes/Application.class.js'));

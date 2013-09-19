@@ -1,57 +1,75 @@
-.shrink_button {
-	width: '100%';
-	cursor: pointer;
-	background-color: #7799bb;
-	color: #FFFFFF;
-	padding: 8px;
-	margin: 10px 0 0 0;
-	font-size: 1em;
-	font-weight: bold;
-	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
+.shrinkable .item {
+  width: 100%;
+  cursor: pointer;
+  padding: 8px;
+  margin: 10px 0 0 0;
+  border-radius: 4px;
+  text-align: left;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  height: 1em;
+  clear: both;
 }
-.shrink_button:before
+
+#chooser .shrink_button{
+  background-color: #7799bb;
+  color: #FFFFFF;
+}
+
+#chooser .shrink_button:before
 {
-	float: left;     
-	width: 1em;
-	font-size: 1em;
-        content: "\271A";
+    float: left;     
+    width: 1em;
+    font-size: 1em;
+    content: "\271A";
+}
+
+#chosen .shrink_button{
+  background-color: #FFFFFF;
+  color: #7799bb;
+  font-weight: bold;
 }
 
 .shrink_button p {
   margin:0;
   padding: 0 0 0 28px;
+  display: inline;
+  float: left;
 }
+
 .shrink_list {
+  width: 80%;
   margin: 10px 0 10px 20px;
   padding: 0;
+  display: none;
 }
 
-.block_list, .block_list li {
-  list-style-type: none;
-}
-
-.block_list .item {
-  width: '60%';
-  cursor: pointer;
-  background-color: #FFFFFF;
-  color: #7799bb;
-  padding: 8px;
+.shrink_list .item {
   margin-top: 2px;
   font-size: .8em;
   font-weight: normal;
-  border-radius: 4px;
-  -webkit-border-radius: 4px;
-  text-align: left;
-  -moz-border-radius: 4px;
+  background-color: #FFFFFF;
+  color: #7799bb;
 }
 
-.block_list .item.selected {
+.shrink_list, .shrink_list li {
+  list-style-type: none;
+}
+
+#chooser .item.selected {
   background-color: #3C9600;
   color: #ffffff;
 }
 
+.shrinkable .item .left {
+    float: left;
+}
+
+.shrinkable .item .right {
+    float: right;
+}
+
 .ui-sortable .handle {
-  float: left;
+  margin-right: 2px;
+  border-right: thin dashed black;
 }
