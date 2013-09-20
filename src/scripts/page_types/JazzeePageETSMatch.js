@@ -60,9 +60,9 @@ JazzeePageETSMatch.prototype.pageProperties = function(){
  */
 JazzeePageETSMatch.prototype.listDisplayElements = function(){
   var elements = [];
-  
+  var self = this;
   $(this.elements).each(function(){
-    elements.push({name: this.id, title: this.title, type: 'element'});
+    elements.push({name: this.id, title: this.title, type: 'element', pageId: self.id});
   });
   elements.push({name: 'greRegistrationNumber', type: 'page', title: 'GRE Registration Number', pageId: this.id});
   elements.push({name: 'greDepartmentName', type: 'page', title: 'GRE Department Name', pageId: this.id});
