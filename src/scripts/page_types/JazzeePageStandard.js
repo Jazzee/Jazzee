@@ -243,8 +243,9 @@ JazzeePageStandard.prototype.editDisplaySortElementButton = function(){
  */
 JazzeePageStandard.prototype.listDisplayElements = function(){
   var elements = [];
+  var self = this;
   $(this.elements).each(function(){
-    elements.push({name: this.id, title: this.title, type: 'element'});
+    elements.push({name: this.id, title: this.title, type: 'element', pageId: self.id});
   });
 
   elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});
