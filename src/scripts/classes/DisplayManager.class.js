@@ -30,7 +30,7 @@ DisplayManager.prototype.init = function(canvas){
   div.append(right);
   canvas.append(div);
   this.drawChooser();
-  this.drawChosen();
+  //  this.drawChosen();
 };
 
 /**
@@ -71,12 +71,11 @@ DisplayManager.prototype.drawChooser = function(){
   var gridPath = this.services.getControllerPath('applicants_grid');
   div.append(this.shrinkButton('Applicant', this.applicantBox(maximumDisplay)));
 
-    $.post(gridPath + '/getApplicationTags',{}, function(json){
-	  div.append(self.shrinkButton("Tags", self.tagBox(json.data.result, maximumDisplay)));
-    });  
+  div.append(self.shrinkButton("Tags", self.tagBox(maximumDisplay)));
+
 
   $.each(this.application.listApplicationPages(), function(){
-    div.append(self.shrinkButton(this.title, self.pageBox(this, maximumDisplay)));
+     div.append(self.shrinkButton(this.title, self.pageBox(this, maximumDisplay)));
   });
   
   $('.shrink_button', div).click(function() {
@@ -100,7 +99,7 @@ DisplayManager.prototype.drawChosen = function(){
     var li = $('<li>').addClass('item').html(this.title).data('element', this);
     li.prepend($('<span>').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
     li.bind('click', function(){
-//      self.drawChosen();
+      self.drawChosen();
     });
     list.append(li);
   });
@@ -140,10 +139,15 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
     {type:'applicant', title: 'Locked', name: 'isLocked'},
     {type:'applicant', title: 'Paid', name: 'hasPaid'},
     {type:'applicant', title: 'Attachments', name: 'attachments'},
-{type:'applicant', title: 'Declined', name: 'status_declined'},
-{type:'applicant', title: 'Admitted', name: 'status_admitted'},
-{type:'applicant', title: 'Denied', name: 'status_denied'},
-{type:'applicant', title: 'Accepted', name: 'status_accepted'}
+
+    // these should really be a separate type (eg. tag or decision).
+    // the name part here corresponds to keys in the FullApplication.php display.
+    {type:'applicant', title: 'Declined', name: 'status_declined'},
+    {type:'applicant', title: 'Admitted', name: 'status_admitted'},
+    {type:'applicant', title: 'Denied', name: 'status_denied'},
+    {type:'applicant', title: 'Accepted', name: 'status_accepted'},
+    {type:'applicant', title: 'Nominate Admit', name: 'status_nominate_admit'},
+    {type:'applicant', title: 'Nominate Deny', name: 'status_nominate_deny'}
   ];
   var hasItems = false;
   $.each(arr,function(){
@@ -239,12 +243,12 @@ DisplayManager.prototype.pageBox = function(applicationPage, maximumDisplay){
   return false;
 };
 
-DisplayManager.prototype.tagBox = function(tagList, maximumDisplay){
+DisplayManager.prototype.tagBox = function(maximumDisplay){
   var self = this;
   var list = $('<ul>').addClass('block_list');
   var hasItems = false;
   try{
-  $.each(tagList, function(){
+      $.each(maximumDisplay.listTags(), function(){
 	  this.type = 'applicant';
 	  this.name = this.id;
 	  this.weight = 1;

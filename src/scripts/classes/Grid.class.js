@@ -48,16 +48,6 @@ Grid.prototype.init = function(){
     aoColumns: columns,
     bJQueryUI: true,
     "sDom": '<"H"Tfrl>t<"F"ip>',
-      "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-	      //console.log("row data: ");
-	      //console.log(aData);
-	      //console.log(nRow);
-		// Bold the grade for all 'A' grade browsers
-		$.each(aData["tags"], function(){
-			$(nRow).addClass("tag_"+this.id);
-		    });
-
-      },
     "oTableTools": {
       "sRowSelect": "multi",
       "fnPreRowSelect": function(e, nodes) {
@@ -131,7 +121,7 @@ Grid.prototype.getColumns = function(){
 
     switch(this.type){
       case 'applicant':
-	  console.log("adding applicant column: "+this.title);
+
 	  var column = {
           sTitle: this.title,
           mData: this.name
@@ -149,16 +139,22 @@ Grid.prototype.getColumns = function(){
 
 	if((this.name == 'status_declined') ||
 	   (this.name == 'status_admitted') ||
+	   (this.name == 'status_nominate_admit') ||
+	   (this.name == 'status_nominate_deny') ||
 	   (this.name == 'status_denied') ||
 	   (this.name == 'status_accepted') ){
-	    column.mData = null;
+	    column.mData = function(obj, type, set){
+		return obj; // pass the whole applicantData object
+	    };
 	    column.mRender = Grid.formatStatus.bind(this, this.name);
 	}
 
 	// using the numeric tag id 
 	if(isNumber(this.name)){
 	    column.mRender = Grid.formatTag.bind(this, this.name);
-	    column.mData = null;
+	    column.mData =  function(obj, type, set){
+		return obj; // pass the whole applicantData object
+	    };
 	}
         columns.push(column);
         break;
@@ -243,10 +239,8 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       var pages = json.data.result.pages; // available pages
 
       while (length--) {
-	  var d = json.data.result.applicants.splice(length, 1)[0];
-	  //	  console.log(d);
-        applicants.push(new ApplicantData(d));
-        $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
+	  applicants.push(new ApplicantData(json.data.result.applicants.splice(length, 1)[0]));
+	  $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
       }
       grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();
@@ -281,56 +275,16 @@ Grid.formatCheckmark = function(data, type, full){
 
 Grid.formatTag = function(tagName, data, type, full){
   if(type == 'filter' || type == 'display'){
-      var hasTag = false;
-      var hasTags = full["tags"].length > 0;
-      if(hasTags){
-	  // check if we have a tag that matches the bound tagName
-	  $.each(full["tags"], function(){
-		  if(tagName == this.id) hasTag = true;
-	      });
-      }
-    return hasTag ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
+      data.hasTag(tagName);
   }
   return data;
 };
 
-Grid.formatStatus = function(statusName, data, type, full){
+Grid.formatStatus = function(statusName, applicantData, type, full){
   if(type == 'filter' || type == 'display'){
-      var hasTag = false;
-      var hasTags = full["tags"].length > 0;
-      if(hasTags){
-	  // check if we have a tag that matches the bound tagName
-	  $.each(full["tags"], function(){
-		  if(tagName == this.id) hasTag = true;
-	      });
-      }
-    return hasTag ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
+      return applicantData.hasStatus(statusName);
   }
-  return data;
-};
-Grid.formatStatus = function(statusName, data, type, full){
-  if(type == 'filter' || type == 'display'){
-      var hasStatus = false;
-      var hasDecision = full["decision"];
-      if(hasDecision){
-	  // check if we have a status that matches the bound statusName
-	  console.log("decision is ");
-	  console.log(full["decision"]);
-	  if(statusName == 'status_declined'){
-	      hasStatus = (full["decision"]["declineOffer"] != null);
-	  }else if(statusName == 'status_admitted'){
-	      hasStatus = (full["decision"]["finalAdmit"] != null);
-	  }else if(statusName == 'status_denied'){
-	      hasStatus = (full["decision"]["finalDeny"] != null);
-	  }else if(statusName == 'status_accepted'){
-	      hasStatus = (full["decision"]["acceptOffer"] != null);
-
-	  }
-
-      }
-    return hasStatus ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
-  }
-  return data;
+  return applicantData;
 };
 
 /**

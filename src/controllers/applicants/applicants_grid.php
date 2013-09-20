@@ -348,12 +348,6 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $this->loadView('applicants_single/result');
   }
 
-  public function actionGetApplicationTags(){
-   $this->setVar('result', $this->_em->getRepository('Jazzee\Entity\Tag')->findByApplication2($this->_application));
-    $this->loadView('applicants_single/result');
-
-  }
-
   /**
    * Controll actions with the index action
    * @param string $controller

@@ -37,7 +37,9 @@ class FullApplication implements \Jazzee\Interfaces\Display
       'status_declined'=> 'Declined',
       'status_admitted'=> 'Admitted',
       'status_denied'=> 'Denied',
-      'status_accepted'=> 'Accepted'
+      'status_accepted'=> 'Accepted',
+      'status_nominate_admit'=>'Nominate Admit',
+      'status_nominate_deny'=>'Nominate Deny'
     );
 
     
