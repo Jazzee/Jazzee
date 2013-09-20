@@ -66,7 +66,7 @@ class Intersection implements \Jazzee\Interfaces\Display
         
         $this->_pageIds = array_values(call_user_func_array("array_intersect", $pageIds));
         $this->_elementIds = array_values(call_user_func_array("array_intersect", $elementIds));
-        $this->_elements = array_values(call_user_func_array("array_intersect_key", $elements));
+        $this->_elements = array_values(call_user_func_array("array_intersect_key", array_reverse($elements)));
     }
   }
 
