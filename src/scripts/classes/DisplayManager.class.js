@@ -30,7 +30,7 @@ DisplayManager.prototype.init = function(canvas){
   div.append(right);
   canvas.append(div);
   this.drawChooser();
-  //  this.drawChosen();
+  this.drawChosen();
 };
 
 /**
@@ -68,11 +68,9 @@ DisplayManager.prototype.drawChooser = function(){
   });
   $('h3',div).append(button);
   var maximumDisplay = this.services.getMaximumDisplay();
-  var gridPath = this.services.getControllerPath('applicants_grid');
+
   div.append(this.shrinkButton('Applicant', this.applicantBox(maximumDisplay)));
-
   div.append(self.shrinkButton("Tags", self.tagBox(maximumDisplay)));
-
 
   $.each(this.application.listApplicationPages(), function(){
      div.append(self.shrinkButton(this.title, self.pageBox(this, maximumDisplay)));

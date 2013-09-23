@@ -15,10 +15,6 @@ ApplicantData.prototype.hasStatus = function(statusName){
       var hasDecision = this["decision"];
       if(hasDecision){
 	  // check if we have a status that matches the bound statusName
-	  //	  console.log("decision is ");
-	  //console.log(full["decision"]);
-	  //console.log("applicant data is ");
-	  //console.log(data);
 	  if(statusName == 'status_declined'){
 	      hasStatus = (this["decision"]["declineOffer"] != null);
 	  }else if(statusName == 'status_admitted'){
@@ -31,7 +27,7 @@ ApplicantData.prototype.hasStatus = function(statusName){
 	  }
 
       }
-    return hasStatus ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
+    return hasStatus;
 };
 
 ApplicantData.prototype.hasTag = function(tagName){
@@ -43,7 +39,7 @@ ApplicantData.prototype.hasTag = function(tagName){
 		  if(tagName == this.id) hasTag = true;
 	      });
       }
-    return hasTag ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
+    return hasTag;
 };
 
 /**

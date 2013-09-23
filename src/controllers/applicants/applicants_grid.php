@@ -358,7 +358,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
    */
   public static function isAllowed($controller, $action, \Jazzee\Entity\User $user = null, \Jazzee\Entity\Program $program = null, \Jazzee\Entity\Application $application = null)
   {
-    if (in_array($action, array('getApplicants', 'getApplicationTags', 'listApplicants', 'describeDisplay'))) {
+    if (in_array($action, array('getApplicants', 'listApplicants', 'describeDisplay'))) {
       $action = 'index';
     }
 

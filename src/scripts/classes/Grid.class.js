@@ -116,7 +116,7 @@ Grid.prototype.getColumns = function(){
       return data.fullName + ' ' + data.email;
     }
   });
-  var tags = this.display.getApplication().listTags();
+
   $.each(this.display.listElements(), function(){
 
     switch(this.type){
@@ -275,14 +275,14 @@ Grid.formatCheckmark = function(data, type, full){
 
 Grid.formatTag = function(tagName, data, type, full){
   if(type == 'filter' || type == 'display'){
-      data.hasTag(tagName);
+      return data.hasTag(tagName) ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
   }
   return data;
 };
 
 Grid.formatStatus = function(statusName, applicantData, type, full){
   if(type == 'filter' || type == 'display'){
-      return applicantData.hasStatus(statusName);
+      return applicantData.hasStatus(statusName) ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
   }
   return applicantData;
 };
