@@ -143,17 +143,19 @@ Grid.prototype.getColumns = function(){
 	   (this.name == 'status_nominate_deny') ||
 	   (this.name == 'status_denied') ||
 	   (this.name == 'status_accepted') ){
-	    column.mData = function(obj, type, set){
-		return obj; // pass the whole applicantData object
-	    };
-	    column.mRender = Grid.formatStatus.bind(this, this.name);
+           var statusName = this.name;
+	   column.mData = function(obj, type, set){
+	     return obj.hasStatus(statusName);
+	   };
+	   column.mRender = Grid.formatCheckmark;
 	}
 
 	// using the numeric tag id 
 	if(isNumber(this.name)){
-	    column.mRender = Grid.formatTag.bind(this, this.name);
+            var tagName = this.name;
+	    column.mRender = Grid.formatCheckmark;
 	    column.mData =  function(obj, type, set){
-		return obj; // pass the whole applicantData object
+		return obj.hasTag(tagName);
 	    };
 	}
         columns.push(column);
@@ -271,20 +273,6 @@ Grid.formatCheckmark = function(data, type, full){
     return data === true ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
   }
   return data;
-};
-
-Grid.formatTag = function(tagName, data, type, full){
-  if(type == 'filter' || type == 'display'){
-      return data.hasTag(tagName) ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
-  }
-  return data;
-};
-
-Grid.formatStatus = function(statusName, applicantData, type, full){
-  if(type == 'filter' || type == 'display'){
-      return applicantData.hasStatus(statusName) ? "<img src='resource/foundation/media/icons/tick.png'>" : "";
-  }
-  return applicantData;
 };
 
 /**
