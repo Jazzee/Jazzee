@@ -191,4 +191,17 @@ class ApplicationRepository extends \Doctrine\ORM\EntityRepository
     return $queryBuilder;
   }
 
+  /**
+   * Find all applications by tag
+   *
+   * @param \Jazzee\Entity\Tag  tag
+   * @return array Applications
+   */
+  public function findByTag(\Jazzee\Entity\Tag $tag)
+  {
+    $query = $this->_em->createQuery('SELECT a FROM Jazzee\Entity\Application a JOIN a.applicants app JOIN app.tags tags WHERE tags.id = :tagId');
+    $query->setParameter('tagId', $tag->getId());
+    return $query->getResult();
+  }
+
 }

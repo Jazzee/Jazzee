@@ -31,35 +31,54 @@ class ApplicationEventListener
       $uow->getScheduledEntityUpdates(),
       $uow->getScheduledEntityDeletions()
     );
-    $applicationMetadata = $entityManager->getClassMetadata('Jazzee\Entity\Application');
+    $applications = array();
     foreach($entities as $entity){
       switch(get_class($entity)){
         case 'Jazzee\Entity\Application':
-          $entity->clearCache();
-          break;
-        case 'Jazzee\Entity\Tag':
-          $entity->getApplicant()->getApplication()->clearCache();
+          $applications[$entity->getId()] = $entity;
           break;
         case 'Jazzee\Entity\ApplicationPage':
         case 'Jazzee\Entity\PDFTemplate':
-          $entity->getApplication()->clearCache();
+          $applications[$entity->getApplication()->getId()] = $entity;
           break;
         case 'Jazzee\Entity\Element':
           foreach($entity->getPage()->getApplicationPages() as $applicationPage){
-            $applicationPage->getApplication()->clearCache();
+            $applications[$applicationPage->getApplication()->getId()] = $applicationPage->getApplication();
           }
           break;
         case 'Jazzee\Entity\ElementListItem':
           foreach($entity->getElement()->getPage()->getApplicationPages() as $applicationPage){
-            $applicationPage->getApplication()->clearCache();
+            $applications[$applicationPage->getApplication()->getId()] = $applicationPage->getApplication();
           }
           break;
         case 'Jazzee\Entity\ElementListItemVariable':
           foreach($entity->getItem()->getElement()->getPage()->getApplicationPages() as $applicationPage){
-            $applicationPage->getApplication()->clearCache();
+            $applications[$applicationPage->getApplication()->getId()] = $applicationPage->getApplication();
           }
           break;
       }
+    }
+    
+    $collections = array_merge(
+      $uow->getScheduledCollectionUpdates(),
+      $uow->getScheduledCollectionDeletions()
+    );
+    foreach($collections as $collection){
+      switch($collection->getTypeClass()->name){
+        case 'Jazzee\Entity\Tag':
+          foreach($collection as $tag){
+            foreach($entityManager->getRepository('Jazzee\Entity\Application')->findByTag($tag) as $application){
+              $applications[$application->getId()] = $application;
+            }
+          }
+          break;
+      }
+    }
+    
+    foreach($applications as $application){
+        if(!$uow->isScheduledForDelete($application)){
+          $application->clearCache();
+        }
     }
   }
 }
