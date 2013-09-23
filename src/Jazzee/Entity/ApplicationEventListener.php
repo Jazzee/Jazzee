@@ -37,6 +37,9 @@ class ApplicationEventListener
         case 'Jazzee\Entity\Application':
           $entity->clearCache();
           break;
+        case 'Jazzee\Entity\Tag':
+          $entity->getApplicant()->getApplication()->clearCache();
+          break;
         case 'Jazzee\Entity\ApplicationPage':
         case 'Jazzee\Entity\PDFTemplate':
           $entity->getApplication()->clearCache();
