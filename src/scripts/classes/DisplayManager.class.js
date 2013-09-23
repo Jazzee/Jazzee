@@ -257,7 +257,7 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
         li.bind('click', function(){
           var element = $(this).data('element');
           self.display.removeElement(element);
-          list.replaceWith(self.tagBox(tagList, maximumDisplay));
+          list.replaceWith(self.tagBox(maximumDisplay));
           self.drawChosen();
         });
       } else {
@@ -265,7 +265,7 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
           var element = $(this).data('element');
           element.weight = self.nextWeight();
           self.display.addElement(element);
-          list.replaceWith(self.tagBox(tagList, maximumDisplay));
+          list.replaceWith(self.tagBox(maximumDisplay));
           self.drawChosen();
         });
       }
