@@ -1,6 +1,6 @@
 <?php
 /**
- * manage_pendingpayments index view
+ * payments_pending index view
  * @author Jon Johnson <jon.johnson@ucsf.edu>
  * @package jazzee
  * @subpackage manage

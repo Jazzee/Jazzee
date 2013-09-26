@@ -397,6 +397,34 @@ class UCLACashNet extends AbstractPaymentType
     throw new \Jazzee\Exception("We were unable to record this payment.  Cashnet post: " . var_export($_POST, true));
   }
 
+  public function getPaymentNotes(\Jazzee\Entity\Payment $payment)
+  {
+    $arr = array(
+      'UCLA Reference Number' => $payment->getVar('UCLA_REF_NO'),
+      'Transaction Number' => $payment->getVar('tx'),
+      'Customer Code' => $payment->getVar('custcode'),
+      'Payment Code' => $payment->getVar('pmtcode'),
+      'Item Code' => $payment->getVar('itemcode')
+    );
+    return $arr;
+  }
+
+  public function getPaymentNotesFromArray(array $payment)
+  {
+      $variables = array();
+      foreach($payment['variables'] as $arr){
+          $variables[$arr['name']] = \Jazzee\Entity\PaymentVariable::decodeValue($arr['value']);
+      }
+      $arr = array(
+        'UCLA Reference Number' => $variables['UCLA_REF_NO'],
+        'Transaction Number' => $variables['tx'],
+        'Customer Code' => $variables['custcode'],
+        'Payment Code' => $variables['pmtcode'],
+        'Item Code' => $variables['itemcode']
+    );
+    return $arr;
+  }
+
   /**
    * Attempt to settle payments
    * @param AdminCronController $cron

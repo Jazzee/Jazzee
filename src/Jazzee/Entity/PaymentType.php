@@ -5,7 +5,7 @@ namespace Jazzee\Entity;
  * PaymentType
  * The ApplyPayment class we are going to use
  *
- * @Entity
+ * @Entity(repositoryClass="\Jazzee\Entity\PaymentTypeRepository")
  * @Table(name="payment_types",
  * uniqueConstraints={
  *   @UniqueConstraint(name="payemnttype_class",columns={"class"}),
@@ -38,6 +38,11 @@ class PaymentType
 
   /** @Column(type="boolean") */
   private $isExpired;
+
+  /**
+   * @OneToMany(targetEntity="Payment", mappedBy="type")
+   */
+  private $payments;
 
   /**
    * The Jazzee Payment Type

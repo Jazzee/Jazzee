@@ -89,7 +89,7 @@ class PaymentVariable
    */
   public function getValue()
   {
-    return base64_decode($this->value);
+    return self::decodeValue($this->value);
   }
 
   /**
@@ -100,6 +100,16 @@ class PaymentVariable
   public function setValue($value)
   {
     return $this->value = base64_encode($value);
+  }
+
+  /**
+   * Get the base64 decoded value
+   * @param string $value
+   * @return blob
+   */
+  public static function decodeValue($value)
+  {
+    return base64_decode($value);
   }
 
 }

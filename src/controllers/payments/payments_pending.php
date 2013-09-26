@@ -6,12 +6,12 @@
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-class ManagePendingPaymentsController extends \Jazzee\AdminController
+class PaymentsPendingController extends \Jazzee\AdminController
 {
 
-  const MENU = 'Manage';
-  const TITLE = 'Pending Payments';
-  const PATH = 'manage/pendingpayments';
+  const MENU = 'Payments';
+  const TITLE = 'Pending';
+  const PATH = 'payments/pending';
   const ACTION_INDEX = 'View Pending Payments';
   const ACTION_SETTLE = 'Settle Pending Payment';
   const REQUIRE_APPLICATION = false;
@@ -24,7 +24,7 @@ class ManagePendingPaymentsController extends \Jazzee\AdminController
     parent::setUp();
     $this->addScript($this->path('resource/scripts/classes/Status.class.js'));
     $this->addScript($this->path('resource/scripts/classes/ChangeProgram.class.js'));
-    $this->addScript($this->path('resource/scripts/controllers/manage_pendingpayments.controller.js'));
+    $this->addScript($this->path('resource/scripts/controllers/payments_pending.controller.js'));
   }
 
   /**

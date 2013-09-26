@@ -354,6 +354,28 @@ class AuthorizeNetAIM extends AbstractPaymentType
     return false;
   }
 
+  public function getPaymentNotes(\Jazzee\Entity\Payment $payment)
+  {
+    $arr = array(
+      'Transaction ID' => $payment->getVar('transactionId'),
+      'Authorization Code' => $payment->getVar('authorizationCode')
+    );
+    return $arr;
+  }
+
+  public function getPaymentNotesFromArray(array $payment)
+  {
+      $variables = array();
+      foreach($payment['variables'] as $arr){
+          $variables[$arr['name']] = \Jazzee\Entity\PaymentVariable::decodeValue($arr['value']);
+      }
+      $arr = array(
+      'Transaction ID' => $variables['transactionId'],
+      'Authorization Code' => $variables['authorizationCode']
+    );
+    return $arr;
+  }
+
   /**
    * Attempt to settle payments
    * @param AdminCronController $cron

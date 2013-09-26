@@ -34,6 +34,10 @@ if (!class_exists('Composer\\Autoload\\ClassLoader', false)) {
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/manage/');
 \Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/manage/');
 
+//Load payments controllers and views
+\Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/payments/');
+\Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/payments/');
+
 //Load setup controllers and views
 \Foundation\VC\Config::addControllerPath(__DIR__ . '/controllers/setup/');
 \Foundation\VC\Config::addControllerViewPath(__DIR__ . '/views/setup/');
@@ -54,6 +58,7 @@ if (!class_exists('Composer\\Autoload\\ClassLoader', false)) {
 
 //add the builtin admin controller directories
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/manage');
+\Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/payments');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/setup');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/scores');
 \Jazzee\AdminController::addControllerPath(__DIR__ . '/controllers/applicants');
