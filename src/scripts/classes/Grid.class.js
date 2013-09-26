@@ -97,7 +97,7 @@ Grid.prototype.getColumns = function(){
     sWidth: '8px',
     mData: 'id',
     mRender: function( data, type, full ) {
-      return '<a class="applicantlink" href="' + 
+      return '<a title="Click to edit this applicant" class="applicantlink" href="' + 
                 self.services.getControllerPath('applicants_single') + '/' + 
                 data + 
                 '">' + "<img src='resource/foundation/media/icons/user_go.png'>" + 
