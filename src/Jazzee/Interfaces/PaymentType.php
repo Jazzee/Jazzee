@@ -107,4 +107,18 @@ interface PaymentType
    * @param \Foundation\Form\Input $input
    */
   function refundPayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input);
+
+  /**
+   * Get an array of notes for this payment type
+   * @param \Jazzee\Entity\Payment $payment
+   * @return array
+   */
+  function getPaymentNotes(\Jazzee\Entity\Payment $payment);
+
+  /**
+   * Get an array of notes for this payment type from an array
+   * @param array $payment
+   * @return array
+   */
+  function getPaymentNotesFromArray(array $payment);
 }

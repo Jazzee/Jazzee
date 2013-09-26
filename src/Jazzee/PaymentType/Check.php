@@ -216,4 +216,27 @@ class Check extends AbstractPaymentType
     return true;
   }
 
+  public function getPaymentNotes(\Jazzee\Entity\Payment $payment)
+  {
+    $arr = array(
+      'Check Number' => $payment->getVar('checkNumber'),
+      'Settlement Date' => $payment->getVar('checkSettlementDate')
+    );
+    return $arr;
+  }
+
+  public function getPaymentNotesFromArray(array $payment)
+  {
+    $variables = array();
+    foreach($payment['variables'] as $arr){
+        $variables[$arr['name']] = \Jazzee\Entity\PaymentVariable::decodeValue($arr['value']);
+    }
+    $arr = array();
+    $arr['Check Number'] = $variables['checkNumber'];
+    if(array_key_exists('checkSettlementDate', $variables)){
+      $arr['Settlement Date'] = $variables['checkSettlementDate'];
+    }
+    return $arr;
+  }
+
 }
