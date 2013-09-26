@@ -31,7 +31,7 @@ $(document).ready(function(){
                 if(changeProgram.check($(nTd).attr('programId'))){
                     var a = $('<a>').attr('href', document.location.href + '/../../applicants/single/' + $(nTd).attr('applicantId')).html(sData).data('programId', $(nTd).attr('programId'));
                     a.bind('click', function(){
-                      changeProgram.changeTo($(nTd).data('programId'));
+                      changeProgram.changeTo($(this).data('programId'));
                       return true;
                     });
                     $(nTd).html(a);
