@@ -403,8 +403,8 @@ abstract class AdminController extends Controller implements \Jazzee\Interfaces\
     $displays = array();
     foreach($this->_em->getRepository('Jazzee\Entity\Display')->findBy(array('type'=>'user','user'=>$this->_user, 'application'=>$this->_application)) as $userDisplay){
       $intersection = new \Jazzee\Display\Intersection();
-      $intersection->addDisplay($userDisplay);
       $intersection->addDisplay($userMaximumDisplay);
+      $intersection->addDisplay($userDisplay);
       $arr = array(
         'type' => 'user',
         'id'  => $userDisplay->getId(),
