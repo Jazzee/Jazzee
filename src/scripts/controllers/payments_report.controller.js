@@ -44,7 +44,7 @@ $(document).ready(function(){
             var totalAmount = 0;
             for ( var i=0 ; i<aaData.length ; i++ )
             {
-                totalAmount += parseInt(aaData[i][6]);
+                totalAmount += parseInt(aaData[i][8]);
             }
             /* Modify the footer row to match what we want */
             var nCells = nRow.getElementsByTagName('th');

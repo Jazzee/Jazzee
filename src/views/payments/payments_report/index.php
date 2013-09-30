@@ -33,7 +33,7 @@ if ($payments) {?>
     </tbody>
       <tfoot>
         <tr>
-          <th style="text-align:right" colspan="6">Total:</th>
+          <th style="text-align:right" colspan="8">Total:</th>
           <th></th>
         </tr>
       </tfoot>
