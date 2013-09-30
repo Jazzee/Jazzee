@@ -7,7 +7,7 @@ namespace Jazzee\Page;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\DataPage, \Jazzee\Interfaces\FormPage, \Jazzee\Interfaces\ReviewPage, \Jazzee\Interfaces\PdfPage, \Jazzee\Interfaces\CsvPage, \Jazzee\Interfaces\XmlPage
+abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfaces\DataPage, \Jazzee\Interfaces\FormPage, \Jazzee\Interfaces\ReviewPage, \Jazzee\Interfaces\PdfPage, \Jazzee\Interfaces\XmlPage
 {
 
   const ERROR_MESSAGE = 'There was a problem saving your data on this page.  Please correct the errors below and retry your request.';
@@ -192,46 +192,26 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
   {
     return;
   }
-
+  
   /**
-   * Default CSV headers are just the elements for a page
-   * @return array
+   * Get the display value for a display element
+   * @param array $answerArray
+   * @param \Jazzee\Interfaces\DisplayElement $displayElement
+   * @return string
    */
-  public function getCsvHeaders()
+  public function getDisplayElementValueFromArray(array $answerArray, \Jazzee\Interfaces\DisplayElement $displayElement)
   {
-    $headers = array();
-    foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-      $headers[] = $element->getTitle();
-    }
-
-    return $headers;
-  }
-
-  /**
-   * Defaults to just usign the element display values
-   * @param array $pageArr
-   * @param int $position
-   * @return array
-   */
-  public function getCsvAnswer(array $pageArr, $position)
-  {
-    $arr = array();
-    foreach ($this->_applicationPage->getPage()->getElements() as $element) {
-      $value = '';
-      if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
-        foreach($pageArr['answers'][$position]['elements'] as $eArr){
-          if($eArr['id'] == $element->getId()){
-            $value = $eArr['displayValue'];
-            break;
+      if($displayElement->getType() == 'element' or $displayElement->getType() == 'page'){
+        foreach($answerArray['elements'] as $eArr){
+          if($eArr['id'] == $displayElement->getName()){
+            return $eArr['displayValue'];
           }
         }
       }
-      $arr[] = $value;
-    }
-
-    return $arr;
+      
+      return '';
   }
-
+  
   /**
    * Convert an answer to an xml element
    * @param \DomDocument $dom
@@ -662,7 +642,7 @@ abstract class AbstractPage implements \Jazzee\Interfaces\Page, \Jazzee\Interfac
     $elements = array();
     $weight = 0;
     foreach($this->_applicationPage->getPage()->getElements() as $element){
-      $elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++, $element->getId(), null);
+      $elements[] = new \Jazzee\Display\Element('element', $element->getTitle(), $weight++, $element->getId(), $element->getPage()->getId());
     }
     $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Attacment', $weight++, 'attachment', $this->_applicationPage->getPage()->getId());
     $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Public Answer Status', $weight++, 'publicAnswerStatus', $this->_applicationPage->getPage()->getId());

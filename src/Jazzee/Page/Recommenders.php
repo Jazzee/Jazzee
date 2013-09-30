@@ -347,6 +347,33 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
       return self::COMPLETE;
     }
   }
+  
+  /**
+   * Get the display value for a display element
+   * @param array $answerArray
+   * @param \Jazzee\Interfaces\DisplayElement $displayElement
+   * @return string
+   */
+  public function getDisplayElementValueFromArray(array $answerArray, \Jazzee\Interfaces\DisplayElement $displayElement)
+  {
+      if($displayElement->getType() == 'page' and
+         $displayElement->getName() == 'lorReceived' and
+         $displayElement->getPageId() == $this->_applicationPage->getPage()->getId() 
+      ){
+        return empty($answerArray['children'])?'no':'yes';
+      }
+      if($displayElement->getType() == 'element' and 
+         $displayElement->getPageId() != $this->_applicationPage->getPage()->getId()
+      ){
+          if(empty($answerArray['children'][0])){
+              return '';
+          }
+          $jazzeePage = $this->_applicationPage->getPage()->getChildren()->first()->getApplicationPageJazzeePage();
+          return $jazzeePage->getDisplayElementValueFromArray($answerArray['children'][0], $displayElement);
+      }
+
+      return parent::getDisplayElementValueFromArray($answerArray, $displayElement);
+  }
 
   /**
    * Create a table from answers
@@ -446,8 +473,8 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
     $weight = count($elements);
     foreach($this->_applicationPage->getPage()->getChildren() as $child){
       foreach($child->getApplicationPageJazzeePage()->listDisplayElements() as $displayElement){
-        if($displayElement->type != 'page' and !in_array($displayElement->name, array('attachment', 'answerPublicStatus', 'answerPrivateStatus'))){
-          $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() . ' ' . $displayElement->title, $weight++, $displayElement->name, $displayElement->pageId);
+        if($displayElement->getType() != 'page' and !in_array($displayElement->getName(), array('attachment', 'answerPublicStatus', 'answerPrivateStatus'))){
+          $elements[] = new \Jazzee\Display\Element($displayElement->getType(), $this->_applicationPage->getTitle() . ' ' . $displayElement->getTitle(), $weight++, $displayElement->getName(), $displayElement->getPageId());
         }
       }
     }

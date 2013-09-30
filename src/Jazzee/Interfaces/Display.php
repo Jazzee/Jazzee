@@ -65,9 +65,9 @@ interface Display
   
   /**
    * Does the display have this element in it
-   * @param \Jazzee\Display\Element $displayElement
+   * @param \Jazzee\Interfaces\DisplayElement $displayElement
    * 
    * @return boolean
    */
-  function hasDisplayElement(\Jazzee\Display\Element $displayElement);
+  function hasDisplayElement(\Jazzee\Interfaces\DisplayElement $displayElement);
 }
