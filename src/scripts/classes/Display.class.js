@@ -30,6 +30,9 @@ Display.prototype.getApplication = function(){
  * List the elements
  */
 Display.prototype.listElements = function(){
+  this.display.elements.sort(function(a, b) { 
+    return a.weight - b.weight;
+  });
   return this.display.elements;
 };
 
@@ -142,4 +145,20 @@ Display.prototype.removeElement = function(obj){
       
     });
   }
+};
+
+/**
+ * Get the title for an elements page
+ */
+Display.prototype.getElementPageTitle = function(obj){
+  if(this.displayElement(obj)){
+    if(obj.type == 'element'){
+      var element = this.application.getElementClassById(obj.name);
+      var applicationPage = this.application.getApplicationPageByPageId(element.page.id);
+    } else if(obj.type == 'page'){
+      var applicationPage = this.application.getApplicationPageByPageId(obj.pageId);
+    }
+    return applicationPage.title;
+  }
+  return '';
 };

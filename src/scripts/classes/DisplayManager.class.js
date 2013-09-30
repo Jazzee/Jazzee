@@ -23,25 +23,6 @@ DisplayManager.prototype.init = function(canvas){
     self.display.setName($(this).val());
   }));
   canvas.append(name);
-  var div = $('<div>').addClass('yui-g');
-  var left = $('<div>').addClass('yui-u first').attr('id', 'chooser');
-  var right = $('<div>').addClass('yui-u').attr('id', 'chosen');
-  div.append(left);
-  div.append(right);
-  canvas.append(div);
-  this.drawChooser();
-  this.drawChosen();
-};
-
-/**
- * Draw the chooser
- * 
- * @param {jQuery} canvas
- */
-DisplayManager.prototype.drawChooser = function(){
-  var self = this;
-  var div = $('<div>');
-  div.append($('<h3>').html('Available Elements'));
   var button = $('<button>').html('Select All').button();
   button.click(function(e){
     var startWeight = self.nextWeight();
@@ -54,7 +35,7 @@ DisplayManager.prototype.drawChooser = function(){
     self.drawChooser();
     return false;
   });
-  $('h3',div).append(button);
+  canvas.append(button);
   var button = $('<button>').html('Deselect All').button();
   button.click(function(e){
     var startWeight = self.nextWeight();
@@ -66,7 +47,31 @@ DisplayManager.prototype.drawChooser = function(){
     self.drawChooser();
     return false;
   });
-  $('h3',div).append(button);
+  canvas.append(button);
+  var div = $('<div>').addClass('yui-g');
+  var left = $('<div>').addClass('yui-u first').attr('id', 'chooser');
+  var right = $('<div>').addClass('yui-u').attr('id', 'chosen');
+  div.append(left);
+  div.append(right);
+  canvas.append(div);
+  this.drawChooser();
+  this.drawChosen();
+  
+  canvas.on('click', '.shrink_button', function() {
+    $(this).next().toggle('slow');
+    return false;
+  });
+};
+
+/**
+ * Draw the chooser
+ * 
+ * @param {jQuery} canvas
+ */
+DisplayManager.prototype.drawChooser = function(){
+  var self = this;
+  var div = $('<div>');
+  div.append($('<h3>').html('Available Elements'));
   var maximumDisplay = this.services.getMaximumDisplay();
 
   div.append(this.shrinkButton('Applicant', this.applicantBox(maximumDisplay)));
@@ -75,11 +80,6 @@ DisplayManager.prototype.drawChooser = function(){
   $.each(this.application.listApplicationPages(), function(){
      div.append(self.shrinkButton(this.title, self.pageBox(this, maximumDisplay)));
   });
-  
-  $('.shrink_button', div).click(function() {
-    $(this).next().toggle('slow');
-    return false;
-  }).next().hide();
 
   $('#chooser').empty().append(div);
 };
@@ -89,33 +89,65 @@ DisplayManager.prototype.drawChooser = function(){
  * 
  */
 DisplayManager.prototype.drawChosen = function(){
-  var div = $('<div>');
-  div.append($('<h3>').html('Selected Items for ' + this.display.getName() + ' Display'));
   var self = this;
-  var list = $('<ol>').addClass('block_list');
+  var div = $('<div>');
   $.each(this.display.listElements(),function(){
-    var li = $('<li>').addClass('item').html(this.title).data('element', this);
-    li.prepend($('<span>').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
-    li.bind('click', function(){
-      self.drawChosen();
+    var displayElement = this;
+    var ol = $('<ol>');
+    var sourceName = displayElement.type == 'applicant'?'Applicant':self.display.getElementPageTitle(displayElement) + ' Page';
+    ol.append($('<li>').html('<strong>Source:</strong> ' + sourceName).addClass('item'));
+    ol.append($('<li>').html('<strong>Original Name:</strong> ' + $('#'+ this.type + this.name).data('element').title).addClass('item'));
+    var elementDiv = self.shrinkButton(displayElement.title, ol);
+    elementDiv.addClass('element');
+    elementDiv.data('element', displayElement);
+    $('.shrink_button', elementDiv).prepend($('<span>').addClass('left').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
+    
+    $('.shrink_button p', elementDiv).append($('<span>').addClass('right ui-icon ui-icon-pencil'));
+     $('.shrink_button p', elementDiv).editable(function(value, settings) {
+        displayElement.title = value;
+     },
+     {
+       displayElement: displayElement,
+       data: displayElement.title,
+       callback: function(value, setting){
+         self.drawChosen();
+       }
+<<<<<<< HEAD
     });
-    list.append(li);
+    var removeSpan = $('<span>').addClass('right').addClass('ui-icon ui-icon-circle-minus');
+    removeSpan.on('click', function(){
+      self.display.removeElement($(this).closest('.shrinkable').data('element'));
+      self.drawChosen();
+      self.refreshDisplayedChooserElements();
+    });
+=======
+    });
+    var removeSpan = $('<span>').addClass('right').addClass('ui-icon ui-icon-circle-minus');
+    removeSpan.on('click', function(){
+      self.display.removeElement($(this).closest('.shrinkable').data('element'));
+      self.drawChosen();
+      self.refreshDisplayedChooserElements();
+    });
+>>>>>>> 9d814696081f9326594ca5b2c1223a028934e541
+    $('.shrink_button', elementDiv).append(removeSpan);
+    div.append(elementDiv);
   });
-  $('li',list).sort(function(a,b){
+  $('div.element',div).sort(function(a,b){
     return $(a).data('element').weight > $(b).data('element').weight ? 1 : -1;
-  }).appendTo(list);
-  list.sortable({
+  }).appendTo(div);
+  div.sortable({
     handle: '.handle'
   });
-  list.bind("sortupdate", function(e, ui) {
-    $('li',$(ui.item).parent()).each(function(i){
+  div.bind("sortupdate", function(e, ui) {
+    $('div.element',$(ui.item).parent()).each(function(i){
       var element = $(this).data('element');
       element.weight = i;
-      self.display.addElement(element);
     });
   });
-  div.append(list);
-  $('#chosen').empty().append(div);
+  var chosen = $('<div>');
+  chosen.append($('<h3>').html('Selected Items for ' + this.display.getName() + ' Display'));
+  chosen.append(div);
+  $('#chosen').empty().append(chosen);
 };
 
 /**
@@ -152,22 +184,25 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
 	  if(maximumDisplay.displayElement(this)){
       hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element',this);
+      li.attr('id', this.type + this.name);
       if(self.display.displayElement(this)){
-        li.addClass('selected');
-        li.bind('click', function(){
-          self.display.removeElement($(this).data('element'));
+          li.addClass('selected');
+      }
+      li.on('click', function(){
+        var element = $(this).data('element');
+        if(self.display.displayElement(element)){
+          li.addClass('selected');
+          self.display.removeElement(element);
           list.replaceWith(self.applicantBox(maximumDisplay));
           self.drawChosen();
-        });
-      } else {
-        li.bind('click', function(){
-          var element = $(this).data('element');
+        } else {
+          li.removeClass('selected');
           element.weight = self.nextWeight();
           self.display.addElement(element);
           list.replaceWith(self.applicantBox(maximumDisplay));
           self.drawChosen();
-        });
-      }
+        }
+      });
       list.append(li);
             }
   });
@@ -179,7 +214,7 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
 };
 
 /**
- * Draw the applicant box
+ * Draw the shrink button
  * 
  * @param String title
  * @param {jquery} content
@@ -189,14 +224,14 @@ DisplayManager.prototype.shrinkButton = function(title, content){
   if(content === false ){
     return div;
   }
-  div.append($('<div>').addClass('shrink_button').append($('<p>').html(title)));
+  div.append($('<div>').addClass('shrink_button').addClass('item').append($('<p>').html(title)));
   div.append($('<div>').addClass('shrink_list').append(content));
   
   return div;
 };
 
 /**
- * Draw the applicant box
+ * Draw the page box
  * 
  * @param {} applicationPage
  * @param {Display} maximumDisplay
@@ -214,23 +249,26 @@ DisplayManager.prototype.pageBox = function(applicationPage, maximumDisplay){
     if(maximumDisplay.displayElement(this)){
       hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element', this);
+      li.attr('id', this.type + this.name);
+<<<<<<< HEAD
       if(self.display.displayElement(this)){
-        li.addClass('selected');
-        li.bind('click', function(){
-          var element = $(this).data('element');
+          li.addClass('selected');
+      }
+      li.on('click', function(){
+        var element = $(this).data('element');
+        if(self.display.displayElement(element)){
+          li.addClass('selected');
           self.display.removeElement(element);
           list.replaceWith(self.pageBox(applicationPage, maximumDisplay));
           self.drawChosen();
-        });
-      } else {
-        li.bind('click', function(){
-          var element = $(this).data('element');
+        } else {
+          li.removeClass('selected');
           element.weight = self.nextWeight();
           self.display.addElement(element);
           list.replaceWith(self.pageBox(applicationPage, maximumDisplay));
           self.drawChosen();
-        });
-      }
+        }
+      });
       list.append(li);
     }
   });
@@ -252,23 +290,26 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
 	  this.weight = 1;
 	  hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element', this);
+=======
+>>>>>>> 9d814696081f9326594ca5b2c1223a028934e541
       if(self.display.displayElement(this)){
-        li.addClass('selected');
-        li.bind('click', function(){
-          var element = $(this).data('element');
+          li.addClass('selected');
+      }
+      li.on('click', function(){
+        var element = $(this).data('element');
+        if(self.display.displayElement(element)){
+          li.addClass('selected');
           self.display.removeElement(element);
           list.replaceWith(self.tagBox(maximumDisplay));
           self.drawChosen();
-        });
-      } else {
-        li.bind('click', function(){
-          var element = $(this).data('element');
+        } else {
+          li.removeClass('selected');
           element.weight = self.nextWeight();
           self.display.addElement(element);
           list.replaceWith(self.tagBox(maximumDisplay));
           self.drawChosen();
-        });
-      }
+        }
+      });
       list.append(li);
 
       });
@@ -284,7 +325,7 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
 };
 
 /**
- * Draw the applicant box
+ * Save the display
  * 
  * @param url string
  * @param display Display
@@ -299,7 +340,7 @@ DisplayManager.save = function(url, display){
 };
 
 /**
- * Draw the applicant box
+ * REmvoe the display
  * 
  * @param {} applicationPage
  */
@@ -320,3 +361,25 @@ DisplayManager.remove = function(url, display){
 DisplayManager.prototype.nextWeight = function(){
   return $('#chosen li').length+1;
 };
+
+/**
+ * Refresh the list of chooser elements to see which ones should be displayed
+ * 
+ * @param {}
+ * @return {jQuery}
+ */
+DisplayManager.prototype.refreshDisplayedChooserElements = function(){
+  var self = this;
+  $('ul.block_list li.item', '#chooser').each(function(i){
+      var element = $(this).data('element');
+      if(self.display.displayElement(element)){
+        $(this).addClass('selected');
+      } else {
+        $(this).removeClass('selected');
+      }
+    });
+<<<<<<< HEAD
+};
+=======
+};
+>>>>>>> 9d814696081f9326594ca5b2c1223a028934e541
