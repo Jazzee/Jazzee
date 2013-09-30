@@ -1,3 +1,7 @@
+function isNumber (o) {
+    return ! isNaN (o-0) && o !== null && o !== "" && o !== false;
+}
+
 /**
  * Grid class
  * Creats an applicant grid from a display and a set of applicant ids
@@ -117,10 +121,13 @@ Grid.prototype.getColumns = function(){
       return data.fullName + ' ' + data.email;
     }
   });
+
   $.each(this.display.listElements(), function(){
+
     switch(this.type){
       case 'applicant':
-        var column = {
+
+	  var column = {
           sTitle: this.title,
           mData: this.name
         };
@@ -134,6 +141,28 @@ Grid.prototype.getColumns = function(){
         if(this.name == 'attachments'){
           column.mRender = Grid.formatAttachments;
         }
+
+	if((this.name == 'status_declined') ||
+	   (this.name == 'status_admitted') ||
+	   (this.name == 'status_nominate_admit') ||
+	   (this.name == 'status_nominate_deny') ||
+	   (this.name == 'status_denied') ||
+	   (this.name == 'status_accepted') ){
+           var statusName = this.name;
+	   column.mData = function(obj, type, set){
+	     return obj.hasStatus(statusName);
+	   };
+	   column.mRender = Grid.formatCheckmark;
+	}
+
+	// using the numeric tag id 
+	if(isNumber(this.name)){
+            var tagName = this.name;
+	    column.mRender = Grid.formatCheckmark;
+	    column.mData =  function(obj, type, set){
+		return obj.hasTag(tagName);
+	    };
+	}
         columns.push(column);
         break;
       case 'element':
@@ -165,6 +194,8 @@ Grid.prototype.getColumns = function(){
           mRender: Grid.formatPageAnswers
         });
         break;
+    default:
+	console.log("unknown display element type: "+this.type);
     }
   });
   return columns;
@@ -215,8 +246,8 @@ Grid.prototype.loadapps = function(applicantIds, grid){
       var pages = json.data.result.pages; // available pages
 
       while (length--) {
-        applicants.push(new ApplicantData(json.data.result.applicants.splice(length, 1)[0]));
-        $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
+	  applicants.push(new ApplicantData(json.data.result.applicants.splice(length, 1)[0]));
+	  $('div.progress', self.target).progressbar("value", $('div.progress', self.target).progressbar('value')+1);
       }
       grid.fnAddData(applicants);
       grid.fnAdjustColumnSizing();

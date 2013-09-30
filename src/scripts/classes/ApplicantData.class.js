@@ -10,6 +10,38 @@ function ApplicantData(obj){
   }
 };
 
+ApplicantData.prototype.hasStatus = function(statusName){
+      var hasStatus = false;
+      var hasDecision = this["decision"];
+      if(hasDecision){
+	  // check if we have a status that matches the bound statusName
+	  if(statusName == 'status_declined'){
+	      hasStatus = (this["decision"]["declineOffer"] != null);
+	  }else if(statusName == 'status_admitted'){
+	      hasStatus = (this["decision"]["finalAdmit"] != null);
+	  }else if(statusName == 'status_denied'){
+	      hasStatus = (this["decision"]["finalDeny"] != null);
+	  }else if(statusName == 'status_accepted'){
+	      hasStatus = (this["decision"]["acceptOffer"] != null);
+
+	  }
+
+      }
+    return hasStatus;
+};
+
+ApplicantData.prototype.hasTag = function(tagName){
+      var hasTag = false;
+      var hasTags = this["tags"].length > 0;
+      if(hasTags){
+	  // check if we have a tag that matches the bound tagName
+	  $.each(this["tags"], function(){
+		  if(tagName == this.id) hasTag = true;
+	      });
+      }
+    return hasTag;
+};
+
 /**
  * Get answers for an applicant page
  */

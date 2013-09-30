@@ -34,6 +34,26 @@ Display.prototype.listElements = function(){
 };
 
 /**
+ *  Loop through application tags, filtering for those in our maximum display.
+ */
+Display.prototype.listTags = function(){
+    var tags = [];
+    var self = this;
+    // we get tag objects from the server and need to add type and name properties
+    // so that they can function as display elements when we pass them to
+    // the this.displayElement(...) method.
+    $.each(this.getApplication().listTags(), function(){
+	    this.type = "applicant";
+	    this.name = this.id;
+	    if(self.displayElement(this)){
+		tags.push(this);
+	    }
+	});
+    return tags;
+};
+
+
+/**
  * Get the display name
  */
 Display.prototype.getName = function(){
@@ -76,6 +96,7 @@ Display.prototype.displayPage = function(pageId){
  */
 Display.prototype.displayElement = function(obj){
   var matches = $.grep(this.display.elements, function(element) {
+
     switch(obj.type){
       case 'applicant':
       case 'element':

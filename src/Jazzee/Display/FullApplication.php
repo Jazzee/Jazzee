@@ -33,8 +33,22 @@ class FullApplication implements \Jazzee\Interfaces\Display
       'percentComplete' => 'Progress',
       'isLocked' => 'Locked',
       'hasPaid' => 'Paid',
-      'attachments' => 'Attachments'
+      'attachments' => 'Attachments',
+      'status_declined'=> 'Declined',
+      'status_admitted'=> 'Admitted',
+      'status_denied'=> 'Denied',
+      'status_accepted'=> 'Accepted',
+      'status_nominate_admit'=>'Nominate Admit',
+      'status_nominate_deny'=>'Nominate Deny'
     );
+
+    
+    foreach($application->getApplicants() as $applicant){
+       foreach($applicant->getTags() as $tag){
+	 $applicantElements[$tag->getId()] = $tag->getTitle();
+       }      
+    }   
+
     $weight = 0;
     foreach($applicantElements as $name => $title){
       $this->_elements[] = new \Jazzee\Display\Element('applicant', $title, $weight++, $name, null);
