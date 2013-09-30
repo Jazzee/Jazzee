@@ -112,7 +112,6 @@ DisplayManager.prototype.drawChosen = function(){
        callback: function(value, setting){
          self.drawChosen();
        }
-<<<<<<< HEAD
     });
     var removeSpan = $('<span>').addClass('right').addClass('ui-icon ui-icon-circle-minus');
     removeSpan.on('click', function(){
@@ -120,15 +119,6 @@ DisplayManager.prototype.drawChosen = function(){
       self.drawChosen();
       self.refreshDisplayedChooserElements();
     });
-=======
-    });
-    var removeSpan = $('<span>').addClass('right').addClass('ui-icon ui-icon-circle-minus');
-    removeSpan.on('click', function(){
-      self.display.removeElement($(this).closest('.shrinkable').data('element'));
-      self.drawChosen();
-      self.refreshDisplayedChooserElements();
-    });
->>>>>>> 9d814696081f9326594ca5b2c1223a028934e541
     $('.shrink_button', elementDiv).append(removeSpan);
     div.append(elementDiv);
   });
@@ -250,7 +240,6 @@ DisplayManager.prototype.pageBox = function(applicationPage, maximumDisplay){
       hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element', this);
       li.attr('id', this.type + this.name);
-<<<<<<< HEAD
       if(self.display.displayElement(this)){
           li.addClass('selected');
       }
@@ -290,8 +279,6 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
 	  this.weight = 1;
 	  hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element', this);
-=======
->>>>>>> 9d814696081f9326594ca5b2c1223a028934e541
       if(self.display.displayElement(this)){
           li.addClass('selected');
       }
@@ -378,8 +365,4 @@ DisplayManager.prototype.refreshDisplayedChooserElements = function(){
         $(this).removeClass('selected');
       }
     });
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 9d814696081f9326594ca5b2c1223a028934e541
