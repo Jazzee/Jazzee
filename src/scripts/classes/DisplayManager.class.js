@@ -68,10 +68,12 @@ DisplayManager.prototype.drawChooser = function(){
   });
   $('h3',div).append(button);
   var maximumDisplay = this.services.getMaximumDisplay();
+
   div.append(this.shrinkButton('Applicant', this.applicantBox(maximumDisplay)));
-  
+  div.append(self.shrinkButton("Tags", self.tagBox(maximumDisplay)));
+
   $.each(this.application.listApplicationPages(), function(){
-    div.append(self.shrinkButton(this.title, self.pageBox(this, maximumDisplay)));
+     div.append(self.shrinkButton(this.title, self.pageBox(this, maximumDisplay)));
   });
   
   $('.shrink_button', div).click(function() {
@@ -95,7 +97,7 @@ DisplayManager.prototype.drawChosen = function(){
     var li = $('<li>').addClass('item').html(this.title).data('element', this);
     li.prepend($('<span>').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
     li.bind('click', function(){
-//      self.drawChosen();
+      self.drawChosen();
     });
     list.append(li);
   });
@@ -134,11 +136,20 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
     {type:'applicant', title: 'Account Created', name: 'createdAt'},
     {type:'applicant', title: 'Locked', name: 'isLocked'},
     {type:'applicant', title: 'Paid', name: 'hasPaid'},
-    {type:'applicant', title: 'Attachments', name: 'attachments'}
+    {type:'applicant', title: 'Attachments', name: 'attachments'},
+
+    // these should really be a separate type (eg. tag or decision).
+    // the name part here corresponds to keys in the FullApplication.php display.
+    {type:'applicant', title: 'Declined', name: 'status_declined'},
+    {type:'applicant', title: 'Admitted', name: 'status_admitted'},
+    {type:'applicant', title: 'Denied', name: 'status_denied'},
+    {type:'applicant', title: 'Accepted', name: 'status_accepted'},
+    {type:'applicant', title: 'Nominate Admit', name: 'status_nominate_admit'},
+    {type:'applicant', title: 'Nominate Deny', name: 'status_nominate_deny'}
   ];
   var hasItems = false;
   $.each(arr,function(){
-    if(maximumDisplay.displayElement(this)){
+	  if(maximumDisplay.displayElement(this)){
       hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element',this);
       if(self.display.displayElement(this)){
@@ -158,7 +169,7 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
         });
       }
       list.append(li);
-    }
+            }
   });
   if(hasItems){
     return $('<div>').append(list);
@@ -223,6 +234,48 @@ DisplayManager.prototype.pageBox = function(applicationPage, maximumDisplay){
       list.append(li);
     }
   });
+  if(hasItems){
+    return $('<div>').append(list);
+  }
+
+  return false;
+};
+
+DisplayManager.prototype.tagBox = function(maximumDisplay){
+  var self = this;
+  var list = $('<ul>').addClass('block_list');
+  var hasItems = false;
+  try{
+      $.each(maximumDisplay.listTags(), function(){
+	  this.type = 'applicant';
+	  this.name = this.id;
+	  this.weight = 1;
+	  hasItems = true;
+      var li = $('<li>').addClass('item').html(this.title).data('element', this);
+      if(self.display.displayElement(this)){
+        li.addClass('selected');
+        li.bind('click', function(){
+          var element = $(this).data('element');
+          self.display.removeElement(element);
+          list.replaceWith(self.tagBox(maximumDisplay));
+          self.drawChosen();
+        });
+      } else {
+        li.bind('click', function(){
+          var element = $(this).data('element');
+          element.weight = self.nextWeight();
+          self.display.addElement(element);
+          list.replaceWith(self.tagBox(maximumDisplay));
+          self.drawChosen();
+        });
+      }
+      list.append(li);
+
+      });
+  }catch(ex){
+      console.log("unable to create tag list: "+ex);
+  }
+
   if(hasItems){
     return $('<div>').append(list);
   }

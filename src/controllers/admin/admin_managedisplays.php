@@ -64,7 +64,7 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
       $maximumUserDisplay = $this->_user->getMaximumDisplayForApplication($this->_application);
       foreach($obj->elements as $eObj){
         $tempDisplayElement = new \Jazzee\Display\Element($eObj->type, $eObj->title, $eObj->weight, $eObj->name, isset($eObj->pageId)?$eObj->pageId:null);
-        if($maximumUserDisplay->hasDisplayElement($tempDisplayElement)){
+       if($maximumUserDisplay->hasDisplayElement($tempDisplayElement)){
           $displayElement = \Jazzee\Entity\DisplayElement::createFromDisplayElement($tempDisplayElement, $this->_application);
           $display->addElement($displayElement);
           $this->getEntityManager()->persist($displayElement);
