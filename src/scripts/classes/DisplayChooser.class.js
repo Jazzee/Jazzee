@@ -30,7 +30,7 @@ DisplayChooser.prototype.init = function(){
  */
 DisplayChooser.prototype.dropdown = function(){
   var self = this;
-  var displays = this.services.getDisplays();
+  var displays = this.services.getDisplays();  
   var dropdown = $('<select>').attr('id', 'displayChooserSelect');
   $.each(displays, function(){
     dropdown.append($('<option>').html(this.getName()).attr('value', this.getId()).data('display', this));

@@ -19,11 +19,12 @@ class TagRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findByApplication(Application $application)
   {
-    $query = $this->_em->createQuery('SELECT tag FROM Jazzee\Entity\Tag tag INDEX BY tag WHERE tag IN (SELECT DISTINCT t.id FROM Jazzee\Entity\Applicant a JOIN a.tags t WHERE a.application = :applicationId) order by tag.title ASC');
+    $query = $this->_em->createQuery('SELECT tag FROM Jazzee\Entity\Tag tag INDEX BY tag WHERE tag IN (SELECT t.id FROM Jazzee\Entity\Applicant a JOIN a.tags t WHERE a.application = :applicationId) group by tag.id order by tag.title ASC');
 
     $query->setParameter('applicationId', $application->getId());
 
     return $query->getResult();
   }
+
 
 }
