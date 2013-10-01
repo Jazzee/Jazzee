@@ -188,7 +188,8 @@ class Branching extends Standard
       'weight' => 0,
       'values' => array(
         array('value' => $childPage->getTitle(), 'name' => null, 'id'=>null)
-      )
+      ),
+      'displayValue' => $childPage->getTitle()
     );
     foreach ($elements as $elementId => $elementAnswers) {
       $element = $childPage->getElementById($elementId);
@@ -287,6 +288,37 @@ class Branching extends Standard
         $pdf->addText("\n", 'p');
       }
     }
+  }
+
+  /**
+   * Render a single answer in the PDF
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  protected function renderPdfAnswerFromArray(\Jazzee\Entity\Page $page, \Jazzee\ApplicantPDF $pdf, array $answerData)
+  {
+    if(!empty($answerData['elements'])){
+        $pdf->addText("{$this->_applicationPage->getPage()->getVar('branchingElementLabel')}: ", 'b');
+        $pdf->addText("{$answerData['elements'][0]['displayValue']}\n", 'p');
+        foreach($page->getChildren() as $childPage){
+            $jazzeePage = $childPage->getApplicationPageJazzeePage();
+            $jazzeePage->setController($this->_controller);
+            $jazzeePage->renderPdfAnswerFromArray($childPage, $pdf, $answerData);
+        }
+        if ($attachment = $answerData['attachment']) {
+          $pdf->addPdf(\Jazzee\Globals::getFileStore()->getFileContents($attachment["attachmentHash"]));
+        }
+    } else if(!empty($answerData['children'][0])){
+        $childAnswer = $answerData['children'][0];
+        $childPage = $page->getChildById($childAnswer['page_id']);
+        $pdf->addText("{$this->_applicationPage->getPage()->getVar('branchingElementLabel')}: ", 'b');
+        $pdf->addText("{$childPage->getTitle()}\n", 'p');
+        $jazzeePage = $childPage->getApplicationPageJazzeePage();
+        $jazzeePage->setController($this->_controller);
+        $jazzeePage->renderPdfAnswerFromArray($childPage, $pdf, $childAnswer);
+    }
+    
   }
   
   /**
