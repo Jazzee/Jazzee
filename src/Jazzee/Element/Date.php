@@ -76,6 +76,23 @@ class Date extends AbstractElement
 
     return null;
   }
+  
+  /**
+   * Format values into a display value
+   * 
+   * @param array $values
+   * 
+   * @return string
+   */
+  protected function arrayDisplayValue(array $values)
+  {
+    if (isset($values[0])) {
+      $date = new \DateTime($values[0]['value']);
+      return $date->format('F jS Y');
+    }
+
+    return '';
+  }
 
   /**
    * Perform a regular expression match on each value
