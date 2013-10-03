@@ -468,6 +468,105 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
   }
 
   /**
+   * Render a single answer in the PDF
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  protected function renderPdfAnswerFromArray(\Jazzee\Entity\Page $page, \Jazzee\ApplicantPDF $pdf, array $answerData)
+  {
+      parent::renderPdfAnswerFromArray($page, $pdf, $answerData);
+      if(!empty($answerData['greScore'])){
+          $score = $answerData['greScore'];
+          $pdf->addText("Test Type: ", 'b');
+          $pdf->addText("GRE/GRE Subject\n", 'p');
+          $pdf->addText("Test Date: ", 'b');
+          $pdf->addText($score['testDate']->format('M Y') . "\n", 'p');
+          $pdf->addText("Registration Number: ", 'b');
+          $pdf->addText("{$score['registrationNumber']}\n", 'p');
+          $pdf->addText("Department Name: ", 'b');
+          $pdf->addText("{$score['departmentName']}\n", 'p');
+          $pdf->addText("First Name: ", 'b');
+          $pdf->addText("{$score['firstName']}\n", 'p');
+          $pdf->addText("Middle Initial: ", 'b');
+          $pdf->addText("{$score['middleInitial']}\n", 'p');
+          $pdf->addText("Last Name: ", 'b');
+          $pdf->addText("{$score['lastName']}\n", 'p');
+          $pdf->addText("Birth Date: ", 'b');
+          $pdf->addText($score['birthDate']->format('m/d/Y') . "\n", 'p');
+          $pdf->addText("Gender: ", 'b');
+          $pdf->addText("{$score['gender']}\n", 'p');
+          $pdf->addText("Test Name: ", 'b');
+          $pdf->addText("{$score['testName']}\n", 'p');
+          for($i=1;$i<=4;$i++){
+              $summary = $score["score{$i}Type"] . ' ' .
+                  $score["score{$i}Converted"] . ' ' .
+                  $score["score{$i}Percentile"] . '%';
+              $pdf->addText("Score {$i}: ", 'b');
+              $pdf->addText("{$summary}\n", 'p');
+          }
+             
+      }
+      if(!empty($answerData['toeflScore'])){
+          $score = $answerData['toeflScore'];
+          $pdf->addText("Test Type: ", 'b');
+          $pdf->addText("TOEFL\n", 'p');
+          $pdf->addText("Test Date: ", 'b');
+          $pdf->addText($score['testDate']->format('M Y') . "\n", 'p');
+          $pdf->addText("ETS Registration Number: ", 'b');
+          $pdf->addText("{$score['registrationNumber']}\n", 'p');
+          $pdf->addText("First Name: ", 'b');
+          $pdf->addText("{$score['firstName']}\n", 'p');
+          $pdf->addText("Middle Name: ", 'b');
+          $pdf->addText("{$score['middleName']}\n", 'p');
+          $pdf->addText("Last Name: ", 'b');
+          $pdf->addText("{$score['lastName']}\n", 'p');
+          $pdf->addText("Birth Date: ", 'b');
+          $pdf->addText($score['birthDate']->format('m/d/Y') . "\n", 'p');
+          $pdf->addText("Gender: ", 'b');
+          $pdf->addText("{$score['gender']}\n", 'p');
+          $pdf->addText("Native Country: ", 'b');
+          $pdf->addText("{$score['nativeCountry']}\n", 'p');
+          $pdf->addText("Native Language: ", 'b');
+          $pdf->addText("{$score['nativeLanguage']}\n", 'p');
+          $pdf->addText("Test Type: ", 'b');
+          $pdf->addText("{$score['testType']}\n", 'p');
+          $pdf->addText("Listening Indicator: ", 'b');
+          $pdf->addText("{$score['listeningIndicator']}\n", 'p');
+          $pdf->addText("Speaking Indicator: ", 'b');
+          $pdf->addText("{$score['speakingIndicator']}\n", 'p');
+          $pdf->addText("IBT Listening: ", 'b');
+          $pdf->addText("{$score['ibtListening']}\n", 'p');
+          $pdf->addText("IBT Writing: ", 'b');
+          $pdf->addText("{$score['ibtWriting']}\n", 'p');
+          $pdf->addText("IBT Speaking: ", 'b');
+          $pdf->addText("{$score['ibtSpeaking']}\n", 'p');
+          $pdf->addText("IBT Reading: ", 'b');
+          $pdf->addText("{$score['ibtReading']}\n", 'p');
+          $pdf->addText("IBT Total: ", 'b');
+          $pdf->addText("{$score['ibtListening']}\n", 'p');
+          $pdf->addText("TSE Score: ", 'b');
+          $pdf->addText("{$score['ibtTotal']}\n", 'p');
+          $pdf->addText("Test: ", 'b');
+          $pdf->addText("{$score['tseScore']}\n", 'p');
+          $pdf->addText("Listening: ", 'b');
+          $pdf->addText("{$score['listening']}\n", 'p');
+          $pdf->addText("Writing: ", 'b');
+          $pdf->addText("{$score['writing']}\n", 'p');
+          $pdf->addText("Reading: ", 'b');
+          $pdf->addText("{$score['reading']}\n", 'p');
+          $pdf->addText("Essay: ", 'b');
+          $pdf->addText("{$score['essay']}\n", 'p');
+          $pdf->addText("Total: ", 'b');
+          $pdf->addText("{$score['total']}\n", 'p');
+          $pdf->addText("Times Taken: ", 'b');
+          $pdf->addText("{$score['timesTaken']}\n", 'p');
+          $pdf->addText("Off Topic: ", 'b');
+          $pdf->addText("{$score['offTopic']}\n", 'p');
+      }
+  }
+
+  /**
    * Match unmatched scores as a cron task
    * @param AdminCronController $cron
    */
