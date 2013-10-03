@@ -478,12 +478,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
       parent::renderPdfAnswerFromArray($page, $pdf, $answerData);
       if(!empty($answerData['greScore'])){
           $score = $answerData['greScore'];
-          $pdf->addText("Test Type: ", 'b');
-          $pdf->addText("GRE/GRE Subject\n", 'p');
-          $pdf->addText("Test Date: ", 'b');
-          $pdf->addText($score['testDate']->format('M Y') . "\n", 'p');
-          $pdf->addText("Registration Number: ", 'b');
-          $pdf->addText("{$score['registrationNumber']}\n", 'p');
+          $pdf->addText("Matched Score\n", 'h5');
           $pdf->addText("Department Name: ", 'b');
           $pdf->addText("{$score['departmentName']}\n", 'p');
           $pdf->addText("First Name: ", 'b');
@@ -509,12 +504,7 @@ class ETSMatch extends AbstractPage implements \Jazzee\Interfaces\StatusPage
       }
       if(!empty($answerData['toeflScore'])){
           $score = $answerData['toeflScore'];
-          $pdf->addText("Test Type: ", 'b');
-          $pdf->addText("TOEFL\n", 'p');
-          $pdf->addText("Test Date: ", 'b');
-          $pdf->addText($score['testDate']->format('M Y') . "\n", 'p');
-          $pdf->addText("ETS Registration Number: ", 'b');
-          $pdf->addText("{$score['registrationNumber']}\n", 'p');
+          $pdf->addText("Matched Score\n", 'h5');
           $pdf->addText("First Name: ", 'b');
           $pdf->addText("{$score['firstName']}\n", 'p');
           $pdf->addText("Middle Name: ", 'b');
