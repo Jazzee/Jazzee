@@ -747,10 +747,8 @@ class Application
   public function getApplicationPageByChildPageId($id)
   {
     foreach ($this->applicationPages as $applicationPage) {
-      foreach($applicationPage->getPage()->getChildren() as $child){
-        if($child->getId() == $id){
-          return $applicationPage;
-        }
+      if($applicationPage->getPage()->hasPageId($id)){
+        return $applicationPage;
       }
     }
 

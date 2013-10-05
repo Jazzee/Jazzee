@@ -27,7 +27,7 @@ JazzeePageEducation.prototype.listDisplayElements = function(){
   elements.push({name: 'schoolName', type: 'page', title: 'Selected School', pageId: this.id});
   elements.push({name: 'schoolType', type: 'page', title: 'School Type', pageId: this.id});
   $(this.elements).each(function(){
-    elements.push({name: this.id, title: this.title, type: 'element'});
+    elements.push({name: this.id, title: this.title, type: 'element', pageId: self.id});
   });
   elements.push({name: 'locationSummary', type: 'page', title: 'School Location', pageId: this.id});
   elements.push({name: 'attachment', type: 'page', title: this.title + ' Attachment', pageId: this.id});

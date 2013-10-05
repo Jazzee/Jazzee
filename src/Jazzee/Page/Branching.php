@@ -176,7 +176,6 @@ class Branching extends Standard
   protected function arrayAnswer(array $answer, \Jazzee\Entity\Page $page)
   {
     $child = $answer['children'][0];
-    unset($answer['children']);
     $childPage = $page->getChildById($child['page_id']);
     $elements = $child['elements'];
     $answer['elements'] = array();
@@ -197,57 +196,30 @@ class Branching extends Standard
     if(!is_null($answer['attachment'])){
       $answer['attachment'] = $this->arrayAnswerAttachment($answer['attachment'], $page);
     }
+    $answer['children'][0]['elements'] = $answer['elements'];
 
     return $answer;
   }
-
+  
   /**
-   * Branchign pages get special CSV headers so all the branches are reprsented
-   * @return array
+   * Get the display value for a display element
+   * @param array $answerArray
+   * @param \Jazzee\Interfaces\DisplayElement $displayElement
+   * @return string
    */
-  public function getCsvHeaders()
+  public function getDisplayElementValueFromArray(array $answerArray, \Jazzee\Interfaces\DisplayElement $displayElement)
   {
-    $headers = array();
-    $headers[] = $this->_applicationPage->getPage()->getVar('branchingElementLabel');
-    foreach ($this->_applicationPage->getPage()->getChildren() as $child) {
-      foreach ($child->getElements() as $element) {
-        $headers[] = $child->getTitle() . ' ' . $element->getTitle();
+      if($displayElement->getType() == 'page' and
+         $displayElement->getName() == 'branchingPageSelection' and
+         $displayElement->getPageId() == $this->_applicationPage->getPage()->getId() 
+      ){
+        return $answerArray['elements'][0]['values'][0]['value'];
       }
-    }
-
-    return $headers;
-  }
-
-  /**
-   * Branching pages return elements for every page
-   * @param array $pageArr
-   * @param int $position
-   * @return array
-   */
-  public function getCsvAnswer(array $pageArr, $position)
-  {
-    $arr = array();
-    if (isset($pageArr['answers']) AND array_key_exists($position, $pageArr['answers'])) {
-      $arr[] = $pageArr['answers'][$position]['elements'][0]['values'][0]['value'];
-    } else {
-      $arr[] = '';
-    }
-    foreach($this->_applicationPage->getPage()->getChildren() as $child){
-      foreach ($child->getElements() as $element) {
-        $value = '';
-        if (isset($pageArr['answers']) and array_key_exists($position, $pageArr['answers'])) {
-          foreach($pageArr['answers'][$position]['elements'] as $eArr){
-            if($eArr['id'] == $element->getId()){
-              $value = $eArr['displayValue'];
-              break;
-            }
-          }
-        }
-        $arr[] = $value;
+      if(empty($answerArray['children'][0])){
+        return '';
       }
-    }
 
-    return $arr;
+      return parent::getDisplayElementValueFromArray($answerArray['children'][0], $displayElement);
   }
 
   /**
@@ -447,8 +419,8 @@ class Branching extends Standard
     $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getPage()->getVar('branchingElementLabel'), $weight++, 'branchingPageSelection', $this->_applicationPage->getPage()->getId());
     foreach($this->_applicationPage->getPage()->getChildren() as $child){
       foreach($child->getApplicationPageJazzeePage()->listDisplayElements() as $displayElement){
-        if($displayElement->type != 'page' and !in_array($displayElement->name, array('attachment', 'answerPublicStatus', 'answerPrivateStatus'))){
-          $elements[] = new \Jazzee\Display\Element($displayElement->type, $this->_applicationPage->getTitle() .' ' . $displayElement->title, $weight++, $displayElement->name, $displayElement->pageId);
+        if($displayElement->getType() != 'page' and !in_array($displayElement->getName(), array('attachment', 'answerPublicStatus', 'answerPrivateStatus'))){
+          $elements[] = new \Jazzee\Display\Element($displayElement->getType(), $this->_applicationPage->getTitle() .' ' . $displayElement->getTitle(), $weight++, $displayElement->getName(), $displayElement->getPageId());
         }
       }
     }

@@ -59,14 +59,14 @@ class Intersection implements \Jazzee\Interfaces\Display
           $elementIds[] = $display->getElementIds();
           $ourElements = array();
           foreach($display->listElements() as $element){
-            $ourElements[$element->type.$element->name.$element->pageId] = $element;
+            $ourElements[$element->getType().$element->getName().$element->getPageId()] = $element;
           }
           $elements[] = $ourElements;
         }
         
         $this->_pageIds = array_values(call_user_func_array("array_intersect", $pageIds));
         $this->_elementIds = array_values(call_user_func_array("array_intersect", $elementIds));
-        $this->_elements = array_values(call_user_func_array("array_intersect_key", $elements));
+        $this->_elements = array_values(call_user_func_array("array_intersect_key", array_reverse($elements)));
     }
   }
 
@@ -132,7 +132,7 @@ class Intersection implements \Jazzee\Interfaces\Display
     return in_array($element->getId(), $this->_elementIds);
   }
 
-  public function hasDisplayElement(Element $displayElement)
+  public function hasDisplayElement(\Jazzee\Interfaces\DisplayElement $displayElement)
   {
     foreach($this->listElements() as $element){
       if($displayElement->sameAs($element)){

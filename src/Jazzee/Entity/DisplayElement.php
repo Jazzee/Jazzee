@@ -12,7 +12,7 @@ namespace Jazzee\Entity;
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
  */
-class DisplayElement
+class DisplayElement implements \Jazzee\Interfaces\DisplayElement
 {
 
   /**
@@ -207,6 +207,25 @@ class DisplayElement
   }
 
   /**
+   * Get name
+   *
+   * @return string
+   */
+  public function getPageId()
+  {
+    switch($this->type){
+      case 'page':
+        return $this->page->getId();
+        break;
+      case 'element':
+        return $this->element->getPage()->getId();
+        break;
+      default:
+        return null;
+    }
+  }
+
+  /**
    * Get display
    *
    * @return \Jazzee\Entity\Display
@@ -228,34 +247,43 @@ class DisplayElement
   
   /**
    * Create a new display element from the Elements of another display
-   * @param \Jazzee\Display\Element $originalElement
+   * @param \Jazzee\Interfaces\DisplayElement $originalElement
    * @param \Jazzee\Entity\Application $application
    * 
-   * @return \Jazzee\Entity\DisplayElement
+   * @return \Jazzee\Interfaces\DisplayElement
    */
-  public static function createFromDisplayElement(\Jazzee\Display\Element $originalElement, \Jazzee\Entity\Application $application)
+  public static function createFromDisplayElement(\Jazzee\Interfaces\DisplayElement $originalElement, \Jazzee\Entity\Application $application)
   {
-    $displayElement = new \Jazzee\Entity\DisplayElement($originalElement->type);
-    switch($originalElement->type){
+    $displayElement = new \Jazzee\Entity\DisplayElement($originalElement->getType());
+    switch($originalElement->getType()){
       case 'element':
-        if(!$element = $application->getElementById($originalElement->name)){
-          throw new \Jazzee\Exception("{$originalElement->name} is not a valid Jazzee Element ID, so it cannot be used in a 'element' display element.  Element: " . var_export($originalElement, true));
+        if(!$element = $application->getElementById($originalElement->getName())){
+          throw new \Jazzee\Exception("{$originalElement->getName()} is not a valid Jazzee Element ID, so it cannot be used in a 'element' display element.  Element: " . var_export($originalElement, true));
         }
         $displayElement->setElement($element);
         break;
       case 'page':
-        if(!$applicationPage = $application->getApplicationPageByPageId($originalElement->pageId) and !$applicationPage = $application->getApplicationPageByChildPageId($originalElement->pageId)){
-          throw new \Jazzee\Exception("{$originalElement->pageId} is not a valid Page ID, so it cannot be used in a 'page' display element.  Element: " . var_export($originalElement, true));
+        if(!$applicationPage = $application->getApplicationPageByPageId($originalElement->getPageId()) and !$applicationPage = $application->getApplicationPageByChildPageId($originalElement->getPageId())){
+          throw new \Jazzee\Exception("{$originalElement->getPageId()} is not a valid Page ID, so it cannot be used in a 'page' display element.  Element: " . var_export($originalElement, true));
         }
         $displayElement->setPage($applicationPage->getPage());
       case 'applicant':
-        $displayElement->setName($originalElement->name);
+        $displayElement->setName($originalElement->getName());
         break;
     }
-    $displayElement->setTitle($originalElement->title);
-    $displayElement->setWeight($originalElement->weight); 
+    $displayElement->setTitle($originalElement->getTitle());
+    $displayElement->setWeight($originalElement->getWeight()); 
 
     return $displayElement;
+  }
+
+  public function sameAs(\Jazzee\Interfaces\DisplayElement $element)
+  {
+    return ($this->type == $element->getType() and $this->name == $element->getName() and ((is_null($this->pageId) and is_null($element->getPageId())) or $this->pageId == $element->getPageId()));
+  }
+  
+  public function getDisplayElementObject(){
+    return new \Jazzee\Display\Element($this->getType(), $this->getTitle(), $this->getWeight(), $this->getName(), $this->getPageId());
   }
 
 }
