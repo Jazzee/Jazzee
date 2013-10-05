@@ -407,6 +407,24 @@ class Recommenders extends AbstractPage implements \Jazzee\Interfaces\StatusPage
       }
   }
 
+  /**
+   * Render a single answer in the PDF
+   * @param \Jazzee\ApplicantPDF $pdf
+   * @param \Jazzee\Entity\Page $page
+   * @param \Jazzee\Entity\Answer $answer
+   */
+  protected function renderPdfAnswerFromArray(\Jazzee\Entity\Page $page, \Jazzee\ApplicantPDF $pdf, array $answerData)
+  {
+    parent::renderPdfAnswerFromArray($page, $pdf, $answerData);
+    if(!empty($answerData['children'])){
+        $childPage = $page->getChildren()->first();
+        $pdf->addText($childPage->getTitle() . "\n", 'h5');
+        $jazzeePage = $childPage->getApplicationPageJazzeePage();
+        $jazzeePage->setController($this->_controller);
+        $jazzeePage->renderPdfAnswerFromArray($childPage, $pdf, $answerData['children'][0]);
+    }
+  }
+
   public static function applyPageElement()
   {
     return 'Recommenders-apply_page';

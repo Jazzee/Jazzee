@@ -205,6 +205,16 @@ class Payment extends AbstractPage
     //payments aren't recorded in PDFs
   }
 
+  /**
+   * Display nothing on PDFs
+   * @param array $answers
+   * @param \Jazzee\ApplicantPDF $pdf
+   */
+  public function renderPdfSectionFromArray(array $answers, \Jazzee\ApplicantPDF $pdf)
+  {
+    //payments aren't recorded in PDFs
+  }
+
   public function getStatus()
   {
     $answers = $this->getAnswers();
