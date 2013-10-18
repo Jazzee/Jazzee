@@ -66,7 +66,8 @@ class Minimal implements \Jazzee\Interfaces\Display
       'lastLogin' => 'Last Login',
       'percentComplete' => 'Progress',
       'isLocked' => 'Locked',
-      'hasPaid' => 'Paid'
+      'hasPaid' => 'Paid',
+      'externalId' => 'External ID'
     );
     $elements = array();
     $weight = 0;
