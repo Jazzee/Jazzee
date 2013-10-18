@@ -282,7 +282,8 @@ Grid.prototype.updateSingleApplicant = function(applicantId, grid, row){
 Grid.formatDate = function(data, type, full){
   if(data == null) return null;
   if(type == 'filter' || type == 'display'){
-    var date = new Date(data.date);
+    //we extract just the date FF was picky about the datestring format
+    var date = new Date(data.date.substr(0,10));
     return date.toLocaleDateString();
   }
   return data.date;
