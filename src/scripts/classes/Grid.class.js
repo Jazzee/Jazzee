@@ -208,7 +208,13 @@ Grid.prototype.getColumns = function(){
 Grid.prototype.getButtons = function(){
   var self = this;
   var buttons = [];
-  buttons.push('select_all');
+  buttons.push({
+    "sExtends": "select_all",
+    "sButtonText": "Select All",
+    "fnClick": function (nButton, oConfig, oFlash) {
+      TableTools.fnGetInstance(this.s.dt.sTableId).fnSelectAll(true);
+    }
+  });
   buttons.push('select_none');
   if(self.services.checkIsAllowed('applicants_grid', 'sendMessage')){
     buttons.push({
@@ -275,11 +281,13 @@ Grid.prototype.updateSingleApplicant = function(applicantId, grid, row){
  */
 Grid.formatDate = function(data, type, full){
   if(data == null) return null;
+  //we extract just the date FF was picky about the datestring format
+  var dateString = data.date.substr(0,10);
   if(type == 'filter' || type == 'display'){
-    var date = new Date(data.date);
+    var date = new Date(dateString);
     return date.toLocaleDateString();
   }
-  return data.date;
+  return dateString;
 };
 
 /**
@@ -592,7 +600,19 @@ TableTools.BUTTONS.download_applicants = {};
 $.extend( true, TableTools.BUTTONS.download_applicants, TableTools.buttonBase);
 TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
   var tableTools = this;
+  var selected = tableTools.fnGetSelected();
   var dialog = $('<div>');
+  dialog.dialog({
+    modal: true,
+    autoOpen: false,
+    width: 500
+  });
+  if(selected.length == 0){
+    dialog.html('You must select at least one applicant');
+    dialog.dialog( "option", "buttons", [ { text: "Ok", click: function() { $( this ).dialog( "close" ); } } ] );
+    dialog.dialog('open');
+    return;
+  }
   var obj = new FormObject();
   var field = obj.newField({name: 'legend', value: 'Download Options'});
 
@@ -646,6 +666,11 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
     } else {
       $('select[name=display]', form).parent().parent().hide();
     }
+    if($('option:selected', this).text() == 'PDF'){
+      $('select[name=pdftemplate]', form).parent().parent().show();
+    } else {
+      $('select[name=pdftemplate]', form).parent().parent().hide();
+    }
   });
   form.on('submit',function(e){
     var overlay = $('<div>').attr('id', 'downloadoverlay');
@@ -676,9 +701,14 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
         iframeForm.append($('<input>').attr('name', 'display').attr('type', 'hidden').val(display));
 
         var applicantIds = [];
-        var selected = tableTools.fnGetSelectedData();
-        for(var i = 0; i < selected.length; i++){
-          applicantIds.push(selected[i].id);
+        //In order to get the rows in order we have to find them ourselves
+        //since fnGetSelected / fnGetSelectedData use the original order
+        var oSettings = tableTools.s.dt.oInstance.fnSettings();
+        for(var i = 0; i < oSettings.aiDisplay.length; i++) {
+          if (oSettings.aoData[ oSettings.aiDisplay[i] ]._DTTT_selected )
+          {
+            applicantIds.push( tableTools.s.dt.oInstance.fnGetData(oSettings.aiDisplay[i]).id );
+          }
         }
         iframeForm.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
         iframeForm.bind('submit', function(){
@@ -703,9 +733,5 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
     return false;
   });//end submit
   dialog.append(form);
-  dialog.dialog({
-    modal: true,
-    autoOpen: true,
-    width: 500
-  });
+  dialog.dialog('open');
 };

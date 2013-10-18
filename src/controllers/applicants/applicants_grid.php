@@ -140,7 +140,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
     $fileName = tempnam($this->_config->getVarPath() . '/tmp/', 'applicants_download');
     $handle = fopen($fileName, 'w+');
     $this->writeXlsFile($header, $handle);
-    $applicants = explode(',',$this->post['applicantIds']);
+    $applicants = empty($this->post['applicantIds'])?array():explode(',',$this->post['applicantIds']);
     foreach ($applicants as $id) {
       $applicant = $this->_application->formatApplicantDisplayArray($this->_em->getRepository('Jazzee\Entity\Applicant')->findArray($id, $display));
       $arr = array();
@@ -231,7 +231,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
   {
     //use a full applicant display where display is needed
     $display = new \Jazzee\Display\FullApplication($this->_application);
-    $applicants = explode(',',$this->post['applicantIds']);
+    $applicants = empty($this->post['applicantIds'])?array():explode(',',$this->post['applicantIds']);
     $applicants = array_slice($applicants, 0, 50);
     $arr = array();
     $count = 0;
@@ -252,7 +252,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
 
   public function actionDownloadXml()  
   {
-    $applicants = explode(',',$this->post['applicantIds']);
+    $applicants = empty($this->post['applicantIds'])?array():explode(',',$this->post['applicantIds']);
     $xml = new DOMDocument();
     $xml->formatOutput = true;
     $applicantsXml = $xml->createElement("applicants");
@@ -284,7 +284,7 @@ class ApplicantsGridController extends \Jazzee\AdminController
   {
     //use a full applicant display where display is needed
     $display = new \Jazzee\Display\FullApplication($this->_application);
-    $applicants = explode(',',$this->post['applicantIds']);
+    $applicants = empty($this->post['applicantIds'])?array():explode(',',$this->post['applicantIds']);
     // ensure garbage collection is on, we need it
     gc_enable();
 

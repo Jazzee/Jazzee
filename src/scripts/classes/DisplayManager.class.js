@@ -158,6 +158,7 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
     {type:'applicant', title: 'Account Created', name: 'createdAt'},
     {type:'applicant', title: 'Locked', name: 'isLocked'},
     {type:'applicant', title: 'Paid', name: 'hasPaid'},
+    {type:'applicant', title: 'External ID', name: 'externalId'},
     {type:'applicant', title: 'Attachments', name: 'attachments'},
 
     // these should really be a separate type (eg. tag or decision).

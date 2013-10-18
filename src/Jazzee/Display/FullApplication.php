@@ -33,6 +33,7 @@ class FullApplication implements \Jazzee\Interfaces\Display
       'percentComplete' => 'Progress',
       'isLocked' => 'Locked',
       'hasPaid' => 'Paid',
+      'externalId' => 'External ID',
       'attachments' => 'Attachments',
       'status_declined'=> 'Declined',
       'status_admitted'=> 'Admitted',
