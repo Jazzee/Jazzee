@@ -599,7 +599,19 @@ TableTools.BUTTONS.download_applicants = {};
 $.extend( true, TableTools.BUTTONS.download_applicants, TableTools.buttonBase);
 TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
   var tableTools = this;
+  var selected = tableTools.fnGetSelected();
   var dialog = $('<div>');
+  dialog.dialog({
+    modal: true,
+    autoOpen: false,
+    width: 500
+  });
+  if(selected.length == 0){
+    dialog.html('You must select at least one applicant');
+    dialog.dialog( "option", "buttons", [ { text: "Ok", click: function() { $( this ).dialog( "close" ); } } ] );
+    dialog.dialog('open');
+    return;
+  }
   var obj = new FormObject();
   var field = obj.newField({name: 'legend', value: 'Download Options'});
 
@@ -652,6 +664,11 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
       $('select[name=display]', form).parent().parent().show();
     } else {
       $('select[name=display]', form).parent().parent().hide();
+    }
+    if($('option:selected', this).text() == 'PDF'){
+      $('select[name=pdftemplate]', form).parent().parent().show();
+    } else {
+      $('select[name=pdftemplate]', form).parent().parent().hide();
     }
   });
   form.on('submit',function(e){
@@ -710,9 +727,5 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
     return false;
   });//end submit
   dialog.append(form);
-  dialog.dialog({
-    modal: true,
-    autoOpen: true,
-    width: 500
-  });
+  dialog.dialog('open');
 };
