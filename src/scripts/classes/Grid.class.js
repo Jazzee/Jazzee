@@ -208,7 +208,13 @@ Grid.prototype.getColumns = function(){
 Grid.prototype.getButtons = function(){
   var self = this;
   var buttons = [];
-  buttons.push('select_all');
+  buttons.push({
+    "sExtends": "select_all",
+    "sButtonText": "Select All",
+    "fnClick": function (nButton, oConfig, oFlash) {
+      TableTools.fnGetInstance(this.s.dt.sTableId).fnSelectAll(true);
+    }
+  });
   buttons.push('select_none');
   if(self.services.checkIsAllowed('applicants_grid', 'sendMessage')){
     buttons.push({
