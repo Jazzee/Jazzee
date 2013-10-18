@@ -50,7 +50,11 @@ class FileRepository extends \Doctrine\ORM\EntityRepository
   {
     $query = $this->_em->createQuery('SELECT f from Jazzee\Entity\File f WHERE f.hash= :hash');
     $query->setParameter('hash', $hash);
+    try{
     $result = $query->getSingleResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+    } catch(\Doctrine\ORM\NoResultException $e) {
+        throw new \Jazzee\Exception('There is no file with the hash: ' . $hash . $e->getTraceAsString());
+    }
     //we use a second array becuase the other properties are internal
     $arr = array();
     $arr['blob'] = base64_decode($result['encodedBlob']);
