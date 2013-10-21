@@ -41,7 +41,7 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository
    * Find all of the payments in a status
    * 
    * @param string $status
-   * @param \Jazzee\Entity\PaymentType $paymentType
+   * @param array $paymentTypes leve empty for all types
    * @param \DateTime $from
    * @param \DateTime $to
    * @param \Jazzee\Entity\Program $program
@@ -50,7 +50,7 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository
    */
   public function findByStatusArray(
       $status,
-      \Jazzee\Entity\PaymentType $paymentType = null,
+      array $paymentTypes,
       \DateTime $from = null,
       \DateTime $to = null,
       \Jazzee\Entity\Program $program = null,
@@ -75,9 +75,14 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository
     $queryBuilder->where('payment.status = :status');
     $queryBuilder->setParameter('status', $status);
     
-    if(!is_null($paymentType)){  
-      $queryBuilder->andWhere('payment.type = :paymentType');
-      $queryBuilder->setParameter('paymentType', $paymentType->getId());
+    if(!empty($paymentTypes)){
+      $expression = $queryBuilder->expr()->orX();
+      foreach($paymentTypes as $key => $paymentType){
+        $paramKey = 'paymentType' . $key;
+        $expression->add($queryBuilder->expr()->eq("payment.type", ":{$paramKey}"));
+        $queryBuilder->setParameter($paramKey, $paymentType);
+      }
+      $queryBuilder->andWhere($expression);
     }
     if(!is_null($from)){
         $queryBuilder->andWhere('answer.updatedAt > :from');

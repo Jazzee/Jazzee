@@ -46,9 +46,10 @@ class PaymentsReportController extends \Jazzee\AdminController
     $field = $form->newField();
     $field->setLegend('Search');
     
-    $element = $field->newElement('SelectList', 'type');
+    $element = $field->newElement('CheckboxList', 'types');
     $element->setLabel('Payment Type');
-    $element->newItem(null, '');
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
     $paymentTypes = array();
     foreach($this->_em->getRepository('Jazzee\Entity\PaymentType')->findWithPayment() as $type){
         $paymentTypes[$type->getId()] = $type;
@@ -90,21 +91,28 @@ class PaymentsReportController extends \Jazzee\AdminController
         $from = new \DateTime('midnight yesterday');
         $to = new \DateTime('now');
         $payments = $this->_em->getRepository('\Jazzee\Entity\Payment')
-            ->findByStatusArray(\Jazzee\Entity\Payment::SETTLED, null, $from, $to);
+            ->findByStatusArray(\Jazzee\Entity\Payment::SETTLED, array(), $from, $to);
         $this->setVar('resultsDescription', '');
         $description = sprintf('%s payments since midnight yesterday', count($payments));
       $this->setVar('searchResultsDescription', $description);
+      $form->getElementByName('types')->setValue(array_keys($paymentTypes));
     } else if ($input = $form->processInput($this->post)) {
       set_time_limit(120);
-      $type = $input->get('type')?$paymentTypes[$input->get('type')]:null;
+      $types = array();
+      foreach($input->get('types') as $id){
+          $types[] = $paymentTypes[$id];
+      }
       $program = $input->get('program')?$programs[$input->get('program')]:null;
       $cycle = $input->get('cycle')?$cycles[$input->get('cycle')]:null;
       $from = $input->get('from')?new \DateTime($input->get('from')):null;
       $to = $input->get('to')?new \DateTime($input->get('to')):null;
       $payments = $this->_em->getRepository('\Jazzee\Entity\Payment')->
-        findByStatusArray(\Jazzee\Entity\Payment::SETTLED, $type, $from, $to, $program, $cycle);
+        findByStatusArray(\Jazzee\Entity\Payment::SETTLED, $types, $from, $to, $program, $cycle);
 //      $description = sprintf('%s results from search', count($payments));
       $this->setVar('searchResultsDescription', '');
+    } else {
+        $this->setVar('searchResultsDescription', '');
+        
     }
     foreach($payments as &$payment){
         $paymentType = $paymentTypes[$payment['type']['id']]->getJazzeePaymentType($this);

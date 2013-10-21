@@ -11,6 +11,15 @@ $(document).ready(function(){
       jazzeePaymentsReportDatePicker(input);
     }
   });
+  var checkAll = $('<a>').html('(all)').attr('href','#').bind('click', function(e){
+    $(':checkbox', $(this).closest('div.field')).prop('checked', true);
+    return false;
+  });
+  var checkNone = $('<a>').html('(none)').attr('href','#').bind('click', function(e){
+    $(':checkbox', $(this).closest('div.field')).prop('checked', false);
+    return false;
+  });
+  $('div.CheckboxList[name="types"] div.label label').append(checkAll).append(' ').append(checkNone);
   var progressbar = $('<div>').attr('id', 'progress').append('Loading...').css('width', '250px');
   $('div.form').append(progressbar);
   progressbar.progressbar({
