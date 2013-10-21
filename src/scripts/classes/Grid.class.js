@@ -700,9 +700,14 @@ TableTools.BUTTONS.download_applicants.fnClick =  function( nButton, oConfig ) {
         iframeForm.append($('<input>').attr('name', 'display').attr('type', 'hidden').val(display));
 
         var applicantIds = [];
-        var selected = tableTools.fnGetSelectedData();
-        for(var i = 0; i < selected.length; i++){
-          applicantIds.push(selected[i].id);
+        //In order to get the rows in order we have to find them ourselves
+        //since fnGetSelected / fnGetSelectedData use the original order
+        var oSettings = tableTools.s.dt.oInstance.fnSettings();
+        for(var i = 0; i < oSettings.aiDisplay.length; i++) {
+          if (oSettings.aoData[ oSettings.aiDisplay[i] ]._DTTT_selected )
+          {
+            applicantIds.push( tableTools.s.dt.oInstance.fnGetData(oSettings.aiDisplay[i]).id );
+          }
         }
         iframeForm.append($('<input>').attr('name', 'applicantIds').attr('type', 'hidden').val(applicantIds));
         iframeForm.bind('submit', function(){
