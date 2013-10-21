@@ -400,8 +400,8 @@ class UCLACashNet extends AbstractPaymentType
   public function getPaymentNotes(\Jazzee\Entity\Payment $payment)
   {
     $arr = array(
-      'UCLA Reference Number' => $payment->getVar('UCLA_REF_NO'),
       'Transaction Number' => $payment->getVar('tx'),
+      'UCLA Reference Number' => $payment->getVar('UCLA_REF_NO'),
       'Customer Code' => $payment->getVar('custcode'),
       'Payment Code' => $payment->getVar('pmtcode'),
       'Item Code' => $payment->getVar('itemcode')
@@ -416,8 +416,8 @@ class UCLACashNet extends AbstractPaymentType
           $variables[$arr['name']] = \Jazzee\Entity\PaymentVariable::decodeValue($arr['value']);
       }
       $arr = array(
-        'UCLA Reference Number' => $variables['UCLA_REF_NO'],
         'Transaction Number' => $variables['tx'],
+        'UCLA Reference Number' => $variables['UCLA_REF_NO'],
         'Customer Code' => $variables['custcode'],
         'Payment Code' => $variables['pmtcode'],
         'Item Code' => $variables['itemcode']
