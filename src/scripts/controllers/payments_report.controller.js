@@ -46,18 +46,21 @@ $(document).ready(function(){
                     $(nTd).html(a);
                 }
               },
-              "aTargets": [2]
+              "aTargets": [3]
             }
          ],
         "fnFooterCallback": function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
             var totalAmount = 0;
             for ( var i=0 ; i<aaData.length ; i++ )
             {
-                totalAmount += parseInt(aaData[i][8]);
+              var lastColumn = aaData[i].length-1;
+              totalAmount += parseInt(aaData[i][lastColumn]);
             }
             /* Modify the footer row to match what we want */
             var nCells = nRow.getElementsByTagName('th');
-            nCells[1].innerHTML = '$' + totalAmount;
+            $(nCells[0]).attr('colspan', lastColumn);
+            $(nCells[0]).css('text-align', 'right');
+            $(nCells[1]).html('$' + totalAmount);
         }
       });
       $('#progress').hide().remove();
