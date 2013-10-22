@@ -175,7 +175,15 @@ class UCLACashNet extends AbstractPaymentType
           $this->_controller->log("Unable to get transaction details from cashnet for transaction: {$payment->getVar('tx')} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}",  \Monolog\Logger::ERROR);
         } else {
           if($xml->transactions[0]->transaction->txno == $payment->getVar('tx') and $xml->transactions[0]->transaction->totalamount == $payment->getAmount()){
-            $payment->settled();
+            if(strtolower($xml->transactions[0]->transaction->txstatus) == 'c'){
+                $payment->setVar('tx', $xml->transactions[0]->transaction->txno);
+                $payment->settled();
+            } else {
+                //for unspecified reasons sometimes a voided/cancled transaction gets sent, these need to be marked
+                //as rejected.  Its unclear if they would normally have a transaction 'result' or zero so we have to be carefull
+                $payment->setVar('rejectedReason', $xml->transactions[0]->transaction->respmessage);
+                $payment->rejected(); 
+            }
           } else {
             throw new \Jazzee\Exception("Transaction details differ between cashnet and payment for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Payment (TX: {$payment->getVar('tx')}, Ammount: {$payment->getAmount()}) Cashnet Payment (TX: {$xml->transactions[0]->transaction->txno}, Amount: {$xml->transactions[0]->transaction->totalamount}) ");
           }
@@ -213,7 +221,14 @@ class UCLACashNet extends AbstractPaymentType
       foreach ($xml->transactions[0]->transaction->trefs->tref as $tref) {
         $payment->setVar($tref->reftype, $tref->refvalue);
       }
-      $payment->settled();
+      if(strtolower($xml->transactions[0]->transaction->txstatus) == 'c'){
+        $payment->settled();
+      } else {
+        //for unspecified reasons sometimes a voided/cancled transaction gets sent, these need to be marked
+        //as rejected.  Its unclear if they would normally have a transaction 'result' or zero so we have to be carefull
+        $payment->setVar('rejectedReason', $xml->transactions[0]->transaction->respmessage);
+        $payment->rejected();
+      }
     } else {
       throw new \Jazzee\Exception("UCLACashNET::pendingPayment called form invalid controller: " . get_class($this->_controller));
     }
@@ -240,7 +255,7 @@ class UCLACashNet extends AbstractPaymentType
   }
 
   /**
-   * Attempt to settle the payment with authorize.net
+   * Attempt to settle the payment with cashnet
    * @SuppressWarnings(PHPMD.UnusedFormalParameter)
    */
   public function settlePayment(\Jazzee\Entity\Payment $payment, \Foundation\Form\Input $input)
@@ -258,7 +273,12 @@ class UCLACashNet extends AbstractPaymentType
       return "Unable to get transaction details from cashnet for payment: {$payment->getId()}, transaction: {$payment->getVar('tx')} for applicant {$payment->getAnswer()->getApplicant()->getId()}.  Cashnet said: {$xml->respmessage}";
     }
     if($xml->transactions[0]->transaction->txno == $payment->getVar('tx') and $xml->transactions[0]->transaction->totalamount == $payment->getAmount()){
-      $payment->settled();
+      if(strtolower($xml->transactions[0]->transaction->txstatus) == 'c'){
+        $payment->settled();
+      } else {
+        $payment->setVar('rejectedReason', $xml->transactions[0]->transaction->respmessage);
+        $payment->rejected();
+      }
       return true;
     } else {
       throw new \Jazzee\Exception("Transaction details differ between cashnet and payment: {$payment->getId()} for applicant {$payment->getAnswer()->getApplicant()->getId()}.");
