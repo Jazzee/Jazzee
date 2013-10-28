@@ -182,6 +182,30 @@ class ApplicantsGridController extends \Jazzee\AdminController
                         }
                         $arr[$displayElement->getName()] = implode(',', $values);
                         break;
+                     case 'status_declined':
+                        $arr[$displayElement->getName()] = $applicant['decision']? 
+                          (is_null($applicant['decision']['declineOffer']) ? 'no' : 'yes'):'no';
+                        break;
+                    case 'status_admitted':
+                        $arr[$displayElement->getName()] = $applicant['decision']? 
+                          (is_null($applicant['decision']['finalAdmit']) ? 'no' : 'yes'):'no';
+                        break;
+                    case 'status_denied':
+                        $arr[$displayElement->getName()] = $applicant['decision']? 
+                          (is_null($applicant['decision']['finalDeny']) ? 'no' : 'yes'):'no';
+                        break;
+                    case 'status_accepted':
+                        $arr[$displayElement->getName()] = $applicant['decision']? 
+                          (is_null($applicant['decision']['acceptOffer']) ? 'no': 'yes'):'no';
+                        break;
+                    case 'status_nominate_admit':
+                        $arr[$displayElement->getName()] = $applicant['decision']?
+                          (is_null($applicant['decision']['nominateAdmit']) ? 'no': 'yes') :'no';
+                        break;
+                    case 'status_nominate_deny':
+                      $arr[$displayElement->getName()] = $applicant['decision']? 
+                        (is_null($applicant['decision']['nominateDeny']) ? 'no' : 'yes'):'no';
+                      break;
                     default:
                         if(array_key_exists($displayElement->getName(), $applicant)){
                           $arr[$displayElement->getName()] = $applicant[$displayElement->getName()];
