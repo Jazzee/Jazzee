@@ -146,35 +146,47 @@ class ApplicantsGridController extends \Jazzee\AdminController
       $arr = array();
       foreach($display->listElements() as $displayElement){
         if($displayElement->getType() == 'applicant'){
-            switch($displayElement->getName()){
-                case 'isLocked':
-                    $arr['isLocked'] = $applicant['isLocked']? 'yes':'no';
-                    break;
-                case 'hasPaid':
-                    $arr['hasPaid'] = $applicant['hasPaid']? 'yes':'no';
-                    break;
-                case 'lastLogin':
-                    $arr['lastLogin'] = !is_null($applicant['lastLogin'])?$applicant['lastLogin']->format('c'):'never';
-                    break;
-                case 'updatedAt':
-                case 'createdAt':
-                    $arr[$displayElement->getName()] = $applicant['updatedAt']->format('c');
-                    break;
-                case 'decision':
-                    $arr['decision'] = $applicant['decision']? $applicant['decision']['status']:'none';
-                    break;
-                case 'percentComplete':
-                    $arr['percentComplete'] = $applicant['percentComplete'] * 100 . '%';
-                    break;
-                case 'attachments':
-                    $values = array();
-                    foreach($applicant['attachments'] as $attachment){
-                        $values[] = $attachment['displayValue'];
+            if(is_numeric($displayElement->getName())){
+                $arr[$displayElement->getName()] = 'no';
+                foreach($applicant['tags'] as $tag){
+                    if($tag['id'] == $displayElement->getName()){
+                        $arr[$displayElement->getName()] = 'yes';
+                        break;
                     }
-                    $arr[$displayElement->getName()] = implode(',', $values);
-                    break;
-                default:
-                    $arr[$displayElement->getName()] = $applicant[$displayElement->getName()];
+                }
+            } else {
+                switch($displayElement->getName()){
+                    case 'isLocked':
+                        $arr['isLocked'] = $applicant['isLocked']? 'yes':'no';
+                        break;
+                    case 'hasPaid':
+                        $arr['hasPaid'] = $applicant['hasPaid']? 'yes':'no';
+                        break;
+                    case 'lastLogin':
+                        $arr['lastLogin'] = !is_null($applicant['lastLogin'])?$applicant['lastLogin']->format('c'):'never';
+                        break;
+                    case 'updatedAt':
+                    case 'createdAt':
+                        $arr[$displayElement->getName()] = $applicant['updatedAt']->format('c');
+                        break;
+                    case 'decision':
+                        $arr['decision'] = $applicant['decision']? $applicant['decision']['status']:'none';
+                        break;
+                    case 'percentComplete':
+                        $arr['percentComplete'] = $applicant['percentComplete'] * 100 . '%';
+                        break;
+                    case 'attachments':
+                        $values = array();
+                        foreach($applicant['attachments'] as $attachment){
+                            $values[] = $attachment['displayValue'];
+                        }
+                        $arr[$displayElement->getName()] = implode(',', $values);
+                        break;
+                    default:
+                        if(array_key_exists($displayElement->getName(), $applicant)){
+                          $arr[$displayElement->getName()] = $applicant[$displayElement->getName()];
+                        }
+                }
             }
             
         } else {
