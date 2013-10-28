@@ -24,6 +24,12 @@ ApplicantData.prototype.hasStatus = function(statusName){
 	  }else if(statusName == 'status_accepted'){
 	      hasStatus = (this["decision"]["acceptOffer"] != null);
 
+	  }else if(statusName == 'status_nominate_admit'){
+	      hasStatus = (this["decision"]["nominateAdmit"] != null);
+
+	  }else if(statusName == 'status_nominate_deny'){
+	      hasStatus = (this["decision"]["nominateDeny"] != null);
+
 	  }
 
       }
