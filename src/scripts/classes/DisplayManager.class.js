@@ -277,9 +277,9 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
       $.each(maximumDisplay.listTags(), function(){
 	  this.type = 'applicant';
 	  this.name = this.id;
-	  this.weight = 1;
 	  hasItems = true;
       var li = $('<li>').addClass('item').html(this.title).data('element', this);
+      li.attr('id', this.type + this.name);
       if(self.display.displayElement(this)){
           li.addClass('selected');
       }
@@ -293,6 +293,7 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
         } else {
           li.removeClass('selected');
           element.weight = self.nextWeight();
+          console.log(element.weight);
           self.display.addElement(element);
           list.replaceWith(self.tagBox(maximumDisplay));
           self.drawChosen();
