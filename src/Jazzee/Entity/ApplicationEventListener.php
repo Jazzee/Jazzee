@@ -39,7 +39,7 @@ class ApplicationEventListener
           break;
         case 'Jazzee\Entity\ApplicationPage':
         case 'Jazzee\Entity\PDFTemplate':
-          $applications[$entity->getApplication()->getId()] = $entity;
+          $applications[$entity->getApplication()->getId()] = $entity->getApplication();
           break;
         case 'Jazzee\Entity\Element':
           foreach($entity->getPage()->getApplicationPages() as $applicationPage){
