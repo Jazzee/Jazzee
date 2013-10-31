@@ -21,15 +21,22 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
    */
   public function actionIndex()
   {
-    $pattern = $this->getPathString(preg_replace("/[^a-z0-9\._-]/i",'',$this->_program->getShortName() . $this->_cycle->getName()) . '-*');
+    $programCycleName = preg_replace("/[^a-z0-9\._-]/i",'',$this->_program->getShortName() . $this->_cycle->getName());
+    $pattern = $this->getPathString($programCycleName . '-*');
     $existing = array();
     foreach (glob($pattern) as $path) {
-      $stats = stat($path);
       $arr = array();
       $key = $this->getKeyFromPath($path);
       $arr['key'] = $key;
       $arr['link'] = $this->applyPath('preview/start/' . $key);
-      $arr['lastAccessed'] = date('m-d-Y h:i', $stats['mtime']);
+      $matches = array();
+      if(preg_match("/^{$programCycleName}-([0-9]+)-[a-z0-9]+$/i", $key, $matches)){
+        $time = $matches[1];
+      } else {
+          $stats = stat($path);
+          $time = $stats['mtime'];
+      }
+      $arr['lastAccessed'] = date('m-d-Y h:i', $time);
 
       $existing[] = $arr;
     }
@@ -67,7 +74,9 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
       }
       $prefix = substr(md5(mt_rand() * mt_rand()), rand(0, 24), rand(6, 8));
       //clean out any wierd chars in program or cycle name
-      $key = preg_replace("/[^a-z0-9\._-]/i",'',$this->_program->getShortName() . $this->_cycle->getName()) . '-' . \uniqid($prefix);
+      $key = preg_replace("/[^a-z0-9\._-]/i",'',$this->_program->getShortName() . $this->_cycle->getName()) .
+          '-' . time() .
+          '-' . \uniqid($prefix);
       $path = $this->getPathString($key);
 
       $doctrineConfig = $this->_em->getConfiguration();
