@@ -612,7 +612,7 @@ abstract class PageBuilder extends AdminController
     unset($bsBootstrap);
     // set up configuration
     $config = \HTMLPurifier_Config::createDefault();
-    $config->set('HTML.DefinitionID', 'JazzeeJazzeeConfig');
+    $config->set('HTML.DefinitionID', 'JazzeePageBuilderJazzeeConfig');
     $config->set('HTML.DefinitionRev', 1); // increment when configuration changes
     $config->set('Attr.AllowedFrameTargets', array('_blank', '_top'));
     $config->set('Cache.SerializerPath', $cachePath);
