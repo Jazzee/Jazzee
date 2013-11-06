@@ -56,7 +56,7 @@ class QASAddress extends Standard
     }
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
-    $form->newHiddenElement('level', 1);
+    $form->newHiddenElement('type', 'selectcountry');
     $form->newButton('submit', 'Next');
 
     return $form;
@@ -64,23 +64,33 @@ class QASAddress extends Standard
 
   public function validateInput($arr)
   {
-    if ($input = $this->selectCountryForm()->processInput($arr)) {
-      $countryName = $this->selectCountryForm()->getElementByName('country')->getLabelForValue($input->get('country'));
-      $form = $this->getFormForCountry($countryName);
-      $form->newHiddenElement('countryName', $countryName);
-      $form->newHiddenElement('country', $input->get('country'));
-      $this->_form = $form;
-      if ($input->get('level') == 1) {
-        $this->_controller->setVar('confirm', false);
-        return false;
-      } else {
-        if ($input = $this->_form->processInput($arr)) {
-          return $this->validateAddress($input);
-        }
-      }
+    $selectCountryForm = $this->selectCountryForm();
+    if (!$input = $selectCountryForm->processInput($arr)) {
+      $this->_form = $selectCountryForm;
+      return false;
     }
-
-    return false;
+    $countryName = $this->selectCountryForm()->getElementByName('country')->getLabelForValue($input->get('country'));
+    $countryForm = $this->getFormForCountry($countryName);
+    $countryForm->newHiddenElement('countryName', $countryName);
+    $countryForm->newHiddenElement('country', $input->get('country'));
+    $countryForm->newHiddenElement('type', 'validate');
+    if(!empty($arr['answerId'])){
+        $countryForm->newHiddenElement('answerId', $arr['answerId']);
+        $countryForm->setAction($this->_controller->getActionPath() . "/edit/{$arr['answerId']}");
+    }
+    if($arr['type'] == 'selectcountry') {
+        $this->_form = $countryForm;
+        if(!empty($arr['savedAnswerInput']) and $arr['originalCountry'] == $input->get('country')){
+            $input = unserialize(base64_decode($arr['savedAnswerInput']));
+            foreach($countryForm->getElements() as $formElement){
+                if($input->checkIsSet($formElement->getName())){
+                    $formElement->setValue($input->get($formElement->getName()));
+                }
+            }
+        }
+        return false;
+    }
+    return $this->validateAddress($arr, $countryForm);
   }
 
   /**
@@ -124,6 +134,7 @@ class QASAddress extends Standard
   public function fill($answerId)
   {
     if ($answer = $this->_applicant->findAnswerById($answerId)) {
+      $input = new \Foundation\Form\Input(array());
       $fixedElements = array(
         self::FID_ADDRESS1 => 'address1',
         self::FID_ADDRESS2 => 'address2',
@@ -136,23 +147,23 @@ class QASAddress extends Standard
       $element->getJazzeeElement()->setController($this->_controller);
       $countryName = $element->getJazzeeElement()->formValue($answer);
       $country = array_search($countryName, self::$_countries);
-      if($country === false){
-        $this->_controller->addMessage('error', "This address cannot be edited, you will need to delete it and add it again.");
-        $this->_controller->redirectPath($this->_controller->getActionPath());
-      }
-      $form = $this->getFormForCountry($countryName);
+      
+      $form = $this->selectCountryForm();
       $form->setAction($this->_controller->getActionPath() . "/edit/{$answerId}");
-      $form->newHiddenElement('countryName', $countryName);
-      $form->newHiddenElement('country', $country);
+      $form->newHiddenElement('originalCountryName', $countryName);
+      $form->newHiddenElement('originalCountry', $country);
+      $form->newHiddenElement('answerId', $answer->getId());
       $this->_controller->setVar('confirm', false);
       foreach ($fixedElements as $fid => $name) {
         $element = $this->_applicationPage->getPage()->getElementByFixedId($fid);
         $element->getJazzeeElement()->setController($this->_controller);
         $value = $element->getJazzeeElement()->formValue($answer);
-        if ($value and $formElement = $form->getElementByName($name)) {
-          $formElement->setValue($value);
+        if ($value) {
+          $input->set($name, $value);
         }
       }
+      $form->newHiddenElement('savedAnswerInput', base64_encode(serialize($input)));
+            
       $this->_form = $form;
     }
   }
@@ -241,96 +252,147 @@ class QASAddress extends Standard
 
   /**
    * Validate an address with QAS
-   * @param \Foundation\Form\Input $input
-   * @return array addresses
+   * @param array $postData
+   * @param \Foundation\Form $countryForm
+   * @return \Foundation\Form\Input | false
    */
-  protected function validateAddress(\Foundation\Form\Input $input)
+  protected function validateAddress(array $postData, \Foundation\Form $countryForm)
   {
-
-    //Check to see if this is the second time the user has inptu this address,
-    //if it is then just use that as the address unverified
-    $sameUserInput = false;
-    if ($str = $input->get('originalInput')) {
-      $str = base64_decode($str);
-      $originalInput = unserialize($str);
-      $sameUserInput = true;
-      foreach (array('address1', 'address2', 'address3', 'city', 'state', 'postalCode', 'country') as $name) {
-        if ($originalInput->get($name) != $input->get($name)) {
-          $sameUserInput = false;
-          break;
-        }
-      }
-    }
-    $countryName = $input->get('countryName');
+    $countryName = $countryForm->getElementByName('countryName')->getValue();
+    $country = $countryForm->getElementByName('country')->getValue();
     $countriesToValidate = explode(',', $this->_applicationPage->getPage()->getVar('validatedCountries'));
-    if ($sameUserInput or !in_array($this->getQASCodeForCountry($countryName), $countriesToValidate)) {
-      $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId(), $input->get('address1'));
-      $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId(), $input->get('address2'));
-      $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $input->get('address3'));
-      $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId(), $input->get('city'));
-      $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId(), $input->get('state'));
-      $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId(), $input->get('postalCode'));
-      $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $countryName);
-
-      return $input;
-    }
-
-    $search = array();
-
-    $search[0] = $input->get('address1');
-    $search[1] = $input->get('address2');
-    $search[2] = $input->get('city');
-    $search[3] = $input->get('state');
-    $search[4] = $input->get('postalCode');
-
+    
     //Create the QuickAddress Object and set the engine and picklist type
     $qas = new \QuickAddress($this->_applicationPage->getPage()->getVar('wsdlAddress'));
     $qas->setEngineType(QAS_VERIFICATION_ENGINE);
     $qas->setFlatten(true);
+    $qasCountryCode = $this->getQASCodeForCountry($countryName);
+    $qasLayout = "Database layout";
+    
+    switch($postData['type']){
+        case 'confirmAddress':
+            if($postData['addressChoice'] == 'validated'){
+                return unserialize(base64_decode($postData['validatedInput']));
+            } else if($postData['addressChoice'] == 'original'){
+                return unserialize(base64_decode($postData['originalInput']));
+            } else {
+                $input = unserialize(base64_decode($postData['originalInput']));
+                foreach($countryForm->getElements() as $formElement){
+                    if($input->checkIsSet($formElement->getName())){
+                        $formElement->setValue($input->get($formElement->getName()));
+                    }
+                }
+                $this->_form = $countryForm;
+                return false;
+            }
+            break;
+        case 'validate':
+            if(!$input = $countryForm->processInput($postData)){
+                $this->_form = $countryForm;
+                return false;
+            }
+            
+            //Check to see if this is the second time the user has input this address,
+            //if it is then just use that as the address unverified
+            $sameUserInput = false;
+            if ($str = $input->get('originalInput')) {
+              $str = base64_decode($str);
+              $originalInput = unserialize($str);
+              $sameUserInput = true;
+              foreach (array('address1', 'address2', 'address3', 'city', 'state', 'postalCode', 'country') as $name) {
+                if ($originalInput->get($name) != $input->get($name)) {
+                  $sameUserInput = false;
+                  break;
+                }
+              }
+            }
+            
+            $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId(), $input->get('address1'));
+            $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId(), $input->get('address2'));
+            $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $input->get('address3'));
+            $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId(), $input->get('city'));
+            $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId(), $input->get('state'));
+            $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId(), $input->get('postalCode'));
+            $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $countryName);
+            if ($sameUserInput or !in_array($this->getQASCodeForCountry($countryName), $countriesToValidate) or !$qas->canSearch($qasCountryCode, $qasLayout)->IsOk) {
+              return $input;
+            }
+            
+            
+            $search = array();
+            $search[0] = $input->get('address1');
+            $search[1] = $input->get('address2');
+            $search[2] = $input->get('city');
+            $search[3] = $input->get('state');
+            $search[4] = $input->get('postalCode');
+            //Perform the search itself
+            $result = $qas->search($qasCountryCode, $search, QAS_DEFAULT_PROMPT, $qasLayout);
+            switch ($result->sVerifyLevel) {
+              case 'Verified':
+              case 'InteractionRequired':
+                $originalInput = clone $input;
+                $arr = $result->address->atAddressLines;
+                $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId(), $arr[0]->Line);
+                $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId(), $arr[1]->Line);
+                $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $input->get('address3'));
+                $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId(), $arr[3]->Line);
+                $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId(), $arr[4]->Line);
+                $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId(), $arr[5]->Line);
+                $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $countryName);
+                $validatedInput = clone $input;
 
+                $confirmationForm = new \Foundation\Form;
+                $confirmationForm->setAction($countryForm->getAction());
+                $confirmationForm->setCSRFToken($this->_controller->getCSRFToken());
+                $field = $confirmationForm->newField();
+                $field->setLegend('Confirm Address');
 
-    //Perform the search itself
-    $result = $qas->search($this->getQASCodeForCountry($countryName), $search, QAS_DEFAULT_PROMPT, "Database layout");
-    switch ($result->sVerifyLevel) {
-      case 'Verified':
-        $arr = $result->address->atAddressLines;
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId(), $arr[0]->Line);
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId(), $arr[1]->Line);
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId(), $input->get('address3'));
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId(), $arr[3]->Line);
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId(), $arr[4]->Line);
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId(), $arr[5]->Line);
-        $input->set('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId(), $countryName);
-
-        return $input;
-          break;
-      case 'Multiple':
-        $this->_controller->addMessage('error', 'We were unable to validate your address.');
-        $this->_controller->setVar('confirm', true);
-        $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
-        $this->_controller->setVar('originalInput', base64_encode(serialize($input)));
-        $this->_controller->setVar('picklist', $result->picklist);
-          break;
-      case 'StreetPartial':
-      case 'PremisesPartial':
-        $this->_controller->addMessage('error', 'We were unable to validate your address.  If you are sure this address is correct then click the "Confirm Address as Entered" button.');
-        $this->getForm()->getElementByName('address1')->addMessage('Your address is incomplete');
-        $this->getForm()->getElementByName('address2')->addMessage('Your address is incomplete');
-        $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
-        $this->_form->newHiddenElement('originalInput', base64_encode(serialize($input)));
-          break;
-      case 'InteractionRequired':
-        $this->_controller->addMessage('error', 'We were unable to validate your address.');
-        $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
-        $this->_form->newHiddenElement('originalInput', base64_encode(serialize($input)));
-          break;
-      case 'None':
-        $this->_controller->addMessage('error', 'We were unable to validate your address.');
-        $this->_form->getElementByName('submit')->setValue('Confirm Address as Entered');
-        $this->_form->newHiddenElement('originalInput', base64_encode(serialize($input)));
-          break;
-      default:
-        throw new \Jazzee\Exception("{$result->sVerifyLevel} is not a known QAS address verification type.", E_USER_ERROR, 'There was a problem verifying your address.  Please try entering it again.');
+                $element = $field->newElement('RadioList', 'addressChoice');
+                $element->setLabel('Confirm Address');
+                
+                $element->newItem('validated', 'Use Our Sugested Address <br />' . $this->formatAddressFromInput($validatedInput));
+                $element->newItem('original', 'Use Address as Entered<br />' . $this->formatAddressFromInput($originalInput));
+                $element->newItem('edit', 'Edit the Address you Entered');
+                $element->setValue('validated');
+                $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+                $confirmationForm->newHiddenElement('type', 'confirmAddress');
+                $confirmationForm->newHiddenElement('countryName', $countryName);
+                $confirmationForm->newHiddenElement('country', $country);
+                $confirmationForm->newHiddenElement('originalInput', base64_encode(serialize($originalInput)));
+                $confirmationForm->newHiddenElement('validatedInput', base64_encode(serialize($validatedInput)));
+                $confirmationForm->newButton('submit', 'Save');
+                $this->_form = $confirmationForm;
+                return false;
+                break;
+              case 'Multiple':
+                $this->_controller->addMessage('error', 'We were unable to validate your address.');
+                $this->_controller->setVar('confirm', true);
+                $countryForm->getElementByName('submit')->setValue('Confirm Address as Entered');
+                $this->_controller->setVar('originalInput', base64_encode(serialize($input)));
+                $countryForm->newHiddenElement('originalInput', base64_encode(serialize($input)));
+                $this->_controller->setVar('picklist', $result->picklist);
+                $this->_form = $countryForm;
+                  break;
+              case 'StreetPartial':
+              case 'PremisesPartial':
+                $this->_controller->addMessage('error', 'We were unable to validate your address.  If you are sure this address is correct then click the "Confirm Address as Entered" button.');
+                $countryForm->getElementByName('address1')->addMessage('Your address is incomplete');
+                $countryForm->getElementByName('address2')->addMessage('Your address is incomplete');
+                $countryForm->getElementByName('submit')->setValue('Confirm Address as Entered');
+                $countryForm->newHiddenElement('originalInput', base64_encode(serialize($input)));
+                $this->_form = $countryForm;
+                  break;
+              case 'None':
+                $this->_controller->addMessage('error', 'We were unable to validate your address.');
+                $countryForm->getElementByName('submit')->setValue('Confirm Address as Entered');
+                $countryForm->newHiddenElement('originalInput', base64_encode(serialize($input)));
+                $this->_form = $countryForm;
+                  break;
+              default:
+                throw new \Jazzee\Exception("{$result->sVerifyLevel} is not a known QAS address verification type.", E_USER_ERROR, 'There was a problem verifying your address.  Please try entering it again.');
+            }
+            
+        break;
     }
 
     return false;
@@ -356,6 +418,28 @@ class QASAddress extends Standard
     $lines[] = $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getJazzeeElement()->displayValue($answer);
 
     return $lines;
+  }
+
+  /**
+   * Format an address
+   * @todo: This maybe can be done with QAS, for now its just manual
+   * @param \Jazzee\Entity\Answer
+   * @return array address lines
+   */
+  public function formatAddressFromInput(\Foundation\Form\Input $input)
+  {
+    $lines = array();
+
+
+    $lines[] = $input->get('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS3)->getId());
+    $lines[] = $input->get('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS1)->getId());
+    $lines[] = $input->get('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_ADDRESS2)->getId());
+    $lines[] = $input->get('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_CITY)->getId()) . ', ' .
+        $input->get('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_STATE)->getId()) . ' ' .
+        $input->get('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_POSTALCODE)->getId());
+    $lines[] = $input->get('el' . $this->_applicationPage->getPage()->getElementByFixedId(self::FID_COUNTRY)->getId());
+
+    return implode('<br />', array_filter($lines));
   }
 
   /**
