@@ -25,6 +25,7 @@ class SetupRolesController extends \Jazzee\AdminController
   protected function setUp()
   {
     parent::setUp();
+    $this->addScript('//cdnjs.cloudflare.com/ajax/libs/jeditable.js/1.7.3/jeditable.min.js');
     $this->addScript($this->path('resource/scripts/classes/Display.class.js'));
     $this->addScript($this->path('resource/scripts/classes/Application.class.js'));
     $this->addScript($this->path('resource/scripts/classes/DisplayManager.class.js'));
@@ -62,7 +63,7 @@ class SetupRolesController extends \Jazzee\AdminController
    */
   public function actionIndex()
   {
-    $max = $this->_user->getMaximumDisplayForApplication($this->_application);
+    $this->setVar('application', $this->_application);
     $this->setVar('roles', $this->_em->getRepository('\Jazzee\Entity\Role')->findByProgram($this->_program->getId()));
   }
 
@@ -250,7 +251,7 @@ class SetupRolesController extends \Jazzee\AdminController
   {
     $this->layout = 'json';
     if ($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $roleID, 'program' => $this->_program->getId()))) {
-      if(!$display = $role->getDisplay()){
+      if(!$display = $role->getDisplayForApplication($this->_application)){
         $display = new \Jazzee\Entity\Display('role');
         $display->setRole($role);
         $display->setApplication($this->_application);
@@ -264,9 +265,18 @@ class SetupRolesController extends \Jazzee\AdminController
         'name' => $display->getName(),
         'pageIds' => $display->getPageIds(),
         'elementIds' => $display->getElementIds(),
-        'elements' => $display->listElements(),
+        'elements' => array(),
         'roleId'  => $display->getRole()->getId()
       );
+      foreach($display->listElements() as $displayElement){
+        $displayArray['elements'][] = array(
+            'type' => $displayElement->getType(),
+            'title' => $displayElement->getTitle(),
+            'weight' => $displayElement->getWeight(),
+            'name' => $displayElement->getName(),
+            'pageId' => $displayElement->getPageId()
+        );
+      }
       $this->setVar('result', $displayArray);
     } else {
       $this->addMessage('error', "Error: Role #{$roleID} does not exist.");
@@ -281,7 +291,11 @@ class SetupRolesController extends \Jazzee\AdminController
   {
     $this->layout = 'json';
     $obj = json_decode($this->post['display']);
-    if ($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $obj->roleId, 'program' => $this->_program->getId())) and $display = $role->getDisplay()) {
+    if (
+        $role = $this->_em->getRepository('\Jazzee\Entity\Role')->
+            findOneBy(array('id' => $obj->roleId, 'program' => $this->_program->getId())) and 
+        $display = $role->getDisplayForApplication($this->_application
+    )) {
       $display->setName($obj->name);
       foreach ($display->getElements() as $displayElement) {
         $display->getElements()->removeElement($displayElement);
@@ -310,7 +324,11 @@ class SetupRolesController extends \Jazzee\AdminController
   {
     $this->layout = 'json';
     $obj = json_decode($this->post['display']);
-    if ($role = $this->_em->getRepository('\Jazzee\Entity\Role')->findOneBy(array('id' => $obj->roleId, 'program' => $this->_program->getId())) and $display = $role->getDisplay()) {
+    if (
+        $role = $this->_em->getRepository('\Jazzee\Entity\Role')->
+            findOneBy(array('id' => $obj->roleId, 'program' => $this->_program->getId())) and 
+        $display = $role->getDisplayForApplication($this->_application
+    )) {
       $this->addMessage('success', $display->getName() . ' deleted');
       $this->getEntityManager()->remove($display);
     }
@@ -353,6 +371,9 @@ class SetupRolesController extends \Jazzee\AdminController
     //several views are controller by the complete action
     if (in_array($action, array('saveDisplay', 'deleteDisplay'))) {
       $action = 'getRoleDisplay';
+    }
+    if($action == 'getRoleDisplay' and !$application){
+        return false;
     }
     return parent::isAllowed($controller, $action, $user, $program, $application);
   }

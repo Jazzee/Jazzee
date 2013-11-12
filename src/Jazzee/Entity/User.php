@@ -393,7 +393,7 @@ class User
     foreach($this->roles as $role){
       if(!$role->isGlobal() AND $role->getProgram()->getId() == $application->getProgram()->getId()){
         $hasProgramRole = true;
-        if($roleDisplay = $role->getDisplay()){
+        if($roleDisplay = $role->getDisplayForApplication($application)){
           $display->addDisplay($roleDisplay);
         } else {
           $display->addDisplay(new \Jazzee\Display\FullApplication($application));
