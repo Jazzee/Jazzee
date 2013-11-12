@@ -7,7 +7,8 @@ namespace Jazzee\Entity;
  * Format the display of applicant data
  *
  * @Entity
- * @Table(name="displays")
+ * @Table(name="displays",
+ * uniqueConstraints={@UniqueConstraint(name="role_application",columns={"role_id", "application_id"})})
  * @SuppressWarnings(PHPMD.ShortVariable)
  * @author  Jon Johnson  <jon.johnson@ucsf.edu>
  * @license http://jazzee.org/license BSD-3-Clause
@@ -37,7 +38,7 @@ class Display implements \Jazzee\Interfaces\Display
   protected $user;
 
   /**
-   * @OneToOne(targetEntity="Role",inversedBy="display")
+   * @ManyToOne(targetEntity="Role",inversedBy="displays")
    * @JoinColumn(onDelete="CASCADE")
    */
   protected $role;

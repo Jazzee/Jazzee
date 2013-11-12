@@ -8,7 +8,7 @@ if ($roles) {?>
   <ul id='roleList'><?php
     foreach ($roles as $role) { ?>
       <li id="role<?php print $role->getId();?>"><?php print $role->getName();
-        if($role->getDisplay()){
+        if($application and $role->getDisplayForApplication($application)){
           print ' <span>(Limited Display)</span>';
         } else {
           print ' <span>(Full Applicant Display)</span>';

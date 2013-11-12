@@ -44,14 +44,15 @@ class Role
   private $users;
 
   /**
-   * @OneToOne(targetEntity="Display", mappedBy="role")
+   * @OneToMany(targetEntity="Display", mappedBy="role")
    */
-  protected $display;
+  protected $displays;
 
   public function __construct()
   {
     $this->actions = new \Doctrine\Common\Collections\ArrayCollection();
     $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+    $this->displays = new \Doctrine\Common\Collections\ArrayCollection();
   }
 
   /**
@@ -199,10 +200,25 @@ class Role
 
   /**
    * Get the display for a role
+   * @return array Display
+   */
+  public function getDisplays(){
+    return $this->displays;
+  }
+
+  /**
+   * Get the display for a role
+   * @param Application $application
    * @return Display
    */
-  public function getDisplay(){
-    return $this->display;
+  public function getDisplayForApplication(Application $application){
+    foreach($this->displays as $display){
+        if($display->getApplication()->getId() == $application->getId()){
+            return $display;
+        }
+    }
+
+    return false;
   }
 
 }
