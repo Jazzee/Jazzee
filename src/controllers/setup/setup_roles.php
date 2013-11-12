@@ -194,6 +194,18 @@ class SetupRolesController extends \Jazzee\AdminController
           }
         }
         $this->_em->persist($newRole);
+        if($oldDisplay = $oldRole->getDisplayForApplication($this->_application)){
+            $display = new \Jazzee\Entity\Display('role');
+            $display->setRole($newRole);
+            $display->setApplication($this->_application);
+            $display->setName($newRole->getName() . ' display');
+            foreach($oldDisplay->listElements() as $userDisplayElement){
+              $displayElement = \Jazzee\Entity\DisplayElement::createFromDisplayElement($userDisplayElement, $this->_application);
+              $display->addElement($displayElement);
+              $this->_em->persist($displayElement);
+            }
+            $this->_em->persist($display);
+        }
         $this->addMessage('success', "Role Copied Successfully");
         $this->redirectPath('setup/roles');
       }
