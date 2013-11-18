@@ -123,6 +123,9 @@ class Education extends Standard
 
   public function validateInput($input)
   {
+    if(!array_key_exists('level', $input)){
+        $input['level'] = false;
+    }
     switch($input['level']){
       case 'search':
         if ($input = $this->getForm()->processInput($input)) {
@@ -185,6 +188,8 @@ class Education extends Standard
         $this->pageForm($input);
         return parent::validateInput($input);
         break;
+      default:
+          throw new \Jazzee\Exception('Invalid Input on Education Page: ' . var_export($input, true));
     }
   }
 
