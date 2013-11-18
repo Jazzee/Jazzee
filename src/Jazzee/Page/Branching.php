@@ -60,6 +60,9 @@ class Branching extends Standard
 
   public function validateInput($input)
   {
+    if(!array_key_exists('branching', $input)){
+        throw new \Jazzee\Exception('Invalid input on Branching page: ' . var_export($input, true));
+    }
     $page = $this->_applicationPage->getPage()->getChildById($input['branching']);
     $this->branchingForm($page);
     if ($input['level'] == 1) {
