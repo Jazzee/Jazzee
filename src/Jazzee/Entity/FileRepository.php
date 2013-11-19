@@ -61,8 +61,8 @@ class FileRepository extends \Doctrine\ORM\EntityRepository
     $arr['hash'] = $result['hash'];
     $arr['lastAccess'] = $result['lastAccess'];
     $arr['lastModification'] = $result['lastModification'];
-    $query = $this->_em->createQuery('UPDATE Jazzee\Entity\File f SET f.lastAccess = :lastAccess WHERE f.hash= :hash');
-    $query->setParameter('hash', $hash);
+    $query = $this->_em->createQuery('UPDATE Jazzee\Entity\File f SET f.lastAccess = :lastAccess WHERE f.id= :id and f.lastAccess < :lastAccess');
+    $query->setParameter('id', $result['id']);
     $query->setParameter('lastAccess', new \DateTime());
     $query->execute();
     return $arr;
