@@ -267,7 +267,7 @@ class SetupRolesController extends \Jazzee\AdminController
         $display = new \Jazzee\Entity\Display('role');
         $display->setRole($role);
         $display->setApplication($this->_application);
-        $display->setName($role->getName() . ' display');
+        $display->setName($role->getName());
         $this->_em->persist($display);
         $this->_em->flush();
       }
