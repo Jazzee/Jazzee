@@ -293,7 +293,6 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
         } else {
           li.removeClass('selected');
           element.weight = self.nextWeight();
-          console.log(element.weight);
           self.display.addElement(element);
           list.replaceWith(self.tagBox(maximumDisplay));
           self.drawChosen();
