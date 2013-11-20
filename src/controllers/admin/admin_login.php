@@ -23,6 +23,9 @@ class AdminLoginController extends \Jazzee\AdminController
     $this->_adminAuthentication->loginUser();
     if ($this->_adminAuthentication->isValidUser()) {
       $this->_authLog->info('Successfull login for user ' . $this->_adminAuthentication->getUser()->getId() . ' from ' . $_SERVER['REMOTE_ADDR']);
+      if ($this->_config->getLoginMessage()) {
+          $this->addMessage('info', $this->_config->getLoginMessage());
+      }
       $this->redirectPath('welcome');
     }
     $this->setVar('authenticationClass', $this->_adminAuthentication);
