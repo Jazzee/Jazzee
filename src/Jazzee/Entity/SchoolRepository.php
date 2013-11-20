@@ -75,4 +75,16 @@ class SchoolRepository extends \Doctrine\ORM\EntityRepository
     return $query->getSingleScalarResult();    
   }
 
+  /**
+   * Find all the schools in an array
+   *
+   * @return array
+   */
+  public function findAllArray()
+  {
+    $query = $this->_em->createQuery("SELECT s FROM Jazzee\Entity\School s");
+
+    return $query->getArrayResult();
+  }
+
 }

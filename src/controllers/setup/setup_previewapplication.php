@@ -151,6 +151,27 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
       $em->persist($newType);
     }
     $em->flush();
+    $em->clear();
+    $count = 0;
+    foreach ($this->_em->getRepository('\Jazzee\Entity\School')->findAllArray() as $arr) {
+      $newSchool = new \Jazzee\Entity\School;
+      $newSchool->setCity($arr['city']);
+      $newSchool->setCode($arr['code']);
+      $newSchool->setCountry($arr['country']);
+      $newSchool->setName($arr['name']);
+      $newSchool->setPostalCode($arr['postalCode']);
+      $newSchool->setSearchTerms($arr['searchTerms']);
+      $newSchool->setState($arr['state']);
+      
+      $em->persist($newSchool);
+      $count++;
+      if($count > 1000){
+          $count = 0;
+          $em->flush();
+          $em->clear();
+      }
+    }
+    $em->flush();
   }
 
   /**
@@ -273,6 +294,7 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
     $newPage->setInstructions($page->getInstructions());
     $newPage->setLeadingText($page->getLeadingText());
     $newPage->setTrailingText($page->getTrailingText());
+    $newPage->setFixedId($page->getFixedId());
 
     $newPage->setType($em->getRepository('\Jazzee\Entity\PageType')->findOneByClass($page->getType()->getClass()));
     if ($page->isGlobal()) {
