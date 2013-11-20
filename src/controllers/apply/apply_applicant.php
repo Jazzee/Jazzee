@@ -88,6 +88,9 @@ class ApplyApplicantController extends \Jazzee\ApplyController
       sleep(3); //wait 5 seconds before announcing failure to slow down guessing.
     }
     $this->setVar('form', $form);
+    if ($this->_config->getLoginMessage()) {
+      $this->addMessage('info', $this->_config->getLoginMessage());
+    }
   }
 
   /**

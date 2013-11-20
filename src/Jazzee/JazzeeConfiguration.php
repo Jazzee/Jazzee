@@ -39,6 +39,12 @@ class JazzeeConfiguration
 
   /**
    * @var string
+   * Message displayed on the login page for applicants and administrators.  Not quite as intrusive as the broadcast one
+   */
+  protected $_loginMessage;
+
+  /**
+   * @var string
    * Provides information  to JAZZEE components about the current system state.  Possible values are:
    * <ul>
    * <li><b>PRODUCTION</b> the default live application status</li>
@@ -649,6 +655,24 @@ class JazzeeConfiguration
   public function setbroadcastMessage($broadcastMessage)
   {
     $this->_broadcastMessage = $broadcastMessage;
+  }
+
+  /**
+   * get loginMessage
+   * @return string
+   */
+  public function getLoginMessage()
+  {
+    return $this->_loginMessage;
+  }
+
+  /**
+   * set loginMessage
+   * @var string
+   */
+  public function setLoginMessage($loginMessage)
+  {
+    $this->_loginMessage = $loginMessage;
   }
 
   /**
