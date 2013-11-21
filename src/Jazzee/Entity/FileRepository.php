@@ -13,9 +13,15 @@ class FileRepository extends \Doctrine\ORM\EntityRepository
   
   /**
    * Remove any files which have a reference count of 0
+   * We do this in two steps becuase it is way faster and doesn't lock the whole table
    */
   public function deleteUnreferencedFiles(){
-    $query = $this->_em->createQuery('DELETE FROM Jazzee\Entity\File f WHERE f.referenceCount = 0');
+    $query = $this->_em->createQuery('SELECT f.id FROM Jazzee\Entity\File f WHERE f.referenceCount = 0');
+    $files = array();
+    foreach($query->getArrayResult() as $arr){
+        $files[] = $arr['id'];
+    }
+    $query = $this->_em->createQuery('DELETE FROM Jazzee\Entity\File f WHERE f.id IN (' . implode(',', $files) . ')');
     $query->execute();
   }
   
