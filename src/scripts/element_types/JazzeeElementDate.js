@@ -10,14 +10,24 @@ JazzeeElementDate.prototype.avatar = function(){
   return $('<input type="text" disabled="true">');
 };
 
+
 /**
- * Dispaly applicant data in a grid
+ * Dates return different data depending on type
  */
-JazzeeElementDate.prototype.getDisplayValues = function(data){
-  var values = [];
+JazzeeElementDate.prototype.gridData = function(data, type, full){
+  var dates = [];
   $.each(data, function(){
-    var date = new Date(this.displayValue);
-    values.push(date.toLocaleDateString());
+    dates.push(moment(this.values[0].value).format('L'));
   });
-  return values;
+  if(dates.length === 0){
+    return '';
+  }
+  if(dates.length === 1){
+    return dates[0];
+  }
+  var ol = $('<ol>');
+  $.each(dates, function(){
+    ol.append($('<li>').html(this));
+  });
+  return ol.clone().wrap('<p>').parent().html();
 };

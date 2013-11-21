@@ -11,13 +11,27 @@ JazzeeElementShortDate.prototype.avatar = function(){
 };
 
 /**
- * Dispaly applicant data in a grid
+ * Dates return different data depending on type
  */
-JazzeeElementShortDate.prototype.getDisplayValues = function(data){
-  var values = [];
+JazzeeElementShortDate.prototype.gridData = function(data, type, full){
+  var dates = [];
   $.each(data, function(){
-    var date = new Date(this.displayValue);
-    values.push(date.getMonth()+1 + '/' + date.getFullYear());
+    dates.push(moment('01 ' + this.displayValue));
   });
-  return values;
+  if(dates.length == 0){
+    return '';
+  }
+  //For some reason datatables didn't like the time stamp for short dates, this seems to work though
+  if(type == 'sort'){
+    return dates[0].format('YYYYMM');
+  }
+  if(dates.length == 1){
+    return dates[0].format('MM/YYYY')
+  }
+  var ol = $('<ol>');
+  $.each(dates, function(){
+    ol.append($('<li>').html(this.format('MM/YYYY')));
+  });
+  return ol.clone().wrap('<p>').parent().html();
+  
 };

@@ -89,7 +89,7 @@ Display.prototype.getId = function(){
  * Get the display name
  */
 Display.prototype.getClass = function(){
-  return this.display.class;
+  return this.display['class'];
 };
 
 /**
