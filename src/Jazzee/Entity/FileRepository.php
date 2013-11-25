@@ -21,8 +21,10 @@ class FileRepository extends \Doctrine\ORM\EntityRepository
     foreach($query->getArrayResult() as $arr){
         $files[] = $arr['id'];
     }
-    $query = $this->_em->createQuery('DELETE FROM Jazzee\Entity\File f WHERE f.id IN (' . implode(',', $files) . ')');
-    $query->execute();
+    if(count($files) > 0){
+        $query = $this->_em->createQuery('DELETE FROM Jazzee\Entity\File f WHERE f.id IN (' . implode(',', $files) . ')');
+        $query->execute();
+    }
   }
   
   /**
