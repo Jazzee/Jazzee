@@ -194,18 +194,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
     if (!$this->_applicant->getDecision()->getFinalAdmit()) {
       throw new \Jazzee\Exception("Applicant {$this->_applicant->getFullName()} tried to access final admit letter, but they are not admitted.", E_USER_ERROR, 'You do not have access to that page.');
     }
-    $text = $this->_application->getAdmitLetter();
-    $search = array(
-      '_Admit_Date_',
-      '_Applicant_Name_',
-      '_Offer_Response_Deadline_'
-    );
-    $replace = array();
-    $replace[] = $this->_applicant->getDecision()->getFinalAdmit()->format('F jS Y');
-    $replace[] = $this->_applicant->getFullName();
-    $replace[] = $this->_applicant->getDecision()->getOfferResponseDeadline()->format('F jS Y g:ia');
-    $text = str_ireplace($search, $replace, $text);
-
+    $text = $this->_applicant->getDecision()->getDecisionLetter();
     $text = nl2br($text);
     $this->setVar('text', $text);
   }
@@ -218,16 +207,7 @@ class ApplyStatusController extends \Jazzee\AuthenticatedApplyController
     if (!$this->_applicant->getDecision()->getFinalDeny()) {
       throw new \Jazzee\Exception("Applicant {$this->_applicant->getFullName()} tried to access final admit letter, but they are not admitted.", E_USER_ERROR, 'You do not have access to that page.');
     }
-    $text = $this->_application->getDenyLetter();
-    $search = array(
-      '_Deny_Date_',
-      '_Applicant_Name_'
-    );
-    $replace = array();
-    $replace[] = $this->_applicant->getDecision()->getFinalDeny()->format('F jS Y');
-    $replace[] = $this->_applicant->getFullName();
-    $text = str_ireplace($search, $replace, $text);
-
+    $text = $this->_applicant->getDecision()->getDecisionLetter();
     $text = nl2br($text);
     $this->setVar('text', $text);
   }

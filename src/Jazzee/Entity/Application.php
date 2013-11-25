@@ -85,12 +85,6 @@ class Application
   private $visible;
 
   /** @Column(type="text", nullable=true) */
-  private $admitLetter;
-
-  /** @Column(type="text", nullable=true) */
-  private $denyLetter;
-
-  /** @Column(type="text", nullable=true) */
   private $statusIncompleteText;
 
   /** @Column(type="text", nullable=true) */
@@ -382,46 +376,6 @@ class Application
   public function isByInvitationOnly()
   {
     return $this->byInvitationOnly;
-  }
-
-  /**
-   * Set admitLetter
-   *
-   * @param text $admitLetter
-   */
-  public function setAdmitLetter($admitLetter)
-  {
-    $this->admitLetter = $admitLetter;
-  }
-
-  /**
-   * Get admitLetter
-   *
-   * @return text $admitLetter
-   */
-  public function getAdmitLetter()
-  {
-    return $this->admitLetter;
-  }
-
-  /**
-   * Set denyLetter
-   *
-   * @param text $denyLetter
-   */
-  public function setDenyLetter($denyLetter)
-  {
-    $this->denyLetter = $denyLetter;
-  }
-
-  /**
-   * Get denyLetter
-   *
-   * @return text $denyLetter
-   */
-  public function getDenyLetter()
-  {
-    return $this->denyLetter;
   }
 
   /**

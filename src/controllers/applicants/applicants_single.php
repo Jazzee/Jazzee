@@ -453,6 +453,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
     $element->addValidator(new \Foundation\Form\Validator\DateAfter($element, 'today'));
 
+    $element = $field->newElement('SelectList', 'decisionTemplate');
+    $element->setLabel('Decision Template');
+    $templates = array();
+    $arr = $this->_em->getRepository('Jazzee\Entity\Template')->
+            findBy(array('type' => \Jazzee\Entity\Template::DECISION_ADMIT, 'application' => $this->_application));
+    foreach($arr as $template){
+        $element->newItem($template->getId(), $template->getTitle());
+        $templates[$template->getId()] = $template;
+    }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
     $element = $field->newElement('RadioList', 'sendMessage');
     $element->setLabel('Send the applicant a notification?');
     $element->newItem(0, 'No');
@@ -463,33 +474,23 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     if (!empty($this->post)) {
       $this->setLayoutVar('textarea', true);
       if ($input = $form->processInput($this->post)) {
-        $applicant->getDecision()->finalAdmit();
-        $applicant->getDecision()->setOfferResponseDeadline($input->get('offerResponseDeadline'));
+        $decision = $applicant->getDecision();
+        $decision->setOfferResponseDeadline($input->get('offerResponseDeadline'));
+        $template = $templates[$input->get('decisionTemplate')];
+        $decision->finalAdmit($template);
         if ($input->get('sendMessage')) {
           $thread = new \Jazzee\Entity\Thread();
           $thread->setSubject('Admission Decision');
           $thread->setApplicant($applicant);
-
           $message = new \Jazzee\Entity\Message();
           $message->setSender(\Jazzee\Entity\Message::PROGRAM);
-          $text = $this->_application->getAdmitLetter();
-          $search = array(
-            '_Admit_Date_',
-            '_Applicant_Name_',
-            '_Offer_Response_Deadline_'
-          );
-          $replace = array();
-          $replace[] = $applicant->getDecision()->getFinalAdmit()->format('F jS Y');
-          $replace[] = $applicant->getFullName();
-          $replace[] = $applicant->getDecision()->getOfferResponseDeadline()->format('F jS Y g:ia');
-          $text = str_ireplace($search, $replace, $text);
-          $text = nl2br($text);
+          $text = nl2br($applicant->getDecision()->getDecisionLetter());
           $message->setText($text);
           $thread->addMessage($message);
           $this->_em->persist($thread);
           $this->_em->persist($message);
         }
-        $this->_em->persist($applicant);
+        $this->_em->persist($decision);
         $this->auditLog($applicant, 'Final Admit');
         $this->setLayoutVar('status', 'success');
       }
@@ -602,6 +603,17 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $field = $form->newField();
     $field->setLegend('Deny ' . $applicant->getFirstName() . ' ' . $applicant->getLastName());
 
+    $element = $field->newElement('SelectList', 'decisionTemplate');
+    $element->setLabel('Decision Template');
+    $templates = array();
+    $arr = $this->_em->getRepository('Jazzee\Entity\Template')->
+            findBy(array('type' => \Jazzee\Entity\Template::DECISION_DENY, 'application' => $this->_application));
+    foreach($arr as $template){
+        $element->newItem($template->getId(), $template->getTitle());
+        $templates[$template->getId()] = $template;
+    }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
     $element = $field->newElement('RadioList', 'sendMessage');
     $element->setLabel('Send the applicant a notification?');
     $element->newItem(0, 'No');
@@ -612,7 +624,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     if (!empty($this->post)) {
       $this->setLayoutVar('textarea', true);
       if ($input = $form->processInput($this->post)) {
-        $applicant->getDecision()->finalDeny();
+        $decision = $applicant->getDecision();
+        $template = $templates[$input->get('decisionTemplate')];
+        $decision->finalDeny($template);
+        
         if ($input->get('sendMessage')) {
           $thread = new \Jazzee\Entity\Thread();
           $thread->setSubject('Admission Decision');
@@ -620,22 +635,13 @@ class ApplicantsSingleController extends \Jazzee\AdminController
 
           $message = new \Jazzee\Entity\Message();
           $message->setSender(\Jazzee\Entity\Message::PROGRAM);
-          $text = $this->_application->getDenyLetter();
-          $search = array(
-            '_Deny_Date_',
-            '_Applicant_Name_'
-          );
-          $replace = array();
-          $replace[] = $applicant->getDecision()->getFinalDeny()->format('F jS Y');
-          $replace[] = $applicant->getFullName();
-          $text = str_ireplace($search, $replace, $text);
-          $text = nl2br($text);
+          $text = nl2br($decision->getDecisionLetter());
           $message->setText($text);
           $thread->addMessage($message);
           $this->_em->persist($thread);
           $this->_em->persist($message);
         }
-        $this->_em->persist($applicant);
+        $this->_em->persist($decision);
         $this->auditLog($applicant, 'Final Deny');
         $this->setLayoutVar('status', 'success');
       }
