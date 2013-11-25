@@ -51,6 +51,9 @@ class Decision
   /** @Column(type="datetime", nullable=true) */
   private $declineOffer;
 
+  /** @Column(type="text", nullable=true) */
+  private $decisionLetter;
+
   /**
    * Get Id
    * @return integer
@@ -144,9 +147,11 @@ class Decision
 
   /**
    * Final Deny Decision
+   * 
+   * @param \Jazzee\Entity\Template $decisionTemplate
    * @param string $dateString
    */
-  public function finalDeny($dateString = null)
+  public function finalDeny(Template $decisionTemplate, $dateString = null)
   {
     if (!is_null($this->finalAdmit)) {
       throw new \Jazzee\Exception('Cannot record two final decisions');
@@ -158,6 +163,7 @@ class Decision
     if (is_null($this->finalDeny)) {
       $this->finalDeny = $this->decisionStamp($dateString);
     }
+    $this->setDecisionLetterFromTemplate($decisionTemplate);
   }
 
   /**
@@ -167,6 +173,7 @@ class Decision
   {
     $this->finalDeny = null;
     $this->decisionViewed = null;
+    $this->decisionLetter = null;
   }
 
   /**
@@ -189,9 +196,10 @@ class Decision
 
   /**
    * Final Admit Decision
+   * @param \Jazzee\Entity\Template $decisionTemplate
    * @param string $dateString
    */
-  public function finalAdmit($dateString = null)
+  public function finalAdmit(Template $decisionTemplate, $dateString = null)
   {
     if (!is_null($this->finalDeny)) {
       throw new \Jazzee\Exception('Cannot record two final decisions');
@@ -203,6 +211,8 @@ class Decision
     if (is_null($this->finalAdmit)) {
       $this->finalAdmit = $this->decisionStamp($dateString);
     }
+    $this->setDecisionLetterFromTemplate($decisionTemplate);
+
   }
 
   /**
@@ -215,6 +225,7 @@ class Decision
     }
     $this->finalAdmit = null;
     $this->decisionViewed = null;
+    $this->decisionLetter = null;
   }
 
   /**
@@ -338,6 +349,66 @@ class Decision
   public function getDecisionViewed()
   {
     return $this->decisionViewed;
+  }
+  
+  /**
+   * Set the decision letter
+   * @param string $decisionLetter
+   */
+  public function setDecisionLetter($decisionLetter)
+  {
+      $this->decisionLetter = $decisionLetter;
+  }
+  
+  /**
+   * get the decision letter
+   * 
+   * @return string
+   */
+  public function getDecisionLetter()
+  {
+      return $this->decisionLetter;
+  }
+  
+  /**
+   * Set the decision letter using a template
+   * 
+   * @param \Jazzee\Entity\Template $template
+   */
+  protected function setDecisionLetterFromTemplate(Template $template)
+  {
+      if (is_null($this->applicant)) {
+        throw new \Jazzee\Exception('Missing applicant when attemtping to set decision letter from a template');
+      }
+      $search = array(
+        '_Admit_Date_',
+        '_Deny_Date_',
+        '_Offer_Response_Deadline_',
+        '_Applicant_Name_'
+      );
+      $replace = array();
+      switch($template->getType()){
+          case \Jazzee\Entity\Template::DECISION_ADMIT:
+              if (is_null($this->finalAdmit) OR is_null($this->offerResponseDeadline)) {
+                throw new \Jazzee\Exception('Missing final decision or offer response deadline when attemtping to set decision letter from a template');
+              }
+              $replace[] = $this->finalAdmit->format('F jS Y');
+              $replace[] = null;
+              $replace[] = $this->offerResponseDeadline->format('F jS Y g:ia');
+              break;
+          case \Jazzee\Entity\Template::DECISION_DENY:
+              if (is_null($this->finalDeny)) {
+                throw new \Jazzee\Exception('Missing final decision when attemtping to set decision letter from a template');
+              }
+              $replace[] = null;
+              $replace[] = $this->finalDeny->format('F jS Y');
+              $replace[] = null;
+              break;
+          default:
+              throw new \Jazzee\Exception('Template is not a decision template');
+      }
+      $replace[] = $this->applicant->getFullName();
+      $this->decisionLetter = $template->renderText($search, $replace);
   }
 
   /**
