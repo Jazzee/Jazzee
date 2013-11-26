@@ -26,6 +26,9 @@ if (count($denyTemplates)) {?>
   <ul><?php
     foreach ($denyTemplates as $template) { ?>
       <li><?php print $template->getTitle();
+        if ($this->controller->checkIsAllowed('setup_decisionletters', 'copy')) { ?>
+          <a href='<?php print $this->path('setup/decisionletters/copy/') . $template->getId() ?>'>Copy</a><?php
+        }
         if ($this->controller->checkIsAllowed('setup_decisionletters', 'edit')) { ?>
           <a href='<?php print $this->path('setup/decisionletters/edit/') . $template->getId() ?>'>Edit</a><?php
         }
