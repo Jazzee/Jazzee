@@ -16,7 +16,7 @@ class Version20131125000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
         $table->addColumn('id', 'bigint', array('autoincrement' => true));
         $table->addColumn('type', 'string', array('length' => 255));
         $table->addColumn('title', 'string', array('length' => 255));
-        $table->addColumn('text', 'text', array('notNull' => false));
+        $table->addColumn('text', 'text');
         $table->addColumn('application_id', 'bigint', array(
             'precision' => 10,
             'notNull' => false,
