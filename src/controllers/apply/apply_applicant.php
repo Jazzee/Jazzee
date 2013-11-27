@@ -89,7 +89,7 @@ class ApplyApplicantController extends \Jazzee\ApplyController
     }
     $this->setVar('form', $form);
     if ($this->_config->getLoginMessage()) {
-      $this->addMessage('info', $this->_config->getLoginMessage());
+      $this->addMessage('error', $this->_config->getLoginMessage());
     }
   }
 
@@ -289,6 +289,9 @@ class ApplyApplicantController extends \Jazzee\ApplyController
       $this->redirectApplyFirstPage();
     }
     $this->setVar('form', $form);
+    if ($this->_config->getLoginMessage()) {
+      $this->addMessage('error', $this->_config->getLoginMessage());
+    }
   }
 
   public function actionLogout()
