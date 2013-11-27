@@ -19,6 +19,9 @@ class AdminWelcomeController extends \Jazzee\AdminController
    */
   public function actionIndex()
   {
+    if ($this->_config->getLoginMessage()) {
+        $this->addMessage('error', $this->_config->getLoginMessage());
+    }
     if ($this->_user) {
       $this->setVar('user', $this->_user);
     }
