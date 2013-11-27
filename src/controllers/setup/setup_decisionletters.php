@@ -68,7 +68,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController
             if($template->getType() == \Jazzee\Entity\Template::DECISION_DENY){
                 $field->setInstructions('These tokens will be replaced in the text: _Deny_Date_, _Applicant_Name_');
             }
-            $element = $field->newElement('Textinput', 'title');
+            $element = $field->newElement('TextInput', 'title');
             $element->setLabel('Title');
             $element->setValue($template->getTitle());
             $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
