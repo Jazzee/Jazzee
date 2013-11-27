@@ -86,6 +86,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController
         $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
       }
     }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Submit');
     if ($input = $form->processInput($this->post)) {
@@ -126,6 +127,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController
         $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
       }
     }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Submit');
     if ($input = $form->processInput($this->post)) {
@@ -166,6 +168,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController
         $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
       }
     }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $element = $field->newElement('DateInput', 'offerResponseDeadline');
     $element->setLabel('Offer Response Deadline');
@@ -244,6 +247,8 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController
         $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
       }
     }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
+    
     $element = $field->newElement('SelectList', 'decisionTemplate');
     $element->setLabel('Decision Template');
     $templates = array();
@@ -315,6 +320,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController
         $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
       }
     }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Submit');
     if ($input = $form->processInput($this->post)) {
@@ -355,6 +361,7 @@ class ApplicantsDecisionsController extends \Jazzee\AdminController
         $element->newItem($applicant->getId(), $applicant->getLastName() . ', ' . $applicant->getFirstName());
       }
     }
+    $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
 
     $form->newButton('submit', 'Submit');
     if ($input = $form->processInput($this->post)) {
