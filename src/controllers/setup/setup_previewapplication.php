@@ -166,8 +166,6 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
       'contactName',
       'contactEmail',
       'welcome',
-      'admitLetter',
-      'denyLetter',
       'statusIncompleteText',
       'statusNoDecisionText',
       'statusAdmitText',
@@ -253,6 +251,14 @@ class SetupPreviewapplicationController extends \Jazzee\AdminController
     $user->setDefaultCycle($cycle);
     $user->setDefaultProgram($program);
     $em->persist($user);
+    
+    foreach ($this->_em->getRepository('\Jazzee\Entity\Template')->findByApplication($this->_application) as $template) {
+      $newTemplate = new \Jazzee\Entity\Template($template->getType());
+      $newTemplate->setApplication($newApplication);
+      $newTemplate->setText($template->getText());
+      $newTemplate->setTitle($template->getTitle());
+      $em->persist($newTemplate);
+    }
 
     $em->flush();
     return $newApplication;
