@@ -17,30 +17,17 @@ JazzeeElementDate.prototype.avatar = function(){
 JazzeeElementDate.prototype.gridData = function(data, type, full){
   var dates = [];
   $.each(data, function(){
-    //we extract just the date FF was picky about the datestring format
-    var dateString = this.values[0].value.substr(0,10);
-    dates.push(new Date(dateString));
+    dates.push(moment(this.values[0].value).format('L'));
   });
-  if(dates.length == 0){
+  if(dates.length === 0){
     return '';
   }
-  if(type == 'sort'){
-    return dates[0].getTime();
+  if(dates.length === 1){
+    return dates[0];
   }
-  if(type == 'display'){
-    if(dates.length == 1){
-      return dates[0].toLocaleDateString();
-    }
-    var ol = $('<ol>');
-    $.each(dates, function(){
-      ol.append($('<li>').html(this.toLocaleDateString()));
-    });
-    return ol.clone().wrap('<p>').parent().html();
-  }
-  var values = [];
+  var ol = $('<ol>');
   $.each(dates, function(){
-    values.push(this.toLocaleDateString());
+    ol.append($('<li>').html(this));
   });
-  //forsorting and filtering return the raw data
-  return values.join(' ');
+  return ol.clone().wrap('<p>').parent().html();
 };
