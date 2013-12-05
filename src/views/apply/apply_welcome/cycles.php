@@ -34,13 +34,17 @@ $dateFormat = 'm/d/Y';
             } else {
               echo $application->getCycle()->getName() . ' Application <strong>(Closed)</strong>';
             }
-            echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
+            if($application->getBegin()) {
+              echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
+            }
             echo '<br />Application Available: ' . $application->getOpen()->format($dateFormat);
             echo ' - ' . $application->getClose()->format($dateFormat);
           }
         } else {
           echo $application->getCycle()->getName() . ' Application <strong>(Closed)</strong>';
-          echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
+          if($application->getBegin()) {
+            echo '<br />Classes Begin: ' . $application->getBegin()->format($dateFormat);
+          }
           echo '<br />Application Available: ';
           if ($application->getOpen() AND $application->getClose()) {
             echo $application->getOpen()->format($dateFormat) . ' &#45; ' . $application->getClose()->format($dateFormat);
