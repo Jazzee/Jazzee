@@ -28,6 +28,9 @@ class Decision
   private $applicant;
 
   /** @Column(type="datetime", nullable=true) */
+  private $lockedAt;
+
+  /** @Column(type="datetime", nullable=true) */
   private $nominateAdmit;
 
   /** @Column(type="datetime", nullable=true) */
@@ -92,6 +95,33 @@ class Decision
     $dateString = empty($dateString) ? 'now' : $dateString;
 
     return new \DateTime($dateString);
+  }
+
+  /**
+   * Set the time stamp for lock
+   * @param string $dateString
+   */
+  public function setLockedAt($dateString = null)
+  {
+    $this->lockedAt = $this->decisionStamp($dateString);
+  }
+
+  /**
+   * Set the time stamp for lock
+   * @param string $dateString
+   */
+  public function removeLockedAt($dateString = null)
+  {
+    $this->lockedAt = null;
+  }
+
+  /**
+   * Get the time stamp for lock
+   * @return DateTime
+   */
+  public function getLockedAt()
+  {
+      return $this->lockedAt;
   }
 
   /**
@@ -418,15 +448,15 @@ class Decision
    * @param string $format optionally provide a format to convert status times to
    * @return array
    */
-  public function summary($format = null)
+  public function summary($format = null )
   {
     $decisions = array(
+      'lockedAt' => $this->lockedAt,
       'nominateAdmit' => $this->nominateAdmit,
       'nominateDeny' => $this->nominateDeny,
       'finalAdmit' => $this->finalAdmit,
       'finalDeny' => $this->finalDeny,
-      'decisionLetterSent' => $this->decisionLetterSent,
-      'decisionLetterViewed' => $this->decisionLetterViewed,
+      'decisionLetterViewed' => $this->decisionViewed,
       'acceptOffer' => $this->acceptOffer,
       'declineOffer' => $this->declineOffer,
     );
@@ -437,6 +467,37 @@ class Decision
         }
       }
     }
+
+    return $decisions;
+  }
+
+  /**
+   * get decision summaray with nice titles
+   *
+   * and array with each decision status
+   * @param string $format optionally provide a format to convert status times to
+   * @return array
+   */
+  public function dateSummary($format = 'c' )
+  {
+    $decisions = array(
+      'Last Locked' => $this->lockedAt,
+      'Nominate Admit' => $this->nominateAdmit,
+      'Nominate Deny' => $this->nominateDeny,
+      'Admitted' => $this->finalAdmit,
+      'Denied' => $this->finalDeny,
+      'Decision Viewed' => $this->decisionViewed,
+      'Accpeted' => $this->acceptOffer,
+      'Declined' => $this->declineOffer,
+    );
+    foreach ($decisions as $key => $value) {
+      if ($value) {
+        $decisions[$key] = $value->format($format);
+      } else {
+          unset($decisions[$key]);
+      }
+    }
+    
 
     return $decisions;
   }

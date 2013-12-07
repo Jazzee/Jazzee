@@ -331,12 +331,17 @@ Applicant.prototype.refreshDecisions = function(json){
     }
   } else {$('#decisions').html('Status: Not Complete<br />');}
   if(json.allowUnlock && json.isLocked){
-    var a = $('<a>').attr('href', this.baseUrl + '/unlock').addClass('action').html('Unlock Application <br />');
+    var a = $('<a>').attr('href', this.baseUrl + '/unlock').addClass('action').html('Unlock Application');
     $('#decisions').append(a);
   }
   if(json.allowLock && !json.isLocked){
     var a = $('<a>').attr('href', this.baseUrl + '/lock').addClass('action').html('Lock Application <br />');
     $('#decisions').append(a);
+  }
+  if(json.isLocked){
+    $(json.dateSummary).each(function(){
+        $('#decisions').append('<br />' + this.title + ' Date: ' + this.date);
+    });
   }
   this.parseDecisions();
 };

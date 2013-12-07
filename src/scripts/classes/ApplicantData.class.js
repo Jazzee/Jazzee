@@ -172,3 +172,10 @@ ApplicantData.prototype.getAnswersFromAnswerForElement = function(answer, elemen
 
   return answers;
 };
+
+ApplicantData.prototype.getDecisionDate = function(decisionName){
+    if(this["decision"] && this.decision[decisionName]){
+      return this.decision[decisionName];
+    }
+    return null;
+};

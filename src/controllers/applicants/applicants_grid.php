@@ -160,6 +160,10 @@ class ApplicantsGridController extends \Jazzee\AdminController
                     case 'isLocked':
                         $arr['isLocked'] = $applicant['isLocked']? 'yes':'no';
                         break;
+                     case 'lockedAt':
+                        $arr[$displayElement->getName()] = $applicant['decision']? 
+                          (is_null($applicant['decision']['lockedAt']) ? '' : $applicant['decision']['lockedAt']->format('c')):'';
+                        break;
                     case 'hasPaid':
                         $arr['hasPaid'] = $applicant['hasPaid']? 'yes':'no';
                         break;
