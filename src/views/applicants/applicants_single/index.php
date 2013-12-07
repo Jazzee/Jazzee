@@ -145,6 +145,10 @@
               if ($this->controller->checkIsAllowed('applicants_single', 'unlock')) {?>
                 <a class='action' href="<?php print $this->path("applicants/single/{$applicant->getId()}/unlock"); ?>">Unlock Application</a>
             <?php
+              $summary = $applicant->getDecision()->dateSummary();
+              foreach($summary as $name => $value){?>
+                <br /><?php print $name; ?>: <?php print $value;      
+              }
               }
             } else if ($this->controller->checkIsAllowed('applicants_single', 'lock')) {
               ?>

@@ -192,6 +192,10 @@ class ApplicantsSingleController extends \Jazzee\AdminController
     $decisions['allowUnlock'] = $this->checkIsAllowed($this->controllerName, 'unlock');
     $decisions['allowLock'] = $this->checkIsAllowed($this->controllerName, 'lock');
     $decisions['isLocked'] = $applicant->isLocked();
+    $decisions['dateSummary'] = array();
+    foreach($applicant->getDecision()->dateSummary() as $title => $date){
+        $decisions['dateSummary'][] = array('title' => $title, 'date' => $date);
+    }
 
     return $decisions;
   }
