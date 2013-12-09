@@ -264,4 +264,18 @@ class JazzeeController extends PageController
     return $this->_previewMode;
   }
 
+  /**
+   * Override the basic absolute path controller to add preview functionality
+   * @param string $path
+   * @return string
+   */
+  public function absolutePath($path)
+  {
+    if($this->isPreviewMode()){
+      $previewStore = $this->_session->getStore('preview', 3600);
+      $path = 'preview/link/' . $previewStore->get('previewkey') . '/' . $path;
+    }
+    return parent::absolutePath($path);
+  }
+
 }

@@ -16,36 +16,62 @@ class PreviewController extends \Jazzee\Controller
    */
   public function actionStart($key)
   {
-    $path = $this->_config->getVarPath() . '/tmp/' . $key . '.previewdb.db';
-    if(!is_writable($path)){
-      throw new \Jazzee\Exception("Preview database at {$path} does not exist.", E_USER_ERROR, 'This application preview no longer exists.');
-    }
-
+    $path = $this->setupPreview($key);
     $doctrineConfig = $this->_em->getConfiguration();
     $connectionParams = array(
       'driver' => 'pdo_sqlite',
       'path' => $path
     );
     $em = \Doctrine\ORM\EntityManager::create($connectionParams, $doctrineConfig);
-
     $program = $em->getRepository('\Jazzee\Entity\Program')->findOneBy(array());
     $cycle = $em->getRepository('\Jazzee\Entity\Cycle')->findOneBy(array());
-
-    $store = $this->_session->getStore('preview', 3600);
-    $store->set('previewdbpath', $path);
-
     $this->redirectPath('apply/' . $program->getShortName() . '/' . $cycle->getName());
+  }
+
+  /**
+   * Put a user into preview mode
+   * @param string $key
+   * @throws \Jazzee\Exception
+   */
+  public function actionLink($key, $path)
+  {
+    //turn off preview mode so we get the correct link
+    $this->_previewMode = false;
+    $absolutePath = $this->absolutePath($path);
+    $this->setupPreview($key);
+    $this->redirectUrl($absolutePath);
   }
 
   public function actionEnd(){
     $store = $this->_session->getStore('preview', 3600);
     $store->remove('previewdbpath');
+    $store->remove('previewkey');
+    $this->_previewMode = false;
     //clear all the messages
     $this->getMessages();
     $this->addMessage('success', 'Your preview session has ended.');
     $store = $this->_session->getStore(\Jazzee\AdminController::SESSION_STORE_NAME, 1);
     $store->expire();
     $this->redirectPath('admin/login');
+  }
+
+  /**
+   * Setup the preview session
+   * @param string $key
+   * @throws \Jazzee\Exception
+   * @return string
+   */
+  protected function setupPreview($key)
+  {
+    $path = $this->_config->getVarPath() . '/tmp/' . $key . '.previewdb.db';
+    if(!is_writable($path)){
+      throw new \Jazzee\Exception("Preview database at {$path} does not exist.", E_USER_ERROR, 'This application preview no longer exists.');
+    }
+    $store = $this->_session->getStore('preview', 3600);
+    $store->set('previewdbpath', $path);
+    $store->set('previewkey', $key);
+
+    return $path;
   }
 
 }
