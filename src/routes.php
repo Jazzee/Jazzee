@@ -102,12 +102,28 @@ $basicRouter->addRoute('#^lor/([^/]+)$#i', array(
   )
 ));
 
-//preview requests
-$basicRouter->addRoute('#^preview/(start|end)/?([a-z0-9-]+)?$#i', array(
+//preview start
+$basicRouter->addRoute('#^preview/start/([a-z0-9-]+)$#i', array(
   'controller' => 'preview',
-  'action' => 1,
+  'action' => 'start',
   'action_params' => array(
-    'key' => 2
+    'key' => 1
+  )
+));
+
+//preview end
+$basicRouter->addRoute('#^preview/end$#i', array(
+  'controller' => 'preview',
+  'action' => 'end'
+));
+
+//preview link
+$basicRouter->addRoute('#^preview/link/([a-z0-9-]+)/(.*)$#i', array(
+  'controller' => 'preview',
+  'action' => 'link',
+  'action_params' => array(
+    'key' => 1,
+    'redirect' => 2
   )
 ));
 
