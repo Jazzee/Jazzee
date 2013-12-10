@@ -9,6 +9,8 @@ function DisplayChooser(displayTypeName){
   $('#widgets').append(this.div);
   this.preferenceName = 'currentDisplay' + displayTypeName;
   
+  this.displayNames = {};
+  
   //Bind functions to changes in the display
   this.callbacks = $.Callbacks();
 
@@ -33,6 +35,7 @@ DisplayChooser.prototype.dropdown = function(){
   var displays = this.services.getDisplays();  
   var dropdown = $('<select>').attr('id', 'displayChooserSelect');
   $.each(displays, function(){
+    self.displayNames[this.getName()] = this.getId();
     dropdown.append($('<option>').html(this.getName()).attr('value', this.getId()).data('display', this));
   });
   dropdown.bind('change', function(e){
@@ -98,6 +101,7 @@ DisplayChooser.prototype.editLink = function(){
             //use a setTimeout here to take this out of the document flow so the overlay gets built and displayed first
             setTimeout(function(){
               var displayManager = new DisplayManager(self.getCurrentDisplay(), self.services.getCurrentApplication());
+              displayManagerDiv.data('displayManager', displayManager);
               displayManager.init($('#displaymanagercontainer'));
               $('#displaymanagercontainer').dialog('open');
             }, 1); 
@@ -109,10 +113,16 @@ DisplayChooser.prototype.editLink = function(){
             {
               text: "Save", click: function() { 
                 var display = self.getCurrentDisplay();
-                DisplayManager.save(self.services.getControllerPath('admin_managedisplays'),display);
-                $('#displayChooserSelect').replaceWith(self.dropdown());
-                $(this).dialog("destroy").remove();
-                self.chooseDisplay(display.getId());
+                if(display.getName() === ''){
+                    displayManagerDiv.data('displayManager').highlightName('Display Name is required');
+                } else if(self.displayNames.hasOwnProperty(display.getName()) && self.displayNames[display.getName()] !== display.getId()){
+                    displayManagerDiv.data('displayManager').highlightName('You have already used this name, display names must be unique');
+                } else {
+                    DisplayManager.save(self.services.getControllerPath('admin_managedisplays'),display);
+                    $('#displayChooserSelect').replaceWith(self.dropdown());
+                    $(this).dialog("destroy").remove();
+                    self.chooseDisplay(display.getId());
+                }
             }},
             {
               text: "Delete Display", click: function() { 
@@ -164,6 +174,7 @@ DisplayChooser.prototype.newLink = function(){
     $.get(self.services.getControllerPath('admin_managedisplays') + '/new', function(json){
       self.init();
       self.chooseDisplay(json.data.result);
+      self.getCurrentDisplay().setName('');
       $('a', self.div).first().click();
     });
     return false;

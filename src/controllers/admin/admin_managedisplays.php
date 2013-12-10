@@ -26,7 +26,7 @@ class AdminManagedisplaysController extends \Jazzee\AdminController
   public function actionNew()
   {
     $display = new \Jazzee\Entity\Display('user');
-    $display->setName('New');
+    $display->setName('New ' . date('c'));
     $display->setUser($this->_user);
     $display->setApplication($this->_application);
     $this->_em->persist($display);
