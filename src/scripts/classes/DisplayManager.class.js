@@ -8,6 +8,7 @@ function DisplayManager(display, application){
   this.display = display;
   this.application = application;
   this.services = new Services();
+  this.canvas = null;
 };
 
 /**
@@ -17,11 +18,15 @@ function DisplayManager(display, application){
  */
 DisplayManager.prototype.init = function(canvas){
   var self = this;
+  this.canvas = canvas;
   var name = $('<div>').css('text-align', 'left');
   name.append($('<label>').attr('for', 'display-name').html('Display Name: '));
-  name.append($('<input>').attr('id', 'display-name').val(this.display.getName()).bind('change', function(){
+  name.append($('<input>').attr('id', 'display-name').val(this.display.getName()).bind('focus, change', function(){
     self.display.setName($(this).val());
+    $(this).removeClass('highlight');
+    $('p', $(this).closest('div')).html('');
   }));
+  name.append($('p').addClass('error'));
   canvas.append(name);
   var button = $('<button>').html('Select All').button();
   button.click(function(e){
@@ -313,18 +318,31 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
 };
 
 /**
+ * Highlight the display name field
+ * Optionally add an error message
+ * 
+ * @param errorMessage string
+ */
+DisplayManager.prototype.highlightName = function(errorMessage){
+    var input = $('#display-name', this.canvas);
+    input.addClass('highlight');
+    $('p', input.closest('div')).html(errorMessage);
+    this.canvas.scrollTop(0);
+};
+
+/**
  * Save the display
  * 
  * @param url string
  * @param display Display
  */
 DisplayManager.save = function(url, display){
-  $.ajax({
-    url: url + '/saveDisplay',
-    type: 'POST',
-    data: {display: $.toJSON(display.getObj())},
-    async: false
-  });
+    $.ajax({
+      url: url + '/saveDisplay',
+      type: 'POST',
+      data: {display: $.toJSON(display.getObj())},
+      async: false
+    });
 };
 
 /**
