@@ -21,7 +21,7 @@ DisplayManager.prototype.init = function(canvas){
   this.canvas = canvas;
   var name = $('<div>').css('text-align', 'left');
   name.append($('<label>').attr('for', 'display-name').html('Display Name: '));
-  name.append($('<input>').attr('id', 'display-name').val(this.display.getName()).bind('focus, change', function(){
+  name.append($('<input>').attr('id', 'display-name').val(this.display.getName()).bind('focus change keypress input', function(){
     self.display.setName($(this).val());
     $(this).removeClass('highlight');
     $('p', $(this).closest('div')).html('');
