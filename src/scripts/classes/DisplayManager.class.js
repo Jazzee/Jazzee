@@ -24,9 +24,8 @@ DisplayManager.prototype.init = function(canvas){
   name.append($('<input>').attr('id', 'display-name').val(this.display.getName()).bind('focus change keypress input', function(){
     self.display.setName($(this).val());
     $(this).removeClass('highlight');
-    $('#display-name-message').empty();
+    $('p.error', $(this).closest('div')).remove();
   }));
-  name.append($('p').attr('id', 'display-name-message').addClass('error'));
   canvas.append(name);
   var button = $('<button>').html('Select All').button();
   button.click(function(e){
@@ -326,7 +325,8 @@ DisplayManager.prototype.tagBox = function(maximumDisplay){
 DisplayManager.prototype.highlightName = function(errorMessage){
     var input = $('#display-name', this.canvas);
     input.addClass('highlight');
-    $('#display-name-message').html(errorMessage);
+    var p = $('<p>').addClass('error').html(errorMessage);
+    input.closest('div').append(p);
     this.canvas.scrollTop(0);
 };
 
