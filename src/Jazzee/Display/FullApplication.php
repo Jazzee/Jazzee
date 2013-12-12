@@ -32,6 +32,7 @@ class FullApplication implements \Jazzee\Interfaces\Display
       'lastLogin' => 'Last Login',
       'percentComplete' => 'Progress',
       'isLocked' => 'Locked',
+      'lockedAt' => 'Last Locked',
       'hasPaid' => 'Paid',
       'externalId' => 'External ID',
       'attachments' => 'Attachments',

@@ -311,6 +311,7 @@ class Applicant
       $this->decision = new Decision();
       $this->decision->setApplicant($this);
     }
+    $this->decision->setLockedAt();
   }
 
   /**
@@ -319,6 +320,7 @@ class Applicant
   public function unLock()
   {
     $this->isLocked = false;
+    $this->decision->removeLockedAt();
   }
 
   /**

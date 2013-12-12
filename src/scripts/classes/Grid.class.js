@@ -138,6 +138,12 @@ Grid.prototype.getColumns = function(){
         if(this.name == 'isLocked' || this.name == 'hasPaid'){
           column.mRender = Grid.formatCheckmark;
         }
+        if(this.name == 'lockedAt'){
+          column.mData = function(obj, type, set){
+            return obj.getDecisionDate('lockedAt');
+          };
+          column.mRender = Grid.formatDate;
+        }
         if(this.name == 'attachments'){
           column.mRender = Grid.formatAttachments;
         }
