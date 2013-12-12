@@ -157,7 +157,7 @@ DisplayManager.prototype.applicantBox = function(maximumDisplay){
     {type:'applicant', title: 'Last Login', name: 'lastLogin'},
     {type:'applicant', title: 'Account Created', name: 'createdAt'},
     {type:'applicant', title: 'Locked', name: 'isLocked'},
-    {type:'applicant', title: 'Last Locked', name: 'lockedAt'},
+    {type:'applicant', title: 'Last Locked Date', name: 'lockedAt'},
     {type:'applicant', title: 'Paid', name: 'hasPaid'},
     {type:'applicant', title: 'External ID', name: 'externalId'},
     {type:'applicant', title: 'Attachments', name: 'attachments'},
