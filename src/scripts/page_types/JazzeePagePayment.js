@@ -177,3 +177,50 @@ JazzeePagePayment.prototype.newPaymentAmountButton = function(){
   });
   return button;
 };
+
+/**
+ * List all a pages elements
+ */
+JazzeePagePayment.prototype.listDisplayElements = function(){
+  var elements = [];
+  var self = this;
+  elements.push({name: 'paymentAmount', type: 'page', title: this.title + ' Amount', pageId: this.id, sType: 'numeric'});
+  elements.push({name: 'paymentStatus', type: 'page', title: this.title + ' Status', pageId: this.id});
+
+  return elements;
+};
+
+/**
+ * Dispaly applicant data in a grid
+ */
+JazzeePagePayment.prototype.gridData = function(data, type, full){
+  var values = [];
+  var answers = data.applicant.getAnswersForPage(this.id);
+  switch(data.displayElement.name){
+    case 'paymentAmount':
+      $(answers).each(function(){
+        values.push(this.payment.amount);
+      });
+    break;
+    case 'paymentStatus':
+      $(answers).each(function(){
+        values.push(this.payment.status);
+      });
+    break;
+  }
+  if(values.length == 0){
+    return '';
+  }
+  if(values.length == 1){
+    return values[0];
+  }
+  if(type == 'display'){
+    var ol = $('<ol>');
+    $.each(values, function(){
+      ol.append($('<li>').html(this.toString()));
+    });
+    return ol.clone().wrap('<p>').parent().html();
+  }
+  //forsorting and filtering return the raw data
+  return values.join(' ');
+};

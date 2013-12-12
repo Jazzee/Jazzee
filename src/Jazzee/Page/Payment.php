@@ -238,6 +238,21 @@ class Payment extends AbstractPage
     //if none of the payments are pending or settled we are incomplete
     return self::INCOMPLETE;
   }
+  
+  /**
+   * LIst payment page elements
+   * 
+   * @return array
+   */
+  public function listDisplayElements()
+  {
+    $elements = array();
+    $weight = 0;
+    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Amount', $weight++, 'paymentAmount', $this->_applicationPage->getPage()->getId());
+    $elements[] = new \Jazzee\Display\Element('page', $this->_applicationPage->getTitle() . ' Status', $weight++, 'paymentStatus', $this->_applicationPage->getPage()->getId());
+
+    return $elements;
+  }
 
   public static function applyPageElement()
   {
