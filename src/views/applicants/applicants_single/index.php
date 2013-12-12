@@ -147,7 +147,7 @@
             <?php
               $summary = $applicant->getDecision()->dateSummary();
               foreach($summary as $name => $value){?>
-                <br /><?php print $name; ?>: <?php print $value;      
+                <br /><?php print $name; ?> Date: <?php print $value;      
               }
               }
             } else if ($this->controller->checkIsAllowed('applicants_single', 'lock')) {

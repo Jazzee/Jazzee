@@ -340,7 +340,7 @@ Applicant.prototype.refreshDecisions = function(json){
   }
   if(json.isLocked){
     $(json.dateSummary).each(function(){
-        $('#decisions').append('<br />' + this.title + ': ' + this.date);
+        $('#decisions').append('<br />' + this.title + ' Date: ' + this.date);
     });
   }
   this.parseDecisions();

@@ -481,14 +481,14 @@ class Decision
   public function dateSummary($format = 'c' )
   {
     $decisions = array(
-      'Locked' => $this->lockedAt,
-      'Nominated for Admission' => $this->nominateAdmit,
-      'Nominated for Denial' => $this->nominateDeny,
-      'Final Admission' => $this->finalAdmit,
-      'Final Denial' => $this->finalDeny,
+      'Last Locked' => $this->lockedAt,
+      'Nominate Admit' => $this->nominateAdmit,
+      'Nominate Deny' => $this->nominateDeny,
+      'Admitted' => $this->finalAdmit,
+      'Denied' => $this->finalDeny,
       'Decision Viewed' => $this->decisionViewed,
-      'Offer Accpeted' => $this->acceptOffer,
-      'Offer Declined' => $this->declineOffer,
+      'Accpeted' => $this->acceptOffer,
+      'Declined' => $this->declineOffer,
     );
     foreach ($decisions as $key => $value) {
       if ($value) {
