@@ -97,34 +97,43 @@ DisplayManager.prototype.drawChosen = function(){
   var div = $('<div>');
   $.each(this.display.listElements(),function(){
     var displayElement = this;
-    var ol = $('<ol>');
-    var sourceName = displayElement.type == 'applicant'?'Applicant':self.display.getElementPageTitle(displayElement) + ' Page';
-    ol.append($('<li>').html('<strong>Source:</strong> ' + sourceName).addClass('item'));
-    ol.append($('<li>').html('<strong>Original Name:</strong> ' + $('#'+ this.type + this.name).data('element').title).addClass('item'));
-    var elementDiv = self.shrinkButton(displayElement.title, ol);
-    elementDiv.addClass('element');
-    elementDiv.data('element', displayElement);
-    $('.shrink_button', elementDiv).prepend($('<span>').addClass('left').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
-    
-    $('.shrink_button p', elementDiv).append($('<span>').addClass('right ui-icon ui-icon-pencil'));
-     $('.shrink_button p', elementDiv).editable(function(value, settings) {
-        displayElement.title = value;
-     },
-     {
-       displayElement: displayElement,
-       data: displayElement.title,
-       callback: function(value, setting){
-         self.drawChosen();
-       }
-    });
-    var removeSpan = $('<span>').addClass('right').addClass('ui-icon ui-icon-circle-minus');
-    removeSpan.on('click', function(){
-      self.display.removeElement($(this).closest('.shrinkable').data('element'));
-      self.drawChosen();
-      self.refreshDisplayedChooserElements();
-    });
-    $('.shrink_button', elementDiv).append(removeSpan);
-    div.append(elementDiv);
+    //if an element is removed from the application or a tag is no longer present it won't be possible to find the
+    //base element and it should be removed from this display.
+    if($('#'+ displayElement.type + displayElement.name).data('element')){
+        var ol = $('<ol>');
+        var sourceName = displayElement.type === 'applicant'?'Applicant':self.display.getElementPageTitle(displayElement) + ' Page';
+        ol.append($('<li>').html('<strong>Source:</strong> ' + sourceName).addClass('item'));
+        ol.append(
+                $('<li>').html('<strong>Original Name:</strong> ' + 
+                $('#'+ displayElement.type + displayElement.name).data('element').title).addClass('item')
+        );
+        var elementDiv = self.shrinkButton(displayElement.title, ol);
+        elementDiv.addClass('element');
+        elementDiv.data('element', displayElement);
+        $('.shrink_button', elementDiv).prepend($('<span>').addClass('left').addClass('handle ui-icon ui-icon-arrowthick-2-n-s'));
+
+        $('.shrink_button p', elementDiv).append($('<span>').addClass('right ui-icon ui-icon-pencil'));
+         $('.shrink_button p', elementDiv).editable(function(value, settings) {
+            displayElement.title = value;
+         },
+         {
+           displayElement: displayElement,
+           data: displayElement.title,
+           callback: function(value, setting){
+             self.drawChosen();
+           }
+        });
+        var removeSpan = $('<span>').addClass('right').addClass('ui-icon ui-icon-circle-minus');
+        removeSpan.on('click', function(){
+          self.display.removeElement($(this).closest('.shrinkable').data('element'));
+          self.drawChosen();
+          self.refreshDisplayedChooserElements();
+        });
+        $('.shrink_button', elementDiv).append(removeSpan);
+        div.append(elementDiv);
+    } else {
+        self.display.removeElement(displayElement);
+    }
   });
   $('div.element',div).sort(function(a,b){
     return $(a).data('element').weight > $(b).data('element').weight ? 1 : -1;
