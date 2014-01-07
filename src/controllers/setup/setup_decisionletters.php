@@ -125,7 +125,7 @@ class SetupDecisionlettersController extends \Jazzee\AdminController
         $element->setValue(\Jazzee\Entity\Template::DECISION_ADMIT);
         $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
         
-        $element = $field->newElement('Textinput', 'title');
+        $element = $field->newElement('TextInput', 'title');
         $element->setLabel('Title');
         $element->addValidator(new \Foundation\Form\Validator\NotEmpty($element));
         $element->addFilter(new \Foundation\Form\Filter\SafeHTML($element));
