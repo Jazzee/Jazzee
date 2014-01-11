@@ -62,8 +62,6 @@ class SetupImportApplicationController extends \Jazzee\AdminController
       $this->_application->setOpen($arr['open']);
       $this->_application->setClose($arr['close']);
       $this->_application->setBegin($arr['begin']);
-      $this->_application->setAdmitLetter($arr['admitletter']);
-      $this->_application->setDenyLetter($arr['denyletter']);
       $this->_application->setStatusIncompleteText($arr['statusIncompleteText']);
       $this->_application->setStatusNoDecisionText($arr['statusNoDecisionText']);
       $this->_application->setStatusAdmitText($arr['statusAdmitText']);
@@ -80,6 +78,17 @@ class SetupImportApplicationController extends \Jazzee\AdminController
       }
       if(array_key_exists('externalIdValidationExpression', $arr) and !empty($arr['externalIdValidationExpression'])){
         $this->_application->setExternalIdValidationExpression($arr['externalIdValidationExpression']);
+      }
+      foreach ($xml->xpath('/response/application/preferences/templates/template') as $templates) {
+        $arr2 = array();
+        foreach ($templates[0]->children() as $element) {
+          $arr2[$element->getName()] = (string) $element;
+        }
+        $template = new \Jazzee\Entity\Template($arr2['type']);
+        $template->setApplication($this->_application);
+        $template->setTitle($arr2['title']);
+        $template->setText($arr2['text']);
+        $this->_em->persist($template);
       }
       foreach ($xml->xpath('/response/application/pages/page') as $element) {
         $attributes = $element->attributes();
