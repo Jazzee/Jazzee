@@ -52,8 +52,6 @@ class SetupCopyApplicationController extends \Jazzee\AdminController
       $this->_application->setOpen($previousApplication->getOpen()->format('c'));
       $this->_application->setClose($previousApplication->getClose()->format('c'));
       $this->_application->setBegin($previousApplication->getBegin()->format('c'));
-      $this->_application->setAdmitLetter($previousApplication->getAdmitletter());
-      $this->_application->setDenyLetter($previousApplication->getDenyletter());
       $this->_application->setStatusIncompleteText($previousApplication->getStatusIncompleteText());
       $this->_application->setStatusNoDecisionText($previousApplication->getStatusNoDecisionText());
       $this->_application->setStatusAdmitText($previousApplication->getStatusAdmitText());
@@ -86,6 +84,16 @@ class SetupCopyApplicationController extends \Jazzee\AdminController
         $applicationPage->setWeight($previousPage->getWeight());
         $this->_em->persist($applicationPage);
       }
+      $templates = $this->_em->getRepository('Jazzee\Entity\Template')->
+        findBy(array('application' => $previousApplication));
+      foreach($templates as $previousTemplate){
+        $template = new \Jazzee\Entity\Template($previousTemplate->getType());
+        $template->setApplication($this->_application);
+        $template->setTitle($previousTemplate->getTitle());
+        $template->setText($previousTemplate->getText());
+        $this->_em->persist($template);
+      }
+      
       $this->_em->persist($this->_application);
       $this->addMessage('success', 'Application copied successfully');
       unset($this->_store->AdminControllerGetNavigation);
