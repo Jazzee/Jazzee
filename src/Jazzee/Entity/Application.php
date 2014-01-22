@@ -730,8 +730,6 @@ class Application
       'contactName' => 'Contact Name',
       'contactEmail' => 'Contact Email',
       'welcome' => 'Welcome Message',
-      'admitLetter' => 'Admit Letter',
-      'denyLetter' => 'Deny Letter',
       'statusIncompleteText' => 'Incomplete Status Text',
       'statusNoDecisionText' => 'No Decision Status Text',
       'statusAdmitText' => 'Admitted Status Text',
