@@ -36,7 +36,7 @@ class Template
   /** @Column(type="string") */
   private $title;
 
-  /** @Column(type="text") */
+  /** @Column(type="text", nullable=true) */
   private $text;
   /**
    * @ManyToOne(targetEntity="Application")
