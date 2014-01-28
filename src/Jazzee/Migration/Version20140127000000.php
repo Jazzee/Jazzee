@@ -3,7 +3,7 @@
 namespace Jazzee\Migration;
 
 /**
- * Add lock stamp to decisions
+ * Make text in templates nullable
  */
 class Version20140127000000 extends \Doctrine\DBAL\Migrations\AbstractMigration
 {
